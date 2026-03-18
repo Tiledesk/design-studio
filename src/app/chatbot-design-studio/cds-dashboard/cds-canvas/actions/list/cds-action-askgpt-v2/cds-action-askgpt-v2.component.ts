@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionAskGPTV2 } from 'src/app/models/action-model';
@@ -34,7 +34,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   templateUrl: './cds-action-askgpt-v2.component.html',
   styleUrls: ['./cds-action-askgpt-v2.component.scss']
 })
-export class CdsActionAskgptV2Component implements OnInit {
+export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   private readonly DEFAULT_MAX_TOKENS = 10000;
 
   @Input() intentSelected: Intent;
@@ -173,6 +173,15 @@ export class CdsActionAskgptV2Component implements OnInit {
     }
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // When the action changes while the detail panel stays mounted,
+    // ensure the selected model + dependent UI constraints are updated.
+    if (changes['action'] && this.llm_models_flat?.length) {
+      const modelName = this.resolveModelNameFromAction();
+      this.setModel(modelName, { resetMaxTokens: false, resetTemperature: false });
+    }
+  }
+
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
       this.subscriptionChangedConnector.unsubscribe();
@@ -182,8 +191,33 @@ export class CdsActionAskgptV2Component implements OnInit {
   private async initialize(){
     await this.initLLMModels();
     this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action);
-    this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    this.setModel(this.resolveModelNameFromAction(), { resetMaxTokens: false, resetTemperature: false });
     
+  }
+
+  private resolveModelNameFromAction(): string {
+    // Prefer the explicit modelName when available (new format).
+    const explicitModelName = (this.action?.modelName ?? '').trim();
+    if (explicitModelName) {
+      return explicitModelName;
+    }
+
+    // Backward compatibility: some saved actions may have only `model` and/or `llm`.
+    const actionModel = (this.action?.model ?? '').trim();
+    if (actionModel && this.llm_models_flat?.length) {
+      const actionLlm = (this.action?.llm ?? '').trim().toLowerCase();
+      const match = this.llm_models_flat.find(m => {
+        const sameModel = (m?.model ?? '') === actionModel;
+        if (!sameModel) return false;
+        if (!actionLlm) return true;
+        return (m?.llm ?? '').toLowerCase() === actionLlm;
+      });
+      if (match?.modelName) {
+        return match.modelName;
+      }
+    }
+
+    return this.default_model?.name;
   }
 
 
@@ -201,7 +235,11 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
 
-  setModel(modelName: string){
+  setModel(
+    modelName: string,
+    options?: { resetMaxTokens?: boolean; resetTemperature?: boolean }
+  ) {
+    const { resetMaxTokens = true, resetTemperature = true } = options ?? {};
     const result = setModel(modelName, this.llm_models_flat, this.logger);
     this.llm_model_selected = result ?? ({} as LlmModel);
     this.logger.log("[ACTION ASKGPTV2] llm_model_selected: ", this.llm_model_selected);
@@ -216,15 +254,27 @@ export class CdsActionAskgptV2Component implements OnInit {
       const citationsMin = this.action?.citations ? 1024 : 0;
       this.ai_setting['max_tokens'].min = Math.max(modelMin, citationsMin);
 
-      // Every model change resets max_tokens to default (capped by model max)
       const min = this.ai_setting['max_tokens'].min;
       const max = this.ai_setting['max_tokens'].max;
-      let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
-      if (next < min) next = min;
-      this.action.max_tokens = next;
-      if (modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')) {
-        this.action.temperature = 1;
+
+      // Init/detail-panel open: keep the saved max_tokens, just clamp it into the model range.
+      // User-triggered model change: reset to default (capped by model max).
+      const currentMaxTokens = typeof this.action?.max_tokens === 'number' ? this.action.max_tokens : Number(this.action?.max_tokens);
+      if (resetMaxTokens || !Number.isFinite(currentMaxTokens)) {
+        let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+        if (next < min) next = min;
+        this.action.max_tokens = next;
+      } else {
+        this.action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
+      }
+
+      const isGpt5 = modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5');
+      if (isGpt5) {
         this.ai_setting['temperature'].disabled = true;
+        const currentTemp = typeof this.action?.temperature === 'number' ? this.action.temperature : Number(this.action?.temperature);
+        if (resetTemperature || !Number.isFinite(currentTemp)) {
+          this.action.temperature = 1;
+        }
       } else {
         this.ai_setting['temperature'].disabled = false;
       }
@@ -363,7 +413,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   onChangeSelect(event, target) {
     this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event", event);
     if (target === 'llm_model'){
-      this.setModel(event.modelName);
+      // User explicitly changed model from UI: apply model constraints and reset defaults.
+      this.setModel(event.modelName, { resetMaxTokens: true, resetTemperature: true });
     } 
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
