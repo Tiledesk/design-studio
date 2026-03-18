@@ -7,13 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.39.34
-- **bug-fix**: action blind trasfer not display voice commands
 
-# this branch 
+# 1.39.35
 - **bug-fix**: Removed "manage kb" from webhook detail panel
 - **bug-fix**: in action Ask KB shows the selected template's default value and max-token
 - **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
+
+# 1.39.34
+- **bug-fix**: action blind trasfer not display voice commands
 
 # 1.39.33
 - **Added**: Added the ability to insert tags into the KB ask action and the KB create action
