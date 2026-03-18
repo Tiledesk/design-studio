@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.39.33-rc5
+# 1.39.34-rc1
 - **bug-fix**: action blind trasfer not display voice commands
 
 # 1.39.33-rc4
