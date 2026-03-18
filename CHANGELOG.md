@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+# 1.39.34-rc2 
 - **bug-fix**: Removed "manage kb" from webhook detail panel
 - **bug-fix**: in action Ask KB shows the selected template's default value and max-token
 - **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
