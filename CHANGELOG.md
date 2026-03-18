@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.33-rc5
+- **bug-fix**: action blind trasfer not display voice commands
+
 # 1.39.33-rc4
 - **bug-fix**: renamed onClickControl to onActionControl in intent.component
 
