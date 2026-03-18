@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+# 1.39.34
+- **bug-fix**: action blind trasfer not display voice commands
 
 # 1.39.33
 - **Added**: Added the ability to insert tags into the KB ask action and the KB create action
