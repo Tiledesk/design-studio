@@ -10,6 +10,7 @@
 
 
 # this branch 
+- **bug-fix**: in action Ask KB shows the selected template's default value and max-token
 - **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
 
 # 1.39.32 
