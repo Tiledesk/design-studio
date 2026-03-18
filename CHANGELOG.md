@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+# 1.39.34
+- **bug-fix**: action blind trasfer not display voice commands
 
 # this branch 
 - **bug-fix**: Removed "manage kb" from webhook detail panel
