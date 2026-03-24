@@ -265,7 +265,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
 
   /**
    * Inizializza la select per gestire il connettore dell'intent.
-   * Carica la lista degli intent escludendo quello corrente, START e WEBHOOK.
+   * Carica la lista degli intent escludendo quello corrente.
    */
   private initializeConnectorSelect(): void {
     // Ottiene la lista di tutti gli intent

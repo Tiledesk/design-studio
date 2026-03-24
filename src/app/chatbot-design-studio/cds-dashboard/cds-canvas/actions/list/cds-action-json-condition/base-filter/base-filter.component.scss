@@ -1,22 +1,21 @@
-:host{
+:host {
     --icon-color: #{var(--blu)};
     --textColor: #{var(--blu)};
     --backGroundColor: #{var(--blu-light-04)};
     --hoverBackgroundColor: #{var(--blu-light-03)};
-
     --content-background: rgb(244, 246, 251, 0.4);
-    --border-radius-base: 8px
-
+    --border-radius-base: 8px;
 }
-.base-filter{
-    &:hover{
-        div.filter-remove{
+
+.base-filter {
+    &:hover {
+        div.filter-remove {
             opacity: 1;
             transition: opacity 0.3s ease 0s;
         }
     }
 }
-.content{
+.content {
     background-color: var(--content-background);
     border: 1px solid var(--gray-light-02);
     padding: 20px;
@@ -26,14 +25,14 @@
     gap: 10px;
 }
 
-.control-buttons{
+.control-buttons {
     height: 100%;
     left: -44px;
     position: absolute;
     top: 0px;
     width: 44px;
 
-    div.filter-remove{
+    div.filter-remove {
         position: absolute;
         right: -8px;
         top: -14px;
@@ -56,7 +55,7 @@
         font-size: 12px;
 
         span.material-icons,
-        span.material-icons-outlined{
+        span.material-icons-outlined {
             font-size: 20px;
             color: var(--backGroundColor);
         }
@@ -64,23 +63,20 @@
         &:hover{
             background-color: var(--textColor);
             span.material-icons,
-            span.material-icons-outlined{
+            span.material-icons-outlined {
                 color: var(--backGroundColor);
             }
         }
     }
 }
 
-.basic-filter-wrp{
-    // background: #fff;
-    // margin: 0 30px;
-    // padding: 20px 0px 0px;
+.basic-filter-wrp {
     grid-row-gap: 15px;
     border-radius: 4px;
     display: flex;
     justify-content: center;
 
-    .add-filter-button{
+    .add-filter-button {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -96,7 +92,6 @@
         font-size: 0.7em;
         font-weight: 400;
         line-height: var(--button-height-base);
-        // margin: 0px 5px 0;
         order: 1;
         padding: 0 10px;
         transition: all .3s;
@@ -105,7 +100,7 @@
         width: fit-content;
 
         
-        &:hover{
+        &:hover {
             border-color: var(--textColor);
             color: var(--textColor);
         }
@@ -115,7 +110,6 @@
 
 
 ::ng-deep .base-filter--add-filter-panel {
-    // position: relative;
     box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
     background: rgb(255,255,255);
     border-radius: 4px;
@@ -150,7 +144,7 @@
     }
 }
 
-.filter-condition{
+.filter-condition {
     -webkit-box-align: center;
     align-items: center;
     display: flex;
@@ -167,7 +161,7 @@
     &:hover{
         background: var(--hoverBackgroundColor);
         border-color: var(--textColor);
-        div.remove{
+        div.remove {
             opacity: 1;
         }
     }
@@ -187,7 +181,7 @@
         cursor: pointer;
         display: flex;
         justify-content: center;
-        background:white;
+        background: white;
         border-radius: 100%;
         transition: background-color 0.3s ease 0s;
         font-size: 12px;
@@ -214,7 +208,7 @@
     }
 }
 
-.ellips{
+.ellips {
     line-height: 20px;
     text-overflow: ellipsis;
     white-space: nowrap;

@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -147,6 +147,15 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     await this.initialize();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // When the action changes while the detail panel stays mounted,
+    if (changes['action'] && this.llm_models_flat?.length) {
+      const modelName = this.resolveModelNameFromAction();
+      this.setModel(modelName, { resetMaxTokens: false, resetTemperature: false });
+    }
+  }
+
+  // ensure the selected model + dependent UI constraints are updated.
   private ensureTags(): void {
     if (!Array.isArray(this.action.tags)) {
       this.action.tags = [];
@@ -170,15 +179,6 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     if (index !== -1) {
       this.action.tags.splice(index, 1);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // When the action changes while the detail panel stays mounted,
-    // ensure the selected model + dependent UI constraints are updated.
-    if (changes['action'] && this.llm_models_flat?.length) {
-      const modelName = this.resolveModelNameFromAction();
-      this.setModel(modelName, { resetMaxTokens: false, resetTemperature: false });
     }
   }
 

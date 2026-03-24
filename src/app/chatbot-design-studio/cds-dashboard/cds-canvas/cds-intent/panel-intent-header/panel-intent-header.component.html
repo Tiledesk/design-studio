@@ -1,5 +1,6 @@
-<div class="header" (click)="onSelectIntent($event)" [class.is-start]="isStart || isWebhook">
-
+<div class="header"
+     [class.is-start]="isStart || isWebhook"
+     (click)="onSelectIntent($event)">
     <div *ngIf="isStart" class="intent-icon">
         <span class="material-icons rocket">rocket_launch</span>
     </div>
@@ -10,26 +11,25 @@
         <span class="material-icons webhook">webhook</span>
     </div>
     <div *ngIf="intentName === RESERVED_INTENT_NAMES.CLOSE && intent.attributes.readonly" class="intent-icon">
-        <span class="material-icons call_end ">call_end</span>
+        <span class="material-icons call_end">call_end</span>
     </div>
 
-    <div class="form-group" 
-        [class.is-error]="!isNotErrorName"
-        [class.is-start]="isStart || isWebhook">
-        <input 
-            #inputIntentName type="text" 
-            class="input ellips form-control tds_draggable"
-            [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
-            [(ngModel)]="intentName"
-            [readonly]="intent.attributes?.readonly"
-            [placeholder]="'CDSCanvas.EnterIntentName' | translate"
-            (ngModelChange)="onChangeIntentName($event)"
-            (mouseup)="onMouseUpInput($event)" 
-            (dblclick)="doubleClickFunction($event)"
-            (blur)="onBlur($event)"
-            (keydown.enter)="onEnterButtonPressed($event)">
+    <div class="form-group"
+         [class.is-error]="!isNotErrorName"
+         [class.is-start]="isStart || isWebhook">
+        <input #inputIntentName
+               type="text"
+               class="input ellips form-control tds_draggable"
+               [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
+               [(ngModel)]="intentName"
+               [readonly]="intent.attributes?.readonly"
+               [placeholder]="'CDSCanvas.EnterIntentName' | translate"
+               (ngModelChange)="onChangeIntentName($event)"
+               (mouseup)="onMouseUpInput($event)"
+               (dblclick)="doubleClickFunction($event)"
+               (blur)="onBlur($event)"
+               (keydown.enter)="onEnterButtonPressed($event)">
         <div *ngIf="intentNameAlreadyExist" class="error---msg">{{ 'CDSCanvas.ErrorBlockName' | translate }}</div>
         <div *ngIf="!intentNameNOTHasSpecialCharacters" class="error---msg">{{ 'CDSCanvas.ErrorBlockCharacter' | translate }}</div>
-
-    </div> 
+    </div>
 </div>

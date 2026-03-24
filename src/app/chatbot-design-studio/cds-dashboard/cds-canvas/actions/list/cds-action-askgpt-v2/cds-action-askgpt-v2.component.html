@@ -317,6 +317,7 @@
                                 [step]="ai_setting['max_tokens'].step"  
                                 [min]="ai_setting['max_tokens'].min"
                                 [max]="ai_setting['max_tokens'].max"
+                                [disabled]="ai_setting['max_tokens'].disabled"
                                 [(ngModel)]="action.max_tokens"
                                 (change)="updateSliderValue($event.value, 'max_tokens')" 
                                 aria-label="units">
@@ -373,7 +374,8 @@
                                     [displayWith]="formatLabel" 
                                     [step]="ai_setting['search_type'].step"  
                                     [min]="ai_setting['search_type'].min"
-                                    [max]="ai_setting['search_type'].max" 
+                                    [max]="ai_setting['search_type'].max"
+                                    [disabled]="ai_setting['max_tokens'].disabled" 
                                     [(ngModel)]="action.alpha"
                                     (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
                                 </mat-slider>
@@ -464,6 +466,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="25" 
                         [text]="action.context" 
