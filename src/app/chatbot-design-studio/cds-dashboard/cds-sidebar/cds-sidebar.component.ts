@@ -55,6 +55,15 @@ export class CdsSidebarComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges){
   }
 
+  get hasRules(): boolean {
+    const rules = this.dashboardService.selectedChatbot?.attributes?.rules;
+    return Array.isArray(rules) && rules.length > 0;
+  }
+
+  get isRulesRouteActive(): boolean {
+    return this.router.url.includes('/rules');
+  }
+
 
   getUserRole(){
     this.projectService.getProjectUserByUserId(this.projectID, this.user.uid).pipe( takeUntil(this.unsubscribe$)).subscribe((projectUser: ProjectUser) => {

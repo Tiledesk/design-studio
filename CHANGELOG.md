@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# this branch 
+- **changed**: hide the "rules" button if there are no "rules" set
+
 # 1.39.35
 - **bug-fix**: Removed "manage kb" from webhook detail panel
 - **bug-fix**: in action Ask KB shows the selected template's default value and max-token
