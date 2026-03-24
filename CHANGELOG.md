@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch 
+# 1.39.36-rc1 
 - **changed**: hide the "rules" button if there are no "rules" set
 
 # 1.39.35
