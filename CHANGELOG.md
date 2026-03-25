@@ -7,8 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.36
 
-# 1.39.36-rc1 
+# 1.39.35-rc1 
 - **changed**: hide the "rules" button if there are no "rules" set
 - **changed**: updated AI models
 
