@@ -152,6 +152,15 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
 
 export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number, reasoning: boolean}> = [
   {
+    name: "Claude Sonnet 4.6",
+    value: "claude-sonnet-4-6",
+    description: "TYPE_GPT_MODEL.claude-sonnet-4-6.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 200000,
+    reasoning: true
+  },
+  {
     name: "Claude Opus 4.6",
     value: "claude-opus-4-6",
     description: "TYPE_GPT_MODEL.claude-opus-4-6.description",
@@ -214,20 +223,20 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     max_output_tokens: 200000,
     reasoning: true
   },
-  // {
-  //   name: "Claude-3.5 Sonnet",
-  //   value: "claude-3-5-sonnet-20240620",
-  //   description: "TYPE_GPT_MODEL.text-davinci-003.description",
-  //   status: "active",
-  //   min_tokens: 1,
-  //   max_output_tokens: 200000,
-  //   reasoning: false
-  // },
+  {
+    name: "Claude-3.5 Sonnet",
+    value: "claude-3-5-sonnet-20240620",
+    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    status: "inactive",
+    min_tokens: 1,
+    max_output_tokens: 200000,
+    reasoning: false
+  },
   {
     name: "Claude 3.5 Haiku",
     value: "claude-3-5-haiku-latest",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 200000,
     reasoning: false
@@ -236,7 +245,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     name: "Claude 3.7 Sonnet",
     value: "claude-3-7-sonnet-latest",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 200000,
     reasoning: true
@@ -398,15 +407,6 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     reasoning: false
   },
   {
-    name: "Llama Guard 4 – 12B Safety Model",
-    value: "meta-llama/llama-guard-4-12b",
-    description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "active",
-    min_tokens: 1,
-    max_output_tokens: 8192,
-    reasoning: false
-  },
-  {
     name: "DeepSeek R1 Distilled Llama 70B",
     value: "deepseek-r1-distill-llama-70b",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
@@ -416,10 +416,19 @@ export const GROQ_MODEL: Array<{ name: string, value: string, description:string
     reasoning: false
   },
   {
+    name: "Llama Guard 4 – 12B Safety Model",
+    value: "meta-llama/llama-guard-4-12b",
+    description: "TYPE_GPT_MODEL.text-davinci-003.description",
+    status: "inactive",
+    min_tokens: 1,
+    max_output_tokens: 8192,
+    reasoning: false
+  },
+  {
     name: "Llama 4 Maverick – 17B (128 Experts, Instruct)",
     value: "meta-llama/llama-4-maverick-17b-128e-instruct",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 32768,
     reasoning: false
@@ -499,6 +508,42 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
 ]
 
 export var OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number, reasoning: boolean}> = [
+  {
+    name: "Gpt-5.4 Nano",
+    value: "gpt-5.4-nano",
+    description: "TYPE_GPT_MODEL.gpt-5.4-nano.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000,
+    reasoning: true
+  },
+  {
+    name: "Gpt-5.4 Mini",
+    value: "gpt-5.4-mini",
+    description: "TYPE_GPT_MODEL.gpt-5.4-mini.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000,
+    reasoning: true
+  },
+  {
+    name: "Gpt-5.4",
+    value: "gpt-5.4",
+    description: "TYPE_GPT_MODEL.gpt-5.4.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000,
+    reasoning: true
+  },
+  {
+    name: "Gpt-5.3 Chat Latest",
+    value: "gpt-5.3-chat-latest",
+    description: "TYPE_GPT_MODEL.gpt-5.3-chat-latest.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000,
+    reasoning: true
+  },
   {
     name: "Gpt-5.2",
     value: "gpt-5.2",
