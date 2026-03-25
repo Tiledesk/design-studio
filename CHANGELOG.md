@@ -8,8 +8,9 @@
 *Tiledesk SRL*
 
 
-# this branch 
+# 1.39.36 
 - **changed**: hide the "rules" button if there are no "rules" set
+- **changed**: updated AI models
 
 # 1.39.35
 - **bug-fix**: Removed "manage kb" from webhook detail panel
