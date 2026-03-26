@@ -9,6 +9,7 @@
 
 
 # this branch 
+- **added**: added parameter to enable/disable rules management 
 - **changed**: hide the "rules" button if there are no "rules" set
 
 # 1.39.35
