@@ -32,6 +32,7 @@ export class CdsSidebarComponent implements OnInit {
   USER_ROLE: any;
   IS_OPEN: boolean = true;
   INFO_MENU_ITEMS = INFO_MENU_ITEMS;
+  showRulesButton: boolean = false;
   
   private unsubscribe$: Subject<any> = new Subject<any>();
   
@@ -50,18 +51,36 @@ export class CdsSidebarComponent implements OnInit {
     this.projectID = this.dashboardService.projectID;
     this.user = this.tiledeskAuthService.getCurrentUser()
     this.getUserRole();
+    this.updateRulesVisibility();
+    this.dashboardService.selectedChatbot$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.updateRulesVisibility());
+    this.dashboardService.project$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.updateRulesVisibility());
   }
 
   ngOnChanges(changes: SimpleChanges){
   }
 
-  get hasRules(): boolean {
-    const rules = this.dashboardService.selectedChatbot?.attributes?.rules;
-    return Array.isArray(rules) && rules.length > 0;
+  private updateRulesVisibility(): void {
+    const project: any = this.dashboardService.project;
+    const profileRulesEnabled = project?.profile?.customization?.rules === true;
+    this.logger.log('[CDS-SIDEBAR] - rules »»» ',  project?.profile?.customization)
+    const chatbot: any = this.dashboardService.selectedChatbot;
+    const rules = chatbot?.attributes?.rules;
+    const hasConfiguredRules = Array.isArray(rules) && rules.length > 0;
+
+    this.showRulesButton = profileRulesEnabled || hasConfiguredRules;
   }
 
   get isRulesRouteActive(): boolean {
     return this.router.url.includes('/rules');
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next(null);
+    this.unsubscribe$.complete();
   }
 
 
