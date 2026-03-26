@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+# 1.39.36-rc1
 - **added**: added parameter to enable/disable rules management 
 
 # 1.39.36
