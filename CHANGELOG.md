@@ -7,10 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
 # this branch 
 - **added**: added parameter to enable/disable rules management 
+
+# 1.39.36
+
+# 1.39.35-rc1 
 - **changed**: hide the "rules" button if there are no "rules" set
+- **changed**: updated AI models
 
 # 1.39.35
 # 1.39.34-rc2 
