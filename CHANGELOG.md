@@ -9,6 +9,11 @@
 
 
 # this branch 
+- **changed**: nella action "Flow log" ordinare nella select i tipi di errori con icon e colori
+- **changed**: eliminata la action "Chatgpt task" dall'elenco delle actions. Se già usata aggiungi il tag "deprecata"
+- **bug-fix**: modificato la possibilità di draggare una action fuori dal blocco intent
+- **bug-fix**: modifica css nelle actions che hanno AI Settings
+
 - **added**: added parameter to enable/disable rules management 
 - **changed**: hide the "rules" button if there are no "rules" set
 

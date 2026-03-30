@@ -241,26 +241,31 @@
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
                                 <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
-                                    {{ action?.modelName || llm_model_selected?.modelName }}
+                                    <span class="preview-badge-text">{{ action?.modelName || llm_model_selected?.modelName }}</span>
                                 </span>
                                 <span *ngIf="action?.max_tokens" class="preview-badge">
-                                    <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
+                                    <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon>
+                                    <span class="preview-badge-text">{{action.max_tokens | formatNumber}}</span>
                                 </span>
                                 <span *ngIf="action?.temperature !== undefined" class="preview-badge">
-                                    <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                                    <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon>
+                                    <span class="preview-badge-text">{{action.temperature | formatNumber}}</span>
                                 </span>
                                 
                                 <span *ngIf="action?.top_k !== undefined" class="preview-badge">
-                                    <mat-icon class="preview-icon" aria-label="chunk limit" title="chunk limit">view_list</mat-icon> {{action.top_k | formatNumber}}
+                                    <mat-icon class="preview-icon" aria-label="chunk limit" title="chunk limit">view_list</mat-icon>
+                                    <span class="preview-badge-text">{{action.top_k | formatNumber}}</span>
                                 </span>
 
                                 <span *ngIf="action?.context">system context: {{action.context}}</span>
                                 <span *ngIf="KB_HYBRID && action?.alpha !== undefined" class="preview-badge">
-                                    <mat-icon class="preview-icon" aria-label="search type" title="search type">manage_search</mat-icon> {{action.alpha | formatNumber}}
+                                    <mat-icon class="preview-icon" aria-label="search type" title="search type">manage_search</mat-icon>
+                                    <span class="preview-badge-text">{{action.alpha | formatNumber}}</span>
                                 </span>
                                 
                                 <span *ngIf="action?.reranking && action?.reranking_multiplier !== undefined" class="preview-badge">
-                                    <mat-icon class="preview-icon" aria-label="reranking multiplier" title="reranking multiplier">auto_graph</mat-icon> {{action.reranking_multiplier | formatNumber}}
+                                    <mat-icon class="preview-icon" aria-label="reranking multiplier" title="reranking multiplier">auto_graph</mat-icon>
+                                    <span class="preview-badge-text">{{action.reranking_multiplier | formatNumber}}</span>
                                 </span>
                                 
                                 <!-- Advanced/KB options preview (when panel is collapsed) -->

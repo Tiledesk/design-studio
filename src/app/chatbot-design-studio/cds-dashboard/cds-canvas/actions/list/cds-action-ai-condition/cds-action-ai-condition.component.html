@@ -167,13 +167,15 @@
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
                             <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
-                                {{ action?.modelName || llm_model_selected?.modelName }}
+                                <span class="preview-badge-text">{{ action?.modelName || llm_model_selected?.modelName }}</span>
                             </span>
                             <span *ngIf="action?.max_tokens" class="preview-badge">
-                                <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon> {{action.max_tokens | formatNumber}}
+                                <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon>
+                                <span class="preview-badge-text">{{action.max_tokens | formatNumber}}</span>
                             </span>
                             <span *ngIf="action?.temperature !== undefined" class="preview-badge">
-                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> {{action.temperature | formatNumber}}
+                                <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon>
+                                <span class="preview-badge-text">{{action.temperature | formatNumber}}</span>
                             </span>
                             <span *ngIf="action?.context">system context: {{action.context}}</span>
                         </div>

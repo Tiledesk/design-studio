@@ -74,7 +74,14 @@
         </div>
     </div>
 
-    <div *ngIf="!previewMode && element?.badge ==='DEP'" class="deprecation-message">{{'CDSCanvas.DeprecationMessage' | translate}}</div>
+    <div *ngIf="!previewMode && element?.badge ==='DEP'"
+        class="deprecation-message"
+        [innerHTML]="'CDSCanvas.DeprecationMessage' | translate:{
+            aiPrompt: ('CDSActionList.NAME.AiPrompt' | translate),
+            aiPromptUrl: ('https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/')
+        }">
+        
+    </div>
 
 </div>
 

@@ -28,6 +28,8 @@ export class SelectComponent implements OnInit {
   @Input() deleteButton: boolean = false;
   @Input() clearable: boolean = false;
   @Input() searchable: boolean = false;
+  /** If true, sorts items alphabetically (default true for backward compatibility). */
+  @Input() sortAlphabetically: boolean = true;
   @Input() placeholder: string = 'Select an option'
   @Input() formGroup: FormGroup = new FormGroup({ select: new FormControl()});
   @Input() formControlName: string = 'select';
@@ -47,8 +49,9 @@ export class SelectComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges){
     // Ordina items in ordine alfabetico crescente (come cds-panel-intent-list)
-    if (changes['items'] || changes['bindLabelSelect'] || changes['groupByKey']) {
-      this.sortedItems = this.sortItemsAlphabetically(this.items);
+    // Unless explicitly disabled to preserve incoming order.
+    if (changes['items'] || changes['bindLabelSelect'] || changes['groupByKey'] || changes['sortAlphabetically']) {
+      this.sortedItems = this.sortAlphabetically ? this.sortItemsAlphabetically(this.items) : [...(this.items || [])];
     }
 
     if(this.itemSelected && this.sortedItems){

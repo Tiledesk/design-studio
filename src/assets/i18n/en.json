@@ -265,6 +265,7 @@
     "WebhookmentUrlMustBeAHttpsUrl": "The webhook URL must be an https or http URL",
     "WebhookmentUrlMustBeAValidUrl": "The webhook URL must be a valid URL",
     "CDSCanvas": {
+        "DeprecationMessage": "Deprecated. Use the new <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a> action.",
         "EnterIntentName": "Enter block name",
         "ErrorBlockName": "The block name must be unique",
         "ErrorBlockCharacter": "The block name cannot contain special characters",

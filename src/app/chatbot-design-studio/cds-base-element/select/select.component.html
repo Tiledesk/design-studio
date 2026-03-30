@@ -20,6 +20,7 @@
         <ng-template ng-label-tmp let-item="item">
             <div class="select-item-wrp">
                 <span class="material-icons" *ngIf="item['icon']"
+                    [style.color]="item['iconColor'] || null"
                     [class.intent-start]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.START"
                     [class.intent-defaultFallback]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK"
                     [class.intent-close]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.CLOSE">{{item['icon']}}</span>
@@ -35,6 +36,7 @@
                 <div style="width: 100%; display: flex; flex-direction: column;">
                     <div class="select-item-wrp">
                         <span class="material-icons" *ngIf="item['icon']"
+                            [style.color]="item['iconColor'] || null"
                             [class.intent-start]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.START"
                             [class.intent-defaultFallback]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK"
                             [class.intent-close]="item[bindLabelSelect] === RESERVED_INTENT_NAMES.CLOSE">{{item['icon']}}</span>
