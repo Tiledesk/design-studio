@@ -13,6 +13,7 @@
 - **bug-fix**: modificato la possibilità di draggare una action fuori dal blocco intent
 - **bug-fix**: modifica css nelle actions che hanno AI Settings
 
+# 1.39.36-rc1
 - **added**: added parameter to enable/disable rules management 
 
 # 1.39.36
