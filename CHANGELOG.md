@@ -13,9 +13,11 @@
 - **changed**: eliminata la action "Chatgpt task" dall'elenco delle actions. Se già usata aggiungi il tag "deprecata"
 - **bug-fix**: modificato la possibilità di draggare una action fuori dal blocco intent
 - **bug-fix**: modifica css nelle actions che hanno AI Settings
-
 - **added**: added parameter to enable/disable rules management 
+
+# 1.39.36 
 - **changed**: hide the "rules" button if there are no "rules" set
+- **changed**: updated AI models
 
 # 1.39.35
 - **bug-fix**: Removed "manage kb" from webhook detail panel
