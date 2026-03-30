@@ -193,6 +193,7 @@
     "WebhookmentUrlMustBeAHttpsUrl": "L'URL del webhook deve essere un URL https o http",
     "WebhookmentUrlMustBeAValidUrl": "L'URL del webhook deve essere un URL valido",
     "CDSCanvas": {
+      "DeprecationMessage": "Deprecato. Usa la nuova action <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a>.",
       "EnterIntentName": "Inserisci il nome del blocco",
       "ErrorBlockName": "Il nome del blocco deve essere univoco",
       "ErrorBlockCharacter": "Il nome del blocco non può contenere caratteri speciali",

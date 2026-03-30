@@ -86,7 +86,9 @@
             </div>
         </div>
 
-        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last; trackBy: trackByActionId" 
+        <!-- <div class="tds-drop-element tds_draggable"></div> -->
+
+        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
             [cdkDragDisabled]="isNewChatbot"
             (cdkDragStarted)="onDragStart($event, intent.intent_id, i)" 

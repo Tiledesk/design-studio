@@ -17,7 +17,14 @@ export class CdsActionFlowLogComponent implements OnInit {
 
   LOG_LEVELS = LOG_LEVELS;
   selectedLogLevel: string = LOG_LEVELS.NATIVE;
-  logLevelsArray = Object.entries(LOG_LEVELS).map(([key, value]) => ({ key, value }));
+  /** Stable order for UI select options. */
+  logLevelsArray = [
+    { key: 'native', value: LOG_LEVELS.NATIVE, icon: 'code', iconColor: '#6b7280' },
+    { key: 'debug', value: LOG_LEVELS.DEBUG, icon: 'bug_report', iconColor: '#8b5cf6' },
+    { key: 'info', value: LOG_LEVELS.INFO, icon: 'info', iconColor: '#3b82f6' },
+    { key: 'warn', value: LOG_LEVELS.WARN, icon: 'warning', iconColor: '#f59e0b' },
+    { key: 'error', value: LOG_LEVELS.ERROR, icon: 'error', iconColor: '#ef4444' },
+  ];
   filteredLogs: Array<any> = [];
 
   private logger: LoggerService = LoggerInstance.getInstance();
