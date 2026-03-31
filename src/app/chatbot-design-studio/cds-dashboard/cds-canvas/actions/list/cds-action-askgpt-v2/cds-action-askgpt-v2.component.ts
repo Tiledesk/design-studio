@@ -493,7 +493,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
               this.action.max_tokens = 1024;
             }
           }else{
-            this.ai_setting['max_tokens'].min=10;
+            this.ai_setting['max_tokens'].min=this.llm_model_selected.min_tokens;
           }
         } else if (target === 'reranking') {
           // Initialize multiplier when reranking is enabled

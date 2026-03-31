@@ -10,7 +10,6 @@
 # 1.39.38-rc1 
 - **bug-fix**: changed setModel in the ai-condition and ai-prompt actions to retain the maxtoken value
 
-
 # 1.39.37-rc1 
 - **changed**: In the "Flow log" action, sort error types with icons and colors in the select box.
 - **changed**: Removed the "Chatgpt task" action from the list of actions. If already used, add the "deprecated" tag.
