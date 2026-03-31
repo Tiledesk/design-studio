@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch 
+# 1.39.38 
 - **Bug Fix**: Change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
 
 # 1.39.37  
