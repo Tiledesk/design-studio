@@ -9,6 +9,7 @@
 
 
 # this branch 
+- **bug-fix**: impostato i token minimi quando uncecked "Get contents sources"
 - **bug-fix**: modifica di setModel nelle actions ai-condition e ai-prompt per mantenere il valore di maxtoken impostato
 - **changed**: nella action "Flow log" ordinare nella select i tipi di errori con icon e colori
 - **changed**: eliminata la action "Chatgpt task" dall'elenco delle actions. Se già usata aggiungi il tag "deprecata"
