@@ -7,12 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
-- **bug-fix**: modifica di setModel nelle actions ai-condition e ai-prompt per mantenere il valore di maxtoken impostato
-- **changed**: nella action "Flow log" ordinare nella select i tipi di errori con icon e colori
-- **changed**: eliminata la action "Chatgpt task" dall'elenco delle actions. Se già usata aggiungi il tag "deprecata"
-- **bug-fix**: modificato la possibilità di draggare una action fuori dal blocco intent
-- **bug-fix**: modifica css nelle actions che hanno AI Settings
+# 1.39.38-rc1 
+- **bug-fix**: changed setModel in the ai-condition and ai-prompt actions to retain the maxtoken value
+
+
+# 1.39.37-rc1 
+- **changed**: In the "Flow log" action, sort error types with icons and colors in the select box.
+- **changed**: Removed the "Chatgpt task" action from the list of actions. If already used, add the "deprecated" tag.
+- **bug-fix**: Modified the ability to drag an action outside the intent block.
+- **bug-fix**: Modified CSS for actions with AI Settings.
 
 # 1.39.36-rc1
 - **added**: added parameter to enable/disable rules management 
