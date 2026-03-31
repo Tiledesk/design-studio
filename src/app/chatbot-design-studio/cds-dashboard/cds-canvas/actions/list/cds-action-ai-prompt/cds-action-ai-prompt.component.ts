@@ -184,7 +184,10 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
 
   private async initialize(){
     await this.initLLMModels();
-    this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    this.setModel(this.action.modelName ? this.action.modelName : this.default_model.name, {
+      resetMaxTokens: false,
+      resetTemperature: false
+    });
     this.logger.log("[ACTION AI_PROMPT] initialize llm_options_models: ", this.action);
   }
 
@@ -308,7 +311,11 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
   }
 
 
-setModel(modelName: string){
+  setModel(
+    modelName: string,
+    options?: { resetMaxTokens?: boolean; resetTemperature?: boolean }
+  ) {
+  const { resetMaxTokens = true, resetTemperature = true } = options ?? {};
   const result = setModel(modelName, this.llm_models_flat, this.logger);
   this.llm_model_selected = result ?? ({} as LlmModel);
   this.logger.log("[ACTION AI_PROMPT] llm_model_selected: ", this.llm_model_selected);
@@ -319,15 +326,29 @@ setModel(modelName: string){
   if (result) {
     this.ai_setting['max_tokens'].max = result.max_output_tokens;
     this.ai_setting['max_tokens'].min = result.min_tokens;
-    // Every model change resets max_tokens to default (capped by model max)
     const min = this.ai_setting['max_tokens'].min;
     const max = this.ai_setting['max_tokens'].max;
-    let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
-    if (next < min) next = min;
-    this.action.max_tokens = next;
-    if (modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')) {
-      this.action.temperature = 1;
+
+    // Init/detail-panel open: keep saved max_tokens, just clamp into model range.
+    // User-triggered model change: reset to default (capped by model max).
+    const currentMaxTokens =
+      typeof this.action?.max_tokens === 'number' ? this.action.max_tokens : Number(this.action?.max_tokens);
+    if (resetMaxTokens || !Number.isFinite(currentMaxTokens)) {
+      let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+      if (next < min) next = min;
+      this.action.max_tokens = next;
+    } else {
+      this.action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
+    }
+
+    const isGpt5 = modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5');
+    if (isGpt5) {
       this.ai_setting['temperature'].disabled = true;
+      const currentTemp =
+        typeof this.action?.temperature === 'number' ? this.action.temperature : Number(this.action?.temperature);
+      if (resetTemperature || !Number.isFinite(currentTemp)) {
+        this.action.temperature = 1;
+      }
     } else {
       this.ai_setting['temperature'].disabled = false;
     }
@@ -352,7 +373,7 @@ setModel(modelName: string){
     this.logger.log("[ACTION AI_PROMPT] onChangeSelect target: ", target)
     this.action[target] = event.value;
     if (target === 'llm_model'){
-      this.setModel(event.modelName);
+      this.setModel(event.modelName, { resetMaxTokens: true, resetTemperature: true });
     } 
     this.updateAndSaveAction.emit();
   }
