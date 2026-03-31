@@ -80,7 +80,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     name: "Gemini 3 pro preview",
     value: "gemini-3-pro-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-preview.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 65536,
     reasoning: true
@@ -89,7 +89,7 @@ export const GOOGLE_MODEL: Array<{ name: string, value: string, description:stri
     name: "Gemini 3 pro image preview",
     value: "gemini-3-pro-image-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-image-preview.description",
-    status: "active",
+    status: "inactive",
     min_tokens: 1,
     max_output_tokens: 65536,
     reasoning: false
@@ -164,6 +164,15 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     name: "Claude Opus 4.6",
     value: "claude-opus-4-6",
     description: "TYPE_GPT_MODEL.claude-opus-4-6.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 200000,
+    reasoning: true
+  },
+  {
+    name: "Claude Sonnet 4.5",
+    value: "claude-sonnet-4-5",
+    description: "TYPE_GPT_MODEL.claude-sonnet-4-5.description",
     status: "active",
     min_tokens: 1,
     max_output_tokens: 200000,
