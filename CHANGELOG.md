@@ -7,9 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.39
+- **bug-fix**: set minimum tokens when unchecking "Get contents sources"
+- **changed**: updated ai_models
 
 # 1.39.38 
-- **Bug Fix**: Change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
+- **bug fix**: change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
 
 # 1.39.37  
 - **changed**: In the "Flow log" action, sort error types with icons and colors in the select box.
