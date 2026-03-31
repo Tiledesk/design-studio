@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.39-rc1
+- **bug-fix**: set minimum tokens when unchecking "Get contents sources"
+- **changed**: updated ai_models
+
+
 # 1.39.38-rc1 
 - **bug-fix**: changed setModel in the ai-condition and ai-prompt actions to retain the maxtoken value
 
