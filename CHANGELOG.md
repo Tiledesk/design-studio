@@ -9,7 +9,7 @@
 
 
 # this branch 
-- **added**: added PINECONE_REREANKING in environment to set reranking
+- **added**: added PINECONE_RERANKING in environment to set reranking
 - **bug-fix**: impostato i token minimi quando uncecked "Get contents sources"
 - **bug-fix**: modifica di setModel nelle actions ai-condition e ai-prompt per mantenere il valore di maxtoken impostato
 - **changed**: nella action "Flow log" ordinare nella select i tipi di errori con icon e colori
