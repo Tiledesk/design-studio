@@ -27,6 +27,7 @@ import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -85,6 +86,11 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     "reranking_multiplier": { name: "reranking_multiplier", min: 2, max: 50, step: 1, disabled: false }
   }
   KB_HYBRID = false;
+  readonly pineconeRerankingEnabled: boolean = !!environment?.pineconeReranking;
+
+  get rerankingAvailable(): boolean {
+    return !!this.KB_HYBRID || this.pineconeRerankingEnabled;
+  }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;

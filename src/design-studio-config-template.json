@@ -14,6 +14,7 @@
   "logLevel": "${LOG_LEVEL}",
   "aiModels":"${AI_MODELS}",
   "storage_prefix": "${CDS_STORAGE_PREFIX}",
+  "pineconeReranking": "${PINECONE_REREANKING}",
   "phoneNumber":"${PHONE_NUMBER}",
   "firebase": {
     "apiKey": "${FIREBASE_APIKEY}",

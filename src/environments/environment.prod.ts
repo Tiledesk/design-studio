@@ -15,6 +15,7 @@ export const environment = {
   logLevel: 'error',
   aiModels: 'CHANGEIT',
   storage_prefix: "CHANGEIT",
+  pineconeReranking: "CHANGEIT",
   firebaseConfig: {
     apiKey: 'CHANGEIT',
     authDomain: 'CHANGEIT',
