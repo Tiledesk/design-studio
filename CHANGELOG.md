@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **added**: added PINECONE_RERANKING in environment to set reranking
 
 # 1.39.38 
 - **Bug Fix**: Change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
