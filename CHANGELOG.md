@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 # 1.39.39-rc2
-- **added**: added PINECONE_REREANKING in environment to set reranking
+- **added**: added PINECONE_RERANKING in environment to set reranking
 
 # 1.39.39-rc1
 - **bug-fix**: set minimum tokens when unchecking "Get contents sources"
