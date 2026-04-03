@@ -86,7 +86,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     "reranking_multiplier": { name: "reranking_multiplier", min: 2, max: 50, step: 1, disabled: false }
   }
   KB_HYBRID = false;
-  readonly pineconeRerankingEnabled: boolean = !!environment?.pineconeReranking;
+  readonly pineconeRerankingEnabled: boolean = !!environment?.['pineconeReranking'] || false;
 
   get rerankingAvailable(): boolean {
     return !!this.KB_HYBRID || this.pineconeRerankingEnabled;
@@ -96,7 +96,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
 
 
-  default_model = DEFAULT_MODEL;
+  default_model = DEFAULT_MODEL
   llm_model = LLM_MODEL;
   llm_models_flat: Array<LlmModel>;
   llm_model_selected: LlmModel = {} as LlmModel;
