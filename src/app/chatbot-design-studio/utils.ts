@@ -186,7 +186,8 @@ export enum TYPE_MESSAGE {
     FRAME       = 'frame',
     GALLERY     = 'gallery',
     REDIRECT    = 'redirect',
-    AUDIO       = 'audio'
+    AUDIO       = 'audio',
+    TTS         = 'tts'
 }
 
 export enum TYPE_EVENT_CATEGORY {
