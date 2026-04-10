@@ -60,3 +60,38 @@ cds-textarea.text-editable-div ::ng-deep{
         font-size: 0.9em !important;
     }
 }
+
+.tts-badge{
+    margin: 0 30px 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--blu-light-01);
+    color: var(--blu);
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 18px;
+    user-select: none;
+}
+
+.text-editor-wrapper.previewMode{
+    .tts-badge{
+        width: calc(100% - 5px);
+        margin: 0 auto 6px;
+        padding: 4px 10px;
+        border-radius: var(--input-border-radius-base);
+        background: var(--blu);
+        color: var(--color-white-hex);
+    }
+}
+
+.tts-badge__icon{
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    background-color: currentColor;
+    -webkit-mask: url("/assets/images/action-reply-types/tts.svg") no-repeat center / contain;
+    mask: url("/assets/images/action-reply-types/tts.svg") no-repeat center / contain;
+}

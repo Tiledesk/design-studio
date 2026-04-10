@@ -42,12 +42,20 @@
 
 
 <div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    <div class="tts-badge" aria-label="TTS">
+        <span class="tts-badge__icon" aria-hidden="true"></span>
+        <span class="tts-badge__text">TTS</span>
+    </div>
     <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
     <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
 </div> 
 
 
 <div  *ngIf="!previewMode" class="text-editor-wrapper">
+    <div class="tts-badge" aria-label="TTS">
+        <span class="tts-badge__icon" aria-hidden="true"></span>
+        <span class="tts-badge__text">TTS</span>
+    </div>
     <cds-textarea 
         class="text-editable-div"
         [activeFocus]="activeFocus"

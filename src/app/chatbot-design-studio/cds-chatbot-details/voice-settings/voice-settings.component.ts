@@ -172,14 +172,15 @@ export class CDSVoiceSettingsComponent implements OnInit {
     const existingKey = this.list.findIndex( (item: any) => item.key === key );
     if (existingKey > -1 ) {
       this.list[existingKey].value = value
+      this.list[existingKey].visible = false;
     } else {
-      this.list.push({ key: key, value: value });
+      this.list.push({ key: key, value: value, visible: false });
     }
   }
 
   private saveAttributes() {
       
-    let data = this.list.map(({ visible, ...keepAttrs }) => keepAttrs);
+    let data = this.list.map(({ ...keepAttrs }) => keepAttrs);
     this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] saving globals ', data)
 
     this.faqKbService.addNodeToChatbotAttributes(this.selectedChatbot._id, 'globals', data).subscribe((resp) => {
