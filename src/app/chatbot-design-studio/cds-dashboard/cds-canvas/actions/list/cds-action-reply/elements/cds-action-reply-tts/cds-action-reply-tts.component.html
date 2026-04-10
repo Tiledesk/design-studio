@@ -43,7 +43,7 @@
 
 <div *ngIf="previewMode" class="text-editor-wrapper previewMode">
     <div class="tts-badge" aria-label="TTS">
-        <span class="tts-badge__icon" aria-hidden="true"></span>
+        <img class="tts-badge__icon" src="assets/images/action-reply-types/tts.svg" alt="" aria-hidden="true" />
         <span class="tts-badge__text">TTS</span>
     </div>
     <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
@@ -53,7 +53,7 @@
 
 <div  *ngIf="!previewMode" class="text-editor-wrapper">
     <div class="tts-badge" aria-label="TTS">
-        <span class="tts-badge__icon" aria-hidden="true"></span>
+        <img class="tts-badge__icon" src="assets/images/action-reply-types/tts.svg" alt="" aria-hidden="true" />
         <span class="tts-badge__text">TTS</span>
     </div>
     <cds-textarea 
