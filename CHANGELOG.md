@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.41-rc1
+- **added**: ability to add a 'tts' reply message type
+- **changed**: visibility mode for voiceSettings global properties in 'Globals' tab
+
 # 1.39.40
 - **added**: added PINECONE_RERANKING in environment to set reranking
 
