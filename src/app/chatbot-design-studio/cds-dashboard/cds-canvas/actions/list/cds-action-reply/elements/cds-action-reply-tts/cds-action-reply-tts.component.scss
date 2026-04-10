@@ -78,12 +78,15 @@ cds-textarea.text-editable-div ::ng-deep{
 
 .text-editor-wrapper.previewMode{
     .tts-badge{
-        width: calc(100% - 5px);
-        margin: 0 auto 6px;
-        padding: 4px 10px;
-        border-radius: var(--input-border-radius-base);
+        width: fit-content;
+        margin: 0 0 6px calc(5px / 2);
+        padding: 2px 10px;
+        border-radius: 999px;
         background: var(--blu);
         color: var(--color-white-hex);
+    }
+    .tts-badge__icon{
+        filter: none;
     }
 }
 
@@ -91,7 +94,7 @@ cds-textarea.text-editable-div ::ng-deep{
     width: 14px;
     height: 14px;
     display: inline-block;
-    background-color: currentColor;
-    -webkit-mask: url("/assets/images/action-reply-types/tts.svg") no-repeat center / contain;
-    mask: url("/assets/images/action-reply-types/tts.svg") no-repeat center / contain;
+    vertical-align: middle;
+    /* Recolor monochrome svg (default #fff) to match --blu (#506493) */
+    filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1063%) hue-rotate(187deg) brightness(93%) contrast(90%);
 }
