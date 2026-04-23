@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.41-rc3
+- **changed**: enabled voice-settings for type:'chatbot' and 'voice-twilio'
+
 # 1.39.41-rc2
 - **changed**: minor UI changes
 
