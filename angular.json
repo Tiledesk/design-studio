@@ -35,10 +35,11 @@
               "src/assets",
               "src/design-studio-config-template.json",
               "src/design-studio-config.json",
-              "src/environments/real_data/cds-config-firebase.json",
-              "src/environments/real_data/cds-config-native-prod.json",
-              "src/environments/real_data/cds-config-native-collaudo.json",
-              "src/environments/real_data/cds-config-aws-stage.json"
+              {
+                "glob": "**/*",
+                "input": "src/environments/real_data",
+                "output": "/real_data"
+              }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",
