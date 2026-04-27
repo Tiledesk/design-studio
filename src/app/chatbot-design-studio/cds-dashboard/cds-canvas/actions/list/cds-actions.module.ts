@@ -21,6 +21,7 @@ import { OperandComponent } from './cds-action-assign-variable/operand/operand.c
 import { OperationComponent } from './cds-action-assign-variable/operation/operation.component';
 import { OperatorComponent } from './cds-action-assign-variable/operator/operator.component';
 import { CdsActionCaptureUserReplyComponent } from './cds-action-capture-user-reply/cds-action-capture-user-reply.component';
+import { CdsActionIterationComponent } from './cds-action-iteration/cds-action-iteration.component';
 import { CdsActionChangeDepartmentComponent } from './cds-action-change-department/cds-action-change-department.component';
 import { CdsActionCloseComponent } from './cds-action-close/cds-action-close.component';
 import { CdsActionCodeComponent } from './cds-action-code/cds-action-code.component';
@@ -50,6 +51,7 @@ import { CdsActionReplyGalleryComponent } from './cds-action-reply/elements/cds-
 import { CdsActionReplyImageComponent } from './cds-action-reply/elements/cds-action-reply-image/cds-action-reply-image.component';
 import { CdsActionReplyRedirectComponent } from './cds-action-reply/elements/cds-action-reply-redirect/cds-action-reply-redirect.component';
 import { CdsActionReplyTextComponent } from './cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text.component';
+import { CdsActionReplyTTSComponent } from './cds-action-reply/elements/cds-action-reply-tts/cds-action-reply-tts.component';
 import { CdsActionReplyToolsComponent } from './cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools.component';
 import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.component';
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
@@ -70,7 +72,6 @@ import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-da
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
-import { FilterPipe } from 'src/app/pipe/filter.pipe';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
 import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
@@ -81,10 +82,16 @@ import { VariableCssClassPipe } from 'src/app/pipe/variablecssClass.pipe';
 import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
 import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai-prompt.component';
 import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
+import { McpServersDialogComponent } from './cds-action-ai-prompt/mcp-servers-dialog/mcp-servers-dialog.component';
+import { McpServerEditDialogComponent } from './cds-action-ai-prompt/mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
+import { CdsActionAiConditionComponent } from './cds-action-ai-condition/cds-action-ai-condition.component';
+import { AttributesDialogAiConditionComponent } from './cds-action-ai-condition/attributes-dialog/attributes-dialog.component';
+import { AiConditionComponent } from './cds-action-ai-condition/ai-condition/ai-condition.component';
+import { FindPipe } from 'src/app/pipe/find.pipe';
 
 @NgModule({
   declarations: [
@@ -127,6 +134,7 @@ import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow
     CdsActionAskgptComponent,
     CdsActionGPTTaskComponent,
     CdsActionCaptureUserReplyComponent,
+    CdsActionIterationComponent,
     CdsActionGptAssistantComponent,
     CdsActionQaplaComponent,
     CdsActionCodeComponent,
@@ -143,6 +151,7 @@ import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow
     CdsActionReplyFrameComponent,
     CdsActionReplyRedirectComponent,
     CdsActionReplyGalleryComponent,
+    CdsActionReplyTTSComponent,
     CdsActionReplyButtonComponent,
     CdsActionReplySettingsComponent,
     // action REPLY elements: end //
@@ -173,13 +182,16 @@ import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow
     CdsActionConnectBlockComponent,
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
-    // action Ai Prompt elements: start //
     AttributesDialogAiPromptComponent,
+    McpServersDialogComponent,
+    McpServerEditDialogComponent,
+    CdsActionAiConditionComponent,
+    AttributesDialogAiConditionComponent,
+    AiConditionComponent,
     // action Ai Prompt elements: end //
     CdsActionWebResponseComponent,
 
     //PIPES
-    FilterPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,
@@ -235,6 +247,7 @@ import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow
     CdsActionGPTTaskComponent,
     CdsActionGptAssistantComponent,
     CdsActionCaptureUserReplyComponent,
+    CdsActionIterationComponent,
     CdsActionQaplaComponent,
     CdsActionCodeComponent,
     CdsActionAskgptV2Component,
@@ -278,13 +291,16 @@ import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow
     CdsActionConnectBlockComponent,
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
-    // action Ai Prompt elements: start //
     AttributesDialogAiPromptComponent,
+    McpServersDialogComponent,
+    McpServerEditDialogComponent,
+    CdsActionAiConditionComponent,
+    AttributesDialogAiConditionComponent,
+    AiConditionComponent,
     // action Ai Prompt elements: end //
     CdsActionWebResponseComponent,
     
     //PIPES
-    FilterPipe,
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionAddKbContentComponent,

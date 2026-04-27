@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActionKBContent } from 'src/app/models/action-model';
 import { AppConfigService } from 'src/app/services/app-config';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { OpenaiService } from 'src/app/services/openai.service';
@@ -22,8 +22,9 @@ export class CdsActionAddKbContentComponent implements OnInit {
 
   project_id: string;
   selectedNamespace: string;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string}>;
+  listOfNamespaces: Array<{name: string, displayName: string, kbTypeLabel: string, value: string, icon?:string, hybrid?: boolean}>;
   autocompleteOptions: Array<{label: string, value: string}> = [];
+  tagInputValue = '';
   
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
@@ -39,13 +40,42 @@ export class CdsActionAddKbContentComponent implements OnInit {
 
   ngOnInit(): void {
     this.project_id = this.dashboardService.projectID
+    this.ensureTags();
     this.getListNamespaces();
+  }
+
+  private ensureTags(): void {
+    if (!Array.isArray(this.action.tags)) {
+      this.action.tags = [];
+    }
+  }
+
+  addTag(): void {
+    const value = this.tagInputValue?.trim() || '';
+    if (!value) return;
+    this.ensureTags();
+    if (this.action.tags.indexOf(value) === -1) {
+      this.action.tags.push(value);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
+    }
+    this.tagInputValue = '';
+  }
+
+  removeTag(tag: string): void {
+    this.ensureTags();
+    const index = this.action.tags.indexOf(tag);
+    if (index !== -1) {
+      this.action.tags.splice(index, 1);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
+    }
   }
 
   onChangeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ADD_KBCONTENT] onEditableDivTextChange event", $event);
     this.logger.log("[ACTION-ADD_KBCONTENT] onEditableDivTextChange property", property);
-    this.action[property] = $event;
+    if(property === 'namespace'){
+      this.action[property] = $event;
+    } 
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -53,7 +83,11 @@ export class CdsActionAddKbContentComponent implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id} })
+      this.listOfNamespaces = namaspaceList.map((el) => {
+        const isHybrid = (el as any).hybrid ? (el as any).hybrid : false;
+        const kbTypeLabel = isHybrid ? 'Hybrid' : 'Semantic';
+        return { name: el.name, displayName: el.name, kbTypeLabel, value: el.id, hybrid: isHybrid };
+      })
       namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -131,8 +165,15 @@ export class CdsActionAddKbContentComponent implements OnInit {
   }
 
 
-  onBlur(event){
-    this.updateAndSaveAction.emit()
+  onBlur(event, property){
+    if(property === 'source'){
+      this.action.content = this.action.name?  this.action.name + '\n'+this.action[property] : this.action[property];
+    } else if(property === 'namespace'){
+      // this.action.namespace = event.target.value;
+      this.action[property] = event;
+    }
+    // this.updateAndSaveAction.emit()
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
  
   goToKNB(){

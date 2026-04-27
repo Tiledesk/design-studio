@@ -1,16 +1,116 @@
 
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
     --background-color: #{var(--blu-light-01)};
     --slider-background-color: #{var(--blu-light-03)};
     --text-color: #{var(--blu)};
+    --text-color-gray: #{var(--gray)};
 }
 
 // ::-webkit-scrollbar {
 //     width: 0px;
 // }
+
+.tags-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--blu-light-02, #d2d4d6);
+    border-radius: var(--input-border-radius-base, 8px);
+    padding: 0 4px 0 12px;
+    background: #fff;
+    box-sizing: border-box;
+
+    .tags-input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        padding: 5px 0;
+        font-size: 14px;
+        background: transparent;
+        color: var(--gray);
+        &::placeholder {
+            color: #9aa0a6;
+        }
+    }
+
+    .tags-send-btn {
+        flex-shrink: 0;
+        padding: 3px 7px;
+        border: none;
+        border-radius: 6px;
+        background: var(--blu);
+        color: #fff;
+        font-size: 12px;
+        line-height: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        height: 26px;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
+.models--container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.model-name-and-btn-wpr {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0px;
+    border-radius: 4px;
+    background-color: var(--blu-light-01);
+    border: 0px solid #d2d4d6;
+    font-size: 12px;
+}
+
+.model-name {
+    margin: 0;
+    font-weight: 300;
+    color: var(--blu);
+    padding-left: 6px;
+}
+
+.delete-model {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    margin: 0;
+    height: 100%;
+    min-width: 14px;
+    min-height: 14px;
+    border: none;
+    background: transparent;
+    color: #3d4047;
+    cursor: pointer;
+    border-radius: 0px 4px 4px 0px;
+
+    &:hover {
+        background: var(--blu);
+        .remove-tag-icon {
+            fill: var(--color-white-hex);
+        }
+    }
+}
+
+.remove-tag-icon {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    fill: currentColor;
+}
 
 .link-container {
     margin-bottom: 20px;
@@ -82,19 +182,95 @@ mat-expansion-panel ::ng-deep {
     .mat-expansion-panel-body {
         padding: 0 !important;
     }
+    .title-and-parameters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .parameters-preview {
+        font-size: 11px;
+        height: 38px;
+        line-height: normal;
+    }
+
+    .preview-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        font-size: 14px;
+        line-height: 14px;
+        margin: 0;
+        vertical-align: middle;
+        color: var(--text-color);
+    }
+
+    .preview-flag {
+        font-size: 10px;
+
+        .label {
+            position: relative;
+            padding-left: 14px; // room for the check
+        }
+
+        .label::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--blu);
+            font-weight: 700;
+            font-size: 10px;
+            line-height: 1;
+        }
+    }
 }
 
 cds-select#model-condition ::ng-deep{
     .select-item-wrp{
         justify-content: space-between;
     }
+    .label-select-option {
+        font-weight: 400;
+        font-size: 12px;
+    }
 }
 
+
+
 ::ng-deep .ng-dropdown-panel {
+
+
+    .ng-dropdown-panel-items .ng-optgroup.ng-option-disabled {
+        cursor: default;
+        height: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    .ng-dropdown-panel-items.scroll-host .ng-optgroup {
+        padding: 0 10px;
+        color: var(--blu);
+        font-weight: 500;
+        font-size: 14px;
+        background: var(--blu-light-03);
+        line-height: 20px;
+    }
+
+    .ng-dropdown-panel-items .ng-option.ng-option-child{
+        height: 30px;
+    }
     .ng-option .select-item-wrp[additionalText = true]{
         .select-item-wrp{
             justify-content: space-between;
         }
+    }
+    .label-select-option {
+        color: var(--text-color-gray);
+        font-weight: 400;
+        font-size: 12px;
+        line-height: normal;
     }
 }
 
@@ -131,6 +307,10 @@ cds-select#model-condition ::ng-deep{
     margin-left: 6px;
 }
 
+.action-wait-slider.disabled {
+    opacity: 0.4;
+}
+
 .action-wait-slider ::ng-deep{
     .mat-accent .mat-slider-track-fill {
         background-color: var(--text-color) !important;
@@ -140,11 +320,14 @@ cds-select#model-condition ::ng-deep{
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 10px !important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
     }
 }
+
+
 
 .gpt-setting-input {
     color: var(--text-color);
@@ -155,11 +338,26 @@ cds-select#model-condition ::ng-deep{
     border-radius: 12px;
     background-color: white;
     border: 1px solid var(--text-color);
+
+    // Hide number input spinner arrows
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    &[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 }
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }
@@ -189,7 +387,7 @@ cds-select#model-condition ::ng-deep{
 
 .preview-container-extended {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .placeholder-container {
@@ -297,6 +495,9 @@ mat-checkbox ::ng-deep {
 
 
 .field-box {
+    &.advanced-prompt-container {
+        margin-top: -10px;
+    }
     &.disabled {
         pointer-events: none;
         opacity: 0.5;
@@ -342,5 +543,127 @@ mat-expansion-panel ::ng-deep {
         &:hover {
             background-color: transparent !important;
         }
+    }
+}
+
+
+
+
+cds-select#model-condition.not-configured ::ng-deep {
+    .ng-select .ng-select-container {
+        border: 1px solid var(--empty-value-text-color);
+    }
+    .ng-select .ng-select-container .ng-value span.label-select{
+        color: var(--empty-value-text-color);
+    }
+}
+
+
+.select-container {
+    &.not-configured {
+        ::ng-deep .ng-select .ng-select-container {
+            .ng-value {
+                span.label-select {
+                    color: var(--empty-value-text-color);
+                }
+            }
+        }
+        ::ng-deep .text-editor-wrapper .text-editor .box-input input {
+            color: var(--empty-value-text-color)!important;
+            border: 1px solid var(--empty-value-text-color)!important;
+        }
+    }
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: var(--empty-value-text-color);
+        border-radius: 50%;
+        margin: 0px;
+        position: absolute;
+        left: 0px;
+        top: 96px;
+    }
+}
+
+// Bottom row styles for model selection
+.bottom-row {
+    display: flex;
+    align-items: center;
+    margin-top: 0px;
+    padding-left: 0px;
+    flex-direction: row-reverse;
+}
+
+.multiplier-container {
+    color: var(--gray);
+    font-size: 12px;
+    display: inline-block;
+}
+
+.configure-model-button {
+    cursor: pointer;
+    color: #007bff;
+    font-size: 12px;
+    text-decoration: underline;
+    display: inline-block;
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+.tag-replyto {
+    display: flex;
+    width: fit-content;
+    border-radius: 4px;
+    font-size: 10px;
+    margin: 3px;
+    height: -moz-fit-content;
+    height: fit-content;
+    padding: 0px 6px;
+    max-width: calc(100% - 25px);
+    background-color: var(--blu);
+    color: var(--color-white-hex);
+    flex-wrap: nowrap;
+    text-align: end;
+}
+
+.chunks-container {
+    margin-bottom: 20px;
+    .field-box {
+        margin-bottom: 10px;
+    }
+}
+
+
+.parameters-preview {
+    span {
+        line-height: 16px;
+        margin-right: 5px;
+    }
+    .preview-badge {
+        color: #fff;
+        background-color: var(--blu);
+        display: inline-block;
+        padding: 1px 5px;
+        border-radius: 4px;
+        .preview-badge-text {
+            padding: 0;
+            margin:0;
+        }
+    }
+    .preview-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 12px;
+        height: 12px;
+        font-size: 12px;
+        line-height: 12px;
+        margin: 0;
+        vertical-align: middle;
+        color: var(--color-white-hex);
+    }
+    .preview-flag{
+        margin:0;
     }
 }

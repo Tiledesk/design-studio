@@ -15,7 +15,6 @@ import { ChangelogComponent } from 'src/app/modals/changelog/changelog.component
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
 import { CdsPublishOnCommunityModalComponent } from 'src/app/modals/cds-publish-on-community-modal/cds-publish-on-community-modal.component';
 import { WsChatbotService } from 'src/app/services/websocket/ws-chatbot.service';
-import { FilterPipe } from 'src/app/pipe/filter.pipe';
 
 const routes: Routes = [
   { path: '', 

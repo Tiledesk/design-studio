@@ -55,6 +55,7 @@ export class CDSFilterComponent implements OnInit {
   onChangeOperator(event, index: number){
     (this.expression.conditions[index] as Operator).operator= event['type']
     this.logger.log('onChangeOperator expressionn', this.expression)
+    this.onChangeExpression.emit(this.expression)
   }
 
 
@@ -84,6 +85,14 @@ export class CDSFilterComponent implements OnInit {
   onReset(){
     this.selectedCondition = null
     this.selectedIndex= null
+  }
+
+  trackByConditionIndex(index: number): number {
+    return index;
+  }
+
+  getOperatorName(operatorKey: string): string {
+    return this.OPERATORS_LIST[operatorKey]?.name ?? '';
   }
 
 }

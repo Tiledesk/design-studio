@@ -485,15 +485,13 @@ export class CDSDetailBotDetailComponent extends BotsBaseComponent implements On
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
     this.imageURL = null;
-    this.uploadService.uploadProfile(this.selectedChatbot._id, currentUpload).then(downloadURL => {
+    this.uploadService.uploadProfile('bot_' +this.selectedChatbot._id, currentUpload).then(downloadURL => {
       that.logger.debug(`[IMAGE-UPLOAD] Successfully uploaded file and got download link - ${downloadURL}`);
 
-      let url = this.imageRepoService.getImagePhotoUrl(this.selectedChatbot._id)
-      this.checkImageExists(url, (existImage)=> {
-        let timestamp = new Date().getTime();
-        existImage? this.imageURL  = url +  '&' + timestamp : null; 
-        this.selectedChatbot.imageURL = url;
-      })
+      let timestamp = new Date().getTime();
+      this.imageURL  = downloadURL +  '&' + timestamp;
+      this.selectedChatbot.imageURL = downloadURL;
+
       that.isFilePendingToUpload = false;
       // return downloadURL;
     }).catch(error => {

@@ -1,0 +1,53 @@
+.wrapper {
+  position: relative;
+  display: block;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  padding: 0px;
+  padding-top: 10px;
+  background: rgba(255, 255, 255, 0.383);
+  overflow: visible;
+  width: auto;
+  height: auto;
+}
+
+.dropUploadImage.link {
+  padding: 12px 0 8px 0;
+  margin: 0 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.field-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-preview-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.image-preview {
+  max-width: 200px;
+  max-height: 120px;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  background: #fff;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} 

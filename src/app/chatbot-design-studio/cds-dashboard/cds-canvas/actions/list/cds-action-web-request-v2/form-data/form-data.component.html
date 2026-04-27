@@ -27,6 +27,7 @@
                 [setAttributeBtn]="true"
                 [autoResize]="true"
                 [placeholder]="'key'"
+                [isLiquidjs]="false"
                 (blur)="onBlur($event)"
                 (changeTextarea)="onChangeTextarea($event, 'name', i)">
             </cds-textarea>
@@ -50,6 +51,7 @@
             [setAttributeBtn]="true"
             [autoResize]="true"
             [placeholder]="'value'"
+            [isLiquidjs]="false"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'value', i)">
         </cds-textarea>

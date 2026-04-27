@@ -1,0 +1,92 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>{{'CDSCanvas.ChooseToolOrAddMCPServer' | translate}}</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    
+    <hr class="custom-hr mcp-dialog__hr">
+    
+    <!-- Search and Counter Section - Always visible -->
+    <div class="search-section">
+        <div class="server-count">
+            {{'CDSCanvas.TotalMCPServers' | translate}}: <span class="count-number">{{ filteredServers.length }}</span>
+        </div>
+        <div class="search-input-wrapper">
+            <input 
+                type="text" 
+                class="search-input"
+                [(ngModel)]="searchFilter"
+                (input)="onSearchChange()"
+                [placeholder]="'CDSCanvas.SearchByNameURLOrType' | translate">
+            <span class="material-icons search-icon">search</span>
+        </div>
+    </div>
+    
+    <div class="tpl-modal-content">
+        <div class="mcp-servers-list">
+            <div *ngIf="!data.mcpServers || data.mcpServers.length === 0" class="empty-state">
+                <span class="material-icons empty-icon">cloud_off</span>
+                <p class="empty-message">{{'CDSCanvas.NoMCPServerConfigured' | translate}}</p>
+            </div>
+            
+            <div *ngIf="filteredServers.length === 0 && data.mcpServers && data.mcpServers.length > 0" class="empty-state">
+                <span class="material-icons empty-icon">search_off</span>
+                <p class="empty-message">{{'CDSCanvas.NoServersMatchSearch' | translate}}</p>
+            </div>
+            
+            <div class="mcp-server-item-wrapper" *ngFor="let server of filteredServers">
+                <button 
+                    class="mcp-server-item"
+                    [class.selected]="isServerSelected(server)"
+                    type="button"
+                    (click)="toggleServerSelection(server, $event)">
+                    <!-- Edit badge (must NOT trigger server selection) -->
+                    <span
+                        class="edit-button mcp-server__edit-badge"
+                        role="button"
+                        tabindex="0"
+                        (click)="openEditServerDialog(server, $event)"
+                        (keydown.enter)="openEditServerDialog(server, $event)"
+                        (keydown.space)="openEditServerDialog(server, $event)">
+                        <span class="material-icons mcp-server__edit-icon">edit</span>
+                    </span>
+                    <div class="server-info">
+                        <div class="server-name">
+                            {{ server.name }}
+                            <span *ngIf="isServerSelected(server)" class="mcp-server__status-badge mcp-server__status-badge--active">
+                                {{'CDSCanvas.Active' | translate}}
+                            </span>
+                            <span *ngIf="!isServerSelected(server)" class="mcp-server__status-badge mcp-server__status-badge--available">
+                                {{'CDSCanvas.Available' | translate}}
+                            </span>
+                        </div>
+                        <div class="server-url">{{ server.url }}</div>
+                        <div class="server-type">{{ server.transport }}</div>
+                        <div class="server-type mcp-server__tools-meta">
+                            {{'CDSCanvas.Tools' | translate}}:
+                            <strong>{{ getActiveToolsCount(server) }}</strong> {{'CDSCanvas.ToolsActive' | translate}}
+                            /
+                            <strong>{{ getAvailableToolsCount(server) }}</strong> {{'CDSCanvas.ToolsAvailable' | translate}}
+                        </div>
+                    </div>
+                    <!-- <span class="material-icons checkmark-icon" *ngIf="isServerSelected(server)">check_circle</span> -->
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button" 
+            (click)="onAddMcpServer()">
+            <span class="material-icons mcp-dialog__add-icon">add</span>
+            {{'CDSCanvas.AddMCPServer' | translate}}
+        </button>
+        <button id="cds-ok-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
+            OK
+        </button>
+    </div>
+</div>
+

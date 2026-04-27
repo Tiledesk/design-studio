@@ -284,6 +284,10 @@ $margin-bottom: 15px;
     }
 }
 
+#chart-container {
+    width: 100%;
+    height: 100%;
+}
 // cds-action-description {
 //     padding: 10px 0;
 //     margin-left: 10px;
@@ -297,7 +301,8 @@ cds-action-reply-text,
 cds-action-reply-image,
 cds-action-reply-frame,
 cds-action-reply-redirect,
-cds-action-reply-gallery{
+cds-action-reply-gallery,
+cds-action-reply-tts{
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -309,7 +314,8 @@ cds-action-reply-text.no-controls ::ng-deep,
 cds-action-reply-image.no-controls ::ng-deep,
 cds-action-reply-frame.no-controls ::ng-deep,
 cds-action-reply-redirect.no-controls ::ng-deep,
-cds-action-reply-gallery.no-controls ::ng-deep{
+cds-action-reply-gallery.no-controls ::ng-deep,
+cds-action-reply-tts.no-controls ::ng-deep{
     .text-editor-drop{
         display: none;
     }

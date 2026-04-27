@@ -297,7 +297,8 @@ cds-action-reply-text,
 cds-action-reply-image,
 cds-action-reply-frame,
 cds-action-reply-redirect,
-cds-action-reply-gallery{
+cds-action-reply-gallery,
+cds-action-reply-tts{
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -309,7 +310,8 @@ cds-action-reply-text.no-controls ::ng-deep,
 cds-action-reply-image.no-controls ::ng-deep,
 cds-action-reply-frame.no-controls ::ng-deep,
 cds-action-reply-redirect.no-controls ::ng-deep,
-cds-action-reply-gallery.no-controls ::ng-deep{
+cds-action-reply-gallery.no-controls ::ng-deep,
+cds-action-reply-tts.no-controls ::ng-deep{
     .text-editor-drop{
         display: none;
     }

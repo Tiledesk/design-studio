@@ -7,12 +7,12 @@
         
     </div>
     
-    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    <hr class="custom-hr attr-dialog__hr">
     
     <form>
         <div class="tpl-modal-content">
 
-            <div *ngFor="let attr of data.attributes" style="margin-bottom: 14px;">
+            <div *ngFor="let attr of data.attributes" class="attr-dialog__item">
                 <div class="attr-container">{{ attr.name }}</div>
                 <cds-textarea id="timeout"
                     class = "text-editable-div"

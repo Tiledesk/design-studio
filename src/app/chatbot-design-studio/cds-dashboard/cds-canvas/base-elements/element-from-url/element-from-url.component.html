@@ -1,31 +1,44 @@
-<div *ngIf="!metadata.src" class="response-frame-panel">
+<div *ngIf="metadata.src && !previewMode" class="content-frame">
+    <iframe 
+        id="contentFrame" 
+        #iframe allowfullscreen
+        style= "border:none;"
+        [width]="widthElement"
+        [height]="heightElement"
+        [src]="sanitizerUrl()">
+    </iframe>
+
+    <div class="control-button delete" (click)="onDeletePathElement()">
+        <em class="material-icons">clear</em>
+    </div>
+</div>
+<div *ngIf="!previewMode" class="response-frame-panel">
     <div class="row-upload">
         <div class="response-image-uploader-overlay">
     
             <div class="form-group">
-                <label class="control-label">
+                <label *ngIf="!metadata.src" class="control-label">
                     {{ 'CDSCanvas.AddPath' | translate }}
                 </label>
                 <cds-textarea 
+                    #pathTextarea
                     class="text-editable-div"
                     [text]="pathElement" 
-                    [minRow]="1" [maxRow]="2"
+                    [minRow]="1" [maxRow]="5"
                     [emojiPikerBtn]="false"
                     (blur)="onBlur($event)"
                     (changeTextarea)="onChangeTextArea($event)">
                 </cds-textarea>
             </div> 
     
-            <button 
+            <button
                 type="button" 
                 class="btn btn-primary cds-blue-button" 
                 (click)="onLoadPathElement()">
                 {{ 'CDSCanvas.LoadFrame' | translate }}
             </button>
         </div>
-    
     </div>
-
     
     <!-- <div class="row-dimension">
     
@@ -42,17 +55,10 @@
     </div> -->
 </div>
 
-<div *ngIf="metadata.src" class="content-frame">
-    <iframe 
-        id="contentFrame" 
-        #iframe allowfullscreen
-        style= "border:none;"
-        [width]="widthElement"
-        [height]="heightElement"
-        [src]="sanitizerUrl()">
-    </iframe>
-
-    <div class="control-button delete" (click)="onDeletePathElement()">
-        <em class="material-icons">clear</em>
+<div *ngIf="previewMode" class="preview-mode-wrapper">
+    <div class="icon-wrapper" matTooltipClass="custom-mat-tooltip" matTooltip="{{'Frame' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <img class="active-icon" src="assets/images/action-reply-types/file.svg"/>
     </div>
+    <div class="response-wrp">{{metadata.src}}</div>
 </div>
+

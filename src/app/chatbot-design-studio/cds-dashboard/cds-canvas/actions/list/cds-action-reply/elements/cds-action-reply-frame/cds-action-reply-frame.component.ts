@@ -43,6 +43,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   filterConditionExist: boolean = false;
   booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
 
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -86,6 +87,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
     this.wait.time = value*1000;
     this.isOpenDelaySlider = false;
     // this.canShowFilter = true;
+    // this.logger.log("[ActionReplyFrameComponent] onChangeDelayTime: ", this.response.metadata);
     this.changeActionReply.emit();
   }
 
@@ -93,6 +95,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
     this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    // this.logger.log("[ActionReplyFrameComponent] onChangeExpression: ", this.response.metadata);
     this.changeActionReply.emit();
   }
 
@@ -113,6 +116,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   /** onChangeTextarea */
   onChangeTextarea(text:string) {
+    this.logger.log("[ActionReplyFrameComponent] onChangeTextarea: ", text);
     if(!this.previewMode){
       this.response.text = text;
       // this.changeActionReply.emit();
@@ -120,25 +124,30 @@ export class CdsActionReplyFrameComponent implements OnInit {
   }
 
   onBlur(event){
+    // this.logger.log("[ActionReplyFrameComponent] onBlur: ", this.response.metadata);
     this.changeActionReply.emit();
   }
   
   /** */
   onDeletedMetadata(){
+    // this.logger.log("[ActionReplyFrameComponent] onDeletedMetadata: ", this.response.metadata);
     this.response.metadata.src = '';
     this.changeActionReply.emit();
   }
 
   /** */
   onLoadPathElement(){
-    // // this.response.metadata.height = '1000px';
+    this.response.metadata.height = this.heightIframe+'px';
+    // this.logger.log("[ActionReplyFrameComponent] onLoadPathElement: ", this.response.metadata);
     this.changeActionReply.emit();
   }
 
   /** */
   onChangeHeightIframe(height){
+    this.heightIframe = height;
     this.isOpenHeightSlider = false;
     this.response.metadata.height = height+'px';
+    // this.logger.log("[ActionReplyFrameComponent] onChangeHeightIframe: ", this.response.metadata);
     this.changeActionReply.emit();
   }
   

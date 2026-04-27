@@ -1,0 +1,36 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>Set Attributes</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+        
+    </div>
+    
+    <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+    
+    <form>
+        <div class="tpl-modal-content">
+
+            <div *ngFor="let attr of data.attributes" style="margin-bottom: 14px;">
+                <div class="attr-container">{{ attr.name }}</div>
+                <cds-textarea id="timeout"
+                    class = "text-editable-div"
+                    [text]="attr.value"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="false"
+                    [minRow]="1" [maxRow]="5"
+                    (changeTextarea)="onChangeTextarea($event, attr.name)">
+                </cds-textarea>
+            </div>
+
+        </div>
+        <div class="tpl-modal-buttons">
+            <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">Cancel</button>
+            <button #setVarBtn id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" [disabled]="btn_disabled"
+                (click)="onGenerateClick()">Generate
+            </button>
+        </div>
+    </form>
+</div>

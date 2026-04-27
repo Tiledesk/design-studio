@@ -19,6 +19,7 @@ export class ImagePreloaderResolver implements Resolve<boolean> {
       DOC_BASE_URL+'ADD_TAGS.png',
       DOC_BASE_URL+'AGENT.png',
       DOC_BASE_URL+'AI_PROMPT.png',
+      DOC_BASE_URL+'AI_CONDITION.png',
       DOC_BASE_URL+'ASKGPT.png',
       DOC_BASE_URL+'ASSIGN_VARIABLE.png',
       DOC_BASE_URL+'BREVO.png',

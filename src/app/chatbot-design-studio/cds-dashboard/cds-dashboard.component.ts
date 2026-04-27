@@ -18,6 +18,7 @@ import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
+import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 
 // MODEL //
 import { Project } from 'src/app/models/project-model';
@@ -63,6 +64,7 @@ export class CdsDashboardComponent implements OnInit {
     private dashboardService: DashboardService,
     private kbService: KnowledgeBaseService,
     public departmentService: DepartmentService,
+    private uploadService: UploadService,
     public faqKbService: FaqKbService,
     public faqService: FaqService,
     private openaiService: OpenaiService,
@@ -189,6 +191,7 @@ export class CdsDashboardComponent implements OnInit {
     this.aiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
+    this.uploadService.initialize(this.project._id);
 
     this.hideShowWidget('hide')
 

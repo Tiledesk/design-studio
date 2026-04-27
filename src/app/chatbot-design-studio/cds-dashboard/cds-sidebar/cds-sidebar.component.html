@@ -170,7 +170,7 @@
             </p>
         </div> -->
 
-        <div id="cds-sb-rules" name="rules" class="section"
+        <div *ngIf="showRulesButton || isRulesRouteActive" id="cds-sb-rules" name="rules" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{'Rules' | translate}}"
             #tooltip="matTooltip" 

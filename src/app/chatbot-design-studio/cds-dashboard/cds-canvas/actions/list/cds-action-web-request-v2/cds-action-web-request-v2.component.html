@@ -14,6 +14,24 @@
         {{'CDSCanvas.EnterRequestURL' | translate}}
     </div>
 
+    <div class="action-row">
+        <div class="output-assignments">
+            <span class="output-item" *ngIf="action?.assignResultTo">
+                <span class="output-key">{{ 'CDSCanvas.AssignResultTo' | translate }}:</span>
+                <span class="tag output-val ellips">{{ action.assignResultTo }}</span>
+            </span>
+            <span class="output-item" *ngIf="action?.assignStatusTo">
+                <span class="output-key">{{ 'CDSCanvas.AssignStatusTo' | translate }}:</span>
+                <span class="tag output-val ellips">{{ action.assignStatusTo }}</span>
+            </span>
+            <span class="output-item" *ngIf="action?.assignErrorTo">
+                <span class="output-key">{{ 'CDSCanvas.AssignErrorTo' | translate }}:</span>
+                <span class="tag output-val ellips">{{ action.assignErrorTo }}</span>
+            </span>
+            <span class="output-empty" *ngIf="!action?.assignResultTo && !action?.assignStatusTo && !action?.assignErrorTo">—</span>
+        </div>
+    </div>
+
     <div class="previewContent">
         
         <div class="icon-action">
@@ -170,6 +188,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignResultTo"
@@ -184,6 +203,7 @@
             [textLimitBtn]="false" 
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignStatusTo"
@@ -199,6 +219,7 @@
             [textLimitBtn]="false"
             [emojiPikerBtn]="false" 
             [setAttributeBtn]="true"
+            [isLiquidjs]="false"
             [minRow]="1" [maxRow]="1" 
             [readonly]="true" 
             [text]="action.assignErrorTo"

@@ -9,7 +9,7 @@ export class FilterPipe implements PipeTransform {
     if (!items || !filter) {
       return items;
     }
-    return items.filter(item => item[filter['key']] ===  filter['value'])[0];
+    return items.filter(item => item[filter['key']] ===  filter['value']);
   }
 
 }

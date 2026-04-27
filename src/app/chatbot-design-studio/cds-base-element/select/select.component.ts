@@ -1,5 +1,5 @@
 import { FormControl, FormGroup } from '@angular/forms';
-import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { RESERVED_INTENT_NAMES } from '../../utils';
 
@@ -11,12 +11,14 @@ import { RESERVED_INTENT_NAMES } from '../../utils';
 export class SelectComponent implements OnInit {
   @ViewChild('ngSelect', { static: true }) ngSelect: NgSelectComponent;
 
-  @Input() items: []
+  @Input() items: any[] = [];
   @Input() itemSelected: any;
   @Input() bindLabelSelect: string;
   @Input() bindValueSelect: string;
   @Input() optionalBindAdditionalText: string; 
   @Input() optionalBindDescription: string; 
+  /** If true, renders the optionalBindAdditionalText as a right-aligned badge (opt-in, default false). */
+  @Input() additionalTextAsBadge: boolean = false;
   @Input() groupByKey: string; 
   @Input() footerButton: boolean = false;
   @Input() footerButtonDisabled: boolean = false;
@@ -26,6 +28,8 @@ export class SelectComponent implements OnInit {
   @Input() deleteButton: boolean = false;
   @Input() clearable: boolean = false;
   @Input() searchable: boolean = false;
+  /** If true, sorts items alphabetically (default true for backward compatibility). */
+  @Input() sortAlphabetically: boolean = true;
   @Input() placeholder: string = 'Select an option'
   @Input() formGroup: FormGroup = new FormGroup({ select: new FormControl()});
   @Input() formControlName: string = 'select';
@@ -35,6 +39,7 @@ export class SelectComponent implements OnInit {
 
   RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
   valueFormGroup: FormGroup 
+  sortedItems: any[] = [];
   
   constructor() { }
 
@@ -42,16 +47,43 @@ export class SelectComponent implements OnInit {
     // empty
   }
 
-  ngOnChanges(){
-    if(this.itemSelected && this.items){
-      //   this.itemSelected = this.items.find(el => el[this.bindValueSelect] === this.itemSelected)
-      try {
-        this.itemSelected = this.items.find(el => el[this.bindValueSelect] === this.itemSelected)[this.bindValueSelect]
-      } catch (error) {
-        console.error('ERROR', error);
-      }
-      
+  ngOnChanges(changes: SimpleChanges){
+    // Ordina items in ordine alfabetico crescente (come cds-panel-intent-list)
+    // Unless explicitly disabled to preserve incoming order.
+    if (changes['items'] || changes['bindLabelSelect'] || changes['groupByKey'] || changes['sortAlphabetically']) {
+      this.sortedItems = this.sortAlphabetically ? this.sortItemsAlphabetically(this.items) : [...(this.items || [])];
     }
+
+    if (this.itemSelected != null && this.sortedItems?.length && this.bindValueSelect) {
+      try {
+        const found = this.sortedItems.find(el => el[this.bindValueSelect] === this.itemSelected);
+        this.itemSelected = found ? found[this.bindValueSelect] : this.itemSelected;
+      } catch (error) {
+        //console.error('ERROR', error);
+      }
+    }
+  }
+
+  private sortItemsAlphabetically(items: any[]): any[] {
+    if (!Array.isArray(items) || items.length === 0) return items || [];
+    if (!this.bindLabelSelect) return [...items];
+
+    const labelKey = this.bindLabelSelect;
+    const groupKey = this.groupByKey;
+
+    return [...items].sort((a: any, b: any) => {
+      // Se è presente il groupByKey, ordina prima per gruppo poi per label
+      if (groupKey) {
+        const groupA = (a?.[groupKey] ?? '').toString().toLowerCase();
+        const groupB = (b?.[groupKey] ?? '').toString().toLowerCase();
+        const groupCmp = groupA.localeCompare(groupB);
+        if (groupCmp !== 0) return groupCmp;
+      }
+
+      const nameA = (a?.[labelKey] ?? '').toString().toLowerCase();
+      const nameB = (b?.[labelKey] ?? '').toString().toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
   }
 
   onChangeActionButton(event) {

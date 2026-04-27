@@ -1572,7 +1572,7 @@
         "CreationDate": "Yaradılma tarixi",
         "KbCounterFooter": "{{ counter }} 3 Bilik bazası əlavə edildi",
         "AddKbInfoFirstText": "Bilik Bazası və GPT açarınız üçün etibarlı URL təyin edin.",
-        "AddKbInfoSecondText": "Qeyd: maksimum 3 Knwoledge bazası əlavə edə bilərsiniz.",
+        "AddKbInfoSecondText": "Qeyd: maksimum 3 Knowledge bazası əlavə edə bilərsiniz.",
         "SearchingAnswer": "Uyğun cavab axtarılır...",
         "Answer": "Cavab verin",
         "NoAnswerFound": "Müvafiq cavab tapmaq mümkün deyil",

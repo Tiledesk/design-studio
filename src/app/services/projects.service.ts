@@ -42,6 +42,34 @@ export class ProjectService {
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }
 
+  /**
+   * MCP Tools discovery for a specific MCP server endpoint.
+   *
+   * API:
+   * POST /api/{id_project}/mcp/tools
+   * Body: { url: "<server_url>" }
+   *
+   * NOTE: we build the URL following the same pattern used by other project-scoped endpoints:
+   * SERVER_BASE_URL + project_id + '/mcp/tools'
+   */
+  public getMcpTools(project_id: string, server_url: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/tools';
+    this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - URL', url);
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: this.tiledeskToken
+      })
+    };
+
+    const body = { url: server_url };
+    return this.http.post(url, body, httpOptions).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - RES ', res);
+      return res;
+    }));
+  }
+
 
   getCurrentProject(): Project {
     return this.project
@@ -241,8 +269,53 @@ export class ProjectService {
       })
     };
     return this.http.get(url, httpOptions);
+  }
+
+
+   getIntegrations(project_id: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/integration';
+    this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: this.tiledeskToken
+      })
+    };
+    return this.http.get(url, httpOptions);
    }
 
+   // ----------------------------------------------------------
+   // Save/Update MCP Server in integration
+   // ----------------------------------------------------------
+
+   saveIntegration(project_id: string, integration:any) {
+    this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER', integration);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    }
+    const url = this.SERVER_BASE_URL + project_id + "/integration/";
+    this.logger.debug('[TILEDESK-SERVICE] - save integration URL: ', url);
+    return this.http.post(url, integration, httpOptions);
+  }
+
+  //  updateMcpServer(project_id: string, mcpServer: { name: string, url: string, transport: string }): Observable<any> {
+  //   this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER', mcpServer);
+  //   const httpOptions = {
+  //     headers: new HttpHeaders({
+  //       'Content-Type': 'application/json',
+  //       'Authorization': this.tiledeskToken
+  //     })
+  //   };
+
+  //   const url = this.SERVER_BASE_URL + project_id + "/integration";
+  //   this.logger.log('[TILEDESK-SERVICE] - UPDATE MCP SERVER - URL: ', url);
+
+  //   return this.http.put(url, mcpServer, httpOptions);
+  // }
 
    
 

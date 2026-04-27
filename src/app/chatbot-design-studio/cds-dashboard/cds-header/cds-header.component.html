@@ -31,7 +31,7 @@
     </div>
     <div class="header-title ellips">
         {{ selectedChatbot?.name }}
-        <span class="material-icons" [matMenuTriggerFor]="menuShare">ios_share</span>
+        <span class="material-icons" *ngIf="(SHARE_MENU_ITEMS | filter:{key: 'status', value: 'active' }).length > 0" [matMenuTriggerFor]="menuShare">ios_share</span>
     </div>
     <div class="right-opts">
 
@@ -41,7 +41,15 @@
                     cached
                 </span> -->
                 {{ 'Publish' | translate}}
+                <span *ngIf="selectedChatbot?.modified" 
+                  class="publish-badge"
+                  [matTooltip]="'CDSHeader.ThereAreUnpublishedChanges' | translate"
+                  matTooltipClass="cds-mat-tooltip"
+                  matTooltipPosition="below"
+                  matTooltipHideDelay="100">
+                </span>
             </button>
+            
 
             <!-- <button mat-icon-button [matMenuTriggerFor]="releasehistory"  class="custom-mat-icon-btn">
                 <mat-icon> arrow_drop_down </mat-icon>

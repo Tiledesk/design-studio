@@ -5,12 +5,11 @@
     <div size="4" class="cds-elements" mat-button>
 
         <!-- ACTIONS -->
-        
         <div #div3 *ngFor="let actionCategory of ACTION_CATEGORY" class="cds-element" 
             (click)="onAddNewElement()"  
-            (mouseout)="onCloseMenu()" 
-            (mouseleave)="onCloseMenu()"
-            (mouseover)="onOpenMenu(div3, TYPE_OF_MENU.ACTION, actionCategory.type)">
+            (mouseout)="!isDraggingMenuElement && onCloseMenu()" 
+            (mouseleave)="!isDraggingMenuElement && onCloseMenu()"
+            (mouseover)="!isDraggingMenuElement && onOpenMenu(div3, TYPE_OF_MENU.ACTION, actionCategory.type)">
             <div *ngIf="actionsByCategory[actionCategory.type]" class="cds-button-element">
                 <div class="cds-box-button">
                     <span class="box-img">

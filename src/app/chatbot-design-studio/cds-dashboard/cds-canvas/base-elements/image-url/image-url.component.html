@@ -1,0 +1,18 @@
+<div class="wrapper">
+  <div class="dropUploadImage link">
+    <div class="field-box">
+      <cds-textarea
+        class="text-editable-div"
+        [text]="metadata.src"
+        [textLimitBtn]="false"
+        [emojiPikerBtn]="false"
+        [setAttributeBtn]="true"
+        [minRow]="1" [maxRow]="2"
+        [placeholder]="'Enter image URL...'"
+        (blur)="onBlurUrl(metadata.src)"
+        (changeTextarea)="onChangeUrl($event)">
+      </cds-textarea>
+    </div>
+  </div>
+
+</div> 

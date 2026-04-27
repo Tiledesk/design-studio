@@ -410,19 +410,23 @@ export class ActionAskGPT extends Action {
 export class ActionKBContent extends Action {
     name: string;
     content: string;
+    source: string;
     type: string;
     namespace: string;
     namespaceAsName: boolean;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.KB_CONTENT;
-        this.type = "text";
+        this.type = "faq";
     }
 }
 
 export class ActionAskGPTV2 extends Action {
     question: string;
     model: string;
+    llm: string;
+    modelName: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignChunksTo: string;
@@ -442,6 +446,11 @@ export class ActionAskGPTV2 extends Action {
     namespaceAsName: boolean;
     citations: boolean;
     chunks_only: boolean;
+    skip_unanswered: boolean;
+    reranking: boolean;
+    reranking_multiplier?: number;
+  value: string;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -480,14 +489,21 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+/** Livello di reasoning: low | medium | high */
+export type ReasoningLevel = 'low' | 'medium' | 'high';
+
 export class ActionAiPrompt extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
     history: boolean;
+    reasoning?: boolean;
+    reasoningLevel?: ReasoningLevel;
     max_tokens: number;
     temperature: number;
+    labelModel: string;
     llm: string;
+    modelName: string;
     model: string;
     preview?: Array<any>;
     trueIntent: string;
@@ -498,12 +514,44 @@ export class ActionAiPrompt extends Action {
     }
 }
 
+export class ActionAiCondition extends Action {
+    question: string;
+    intents: Array<any>;
+    instructions: string;
+    llm: string;
+    modelName: string;
+    model: string;
+    max_tokens: number;
+    temperature: number;
+    labelModel: string;
+    preview?: Array<any>;
+    fallbackIntent: string;
+    errorIntent: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.AI_CONDITION,
+        this.intents = [];
+    }
+}
+
 export class ActionCaptureUserReply extends Action {
     assignResultTo: string;
     goToIntent: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.CAPTURE_USER_REPLY
+    }   
+}
+
+export class ActionIteration extends Action {
+    iterable: any;
+    assignOutputTo: string;
+    goToIntent: string;
+    fallbackIntent: string;
+    delay: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ITERATION
     }   
 }
 
@@ -633,12 +681,14 @@ export class Metadata {
 export class Attachment {
     type: string;
     json_buttons?: string;
+    json_gallery?: string;
     buttons?: Button[];
     gallery?: GalleryElement[];
     constructor() {
         this.type = TYPE_ATTACHMENT.TEMPLATE;
         this.buttons = [];
         this.json_buttons = '';
+        this.json_gallery = '';
     }
 }
 

@@ -414,4 +414,19 @@
     margin-left: 10px;
 }
 
+.link-container {
+    .link {
+        font-size: 14px;
+        font-weight: 400;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
+
+.panel-intent-detail {
+    .field-box {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
 // --------- end webhho --------- //

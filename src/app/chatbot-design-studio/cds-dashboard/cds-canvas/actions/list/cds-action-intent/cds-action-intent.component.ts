@@ -64,6 +64,7 @@ export class CdsActionIntentComponent implements OnInit {
 
   private checkConnectionStatus(){
     const resp = checkConnectionStatusByConnector(this.action.intentName, this.idConnector);
+    this.logger.log('[ACTION-INTENT] - checkConnectionStatusByConnector:', this.action.intentName, this.idConnector, resp);
     this.isConnected  = resp.isConnected;
     this.idConnection = resp.idConnection;
   } 
@@ -97,6 +98,7 @@ export class CdsActionIntentComponent implements OnInit {
     this.intents = this.intentService.getListOfIntents();
     this.intents.sort((a, b) => a.name.localeCompare(b.name));
     this.element = Object.values(ACTIONS_LIST).find(el => el.type === this.action._tdActionType);
+    // this.logger.log('[CDS-ACTION-INTENT] - initialize - element ', this.element);
     this.checkConnectionStatus();
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idIntentSelected ', this.idIntentSelected);
     this.logger.log('[CDS-ACTION-INTENT] - initialize - idConnector ', this.idConnector);

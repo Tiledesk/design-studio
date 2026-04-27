@@ -17,6 +17,11 @@
     justify-content: center;
     color: #728087;
     padding: 6px;
+    
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .list-title{
@@ -42,6 +47,11 @@
             border: none;
             color: var(--icon-color-active);
             text-align: left;
+            
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
 
             &::placeholder {
                 color: var(--icon-color-active);

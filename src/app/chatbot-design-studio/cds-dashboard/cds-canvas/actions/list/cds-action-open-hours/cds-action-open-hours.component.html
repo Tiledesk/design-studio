@@ -9,14 +9,14 @@
 
         <div *ngIf="action?.slotId" class="action-row-right">
             <span *ngIf="action.slotId === ''">
-                {{ (radioOptions | filter:{key: 'category', value: 'general'}).name | translate }} 
+                {{ (radioOptions | find:{key: 'category', value: 'general'}).name | translate }} 
             </span>
             <span *ngIf="action.slotId !== ''">
-                <b>{{ (timeSlots | filter:{key: 'value', value: action.slotId}).name }}</b>
+                <b>{{ (timeSlots | find:{key: 'value', value: action.slotId}).name }}</b>
             </span>
         </div>
         <div *ngIf="!action?.slotId" class="action-row-right">
-            {{ (radioOptions | filter:{key: 'category', value: 'general'}).name | translate }} 
+            {{ (radioOptions | find:{key: 'category', value: 'general'}).name | translate }} 
         </div>
     </div>
 

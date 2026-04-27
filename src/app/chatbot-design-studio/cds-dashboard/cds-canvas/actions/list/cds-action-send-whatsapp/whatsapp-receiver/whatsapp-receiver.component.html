@@ -34,7 +34,7 @@
                             <img [src]="header_params[0].image.link" (error)="onHeaderImageError($event)" />
                         </div> -->
                         <span *ngIf="header_component?.format === 'IMAGE'">
-                            <img [src]="header_params[0].image.link" (error)="onHeaderImageError($event)" />
+                            <img [src]="header_params[0]?.image?.link" (error)="onHeaderImageError($event)" />
                         </span>
                         <span *ngIf="header_component?.format === 'DOCUMENT'">
                             <div class="pdf-preview">
@@ -157,7 +157,7 @@
                         [emojiPikerBtn]="false"
                         [textLimitBtn]="false"
                         [minRow]="1" [maxRow]="1" 
-                        [text]="header_params[i].image.link" 
+                        [text]="getHeaderParamLink(i)" 
                         [placeholder]="'CDSCanvas.InsertValidURLOrUpdateFile' | translate "
                         (blur)="onBlur($event)" (focus)="onFocus()"
                         (selectedAttribute)="onSelectedAttribute($event, 'header_params', i+1)"

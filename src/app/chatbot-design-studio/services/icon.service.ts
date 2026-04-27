@@ -139,6 +139,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/ai-prompt.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/ai-condition.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/ai-condition.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions/add_kb_content.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/add_kb_content.svg')
     );
@@ -278,6 +282,10 @@ export class IconService {
       'assets/images/actions/flow_log.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/flow_log.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/repeat.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/repeat.svg')
+    );
 
 
 
@@ -400,6 +408,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/more_vert.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'more_horiz',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/more_horiz.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'mouse',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/mouse.svg')
     );
@@ -482,6 +494,14 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'stacks',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stacks.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'brain',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/brain.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'change_circle',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/change_circle.svg')
     );
   }
 }

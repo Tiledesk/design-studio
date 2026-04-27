@@ -1,0 +1,53 @@
+<div class="app-interruption">
+  <div class="header">
+    <div class="title">{{ 'AppInterruption.Title' | translate }}</div>
+    <div class="subtitle">
+      {{ 'AppInterruption.Message' | translate }}
+    </div>
+  </div>
+
+  <!--
+  <div class="body">
+    <div class="row"><span class="k">Trigger</span><span class="v">{{data.trigger}}</span></div>
+    <div class="row"><span class="k">Visibility</span><span class="v">{{data.visibilityState}}</span></div>
+    <div class="row"><span class="k">navigator.onLine</span><span class="v">{{data.navigatorOnLine}}</span></div>
+    <div class="row"><span class="k">document.wasDiscarded</span><span class="v">{{data.wasDiscardedAtLoad}}</span></div>
+    <div class="row" *ngIf="data.hiddenDurationMs !== null">
+      <span class="k">Tempo in background</span>
+      <span class="v">{{data.hiddenDurationMs}} ms</span>
+    </div>
+    <div class="row">
+      <span class="k">Page Lifecycle</span>
+      <span class="v">
+        freezeAt={{data.lastFreezeAt}} / resumeAt={{data.lastResumeFromFreezeAt}}
+      </span>
+    </div>
+    <div class="row">
+      <span class="k">BFCache</span>
+      <span class="v">pageshow.persisted={{data.lastPageShowPersisted}} (at={{data.lastPageShowAt}})</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <span class="k">Backend check</span>
+      <span class="v" *ngIf="loading">in corso…</span>
+      <span class="v" *ngIf="!loading">
+        {{health?.ok ? 'OK' : 'FAIL'}}<span *ngIf="health?.status"> ({{health?.status}})</span>
+        <span *ngIf="health?.elapsedMs"> - {{health?.elapsedMs}} ms</span>
+      </span>
+    </div>
+    <div class="row" *ngIf="!loading">
+      <span class="k">URL</span>
+      <span class="v mono">{{health?.url}}</span>
+    </div>
+  </div>
+  -->
+
+  <div class="footer">
+    <button class="btn primary" type="button" (click)="refresh()">
+      {{ 'AppInterruption.Refresh' | translate }}
+    </button>
+  </div>
+</div>
+

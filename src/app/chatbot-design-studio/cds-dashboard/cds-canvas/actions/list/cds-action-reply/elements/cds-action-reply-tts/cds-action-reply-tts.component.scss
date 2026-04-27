@@ -1,0 +1,100 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+
+.previewMode{
+    &.buttons-response{
+        padding: 0px 0px 0px 0px;
+        margin: 0;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: center;
+        .button-reply-add {
+            color: var(--blu-light-02);
+            border-color: var(--blu-light-02);
+        }
+    }
+
+}
+
+/* ./ Preview mode 
+/* ****************************** */
+
+
+.editor-utils {
+    position: relative;
+    margin: -20px 50px 0px 0px;
+    float: right;
+    .num-chars {
+        background: var(--blu-light-01);
+        flex-shrink: 0;
+        padding: 0px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+        color: var(--blu);
+        float: right;
+        line-height: 24px;
+        font-weight: 700;
+        text-align: center;
+        &.error {
+            background: var(--color-red-hex);
+            color: var(--color-white-hex);
+            }
+    }
+    .text-editor-insert-attribute {
+        float: right;
+    }
+    .moji-picker {
+        float: right;
+    }
+}
+
+
+/** box-textarea **/
+cds-textarea.text-editable-div ::ng-deep{
+    display: block;
+    margin-left: 30px;
+    margin-right: 30px;
+    textarea {
+        line-height: 20px !important; 
+        width: calc(100% - 20px) !important;
+        font-size: 0.9em !important;
+    }
+}
+
+.tts-badge{
+    margin: 0 30px 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--blu-light-01);
+    color: var(--blu);
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 18px;
+    user-select: none;
+}
+
+.text-editor-wrapper.previewMode{
+    .tts-badge{
+        width: fit-content;
+        margin: 0 0 6px calc(5px / 2);
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: var(--blu);
+        color: var(--color-white-hex);
+    }
+    .tts-badge__icon{
+        filter: none;
+    }
+}
+
+.tts-badge__icon{
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    vertical-align: middle;
+    /* Recolor monochrome svg (default #fff) to match --blu (#506493) */
+    filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1063%) hue-rotate(187deg) brightness(93%) contrast(90%);
+}

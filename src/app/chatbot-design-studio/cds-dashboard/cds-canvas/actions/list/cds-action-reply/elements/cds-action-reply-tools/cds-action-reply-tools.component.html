@@ -28,4 +28,9 @@
         <img class="active-icon" src="assets/images/action-reply-types/redirect.svg"/>
         <!-- <span>{{'Redirect' | translate}}</span> -->
     </div>
+    <div class="add-response" (click)="addElement(TypeMessage.TTS)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'TTS' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <img class="active-icon" src="assets/images/action-reply-types/tts.svg"/>
+        <!-- <span>{{'TTS' | translate}}</span> -->
+    </div>
 </div>

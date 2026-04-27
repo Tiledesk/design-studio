@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -61,6 +61,21 @@ div {
         background-color: #ecb606;
         color: white;
 
+    }
+
+    div.tag-replyto {
+        display: flex;
+        width: fit-content;
+        border-radius: 4px;
+        font-size: 10px;
+        margin: 0px;
+        height: fit-content;
+        padding: 0px 6px;
+        max-width: calc(100% - 25px);
+        background-color: var(--blu);
+        color: var(--color-white-hex);
+        flex-wrap: nowrap;
+        text-align: end;
     }
 }
 
@@ -147,6 +162,48 @@ mat-expansion-panel ::ng-deep {
         color: var(--text-color);
     }
 
+    .title-and-parameters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .parameters-preview {
+        font-size: 11px;
+        height: 24px;
+        line-height: normal;
+        span {
+            line-height: 16px;
+            margin-right: 5px;
+        }
+        .preview-badge {
+            color: #fff;
+            background-color: var(--blu);
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 4px;
+            .preview-badge-text {
+                padding: 0;
+                margin:0;
+            }
+        }
+        .preview-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 12px;
+            height: 12px;
+            font-size: 12px;
+            line-height: 12px;
+            margin: 0;
+            vertical-align: middle;
+            color: var(--color-white-hex);
+        }
+        .preview-flag{
+            margin:0;
+        }
+    }
+
     .mat-expansion-indicator::after {
         color: var(--text-color) !important;
     }
@@ -221,11 +278,17 @@ mat-checkbox ::ng-deep {
     text-align: center;
     transition: width 0.3s ease-in;
     font-size: 14px;
+    &.disabled {
+        opacity: 0.5;
+    }
 }
 
 .action-wait-slider>mat-slider {
     width: 100%;
     margin-left: 6px;
+}
+.action-wait-slider.disabled {
+    opacity: 0.4;
 }
 
 .action-wait-slider ::ng-deep{
@@ -237,10 +300,12 @@ mat-checkbox ::ng-deep {
     }
     .mat-slider-thumb-label-text{
         color: var(--background-color) !important;
+        font-size: 10px !important;
     }
     .mat-slider-thumb {
         background-color: var(--text-color) !important;
     }
+   
 }
 
 .gpt-setting-input {
@@ -252,11 +317,26 @@ mat-checkbox ::ng-deep {
     border-radius: 12px;
     background-color: white;
     border: 1px solid var(--text-color);
+
+    // Hide number input spinner arrows
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    &[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 }
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }
@@ -314,7 +394,7 @@ mat-checkbox ::ng-deep {
 
 .preview-container-extended {
     max-height: 300px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .placeholder-container {
@@ -414,4 +494,194 @@ loading-spinner.custom-spinner ::ng-deep {
     width: 100%;
 }
 
+
+.configure-model-button {    
+    color: var(--blu);
+    text-align: right;
+    padding: 0 5px;
+    text-decoration: underline;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+
+
+cds-select#model-condition.not-configured ::ng-deep {
+    .ng-select .ng-select-container {
+        border: 1px solid var(--empty-value-text-color);
+    }
+    .ng-select .ng-select-container .ng-value span.label-select{
+        color: var(--empty-value-text-color);
+    }
+}
+
+
+.select-container {
+    &.not-configured {
+        ::ng-deep .ng-select .ng-select-container {
+            .ng-value {
+                span.label-select {
+                    color: var(--empty-value-text-color);
+                }
+            }
+        }
+        ::ng-deep .text-editor-wrapper .text-editor .box-input input {
+            color: var(--empty-value-text-color)!important;
+            border: 1px solid var(--empty-value-text-color)!important;
+        }
+    }
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: var(--empty-value-text-color);
+        border-radius: 50%;
+        margin: 0px;
+        position: absolute;
+        left: 0px;
+        top: 96px;
+    }
+}
+
+// Bottom row styles for model selection
+.bottom-row {
+    display: flex;
+    align-items: center;
+    margin-top: 0px;
+    padding-left: 0px;
+    flex-direction: row-reverse;
+}
+
+.multiplier-container {
+    color: var(--gray);
+    font-size: 12px;
+    display: inline-block;
+}
+
+.configure-model-button {
+    cursor: pointer;
+    color: var(--blu-02);
+    font-size: 12px;
+    text-decoration: underline;
+    display: inline-block;
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+// MCP TOOLS PREVIEW --- start **************** //
+.mcp-tools-preview-container {
+    padding: 8px 0px;
+    margin-top: 8px;
+}
+
+.mcp-tools-header {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray);
+    text-transform: uppercase;
+}
+
+.mcp-tools-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mcp-tool-tag {
+    background-color: #e8f4ff;
+    color: var(--blu-02);
+    padding: 0px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-family-poppins);
+    white-space: nowrap;
+    display: inline-block;
+}
+// MCP TOOLS PREVIEW --- end **************** //
+
+// MCP SERVERS SECTION --- start **************** //
+.mcp-servers-section {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.mcp-servers-grid {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.mcp-server-button {
+    background-color: #ffffff;
+    border: 0px solid var(--blu-02);
+    border-radius: 4px;
+    padding: 0px 10px;
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    color: var(--blu-02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    position: relative;
+    
+    &:hover {
+        background-color: #e8f4ff;
+        border-color: var(--blu);
+        color: var(--blu);
+    }
+
+    &.selected {
+        background-color: #e8f4ff;
+        border-color: var(--blu-02);
+        padding-right: 30px;
+        justify-content: flex-start;
+        cursor: default;
+        .remove-icon {
+            position: absolute;
+            right: 4px;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+            padding: 2px;
+            &:hover {
+                background-color: rgba(255, 0, 0, 0.1);
+                color: #ff0000;
+            }
+        }
+    }
+
+    &.add-tool-button {
+        background-color: white;
+        border: 2px dashed #d0d0d0;
+        color: #999;
+        font-weight: 400;
+        
+        &:hover {
+            background-color: #fafafa;
+            border-color: #b0b0b0;
+            color: #666;
+        }
+    }
+}
+// MCP SERVERS SECTION --- end **************** //
+
 // PREVIEW SECTION --- start **************** //
+
+.checkbox-reasoning{
+    margin-top: -20px;
+}
+.checkbox-reasoning .reasoning-checkbox-disabled ::ng-deep .mat-checkbox-background {
+    background-color: #e0e0e0 !important;
+}

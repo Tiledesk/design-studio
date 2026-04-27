@@ -1,3 +1,4 @@
+import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -31,9 +32,13 @@ export class DashboardService {
   intent_id: string;
 
   selectedChatbot: Chatbot;
+  /** Reactive stream for components that need to react to chatbot changes. */
+  readonly selectedChatbot$ = new BehaviorSubject<Chatbot | null>(null);
   translateparamBotName: any;
 
   project: Project;
+  /** Reactive stream for components that need to react to project changes. */
+  readonly project$ = new BehaviorSubject<Project | null>(null);
   projectID: string;
 
   departments: Department[]
@@ -92,6 +97,7 @@ export class DashboardService {
           this.logger.log('[CDS DSHBRD] - GET BOT BY ID RES - chatbot', chatbot);
           if (chatbot) {
             this.selectedChatbot = chatbot;
+            this.selectedChatbot$.next(chatbot);
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }
             variableList.find(el => el.key ==='userDefined').elements = [];
             if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {
@@ -106,6 +112,7 @@ export class DashboardService {
                 value: name
               }))
             }
+            //this.logger.log('[CDS DSHBRD] - variableList', variableList, this.selectedChatbot.attributes, this.selectedChatbot.attributes?.globals);
             resolve(true);
           }
         }, error: (error) => {
@@ -130,6 +137,7 @@ export class DashboardService {
       this.projectService.getProjectById(this.projectID).subscribe({ next: (project: Project)=>{
         if (project) {
           this.project = project;
+          this.project$.next(project);
           this.projectID = project._id;
           resolve(true);
         }

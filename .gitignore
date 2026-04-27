@@ -57,3 +57,5 @@ Thumbs.db
 /src/environments/env-locali
 /src/environments/real_data
 settings.json
+docs
+.claude

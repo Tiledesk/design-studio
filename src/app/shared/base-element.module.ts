@@ -13,6 +13,7 @@ import { CDSImageUploadComponent } from '../chatbot-design-studio/cds-dashboard/
 import { CDSAudioUploadComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/audio-upload/audio-upload.component';
 import { CDSDelayTextComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/delay-text/delay-text.component';
 import { CDSTextareaComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/textarea/textarea.component';
+import { CDSImageUrlComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/image-url/image-url.component';
 
 
 @NgModule({
@@ -23,6 +24,7 @@ import { CDSTextareaComponent } from '../chatbot-design-studio/cds-dashboard/cds
     CDSDelayTextComponent,
     CDSElementFromUrlComponent,
     CDSImageUploadComponent,
+    CDSImageUrlComponent,
     CDSAudioUploadComponent,
     CDSTextComponent,
     CDSTextareaComponent,
@@ -42,6 +44,7 @@ import { CDSTextareaComponent } from '../chatbot-design-studio/cds-dashboard/cds
     CDSDelayTextComponent,
     CDSElementFromUrlComponent,
     CDSImageUploadComponent,
+    CDSImageUrlComponent,
     CDSAudioUploadComponent,
     CDSTextComponent,
     CDSTextareaComponent,
