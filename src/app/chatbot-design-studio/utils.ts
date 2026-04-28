@@ -186,6 +186,7 @@ export enum TYPE_MESSAGE {
     FRAME       = 'frame',
     GALLERY     = 'gallery',
     REDIRECT    = 'redirect',
+    URL_PREVIEW = 'url_preview',
     AUDIO       = 'audio'
 }
 

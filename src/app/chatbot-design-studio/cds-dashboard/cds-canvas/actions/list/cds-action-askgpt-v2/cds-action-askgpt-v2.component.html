@@ -636,6 +636,21 @@
         </cds-textarea>
     </div>
 
+    <div class="field-box" [class.disabled]="action?.chunks_only">
+        <label class="title-label">{{'CDSCanvas.KBJsonSources' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignJsonSourcesTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignJsonSourcesTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignJsonSourcesTo')">
+        </cds-textarea>
+    </div>
+
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.KBChunks' | translate}}</label>
         <cds-textarea id="assignTo" 

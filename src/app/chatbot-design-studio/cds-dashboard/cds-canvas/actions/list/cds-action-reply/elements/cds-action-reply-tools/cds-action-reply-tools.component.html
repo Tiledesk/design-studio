@@ -5,6 +5,11 @@
         <!-- <span>{{'Text' | translate}}</span> -->
     </div>
 
+    <div class="add-response" (click)="addElement(TypeMessage.URL_PREVIEW)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'UrlPreview' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <img class="active-icon" src="assets/images/action-reply-types/launch.svg"/>
+    </div>
+
     <div class="add-response" (click)="addElement(TypeMessage.IMAGE)"
         matTooltipClass="custom-mat-tooltip" matTooltip="{{'Image' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
         <img class="active-icon" src="assets/images/action-reply-types/image.svg"/>

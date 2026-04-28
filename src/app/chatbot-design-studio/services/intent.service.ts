@@ -1071,6 +1071,7 @@ export class IntentService {
       action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
       action.assignSourceTo = 'kb_source';
+      action.assignJsonSourcesTo = 'kb_json_sources';
       action.assignChunksTo = 'kb_chunks';
       // Default max tokens for Ask Knowledge Base
       action.max_tokens = 10000;

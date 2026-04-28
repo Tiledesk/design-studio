@@ -32,6 +32,15 @@ export class CdsActionReplyToolsComponent implements OnInit {
           },
         } 
         break;
+      case TYPE_MESSAGE.URL_PREVIEW:
+        newElement = {
+          type: TYPE_COMMAND.MESSAGE,
+          message: {
+            text: '',
+            type: TYPE_MESSAGE.URL_PREVIEW
+          },
+        }
+        break;
       case TYPE_MESSAGE.IMAGE:
         newElement = {
           type: TYPE_COMMAND.MESSAGE,

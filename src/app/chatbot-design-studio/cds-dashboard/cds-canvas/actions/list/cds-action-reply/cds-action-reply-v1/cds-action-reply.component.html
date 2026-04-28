@@ -70,6 +70,35 @@
 
                     </div>
 
+                    <!-- URL_PREVIEW RESPONSE -->
+                    <div *ngIf="command.message?.type === typeMessage.URL_PREVIEW" >
+
+                        <div class="response">
+                            <div class="response-drop" 
+                                [ngClass]="{'grabbing':textGrabbing}"
+                                (mousedown)="mouseDown()" 
+                                (mouseup)="mouseUp()" 
+                                cdkDragHandle>
+                            </div>
+
+                            <cds-action-reply-url-preview 
+                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                                [index] = i
+                                [idAction] = "idAction"
+                                [response] = "command.message"
+                                [wait] = "arrayResponses[i-1]"
+                                [previewMode] = "previewMode"
+                                (moveUpResponse) = onMoveUpResponse($event)
+                                (moveDownResponse) = onMoveDownResponse($event)
+                                (deleteActionReply) = onDeleteActionReply($event)
+                                (updateAndSaveAction) = onUpdateAndSaveAction($event)
+                                (changeActionReply) = onChangeActionReply($event)>
+                            </cds-action-reply-url-preview>
+
+                        </div>
+
+                    </div>
+
                     <!-- IMAGE RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.IMAGE">
                         <!-- <div class="custom-placeholder" *cdkDragPlaceholder>

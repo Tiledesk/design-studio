@@ -1,0 +1,60 @@
+<div class="extensions-response" *ngIf="!previewMode" >
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+
+    <div class="response-controls">
+        <div class="control-button delete" (click)="$event.stopPropagation();onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="$event.stopPropagation();onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="$event.stopPropagation();onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+    
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    
+    <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
+        <span class="material-icons-outlined">filter_alt</span>
+        {{'CDSCanvas.Filter' | translate }}
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter"
+        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+<div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+    <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
+</div> 
+
+<div  *ngIf="!previewMode" class="text-editor-wrapper">
+    <cds-textarea 
+        class="text-editable-div"
+        [activeFocus]="activeFocus"
+        [text]="response.text" 
+        [minRow]="1"
+        [limitCharsText]="limitCharsText"
+        popoverVerticalAlign="above"
+        (changeTextarea)="onChangeTextarea($event)"
+        (blur)="onBlur($event)"
+        (selectedAttribute)="onSelectedAttribute($event)">
+    </cds-textarea>    
+</div> 
+
