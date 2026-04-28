@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.41-rc5
+- **added**: ability to add a 'url_preview' reply message type
+
 # 1.39.41-rc4
 - **changed**: enabled voice-settings for type:'chatbot' and 'voice-twilio'
 
