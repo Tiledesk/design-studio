@@ -135,6 +135,15 @@ export class CdsActionReplyToolsComponent implements OnInit {
           },
         } 
         break;
+      case TYPE_MESSAGE.TTS:
+        newElement = {
+          type: TYPE_COMMAND.MESSAGE,
+          message: {
+            text: '',
+            type: TYPE_MESSAGE.TTS,
+          },
+        } 
+        break;
       default:
         break;
     }
