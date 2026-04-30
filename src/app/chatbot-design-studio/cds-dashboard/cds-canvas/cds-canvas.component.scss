@@ -199,9 +199,10 @@ cds-fulfillment {
       border-radius: 0em;
       overflow: hidden;
       margin: 0px;
-      padding: 0px 2px 10px 2px;
-      align-items: flex-start;
-      overflow-y: scroll;
+      padding: 0px;
+      // padding: 0px 2px 10px 2px;
+      // align-items: flex-start;
+      // overflow-y: scroll;
 
       
 
@@ -343,6 +344,17 @@ cds-fulfillment {
   position: absolute;
 }
 
+.cds-panel-library-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 230px;
+  height: 100%;
+  z-index: 15;
+  border-right: 1px solid var(--ds-border, #ececea);
+  box-shadow: var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12), 0 0 0 1px rgba(20,20,18,.06));
+}
+
 #cds-options-panel{
   bottom: 12px;
   right: 12px;
@@ -461,4 +473,72 @@ cds-widget-logs {
   &.small{
     width: calc(100% - 460px);
   }
+}
+
+
+// ── Stage toolbar ─────────────────────────────────────────────────────────────
+
+.stage-toolbar {
+  position: absolute;
+  top: 14px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+  transition: left 0.3s ease;
+}
+
+.stb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--ds-radius-sm, 6px);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-family-poppins);
+  cursor: pointer;
+  border: none;
+  transition: background 0.12s, box-shadow 0.12s;
+  white-space: nowrap;
+  user-select: none;
+
+  &--ghost {
+    background: var(--ds-surface, #fff);
+    color: var(--ds-ink, #1a1a19);
+    box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.08));
+
+    &:hover { background: var(--ds-canvas, #f7f6f3); }
+
+    &-active {
+      background: var(--ds-canvas, #f7f6f3);
+      box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.12));
+      font-weight: 600;
+    }
+  }
+
+  &--primary {
+    background: var(--ds-ink, #1a1a19);
+    color: var(--ds-surface, #fff);
+    box-shadow: 0 1px 2px rgba(20,20,18,.18);
+
+    &:hover { background: var(--ds-ink-2, #4a4a47); }
+
+    &-active {
+      background: var(--ds-ink-2, #4a4a47);
+    }
+  }
+}
+
+.stb-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }

@@ -1,316 +1,333 @@
 @import "./src/assets/sass/cds/styles.scss";
 @import "./src/assets/sass/cds/tooltip-styles.scss";
 
-.header-left {
-    // border-right: 2px solid #394f5a;
-    max-width: 60px;
-    width: 100%;
-    // display: flex;
-    // justify-content: center;
-    // align-items: center;
-    transition: 0.3s;
-    // background-color: var(--blu);
-    border-right: 1px solid var(--gray-light-02);
-    padding: 10px;
-    
-    &.is_opened{
-        max-width: 175px;
-        transition: 0.3s;
-        img{
-            width: 100px;
-        }
-    }
-    
-    div {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        box-shadow: rgba(17, 49, 96, 0.16) 0px 8px 16px 0px, rgba(17, 49, 96, 0.06) 0px 0px 0px 1px;        ;
-        .logo{
-            opacity: 1;
-            width: 25px;
-            position: absolute;
-            transition: opacity 0.2s ease-in-out;
-        }
-        span.material-icons{
-            opacity: 0;
-            position: absolute;
-            color: var(--blu)
-        }
-        
-        &:hover{
-            .logo{
-                opacity: 0;
-            }
-            span.material-icons{
-                opacity: 1;
-                transition: opacity 0.5s ease-in-out;
-                cursor:pointer;
-            }   
-        }
-    } 
+
+// ── Layout ────────────────────────────────────────────────────────────────────
+
+:host {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.header-right {
-    // display: flex;
-    display: grid;
-    grid-template-columns: 3fr 3fr 3fr;
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-right { justify-content: flex-end; }
+
+
+// ── Brand ─────────────────────────────────────────────────────────────────────
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+  border-radius: var(--ds-radius-sm, 6px);
+}
+
+.brand-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--ds-ink, #1a1a19);
+  color: var(--ds-bg, #fbfbfa);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.brand-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink, #1a1a19);
+  white-space: nowrap;
+
+  .dim {
+    color: var(--ds-muted, #8a8884);
+    font-weight: 400;
+  }
+}
+
+
+// ── Breadcrumb ────────────────────────────────────────────────────────────────
+
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ds-muted, #8a8884);
+
+  .sep { color: var(--ds-border-strong, #d8d6d2); }
+
+  .here {
+    color: var(--ds-ink, #1a1a19);
+    font-weight: 500;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0px 10px;
-    box-sizing: border-box;
-    z-index: 11;
-    .right-opts{
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-        height: 100%;
-    }
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: var(--ds-radius-sm, 6px);
 
-    .header-go-back {
-        cursor: pointer;
-        position: relative;
+    &:hover { background: var(--ds-canvas, #f7f6f3); }
+  }
 
-        
-        .cds-text{
-            font-weight: 700;
-            color: var(--base-brand-color);
-
-            &.title{
-                font-weight: 200;
-            }
-        }
-    }
-    .toggle-setting-sidebar-icon-wpr {
-        position: absolute;
-        z-index: 1050;
-        width: 22px;
-        height: 22px;
-        // background: #1e293b;
-        left: 49px;
-        transition: 0.3s;
-
-        &.is_opened {
-            left: 164px;
-            transition: 0.3s;
-        }
-    }
-
-    .toggle-setting-sidebar-icon {
-        background: #1e293b;
-        border: 1px solid #394f5a !important;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        font-size: 18px;
-        display: block;
-    }
-
-    .toggle-setting-sidebar-icon:hover {
-        background: #f5f8fa;
-        color: #1e293b;
-    }
-
-    .header-title {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        font-weight: 300;
-
-        span.material-icons{
-            font-size: 20px;
-            cursor: pointer;
-            &:hover{
-                opacity: 0.8;
-            }
-        }
-    }
+  .share-trigger {
+    display: inline-flex;
+    cursor: pointer;
+    opacity: 0.6;
+    &:hover { opacity: 1; }
+  }
 }
 
-// #cds-publish-btn { 
-//     border-bottom-right-radius: 0px;
-//     border-top-right-radius: 0px;
-//     margin-right: 0.5px;
-// }
+.draft-pill {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--ds-canvas, #f7f6f3);
+  color: var(--ds-ink-2, #4a4a47);
+  border: 1px solid var(--ds-border, #ececea);
+  font-weight: 500;
+}
 
-#cds-publish-btn-wrp {
+
+// ── Center tools ──────────────────────────────────────────────────────────────
+
+.center-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--ds-surface, #fff);
+  border: 1px solid var(--ds-border, #ececea);
+  border-radius: 999px;
+  padding: 3px;
+  min-height: 38px;
+}
+
+.tool-tab {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--ds-muted, #8a8884);
+  font-weight: 500;
+  transition: all 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover { color: var(--ds-ink, #1a1a19); }
+
+  &.active {
+    background: var(--ds-ink, #1a1a19);
+    color: var(--ds-bg, #fbfbfa);
+  }
+}
+
+
+// ── Icon button ───────────────────────────────────────────────────────────────
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--ds-radius-sm, 6px);
+  color: var(--ds-ink-2, #4a4a47);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+
+  &:hover { background: var(--ds-canvas, #f7f6f3); color: var(--ds-ink, #1a1a19); }
+
+  &--active {
+    background: var(--ds-canvas, #f7f6f3);
+    color: var(--ds-ink, #1a1a19);
+  }
+
+  .i { width: 16px; height: 16px; }
+
+  ::ng-deep mat-icon { width: 16px; height: 16px; }
+}
+
+
+// ── Ghost button ──────────────────────────────────────────────────────────────
+
+.ghost-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--ds-radius-sm, 6px);
+  color: var(--ds-ink-2, #4a4a47);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  transition: all 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { background: var(--ds-canvas, #f7f6f3); color: var(--ds-ink, #1a1a19); }
+}
+
+
+// ── Topbar divider ────────────────────────────────────────────────────────────
+
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--ds-border, #ececea);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+
+// ── Split publish button ──────────────────────────────────────────────────────
+
+.split-btn {
+  display: inline-flex;
+  align-items: stretch;
+  height: 32px;
+  border-radius: var(--ds-radius-sm, 6px);
+  overflow: hidden;
+  background: var(--ds-ink, #1a1a19);
+  color: var(--ds-bg, #fbfbfa);
+  position: relative;
+
+  &:hover { opacity: 0.88; }
+
+  &__main {
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
     position: relative;
-    
-    .publish-badge {
-        position: absolute;
-        top: -5px;
-        right: -3px;
-        background-color: #dc362e;
-        border-radius: 50%;
-        width: 14px;
-        height: 14px;
-        display: block;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-    }
-}
+    font-family: inherit;
+  }
 
-// .custom-mat-icon-btn {
-//     height: 33px;
-//     line-height: 33px;
-//     background: var(--blu-02);
-//     width: 33px;
-//     color: #fff;
-//     border-bottom-left-radius: 0px;
-//     border-top-left-radius: 0px;
-// }
+  &__sep {
+    width: 1px;
+    background: rgba(255, 255, 255, 0.18);
+    flex-shrink: 0;
+    align-self: stretch;
+  }
 
-// #cds-publish-btn-option {
-//     background: #006cff;
-//     color: #fff;
-//     box-shadow: none;
-//     font-weight: 500;
-//     font-family: Poppins, Roboto, Arial, sans-serif;
-//     text-transform: capitalize;
-//     font-size: 14px;
-//     padding: 6px 12px;
-//     border-radius: 10px;
-// } 
-
-// #cds-publish-btn-option:hover {
-//     opacity: .8!important;
-// }
-
-#cds-test-it-wab-out-btn{
-    background-color: #45c351; 
-    color: #fff;
-    img {
-        width: 14px;
-        vertical-align: text-top;
-        filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(2%) hue-rotate(182deg) brightness(111%) contrast(101%)
-    }
-
-}
-
-#cds-test-it-out-btn{
-    background-color: transparent;
-    border: 2px solid var(--blu-02);
-    // outline-offset: -1px;
-    color: var(--blu-02);
-    border-radius: 50%;
-    display: flex;
+  &__arrow {
+    padding: 0 8px;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 6px 6px;
-    width: 33px;
-    height: 33px;
-    &.button-stop {
-        padding: 0px 0px 0 0;
-    }
-}
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+  }
 
-::ng-deep .mat-menu-panel.menuElement {
-    min-width: 100px;
-    max-width: 400px;
-    width: 185px;
-    color: var(--blu);
-    font-size: 15px;
-    line-height: 18px;
-    list-style: none;
-    overflow: hidden;
-    padding: 0;
-    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
-    border-radius: 8px;
-    background: rgb(255,255,255);
-    will-change: transform;
-    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
-    margin: 0;
+  .publish-badge {
     position: absolute;
-    top: -35px;
-    left: 35px;
-    border: 2px solid var(--gray-02);
-    box-shadow: none;
-
-    &.shareMenu{
-        width: unset;
-        top: 10px;
-        left: -100px;
-    }
-
-    &.playMenu{
-        width: 200px;
-        top: 10px;
-        left: -170px;
-        min-height: unset;
-    }
+    top: -4px;
+    right: -4px;
+    background-color: #dc362e;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    display: block;
+    border: 1.5px solid var(--ds-bg, #fbfbfa);
+    z-index: 1;
+  }
 }
 
-::ng-deep {
-    .mat-menu-content{
-        padding: 0 !important;
-    }
+
+// ── SVG icon helper ───────────────────────────────────────────────────────────
+
+.i {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  &.i-sm { width: 14px; height: 14px; }
 }
+
+
+// ── Webhook URL box ───────────────────────────────────────────────────────────
 
 .box-url {
-    /* display: flex
-; */
-    /* position: absolute; */
-    background: transparent;
-    justify-content: flex-end;
-    flex-direction: row;
-    /* float: right; */
-    align-items: center;
-    width: 100%;
-    /* margin-top: 60px; */
-    font-size: 12px;
-    height: 30px;
-    z-index: 3;
+  max-width: 300px;
+  font-size: 12px;
+  position: relative;
+  cursor: pointer;
 
-    .button-url {
-        height: 62px;
-        position: relative;
-        margin: 28px 0 0 0;
-        max-width: 600px;
-        .span-url {
-            border: 1px solid var(--gray-02);
-            border-radius: 6px;
-            padding: 6px;
-            cursor: pointer;
-            background: #fff;
-            line-height: normal;
-            top: 0;
-            display: block;
-            overflow: hidden;
-        }
-        .webhook-message {
-            position: relative;
-            top: 4px;
-            float: right;
-            border: 1px solid var(--gray-02);
-            border-radius: 6px;
-            height: 30px;
-            background-color: #fff;
-            padding: 4px 6px;
-            font-weight: 500;
-            line-height: 22px;
-            width: -moz-fit-content;
-        }
-    }
-}
+  .span-url {
+    border: 1px solid var(--ds-border, #ececea);
+    border-radius: var(--ds-radius-sm, 6px);
+    padding: 4px 8px;
+    background: var(--ds-surface, #fff);
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 260px;
+  }
 
-.btn-play-webhook {
-    pointer-events: initial;
-    opacity: 1;
-    &.disabled {
-        pointer-events: none;
-        opacity: 0.5;
-    }
+  .webhook-message {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    border: 1px solid var(--ds-border, #ececea);
+    border-radius: var(--ds-radius-sm, 6px);
+    background: var(--ds-surface, #fff);
+    padding: 4px 8px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
 }
 
 
+// ── Mat-menu overrides ────────────────────────────────────────────────────────
 
+::ng-deep .mat-menu-panel.menuElement {
+  min-width: 100px;
+  max-width: 400px;
+  width: 185px;
+  font-size: 14px;
+  overflow: hidden;
+  padding: 0;
+  border-radius: var(--ds-radius-sm, 6px);
+  background: var(--ds-surface, #fff);
+  border: 1px solid var(--ds-border, #ececea);
+  box-shadow: var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12), 0 2px 6px rgba(20,20,18,.05));
 
+  &.shareMenu { width: unset; }
+  &.playMenu  { width: 200px; min-height: unset; }
+}
+
+::ng-deep .mat-menu-content {
+  padding: 0 !important;
+}

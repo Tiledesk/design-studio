@@ -35,7 +35,11 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   internalIntents: Intent[] = [];
   defaultIntents: Intent[] = [];
   filteredIntents: Intent[] = [];
-  
+  untitledIntents: Intent[] = [];
+
+  isRenamedExpanded = true;
+  isDefaultExpanded = false;
+
   idSelectedIntent: string;
 
 
@@ -105,6 +109,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- internalIntents ',this.internalIntents);
     this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
+    this.untitledIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- defaultIntents ',this.defaultIntents);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DEFAULT_FALLBACK, 1);
@@ -169,6 +174,14 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   /** onDeleteIntent */
   onDeleteIntent(intent: Intent) {
     this.deleteIntent.emit(intent);
+  }
+
+  /** Returns css color-variant class for the lib-icon of a system intent */
+  getIconColorClass(intent: Intent): string {
+    const icon = this.onGetIconForName(intent);
+    if (icon === this.ICON_ROCKET) return 'green';
+    if (icon === this.ICON_UNDO)   return 'red';
+    return '';
   }
 
 

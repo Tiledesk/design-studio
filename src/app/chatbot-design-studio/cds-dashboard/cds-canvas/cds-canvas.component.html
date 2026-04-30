@@ -1,10 +1,9 @@
-<div class="cds-toggle-setting-sidebar-icon-right-wpr" 
+<!-- TODO: eliminare cds-toggle-setting-sidebar-icon-right-wpr, il suo CSS e tutti i riferimenti. Sostituito dai pulsanti stage-toolbar. -->
+<!-- <div class="cds-toggle-setting-sidebar-icon-right-wpr"
     [class.is_opened]="IS_OPEN_INTENTS_LIST"
     (click)="onToogleSidebarIntentsList()">
-    <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
-    <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
     <mat-icon *ngIf="!IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_right" aria-hidden="true"></mat-icon>
-</div>
+</div> -->
 
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
     <cds-panel-intent-list 
@@ -27,11 +26,43 @@
 
 <div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
 
-    <cds-panel-elements class="cds-panel-elements" 
+    <!-- ── Stage toolbar ────────────────────────────────────────────────────── -->
+    <div class="stage-toolbar"
+         [ngStyle]="{'left': (IS_OPEN_INTENTS_LIST || IS_OPEN_LIBRARY) ? '244px' : '14px'}"
+         (click)="$event.stopPropagation()">
+      <button class="stb-btn stb-btn--ghost"
+              [class.stb-btn--ghost-active]="IS_OPEN_INTENTS_LIST"
+              (click)="onToogleSidebarIntentsList()">
+        <svg class="stb-icon" viewBox="0 0 24 24">
+          <path d="M21 16.5l-9 5-9-5"/><path d="M21 12l-9 5-9-5"/>
+          <path d="M3 7.5l9-5 9 5-9 5z"/>
+        </svg>
+        <span>Block</span>
+      </button>
+      <button class="stb-btn stb-btn--primary"
+              [class.stb-btn--primary-active]="IS_OPEN_LIBRARY"
+              (click)="onOpenActionsPanel()">
+        <svg class="stb-icon" viewBox="0 0 24 24">
+          <path d="M12 5v14"/><path d="M5 12h14"/>
+        </svg>
+        <span>New</span>
+      </button>
+    </div>
+
+    <!-- ── Actions library panel ────────────────────────────────────────────── -->
+    <cds-panel-library *ngIf="IS_OPEN_LIBRARY"
+        class="cds-panel-library-sidebar"
+        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+    </cds-panel-library>
+
+    <!-- TODO: eliminare cds-panel-elements e tutti i suoi riferimenti (component, module declaration,
+         cds-panel-actions sub-component, onMouseOverActionMenuSx handler, onHideActionPlaceholderOfActionPanel
+         se non usato altrove, CSS .cds-panel-elements). Sostituito da cds-panel-library. -->
+    <!-- <cds-panel-elements class="cds-panel-elements"
         [ngStyle]="{'left': IS_OPEN_INTENTS_LIST ? '230px' : '0px'}"
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
         (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
-    </cds-panel-elements>
+    </cds-panel-elements> -->
 
     <div #receiver_elements_dropped_on_stage cdkDropList
         class="receiver-elements-dropped-on-stage"

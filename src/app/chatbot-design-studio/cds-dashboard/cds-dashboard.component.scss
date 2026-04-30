@@ -4,12 +4,10 @@
 cds-header {
   height: var(--header-height);
   font-family: var(--font-family-poppins);
-  line-height: var(--header-height);
-  font-size: 21px;
-  color: var(--blu);
-  background: white;
-  border-bottom: 1px solid var(--gray-light-02);
-  display: flex;
+  font-size: 14px;
+  color: var(--ds-ink, #1a1a19);
+  background: var(--ds-bg, #fbfbfa);
+  border-bottom: 1px solid var(--ds-border, #ececea);
 }
 
 .chatboat-dashboard {
@@ -56,8 +54,8 @@ cds-support {
 }
 
 cds-sidebar {
-  background-color: var(--blu-light-04);
-  border-right: 1px solid var(--gray-light-02);
+  background-color: var(--ds-bg);
+  border-right: 1px solid var(--ds-border);
   width: var(--sidebar-base-width);
   transition: 0.3s;
   display: flex;
@@ -66,21 +64,9 @@ cds-sidebar {
   z-index: 100;
 }
 
-// .cds-content {
-//   display: flex;
-//   width: calc(100% - var(--sidebar-base-width));
-//   overflow: hidden;
-// }
-
-
-
-
 .loader{
   display: block;
   z-index: 99;
-  // margin-top: 40vh;
-  // margin-left: auto;
-  // margin-right: auto;
   width: 100px;
   height: 100px;
   border: 3px solid var(--base-brand-color);

@@ -1,0 +1,116 @@
+<!-- ── Head: search ──────────────────────────────────────────────────────────── -->
+<div class="lib-head">
+  <div class="search">
+    <svg class="i" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+    </svg>
+    <input placeholder="{{ 'CDSSetting.SearchABlock' | translate }}"
+           [value]="searchText"
+           (input)="onSearch($event.target.value)">
+  </div>
+</div>
+
+<!-- ── Body: category accordions ────────────────────────────────────────────── -->
+<div class="lib-body" (wheel)="$event.stopPropagation()">
+
+  <div *ngFor="let cat of visibleCategories()" class="acc" [attr.data-cat]="cat.type">
+
+    <button class="acc-header" (click)="toggleCategory(cat.type)">
+      <span class="acc-dot"></span>
+      <span class="acc-name">{{ cat.name | translate }}</span>
+      <span class="acc-count">{{ itemCount(cat.type) }}</span>
+      <svg class="i i-sm acc-chev" [class.acc-chev--open]="isExpanded(cat.type)" viewBox="0 0 24 24">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+
+    <div class="acc-body" [class.acc-body--open]="isExpanded(cat.type)">
+      <div class="acc-inner"
+           cdkDropList
+           [id]="'lib-drop-' + cat.type"
+           [cdkDropListData]="filteredActionsByCategory[cat.type]">
+
+        <div *ngFor="let item of filteredActionsByCategory[cat.type]; let i = index"
+             class="lib-item"
+             cdkDrag
+             [cdkDragData]="item"
+             [cdkDragDisabled]="item.value.disabled"
+             (cdkDragStarted)="onDragStarted($event, i)"
+             (cdkDragEnded)="onDragEnd($event)">
+
+          <div class="lib-drag-placeholder" *cdkDragPlaceholder></div>
+
+          <div class="lib-icon">
+            <mat-icon class="lib-svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+          </div>
+
+          <div class="lib-name">{{ item.value.name | translate }}</div>
+
+          <span *ngIf="!item.canLoad" class="lib-badge-pro">PRO</span>
+          <span *ngIf="item.value.badge"
+                class="lib-badge"
+                [class]="'lib-badge--' + item.value.badge">{{ item.value.badge }}</span>
+
+          <div class="lib-info-btn"
+               #infoBtn
+               (mouseenter)="openInfo(infoBtn, item.value)"
+               (mouseleave)="closeInfo()">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"/>
+              <line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round"/>
+              <line x1="12" y1="11" x2="12" y2="16"/>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ── Info tooltip ──────────────────────────────────────────────────────────── -->
+<div #tooltipEl
+     id="menuInfo"
+     class="info-tooltip"
+     [style.display]="isTooltipOpen ? 'block' : 'none'"
+     [style.top.px]="tooltipPos.y"
+     [style.left.px]="tooltipPos.x"
+     (mouseover)="isTooltipOpen = true"
+     (mouseleave)="closeInfo()">
+  <div class="tooltip-wrp">
+    <div class="tooltip-caret"></div>
+
+    <div class="tooltip-header">
+      <div *ngIf="hoveredElement?.src" class="tooltip-icon">
+        <mat-icon class="lib-svg-icon" [svgIcon]="hoveredElement.src" aria-hidden="true"></mat-icon>
+      </div>
+      <div *ngIf="hoveredElement?.name" class="tooltip-title">
+        {{ hoveredElement.name | translate : BRAND_BASE_INFO }}
+      </div>
+    </div>
+
+    <div class="tooltip-content">
+      <span class="tooltip-text-title"
+            [innerHTML]="hoveredElement?.doc + '.TITLE' | translate"></span>
+      <span class="tooltip-text-desc"
+            [innerHTML]="hoveredElement?.doc + '.DESCRIPTION' | translate : BRAND_BASE_INFO"></span>
+      <img class="tooltip-image"
+           [src]="hoveredElement?.doc + '.IMAGE' | translate" alt="">
+    </div>
+
+    <div class="tooltip-footer">
+      <a *ngIf="hoveredElement?.doc + '.DOC_URL' | translate"
+         [href]="hoveredElement?.doc + '.DOC_URL' | translate"
+         target="_blank">{{ 'LearnMore' | translate }}</a>
+      <button *ngIf="hoveredElement?.doc + '.VIDEO_URL' | translate"
+              class="tooltip-video-btn"
+              type="button"
+              (click)="onVideoUrlClick()">
+        <img src="assets/images/icons/youtube.svg" width="14" height="14" alt="">
+        <span>{{ 'WatchVideo' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

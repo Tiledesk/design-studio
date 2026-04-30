@@ -93,8 +93,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   mapOfIntents = [];
   labelInfoLoading:string = 'Loading';
 
-  /** panel list of intent */ 
+  /** panel list of intent */
   IS_OPEN_INTENTS_LIST: boolean = true;
+
+  /** actions library panel */
+  IS_OPEN_LIBRARY: boolean = false;
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -1136,10 +1139,26 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** onToogleSidebarIntentsList */
   onToogleSidebarIntentsList() {
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ')
-    this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
+    if (!this.IS_OPEN_INTENTS_LIST) {
+      this.IS_OPEN_INTENTS_LIST = true;
+      this.IS_OPEN_LIBRARY = false;
+    } else {
+      this.IS_OPEN_INTENTS_LIST = false;
+    }
     this.removeConnectorDraftAndCloseFloatMenu();
     this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, this.IS_OPEN_INTENTS_LIST);
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
+  }
+
+  /** onOpenActionsPanel */
+  onOpenActionsPanel() {
+    if (!this.IS_OPEN_LIBRARY) {
+      this.IS_OPEN_LIBRARY = true;
+      this.IS_OPEN_INTENTS_LIST = false;
+      this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, false);
+    } else {
+      this.IS_OPEN_LIBRARY = false;
+    }
   }
 
   /** onDroppedElementToStage **

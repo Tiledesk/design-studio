@@ -1,121 +1,114 @@
-<div class="content">
+<!-- ── Title ──────────────────────────────────────────────────────────────── -->
+<div class="lib-head-title" *ngIf="IS_OPEN">
+  <div class="lib-title-text">{{ 'Blocks' | translate }}</div>
+</div>
 
-    <div class="cds-title list-title">
-        {{ 'Blocks' | translate }}
+<!-- ── Pinned / Core blocks ───────────────────────────────────────────────── -->
+<div class="pinned-blocks">
+  <div *ngFor="let intent of internalIntents"
+       class="block-item"
+       [class.block-item--active]="idSelectedIntent === intent.intent_id"
+       (click)="onSelectIntent(intent)">
+    <div class="block-icon" [ngClass]="getIconColorClass(intent)">
+      <mat-icon *ngIf="onGetIconForName(intent) === ICON_ROCKET" class="sys-icon">rocket_launch</mat-icon>
+      <mat-icon *ngIf="onGetIconForName(intent) === ICON_UNDO"   class="sys-icon">undo</mat-icon>
+      <svg class="i i-sm" viewBox="0 0 24 24" *ngIf="onGetIconForName(intent) === ICON_WEBHOOK">
+        <path d="M16 13a4 4 0 0 1-8 0V7a4 4 0 0 1 8 0z"/>
+        <path d="M2 12h2"/><path d="M20 12h2"/>
+      </svg>
+      <svg class="i i-sm" viewBox="0 0 24 24"
+           *ngIf="onGetIconForName(intent) !== ICON_ROCKET && onGetIconForName(intent) !== ICON_UNDO && onGetIconForName(intent) !== ICON_WEBHOOK">
+        <path d="M18.364 4.636a9 9 0 0 1 0 12.728"/><path d="M5.636 4.636a9 9 0 0 0 0 12.728"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
     </div>
+    <div class="block-text" *ngIf="IS_OPEN">
+      <div class="block-name">{{ intent.intent_display_name }}</div>
+    </div>
+  </div>
+</div>
 
-    <div class="intents-list">
-        <div class="topic-internal">
+<!-- ── Search ─────────────────────────────────────────────────────────────── -->
+<div class="lib-head" *ngIf="IS_OPEN">
+  <div class="search">
+    <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input placeholder="{{ 'CDSSetting.SearchABlock' | translate }}"
+           (input)="onLiveSearch($event.target.value)">
+  </div>
+</div>
 
-            <div class="intents">
-                <div *ngFor="let intent of internalIntents; let id = index" id="intent_{{id}}" class="intent"
-                    [ngClass]="{'active': idSelectedIntent === intent.intent_id}" 
-                    [value]="intent.intent_id"
-                    (click)="onSelectIntent(intent)">
+<!-- ── Accordion body ─────────────────────────────────────────────────────── -->
+<div class="lib-body">
 
-                    <div class="icon-container">
-                        <span class="material-icons">{{onGetIconForName(intent)}}</span>
-                    </div>
-
-                    <div class="item-box" *ngIf="IS_OPEN">
-                        <div>
-                            <p class="intent-display-name ellips"><span *ngIf="intent.agents_available" class="agents-available material-icons">boy</span>{{intent.intent_display_name}}</p>
-                            <div class="icon-list">
-
-                                <p *ngIf="intent.questions" class="ai-icon icon">Ai</p>
-
-                                <!-- <span *ngIf="!intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span> -->
-                                <mat-icon  *ngIf="intent.webhook_enabled" class="icon" svgIcon="webhook" aria-hidden="true"></mat-icon>
-
-                                <!-- <span *ngIf="!intent.form" class="material-icons icon list-alt-icon">list_alt</span> -->
-                                <mat-icon  *ngIf="intent.form" class="icon" svgIcon="list_alt" aria-hidden="true"></mat-icon>
-
-
-
-                                <div *ngIf="intent?.actions && intent?.actions?.length > 0" class="actions">
-                                    <!-- <span class="material-icons icon bolt-icon">bolt</span> -->
-                                    <mat-icon class="icon" svgIcon="bolt" aria-hidden="true"></mat-icon>
-                                    <p class="action-counter icon">{{ intent.actions?.length }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- <div class="delete-box" *ngIf="selectedIntent !== null">
-                            <span class="material-icons delete-icon"
-                                (click)="$event.stopPropagation();onDeleteIntent(intent)">delete</span>
-                        </div> -->
-                    </div>
-
-                </div>
+  <!-- Renamed blocks -->
+  <div class="acc">
+    <button class="acc-header" *ngIf="IS_OPEN"
+            (click)="isRenamedExpanded = !isRenamedExpanded; isDefaultExpanded = false">
+      <span class="acc-name">{{ 'Renamed' | translate }}</span>
+      <span class="acc-count">{{ filteredIntents.length }}</span>
+      <svg class="i i-sm acc-chev" [class.acc-chev--open]="isRenamedExpanded" viewBox="0 0 24 24">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+    <div class="acc-body" [class.acc-body--open]="isRenamedExpanded || !IS_OPEN">
+      <div class="acc-inner">
+        <div *ngFor="let intent of filteredIntents"
+             class="block-item"
+             [class.block-item--active]="idSelectedIntent === intent.intent_id"
+             (click)="onSelectIntent(intent)">
+          <div class="block-icon">
+            <svg class="i i-sm" viewBox="0 0 24 24">
+              <path d="M21 16.5l-9 5-9-5"/><path d="M21 12l-9 5-9-5"/>
+              <path d="M3 7.5l9-5 9 5-9 5z"/>
+            </svg>
+          </div>
+          <div class="block-text" *ngIf="IS_OPEN">
+            <div class="block-name ellips">
+              <mat-icon *ngIf="intent.agents_available" class="agents-icon" svgIcon="man" aria-hidden="true"></mat-icon>
+              {{ intent.intent_display_name }}
             </div>
-
-        </div>
-    </div>
-
-
-    <div class="search-box">
-        <div class="icon-container">
-            <mat-icon class="icon" svgIcon="search" aria-hidden="true"></mat-icon>
-            <!-- <span class="material-icons">search</span> -->
-        </div>
-        <div class="input-box-search-input-wpr">
-            <input class="custom-input ellips" placeholder="{{ 'CDSSetting.SearchABlock' | translate }}"
-                (input)="onLiveSearch($event.target.value);">
-        </div>
-    </div>
-
-
-    <div style="width: 100%; display: flex; justify-content: center;">
-        <div class="custom-divider-search"></div>
-    </div>
-
-    <div class="intents-list">
-
-        <div class="intents" id="intents-list">
-            <div *ngFor="let intent of filteredIntents; let id = index" id="intent_{{id}}" class="intent"
-                [ngClass]="{'active': idSelectedIntent === intent.intent_id}"
-                value="intent.intent_id" (click)="onSelectIntent(intent)">
-                
-                <div class="icon-container">
-                    <mat-icon class="icon" [class.active-icon]="idSelectedIntent === intent.intent_id" svgIcon="block" aria-hidden="true"></mat-icon>
-                    <!-- <img src="assets/images/icons/block.svg"
-                        [class.active-icon]="idSelectedIntent === intent.intent_id"
-                        class=" "> -->
-                </div>
-
-                <div class="item-box" *ngIf="IS_OPEN">
-                    <div>
-                        <p class="intent-display-name ellips">
-                            <!-- <span *ngIf="!intent.agents_available" class="agents-available material-icons">boy</span> -->
-                            <mat-icon *ngIf="intent.agents_available" class="icon agents-available" svgIcon="man" aria-hidden="true"></mat-icon>
-                            {{intent.intent_display_name}}
-                        </p>
-                        <div class="icon-list">
-                            <p *ngIf="intent.questions" class="ai-icon icon">Ai</p>
-              
-                            <mat-icon *ngIf="intent.webhook_enabled" class="icon" svgIcon="webhook" aria-hidden="true"></mat-icon>
-                            <!-- <span *ngIf="!intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span> -->
-
-                            <mat-icon *ngIf="intent.form" class="icon" svgIcon="list_alt" aria-hidden="true"></mat-icon>
-                            <!-- <span *ngIf="!intent.form" class="material-icons icon list-alt-icon">list_alt</span> -->
-
-                            <div *ngIf="intent?.actions && intent?.actions?.length > 0" class="actions">
-                                <mat-icon class="icon" svgIcon="bolt" aria-hidden="true"></mat-icon>
-                                <!-- <span class="material-icons icon bolt-icon">bolt</span> -->
-                                <p class="action-counter icon">{{ intent.actions?.length }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="delete-box" *ngIf="selectedIntent !== null">
-                        <span class="material-icons delete-icon"
-                            (click)="$event.stopPropagation();onDeleteIntent(intent)">delete</span>
-                    </div> -->
-                </div>
-
+            <div class="block-meta" *ngIf="intent?.actions?.length > 0">
+              <svg style="width:9px; height:9px; flex-shrink:0;" viewBox="0 0 24 24">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
+              </svg>
+              <span class="mono">{{ intent.actions?.length }}</span>
             </div>
-
+          </div>
         </div>
-
-
+      </div>
     </div>
+  </div>
+
+
+
+  <!-- Default-named blocks -->
+  <div class="acc">
+    <button class="acc-header" *ngIf="IS_OPEN"
+            (click)="isDefaultExpanded = !isDefaultExpanded; isRenamedExpanded = false">
+      <span class="acc-name">{{ 'DefaultName' | translate }}</span>
+      <span class="acc-count">{{ untitledIntents.length }}</span>
+      <svg class="i i-sm acc-chev" [class.acc-chev--open]="isDefaultExpanded" viewBox="0 0 24 24">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </button>
+    <div class="acc-body" [class.acc-body--open]="isDefaultExpanded">
+      <div class="acc-inner">
+        <div *ngFor="let intent of untitledIntents"
+             class="block-item"
+             [class.block-item--active]="idSelectedIntent === intent.intent_id"
+             (click)="onSelectIntent(intent)">
+          <div class="block-icon">
+            <svg class="i i-sm" viewBox="0 0 24 24">
+              <path d="M21 16.5l-9 5-9-5"/><path d="M21 12l-9 5-9-5"/>
+              <path d="M3 7.5l9-5 9 5-9 5z"/>
+            </svg>
+          </div>
+          <div class="block-text" *ngIf="IS_OPEN">
+            <div class="block-name block-default ellips">{{ intent.intent_display_name }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

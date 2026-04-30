@@ -1,284 +1,88 @@
-<div *ngIf="projectID" class="settings-sidebar-wpr" [class.is_opened]="IS_OPEN_SIDEBAR">
-    <ul class="settings-sidebar" style="padding-left: 0px;list-style: none;">
+<nav class="rail">
 
-        
-        <!-- ------------------------------------------------------- -->
-        <!-- @ Bot Intents -->
-        <!-- ------------------------------------------------------- -->
-        <ng-container *ngIf="USER_ROLE !== 'agent'">
-            <li [ngClass]="{'active-item': INTENTS_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.INTENTS)"
-                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{ 'Blocks' | translate }}" #tooltip="matTooltip"
-                matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
-                <a>
-                    <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
-                        class="material-icons-outlined settings-sidebar-icons">
-                        textsms
-                    </i>
-                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
-                        {{ 'Blocks' | translate }}
-                    </p>
-                </a>
-            </li>
-        </ng-container>
+  <!-- Blocks -->
+  <div class="rail-btn"
+       id="cds-sb-intents"
+       matTooltipClass="cds-mat-tooltip"
+       matTooltip="{{ 'Blocks' | translate }}"
+       matTooltipPosition="right"
+       matTooltipHideDelay="100"
+       [routerLink]="['blocks']"
+       routerLinkActive="active">
+    <svg class="i i-lg" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+  </div>
 
-        <!-- ------------------------------------------------------- -->
-        <!-- @ Bot Fulfillment-->
-        <!-- ------------------------------------------------------- -->
-        <!-- <ng-container *ngIf="USER_ROLE !== 'agent'">
-            <li [ngClass]="{'active-item': FULFILLMENT_ROUTE_IS_ACTIVE }" (click)="goTo(SIDEBAR_PAGES.FULFILLMENT)"
-                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{ 'Fulfillment' | translate }}" #tooltip="matTooltip"
-                matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
-                <a>
-                    <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
-                        class="material-icons-outlined settings-sidebar-icons">
-                        offline_bolt
-                    </i>
-                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
-                        {{ 'Fulfillment' | translate }}
-                    </p>
-                </a>
-            </li>
-        </ng-container> -->
+  <!-- Rules -->
+  <div *ngIf="showRulesButton || isRulesRouteActive"
+       class="rail-btn"
+       id="cds-sb-rules"
+       matTooltipClass="cds-mat-tooltip"
+       matTooltip="{{ 'Rules' | translate }}"
+       matTooltipPosition="right"
+       matTooltipHideDelay="100"
+       [routerLink]="['rules']"
+       routerLinkActive="active">
+    <svg class="i i-lg" viewBox="0 0 24 24"><path d="M3 3v6a4 4 0 0 0 4 4h10"/><path d="M14 9l3 4-3 4"/><path d="M21 21V3"/></svg>
+  </div>
 
-        <!-- ------------------------------------------------------- -->
-        <!-- Bot Training -->
-        <!-- ------------------------------------------------------- -->
-        <!-- <ng-container>
-            <li [ngClass]="{'active-item': TRAINING_ROUTE_IS_ACTIVE}" (click)="goTo('training')"
-            matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{'Training' | translate}}"
-            #tooltip="matTooltip" matTooltipPosition='right' matTooltipHideDelay="100" [matTooltipDisabled]="IS_OPEN_SIDEBAR">
-            <a>
-                <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons settings-sidebar-icons">
-                school
-                </i>
-                <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
-                {{'Training' | translate}}
-                </p>
-            </a>
-            </li>
-        </ng-container> -->
+  <!-- Globals -->
+  <div class="rail-btn"
+       id="cds-sb-globals"
+       matTooltipClass="cds-mat-tooltip"
+       matTooltip="{{ 'Globals' | translate }}"
+       matTooltipPosition="right"
+       matTooltipHideDelay="100"
+       [routerLink]="['globals']"
+       routerLinkActive="active">
+    <svg class="i i-lg" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  </div>
 
-        <!-- ------------------------------------------------------- -->
-        <!-- Bot Rules -->
-        <!-- ------------------------------------------------------- -->
-        <ng-container>
-            <li [ngClass]="{'active-item': TRAINING_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.RULES)"
-                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" 
-                matTooltip="{{'Rules' | translate}}"
-                #tooltip="matTooltip" 
-                matTooltipPosition='right' 
-                matTooltipHideDelay="100"
-                [matTooltipDisabled]="IS_OPEN_SIDEBAR">
-                <a>
-                    <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false"
-                        class="material-icons-outlined settings-sidebar-icons">
-                        <span class="material-icons">format_list_bulleted_add </span>
-                    </i>
-                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph">
-                        {{'Rules' | translate}}
-                    </p>
-                </a>
-            </li>
-        </ng-container>
+  <!-- Publish History -->
+  <div class="rail-btn"
+       id="cds-sb-history"
+       matTooltipClass="cds-mat-tooltip"
+       matTooltip="{{ 'ReleaseHistory' | translate }}"
+       matTooltipPosition="right"
+       matTooltipHideDelay="100"
+       [routerLink]="['publish-history']"
+       routerLinkActive="active">
+    <svg class="i i-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+  </div>
 
+  <div class="rail-spacer"></div>
 
-        <!-- -------------------------------------------------------- -->
-        <!--  @ Bot general settings  -->
-        <!-- -------------------------------------------------------- -->
-        <ng-container *ngIf="USER_ROLE !== 'agent'">
-            <li [ngClass]="{'active-item': GENERAL_ROUTE_IS_ACTIVE}" (click)="goTo(SIDEBAR_PAGES.SETTINGS)"
-                matTooltipClass="custom-mat-tooltip-in-settings-sidebar" 
-                matTooltip="{{'General' | translate}}"
-                #tooltip="matTooltip" 
-                matTooltipPosition='right' 
-                matTooltipHideDelay="100">
+  <!-- Settings -->
+  <div class="rail-btn"
+       id="cds-sb-settings"
+       matTooltipClass="cds-mat-tooltip"
+       matTooltip="{{ 'Settings' | translate }}"
+       matTooltipPosition="right"
+       matTooltipHideDelay="100"
+       [routerLink]="['settings']"
+       routerLinkActive="active">
+    <svg class="i i-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
 
-                <div class="sidebar-bot-profile-img-wpr" style="width: 0%;">
-                    <img *ngIf="botProfileImageExist === true || botImageHasBeenUploaded === true"
-                        class="sidebar-bot-profile-img" [src]="botProfileImageurl"
-                        onerror="this.src='assets/images/avatar_bot_tiledesk.svg'" />
+  <!-- Help/Support -->
+  <div class="rail-btn"
+       id="cds-sb-support"
+       matTooltipClass="cds-mat-tooltip"
+       matTooltip="{{ 'HelpCenter' | translate }}"
+       matTooltipPosition="right"
+       matTooltipHideDelay="100"
+       [matMenuTriggerFor]="menuSupport">
+    <svg class="i i-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </div>
 
-                    <img *ngIf="botProfileImageExist === false && botImageHasBeenUploaded !== true"
-                        class="sidebar-bot-profile-img" src="assets/images/avatar_bot_tiledesk.svg" />
-                </div>
-                <a>
-                    <p *ngIf="IS_OPEN_SIDEBAR === true" class="custom_paragraph"
-                        style="position: relative;left: 27px;margin-top: 8px;">
-                        {{ faqKb_name_truncated }}
-                        <!-- matTooltipClass="custom-mat-tooltip-in-settings-sidebar" matTooltip="{{'BotLanguage' | translate}}"
-                        #tooltip="matTooltip" matTooltipPosition='right' matTooltipHideDelay="100" -->
-                        <span class="bot-lang-badge">
-                            {{ bot_lang_in_badge }}
-                        </span>
-                    </p>
+</nav>
 
-                    <div class="settings-icon-wpr"
-                        style="float: right;height: 30px; width: 30px; position: relative;top: 5px;">
-                        <i *ngIf="IS_OPEN_SIDEBAR === true" class="material-icons-outlined settings-sidebar-icons">
-                            settings
-                        </i>
-                    </div>
-                </a>
-            </li>
-        </ng-container>
-    </ul>
-</div>
-
-
-<div class="content" [class.is_opened]="IS_OPEN_SIDEBAR">
-
-    <div style="width: 100%;">
-
-        <div id="cds-sb-intents" name="intents" class="section"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{ 'Blocks' | translate }}" 
-            #tooltip="matTooltip"
-            matTooltipPosition='right' 
-            matTooltipHideDelay="100" 
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
-            [routerLink]="['blocks']" routerLinkActive="is_active">
-            <span class="item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg"  height="24" viewBox="0 0 24 24" width="24">
-                    <path d="M18.8,8.6c1.9,0,3.4-1.5,3.4-3.4s-1.5-3.4-3.4-3.4c-1.9,0-3.4,1.5-3.4,3.4c0,0.2,0,0.4,0.1,0.6l-8,4
-                        C6.8,9.2,6.1,8.9,5.2,8.9c-1.9,0-3.4,1.5-3.4,3.4s1.5,3.4,3.4,3.4c0.8,0,1.5-0.3,2.1-0.7l6.1,3.2c0,0.2-0.1,0.4-0.1,0.6
-                        c0,1.9,1.5,3.4,3.4,3.4c1.9,0,3.4-1.5,3.4-3.4s-1.5-3.4-3.4-3.4c-1,0-1.8,0.4-2.4,1l-5.8-3c0.1-0.3,0.2-0.7,0.2-1.1
-                        c0-0.3,0-0.6-0.1-0.9l7.8-3.9C17,8.2,17.8,8.6,18.8,8.6z M16.7,17.1c0.9,0,1.7,0.8,1.7,1.7c0,0.9-0.8,1.7-1.7,1.7
-                        c-0.9,0-1.7-0.8-1.7-1.7C15,17.9,15.7,17.1,16.7,17.1z M5.2,14c-0.9,0-1.7-0.8-1.7-1.7c0-0.9,0.8-1.7,1.7-1.7s1.7,0.8,1.7,1.7
-                        C6.9,13.2,6.1,14,5.2,14z M18.8,3.5c0.9,0,1.7,0.8,1.7,1.7s-0.8,1.7-1.7,1.7c-0.9,0-1.7-0.8-1.7-1.7S17.9,3.5,18.8,3.5z"/>
-                </svg>
-            </span>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{ 'Blocks' | translate }}
-            </p>
-        </div>
-
-        <!-- <div id="cds-sb-fulfillment" name="fulfillment" class="section"
-                matTooltipClass="cds-mat-tooltip" 
-                matTooltip="{{'Fulfillment' | translate}}" 
-                #tooltip="matTooltip"
-                matTooltipPosition='right' 
-                matTooltipHideDelay="100" 
-                [matTooltipDisabled]="IS_OPEN_SIDEBAR"
-                [routerLink]="['fulfillment']" routerLinkActive="is_active">
-            <span *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                    <path d="m422-232 207-248H469l29-227-185 267h139l-30 208ZM320-80l40-280H160l360-520h80l-40 320h240L400-80h-80Zm151-390Z"/>
-                </svg>
-            </span>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'Fulfillment' | translate}}
-            </p>
-        </div> -->
-
-        <div *ngIf="showRulesButton || isRulesRouteActive" id="cds-sb-rules" name="rules" class="section"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{'Rules' | translate}}"
-            #tooltip="matTooltip" 
-            matTooltipPosition='right' 
-            matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
-            [routerLink]="['rules']" routerLinkActive="is_active">
-            <span class="item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                    <path d="m576-160-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm79-360L513-662l56-56 85 85 170-170 56 57-225 226ZM80-280v-80h360v80H80Zm0-320v-80h360v80H80Z"/>
-                </svg>
-            </span>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'Rules' | translate}}
-            </p>
-        </div>
-
-     
-
-        <div id="cds-sb-globals" name="globals" class="section"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{'Globals' | translate}}"
-            #tooltip="matTooltip" 
-            matTooltipPosition='right' 
-            matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
-            [routerLink]="['globals']" routerLinkActive="is_active" >
-            <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
-                <span class="material-icons">lock</span>
-            </i>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'Globals' | translate}}
-            </p>
-        </div>
-
-        <div id="cds-sb-globals" name="globals" class="section"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{'ReleaseHistory' | translate}}"
-            #tooltip="matTooltip" 
-            matTooltipPosition='right' 
-            matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
-            [routerLink]="['publish-history']" routerLinkActive="is_active" >
-            <i *ngIf="IS_OPEN_SIDEBAR === true || IS_OPEN_SIDEBAR === false" class="material-icons-outlined item-icon">
-                <span class="material-icons">history</span>
-            </i>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'ReleaseHistory' | translate}}
-            </p>
-        </div>
-
-        <div id="cds-sb-settings" name="settings" class="section"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{'Settings' | translate}}"
-            #tooltip="matTooltip" 
-            matTooltipPosition='right' 
-            matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
-            [routerLink]="['settings']" routerLinkActive="is_active">
-            <span class="item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                    <path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 
-                        50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 
-                        190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 
-                        7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 
-                        23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 
-                        106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"/>
-                </svg>
-            </span>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'Settings' | translate}}
-            </p>
-        </div>
-    </div>
-
-    <div style="width: 100%;">
-        <div id="cds-sb-support" name="support" class="section" [matMenuTriggerFor]="menuSupport"
-            matTooltipClass="cds-mat-tooltip" 
-            matTooltip="{{'HelpCenter' | translate}}"
-            #tooltip="matTooltip" 
-            matTooltipPosition='right' 
-            matTooltipHideDelay="100"
-            [matTooltipDisabled]="IS_OPEN_SIDEBAR">
-            <span class="item-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px">
-                    <path d="M12,2C6.48,2,2,6.48,2,12c0,5.52,4.48,10,10,10s10-4.48,10-10C22,6.48,17.52,2,12,2z M19.46,9.12l-2.78,1.15 
-                        c-0.51-1.36-1.58-2.44-2.95-2.94l1.15-2.78C16.98,5.35,18.65,7.02,19.46,9.12z M12,15c-1.66,0-3-1.34-3-3s1.34-3,3-3s3,1.34,3,3 
-                        S13.66,15,12,15z M9.13,4.54l1.17,2.78c-1.38,0.5-2.47,1.59-2.98,2.97L4.54,9.13C5.35,7.02,7.02,5.35,9.13,4.54z M4.54,14.87 
-                        l2.78-1.15c0.51,1.38,1.59,2.46,2.97,2.96l-1.17,2.78C7.02,18.65,5.35,16.98,4.54,14.87z M14.88,19.46l-1.15-2.78 
-                        c1.37-0.51,2.45-1.59,2.95-2.97l2.78,1.17C18.65,16.98,16.98,18.65,14.88,19.46z"/>
-                </svg>
-            </span>
-            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
-                {{'HelpCenter' | translate}}
-            </p>
-        </div>
-    </div>
-
-</div>
-
-
-<!-- SIDEBAR MENU OPTIONS-->
+<!-- SIDEBAR MENU OPTIONS -->
 <mat-menu #menuSupport="matMenu" class="menuElementSupport" xPosition="before">
-    <ng-template matMenuContent>
-        <cds-menu
-            [items]="INFO_MENU_ITEMS"
-            [menuType]="'sidebar'"
-            (onMenuOption)="onMenuOptionFN($event)">
-        </cds-menu>
-    </ng-template>
+  <ng-template matMenuContent>
+    <cds-menu
+      [items]="INFO_MENU_ITEMS"
+      [menuType]="'sidebar'"
+      (onMenuOption)="onMenuOptionFN($event)">
+    </cds-menu>
+  </ng-template>
 </mat-menu>
