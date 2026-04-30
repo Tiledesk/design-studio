@@ -2,6 +2,7 @@ export const environment = {
     production: false,
     t2y12PruGU9wUtEGzBJfolMIgK: 'tokenKey',
     VERSION: require('../../package.json').version,
+    DS_VERSION: '3',
     remoteConfig: true,
     remoteConfigUrl: './real_data/cds-config-local.json',
     apiUrl: 'http://localhost:3000/',

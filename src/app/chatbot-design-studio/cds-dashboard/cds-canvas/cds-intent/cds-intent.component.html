@@ -70,51 +70,14 @@
         </cds-action-intent>
     </div>
 
-    <div *ngIf="!isStart" class="actions-list-wpr"
-        cdkDropList
-        [cdkDropListData]="listOfActions"
-        [cdkDropListDisabled]="isNewChatbot"
-        (cdkDropListDropped)="onDropAction($event)"
-        [cdkDropListEnterPredicate]="canEnterDropList(intent)">
+    <div *ngIf="!isStart" class="actions-list-wpr">
         <!-- [id]="'action_'+i" -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
-        <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
-            cdkDrag
-            [cdkDragDisabled]="dragDisabled || isNewChatbot">
-            <!-- add-action-placeholder  -->
-            <!-- <div class="add--action-placeholder-add-icon">
-                <span class="material-icons"> add </span>
-            </div> -->
-            <div class="add--action-placeholder-text">
-                {{ 'CDSCanvas.AddAnActionToBlock' | translate}}
-                <span style="display: block;font-size: 12px;">
-                    {{ 'CDSCanvas.AddAnActionToBlockDescription' | translate}}
-                </span>
-            </div>
-
-            <div class="csd-open-action-menu-btn-wpr">
-                <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="cds-add-action-btn">    
-                    + {{ 'CDSCanvas.AddAction' | translate}}
-                </div>
-                <!-- <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
-                    + Add action
-                </button> -->
-            </div>
-        </div>
 
         <!-- <div class="tds-drop-element tds_draggable"></div> -->
 
-        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
-            cdkDrag
-            [cdkDragDisabled]="isNewChatbot"
-            (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
-            (cdkDragReleased)="onDragEnded($event, i)"
-            (cdkDragMoved)="onDragMove($event)"
-            [id]="action._tdActionId" 
+        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;"
+            [id]="action._tdActionId"
             class="box-action" 
             tabindex=-1
             [ngClass]="{
@@ -133,27 +96,13 @@
 
             <span class="action-element">
 
-                <div *cdkDragPreview id="customDragPreview">
-                    <cds-action-description 
-                        class="header-action" 
-                        [previewMode]="false"
-                        [elementType]="action._tdActionType">
-                    </cds-action-description>
-                </div>
-            
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
-
-                <cds-action-description 
-                    class="header-action" 
-                    cdkDragHandle
+                <cds-action-description
+                    class="header-action"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
-                <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
+                <div class="body-action" [ngSwitch]="action._tdActionType">
 
-                    <cds-action-controls *ngIf="!isNewChatbot"
-                        (onClickControl)="onClickControl($event, action, i)">
-                    </cds-action-controls>
     
     
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY" 
@@ -537,14 +486,7 @@
         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
     </cds-action-intent>
 
-    <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
-            <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="cds-add-action-btn">    
-                + {{ 'CDSCanvas.AddAction' | translate}}
-            </div>
-        </div>
-    </div>
+    <div class="footer-intent"></div>
     
 
 

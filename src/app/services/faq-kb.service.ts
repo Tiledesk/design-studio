@@ -9,6 +9,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from './app-config';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { environment } from 'src/environments/environment';
 @Injectable()
 export class FaqKbService {
 
@@ -144,6 +145,7 @@ export class FaqKbService {
     //   chatbot['webhook_url'] = webhookurl
     //   chatbot['language'] = resbotlanguage
     // }
+    chatbot.cds_version = environment.DS_VERSION;
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', chatbot);
     return this._httpClient.put(url, JSON.stringify(chatbot), httpOptions)
   }
@@ -205,6 +207,7 @@ export class FaqKbService {
 
     let url = this.FAQKB_URL + chatbot._id;
     this.logger.log('update BOT - URL ', url);
+    chatbot.cds_version = environment.DS_VERSION;
     this.logger.log('[FAQ-KB.SERV] updateFaqKb - BODY ', chatbot);
 
     return this._httpClient.put(url, JSON.stringify(chatbot), httpOptions)

@@ -1,7 +1,6 @@
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
-import { CdkDragDrop, CdkDrag, moveItemInArray, CdkDragMove, transferArrayItem, CdkDropListGroup, CdkDropList, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Form, Intent } from 'src/app/models/intent-model';
 import { Action, ActionIntentConnected } from 'src/app/models/action-model';
 import { IntentService } from '../../../services/intent.service';
@@ -73,11 +72,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isDefaultFallback = false;
 
   startAction: any;
-  isDragging: boolean = false;
-  actionDragPlaceholderWidth: number;
-  hideActionDragPlaceholder: boolean;
   newActionCreated: Action;
-  dragDisabled: boolean = true;
   connectorIsOverAnIntent: boolean = false;
   // Track mouse movement to distinguish click from drag
   private mouseDownX: number = 0;
@@ -511,7 +506,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       for (const entry of entries) {
         const nuovaAltezza = entry.contentRect.height;
         this.logger.log('[CDS-INTENT] ngAfterViewInit Nuova altezza del div:', nuovaAltezza);
-        if(!this.isDragging)this.connectorService.updateConnector(this.intent.intent_id);
+        this.connectorService.updateConnector(this.intent.intent_id);
       }
     });
     const elementoDom = this.resizeElement.nativeElement;
@@ -850,158 +845,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  public onDragMove(event: CdkDragMove): void {
-    const element = document.getElementById('customDragPreview');
-    if (element) {
-      const xPos = event.pointerPosition.x - 122;
-      const yPos = event.pointerPosition.y - 20;
-      element.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
-    }
-}
 
 
-  /** !!! IMPORTANT 
-   * when the drag of an action starts, I save the starting intent. 
-   * Useful in case I move an action between different intents 
-  * */
-  onDragStarted(event, previousIntentId, index) {
-    this.controllerService.closeActionDetailPanel();
-    this.logger.log('[CDS-INTENT] onDragStarted event ', event, 'previousIntentId ', previousIntentId);
-    this.logger.log('[CDS-INTENT] onDragStarted index ', index);
-    this.intentService.setPreviousIntentId(previousIntentId);
-    this.isDragging = true;
-    this.logger.log('[CDS-INTENT] isDragging - onDragStarted', this.isDragging)
-    
-    // ----------------------------------
-    // Hide action arrow on drag started 
-    // ----------------------------------
-    // const actionArrowElem = <HTMLElement>document.querySelector(`#action-arrow-${index}`);
-    // actionArrowElem.style.display = 'none';
-    // this.logger.log('[CDS-INTENT] onDragStarted actionArrowElem', actionArrowElem)
-    // const actionDragPlaceholderWidth = actionDragPlaceholder.offsetWidth;
-    // this.logger.log('[CDS-INTENT] onDragStarted actionDragPlaceholderWidth', actionDragPlaceholderWidth)
-
-    // --------------------------------------------------------------------------------------------------
-    // Bug fix: When an action is dragged, the "drag placeholder" moves up and changes size to full width
-    // --------------------------------------------------------------------------------------------------
-    const actionDragPlaceholder = document.querySelector('.action-drag-placeholder');
-    const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-
-    this.logger.log('[CDS-INTENT] onDragStarted actionDragPlaceholder', actionDragPlaceholder)
-    this.logger.log('[CDS-INTENT] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
-    const myObserver = new ResizeObserver(entries => {
-      // this will get called whenever div dimension changes
-      entries.forEach(entry => {
-        this.actionDragPlaceholderWidth = entry.contentRect.width
-        this.logger.log('[CDS-INTENT] width actionDragPlaceholderWidth', this.actionDragPlaceholderWidth);
-        if (this.actionDragPlaceholderWidth <= 270) {
-          this.hideActionDragPlaceholder = false;
-          this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
-          if (actionDragPlaceholder instanceof HTMLElement) {
-            actionDragPlaceholder.style.opacity = '1';
-          }
-          if (addActionPlaceholderEl instanceof HTMLElement) {
-            addActionPlaceholderEl.style.opacity = '0';
-          }
-          this.logger.log('[CDS-INTENT] HERE 1 !!!! ');
-        } else {
-          this.hideActionDragPlaceholder = true;
-          this.logger.log('[CDS-INTENT] Hide action drag placeholder', this.hideActionDragPlaceholder);
-          if (actionDragPlaceholder instanceof HTMLElement) {
-            actionDragPlaceholder.style.opacity = '0';
-          }
-          if (addActionPlaceholderEl instanceof HTMLElement) {
-            addActionPlaceholderEl.style.opacity = '1';
-          }
-          this.logger.log('[CDS-INTENT] HERE 2 !!!! ');
-        }
-      });
-    });
-    myObserver.observe(actionDragPlaceholder);
-  }
-
-
-
-  /** onDragEnded
-   * get the action moved and update its connectors */
-  onDragEnded(event, index) {
-    this.logger.log('[CDS-INTENT] onDragEnded: ', event, this.intent.intent_id);
-    this.isDragging = false;
-    this.connectorService.updateConnector(this.intent.intent_id);
-    /** 
-    // const previousIntentId = this.intentService.previousIntentId;
-    // if(previousIntentId){
-    //   this.logger.log("[CDS-INTENT] onDropAction previousIntentId: ", previousIntentId);
-    //   this.connectorService.updateConnector(previousIntentId);
-    // }
-    // this.connectorService.updateConnector(this.intent.intent_id);
-    // */
-  }
-
-
-  /** Predicate function that only allows type='intent' to be dropped into a list. */
-  canEnterDropList(action: any) {
-    return (item: CdkDrag<any>) => {
-      // Se il chatbot è nuovo, disabilita il drop se c'è già un'action nell'intent
-      // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-        return false;
-      }
-      // Per i chatbot esistenti, permette il drop normalmente
-      return true;
-    }
-  }
-
-
-
-
-
-  /** on Drop Action check the three possible cases:
-   * chaimata quando muovo la action in un intent
-   * 1 - moving action in the same intent 
-   * 2 - moving action from another intent
-   * 3 - moving new action in intent from panel elements
-   */
-  async onDropAction(event: CdkDragDrop<string[]>) {
-    this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
-    
-    // Se il chatbot è nuovo, impedisce il drop se c'è già un'action nell'intent
-    // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-    if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
-      return;
-    }
-    
-    // Per i chatbot esistenti, esegue il drop normalmente
-    this.controllerService.closeAllPanels();
-    this.intentService.setIntentSelected(this.intent.intent_id);
-    if (event.previousContainer === event.container) {
-      // moving action in the same intent 
-      moveItemInArray(this.intent.actions, event.previousIndex, event.currentIndex);
-      this.intentService.updateIntent(this.intent, null);
-      /** //const response = await this.intentService.onUpdateIntentWithTimeout(this.intent); */
-    } else {
-      try {
-        let action: any = event.previousContainer.data[event.previousIndex];
-        if (event.previousContainer.data.length > 0) {
-          if (action._tdActionType) {
-            // moving action from another intent
-            this.logger.log("[CDS-INTENT] onDropAction sposto la action tra 2 intent differenti");
-            this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
-            this.intentService.updateIntent(this.intent, null);
-            this.connectorService.updateConnectorsOfBlock(this.intent.intent_id)
-          } else if (action.value?.type) {
-            // moving new action in intent from panel elements
-            this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
-            this.intentService.moveNewActionIntoIntent(event.currentIndex, action, this.intent.intent_id);
-            // this.onSelectAction(newAction, event.currentIndex, newAction._tdActionId)
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
 
 
   /**  onUpdateAndSaveAction: 

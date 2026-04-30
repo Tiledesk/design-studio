@@ -23,6 +23,7 @@ export interface FaqKb {
 
 export interface Chatbot extends FaqKb {
     attributes?: any
+    cds_version?: string;
     public?: boolean;
     certified?: boolean;
     tags?: any;

@@ -1154,21 +1154,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     let action: any = event.previousContainer.data[event.previousIndex];
     if (action.value && action.value.type) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
-    this.closeAllPanels();
-    this.closeActionDetailPanel();
-      // this.removeConnectorDraftAndCloseFloatMenu();  
+      this.closeAllPanels();
+      this.closeActionDetailPanel();
       this.createNewIntentFromPanelElement(pos, action.value.type);
-    } else if (action) {
-      this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
-      let prevIntentOfaction = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
-      prevIntentOfaction.actions = prevIntentOfaction.actions.filter((act) => act._tdActionId !== action._tdActionId);
-      this.connectorService.deleteConnectorsFromActionByActionId(action._tdActionId);
-      this.connectorService.updateConnector(prevIntentOfaction.intent_id);
-      this.intentService.refreshIntent(prevIntentOfaction);
-      this.listOfIntents = this.listOfIntents.map(obj => obj.intent_id === prevIntentOfaction.intent_id ? prevIntentOfaction : obj);
-      this.createNewIntentDraggingActionFromAnotherIntent(pos, action);
-      // this.intentService.refreshIntents();
-      // // this.updateIntent(intentPrevious, 0, false);
     }
   }
 
@@ -1233,28 +1221,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
 
-  /**
-   * createNewIntentDraggingActionFromAnotherIntent
-   * @param pos 
-   * @param action 
-   */
-  async createNewIntentDraggingActionFromAnotherIntent(pos, action){
-    // let nowIntent = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
-    let prevIntent = this.intentService.prevListOfIntent.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
-    let nowIntent = this.listOfIntents.find((obj) => obj.intent_id === prevIntent.intent_id);
-    // let nowIntent = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
-    this.logger.log('[CDS-CANVAS] createNewIntentDraggingActionFromAnotherIntent: ', prevIntent, nowIntent, this.listOfIntents);
-    let intent = this.intentService.createNewIntent(this.id_faq_kb, action, pos);
-    this.intentService.addNewIntentToListOfIntents(intent);
-    const newIntent = await this.settingAndSaveNewIntent(pos, intent, nowIntent, prevIntent);
-    // if (newIntent) {
-    //   // this.logger.log('[CDS-CANVAS] cancello i connettori della action draggata');
-    //   // this.connectorService.deleteConnectorsFromActionByActionId(action._tdActionId);
-    //   // const elementID = this.intentService.previousIntentId;
-    //   // this.logger.log("[CDS-CANVAS] aggiorno i connettori dell'intent", elementID);
-    //   // this.connectorService.updateConnector(elementID);
-    // }
-  }
 
 
 
