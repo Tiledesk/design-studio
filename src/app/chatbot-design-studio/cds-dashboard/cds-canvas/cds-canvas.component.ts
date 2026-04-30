@@ -275,9 +275,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
-    if(this.stageService.settings?.open_intent_list_state != null){
-      this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
-    }
+    this.IS_OPEN_INTENTS_LIST = true;
     
     
     // this.stageService.initStageSettings(this.id_faq_kb);

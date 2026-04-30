@@ -1,25 +1,28 @@
-<div class="add-action-menu-content">
-    <div class="menu-context-add-search">
-        <div class="action-menu-search">
-            <span class="material-icons"> search </span>
-            <input type="text" #search [placeholder]="'Search' | translate" [(ngModel)]="actionToSearch" (ngModelChange)="onSearchAction($event)">
-        </div>
+<!-- ── Search ───────────────────────────────────────────────────────────────── -->
+<div class="lib-head">
+  <div class="search">
+    <svg class="i" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>
+    </svg>
+    <input #search
+           type="text"
+           placeholder="{{ 'Search' | translate }}"
+           [(ngModel)]="actionToSearch"
+           (ngModelChange)="onSearchAction($event)">
+  </div>
+</div>
+
+<!-- ── Actions list ─────────────────────────────────────────────────────────── -->
+<div class="lib-body" (wheel)="$event.stopPropagation()">
+  <div *ngFor="let item of filterMenuItemsList"
+       class="lib-item"
+       (click)="onAddActionFromActionMenu(item)">
+
+    <div class="lib-icon">
+      <mat-icon class="lib-svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
     </div>
 
-    <div  id="panel-actions-div" class="actions-drawer" style="overflow-y: auto;">
-        <div  class="action-list" id="action_list_drop_connect">
-            <div class="menu-dragging">
-                <div class="action-box" *ngFor="let item of filterMenuItemsList; let i = index;" (click)="onAddActionFromActionMenu(item)">
-                    <div class="actions--btns-wpr">
-                        <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                            <button class="btn btn-tdblu-no-boxshadow action-btn">
-                                <img [src]="item?.value?.src" [title]="item?.value?.name | translate" [alt]="item?.value?.name" />
-                            </button>
-                        </div>
-                        <div *ngIf="item.value.name" class="action--btn-text">{{item?.value?.name | translate}}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="lib-name">{{ item.value.name | translate }}</div>
+
+  </div>
 </div>

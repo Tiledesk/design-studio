@@ -273,7 +273,7 @@ cds-intent:hover > cds-panel-intent-controls > .intent-header-actions-container 
     user-select: none;
     width: 270px;
     z-index: 1;
-    overflow: scroll;
+    overflow: auto;
 }
 
 // https://www.codewithrandom.com/2023/05/01/ripple-effect-css/

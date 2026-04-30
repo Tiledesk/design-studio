@@ -1,3 +1,28 @@
+<!-- ── Head: title ───────────────────────────────────────────────────────────── -->
+<div class="lib-head-title">
+  <div class="lib-title-text">{{ 'Actions' | translate }}</div>
+  <button class="lib-close-btn" (click)="closePanel.emit()" aria-label="Close">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+</div>
+
+<!-- ── Sidebar tabs ───────────────────────────────────────────────────────────── -->
+<div class="sidebar-tabs">
+  <button class="stab" [class.stab--active]="isBlocksOpen" (click)="openBlocks.emit()">
+    <svg class="stab-icon" viewBox="0 0 24 24">
+      <path d="M21 16.5l-9 5-9-5"/><path d="M21 12l-9 5-9-5"/>
+      <path d="M3 7.5l9-5 9 5-9 5z"/>
+    </svg>
+    <span>Block</span>
+  </button>
+  <button class="stab stab--active">
+    <svg class="stab-icon" viewBox="0 0 24 24">
+      <path d="M12 5v14"/><path d="M5 12h14"/>
+    </svg>
+    <span>New</span>
+  </button>
+</div>
+
 <!-- ── Head: search ──────────────────────────────────────────────────────────── -->
 <div class="lib-head">
   <div class="search">

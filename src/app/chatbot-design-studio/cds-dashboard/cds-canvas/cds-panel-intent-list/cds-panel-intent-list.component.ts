@@ -28,6 +28,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   @Input() intent_id: string;
   @Output() selectIntent = new EventEmitter();
   @Output() deleteIntent = new EventEmitter();
+  @Output() close = new EventEmitter<void>();
  
 
 

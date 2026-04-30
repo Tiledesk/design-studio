@@ -1,6 +1,9 @@
 <!-- ── Title ──────────────────────────────────────────────────────────────── -->
 <div class="lib-head-title" *ngIf="IS_OPEN">
   <div class="lib-title-text">{{ 'Blocks' | translate }}</div>
+  <button class="lib-close-btn" (click)="close.emit()" aria-label="Close">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
 </div>
 
 <!-- ── Pinned / Core blocks ───────────────────────────────────────────────── -->

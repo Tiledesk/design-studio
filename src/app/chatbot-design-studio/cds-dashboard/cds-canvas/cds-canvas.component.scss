@@ -438,69 +438,77 @@ cds-widget-logs {
 }
 
 
-// ── Stage toolbar ─────────────────────────────────────────────────────────────
+// ── Sidebar tabs ──────────────────────────────────────────────────────────────
 
-.stage-toolbar {
+.sidebar-tabs {
   position: absolute;
-  top: 14px;
-  left: 240px;
-  z-index: 20;
+  top: 7px;
+  right: -1px;
+  transform: translateX(100%);
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 7px;
+  z-index: 20;
   pointer-events: auto;
 }
 
-.stb-btn {
-  display: inline-flex;
+.stab {
+  display: flex;
   align-items: center;
   gap: 6px;
   height: 32px;
-  padding: 0 12px;
-  border-radius: var(--ds-radius-sm, 6px);
-  font-size: 13px;
+  width: 36px;
+  padding: 0 10px;
+  border-radius: 0 var(--ds-radius-sm, 6px) var(--ds-radius-sm, 6px) 0;
+  font-size: 12px;
   font-weight: 500;
   font-family: var(--font-family-poppins);
   cursor: pointer;
-  border: none;
-  transition: background 0.12s, box-shadow 0.12s;
+  border: 1px solid var(--ds-border, #ececea);
+  border-left: none;
+  background: var(--ds-surface, #fff);
+  color: var(--ds-muted, #8a8884);
+  box-shadow: 2px 1px 4px rgba(20,20,18,.06);
+  transition: background 0.12s, color 0.12s;
   white-space: nowrap;
   user-select: none;
+  overflow: hidden;
 
-  &--ghost {
-    background: var(--ds-surface, #fff);
+  span {
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-width 0.2s ease, opacity 0.15s ease;
+  }
+
+  &:hover {
+    background: var(--ds-canvas, #f7f6f3);
     color: var(--ds-ink, #1a1a19);
-    box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.08));
-
-    &:hover { background: var(--ds-canvas, #f7f6f3); }
-
-    &-active {
-      background: var(--ds-canvas, #f7f6f3);
-      box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.12));
-      font-weight: 600;
+    width: auto;
+    span {
+      max-width: 60px;
+      opacity: 1;
     }
   }
 
-  &--primary {
-    background: var(--ds-ink, #1a1a19);
-    color: var(--ds-surface, #fff);
-    box-shadow: 0 1px 2px rgba(20,20,18,.18);
-
-    &:hover { background: var(--ds-ink-2, #4a4a47); }
-
-    &-active {
-      background: var(--ds-ink-2, #4a4a47);
+  &--active {
+    background: var(--ds-canvas, #f7f6f3);
+    color: var(--ds-ink, #1a1a19);
+    width: auto;
+    span {
+      max-width: 60px;
+      opacity: 1;
     }
   }
 }
 
-.stb-icon {
-  width: 14px;
-  height: 14px;
+.stab-icon {
+  width: 13px;
+  height: 13px;
   flex-shrink: 0;
   stroke: currentColor;
   fill: none;
-  stroke-width: 1.6;
+  stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

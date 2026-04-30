@@ -19,9 +19,12 @@
 // ── Title header ──────────────────────────────────────────────────────────────
 
 .lib-head-title {
-  padding: 14px 16px 12px;
+  padding: 10px 10px 10px 16px;
   border-bottom: 1px solid var(--ds-border, #ececea);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .lib-title-text {
@@ -29,6 +32,35 @@
   font-weight: 600;
   color: var(--ds-ink, #1a1a19);
   letter-spacing: -0.01em;
+}
+
+.lib-close-btn {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: none;
+  border-radius: var(--ds-radius-sm, 6px);
+  cursor: pointer;
+  color: var(--ds-muted, #8a8884);
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    background: var(--ds-canvas, #f7f6f3);
+    color: var(--ds-ink, #1a1a19);
+  }
 }
 
 

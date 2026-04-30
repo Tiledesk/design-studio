@@ -4,39 +4,42 @@
         class="panel-intent-list"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST"
         (selectIntent)=onSelectIntent($event)
-        (deleteIntent)="onDeleteIntent($event)">
+        (deleteIntent)="onDeleteIntent($event)"
+        (close)="IS_OPEN_INTENTS_LIST = false">
     </cds-panel-intent-list>
-</div>
 
-
-<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
-
-    <!-- ── Stage toolbar ────────────────────────────────────────────────────── -->
-    <div class="stage-toolbar"
-         (click)="$event.stopPropagation()">
-      <button class="stb-btn stb-btn--ghost"
-              [class.stb-btn--ghost-active]="IS_OPEN_INTENTS_LIST"
+    <!-- ── Sidebar tabs ───────────────────────────────────────────────────────── -->
+    <div class="sidebar-tabs" (click)="$event.stopPropagation()">
+      <button class="stab"
+              [class.stab--active]="IS_OPEN_INTENTS_LIST"
               (click)="onToogleSidebarIntentsList()">
-        <svg class="stb-icon" viewBox="0 0 24 24">
+        <svg class="stab-icon" viewBox="0 0 24 24">
           <path d="M21 16.5l-9 5-9-5"/><path d="M21 12l-9 5-9-5"/>
           <path d="M3 7.5l9-5 9 5-9 5z"/>
         </svg>
         <span>Block</span>
       </button>
-      <button class="stb-btn stb-btn--primary"
-              [class.stb-btn--primary-active]="IS_OPEN_LIBRARY"
+      <button class="stab"
+              [class.stab--active]="IS_OPEN_LIBRARY"
               (click)="onOpenActionsPanel()">
-        <svg class="stb-icon" viewBox="0 0 24 24">
+        <svg class="stab-icon" viewBox="0 0 24 24">
           <path d="M12 5v14"/><path d="M5 12h14"/>
         </svg>
         <span>New</span>
       </button>
     </div>
+</div>
+
+
+<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
 
     <!-- ── Actions library panel ────────────────────────────────────────────── -->
     <cds-panel-library *ngIf="IS_OPEN_LIBRARY"
         class="cds-panel-library-sidebar"
-        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+        [isBlocksOpen]="IS_OPEN_INTENTS_LIST"
+        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)"
+        (closePanel)="IS_OPEN_LIBRARY = false"
+        (openBlocks)="onToogleSidebarIntentsList()">
     </cds-panel-library>
 
     <!-- TODO: eliminare cds-panel-elements e tutti i suoi riferimenti (component, module declaration,
@@ -129,10 +132,10 @@
 
 
 
-<cds-add-action-menu class="menu--context--add" 
-    [style.top.px]="15" 
+<cds-add-action-menu *ngIf="IS_OPEN_ADD_ACTIONS_MENU"
+    class="menu--context--add"
+    [style.top.px]="15"
     [style.left.px]="positionFloatMenu.x"
-    [style.display]="IS_OPEN_ADD_ACTIONS_MENU?'block':'none'"
     [menuType]="TYPE_OF_MENU.ACTION"
     [isActive]="IS_OPEN_ADD_ACTIONS_MENU"
     (addActionFromActionMenu)="onAddActionFromActionMenu($event)">

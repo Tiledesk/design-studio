@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CdkDragStart, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -31,7 +31,10 @@ interface CategoryEntry {
 })
 export class CdsPanelLibraryComponent implements OnInit {
 
+  @Input() isBlocksOpen = false;
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter<boolean>();
+  @Output() closePanel = new EventEmitter<void>();
+  @Output() openBlocks = new EventEmitter<void>();
 
   @ViewChild('tooltipEl') tooltipEl: ElementRef<HTMLElement>;
 
