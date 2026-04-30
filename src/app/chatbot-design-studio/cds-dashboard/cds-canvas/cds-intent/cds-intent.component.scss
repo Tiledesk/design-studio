@@ -1,259 +1,243 @@
 @import "./src/assets/sass/animations.scss";
 
 
-:host{
-  --action-background: #{var(--action-item-background)};
-  --action-no-featured-backgroud: #{var(--action-no-featured-item-background)};
-  --intent-background: #{var(--intent-preview-background)};
-  --intent-border-color: #{var(--intent-preview-borderColor)};
-  --intent-header-background: transparent;
-  --base-border-radius-preview: #{var(--border-radius-base-preview)};
-  --base-padding-preview: #{var(--padding-base-preview)};
-  --action-selected-color: #{var(--action-color-selected)};
-  --add-action-btn-background: #{var(--add-action-btn-background-preview)};
-  --add-action-btn-color: #{var(--add-action-btn-color-preview)};
-  --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
-  --base-color: #{var(--blu)};
-  --startIntentMaxWith: 160px;
-  --base-border-radius-base: #{var(--button-border-radius-base)};
-}
+// ============================================================
+// NODE CARD — shell principale del blocco intent
+// ============================================================
 
-
-#customDragPreview {
+:host {
   display: block;
-  position:absolute;
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.8;
-  background-color: var(--drag-preview-background);
-  max-width: 244px;
-  width: 100%;
-}
-
-
-.action-element{
-  width: 100%;
-}
-
-
-.panel-intent-content {
-  transition: background-color 0.15s ease 0s;
-  width: 264px;
-  cursor: grab;
   position: relative;
-  margin: 0px;
-  padding: var(--base-padding-preview);
-  border-radius: var(--base-border-radius-preview);
-  // outline: 1px solid var(--intent-border-color);
-  &::before {
-    display: block;
-    border-radius: 10px;
-    position: absolute;
-    content: "";
-    transition: box-shadow 0.15s ease 0s;
+  overflow: visible;
+}
+
+.node {
+  background: var(--ds-surface, #fff);
+  border: 2px solid rgba(var(--intent-color), 0.5);
+  border-radius: var(--ds-radius, 10px);
+  box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.05));
+  width: 264px;
+  cursor: pointer;
+  position: relative;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  padding: 0;
+  margin: 0;
+
+  &:hover {
+    box-shadow: var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12), 0 2px 6px rgba(20,20,18,.05), 0 0 0 1px rgba(20,20,18,.06));
   }
-  &.outline-border {
-    outline: 2px solid var(--brown);
-    border-radius: var(--base-border-radius-preview);
+
+  &.node--selected {
+    border-color: rgba(var(--intent-color), 1);
+    box-shadow: 0 0 0 3px rgba(var(--intent-color), 0.15),
+                var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12));
   }
-  &.ripple-effect {
-    animation-name: ripple_effect;
-    animation-duration: 1s;
-    animation-iteration-count: 1s;
-    border-radius: var(--base-border-radius-preview);
-  }
-  &.isStart{
-    position: absolute;
-    height: 100%;
-    background-color: unset!important;
-    padding: 0;
-    border-radius: unset;
-    border: unset;
-    max-width: var(--startIntentMaxWith);
-    outline: unset!important;
-    .intent-background-overlay {
-      background-color: transparent!important;
-      outline: unset!important;
+
+  // Blocco start: pill chiara minimal
+  &.node--start {
+    background: var(--ds-surface, #fff);
+    border-color: var(--ds-border, #ececea);
+    border-radius: 999px;
+    width: 160px;
+    min-width: unset;
+    max-width: unset;
+
+    .node-icon,
+    .node-type-row {
+      display: none;
     }
-    .header-draggable {
-      height: 100%;
-      width: 100%;
+
+    .node-header {
+      padding: 6px 14px 6px 8px;
+      min-height: unset;
+      gap: 6px;
     }
-    .pic-header {
-      height: 100%;
-      display: block;
-      position: absolute;
-      margin: 0;
-      padding: 0;
+
+    .node-meta {
+      flex: unset;
     }
   }
 
+  // Overlay bianco per il z-index layering (lasciato per compatibilità TiledeskStage)
   .intent-background-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #fff;
-      z-index: -1;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: transparent;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
   }
 
+  // Drag handle trasparente in alto
   .header-draggable {
     position: absolute;
     background-color: transparent;
     width: calc(100% - 20px);
     height: 40px;
+    top: 0; left: 0;
+    z-index: 1;
   }
-  .pic-header {
-    display: flex;
-    justify-content: space-between;
-    width: auto;
-    margin: 0;
-    padding: 0 0 10px 0;
-    background-color: var(--intent-header-background);
-    overflow: hidden;
-    justify-content: flex-end;
-  }
+}
 
-  .agents-available {
-    margin-top: -70px;
-    margin-left: -10px;
+
+// ============================================================
+// NODE HEADER
+// ============================================================
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  position: relative;
+  min-height: 44px;
+
+}
+
+// Icona tipo-nodo (box colorato 24×24)
+.node-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--ds-canvas, #f7f6f3);
+  color: var(--ds-ink-2, #4a4a47);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+
+  &:not(:has(img))::after {
+    content: "";
     display: block;
-    position: absolute;
-    &.isStart{
-      margin-top: -25px;
-      margin-left: 10px;
-    }
-    span.material-icons{
-      color: var(--intent-header-icon-color)
-    }
-  }
-  // --------------------------------
-  // https://stackoverflow.com/questions/9476923/css3-animate-border-color
-
-  .flashBorder {
-    // border: 3px solid #fff;
-    animation-name: flash_border;
-    animation-duration: 2s;
-    animation-timing-function: linear;
-    animation-iteration-count: 2s; //infinite;
-    -webkit-animation-name: flash_border;
-    -webkit-animation-duration: 2s;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: 2s; //infinite;
-    -moz-animation-name: flash_border;
-    -moz-animation-duration: 2s;
-    -moz-animation-timing-function: linear;
-    -moz-animation-iteration-count: 2s //infinite;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: currentColor;
+    opacity: 0.6;
   }
 
-
-  &.live-active-intent-pulse {
-    cursor: pointer;
-    animation: pulse-blu 1s 2 forwards;
-    outline: 2px solid var(--action-selected-color);
+  // default: icona scurita rispetto al canvas (#f7f6f3 → tono ~#6b6960)
+  img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(41%) sepia(8%) saturate(400%) hue-rotate(20deg) brightness(95%) contrast(90%);
   }
 
-  &.live-active-intent2 {
-    cursor: pointer;
-    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
-    outline: 3px solid var(--blu);
-    outline-offset: 9px;
+  &.node-icon--blue {
+    background: var(--ds-blue-soft, oklch(0.95 0.03 245));
+    color: var(--ds-blue, oklch(0.62 0.13 245));
+    img { filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%) contrast(90%); }
   }
-
-  &.live-start-intent {
-    cursor: pointer;
-    box-shadow: 0 0 0 rgba(204, 169, 44, 0.4);
-    min-height: 44px;
-    border-radius: 20px;
-    animation: pulse 1s infinite;
+  &.node-icon--amber {
+    background: var(--ds-accent-soft, oklch(0.95 0.04 60));
+    color: var(--ds-accent-ink, oklch(0.45 0.15 45));
+    img { filter: brightness(0) saturate(100%) invert(30%) sepia(50%) saturate(700%) hue-rotate(20deg) brightness(90%) contrast(90%); }
   }
-
-
-  .cds-start {
-    transition: box-shadow .15s ease 0s, background-color .15s ease 0s;
-    position: absolute;
-    box-shadow: #00000052 0 -1px inset;
-    background-color: #4b5052;
-    border-radius: 22px;
-    max-width: var(--startIntentMaxWith);
-    right: 0;
-    cursor: pointer;
-    opacity: 1;
-
-    .cds-intent-options {
-      margin-right: 30px;
-    }
+  &.node-icon--red {
+    background: var(--ds-red-soft, oklch(0.95 0.03 28));
+    color: var(--ds-red, oklch(0.62 0.16 28));
+    img { filter: brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(700%) hue-rotate(340deg) brightness(90%) contrast(90%); }
   }
-
-  .cds-start-content {
-    position: relative;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    align-content: center;
-    flex-direction: row;
-    height: 100%;
-    right: 11px;
-    .title-label {
-      display: none;
-    }
+  &.node-icon--green {
+    background: var(--ds-green-soft, oklch(0.95 0.04 155));
+    color: var(--ds-green, oklch(0.68 0.13 155));
+    img { filter: brightness(0) saturate(100%) invert(40%) sepia(50%) saturate(500%) hue-rotate(120deg) brightness(85%) contrast(90%); }
   }
+}
 
-  .pic-header-title {
-    border-radius: 5px;
-    overflow-x: hidden;
-    margin: auto 0;
+// Icona play blocco start
+.node-start-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--ds-green-soft, oklch(0.95 0.04 155));
+  color: var(--ds-green, oklch(0.68 0.13 155));
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  span.material-icons {
+    font-size: 16px;
   }
+}
 
-  // .pic-title-text:hover {
-  //   /*  background: rgb(221, 212, 183); */
-  // }
+// Meta: nome + tipo
+.node-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
 
-  .pic-title-text {
-    transition: background 0.15s ease 0s;
-    padding: 4px 8px;
-    border-radius: 5px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: grab;
-    box-sizing: border-box;
-    max-width: 100%;
-    width: 100%;
-    color: rgb(108, 104, 89);
-    display: inline-block;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-    pointer-events: auto;
-    &.isStart{
-      height: 100%;
-      display:flex;
-      align-items: center;
-    }
-    .header {
-      padding:0px!important;
-    }
-  }
+.node-type-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.node-badge {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  padding: 0 5px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  background: linear-gradient(45deg, #3167e2, #a736ff);
+  flex-shrink: 0;
+
+  &.badge-NEW  { background: linear-gradient(45deg, #3167e2, #a736ff); }
+  &.badge-BETA { background: linear-gradient(45deg, #e23131, #ff8736); }
+  &.badge-DEP  { background: linear-gradient(45deg, #e23131, #640b0b); }
+}
+
+// Il tipo viene iniettato tramite panel-intent-header — sovrascriviamo il suo stile
+cds-panel-intent-header {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.node--start cds-panel-intent-header {
+  width: auto;
+}
+
+.node-type {
+  font-family: "Geist Mono", ui-monospace, "SF Mono", monospace;
+  font-size: 10.5px;
+  color: var(--ds-muted, #8a8884);
+  text-transform: lowercase;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
 }
 
 
 
+// ============================================================
+// NODE BODY (area contenuto / action)
+// ============================================================
+
+.node-body {
+  border-top: 1px solid var(--ds-border, #ececea);
+  padding: 10px 12px 12px;
+}
 
 
+// ============================================================
+// ACTIONS LIST
+// ============================================================
 
-/* Actions list
-/* ***************************** */
 .actions-list-wpr {
   display: flex;
   flex-direction: column;
-  // gap: 10px; // nk
-  gap: 18px; // nk
-  //min-height: 200px;
-  //width: 200px;
-  // border: 1px solid #ccc;
-  //padding: 10px;
-  padding-top: 0px;
+  gap: 8px;
 }
 
 .box-action {
@@ -263,384 +247,128 @@
   align-items: center;
   width: 100%;
   min-height: 30px;
-  border-radius: var(--base-border-radius-preview);
-  border: 2px solid rgb(255, 255, 255);
-  // padding: 0 10px 10px 10px;
-  background-color: var(--action-background);
-  &.isFirst{
-    // height: 1px!important;
-    display: none;
-  }
+  border-radius: var(--ds-radius-sm, 6px);
+  border: none;
+  background-color: var(--ds-surface, #fff);
 }
-
-/* Drag placeholder 
-/* ******************************** */
-.cdk-drag-preview {
-  box-sizing: border-box;
-  border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-    0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
-
-
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-// .box-action:last-child {
-//   border: none;
-// }
-
-.actions-list-wpr.cdk-drop-list-dragging .box-action:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.action-drag-placeholder {
-  // background: #ccc;
-  background: var(--drop-zone-background);
-  // border: dotted 3px #999;
-  border: dashed 1px var(----drop-zone-color-border);
-  min-height: 60px;
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-  border-radius: 8px;
-  opacity: 0;
-}
-
-.cdk-action-placeholder {
-  opacity: 1;
-}
-
-.hide-drag-action-palceholder {
-  display: none;
-}
-
-.cdk-drag-placeholder {
-  opacity: 1;
-}
-
 
 .cds-no-featured-action {
-  // background-color: var(--action-no-featured-backgroud);
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: var(--ds-canvas, #f7f6f3);
+  border-color: transparent;
 }
 
-
-.footer-intent {
-  cursor: pointer;
-  margin-bottom: -10px;
-  min-height: 12px;
-  .csd-open-action-menu-btn-wpr {
-    bottom: -28px;
-  }
+.action-element {
+  width: 100%;
 }
 
-.last-action-intent {
-  display: block;
-  float: inline-end;
-  // margin: 6px -12px 0 0;
-  // padding: 0 24px 0 0;
-  margin: 6px 0 0 0;
+.header-action {
+  position: relative;
   padding: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  min-height: 25px;
 }
-/* Btn add action
-/* --------------------------------- */
-.csd-open-action-menu-btn-wpr {
-  text-align: center;
-  position: absolute;
-  display: block;
-  bottom: -41px;
-  left: 0px;
-  right: 0px;
-  padding-top: 20px;
-}
-
-.footer-intent>.csd-open-action-menu-btn-wpr,
-.add--action-placeholder .csd-open-action-menu-btn-wpr
-{
-  opacity: 0;
-}
-
-.footer-intent:hover>.csd-open-action-menu-btn-wpr,
-.add--action-placeholder:hover .csd-open-action-menu-btn-wpr {
-  opacity: 1;
-  transform: translate3d(0, 00px, 0);
-  transition: 0.25s all ease-in-out;
-}
-
-
-// .cds-last-action>.csd-open-action-menu-btn-wpr {
-//   opacity: 0;
-// }
-
-// .cds-last-action:hover>.csd-open-action-menu-btn-wpr {
-//   opacity: 1;
-// }
 
 .body-action {
   position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  // background-color: #ffffff80; // nk
-  // box-shadow: #0000000f 0 0 0 1px; // nk
-  border-radius: 6px; // nk
+  border-radius: 6px;
 }
 
-// .cds-featured-action {
-//   background-color: #e3e1f1;
-// }
+.cds-action-arrow {
+  position: absolute;
+  bottom: -15px;
+}
 
-.header-action {
-  position: relative;
-  min-height: 54px;
-  /* padding: 0px 10px; */
-  padding: 0px 0px;
-  width: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  // flex-direction: column;
-  min-height: 25px;
-  // border-radius: 6px;
-  // background-color: rgb(255 255 255 / 50%);
-  // box-shadow: rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
-  &.isLast{
+.cds-action-arrow > span {
+  transform: rotate(-90deg);
+  color: var(--ds-border-strong, #d8d6d2);
+}
+
+
+// ============================================================
+// LAST ACTION INTENT (connettore implicito)
+// ============================================================
+
+.last-action-intent {
+  display: block;
+  float: inline-end;
+  margin: 6px 0 0 0;
+  padding: 0;
+}
+
+
+// ============================================================
+// FOOTER
+// ============================================================
+
+.footer-intent {
+  cursor: pointer;
+  min-height: 8px;
+}
+
+
+// ============================================================
+// AGENTS AVAILABLE BADGE
+// ============================================================
+
+.agents-available {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  display: block;
+
+  &.isStart {
+    top: -4px;
+    left: 8px;
+  }
+
+  span.material-icons {
+    color: var(--ds-accent, oklch(0.66 0.15 50));
+    font-size: 18px;
+  }
+}
+
+
+// ============================================================
+// START BLOCK — connettore esterno alla pill
+// ============================================================
+
+.cds-start-connector {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: auto;
+
+  ::ng-deep .previewContent .title-label {
     display: none;
   }
 }
 
-.icon-action {
-  transition: opacity .15s ease 0s;
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  margin-right: 6px;
-  align-self: start;
-  color: #718497;
-  opacity: .85;
-  background: var(--brown);
-}
 
-.label-action {
-  overflow-x: clip;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 14px;
-}
+// ============================================================
+// INTENT OPTIONS (brain / form)
+// ============================================================
 
-
-.tds_connectable {
-  width: 30px;
-  height: 30px;
-  background-color: #ff4000;
-}
-
-.unselectable {
-  -moz-user-select: -moz-none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
-
-.button-intent {
-  display: block;
-  text-align: center;
-  user-select: none;
-  box-sizing: border-box;
-  outline: none;
-  border: 0.1em dashed #d2d2d2;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: normal;
-  height: auto;
-  line-height: 32px;
-  margin: 10px 5px 0;
-  font-family: var(--font-family-poppins);
-  padding: 10px;
-  transition: all 0.1s;
-
-  // min-width: 100px;
-  &:hover {
-    background-color: #d2d2d2;
-    color: #333333;
-  }
-}
-
-
-
-.button-intent-active {
-  // background-color: #d2d2d2;
-  // color: #333333;
-
-  outline: 2px solid rgba(236, 182, 6, .6901960784) !important;
-
-}
-
-
-// .button-intent:hover svg {
-//   fill: #333333;
-// } 
-
-.button-intent-active {
-  background-color: #d2d2d2;
-  color: #333333;
-}
-
-.intent--action {
-  display: block;
-  text-align: center;
-  user-select: none;
-  box-sizing: border-box;
-  outline: none;
-  border: 0.1em dashed #d2d2d2;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: normal;
-  height: auto;
-  line-height: 32px;
-  margin: 10px 5px 0;
-  font-family: var(--font-family-poppins);
-  padding: 10px;
-  transition: all 0.3s;
-  width: 96px;
-}
-
-.actions-btn-active {
-  background-color: #fff;
-  color: #333333;
-  border: 1px solid #fff !important;
-}
-
-.cds-action-title {
-  position: absolute;
-  width: 155px;
-  margin-top: -57px;
-  text-align: center;
-  line-height: 15px;
-  height: 18px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 11px;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-.action-wpr {
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cds-action-icon-wpr {
-  display: flex;
-  margin-right: 10px;
-
-  img {
-    width: 18px;
-    filter: brightness(0) saturate(100%) invert(97%) sepia(66%) saturate(6656%) hue-rotate(177deg) brightness(102%) contrast(98%);
-  }
-}
-
-// .header__center {
-//   font-size: 2rem;
-//   display: grid;
-//   grid-template-columns: 1fr max-content 1fr;
-//   grid-column-gap: 1.2rem;
-//   align-items: center;
-//   margin-top: 24px;
-//   margin-bottom: 0px;
-//   padding-left: 12px;
-//   padding-right: 12px;
-// }
-
-// .header__center::before,
-// .header__center::after {
-//   content: "";
-//   display: block;
-//   height: 1px;
-//   background-color: currentColor;
-// }
-
-
-.cds-action-arrow {
-  position: absolute;
-  // display: flex;
-  bottom: -15px
-}
-
-.cds-action-arrow>span {
-  transform: rotate(-90deg);
-  color: #d2e3fc;
-}
-
-
-
-
-.cds-add-action-btn {
-  margin: 0px;
-  padding: 0 10px;
-  background: var(--add-action-btn-background);
-  box-shadow: #001b4714 0 3px 8px;
-  border-radius: var(--base-border-radius-base);
-  color: var(--add-action-btn-color);
-  cursor: pointer;
-  font-size: 0.7em;
-  font-weight: 400;
-  transition: all .3s;
-  line-height: 20px;
-  width: 100%;
-  // outline: 2px solid var(--base-color) !important;
-  // z-index: 2;
-}
-
-.cds-add-action-btn>span {
-  font-size: 16px;
-  color: var(--base-color);
-}
-
-.cds-add-action-btn:hover {
-  opacity: 0.8;
-  // color: var(--add-action-btn-hover-color)
-}
-
-cds-action-description.header-action ::ng-deep{
-  .action-title{
-    max-width: 100%
-  }
-}
-
-cds-panel-intent-header.isStart ::ng-deep{
-  input {
-    color: white !important;
-  }
-}
-
-
-//** FLOATING MENU - start**//
 .cds-intent-options {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 5px;
-  height: 33px;
+  align-items: center;
+  gap: 4px;
 
   .option {
     display: flex;
     cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.12s;
 
-    &:hover {
-      opacity: 0.85;
-    }
+    &:hover { opacity: 1; }
 
     &[active=true] {
+      opacity: 1;
       img {
         filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
       }
@@ -648,72 +376,27 @@ cds-panel-intent-header.isStart ::ng-deep{
   }
 
   img {
-    width: 24px;
-    height: 24px;
-    filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%);
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(216deg) brightness(94%) contrast(91%);
   }
 }
 
-//** FLOATING MENU - end**//
 
+// ============================================================
+// LIVE ACTIVE ANIMATIONS (invariate)
+// ============================================================
 
-
-
-.add--action-placeholder {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  min-height: 30px;
-  border-radius: 10px;
-  border: 1px solid var(--brown);
-  padding: 12px 6px;
-  border-style: dashed;
-  // background: rgba(62, 169, 245, 0.1);
-  background: rgba(221, 228, 234, .8);
+.live-active-intent-pulse {
+  cursor: pointer;
+  animation: pulse-blu 1s 2 forwards;
+  outline: 2px solid var(--ds-accent, oklch(0.66 0.15 50));
 }
 
-.add--action-placeholder-add-icon span {
-  color: var(--brown);
-  font-size: 30px;
-}
-
-.add--action-placeholder-text {
-  font-weight: 400;
-  color: var(--brown);
-  font-size: 14px;
-  text-align: center;
-}
-
-.add--action-placeholder:hover .add--action-placeholder-add-icon span {
-  color: #3ea9f5;
-}
-
-.add--action-placeholder:hover .add--action-placeholder-text {
-  color: #3ea9f5;
-}
-
-.add--action-placeholder:hover {
-  border: 1px solid #3ea9f5;
-  border-style: dashed;
-}
-
-.add--action-placeholder>.add-action-from-placeholder-btn-wpr {
-  opacity: 0;
-  position: absolute;
-  top: 99px;
-}
-
-.add--action-placeholder:hover>.add-action-from-placeholder-btn-wpr {
-  opacity: 1;
-}
-
-
-/** INTENT BORDER ANIMATION **/
 .live-active-intent {
   position: relative;
 }
+
 .live-active-intent::before {
   content: "";
   position: absolute;
@@ -725,47 +408,30 @@ cds-panel-intent-header.isStart ::ng-deep{
     from var(--outline-angle),
     var(--blu) 60%,
     rgba(255, 255, 255, 0.5) 90%,
-    transparent 10%,               
-    var(--blu) 80%   
+    transparent 10%,
+    var(--blu) 80%
   );
   animation: outline-spin 3s linear infinite;
 }
+
 @property --outline-angle {
   syntax: "<angle>";
   inherits: false;
   initial-value: 0turn;
 }
+
 @keyframes outline-spin {
-  to {
-    --outline-angle: -1turn;
-  }
-}
-
-/** SLIM INTENT **/
-.tds-slim-intent {
-  padding: 2px;
-  .pic-header {
-    padding: 0px;
-  }
-  .pic-title-text {
-    padding: 4px 8px 10px;
-  }
-  .footer-intent{
-    min-height: 0px;
-    margin: 0;
-  }
-  .tds-drop-element {
-    width: calc(100% - 4px);
-  }
-
-}
-
-.tds-drop-element {
-  position: absolute;
-  height: 30px;
-  width: calc(100% - 20px);
-  z-index: 1;
-  cursor: move;
+  to { --outline-angle: -1turn; }
 }
 
 
+// ============================================================
+// cds-panel-intent-header override (nel contesto del nodo)
+// ============================================================
+
+
+cds-action-description.header-action ::ng-deep {
+  .action-title {
+    max-width: 100%;
+  }
+}

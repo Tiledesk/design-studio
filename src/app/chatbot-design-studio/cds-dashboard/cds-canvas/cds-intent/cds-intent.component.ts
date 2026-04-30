@@ -11,7 +11,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT, INTENT_ELEMENT } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -93,6 +93,20 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
+
+  get firstActionElement(): any {
+    const type = this.listOfActions?.[0]?._tdActionType;
+    if (!type) return null;
+    if (type === 'form' || type === 'question' || type === 'answer') {
+      return Object.values(INTENT_ELEMENT).find((el: any) => el.type === type) ?? null;
+    }
+    if (type === 'jsoncondition') {
+      return 'noelse' in (this.listOfActions[0] as any)
+        ? ACTIONS_LIST.CONDITION
+        : ACTIONS_LIST.JSON_CONDITION;
+    }
+    return Object.values(ACTIONS_LIST).find((el: any) => el.type === type) ?? null;
+  }
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 

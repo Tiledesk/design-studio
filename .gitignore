@@ -63,3 +63,4 @@ docs
 src/environments/real_data/cds-config-local.json
 .claude
 CLAUDE.md
+.docs

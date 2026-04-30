@@ -1,8 +1,5 @@
 <div class="header" (click)="onSelectIntent($event)" [class.is-start]="isStart || isWebhook">
 
-    <div *ngIf="isStart" class="intent-icon">
-        <span class="material-icons rocket">rocket_launch</span>
-    </div>
     <div *ngIf="isDefaultFallback" class="intent-icon">
         <span class="material-icons undo">undo</span>
     </div>

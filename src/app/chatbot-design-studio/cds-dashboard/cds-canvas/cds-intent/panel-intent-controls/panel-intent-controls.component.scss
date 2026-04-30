@@ -1,89 +1,61 @@
 @import "./src/assets/sass/animations.scss";
 
-/* Intent header actions
-/* ***************************** */
+// Il container è ora inline nell'header del nodo (non più absolute/floating).
+// La visibilità è controllata dal genitore via opacity transition.
+
 .intent-header-actions-container {
-    position: absolute;
-    top: -10px;
-    right: 0px;
-    height: 30px;
-    padding-left: 12px;
-    opacity: 0;
-    cursor: default;
-    transform: translate3d(0, 20px, 0);
-    transition: 0.25s all ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 28px;
+  padding-bottom: 4px;
+
+  &.intent-header-actions-container-on-start {
+    // nessuna differenza visiva necessaria nella nuova struttura
+  }
+}
+
+.intent-header-actions-wpr {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--ds-surface, #fff);
+  border: 1px solid var(--ds-border, #ececea);
+  border-radius: var(--ds-radius-sm, 6px);
+  box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04));
+  padding: 2px;
+  height: 26px;
+}
+
+button.intent-header-action-btn {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  color: var(--ds-muted, #8a8884);
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: var(--ds-canvas, #f7f6f3);
+    color: var(--ds-ink, #1a1a19);
   }
 
-
-  .intent-header-action-btn {
-    mat-icon {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      ::ng-deep svg {
-        fill: var(--gray);
-      }
-    }
-  }
-
-
-  .intent-header-action-btn:hover {
-    mat-icon {
-      ::ng-deep svg {
-          fill: var(--blu);
-      }
-    }
-  }
-
-  
-  .panel-intent-content:hover .intent-header-actions-container-on-start {
-    top: -19px !important;
-    right: 12px !important;
-  }
-
-  
-  .intent-header-actions-wpr {
-    background: #fff;
-    height: 25px;
-    border-radius: 14px;
-    box-shadow: #001b4714 0 3px 8px;
-    outline: 1px solid #0000000a;
+  mat-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
     display: flex;
-    padding: 3px 0px;
-  }
-  
-  button.intent-header-action-btn {
-    border: none;
-    border-left: solid 1px var(--gray-light-02);
-    background-color: rgba(255, 255, 255, 0);
+    align-items: center;
 
-    img {
-      width: auto;
-      height: 100%;
+    ::ng-deep svg {
+      fill: currentColor;
+      width: 14px;
+      height: 14px;
     }
   }
-
-  .intent-header-action-btn {
-    cursor: pointer;
-    border-left: solid 1px var(--gray-light-02);
-    padding: 2px 3px;
-    display: flex;
-  
-  }
-  
-  .intent-header-action-btn:first-child {
-    border-left: unset;
-  }
-  
-  .icon.webhook-enabled  img {
-    filter: brightness(0) saturate(100%) invert(41%) sepia(79%) saturate(1263%) hue-rotate(121deg) brightness(101%) contrast(82%);
-  }
-  
-  .icon img {
-    filter: brightness(0) saturate(100%) invert(46%) sepia(0%) saturate(0%) hue-rotate(216deg) brightness(94%) contrast(91%);
-  }
-  .icon:hover {
-    img {
-      filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
-    }
-  }
+}

@@ -100,7 +100,7 @@
     cursor: default;
     &::before {
         inset: 0px;
-        border: 1px solid rgb(168, 168, 174);
+        // border: 1px solid rgb(168, 168, 174);
         transition: inset 0.1s ease 0s, border 0.1s ease 0s;
         position: absolute;
         content: "";

@@ -197,6 +197,24 @@ emoji-mart {
 
 /* Intent Controls
 /* ------------------------ */
+cds-intent > cds-panel-intent-controls {
+    position: absolute;
+    top: -32px;
+    right: 0;
+    z-index: 10;
+}
+
+cds-intent > cds-panel-intent-controls > .intent-header-actions-container {
+    visibility: hidden;
+    transition: visibility 0s 0.15s;
+}
+
+cds-intent:hover > cds-panel-intent-controls > .intent-header-actions-container {
+    visibility: visible;
+    transition-delay: 0s;
+}
+
+/* legacy fallback (rimosso con v3) */
 .panel-intent-content:hover cds-panel-intent-controls>.intent-header-actions-container-on-start {
     top: -30px !important;
     right: 12px !important;
