@@ -38,7 +38,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   untitledIntents: Intent[] = [];
 
   isRenamedExpanded = true;
-  isDefaultExpanded = false;
+  isDefaultExpanded = true;
 
   idSelectedIntent: string;
 

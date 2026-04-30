@@ -10,7 +10,7 @@ import { ControllerService } from '../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT, INTENT_ELEMENT } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -784,6 +784,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
+    const intentAlreadySelected = this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive;
+    if (!intentAlreadySelected) {
+      this.intentService.setIntentSelected(this.intent.intent_id);
+      return;
+    }
     this.elementTypeSelected = idAction;
     this.intentService.selectAction(this.intent.intent_id, idAction);
     this.actionSelected.emit({ action: action, index: index, maxLength: this.listOfActions.length });
@@ -1027,6 +1032,23 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   openIntentPanel(intent: Intent){
     this.intentService.setIntentSelected(this.intent.intent_id);
     this.openIntent.emit(intent);
+  }
+
+  getFirstActionCategoryKey(): string | null {
+    const firstType = this.listOfActions?.[0]?._tdActionType;
+    if (!firstType) { return null; }
+    const entry = Object.values(ACTIONS_LIST).find(a => a.type === firstType);
+    if (!entry?.category) { return null; }
+    const catMap: Partial<Record<TYPE_ACTION_CATEGORY, string>> = {
+      [TYPE_ACTION_CATEGORY.MOST_USED]:    'MOST_USED',
+      [TYPE_ACTION_CATEGORY.AI]:           'AI',
+      [TYPE_ACTION_CATEGORY.FLOW]:         'FLOW',
+      [TYPE_ACTION_CATEGORY.INTEGRATIONS]: 'INTEGRATIONS',
+      [TYPE_ACTION_CATEGORY.SPECIAL]:      'SPECIAL',
+      [TYPE_ACTION_CATEGORY.VOICE]:        'VOICE',
+      [TYPE_ACTION_CATEGORY.VOICE_TWILIO]: 'VOICE_TWILIO',
+    };
+    return catMap[entry.category] ?? null;
   }
 
   onColorIntent(intent: Intent) {

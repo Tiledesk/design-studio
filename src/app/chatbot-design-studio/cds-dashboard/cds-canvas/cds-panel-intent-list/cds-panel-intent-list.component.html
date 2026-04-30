@@ -43,7 +43,7 @@
   <!-- Renamed blocks -->
   <div class="acc">
     <button class="acc-header" *ngIf="IS_OPEN"
-            (click)="isRenamedExpanded = !isRenamedExpanded; isDefaultExpanded = false">
+            (click)="isRenamedExpanded = !isRenamedExpanded">
       <span class="acc-name">{{ 'Renamed' | translate }}</span>
       <span class="acc-count">{{ filteredIntents.length }}</span>
       <svg class="i i-sm acc-chev" [class.acc-chev--open]="isRenamedExpanded" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@
   <!-- Default-named blocks -->
   <div class="acc">
     <button class="acc-header" *ngIf="IS_OPEN"
-            (click)="isDefaultExpanded = !isDefaultExpanded; isRenamedExpanded = false">
+            (click)="isDefaultExpanded = !isDefaultExpanded">
       <span class="acc-name">{{ 'DefaultName' | translate }}</span>
       <span class="acc-count">{{ untitledIntents.length }}</span>
       <svg class="i i-sm acc-chev" [class.acc-chev--open]="isDefaultExpanded" viewBox="0 0 24 24">

@@ -12,7 +12,6 @@
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.node--start]="isStart"
-    [class.node--selected]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive"
     [id]="'intent-content-'+ intent?.intent_id"
     [style.--intent-color]="intentColor">
 
@@ -40,10 +39,7 @@
 
         <!-- icona tipo nodo -->
         <div class="node-icon"
-            [class.node-icon--blue]="listOfActions?.[0]?._tdActionType === TYPE_ACTION.REPLY || listOfActions?.[0]?._tdActionType === TYPE_ACTION.REPLYV2 || listOfActions?.[0]?._tdActionType === TYPE_ACTION.RANDOM_REPLY"
-            [class.node-icon--amber]="listOfActions?.[0]?._tdActionType === TYPE_ACTION.ASKGPT || listOfActions?.[0]?._tdActionType === TYPE_ACTION.ASKGPTV2 || listOfActions?.[0]?._tdActionType === TYPE_ACTION.GPT_TASK || listOfActions?.[0]?._tdActionType === TYPE_ACTION.GPT_ASSISTANT || listOfActions?.[0]?._tdActionType === TYPE_ACTION.AI_PROMPT || listOfActions?.[0]?._tdActionType === TYPE_ACTION.AI_CONDITION"
-            [class.node-icon--red]="isDefaultFallback || listOfActions?.[0]?._tdActionType === TYPE_ACTION.CLOSE"
-            [class.node-icon--green]="intent?.webhook_enabled">
+            [attr.data-cat]="getFirstActionCategoryKey()">
             <img *ngIf="firstActionElement?.src" class="active-icon" [src]="firstActionElement.src" [title]="firstActionElement.name | translate">
         </div>
 

@@ -13,7 +13,7 @@
 
 .node {
   background: var(--ds-surface, #fff);
-  border: 2px solid rgba(var(--intent-color), 0.5);
+  border: 2px solid var(--ds-border, #ececea);
   border-radius: var(--ds-radius, 10px);
   box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.05));
   width: 264px;
@@ -27,11 +27,6 @@
     box-shadow: var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12), 0 2px 6px rgba(20,20,18,.05), 0 0 0 1px rgba(20,20,18,.06));
   }
 
-  &.node--selected {
-    border-color: rgba(var(--intent-color), 1);
-    box-shadow: 0 0 0 3px rgba(var(--intent-color), 0.15),
-                var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12));
-  }
 
   // Blocco start: pill chiara minimal
   &.node--start {
@@ -116,35 +111,32 @@
     opacity: 0.6;
   }
 
-  // default: icona scurita rispetto al canvas (#f7f6f3 → tono ~#6b6960)
   img {
     width: 16px;
     height: 16px;
     object-fit: contain;
-    filter: brightness(0) saturate(100%) invert(41%) sepia(8%) saturate(400%) hue-rotate(20deg) brightness(95%) contrast(90%);
+    filter: var(--cat-filter, brightness(0) saturate(100%) invert(41%) sepia(8%) saturate(400%) hue-rotate(20deg) brightness(95%) contrast(90%));
   }
 
-  &.node-icon--blue {
-    background: var(--ds-blue-soft, oklch(0.95 0.03 245));
-    color: var(--ds-blue, oklch(0.62 0.13 245));
-    img { filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%) contrast(90%); }
-  }
-  &.node-icon--amber {
-    background: var(--ds-accent-soft, oklch(0.95 0.04 60));
-    color: var(--ds-accent-ink, oklch(0.45 0.15 45));
-    img { filter: brightness(0) saturate(100%) invert(30%) sepia(50%) saturate(700%) hue-rotate(20deg) brightness(90%) contrast(90%); }
-  }
-  &.node-icon--red {
-    background: var(--ds-red-soft, oklch(0.95 0.03 28));
-    color: var(--ds-red, oklch(0.62 0.16 28));
-    img { filter: brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(700%) hue-rotate(340deg) brightness(90%) contrast(90%); }
-  }
-  &.node-icon--green {
-    background: var(--ds-green-soft, oklch(0.95 0.04 155));
-    color: var(--ds-green, oklch(0.68 0.13 155));
-    img { filter: brightness(0) saturate(100%) invert(40%) sepia(50%) saturate(500%) hue-rotate(120deg) brightness(85%) contrast(90%); }
+  &[data-cat] {
+    background: var(--cat-soft);
+    color: var(--cat-color);
   }
 }
+
+// hue 90  = warm grey/tan
+.node-icon[data-cat="MOST_USED"]    { --cat-color: oklch(0.55 0.02 90);  --cat-soft: oklch(0.94 0.01 90);  --cat-filter: brightness(0) saturate(100%) invert(40%) sepia(10%) saturate(300%) hue-rotate(25deg) brightness(95%); }
+// hue 50  = amber
+.node-icon[data-cat="AI"]           { --cat-color: oklch(0.66 0.15 50);  --cat-soft: oklch(0.95 0.04 60);  --cat-filter: brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(600%) hue-rotate(5deg) brightness(95%); }
+// hue 245 = blue
+.node-icon[data-cat="FLOW"]         { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); --cat-filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%); }
+// hue 195 = teal
+.node-icon[data-cat="INTEGRATIONS"] { --cat-color: oklch(0.62 0.14 195); --cat-soft: oklch(0.95 0.04 195); --cat-filter: brightness(0) saturate(100%) invert(45%) sepia(60%) saturate(500%) hue-rotate(155deg) brightness(90%); }
+// hue 290 = purple
+.node-icon[data-cat="SPECIAL"]      { --cat-color: oklch(0.6 0.14 290);  --cat-soft: oklch(0.95 0.04 290); --cat-filter: brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(600%) hue-rotate(250deg) brightness(90%); }
+// hue 245 = blue (voice)
+.node-icon[data-cat="VOICE"]        { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); --cat-filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%); }
+.node-icon[data-cat="VOICE_TWILIO"] { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); --cat-filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%); }
 
 // Icona play blocco start
 .node-start-icon {
@@ -253,7 +245,7 @@ cds-panel-intent-header {
 }
 
 .cds-no-featured-action {
-  background-color: var(--ds-canvas, #f7f6f3);
+  background-color: var(--ds-surface, #fff);
   border-color: transparent;
 }
 

@@ -169,13 +169,10 @@
 .block-name {
   font-size: 13px;
   color: var(--ds-ink, #1a1a19);
-  font-weight: 500;
-  white-space: nowrap;
+  flex: 1;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .block-default {

@@ -1,26 +1,11 @@
-<!-- TODO: eliminare cds-toggle-setting-sidebar-icon-right-wpr, il suo CSS e tutti i riferimenti. Sostituito dai pulsanti stage-toolbar. -->
-<!-- <div class="cds-toggle-setting-sidebar-icon-right-wpr"
-    [class.is_opened]="IS_OPEN_INTENTS_LIST"
-    (click)="onToogleSidebarIntentsList()">
-    <mat-icon *ngIf="!IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_right" aria-hidden="true"></mat-icon>
-</div> -->
-
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
-    <cds-panel-intent-list 
+    <cds-panel-intent-list
         id="cdsPanelIntentList"
         class="panel-intent-list"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST"
-        (selectIntent)=onSelectIntent($event) 
+        (selectIntent)=onSelectIntent($event)
         (deleteIntent)="onDeleteIntent($event)">
     </cds-panel-intent-list>
-    
-    <div class="cds-toggle-setting-sidebar-icon-left-wpr" 
-        [class.is_opened]="IS_OPEN_INTENTS_LIST"
-        (click)="onToogleSidebarIntentsList()">
-        <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
-        <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
-        <mat-icon *ngIf="IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_left" aria-hidden="true"></mat-icon>
-    </div>
 </div>
 
 
@@ -28,7 +13,6 @@
 
     <!-- ── Stage toolbar ────────────────────────────────────────────────────── -->
     <div class="stage-toolbar"
-         [ngStyle]="{'left': (IS_OPEN_INTENTS_LIST || IS_OPEN_LIBRARY) ? '244px' : '14px'}"
          (click)="$event.stopPropagation()">
       <button class="stb-btn stb-btn--ghost"
               [class.stb-btn--ghost-active]="IS_OPEN_INTENTS_LIST"
@@ -75,7 +59,8 @@
         <cds-intent *ngFor="let intent of listOfIntents"
             [id]="intent.intent_id"
             [IS_OPEN_PANEL_INTENT_DETAIL]="IS_OPEN_PANEL_INTENT_DETAIL"
-            class="panel-intent tds_input_block" 
+            class="panel-intent tds_input_block"
+            [class.panel-intent--selected]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive"
             [style.top.px]="getIntentPosition(intent.intent_id).y"
             [style.left.px]="getIntentPosition(intent.intent_id).x" 
             [intent]="intent"
