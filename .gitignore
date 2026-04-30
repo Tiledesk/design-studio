@@ -58,3 +58,8 @@ Thumbs.db
 /src/environments/real_data
 settings.json
 docs
+
+# Local dev config (do not commit)
+src/environments/real_data/cds-config-local.json
+.claude
+CLAUDE.md

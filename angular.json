@@ -38,7 +38,8 @@
               "src/environments/real_data/cds-config-firebase.json",
               "src/environments/real_data/cds-config-native-prod.json",
               "src/environments/real_data/cds-config-native-collaudo.json",
-              "src/environments/real_data/cds-config-aws-stage.json"
+              "src/environments/real_data/cds-config-aws-stage.json",
+              { "glob": "cds-config-local.json", "input": "src/environments/real_data", "output": "/real_data" }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

@@ -2,5 +2,6 @@
     "workbench.editorAssociations": {
         "*.json": "default",
         "*.svg": "default"
-    }
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
