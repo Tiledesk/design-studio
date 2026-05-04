@@ -89,7 +89,7 @@
     </div>
 
     <!-- ===== LISTA ACTION ===== -->
-    <div *ngIf="!isStart" class="node-body">
+    <div *ngIf="!isStart && !isNoBodyAction" class="node-body">
         <div class="actions-list-wpr">
 
             <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;"

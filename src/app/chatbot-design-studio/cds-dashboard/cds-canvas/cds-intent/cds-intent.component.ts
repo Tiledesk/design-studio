@@ -95,6 +95,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
 
+  get isNoBodyAction(): boolean {
+    const type = this.listOfActions?.[0]?._tdActionType;
+    return type === TYPE_ACTION.CLOSE ||
+           type === TYPE_ACTION.AGENT ||
+           type === TYPE_ACTION.MOVE_TO_UNASSIGNED ||
+           type === TYPE_ACTION.CLEAR_TRANSCRIPT;
+  }
+
   get firstActionElement(): any {
     const type = this.listOfActions?.[0]?._tdActionType;
     if (!type) return null;
