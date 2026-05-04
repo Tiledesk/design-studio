@@ -42,6 +42,7 @@ import { CdsPanelPublishComponent } from './cds-panel-publish/cds-panel-publish.
 import { CdsNotesComponent } from './cds-notes/cds-notes.component';
 import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-note-detail.component';
 import { NoteControlsComponent } from './cds-notes/note-controls/note-controls.component';
+import { CdsPanelDetailComponent } from './cds-panel-detail/cds-panel-detail.component';
 import { NoteResizeStateService } from './note-resize-state.service';
 
 import { FormsModule } from '@angular/forms';
@@ -100,6 +101,9 @@ const routes: Routes = [
     CdsNotesComponent,
     NoteControlsComponent,
     CdsPanelNoteDetailComponent,
+
+    //CDS PANEL DETAIL
+    CdsPanelDetailComponent,
 
     //ACTIONS
     //SHARED

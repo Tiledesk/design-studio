@@ -47,6 +47,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // @Output() testItOut = new EventEmitter<Intent>();
   @Output() deleteIntent = new EventEmitter();
   @Output() openIntent = new EventEmitter<Intent>();
+  @Output() blockSelected = new EventEmitter<Intent>();
   @Output() changeColorIntent = new EventEmitter();
 
   @ViewChild('resizeElement', { static: false }) resizeElement: ElementRef;
@@ -784,14 +785,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
-    const intentAlreadySelected = this.intentService.intentSelectedID === this.intent.intent_id && this.intentService.intentActive;
-    if (!intentAlreadySelected) {
-      this.intentService.setIntentSelected(this.intent.intent_id);
-      return;
-    }
+    this.intentService.setIntentSelected(this.intent.intent_id);
+    this.blockSelected.emit(this.intent);
     this.elementTypeSelected = idAction;
-    this.intentService.selectAction(this.intent.intent_id, idAction);
-    this.actionSelected.emit({ action: action, index: index, maxLength: this.listOfActions.length });
   }
 
   // onSelectAnswer(elementSelected) {
@@ -943,7 +939,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   onOpenIntentPanel(intent: Intent){
     this.logger.log('[CDS-INTENT] onOpenIntentPanel > intent', this.intent, " con : ", intent);
     // Only open panel if there was no mouse movement (single click, not drag)
-    if(!this.hasMouseMoved && !intent['attributesChanged'] && this.isStart && !this.IS_OPEN_PANEL_INTENT_DETAIL){
+    if(!this.hasMouseMoved && !intent['attributesChanged']){
       this.openIntentPanel(intent);
     }
   }
@@ -1031,7 +1027,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   openIntentPanel(intent: Intent){
     this.intentService.setIntentSelected(this.intent.intent_id);
-    this.openIntent.emit(intent);
+    this.blockSelected.emit(intent);
   }
 
   getFirstActionCategoryKey(): string | null {

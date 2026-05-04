@@ -112,6 +112,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private subscriptionOpenDetailPanel: Subscription;
   IS_OPEN_PANEL_ACTION_DETAIL: boolean = false;
   elementIntentSelected: any;
+
+  /** new unified detail panel */
+  IS_OPEN_PANEL_DETAIL: boolean = false;
   
   /** panel reply button configuaration */
   private subscriptionOpenButtonPanel: Subscription;
@@ -670,6 +673,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_PANEL_ACTION_DETAIL = false;
     this.IS_OPEN_PANEL_INTENT_DETAIL = false;
     this.IS_OPEN_PANEL_NOTE_DETAIL = false;
+    this.IS_OPEN_PANEL_DETAIL = false;
     this.IS_OPEN_PANEL_BUTTON_CONFIG = false;
     this.IS_OPEN_PANEL_CONNECTOR_MENU = false;
     this.IS_OPEN_CONTEXT_MENU = false;
@@ -1354,6 +1358,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   onOpenIntent(intent: Intent){
     this.logger.log('[CDS-CANVAS] onOpenIntent: ', intent.intent_id);
     this.onIntentSelected(intent);
+  }
+
+  onBlockSelected(intent: Intent){
+    this.closeAllPanels();
+    this.elementIntentSelected = intent;
+    this.IS_OPEN_PANEL_DETAIL = true;
   }
   // --------------------------------------------------------- //
  

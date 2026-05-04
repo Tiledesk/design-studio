@@ -79,7 +79,8 @@
             (actionDeleted)="onActionDeleted($event)"
             (changeColorIntent)="onChangeColorIntent($event)"
             (deleteIntent)="onDeleteIntent($event)"
-            (openIntent)="onOpenIntent($event)">
+            (openIntent)="onOpenIntent($event)"
+            (blockSelected)="onBlockSelected($event)">
         </cds-intent>
    
 
@@ -178,13 +179,20 @@
 </cds-panel-publish>
 
 <cds-panel-action-detail *ngIf="IS_OPEN_PANEL_ACTION_DETAIL"
-    id="action-detail" 
+    id="action-detail"
     class="cds-generic-panel"
     [project_id]="projectID"
     [elementIntentSelected]="elementIntentSelected"
     (closePanel)="closeAllPanels()"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
-</cds-panel-action-detail> 
+</cds-panel-action-detail>
+
+<cds-panel-detail *ngIf="IS_OPEN_PANEL_DETAIL"
+    id="panel-detail"
+    class="cds-generic-panel"
+    [intent]="elementIntentSelected"
+    (closePanel)="closeAllPanels()">
+</cds-panel-detail> 
 
 <!-- *ngIf="IS_OPEN_PANEL_WIDGET" intent]="intentSelected" testitOutFirstClick -->
 <cds-panel-widget  *ngIf="IS_OPEN_PANEL_WIDGET"
