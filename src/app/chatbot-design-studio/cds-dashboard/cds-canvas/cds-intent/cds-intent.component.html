@@ -12,6 +12,7 @@
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.node--start]="isStart"
+    [class.node--fallback]="isDefaultFallback"
     [id]="'intent-content-'+ intent?.intent_id"
     [style.--intent-color]="intentColor">
 
@@ -73,8 +74,8 @@
 
     </div>
 
-    <!-- badge agenti disponibili (non nel blocco start) -->
-    <div *ngIf="isAgentsAvailable && !isStart" class="agents-available">
+    <!-- badge agenti disponibili -->
+    <div *ngIf="isAgentsAvailable" class="agents-available">
         <span class="material-icons">boy</span>
     </div>
 

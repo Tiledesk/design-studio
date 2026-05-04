@@ -30,8 +30,10 @@
 
   // Blocco start: pill chiara minimal
   &.node--start {
-    background: var(--ds-surface, #fff);
-    border-color: var(--ds-border, #ececea);
+    background: var(--ds-link, #1a1a19);
+    color: var(--ds-bg, #fbfbfa);
+    // border-color: var(--ds-border, #ececea);
+    border: 0px solid var(--ds-border, #ececea);
     border-radius: 999px;
     width: 160px;
     min-width: unset;
@@ -53,6 +55,14 @@
     }
   }
 
+  // Blocco defaultfallback: nasconde icona e tipo
+  &.node--fallback {
+    .node-icon,
+    .node-type-row {
+      display: none;
+    }
+  }
+
   // Overlay bianco per il z-index layering (lasciato per compatibilità TiledeskStage)
   .intent-background-overlay {
     position: absolute;
@@ -68,7 +78,7 @@
   .header-draggable {
     position: absolute;
     background-color: transparent;
-    width: calc(100% - 20px);
+    width: calc(100% - 0px);
     height: 40px;
     top: 0; left: 0;
     z-index: 1;
@@ -95,7 +105,8 @@
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: var(--ds-canvas, #f7f6f3);
+  // background: var(--ds-canvas, #f7f6f3);
+  background: var(--ds-bg, #fbfbfa);
   color: var(--ds-ink-2, #4a4a47);
   flex-shrink: 0;
   display: grid;
@@ -119,31 +130,31 @@
   }
 
   &[data-cat] {
-    background: var(--cat-soft);
+    // bacxkground: var(--cat-soft);
     color: var(--cat-color);
   }
 }
 
-// hue 90  = warm grey/tan
-.node-icon[data-cat="MOST_USED"]    { --cat-color: oklch(0.55 0.02 90);  --cat-soft: oklch(0.94 0.01 90);  --cat-filter: brightness(0) saturate(100%) invert(40%) sepia(10%) saturate(300%) hue-rotate(25deg) brightness(95%); }
-// hue 50  = amber
-.node-icon[data-cat="AI"]           { --cat-color: oklch(0.66 0.15 50);  --cat-soft: oklch(0.95 0.04 60);  --cat-filter: brightness(0) saturate(100%) invert(55%) sepia(90%) saturate(600%) hue-rotate(5deg) brightness(95%); }
-// hue 245 = blue
-.node-icon[data-cat="FLOW"]         { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); --cat-filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%); }
-// hue 195 = teal
-.node-icon[data-cat="INTEGRATIONS"] { --cat-color: oklch(0.62 0.14 195); --cat-soft: oklch(0.95 0.04 195); --cat-filter: brightness(0) saturate(100%) invert(45%) sepia(60%) saturate(500%) hue-rotate(155deg) brightness(90%); }
-// hue 290 = purple
-.node-icon[data-cat="SPECIAL"]      { --cat-color: oklch(0.6 0.14 290);  --cat-soft: oklch(0.95 0.04 290); --cat-filter: brightness(0) saturate(100%) invert(35%) sepia(60%) saturate(600%) hue-rotate(250deg) brightness(90%); }
-// hue 245 = blue (voice)
-.node-icon[data-cat="VOICE"]        { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); --cat-filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%); }
-.node-icon[data-cat="VOICE_TWILIO"] { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); --cat-filter: brightness(0) saturate(100%) invert(38%) sepia(60%) saturate(500%) hue-rotate(190deg) brightness(90%); }
+// #8bc73e = green
+.node-icon[data-cat="MOST_USED"]    { --cat-color: oklch(0.74 0.17 128); --cat-soft: oklch(0.96 0.05 128); --cat-filter: brightness(0) saturate(100%) invert(68%) sepia(50%) saturate(500%) hue-rotate(50deg) brightness(100%); }
+// #34afed = sky blue
+.node-icon[data-cat="AI"]           { --cat-color: oklch(0.67 0.17 225); --cat-soft: oklch(0.95 0.04 225); --cat-filter: brightness(0) saturate(100%) invert(55%) sepia(60%) saturate(500%) hue-rotate(180deg) brightness(100%); }
+// #f59217 = orange
+.node-icon[data-cat="FLOW"]         { --cat-color: oklch(0.73 0.18 62);  --cat-soft: oklch(0.96 0.05 62);  --cat-filter: brightness(0) saturate(100%) invert(65%) sepia(80%) saturate(800%) hue-rotate(5deg) brightness(100%); }
+// #6c2d8f = purple
+.node-icon[data-cat="INTEGRATIONS"] { --cat-color: oklch(0.38 0.18 300); --cat-soft: oklch(0.95 0.04 300); --cat-filter: brightness(0) saturate(100%) invert(20%) sepia(80%) saturate(600%) hue-rotate(265deg) brightness(85%); }
+// #fddc02 = yellow
+.node-icon[data-cat="SPECIAL"]      { --cat-color: oklch(0.82 0.18 96);  --cat-soft: oklch(0.97 0.05 96);  --cat-filter: brightness(0) saturate(100%) invert(90%) sepia(60%) saturate(600%) hue-rotate(10deg) brightness(105%); }
+// #34afed = sky blue (voice)
+.node-icon[data-cat="VOICE"]        { --cat-color: oklch(0.67 0.17 225); --cat-soft: oklch(0.95 0.04 225); --cat-filter: brightness(0) saturate(100%) invert(55%) sepia(60%) saturate(500%) hue-rotate(180deg) brightness(100%); }
+.node-icon[data-cat="VOICE_TWILIO"] { --cat-color: oklch(0.67 0.17 225); --cat-soft: oklch(0.95 0.04 225); --cat-filter: brightness(0) saturate(100%) invert(55%) sepia(60%) saturate(500%) hue-rotate(180deg) brightness(100%); }
 
 // Icona play blocco start
 .node-start-icon {
   width: 26px;
   height: 26px;
   border-radius: 8px;
-  background: var(--ds-green-soft, oklch(0.95 0.04 155));
+  // background: var(--ds-green-soft, oklch(0.95 0.04 155));
   color: var(--ds-green, oklch(0.68 0.13 155));
   display: grid;
   place-items: center;
@@ -196,6 +207,10 @@ cds-panel-intent-header {
 
 .node--start cds-panel-intent-header {
   width: auto;
+
+  ::ng-deep .form-control {
+    color: var(--ds-bg, #fbfbfa);
+  }
 }
 
 .node-type {
@@ -301,17 +316,17 @@ cds-panel-intent-header {
 
 .agents-available {
   position: absolute;
-  top: -8px;
-  left: -8px;
+  top: -14px;
+  left: -14px;
   display: block;
 
   &.isStart {
-    top: -4px;
-    left: 8px;
+    top: -10px;
+    left: -10px;
   }
 
   span.material-icons {
-    color: var(--ds-accent, oklch(0.66 0.15 50));
+    color: var(--ds-ink-2, oklch(0.66 0.15 50));
     font-size: 18px;
   }
 }

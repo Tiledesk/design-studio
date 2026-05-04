@@ -33,7 +33,7 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild(PanelIntentHeaderComponent) panelIntentHeader: PanelIntentHeaderComponent;
 
   maximize = false;
-  settingsOpen = true;
+  settingsOpen = false;
   isStart = false;
   isWebhook = false;
 

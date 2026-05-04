@@ -387,7 +387,7 @@ svg:not(:root) {
   right: 0;
   z-index: 999;
   pointer-events: all;
-  background-color: var(--blu-light-04);
+  background-color: var(--ds-canvas, #f7f6f3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -466,13 +466,13 @@ cds-widget-logs {
   cursor: pointer;
   border: 1px solid var(--ds-border, #ececea);
   border-left: none;
-  background: var(--ds-surface, #fff);
-  color: var(--ds-muted, #8a8884);
   box-shadow: 2px 1px 4px rgba(20,20,18,.06);
   transition: background 0.12s, color 0.12s;
   white-space: nowrap;
   user-select: none;
   overflow: hidden;
+  background: var(--ds-ink, #1a1a19);
+  color: var(--ds-bg, #fbfbfa);
 
   span {
     max-width: 0;

@@ -92,7 +92,7 @@ $margin-bottom: 15px;
 .box-up {
     display: flex;
     padding: 5px 10px;
-    background: var(--blu-light-04);
+    background: var(--ds-canvas, #f7f6f3);
     position: relative;
     /* top: 0; */
     width: 100%;

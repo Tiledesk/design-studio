@@ -232,13 +232,13 @@
   box-shadow: 0 0 0 3px var(--cat-soft, var(--ds-canvas, #f7f6f3));
 }
 
-.acc[data-cat="MOST_USED"]    { --cat-color: oklch(0.55 0.02 90);  --cat-soft: oklch(0.94 0.01 90);  }
-.acc[data-cat="AI"]           { --cat-color: oklch(0.66 0.15 50);  --cat-soft: oklch(0.95 0.04 60);  }
-.acc[data-cat="FLOW"]         { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); }
-.acc[data-cat="INTEGRATIONS"] { --cat-color: oklch(0.62 0.14 195); --cat-soft: oklch(0.95 0.04 195); }
-.acc[data-cat="SPECIAL"]      { --cat-color: oklch(0.6 0.14 290);  --cat-soft: oklch(0.95 0.04 290); }
-.acc[data-cat="VOICE"]        { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); }
-.acc[data-cat="VOICE_TWILIO"] { --cat-color: oklch(0.62 0.13 245); --cat-soft: oklch(0.95 0.03 245); }
+.acc[data-cat="MOST_USED"]    { --cat-color: oklch(0.74 0.17 128); --cat-soft: oklch(0.96 0.05 128); }
+.acc[data-cat="AI"]           { --cat-color: oklch(0.67 0.17 225); --cat-soft: oklch(0.95 0.04 225); }
+.acc[data-cat="FLOW"]         { --cat-color: oklch(0.73 0.18 62);  --cat-soft: oklch(0.96 0.05 62);  }
+.acc[data-cat="INTEGRATIONS"] { --cat-color: oklch(0.38 0.18 300); --cat-soft: oklch(0.95 0.04 300); }
+.acc[data-cat="SPECIAL"]      { --cat-color: oklch(0.82 0.18 96);  --cat-soft: oklch(0.97 0.05 96);  }
+.acc[data-cat="VOICE"]        { --cat-color: oklch(0.67 0.17 225); --cat-soft: oklch(0.95 0.04 225); }
+.acc[data-cat="VOICE_TWILIO"] { --cat-color: oklch(0.67 0.17 225); --cat-soft: oklch(0.95 0.04 225); }
 
 .acc-name {
   flex: 1;

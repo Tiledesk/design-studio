@@ -1,21 +1,9 @@
-<div class="intent-header-actions-container" 
+<div class="intent-header-actions-container"
+    *ngIf="showColor || showDelete || showCopy || showPlay"
     [ngClass]="{'intent-header-actions-container-on-start': isStart}">
 
     <div class="intent-header-actions-wpr">
-        <!-- ---------------------------------- -->
-        <!-- Panel intent -->
-        <!-- ---------------------------------- -->
-        <button *ngIf="showMore"
-            class="intent-header-action-btn"
-            (click)="$event.stopPropagation();onOpenIntentPanel()" 
-            matTooltipClass="cds-mat-tooltip"
-            [matTooltip]="'CDSCanvas.IntentPanel' | translate" 
-            #tooltip="matTooltip" 
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100">
-            <mat-icon class="icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
-            <!-- <img src="assets/images/icons/more_vert.svg" alt="open intent panel"> -->
-        </button>
+        <!-- Panel intent (hidden) -->
 
         <!-- ---------------------------------- -->
         <!-- Color intent  -->
