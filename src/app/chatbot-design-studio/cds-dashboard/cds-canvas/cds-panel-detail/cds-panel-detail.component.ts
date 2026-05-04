@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Intent } from 'src/app/models/intent-model';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -9,8 +10,11 @@ import { StageService } from 'src/app/chatbot-design-studio/services/stage.servi
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { RESERVED_INTENT_NAMES, INTENT_ELEMENT, INTENT_COLORS, STAGE_SETTINGS } from 'src/app/chatbot-design-studio/utils';
-import { ACTIONS_LIST, TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { ProjectPlanUtils } from 'src/app/utils/project-utils';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { PLAN_NAME } from 'src/chat21-core/utils/constants';
+import { RESERVED_INTENT_NAMES, INTENT_ELEMENT, INTENT_COLORS, STAGE_SETTINGS, TYPE_INTENT_ELEMENT } from 'src/app/chatbot-design-studio/utils';
+import { ACTIONS_LIST, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 
 const swal = require('sweetalert');
@@ -20,7 +24,7 @@ const swal = require('sweetalert');
   templateUrl: './cds-panel-detail.component.html',
   styleUrls: ['./cds-panel-detail.component.scss']
 })
-export class CdsPanelDetailComponent implements OnInit, OnChanges {
+export class CdsPanelDetailComponent implements OnInit, OnChanges, OnDestroy {
   @Input() intent: Intent;
   @Input() project_id: string;
   @Output() closePanel = new EventEmitter<void>();
@@ -43,6 +47,15 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
   webhookUrlDev = '';
   messageText = '';
 
+  // action detail
+  typeIntentElement = TYPE_INTENT_ELEMENT;
+  TYPE_ACTION = TYPE_ACTION;
+  TYPE_ACTION_VXML = TYPE_ACTION_VXML;
+  elementSelected: any;
+  elementIntentSelectedType: string;
+  canShowActionByPlan: { plan: PLAN_NAME; enabled: boolean } = { plan: PLAN_NAME.A, enabled: true };
+
+  private subscriptionIntent: Subscription;
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -52,12 +65,15 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
     private readonly webhookService: WebhookService,
     private readonly appConfigService: AppConfigService,
     private readonly dashboardService: DashboardService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    private readonly projectPlanUtils: ProjectPlanUtils,
+    private readonly tiledeskAuthService: TiledeskAuthService
   ) {}
 
   ngOnInit(): void {
     this.maximize = this.stageService.getMaximize();
     this.initialize();
+    this.initSubscriptions();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -65,6 +81,10 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
       this.initialize();
       setTimeout(() => this.panelIntentHeader?.focusInput(), 300);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptionIntent?.unsubscribe();
   }
 
   get intentColor(): string {
@@ -92,6 +112,8 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
     this.webhookUrlDev = '';
     this.selectedNextIntent = null;
     this.listOfIntents = [];
+    this.elementSelected = null;
+    this.elementIntentSelectedType = null;
 
     if (!this.intent) { return; }
 
@@ -104,6 +126,13 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
 
     if (!this.isStart && !this.isWebhook) {
       this.initializeConnectorSelect();
+    }
+
+    // Initialize action detail
+    if (this.intent.actions?.length > 0) {
+      this.elementSelected = this.intent.actions[0];
+      this.elementIntentSelectedType = TYPE_INTENT_ELEMENT.ACTION;
+      this.checkActionAvailability();
     }
   }
 
@@ -128,6 +157,38 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
     }
   }
 
+  private initSubscriptions(): void {
+    this.subscriptionIntent = this.intentService.behaviorIntent.subscribe((int: Intent) => {
+      const intent = this.intentService.listOfIntents.find(obj => obj.intent_id === int.intent_id);
+      if (!intent || !this.intent) { return; }
+      if (intent.intent_id === this.intent.intent_id) {
+        if (this.elementIntentSelectedType === TYPE_INTENT_ELEMENT.ACTION && this.elementSelected) {
+          const updated = intent.actions.find(a => a._tdActionId === this.elementSelected._tdActionId);
+          if (updated) { this.elementSelected = updated; }
+        }
+      } else {
+        this.closePanel.emit();
+      }
+    });
+  }
+
+  private checkActionAvailability(): void {
+    if (!this.elementSelected?._tdActionType) { return; }
+    const action = Object.values(ACTIONS_LIST).find(el => el.type === this.elementSelected._tdActionType);
+    if (action?.plan) {
+      this.canShowActionByPlan = {
+        plan: action.plan,
+        enabled: this.projectPlanUtils.checkIfCanLoad(action.type, action.plan)
+      };
+    }
+    if (action?.type === TYPE_ACTION.CODE) {
+      this.canShowActionByPlan = {
+        plan: action.plan,
+        enabled: this.projectPlanUtils.checkIfIsEnabledInProject(action.type)
+      };
+    }
+  }
+
   onToggleMaximize(): void {
     this.maximize = !this.maximize;
     this.stageService.saveSettings(this.dashboardService.id_faq_kb, STAGE_SETTINGS.Maximize, this.maximize);
@@ -138,7 +199,11 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
     this.onSaveIntent();
   }
 
-  onSaveIntent(): void {
+  onSaveIntent(event?: any): void {
+    if (this.elementIntentSelectedType === TYPE_INTENT_ELEMENT.ACTION && this.elementSelected) {
+      const index = this.intent.actions.findIndex(a => a._tdActionId === this.elementSelected._tdActionId);
+      if (index >= 0) { this.intent.actions[index] = this.elementSelected; }
+    }
     this.savePanelIntentDetail.emit(this.intent);
   }
 
@@ -168,6 +233,27 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
       this.intent.attributes.nextBlockAction.intentName = null;
       this.selectedNextIntent = null;
       this.onSaveIntent();
+    }
+  }
+
+  onConnectorChange(type: 'create' | 'delete', idConnector: string, toIntentId: string): void {
+    this.connectorService.updateConnectorAttributes(idConnector, null);
+    switch (type) {
+      case 'create': {
+        let toId = toIntentId;
+        if (toIntentId.includes('#')) {
+          toId = toIntentId.split('#')[1];
+          if (toIntentId.includes('{')) {
+            toId = toIntentId.split('#')[1].split('{')[0];
+          }
+        }
+        this.connectorService.deleteConnectorWithIDStartingWith(idConnector, false, true);
+        this.connectorService.createNewConnector(idConnector, toId);
+        break;
+      }
+      case 'delete':
+        this.connectorService.deleteConnectorWithIDStartingWith(idConnector, false, true);
+        break;
     }
   }
 
@@ -234,6 +320,19 @@ export class CdsPanelDetailComponent implements OnInit, OnChanges {
       } catch (err) {
         this.logger.error('[CdsPanelDetailComponent] clipboard error:', err);
       }
+    }
+  }
+
+  goToContactSales(): void {
+    const user = this.tiledeskAuthService.getCurrentUser();
+    window.open(`mailto:sales@tiledesk.com?subject=Upgrade to Tiledesk ${this.canShowActionByPlan.plan}`);
+    try {
+      (window as any)['analytics'].track(`Contact us to upgrade plan to ${this.canShowActionByPlan.plan}`, {
+        email: user.email,
+        action: this.elementSelected
+      }, { context: { groupId: this.dashboardService.projectID } });
+    } catch (err) {
+      this.logger.error('track contact us to upgrade plan error', err);
     }
   }
 

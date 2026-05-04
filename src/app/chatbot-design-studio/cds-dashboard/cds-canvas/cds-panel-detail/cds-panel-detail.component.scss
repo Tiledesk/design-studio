@@ -388,9 +388,36 @@
   padding: 4px 0;
 }
 
-// ===== BODY (vuoto) =====
+// ===== BODY =====
 
 .insp-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.panel-response {
+  display: block;
+}
+
+.block-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--ink-2);
+  font-size: 13px;
+
+  .lock-icon {
+    font-size: 32px;
+    color: var(--muted);
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.5;
+  }
 }
