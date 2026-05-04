@@ -191,7 +191,9 @@
     id="panel-detail"
     class="cds-generic-panel"
     [intent]="elementIntentSelected"
-    (closePanel)="closeAllPanels()">
+    [project_id]="projectID"
+    (closePanel)="closeAllPanels()"
+    (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-detail> 
 
 <!-- *ngIf="IS_OPEN_PANEL_WIDGET" intent]="intentSelected" testitOutFirstClick -->

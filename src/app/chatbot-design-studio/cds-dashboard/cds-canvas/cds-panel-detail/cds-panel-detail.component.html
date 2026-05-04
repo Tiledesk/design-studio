@@ -1,11 +1,123 @@
-<div class="cds-panel-detail">
-  <div class="cds-panel-detail__header">
-    <span class="cds-panel-detail__title">Detail</span>
-    <button class="cds-panel-detail__close" (click)="onClose()">
-      <i class="material-icons">close</i>
+<div class="inspector" [class.maximize]="maximize" [class.minimize]="!maximize">
+
+  <!-- ===== BLOCK HEADER ===== -->
+  <div class="block-header">
+    <div class="block-header__meta">
+      <cds-panel-intent-header
+        [intent]="intent"
+        [intentColor]="intentColor"
+        (saveIntent)="onSaveIntent()">
+      </cds-panel-intent-header>
+      <div class="block-header__type-row">
+        <img *ngIf="firstActionElement?.src"
+             class="block-header__type-icon"
+             [src]="firstActionElement.src"
+             alt="">
+        <span class="block-header__type">
+          {{ (firstActionElement?.name | translate) || intent?.actions?.[0]?._tdActionType || 'Block' }}
+        </span>
+      </div>
+    </div>
+
+    <button class="icon-btn" (click)="onToggleMaximize()" [title]="(maximize ? 'Minimize' : 'Maximize') | translate">
+      <img *ngIf="!maximize" src="assets/images/icons/fold.svg" class="fold-icon" alt="Maximize">
+      <img *ngIf="maximize" src="assets/images/icons/unfold.svg" class="fold-icon" alt="Minimize">
     </button>
   </div>
-  <div class="cds-panel-detail__body">
-    <!-- content will be added in a future refactoring -->
+
+  <!-- ===== BLOCK SETTINGS (collassabile) ===== -->
+  <div class="settings" [class.open]="settingsOpen">
+    <button class="settings-toggle" (click)="settingsOpen = !settingsOpen">
+      <span>{{ 'CDSCanvas.BlockSettings' | translate }}</span>
+      <svg class="chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline points="3,5 7,9 11,5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="settings-body">
+      <div class="settings-body-inner">
+
+        <!-- Agents available (non webhook) -->
+        <div *ngIf="!isWebhook" class="settings-row">
+          <div class="settings-label-group">
+            <span class="settings-label">{{ 'CDSCanvas.AvailableToAgents' | translate }}</span>
+            <span class="info-icon"
+              matTooltip="{{ 'CDSCanvas.InfoAvailableToAgents' | translate }}"
+              matTooltipClass="cds-mat-tooltip"
+              matTooltipPosition="above">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.25"/>
+                <line x1="7" y1="6" x2="7" y2="10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+                <circle cx="7" cy="4" r="0.75" fill="currentColor"/>
+              </svg>
+            </span>
+          </div>
+          <div class="switch-group">
+            <span *ngIf="intent?.agents_available" class="material-icons agents-icon">boy</span>
+            <button class="switch" [class.on]="intent?.agents_available"
+              (click)="onAgentsAvailableChange(!intent.agents_available)">
+            </button>
+          </div>
+        </div>
+
+        <!-- Go to block (non webhook, non start) -->
+        <div *ngIf="!isWebhook && !isStart" class="settings-row settings-row--column">
+          <label class="settings-label">{{ 'CDSCanvas.GoToBlock' | translate }}</label>
+          <cds-select
+            id="next-intent-select"
+            [items]="listOfIntents"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [itemSelected]="selectedNextIntent"
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true"
+            (onSelected)="onChangeNextIntentSelect($event)"
+            (onReset)="onResetNextIntentSelect($event)">
+          </cds-select>
+        </div>
+
+        <!-- Webhook section -->
+        <div *ngIf="isWebhook" class="settings-row settings-row--column">
+          <div class="webhook-section">
+            <label class="settings-label">{{ 'CDSCanvas.ProductionUrl' | translate }}</label>
+            <div class="webhook-block">
+              <div *ngIf="!webhookUrl" class="webhook-icon-placeholder">
+                <img src="assets/images/icons/webhook.svg" alt="webhook">
+              </div>
+              <input #copyInput class="webhook-link" [class.empty]="!webhookUrl" type="text" [value]="webhookUrl" readonly>
+              <button *ngIf="webhookUrl" class="webhook-copy-btn" (click)="onCopyToClipboard(copyInput.value)" title="{{ 'Copy' | translate }}">
+                <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+              </button>
+            </div>
+
+            <div *ngIf="webhookUrlDev" class="webhook-dev">
+              <label class="settings-label">{{ 'CDSCanvas.DevelopmentUrl' | translate }}</label>
+              <div class="webhook-block">
+                <input #copyDevInput class="webhook-link" type="text" [value]="webhookUrlDev" readonly>
+                <button class="webhook-copy-btn" (click)="onCopyToClipboard(copyDevInput.value)" title="{{ 'Copy' | translate }}">
+                  <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="webhook-buttons">
+              <button *ngIf="webhookUrl" type="button" class="btn-webhook" (click)="onRegenerateWebhook()">
+                {{ 'Regenerate' | translate }}
+              </button>
+              <button *ngIf="!webhookUrl" type="button" class="btn-webhook btn-webhook--primary" (click)="newWebhook()">
+                {{ 'Create' | translate }}
+              </button>
+            </div>
+
+            <p *ngIf="messageText" class="webhook-message">{{ messageText }}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
+
+  <!-- ===== BODY (vuoto per ora) ===== -->
+  <div class="insp-body"></div>
+
 </div>

@@ -571,6 +571,7 @@
         "Examples": "Examples",
         "FlowLog": "Log",
         "SetFlowLog":"Set the log",
+        "BlockSettings": "Block settings",
         "AvailableToAgents": "Available to agents",
         "InfoAvailableToAgents": "A block with this option is visible to agents for the purpose to be put back in the conversation",
         "Create": "Create",

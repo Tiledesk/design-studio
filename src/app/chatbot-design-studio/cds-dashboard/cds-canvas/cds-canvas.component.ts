@@ -1595,6 +1595,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       // Manteniamo questa guard per retro-compatibilità (nel caso venga riattivata la modalità note).
       return;
     }
+    this.closeAllPanels();
   }
 
   onNoteDroppedOnStage(evt: { noteType: NoteType; clientX: number; clientY: number }): void {
