@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 2.0.1
+- **changed**: new version v3
+
+
 # 1.39.40
 - **added**: added PINECONE_RERANKING in environment to set reranking
 
