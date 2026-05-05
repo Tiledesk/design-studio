@@ -27,6 +27,7 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
   // ============ Inputs & Outputs ============
   @Input() action: ActionReply;
   @Input() intentSelected: Intent;
+  @Input() connector: any;
   @Input() previewMode: boolean = true;
 
   @Output() updateAndSaveAction = new EventEmitter<ActionReply>();
