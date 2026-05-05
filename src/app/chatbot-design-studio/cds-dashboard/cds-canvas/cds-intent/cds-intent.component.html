@@ -113,13 +113,13 @@
 
                     <div class="body-action" [ngSwitch]="action._tdActionType">
 
-                        <cds-action-reply-new *ngSwitchCase="TYPE_ACTION.REPLY"
+                        <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY"
                             class="panel-response"
                             [intentSelected]="intent"
                             [connector]="connector"
                             [action]="action"
                             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                        </cds-action-reply-new>
+                        </cds-action-reply>
 
                         <cds-action-reply-v2 *ngSwitchCase="TYPE_ACTION.REPLYV2"
                             class="panel-response"
@@ -129,13 +129,13 @@
                             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                         </cds-action-reply-v2>
 
-                        <cds-action-reply-new *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY"
+                        <cds-action-reply *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY"
                             class="panel-response"
                             [intentSelected]="intent"
                             [connector]="connector"
                             [action]="action"
                             (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                        </cds-action-reply-new>
+                        </cds-action-reply>
 
                         <cds-action-intent *ngSwitchCase="TYPE_ACTION.INTENT"
                             class="panel-response"
