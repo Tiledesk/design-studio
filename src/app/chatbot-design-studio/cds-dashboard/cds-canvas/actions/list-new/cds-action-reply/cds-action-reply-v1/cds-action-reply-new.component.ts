@@ -66,7 +66,17 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
   // ============ Lifecycle Hooks ============
 
   ngOnInit(): void {
+    console.log('[CdsActionReplyNew] ngOnInit called');
+    console.log('[CdsActionReplyNew] this.action:', this.action);
+    console.log('[CdsActionReplyNew] this.intentSelected:', this.intentSelected);
+
     this.logger.log('CdsActionReplyNewComponent ngOnInit', this.action, this.intentSelected);
+
+    if (!this.action) {
+      console.warn('[CdsActionReplyNew] Action is undefined in ngOnInit!');
+      return;
+    }
+
     this.typeAction = this.action._tdActionType === TYPE_ACTION.RANDOM_REPLY
       ? TYPE_ACTION.RANDOM_REPLY
       : TYPE_ACTION.REPLY;
@@ -104,8 +114,13 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
     this.intentNameResult = true;
     this.textGrabbing = false;
 
+    console.log('[CdsActionReplyNew] initialize() called with action:', this.action);
+    console.log('[CdsActionReplyNew] action.attributes:', this.action?.attributes);
+    console.log('[CdsActionReplyNew] action.attributes.commands:', this.action?.attributes?.commands);
+
     try {
       this.arrayResponses = this.action?.attributes?.commands ?? [];
+      console.log('[CdsActionReplyNew] arrayResponses set to:', this.arrayResponses);
     } catch (error) {
       this.logger.error('Failed to initialize arrayResponses', error);
       this.arrayResponses = [];
