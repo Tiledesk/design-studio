@@ -12,8 +12,8 @@ import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-serv
 })
 export class McpServersDialogComponent implements OnInit {
 
-  selectedServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }> = [];
-  filteredServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }> = [];
+  selectedServers: Array<{ name: string, url: string, transport: string, customHeaders?: Array<{ enabled: boolean, key: string, value: string }>, tools?: Array<{ name: string }> }> = [];
+  filteredServers: Array<{ name: string, url: string, transport: string, customHeaders?: Array<{ enabled: boolean, key: string, value: string }>, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }> = [];
   searchFilter: string = '';
   onUpdateCallback: (data: any) => void;
   
@@ -24,8 +24,8 @@ export class McpServersDialogComponent implements OnInit {
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { 
       // mcpServers from integrations: tools = available, selectedTools = last selection (kept even when server not selected).
-      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }>,
-      selectedServers?: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
+      mcpServers: Array<{ name: string, url: string, transport: string, customHeaders?: Array<{ enabled: boolean, key: string, value: string }>, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }>,
+      selectedServers?: Array<{ name: string, url: string, transport: string, customHeaders?: Array<{ enabled: boolean, key: string, value: string }>, tools?: Array<{ name: string }> }>,
       onUpdate?: (data: any) => void
     }
   ) { }
@@ -50,7 +50,7 @@ export class McpServersDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  toggleServerSelection(server: { name: string, url: string, transport: string, selectedTools?: Array<{ name: string }> }, event?: Event): void {
+  toggleServerSelection(server: { name: string, url: string, transport: string, customHeaders?: Array<{ enabled: boolean, key: string, value: string }>, selectedTools?: Array<{ name: string }> }, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent triggering the button click
     }
@@ -65,6 +65,7 @@ export class McpServersDialogComponent implements OnInit {
         name: server.name,
         url: server.url,
         transport: server.transport,
+        customHeaders: stored?.customHeaders,
         tools
       });
     }
@@ -147,6 +148,7 @@ export class McpServersDialogComponent implements OnInit {
           name: createdServer.name,
           url: createdServer.url,
           transport: createdServer.transport,
+          customHeaders: createdServer.customHeaders,
           tools: result?.selectedTools || []
         });
         this.logger.log("[McpServersDialog] New server added:", createdServer);
@@ -160,7 +162,7 @@ export class McpServersDialogComponent implements OnInit {
     });
   }
 
-  openEditServerDialog(server: { name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }, event?: Event): void {
+  openEditServerDialog(server: { name: string, url: string, transport: string, customHeaders?: Array<{ enabled: boolean, key: string, value: string }>, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent any unwanted propagation
     }
@@ -199,6 +201,7 @@ export class McpServersDialogComponent implements OnInit {
               name: updatedServer.name,
               url: updatedServer.url,
               transport: updatedServer.transport,
+              customHeaders: updatedServer.customHeaders,
               tools: Array.from(unique.values())
             };
           }
