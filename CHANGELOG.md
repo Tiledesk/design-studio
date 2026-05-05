@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.42-rc1
+- **added**: custom header authentication in mcp server
+- **added**: use_hyde and use_cache parameters to ask KB AI settings
+- **bug fix**: fixed an error in the "Add to Knowledge Base" action: information was not saved.
 
 # 1.39.41-rc5
 - **added**: ability to add a 'url_preview' reply message type
