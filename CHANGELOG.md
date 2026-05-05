@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.41
+- **bug fix**: fixed an error in the "Add to Knowledge Base" action: information was not saved.
+
 # 1.39.40
 - **added**: added PINECONE_RERANKING in environment to set reranking
 
