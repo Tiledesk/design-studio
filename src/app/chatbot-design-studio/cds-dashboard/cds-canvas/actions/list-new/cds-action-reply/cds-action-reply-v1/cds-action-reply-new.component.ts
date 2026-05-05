@@ -80,6 +80,11 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
       this.action._tdActionId = generateShortUID();
     }
     this.idAction = `${this.intentSelected.intent_id}/${this.action._tdActionId}`;
+
+    if (this.action && this.intentSelected) {
+      this.initialize();
+    }
+
     this.changeDetectorRef.detectChanges();
   }
 
