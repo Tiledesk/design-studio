@@ -1,0 +1,115 @@
+<div class="content-panel-intent-detail no-footer">
+    <!-- SPLASH SCREEN  -->
+    <div *ngIf="displayNewFormButton" class="splash-screen--form">
+        <div class="field-box">
+            <h4>{{'CDSForm.FormDescription' | translate }}</h4>
+        </div>
+
+        <!-- <div class="field-box">
+            <div class="tpl-info-text">
+                <span class="material-icons-outlined">help_outline</span>
+                <a href="https://gethelp.tiledesk.com/articles/how-to-create-conversational-forms-with-chatbots/" target="_blank">More info: How to create conversational forms with chatbots</a>
+            </div>
+        </div> -->
+
+        <button id="add-form-btn" class="btn btn-primary cds-blue-button" (click)="openBoxNewFormForm()">
+            <span class="material-icons">add</span>
+                {{ 'CDSForm.AddForm' | translate }}
+        </button>
+    </div>
+
+    <!-- HEADER BUTTONS -->
+    <div class="header-buttons--form">
+        
+        <button id="delete-form-btn" *ngIf="!displayNewFormButton && intentFormSize > 0" class="btn btn-primary cds-blue-button" 
+            (click)="openDeleteForm()">
+            <!-- <span class="icon-label">{{ "AddIntentPage.DeleteForm" | translate }}</span> -->
+            <span class="material-icons">delete_outline</span>
+        </button>
+
+        <button id="open-setting-btn" *ngIf="displaySettingsButton" class="btn btn-primary cds-blue-button" (click)="openSettingsForm()">
+            <!-- <span class="icon-label">{{ "Settings" | translate }}</span> -->
+            <span class="material-icons">settings</span>
+        </button>
+
+        <button id="close-general-btn" *ngIf="displayCancelButton && fields" class="btn btn-primary cds-blue-button" (click)="closeGeneral()">
+            <span class="material-icons">close</span>
+        </button>
+
+    </div>
+
+
+    <!-- SETTINGS FORM -->
+    <div *ngIf="displayBoxNewForm && intentFormSize === 0">
+        <div class="field-box">
+            {{ 'CDSForm.SelectTemplateForm' | translate }}
+        </div>
+        <div class="field-box">
+            <cds-select id="form-model" 
+                [items]="modelsOfForm" 
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'id'" 
+                [itemSelected]="selectedFormId" 
+                [placeholder]="'CDSForm.SelectAForm' | translate"
+                [clearable]="false" 
+                (onSelected)="onChangeBlockSelect($event)">
+            </cds-select>
+            <p class="form-description" *ngIf=selectedForm?.description>{{ selectedForm?.description }}</p>
+        </div>
+        <div class="field-box add-form">
+            <button id="create-intent-form" class="btn btn-primary cds-blue-button" (click)="generateJsonIntentForm()">
+                {{ 'CDSForm.CreateForm' | translate }}
+            </button>
+        </div>
+    </div>
+    
+    <!-- CONTENT FORM -->
+    <div *ngIf="intentFormSize > 0"  #scrollMe class="content-buttons--form scrollMe">
+        <!-- ------------------------------ -->
+        <!-- @ FIELDS LIST -->
+        <!-- ------------------------------ -->
+        <appdashboard-form-field
+            [fields]="fields"
+            (eventEditField)="eventEditField($event)" 
+            (eventDropField)="eventDropField($event)"
+            (openDeleteFieldModal)="openDeleteFieldModal($event)">
+        </appdashboard-form-field>
+    
+        <!-- ------------------------------ -->
+        <!-- @ ADD EDIT FIELD -->
+        <!-- ------------------------------ -->
+        <appdashboard-form-edit-add 
+            *ngIf="displayAddForm || displayEditForm" 
+            [field]="selectedField" 
+            [displayAddForm]="displayAddForm"
+            [displayEditForm]="displayEditForm" 
+            (scrollToBottom)="scrollToBottom()"
+            (changedFormFields)="onChangedFormFields($event)"
+            (saveAddEditForm)="saveAddEditForm($event)"
+            (closeAddEditForm)="closeAddEditForm()">
+        </appdashboard-form-edit-add>
+    </div>
+
+    <!-- ------------------------------ -->
+    <!-- @ BUTTON ADD FIELD  -->
+    <!-- ------------------------------ -->
+    <div *ngIf="!displaySettingForm && !displayAddForm && !displayEditForm" class="header-list-form">
+        <button *ngIf="displayTilebotAddEditForm && intentFormSize > 0"
+            [ngClass]="{'hide':( displaySettingForm || displayAddForm || displayEditForm ) }"
+            class="btn btn-primary cds-blue-button" 
+            (click)="eventAddField()">
+            <span class="material-icons">add</span>
+            {{ 'CDSForm.AddField' | translate }}
+        </button>
+    </div>
+    <!-- ------------------------------ -->
+    <!-- @ DELETE MODAL -->
+    <!-- ------------------------------ -->
+    <appdashboard-modal-window *ngIf="displayMODAL" 
+        [translateMap]="translateMap" 
+        [objectId]="selectedObjectId"
+        (confirmDeleteModal)="confirmDeleteModal($event)" 
+        (closeDeleteModal)="closeDeleteModal($event)">
+    </appdashboard-modal-window>
+
+</div>

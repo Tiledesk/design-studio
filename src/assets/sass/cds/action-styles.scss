@@ -374,3 +374,152 @@ appdashboard-filter{
     line-height: 22px;
 }
 
+// ============================================================================
+// SHARED ACTION REPLY STYLES (DS V3)
+// ============================================================================
+
+// Panel containers
+.ds-action-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ds-panel-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    gap: 4px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--ds-border, #ececea);
+    background: var(--ds-canvas, #f7f6f3);
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.ds-panel-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 18px 14px;
+    gap: 22px;
+    min-height: auto;
+    max-height: calc(100vh - 180px);
+    overflow: auto;
+    margin-top: 0;
+    flex: 1;
+}
+
+.ds-panel-footer {
+    padding: 14px 18px;
+    border-top: 1px solid var(--ds-border, #ececea);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--ds-canvas, #f7f6f3);
+}
+
+// Response grid (icon + content)
+.ds-response-grid {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 8px;
+    align-items: start;
+    position: relative;
+    height: auto;
+    width: 100%;
+    margin: 0;
+}
+
+.ds-response-drop {
+    position: absolute;
+    display: flex;
+    align-content: space-around;
+    width: 24px;
+    height: 26px;
+    left: 0;
+    top: 27px;
+    margin: 0;
+    color: var(--ds-muted, #8a8884);
+    cursor: grab;
+    background-color: transparent;
+    z-index: 1;
+    transition: color 0.15s ease;
+
+    &:hover {
+        color: var(--ds-ink-2, #4a4a47);
+    }
+
+    &.grabbing {
+        cursor: grabbing;
+        color: var(--ds-ink-2, #4a4a47);
+    }
+}
+
+// Empty state
+.ds-empty-state {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    padding: 20px;
+    margin: 18px 14px;
+    border: 1px dashed var(--ds-border-strong, #d8d6d2);
+    border-radius: 10px;
+    background: var(--ds-canvas, #f7f6f3);
+    text-align: center;
+    gap: 8px;
+
+    .ds-empty-state-text {
+        font-weight: 400;
+        color: var(--ds-muted, #8a8884);
+        font-size: 13px;
+        line-height: 1.4;
+    }
+}
+
+// Drag & drop
+.ds-drag-preview {
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    background: var(--ds-surface, #fff);
+}
+
+.ds-drag-placeholder {
+    opacity: 0.4;
+    background: var(--ds-border, #ececea);
+    border: 1px dashed var(--ds-border-strong, #d8d6d2);
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ds-draggable-list {
+    &.cdk-drop-list-dragging .ds-draggable-box:not(.cdk-drag-placeholder) {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+// Custom scrollbar
+.ds-scrollable {
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--ds-border-strong, #d8d6d2);
+        border-radius: 3px;
+
+        &:hover {
+            background: var(--ds-ink-2, #4a4a47);
+        }
+    }
+}
+

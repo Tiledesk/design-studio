@@ -1,0 +1,42 @@
+<div class="cds-questions-main-content">
+
+    <div class="cds-add-question-container">
+        <h4>{{'CDSCanvas.QuestionDescription' | translate:BRAND_BASE_INFO}}</h4>
+        <div class="input-group cds-input-group">
+            <span class="input-group-addon cds-group-addon-left">
+                <span class="material-icons">
+                    format_quote
+                </span>
+            </span>
+            <input [(ngModel)]="newQuestion" (keydown.enter)='onAddQuestion()' type="text"
+                class="cds-question-input" aria-label="question"
+                [placeholder]="'CDSCanvas.QuestionPlaceholderNew' | translate">
+            <span class="input-group-addon cds-group-addon-question-right" (click)="onAddQuestion()"
+                [ngClass]="{'add-question-btn-disabled': !newQuestion || newQuestion?.length === 0}">
+                <!-- <span class="cds-group-addon-question-right-btn-text"> ADD </span> -->
+                <span class="material-icons cds-group-addon-question-right-btn-icon">
+                    add
+                </span>
+            </span>
+        </div>
+
+    </div>
+
+    <div class="cds-questions-container" *ngFor="let q of questions_array;let index = index; trackBy:trackByIndex;">
+        <div class="input-group cds-input-group">
+            <span class="input-group-addon cds-group-addon-left">
+                <span class="material-icons">
+                    format_quote
+                </span>
+            </span>
+            <input [value]="q" (input)="onChangeText($event.target.value, index)" type="text" class="cds-question-input"
+                aria-label="question">
+            <span class="input-group-addon cds-group-addon-right" (click)="onRemoveQuestion(index)">
+                <span class="material-icons-outlined cds-group-addon-right-icon">
+                    delete
+                </span>
+            </span>
+        </div>
+    </div>
+
+</div>

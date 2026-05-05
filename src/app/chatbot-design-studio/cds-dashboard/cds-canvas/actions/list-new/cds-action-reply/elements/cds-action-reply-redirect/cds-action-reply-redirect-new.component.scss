@@ -1,0 +1,113 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+:host{
+    --base-margin: #{var(--input-base-margin)};
+}
+
+.previewMode{
+    &.text-editor-wrapper{
+        // padding: 0;
+        margin: 0px;
+
+        .control-label{
+            margin: 0px 10px;
+            font-size: 0.8em;
+
+        }
+
+        mat-button-toggle-group{
+            margin: 0px 10px;
+        }
+
+        mat-button-toggle ::ng-deep {
+            span{
+                font-size: 0.7em;
+                line-height: 25px;
+            }
+        }
+
+        .url-wrp{
+            flex-direction: row;
+            align-items: center;
+            margin: 0px 10px;
+            span.control-label:first-child{
+                width: 50px;
+                margin: 0;
+                text-align: end;
+            }
+        }
+
+    }
+
+
+}
+
+
+
+
+.url-wrp{
+    display: flex;
+    flex-direction: column;
+    margin: 5px 0 0 0;
+    align-items: flex-start;
+    gap: 5px;
+
+    .form-check{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+}
+.toogle{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.control-label{
+    font-family: var(--font-family-poppins);
+    color: var(--blu);
+    text-align: left;
+    line-height: 20px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-weight: 300;
+
+    margin-left: 30px;
+    // margin-top: 10px;
+    // margin-bottom: 10px;
+}
+
+cds-textarea.text-editable-div ::ng-deep{
+    display: block;
+    margin-left: var(--base-margin);
+    margin-right: var(--base-margin);
+    // width: calc(100% - 66px);
+    textarea {
+        line-height: 20px !important; 
+        width: calc(100% - 20px) !important;
+        font-size: 0.9em !important;
+    }
+}
+
+mat-button-toggle ::ng-deep{
+    .mat-button-toggle-button{
+        span {
+            line-height: 36px;
+        }
+    }
+}
+
+mat-button-toggle-group {
+    border: 1px solid var(--gray-light-02);
+    margin-left: var(--base-margin);
+    border-radius: var(--input-border-radius-base);
+}
+mat-button-toggle.mat-button-toggle-checked{
+    background-color: var(--blu);
+    color: var(--blu-light-02);
+}
+
+mat-button-toggle.mat-button-toggle{
+    color: var(--blu-light-02);
+}

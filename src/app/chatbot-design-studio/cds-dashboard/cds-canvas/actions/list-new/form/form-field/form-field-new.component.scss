@@ -1,0 +1,118 @@
+:host {
+    --background-color: #{var(--blu-light-01)};
+    --text-color: #{var(--blu)};
+    --icon-color: #{var(--blu-light-02)};
+    --selected-row-background: #{var(--blu-light-02)};
+    --selected-row-color:  #{var(--blu-light-03)};
+}
+
+.card-content{
+    max-height: 40vh;
+}
+
+.form-fields-table {
+    display: block;
+    .col-30 {
+        width:150px;
+        max-width:150px;
+    }
+    .label-field {
+        font-weight: 400;
+        font-size: 13px;
+        white-space: normal;
+        word-wrap: break-word;
+        color: var(--text-color);
+    }
+    .td-actions {
+        text-align: right;
+        padding: 0px;
+        width:85px;
+        display: table-cell;
+        > :last-child , >:first-child{
+            color: var(--icon-color);
+        }
+    }
+}
+
+.form-fields-table > thead {
+    width: 100%;
+    display: block;
+    tr {
+        width: 100%; 
+        display: inline-table;
+        border-bottom: 1px solid var(--icon-color);
+        th {
+            color: var(--icon-color);
+            font-weight: 400;
+            border-bottom: 0px solid var(--icon-color) !important;
+        }
+    }
+}
+
+.form-fields-table td {
+    padding: 5px 8px;
+}
+
+
+.form-fields-table > tbody > tr {
+    cursor:pointer;
+    width: 100%;
+    display: inline-table;
+}
+
+.form-fields-table > tbody > tr:hover {
+    // background-color: rgba(30, 41, 59, 0.5);
+}
+
+.form-fields-table tr.selected > * {
+    background-color: var(--selected-row-background);
+    .label-field{
+        color: var(--selected-row-color);
+    }
+    border: 0px;
+}
+
+
+/** DRAG **/
+.cdk-drag-preview {
+    border-radius: 6px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 16px;
+    position: relative;
+    height: inherit;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    tr > * {
+        background-color: var(--selected-row-background);
+    }
+    .label-field {
+        font-weight: 400;
+        font-size: 13px;
+        white-space: normal;
+        word-wrap: break-word;
+        color: var(--text-color);
+    }
+    .col-30 {
+        width:150px;
+        max-width:150px;
+    }
+
+    .td-actions {
+        // display: none;
+        width: 85px;
+        button{
+            display: none;
+        }
+    }
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

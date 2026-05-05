@@ -107,37 +107,49 @@
     --header-height: 60px;
     --sidebar-base-width: 60px;
 
-    /** DESIGN STUDIO v2 — token palette (Design Studio.html) **/
+    /** DESIGN STUDIO v3 — token palette (Reply Inspector.html - Design System V3) **/
+    // Color palette
     --ds-bg:            #fbfbfa;
     --ds-canvas:        #f7f6f3;
     --ds-surface:       #ffffff;
-    --ds-border:        #ececea;
-    --ds-border-strong: #d8d6d2;
-    --ds-ink:           #1a1a19;
-    --ds-ink-2:         #4a4a47;
+    --ds-border:        #e8e6e0;
+    --ds-border-strong: #d8d6d0;
+    --ds-ink:           #14140e;
+    --ds-ink-2:         #3a3935;
     --ds-muted:         #8a8884;
     --ds-muted-2:       #b3b1ac;
 
+    // Semantic colors
     --ds-accent:        oklch(0.66 0.15 50);
     --ds-accent-soft:   oklch(0.95 0.04 60);
     --ds-accent-ink:    oklch(0.45 0.15 45);
 
-    --ds-green:         oklch(0.68 0.13 155);
+    --ds-green:         oklch(0.68 0.14 155);
     --ds-green-soft:    oklch(0.95 0.04 155);
 
     --ds-blue:          oklch(0.62 0.13 245);
     --ds-blue-soft:     oklch(0.95 0.03 245);
 
-    --ds-red:           oklch(0.62 0.16 28);
-    --ds-red-soft:      oklch(0.95 0.03 28);
+    --ds-red:           oklch(0.55 0.2 25);
+    --ds-red-soft:      oklch(0.98 0.02 25);
 
     --ds-purple:        oklch(0.6 0.14 290);
 
-    --ds-shadow-card:   0 1px 2px rgba(20,20,18,.04), 0 0 0 1px rgba(20,20,18,.05);
-    --ds-shadow-pop:    0 8px 24px -8px rgba(20,20,18,.12), 0 2px 6px rgba(20,20,18,.05), 0 0 0 1px rgba(20,20,18,.06);
+    // Shadows
+    --ds-shadow-card:   0 1px 2px rgba(20,20,18,0.04);
+    --ds-shadow-pop:    0 8px 24px -8px rgba(20,20,18,0.12), 0 2px 6px rgba(20,20,18,0.05);
 
+    // Focus ring
+    --ds-focus-ring:    oklch(0.85 0.05 240 / 0.55);
+
+    // Spacing & Radius
     --ds-radius:        10px;
     --ds-radius-sm:     6px;
+    --ds-radius-lg:     14px;
+
+    // Typography
+    --ds-font-family:   'Geist', system-ui, sans-serif;
+    --ds-font-mono:     'Geist Mono', monospace;
 
     /** CONNECTOR **/
     --success-connector: rgb(44, 191, 35);

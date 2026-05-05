@@ -1,0 +1,107 @@
+<div class="extensions-response" *ngIf="!previewMode">
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+    
+    <div class="response-controls">
+        <div class="control-button delete" (click)="onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+
+    <div *ngIf="!isOpenHeightSlider" class="delay-wrapper" [ngStyle]="{width: isOpenDelaySlider? '100%' : 'auto'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+        
+    <div *ngIf="!isOpenDelaySlider" class="height-wrapper" [ngStyle]="{width: isOpenHeightSlider? '100%' : 'auto'}">
+        <cds-height-slider
+            [heightIframe]="heightIframe"
+            (changeHeightIframe)="onChangeHeightIframe($event)"
+            (clickHeightIframe)="onClickHeightIframe($event)">
+        </cds-height-slider>
+    </div>
+
+   <!-- ||  -->
+   <div *ngIf="!isOpenDelaySlider && !isOpenHeightSlider && canShowFilter && filterConditionExist" class="add-filter-btn-wrp">
+        <span class="material-icons-outlined">filter_alt</span>
+        {{'CDSCanvas.Filter' | translate }}
+    </div>
+
+    <div class="filter-wrapper"
+        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+
+
+
+</div>
+
+<div class="previewMode text-editor-wrapper" *ngIf="previewMode">
+    
+    <div class="text-editor">
+        <div *ngIf="!response.metadata.src" class="response-frame-panel no-image">
+            <div class="image">
+                <mat-icon svgIcon="add_image" aria-hidden="true"></mat-icon>
+            </div>
+            <div class="text">{{'CDSCanvas.ClickToAddFrame' | translate}}</div>
+        </div>
+        <div *ngIf="response.metadata.src" class="content-frame">
+            <cds-element-from-url 
+                class="frame-panel"
+                [metadata] = response.metadata
+                [previewMode]="previewMode">
+            </cds-element-from-url>
+        </div>
+    
+        <div>
+            <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+            <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate}}</div>
+        </div>
+
+    </div>
+
+</div>
+
+    
+<div class="text-editor-wrapper" *ngIf="!previewMode">
+    
+    <div class="text-editor">
+    
+        <div class="response-frame-wrapper">
+            <cds-element-from-url class="frame-panel"
+                [metadata] = response.metadata
+                [previewMode]="previewMode"
+                (onChangeMetadata)="onLoadPathElement()"
+                (onDeletedMetadata)="onDeletedMetadata($event)">
+            </cds-element-from-url>
+        </div>
+        
+        <cds-textarea 
+            class="text-editable-div"
+            [text]="response.text" 
+            [minRow]="1"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event)">
+        </cds-textarea>
+            
+    </div>
+
+</div> 
+

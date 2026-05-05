@@ -1,0 +1,9 @@
+<cds-select
+    [items]="listOfOperators"
+    [itemSelected]="operator"
+    [bindLabelSelect]="'name'"
+    [bindValueSelect]="'value'"
+    [placeholder]="'CDSCanvas.SelectOperator' | translate"
+    [clearable]="false"
+    (onSelected)="onSelectedOperator($event)">
+</cds-select>

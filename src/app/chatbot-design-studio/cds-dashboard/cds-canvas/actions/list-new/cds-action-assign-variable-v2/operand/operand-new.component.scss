@@ -1,0 +1,133 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+:host{
+    --icon-color: #{var(--blu)};
+    --text-color: #{var(--blu)};
+    --backGroundColor: #{var(--ds-canvas, #f7f6f3)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+    
+}
+
+div.operand-wrp {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr; //11fr 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 10px;
+    background-color: var(--content-background);
+    border: 1px solid var(--gray-light-02);
+    padding: 10px 10px 20px;
+    border-radius: 4px;
+
+
+    .material-icons {
+        font-size: 25px;
+        color: var(--icon-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    div.value-wrp{
+        position: relative;
+        display: block;
+    }        
+
+    .applay-function-button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        padding: 8px 15px;
+        border: 1px solid #c6cdd4;
+        border-radius: 4px;
+        height: 43px;
+        color: #c6cdd4;
+        cursor: pointer;
+        
+        &:hover{
+            border-color: white;
+            color: white
+        }
+    }
+}
+
+.disable-input-message {
+    display: none;
+    span.material-icons,
+    span.material-icons-outlined{
+        font-size: 16px;
+    }
+}
+
+
+.custom-expansion-panel {
+    background-color: transparent;
+    box-shadow: none;
+    color: white;
+}
+
+mat-expansion-panel ::ng-deep {
+    background-color: transparent;
+    box-shadow: none;
+    color: var(--text-color);
+
+    .mat-expansion-panel-header {
+        padding: 0;
+
+        &:hover {
+            background-color: transparent;
+        }
+    }
+
+    .mat-expansion-panel-header-title {
+        color: var(--text-color);
+    }
+
+    .mat-expansion-indicator::after {
+        color: var(--text-color) !important;
+    }
+
+    .mat-expansion-panel-header-description,
+    .mat-expansion-indicator:after {
+        color: var(--text-color);
+        margin: 5px;
+    }
+
+    ::ng-deep .mat-expansion-indicator,
+    .mat-expansion-indicator:after {
+        color: var(--text-color);
+    }
+
+    .mat-expansion-panel-header.mat-expanded {
+        height: 48px;
+    }
+
+    .disable_ripple:hover {
+        background: transparent !important;
+    }
+
+    .mat-expansion-panel-body {
+        padding: 0 !important;
+    }
+
+    .mat-expansion-panel-body {
+        padding: 0 !important;
+    }
+}
+
+
+
+cds-select#selectOperand ::ng-deep {
+    .ng-value-container{
+        font-family: var(--font-family-poppins);
+        .ng-placeholder {
+            font-size: 13px;
+        }
+    }
+}

@@ -1,0 +1,58 @@
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { LOG_LEVELS } from 'src/app/chatbot-design-studio/utils';
+import { ActionFlowLog } from 'src/app/models/action-model';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+
+@Component({
+  selector: '  selector: 'cds-action-flow-log-new',-new',
+  templateUrl: './cds-action-flow-log-new.component.html',
+  styleUrls: ['./cds-action-flow-log-new.component.scss']
+})
+export class CdsActionFlowLogNewComponent implements OnInit {
+
+  @Input() action: ActionFlowLog;
+  @Input() previewMode: boolean = true;
+  @Output() updateAndSaveAction = new EventEmitter();
+
+  LOG_LEVELS = LOG_LEVELS;
+  selectedLogLevel: string = LOG_LEVELS.NATIVE;
+  /** Stable order for UI select options. */
+  logLevelsArray = [
+    { key: 'native', value: LOG_LEVELS.NATIVE, icon: 'code', iconColor: '#6b7280' },
+    { key: 'debug', value: LOG_LEVELS.DEBUG, icon: 'bug_report', iconColor: '#8b5cf6' },
+    { key: 'info', value: LOG_LEVELS.INFO, icon: 'info', iconColor: '#3b82f6' },
+    { key: 'warn', value: LOG_LEVELS.WARN, icon: 'warning', iconColor: '#f59e0b' },
+    { key: 'error', value: LOG_LEVELS.ERROR, icon: 'error', iconColor: '#ef4444' },
+  ];
+  filteredLogs: Array<any> = [];
+
+  private logger: LoggerService = LoggerInstance.getInstance();
+  
+  constructor() {
+    this.logger.log('[CdsActionFlowLogComponent]:: constructor', this.action);
+  }
+
+  ngOnInit(): void {
+    this.selectedLogLevel = this.action.level;
+    this.logger.log('[CdsActionFlowLogComponent]:: ngOnInit', this.action);
+  }
+
+  onChangeTextArea(text:string) {
+    this.logger.log('[CdsActionFlowLogComponent]:: onChangeTextarea ', text);
+    this.action.log = text;
+  }
+
+  onBlur(event){
+    this.updateAndSaveAction.emit();
+  }
+
+  onLogLevelChange(event: any) {
+    this.selectedLogLevel = event.value;
+    this.action.level = event.value;
+    this.logger.log('[CdsActionFlowLogComponent] onLogLevelChange:', event);
+    this.updateAndSaveAction.emit();
+  }
+
+  
+}

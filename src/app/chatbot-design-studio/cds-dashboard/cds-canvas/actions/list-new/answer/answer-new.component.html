@@ -1,0 +1,14 @@
+<div class="text-editor-wrapper">
+    <div class="text-editor">
+        <mat-form-field class="box-textarea" appearance="fill">
+            <textarea matInput
+                cdkTextareaAutosize
+                [(ngModel)]="answer"
+                #autosize="cdkTextareaAutosize"
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="5"
+                (ngModelChange)="onChangeText($event)">
+            </textarea>
+        </mat-form-field>
+    </div>
+</div> 

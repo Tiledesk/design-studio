@@ -1,0 +1,181 @@
+<div *ngIf="previewMode" class="cds-action-preview-new">
+    
+    <div class="previewContent">       
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+
+
+        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length === 0" [ngTemplateOutlet]="placeholder"></ng-container>
+        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length > 0" [ngTemplateOutlet]="conditions"></ng-container>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>   
+        
+    </div>
+
+
+    <hr *ngIf="!action?.noelse" class="preview-divider">
+
+    <div *ngIf="!action?.noelse" class="previewContent">   
+        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail" id="scrollMe">
+
+        <form [formGroup]="actionJsonConditionFormGroup">
+            <!-- formArrayName="groups" -->
+            <div > 
+                <!-- [formGroupName]="i" -->
+                <div class="text-editor-wrapper" *ngFor="let group of action?.groups; let i = index; let last = last">
+                    <!-- EXPRESSION [i]-->
+                    <div *ngIf="i%2 === 0" class="base-filter">
+                        <div class="control-buttons" *ngIf="group?.conditions && group?.conditions.length > 0 || i!==0">
+                            <div class="filter-remove" (click)="onDeleteGroup(i, last)"><span class="material-icons-outlined">delete</span></div>
+                        </div>
+                        <base-filter *ngIf="i%2 === 0"
+                            [expression]="group"
+                            [booleanOperators]="booleanOperators"
+                            (onChangeExpression)="onChangeExpression($event)">
+                        </base-filter>
+                    </div>
+    
+                    <!-- OPERATOR [i]-->
+                    <div *ngIf="i%2 === 1" class="group-operator-wrapper">
+                        <div class="filter-add-group">
+                            <cds-select style="min-width:70px;" id="operator"
+                                [items]="booleanOperators"
+                                [bindLabelSelect]="'operator'"
+                                [bindValueSelect]="'operator'"
+                                [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                                [itemSelected]="group?.operator"
+                                (onSelected)="onChangeOperator($event, i)">
+                            </cds-select>
+                        </div>
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+            <div class="filter-add-group-wrapper add-conditions-group">
+                <div class="filter-add-group" (click)="onClickAddGroup()">
+                    <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
+                    <span class="text">{{'CDSCanvas.AddConditionsGroup' | translate }}</span>
+                </div> 
+            </div>
+    
+    
+            <!-- trueIntent -->
+            <div class="field-box">
+                <div class="condition-container">
+                    <div class="icon-action">
+                        <img class="active-icon" src="assets/images/icons/if_condition.svg">
+                    </div>
+                    <span class="condition-text">MATCH</span>
+                </div>
+                <cds-select 
+                    id="text-condition" 
+                    [items]="listOfIntents" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'" 
+                    [itemSelected]="action?.trueIntent" 
+                    [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                    [clearable]="true" 
+                    (onSelected)="onChangeForm($event, 'trueIntent')"
+                    (onReset)="onResetBlockSelect($event, 'trueIntent')">
+                </cds-select>
+                <!-- <cds-attributes
+                    class="cds-attributes"
+                    [attributes]="trueIntentAttributes"
+                    (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+                </cds-attributes> -->
+            </div>
+        
+            <!-- falseIntent -->
+            <div *ngIf="!action?.noelse" class="field-box">
+                <div class="condition-container">
+                    <span class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</span>
+                </div>
+                <cds-select 
+                    id="text-condition" 
+                    [items]="listOfIntents" 
+                    [bindLabelSelect]="'name'"
+                    [bindValueSelect]="'value'" 
+                    [itemSelected]="action?.falseIntent" 
+                    [placeholder]="'CDSCanvas.SelectABlock' | translate "
+                    [clearable]="true" 
+                    (onSelected)="onChangeForm($event, 'falseIntent')"
+                    (onReset)="onResetBlockSelect($event, 'falseIntent')">
+                </cds-select>
+                <!-- <cds-attributes
+                    class="cds-attributes"
+                    [attributes]="falseIntentAttributes"
+                    (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+                </cds-attributes> -->
+            </div>
+        
+        </form>
+    
+    </div>
+    
+    <!-- <div class="footer-panel-intent-detail">    
+        <div class="disable-input-message">
+            <section class="disable-input-message-section">
+                <mat-checkbox 
+                    [checked]="action.stopOnConditionMet"
+                    (change)="onStopConditionMeet()">
+                    {{"CDSCanvas.StopOnConditionMet" | translate}}
+                </mat-checkbox>
+            </section>
+        </div>
+    </div> -->
+</div>
+
+
+<ng-template #placeholder>
+    <div class="title-label">{{'CDSCanvas.ClickAddCondition' | translate }}</div>
+</ng-template>
+
+<ng-template #conditions>
+   <div id="conditions">
+        <div *ngFor="let group of action?.groups; let i = index;" class="group">
+            
+            <!-- EXPRESSION [i]-->
+            <div *ngIf="i%2 === 0 && group?.conditions && group?.conditions.length > 0" class="expression">
+                <div *ngFor="let condition of group.conditions; let j = index;" >
+                    <div *ngIf="j%2 === 0" class="condition-group">
+                        <div class="filter-icon">
+                            <span class="material-icons">data_object</span>
+                        </div>
+                        <div class="filter-text no-ellips">
+                            <b>{{condition?.operand1}}</b> 
+                            {{OPERATORS_LIST[condition?.operator].name | translate }}
+                            <b *ngIf="condition?.operand2.type === 'const'">{{condition?.operand2?.value}}</b>
+                            <b *ngIf="condition?.operand2.type === 'var'">{{condition?.operand2?.name}}</b>
+                        </div>
+                       
+                    </div>
+                    <div *ngIf="j%2 === 1">{{condition?.operator}}</div>
+                </div>
+            </div>
+
+            <!-- OPERATOR [i]-->
+            <div *ngIf="i%2 === 1" class="group-operator">
+                <b>{{group.operator}}</b>
+            </div>
+        </div>
+   </div>
+</ng-template>

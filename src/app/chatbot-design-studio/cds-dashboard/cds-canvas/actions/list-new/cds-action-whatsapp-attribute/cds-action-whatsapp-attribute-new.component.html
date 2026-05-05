@@ -1,0 +1,35 @@
+<div *ngIf="previewMode" class="cds-action-preview-new" style="position: relative;">
+
+    <div class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.AssignTo' | translate }}:
+        </div>
+
+        <div class="action-row-right">
+            <div *ngIf="action?.attributeName" class="set-attribute-value">
+                {{action?.attributeName}}
+            </div>
+            <div *ngIf="!action?.attributeName" class="set-attribute-value empty">
+                {{'CDSCanvas.SelectAttribute' | translate}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.AssignTo' | translate }}:</label>
+        <cds-textarea id="assignTo"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            [text]="action.attributeName"
+            (selectedAttribute)="onSelectedAttribute($event)"
+            (clearSelectedAttribute)="onSelectedAttribute($event)">
+        </cds-textarea>
+    </div>
+
+</div>

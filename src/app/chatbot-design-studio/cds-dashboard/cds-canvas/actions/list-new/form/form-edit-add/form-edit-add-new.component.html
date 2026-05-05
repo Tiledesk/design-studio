@@ -1,0 +1,129 @@
+<div class="tilebot-add-edit-form" id="scrollMe" [ngClass]="{'active':showForm}">
+
+    <div class="field-box" [ngClass]="{'is-error':nameResult === false}">
+        <label class="title-label">
+            {{ 'CDSForm.ParameterName' | translate }}
+        </label>
+        <cds-textarea id="assignTo"
+            [ngClass]="{'assigned' : fieldName}"
+            [placeholder]="fieldName?'':'CDSForm.ChooseAnAttribute' | translate"
+            [text]="fieldName"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="hasSelectedVariable? false: true"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            (clearSelectedAttribute)="onClearSelectedAttributeParam()"
+            (selectedAttribute)="onSelectedAttributeParam($event)">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" [ngClass]="{'is-error':labelResult === false}">
+        <label class="title-label">
+            {{ 'CDSForm.Label' | translate }}
+        </label>
+        <cds-textarea id="labelForm"
+            class="text-editable-div"
+            name="field_label"
+            [text]="fieldLabel" 
+            [minRow]="1"
+            popoverVerticalAlign="above"
+            [emojiPikerBtn]="true"
+            (changeTextarea)="onChangeTextAreaLabel($event)">
+        </cds-textarea>
+    </div>
+
+
+    <div class="field-box">
+        <mat-accordion>
+            <mat-expansion-panel (opened)="panelOpenState = true; onScrollToBottom()" (closed)="panelOpenState = false">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <p class="validation-field-title" >
+                            {{ 'CDSForm.ValidationField' | translate }}
+                        </p>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <!-- REGEX TYPE + CUSTOM -->
+                <div class="input-group cds-input-group" *ngIf="showRegexField">
+                    <div class="field-box">
+                        <label class="title-label">
+                            {{ 'Type' | translate }}
+                        </label>
+                        <cds-select id="method"
+                            [class.no-regex]="field?.type !== typeField.CUSTOM"
+                            [items]="modelsOfType"
+                            [bindLabelSelect]="'label'"
+                            [bindValueSelect]="'value'"
+                            [placeholder]="'CDSForm.SelectFieldType' | translate"
+                            [itemSelected]="fieldType"
+                            (onSelected)="onChangeValidationType($event)">
+                        </cds-select>
+                    </div>
+                    <div class="field-box" [style.visibility]="field?.type === typeField.CUSTOM? 'visible': 'hidden'">
+                        <label class="title-label">
+                            {{ 'CDSForm.AddCustomRegex' | translate }}
+                        </label>
+                        <cds-textarea id="regex"
+                            class="text-editable-div"
+                            [text]="fieldRegex" 
+                            [minRow]="1" [maxRow]="1"
+                            popoverVerticalAlign="above"
+                            [textLimitBtn]="false"
+                            [emojiPikerBtn]="false"
+                            [setAttributeBtn]="false"
+                            placeholder="{{ 'CDSForm.AddCustomRegex' | translate }}"
+                            (changeTextarea)="onChangeValidationRegex($event)">
+                        </cds-textarea>
+                    </div>
+
+                </div>
+
+
+                    <!-- ERROR-MESSAGE -->
+                <div class="field-box" *ngIf="fieldType" [ngClass]="{'is-error':errorLabelResult === false}">
+                    <label class="title-label">
+                        {{ 'CDSForm.ErrorMessage' | translate }}
+                    </label>
+                    <cds-textarea id="errorText"
+                        class="text-editable-div"
+                        [text]="fieldErrorLabel" 
+                        [minRow]="2" [maxRow]="3"
+                        popoverVerticalAlign="above"
+                        [textLimitBtn]="false"
+                        [emojiPikerBtn]="false"
+                        [setAttributeBtn]="false"
+                        (changeTextarea)="onChangeValidationErrorMessage($event)">
+                    </cds-textarea>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+
+    <!-- <div class="row input-wrapper info-message"
+        [ngStyle]="{'opacity':displayInfoMessage? '1' : '0' }">
+        <div class="col-sm-12">
+            <em class="material-icons">info</em>
+            <span [innerHTML]="infoMessage"></span>
+        </div>
+    </div> -->
+
+
+    <div *ngIf="displayAddForm === true" class="form-footer">
+        <button  class="btn btn-primary cds-blue-button" type="button" (click)="close()">
+            {{ 'Cancel' | translate }}
+        </button>
+        <button class="btn btn-primary cds-blue-button" id="add-button" type="submit" (click)="save()">
+            {{ 'Add' | translate}}
+        </button>
+    </div>
+
+
+    <button *ngIf="displayEditForm === true"  id="edit-form-builder-field" 
+        class="btn btn-primary cds-blue-button" type="submit" (click)="close()">
+        <span class="material-icons">done</span>Ok
+    </button>
+
+    
+</div>

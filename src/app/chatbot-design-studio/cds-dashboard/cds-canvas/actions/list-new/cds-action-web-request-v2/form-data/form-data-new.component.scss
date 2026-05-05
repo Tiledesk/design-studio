@@ -1,0 +1,115 @@
+:host {
+    --background-color: var(--blu-light-01);
+    --column-color: var(--blu-02);
+    --text-color: var(--blu);
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --base-radius: 8px
+}
+
+.form-data-wrp{
+    background: var(--background-color);
+    padding: 10px;
+}
+
+.form-data-row-header{
+    display: grid;
+    width: 100%;
+    grid-template-columns: 0.05fr 0.5fr 0.45fr;
+    font-size: 14px;
+}
+.form-data-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group{
+    justify-content: flex-end;
+}
+
+cds-textarea#key ::ng-deep,
+cds-textarea#value ::ng-deep {
+    // width: calc(50% - 2px);
+    .editor-utils {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        position: absolute;
+        bottom: -8px;
+        right: 4px;
+        z-index: 1;
+    }
+    textarea {
+        max-height: 41px;
+        cursor: default;
+        display: flex;
+        position: relative;
+        border-radius: var(--base-radius) 0 0 var(--base-radius);
+        font-weight: 500;
+        font-size: 12px;
+        margin: 3px 0px 3px 0;
+        padding: 0 10px 0 10px !important;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        resize: none!important;
+    }      
+}
+
+cds-textarea{
+    display: flex;
+
+    &#key{
+        width: 68%;
+    }
+}
+
+cds-textarea#key ::ng-deep {
+    textarea{
+        border-right: 0;
+    }
+}
+
+cds-textarea#value ::ng-deep {
+
+    textarea{
+        border-radius: 0 var(--base-radius) var(--base-radius) 0;
+        border-left: 0;
+    }
+}
+
+cds-select#method{
+    display: flex;
+    align-items: center;
+    width: 30%;
+    margin: 0;
+
+    ::ng-deep{
+
+        .select-bot-box{
+            width: 100%
+        }
+
+        .ng-select .ng-select-container {
+            height: 28px;
+            min-height: 28px;
+            border-radius: 0;
+        }
+        .ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input{
+            top: unset;
+        }
+
+        .ng-select .ng-select-container .ng-value span.label-select{
+            font-size: 12px;
+        }
+
+
+    }
+}
+
+::ng-deep {
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option span.label-select{
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,223 @@
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
+import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { ActionSendWhatsapp } from 'src/app/models/action-model';
+import { Intent } from 'src/app/models/intent-model';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { WhatsappService } from 'src/app/services/whatsapp.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+
+@Component({
+  selector: 'cds-action-send-whatsapp-new',
+  templateUrl: './cds-action-send-whatsapp-new.component.html',
+  styleUrls: ['./cds-action-send-whatsapp-new.component.scss']
+})
+export class CdsActionSendWhatsappNewComponent implements OnInit {
+
+  @Input() action: ActionSendWhatsapp;
+  @Input() intentSelected: Intent;
+  @Input() previewMode: boolean = true;
+  @Output() updateAndSaveAction = new EventEmitter();
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
+  
+  listOfIntents: Array<{name: string, value: string, icon?:string}>;
+
+  // Connectors
+  idIntentSelected: string;
+  idConnectorTrue: string;
+  idConnectorFalse: string;
+  idConnectionTrue: string;
+  idConnectionFalse: string;
+  isConnectedTrue: boolean = false;
+  isConnectedFalse: boolean = false;
+  connector: any;
+  private subscriptionChangedConnector: Subscription;
+  
+  project_id: string;
+
+  templates_list = [];
+  // receiver_list = [];
+
+  phone_number_id: string;
+  showLoader: Boolean = false;
+  selected_template: any;
+  payload: any;
+
+  private logger: LoggerService = LoggerInstance.getInstance();
+
+  constructor(
+    private dashboardService: DashboardService,
+    private intentService: IntentService,
+    private whatsapp: WhatsappService,
+    public el: ElementRef
+  ) { }
+
+  ngOnInit(): void {
+    this.logger.debug("[ACTION-SEND WHATSAPP] action detail: ", this.action);
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
+      this.logger.debug('[ACTION-SEND WHATSAPP] isChangedConnector -->', connector);
+      this.connector = connector;
+      this.updateConnector();
+    });
+   
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.logger.log("[ACTION REPLACE BOT] action (on-changes): ", this.action)
+    this.initialize();
+  }
+
+  /** */
+  ngOnDestroy() {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
+  }
+
+  initializeConnector() {
+    this.idIntentSelected = this.intentSelected.intent_id;
+    this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
+    this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
+    this.listOfIntents = this.intentService.getListOfIntents();
+    this.checkConnectionStatus();
+  }
+
+
+  private checkConnectionStatus(){
+    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
+    this.isConnectedTrue    = resp.isConnectedTrue;
+    this.isConnectedFalse   = resp.isConnectedFalse;
+    this.idConnectionTrue   = resp.idConnectionTrue;
+    this.idConnectionFalse  = resp.idConnectionFalse;
+  }
+
+  /** */
+  private updateConnector(){
+    this.logger.log('[ACTION REPLACE BOT] updateConnector:');
+    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
+    if(resp){
+      this.isConnectedTrue    = resp.isConnectedTrue;
+      this.isConnectedFalse   = resp.isConnectedFalse;
+      this.idConnectionTrue   = resp.idConnectionTrue;
+      this.idConnectionFalse  = resp.idConnectionFalse;
+      this.logger.log('[ACTION REPLACE BOT] updateConnector:', resp);
+      if (resp.emit) {
+        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
+      } 
+    }
+  }
+  
+
+
+  private initialize(){
+    this.project_id = this.dashboardService.projectID
+    this.action.payload.id_project = this.project_id
+    if (this.previewMode === false) {
+      this.logger.log("Whatsapp static project_id: ", this.project_id);
+      this.showLoader = true;
+      this.getTemplates();
+    }
+    if(this.intentSelected){
+      this.initializeConnector();
+    }
+  }
+
+  getTemplates() {
+    this.whatsapp.getAllTemplates().subscribe({ next:(templates: any[]) => {
+      this.logger.log("[ACTION-SEND WHATSAPP] get templates: ", templates);
+      this.templates_list = templates.map(t => {
+        if (t.category === 'MARKETING') {
+          t.icon = "campaign"
+        }
+        else {
+          t.icon = "notifications_active"
+        }
+        t.description = t.components.find(c => c.type === 'BODY').text;
+        return t;
+      })
+
+    }, error: (error) => {
+      this.showLoader = false;
+      this.logger.log("[ACTION-SEND WHATSAPP] error get templates: ", error);
+    }, complete: () => {
+      
+      if (this.action.templateName) {
+       this.selected_template = this.templates_list.find(t => t.name === this.action.templateName);
+      }
+      this.logger.log("[ACTION-SEND WHATSAPP] get templates completed: ", this.action.templateName, this.templates_list, this.selected_template);
+      this.showLoader = false;
+    }})
+  }
+
+  onChangeSelect(event) {
+    this.logger.debug("[ACTION-SEND WHATSAPP] onChangeSelect event", event);
+    this.selected_template = event;
+    this.action.templateName = this.selected_template.name;
+    this.action.payload.template.name = this.selected_template.name;
+    this.action.payload.template.language = this.selected_template.language;
+    this.action.payload.receiver_list = [];
+    this.addReceiver();
+    this.updateAndSaveAction.emit();
+  }
+
+  addReceiver() {
+    this.action.payload.receiver_list.push({ phone_number: null });
+  }
+
+  onChangeTextarea(event){
+    if(event){
+      this.phone_number_id = event
+      let element = document.getElementById('phone-number-id');
+      element.classList.remove('is-invalid');
+      var reg = new RegExp('^[0-9]+$');
+      if (!reg.test(this.phone_number_id)) {
+        element.classList.add('is-invalid');
+      } else {
+        this.action.payload.phone_number_id = this.phone_number_id;
+        this.updateAndSaveAction.emit();
+      }
+
+      this.logger.debug("[ACTION-SEND WHATSAPP] Action updated ", this.action.payload);
+    }
+  }
+
+  onChangeBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+    if(event){
+      this.action[type]=event.value
+
+      switch(type){
+        case 'trueIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          break;
+        case 'falseIntent':
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          break;
+      }
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    }
+  }
+
+  onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
+    switch(type){
+      case 'trueIntent':
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+        break;
+      case 'falseIntent':
+        this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+        break;
+    }
+    this.action[type] = null;
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  onReceiverEmitted(event, index) {
+    // update receiver
+    this.action.payload.receiver_list[index] = event;
+    this.logger.log("[ACTION-SEND WHATSAPP] Action updated ", this.action.payload);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+}

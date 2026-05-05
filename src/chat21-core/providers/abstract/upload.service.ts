@@ -13,7 +13,7 @@ import { UploadModel } from '../../models/upload';
 export abstract class UploadService {
 
   //params
-  private DEFAULT_URL: string = environment.apiUrl;
+  private DEFAULT_URL: string = environment.apiUrl || '';
   private baseUrl: string = '';
 
   public setBaseUrl(baseUrl: string): void {

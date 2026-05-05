@@ -1,0 +1,71 @@
+<div class="operand-wrp">
+    
+    <div class="textarea-value">
+        <div class="value-wrp">
+            <label class="title-label">{{'CDSCanvas.Value' | translate }}</label>
+            <cds-textarea id="operand"
+                [placeholder]="operandForm.value.isVariable? '' : 'CDSCanvas.InsertConstantValueOrChoise' | translate"
+                [textLimitBtn]="true"
+                [emojiPikerBtn]="false"
+                [text]="operandForm.value.value"
+                [limitCharsText]="100000"
+                [minRow]="4" [maxRow]="16"
+                [control]="operandForm.get('value')"
+                (clearSelectedAttribute)="onClearSelectedAttribute()"
+                (selectedAttribute)="onSelectedAttribute($event)"
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeTextArea($event)">
+            </cds-textarea>
+        </div>
+    </div>
+
+    <mat-accordion>
+        <mat-expansion-panel [expanded]="panelOpenState" (opened)="panelOpenState = true" (closed)="panelOpenState = false"
+            class="custom-expansion-panel">
+            <mat-expansion-panel-header class="disable_ripple">
+                <mat-panel-title>
+                    {{'CDSCanvas.Advanced' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>    
+
+                <!-- // Function -->    
+                <div class="field-box">
+                    <label>{{'CDSCanvas.Function' | translate}}</label>
+                    <cds-select id="selectOperand"
+                        [items]="listOfFunctions"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'value'"
+                        [placeholder]="'CDSCanvas.ApplyAFunctionToValue' | translate"
+                        [itemSelected]="operandForm.value.function"
+                        [clearable]="true"
+                        (onSelected)="onSelectedFunction($event)"
+                        (onReset)="onResetFunction($event)">
+                    </cds-select>
+                </div>
+
+                <!-- // TreatAsAttributeNamer -->    
+                <div class="field-box disable-input-message">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="operandForm.value.isVariable"
+                            (change)="onChangeIsCheckbox($event)">
+                            {{"CDSCanvas.TreatAsAttributeName" | translate}}
+                            <span class="material-icons-outlined" 
+                                matTooltipClass="cds-mat-tooltip"  matTooltip="{{ 'CDSCanvas.TreatAsAttributeNameTips' | translate }}" 
+                                #tooltip="matTooltip" matTooltipPosition='left' matTooltipHideDelay="100">info</span>
+                        </mat-checkbox>
+                    </section>
+                </div>
+
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+
+    <!-- <span class="material-icons" (click)="onToggleSelectFunction()">settings</span> -->
+
+
+    
+    
+</div>

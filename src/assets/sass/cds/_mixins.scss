@@ -1,0 +1,288 @@
+// ============================================================================
+// Design System SCSS Mixins
+// Centralized reusable patterns for consistent styling across components
+// ============================================================================
+
+// ============ Layout Mixins ============
+
+// Flex row container with gap
+@mixin flex-row($gap: 8px, $align: center, $justify: flex-start) {
+  display: flex;
+  flex-direction: row;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+// Flex column container with gap
+@mixin flex-column($gap: 8px, $align: center, $justify: flex-start) {
+  display: flex;
+  flex-direction: column;
+  align-items: $align;
+  justify-content: $justify;
+  gap: $gap;
+}
+
+// Grid layout for 2-column response (icon + content)
+@mixin response-grid($icon-width: 32px, $gap: 8px) {
+  display: grid;
+  grid-template-columns: $icon-width 1fr;
+  gap: $gap;
+  align-items: start;
+}
+
+// ============ Panel Styling ============
+
+// Toolbar/header pattern
+@mixin panel-toolbar($padding: 10px 14px, $border-color: var(--ds-border), $bg-color: var(--ds-canvas)) {
+  display: flex;
+  align-items: center;
+  padding: $padding;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid $border-color;
+  background: $bg-color;
+  width: 100%;
+}
+
+// Content area pattern
+@mixin panel-content($padding: 18px 14px, $gap: 22px) {
+  @include flex-column($gap);
+  width: 100%;
+  padding: $padding;
+  min-height: auto;
+  overflow: auto;
+}
+
+// Footer panel pattern
+@mixin panel-footer($padding: 14px 18px, $border-color: var(--ds-border), $bg-color: var(--ds-canvas)) {
+  padding: $padding;
+  border-top: 1px solid $border-color;
+  @include flex-row(10px);
+  background: $bg-color;
+}
+
+// ============ Empty State ============
+
+// Empty state placeholder
+@mixin empty-state($min-height: 80px, $padding: 20px, $gap: 8px) {
+  position: relative;
+  @include flex-column($gap, center, center);
+  min-height: $min-height;
+  padding: $padding;
+  border: 1px dashed var(--ds-border-strong, #d8d6d2);
+  border-radius: 10px;
+  background: var(--ds-canvas, #f7f6f3);
+  text-align: center;
+
+  > * {
+    color: var(--ds-muted, #8a8884);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+}
+
+// ============ Borders & Spacing ============
+
+// Border utility
+@mixin border-solid($color: var(--ds-border), $width: 1px) {
+  border: $width solid $color;
+}
+
+// Border with DS token
+@mixin border-ds($side: 'all', $color: var(--ds-border), $width: 1px) {
+  @if $side == 'top' {
+    border-top: $width solid $color;
+  } @else if $side == 'bottom' {
+    border-bottom: $width solid $color;
+  } @else if $side == 'left' {
+    border-left: $width solid $color;
+  } @else if $side == 'right' {
+    border-right: $width solid $color;
+  } @else {
+    border: $width solid $color;
+  }
+}
+
+// ============ Typography ============
+
+// Mono text (for char counts, codes)
+@mixin mono-text($size: 11px) {
+  font-family: "Geist Mono", monospace;
+  font-size: $size;
+}
+
+// ============ Buttons & Controls ============
+
+// Base button/control styling
+@mixin control-button($size: 20px, $bg: var(--ds-surface), $color: var(--ds-muted), $hover-bg: var(--ds-canvas)) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  border: 1px solid var(--ds-border, #ececea);
+  background: $bg;
+  color: $color;
+  cursor: pointer;
+  @include flex-row(0, center, center);
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: $hover-bg;
+    color: var(--ds-ink-2, #4a4a47);
+  }
+}
+
+// Pill button (rounded end-to-end)
+@mixin pill-button($height: 32px, $padding: 0 16px, $bg: var(--ds-surface), $color: var(--ds-ink)) {
+  height: $height;
+  padding: $padding;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border, #ececea);
+  background: $bg;
+  color: $color;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  @include flex-row(0, center, center);
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover {
+    border-color: var(--ds-border-strong, #d8d6d2);
+    background: var(--ds-canvas, #f7f6f3);
+  }
+}
+
+// Chip/badge pattern
+@mixin chip($bg: var(--ds-surface), $color: var(--ds-ink-2)) {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border, #ececea);
+  background: $bg;
+  color: $color;
+  font-size: 12.5px;
+  font-weight: 500;
+  @include flex-row(0, center, center);
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover {
+    border-color: var(--ds-border-strong);
+    background: var(--ds-canvas, #f7f6f3);
+  }
+}
+
+// ============ Shadow & Elevation ============
+
+// Drop shadow for dragged elements
+@mixin shadow-drag() {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+// Subtle shadow
+@mixin shadow-subtle() {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+// ============ Material Overrides ============
+
+// Material checkbox override with DS tokens
+@mixin checkbox-override($color: var(--ds-ink, #1a1a19), $surface: var(--ds-surface, #fff)) {
+  ::ng-deep .mat-checkbox.mat-accent {
+    .mat-checkbox-frame {
+      border-color: $color !important;
+    }
+  }
+
+  ::ng-deep .mat-checkbox-checked {
+    .mat-checkbox-background {
+      background-color: $color !important;
+    }
+
+    .mat-checkbox-checkmark {
+      background: $color !important;
+
+      .mat-checkbox-checkmark-path {
+        stroke: $surface !important;
+        stroke-width: 2px !important;
+      }
+    }
+  }
+}
+
+// ============ Drag & Drop ============
+
+// CDK drag preview styling
+@mixin cdk-drag-preview() {
+  box-sizing: border-box;
+  border-radius: 10px;
+  @include shadow-drag();
+  background: var(--ds-surface, #fff);
+}
+
+// CDK drag placeholder
+@mixin cdk-placeholder() {
+  opacity: 0.4;
+  background: var(--ds-border, #ececea);
+  border: 1px dashed var(--ds-border-strong, #d8d6d2);
+  min-height: 60px;
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// ============ Scrollbar ============
+
+// Custom scrollbar styling
+@mixin scrollbar-custom($width: 6px, $thumb-color: var(--ds-border-strong, #d8d6d2), $hover-color: var(--ds-ink-2, #4a4a47)) {
+  ::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $width / 2;
+
+    &:hover {
+      background: $hover-color;
+    }
+  }
+}
+
+// ============ Focus & Interaction ============
+
+// Focus ring for accessibility
+@mixin focus-ring($color: var(--ds-focus-ring, oklch(0.85 0.05 240 / 0.55))) {
+  box-shadow: 0 0 0 3px $color;
+  transition: box-shadow 0.15s ease;
+}
+
+// Transition utility
+@mixin transition($property: all, $duration: 0.15s, $easing: ease) {
+  transition: $property $duration $easing;
+}
+
+// ============ Responsive ============
+
+// Mobile-first responsive mixin
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (min-width: 576px) {
+      @content;
+    }
+  } @else if $breakpoint == 'md' {
+    @media (min-width: 768px) {
+      @content;
+    }
+  } @else if $breakpoint == 'lg' {
+    @media (min-width: 992px) {
+      @content;
+    }
+  } @else if $breakpoint == 'xl' {
+    @media (min-width: 1200px) {
+      @content;
+    }
+  }
+}

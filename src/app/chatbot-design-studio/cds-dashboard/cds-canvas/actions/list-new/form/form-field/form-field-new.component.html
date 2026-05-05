@@ -1,0 +1,58 @@
+<div *ngIf="fields.length > 0" id="scrollMe" class="card-content">
+
+    <table class="table table-hover form-fields-table">
+        <thead>
+            <tr>
+                <th class="col-30">
+                    {{ "Name" | translate }}
+                </th>
+                <th style="width:auto">
+                    {{ "Label" | translate }}
+                </th>
+                <th style="width:85px">
+                    {{ "Actions" | translate }}
+                </th>
+            </tr>
+        </thead>
+
+        <tbody cdkDropList (cdkDropListDropped)="drop($event)" style="display:block">
+            
+            <tr *ngFor="let field of fields; let i = index;" 
+                [ngClass]="{'selected':selectedObjectId === i}" 
+                cdkDrag cdkDragLockAxis="y">
+                <!-- ------------------- -->
+                <!-- FIELS NAME -->
+                <!-- ------------------- -->
+                <td class="ellips col-30" (click)='editField(i)'>
+                    <span class="label-field">
+                        {{ field.name }}
+                    </span>
+                </td>
+                <!-- LABEL -->
+                <td style="width:auto" (click)='editField(i)'>
+                    <span class="label-field">
+                        {{ field?.label }}
+                    </span>
+                </td>
+                <!-- ------------------------------------------------ -->
+                <!-- ACTIONS -->
+                <!-- ------------------------------------------------ -->
+                <td class="td-actions">
+                    <!-- EDIT -->
+                    <button type="button" class="btn btn-primary btn-simple btn-xs" (click)='editField(i)'>
+                        <span class="material-icons cds-edit-field-icon">edit</span>
+                    </button>
+                    <!-- DELETE -->
+                    <button type="button" class="btn btn-danger btn-simple btn-xs" (click)='deleteFieldModal(i)'>
+                        <span class="material-icons">close</span>
+                    </button>
+                    <!-- DRAG INDICATOR -->
+                    <button type="button" class="btn btn-danger btn-simple btn-xs">
+                        <span class="material-icons">drag_indicator</span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

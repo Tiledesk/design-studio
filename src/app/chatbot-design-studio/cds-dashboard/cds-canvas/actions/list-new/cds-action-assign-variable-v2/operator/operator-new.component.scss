@@ -1,0 +1,27 @@
+@import "./src/assets/sass/cds/_variables.scss";
+
+.select-operand-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    padding: 8px 15px;
+    border: 1px solid #c6cdd4;
+    border-radius: 4px;
+    height: 43px;
+    color: #c6cdd4;
+    cursor: pointer;
+    margin-top: 20px;
+    max-width: 406.245px;
+    
+    &:hover{
+        border-color: white;
+        color: white
+    }
+}
+
+span.material-icons{
+    font-size: 25px;
+    color: #8ab4f8;
+    margin-left: 10px;
+}

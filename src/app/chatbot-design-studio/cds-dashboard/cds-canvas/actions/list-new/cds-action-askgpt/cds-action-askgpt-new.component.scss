@@ -1,0 +1,117 @@
+.custom-divider {
+    border-top: 1px solid var(--blu);
+}
+
+
+div {
+    .flex {
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        right: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .close {
+            // height: 16px;
+            width: 17px;
+            top: -7px;
+            right: -7px;
+            font-size: 15px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+
+            &:hover {
+                background: #ecb606;
+                color: white;
+            }
+        }
+    }
+
+    div.tag {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 8px;
+        right: unset;
+        border-radius: 7px;
+        margin: 5px;
+        padding: 5px 10px;
+        background-color: #ecb606;
+        color: white;
+
+    }
+}
+
+
+.custom-icon {
+    margin-right: 6px;
+    font-size: 15px;
+}
+
+.animated-icon {
+    animation: rotate 1.5s linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.play-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: #cbcbcb;
+}
+
+.play-button:hover {
+    cursor: pointer;
+
+    .button-text {
+        text-decoration: underline;
+    }
+
+    .play-icon {
+        font-size: 17px;
+    }
+}
+
+.sync-div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: #cbcbcb;
+}
+
+.indexing-hint {
+    color: #ff4e4e;
+    font-size: 14px;
+    filter: drop-shadow(2px 2px 6px black);
+}
+
+.variable-container {
+    display: flex;
+    height: 35px;
+    flex-direction: row;
+    align-items: center;
+    border: solid 1px black;
+    background-color: white;
+    padding: 0px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+
+a.link{
+    cursor: pointer;
+    text-decoration: underline;
+}

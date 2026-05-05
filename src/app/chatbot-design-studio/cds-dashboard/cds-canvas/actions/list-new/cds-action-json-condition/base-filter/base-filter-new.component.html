@@ -1,0 +1,63 @@
+<div class="content">
+
+    <div class="filter-row" *ngFor="let group of expression?.conditions; let i = index; let last = last">
+        <div class="text-editor-wrapper">
+            <!-- CONDITION [i]-->
+            <div *ngIf="i%2 === 0" 
+                class="filter-condition" 
+                (click)="onOpenConditionDetail(i); addConditionFilter.toggle();">
+                <div class="remove" 
+                    (click)="$event.stopPropagation(); onDeleteCondition(i, last)">
+                    <span class="material-icons-outlined">delete</span>
+                </div>
+                <div class="filter-icon">
+                    <span class="material-icons">data_object</span>
+                </div>
+                <div class="filter-text no-ellips">
+                    <b>{{group?.operand1}}</b> 
+                    {{OPERATORS_LIST[group?.operator].name | translate }}
+                    <b *ngIf="group?.operand2.type === 'const'">{{group?.operand2?.value}}</b>
+                    <b *ngIf="group?.operand2.type === 'var'">{{group?.operand2?.name}}</b>
+                </div>                    
+            </div>
+            <!-- OPERATOR [i]-->
+            <div *ngIf="i%2 === 1">
+                <cds-select
+                    class="filter-operator"
+                    [items]="booleanOperators"
+                    [bindLabelSelect]="'operator'"
+                    [bindValueSelect]="'operator'"
+                    [itemSelected]="group?.operator"
+                    (onSelected)="onChangeOperator($event, i)">
+                </cds-select>
+            </div>
+        </div>
+    </div>
+
+    <div class="basic-filter-wrp" *ngIf="true"> 
+        <div class="add-filter-button" 
+            [satPopoverAnchor]="addConditionFilter" 
+            (click)="addConditionFilter.toggle()">
+            <span class="material-icons">add</span>
+            {{'CDSCanvas.AddNewCondition' | translate }}
+        </div>
+    </div>
+    
+</div>
+
+<!-- verticalAlign="below" -->
+<sat-popover #addConditionFilter 
+    id="addConditionFilter"
+    horizontalAlign="center" 
+    verticalAlign="center" 
+    hasBackdrop 
+    (backdropClicked)="addConditionFilter.close();onDismiss($event)"
+    panelClass="base-filter--add-filter-panel"
+    interactiveClose="false">
+    <base-condition-row
+        [condition]="selectedCondition"
+        (close)="onDismiss($event)">
+    </base-condition-row>
+</sat-popover>
+
+

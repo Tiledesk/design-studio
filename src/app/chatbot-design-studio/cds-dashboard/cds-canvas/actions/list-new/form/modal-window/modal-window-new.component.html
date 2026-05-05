@@ -1,0 +1,41 @@
+
+<!-- ============ MODAL DELETE ============ -->
+<div class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          
+          <div class="modal-title">
+            <span class="material-icons">report_problem</span>
+            {{ translateMap.deleteField }}
+          </div>
+          <button type="button" class="close" aria-label="Close" (click)="closeDelete()">
+            <span class="material-icons">close</span>
+          </button>
+  
+        </div>
+  
+        <div class="modal-body">
+            <p>
+            {{translateMap.confirmDeleteField}} <b>{{translateMap.nameField}}</b>
+            </p>
+        </div>
+  
+        <div class="modal-footer">
+          <!-- Annulla -->
+          <button class="btn btn-white btn-close-delete" (click)="closeDelete()">
+            {{ 'Cancel' | translate }}
+            
+          </button>
+          <!-- Confirm -->
+          <button class="btn btn-danger" (click)="confirmDelete()">
+            {{ translateMap.deleteField }}
+          </button>
+        </div>
+  
+  
+      </div>
+  
+    </div>
+  
+  </div>

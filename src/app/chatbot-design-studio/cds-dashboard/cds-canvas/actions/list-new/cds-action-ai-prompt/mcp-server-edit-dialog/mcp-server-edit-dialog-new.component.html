@@ -1,0 +1,150 @@
+<div class="tpl-modal-box">
+    <!-- Loading overlay - shown only if saving takes more than 500ms -->
+    <div class="loading-overlay" *ngIf="showLoader">
+        <div class="loading-content">
+            <div class="spinner-large"></div>
+            <span class="loading-text">{{'CDSCanvas.Saving' | translate}}...</span>
+        </div>
+    </div>
+
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span>{{ isNewServer ? ('CDSCanvas.AddMCPServer' | translate) : ('CDSCanvas.EditMCPServer' | translate) }}</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    
+    <!-- <  class="custom-hr" style="margin-top:3px; margin-bottom:3px"> -->
+    
+    <div class="tpl-modal-content">
+        <!-- Error message -->
+        <div class="error-alert" *ngIf="showError">
+            <span class="material-icons error-icon">error_outline</span>
+            <span class="error-text">{{ errorMessage }}</span>
+            <span class="material-icons close-error" (click)="showError = false">close</span>
+        </div>
+
+        <form class="edit-form">
+            <!-- Nome -->
+            <div class="form-field">
+                <label class="field-label">{{'CDSCanvas.Name' | translate}}</label>
+                <cds-text 
+                    [text]="editedServer.name"
+                    [setAttributeBtn]="false"
+                    [placeholder]="'CDSCanvas.EnterServerName' | translate"
+                    (onChange)="onChangeField($event, 'name')">
+                </cds-text>
+            </div>
+
+            <!-- URL -->
+            <div class="form-field">
+                <label class="field-label">URL</label>
+                <cds-text 
+                    [text]="editedServer.url"
+                    [setAttributeBtn]="false"
+                    [placeholder]="'CDSCanvas.EnterServerURL' | translate"
+                    (blur)="onUrlBlur()"
+                    (onChange)="onChangeField($event, 'url')">
+                </cds-text>
+            </div>
+
+            <!-- Transport Type (Read-only) -->
+            <div class="form-field">
+                <label class="field-label">Type</label>
+                <div class="readonly-field">
+                    {{ editedServer.transport }}
+                </div>
+                <span class="field-hint">{{'CDSCanvas.OnlySupported' | translate}}</span>
+            </div>
+
+            <!-- Tools (optional, read from integrations -> this.data.allServers/tools) -->
+            <div class="form-field">
+                <label class="field-label">{{'CDSCanvas.Tools' | translate}}</label>
+
+                <!-- Counters + Select button -->
+                <div class="field-hint tools-header-row">
+                    <span>
+                        {{'CDSCanvas.ToolsSelected' | translate}}: {{ selectedToolsCount }} / {{ totalToolsCount }}
+                    </span>
+                    <button *ngIf="totalToolsCount > 0"
+                        type="button"
+                        class="btn btn-primary cds-blue-button tools-select-btn"
+                        (click)="openToolsModal()">
+                        {{'CDSCanvas.SelectTools' | translate}}
+                    </button>
+                </div>
+
+                <!-- <div *ngIf="totalToolsCount === 0" class="readonly-field">
+                    {{'CDSCanvas.NoToolsAvailable' | translate}}
+                </div> -->
+            </div>
+        </form>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-cancel-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [mat-dialog-close]="false"
+            [disabled]="isSaving || isLoadingTools">
+            {{'Cancel' | translate}}
+        </button>
+
+        <!-- Connect / Refresh tools (Edit: visible only if URL has been changed) *ngIf="showConnectButton" -->
+        <button id="cds-connect-btn" class="btn btn-primary cds-blue-button" type="button"
+            [disabled]="!isFormValid() || isSaving || isLoadingTools"
+            (click)="onConnect()">
+            <span *ngIf="!isLoadingTools">{{ connectButtonLabelKey | translate }}</span>
+            <span *ngIf="isLoadingTools" class="btn-inline-spinner">
+                <span class="spinner"></span>
+                {{'CDSCanvas.LoadingTools' | translate}}...
+            </span>
+        </button>
+
+        <!-- Save -->
+        <button *ngIf="showSaveButton" id="cds-save-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [disabled]="isSaveDisabled"
+            (click)="onSave()">
+            <span *ngIf="!isSaving">{{'CDSCanvas.Save' | translate}}</span>
+            <span *ngIf="isSaving" class="btn-inline-spinner">
+                <span class="spinner"></span>
+                {{'CDSCanvas.Saving' | translate}}...
+            </span>
+        </button>
+    </div>
+</div>
+
+<!-- Tools modal: elenco completo + selezione (scrollabile) -->
+<div *ngIf="isToolsModalOpen" class="tools-modal">
+    <div (click)="closeToolsModal()" class="tools-modal__backdrop"></div>
+
+    <div class="tools-modal__panel">
+        <div class="tools-modal__header">
+            <div class="tools-modal__header-left">
+                <div class="tools-modal__title">
+                    {{'CDSCanvas.AvailableTools' | translate}} ({{ totalToolsCount }})
+                </div>
+                <div class="tools-modal__subtitle">
+                    {{'CDSCanvas.ToolsSelected' | translate}}: {{ selectedToolsCount }} / {{ totalToolsCount }}
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary cds-blue-button" (click)="closeToolsModal()">
+                {{'CDSCanvas.Close' | translate}}
+            </button>
+        </div>
+
+        <div class="tools-modal__list">
+            <mat-checkbox
+                *ngFor="let tool of availableTools"
+                [checked]="isToolSelected(tool.name)"
+                (change)="onToggleTool(tool.name, $event.checked)"
+                class="tools-modal__item">
+                <div class="tools-modal__item-content">
+                    <span class="tools-modal__item-name">{{ tool.name }}</span>
+                    <span *ngIf="tool.title" class="tools-modal__item-title">{{ tool.title }}</span>
+                    <span *ngIf="tool.description" class="tools-modal__item-description">
+                        {{ tool.description }}
+                    </span>
+                </div>
+            </mat-checkbox>
+        </div>
+    </div>
+</div>

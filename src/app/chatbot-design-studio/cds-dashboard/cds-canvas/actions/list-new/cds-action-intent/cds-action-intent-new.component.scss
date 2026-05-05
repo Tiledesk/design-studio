@@ -1,0 +1,34 @@
+.cds-action-preview {
+    padding: 0px;
+    margin: 0px;
+    position: relative;
+    &.isStart{
+        // padding: 5px 10px;
+        padding: 0px;
+    }
+}
+
+
+.previewContent{
+    // padding: 5px 5px;
+    // top: calc(50% - 14px);
+    .title-label{
+     color: var(--brown);
+     font-size: 12px; 
+    }
+}
+
+
+
+
+
+/** NG-SELECT **/
+.ng-select.ng-select-focused>.ng-select-container {
+    border-color: var(--color-red-hex);
+    box-shadow: inset 0 1px 1px #00000013,0 0 0 3px #007eff1a;
+}
+
+
+
+
+

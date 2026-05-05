@@ -1,0 +1,93 @@
+<div class="extensions-response" *ngIf="!previewMode">
+    
+    <div class="text-editor-drop">
+        <em class="material-icons">drag_indicator</em>
+    </div>
+
+    <div class="response-controls">
+        <div class="control-button delete" (click)="onDeleteActionReply()">
+            <em class="material-icons">delete</em>
+        </div>
+        <div class="control-button" (click)="onMoveUpResponse()">
+            <em class="material-icons">expand_less</em>
+        </div> 
+        <div class="control-button" (click)="onMoveDownResponse()">
+            <em class="material-icons">expand_more</em>
+        </div>
+    </div>
+    
+
+    <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
+        <appdashboard-delay-slider
+            [delayTime]="delayTime"
+            (changeDelayTime)="onChangeDelayTime($event)"
+            (clickDelayTime)="onClickDelayTime($event)">
+        </appdashboard-delay-slider>
+    </div>
+    <!-- ||  -->
+    <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
+        <span class="material-icons-outlined">filter_alt</span>
+        {{'CDSCanvas.Filter' | translate }}
+    </div>
+    <div class="filter-wrapper" *ngIf="canShowFilter"
+        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
+        <appdashboard-filter
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter>
+    </div>
+</div>
+
+<div class="previewMode text-editor-wrapper" *ngIf="previewMode">
+
+    <div class="text-editor">
+        <div class="url-wrp">
+            <span class="control-label">{{ 'url' | translate }}:</span>
+            <div class="response-wrp" *ngIf="metadata.src">{{metadata.src}}</div>
+            <div class="response-wrp no-text" *ngIf="!metadata.src">{{ 'CDSCanvas.ClickToAddUrl' | translate }}</div>
+        </div>
+        <div class="url-wrp">
+            <span class="control-label">{{ 'OpenIn' | translate }}:</span>
+            <span class="control-label" *ngIf="metadata.target === 'parent'"><b>{{ 'SameWidgetWindow' | translate }}</b></span>
+            <span class="control-label"  *ngIf="metadata.target === 'blank'"><b>{{ 'NewTabWindow' | translate }}</b></span>
+        </div>
+    </div>
+</div>
+
+
+<div class="text-editor-wrapper" *ngIf="!previewMode">
+    
+    <div class="text-editor">
+
+        <div class="url-wrp">
+            <span class="control-label">{{ 'url' | translate }}:</span>
+            <div class="text-editor-wrapper">
+                <cds-textarea id="url"
+                    class="text-editable-div"
+                    [text]="metadata.src" 
+                    [minRow]="1" [maxRow]="1"
+                    popoverVerticalAlign="above"
+                    [emojiPikerBtn]="false"
+                    [textLimitBtn]="false"
+                    (blur)="onBlur($event)"
+                    (changeTextarea)="onChangeTextarea($event)">
+            </cds-textarea>
+            </div>
+        </div>
+
+        <div class="url-wrp toogle">
+            <span class="control-label">{{ 'OpenIn' | translate }}:</span>
+            <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [value]="metadata.target" (change)="onButtonToogleChange($event)">
+                <mat-button-toggle value="parent">{{ 'SameWidgetWindow' | translate }}</mat-button-toggle>
+                <mat-button-toggle value="blank">{{ 'NewTabWindow' | translate }}</mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+        
+
+        
+
+    </div>
+
+</div>

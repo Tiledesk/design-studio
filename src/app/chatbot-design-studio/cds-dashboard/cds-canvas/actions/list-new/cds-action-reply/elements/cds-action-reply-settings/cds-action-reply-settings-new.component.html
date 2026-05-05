@@ -1,0 +1,131 @@
+
+<div *ngIf="previewMode" class="text-editor-wrapper previewMode">
+    
+
+    <!-- <div class="set-attribute-label-and-value-wpr"  *ngIf="action.hasOwnProperty('noInputTimeout')">
+        <div class="set-attribute-label"> {{'CDSCanvas.Timeout' | translate }} </div>
+        <div class="response-wrp ellips" [class.no-text]="!action.noInputTimeout">{{action.noInputTimeout}}</div>
+    </div> -->
+
+   
+    <div class="previewContent" [attr.disabled]="isConnectorInputDisabled">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.NoInput' | translate}}
+            <span *ngIf="action.hasOwnProperty('noInputTimeout')">({{formatLabel(action?.noInputTimeout/1000)}})</span>
+        </label>
+        
+        <cds-connector class="button-connector"
+            [idConnector] = "idConnectorNoInput"
+            [idConnection] = "idConnectionNoInput"
+            [isConnected] = "isConnectedNoInput">
+        </cds-connector>
+    </div>
+
+    <div class="previewContent" [attr.disabled]="isConnectorMatchDisabled">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.NoMatch' | translate}}</label>
+        
+        <cds-connector class="button-connector"
+            [idConnector] = "idConnectorNoMatch"
+            [idConnection] = "idConnectionNoMatch"
+            [isConnected] = "isConnectedNoMatch">
+        </cds-connector>
+    </div>
+    
+</div> 
+
+
+<div  *ngIf="!previewMode" class="setting-wrapper">
+
+   
+    <!-- <div class="field-box" *ngIf="action.hasOwnProperty('noInputTimeout')">
+        <label class="title-label">{{'CDSCanvas.Timeout' | translate}} (s)</label>
+        <cds-textarea class="text-editable-div"
+            [emojiPikerBtn]="false" 
+            [textLimitBtn]="false" 
+            [text]="action.noInputTimeout"
+            [minRow]="1" [maxRow]="1" [limitCharsText]="2"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event, 'noInputTimeout')">
+        </cds-textarea>
+    </div> -->
+
+</div>
+
+<div *ngIf="!previewMode" class="connector-wrapper" >
+
+    <div class="field-box" style="width: 100%;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.NoInput' | translate}}</label>
+            <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '70%'}">
+                <appdashboard-delay-slider *ngIf="action.noInputTimeout < 120000"
+                    [delayTime]="action.noInputTimeout/1000"
+                    [max]="120" [step]="1"
+                    (changeDelayTime)="onChangeDelayTime($event)"
+                    (clickDelayTime)="onClickDelayTime($event)">
+                </appdashboard-delay-slider>
+                <appdashboard-delay-text *ngIf="action.noInputTimeout >= 120000"
+                    [delayTime]="action.noInputTimeout/1000"
+                    [max]="120"
+                    (changeDelayTime)="onChangeDelayTime($event)"
+                    (clickDelayTime)="onClickDelayTime($event)">
+                </appdashboard-delay-text>
+            </div>
+        </div>
+        <cds-select id="noinput-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.noInputIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            [attr.disabled]="isConnectorInputDisabled"
+            (onSelected)="onChangeBlockSelect($event, 'noInputIntent')"
+            (onReset)="onResetBlockSelect($event, 'noInputIntent')">
+        </cds-select>
+        
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box" style="width: 100%;">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.NoMatch' | translate}}</label>
+        </div>
+        <cds-select id="nomatch-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.noMatchIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true"
+            [attr.disabled]="isConnectorMatchDisabled"
+            (onSelected)="onChangeBlockSelect($event, 'noMatchIntent')"
+            (onReset)="onResetBlockSelect($event, 'noMatchIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+</div>

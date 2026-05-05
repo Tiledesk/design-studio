@@ -1,0 +1,65 @@
+<!-- ++++++++ STEP 0 ++++++++ -->
+<div *ngIf="step===0">
+    <variable-list
+        [variableListUserDefined]="variableListUserDefined"
+        [variableListSystemDefined]="variableListSystemDefined"
+        (onSelected)="onSelectedAttribute($event, 0)">
+    </variable-list>
+</div>
+
+<!-- ++++++++ STEP 1 ++++++++ -->
+<div class="step2" *ngIf="step===1">
+    <form class="filter-item-drop-down" [formGroup]="conditionForm" (submit)="onSubmitCondition()">
+        <section class="header">
+            <span class="material-icons">data_object</span>
+            <label class="category-row-name">{{'CDSCanvas.CustomAttribute' | translate }}</label>
+            <span class="material-icons" (click)="onClose()">close</span>
+        </section>
+        <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
+        <section class="attribute">
+            <div>{{'CDSCanvas.AttributeName' | translate }}</div>
+            <div class="operand-attribute">
+                <input #operand1
+                type="text" 
+                formControlName="operand1" 
+                [placeholder]="'AttributeName' | translate "  
+                [readonly]="disableInput" 
+                name="operand1" />
+                <!-- (click)="openvariable-list()" <span class="material-icons close" (click)="onDeleteInputField()">close</span> -->
+            </div>
+        </section>
+        
+        <section class="condition">
+            <div>{{'CDSCanvas.Condition' | translate }}</div>
+            <div class="operators-list">
+                <div class="operator" [class.active]="conditionForm.value.operator === item.type" *ngFor="let item of operatorsList" (click)="onClickOperator(item)">
+                    <img class="active-icon" *ngIf="item.src" width="10px" [src]="item.src">
+                    <div>{{item.name | translate}}</div>
+                </div>
+            </div>
+        </section>
+        <section class="value" formGroupName="operand2" *ngIf="canShowOperand2">
+            <div>{{'CDSCanvas.Value' | translate }}</div>
+            <div class="value-wrp">
+                <!-- //[readonly]="conditionForm.value.operand2.name? true : false" -->
+                <cds-textarea id="operand2"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="setAttributeBtnOperand2"
+                    [minRow]="1" [maxRow]="1"
+                    [readonly]="readonlyTextarea"
+                    [control]="conditionForm.value.operand2.type=='const'? conditionForm.get('operand2.value'): conditionForm.get('operand2.name')"
+                    (selectedAttribute)="onSelectedAttribute($event,1)"
+                    (clearSelectedAttribute)="onClearSelectedAttribute()"
+                    (changeTextarea)="onChangeTextArea($event)">
+                </cds-textarea>
+            </div>
+        </section>
+        <section class="submit">
+            <button class="btn btn-primary pull-right cds-blue-button" [disabled]="disableSubmit" type="submit">{{'CDSCanvas.ApplyCondition' | translate }}</button>
+        </section>
+    </form>
+
+</div>
+
+

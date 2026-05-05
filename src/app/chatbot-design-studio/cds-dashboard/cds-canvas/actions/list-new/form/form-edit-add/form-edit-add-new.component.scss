@@ -1,0 +1,171 @@
+:host {
+    --background-color: #{var(--ds-canvas, #f7f6f3)};
+    --text-color: #{var(--blu)};
+    --icon-color: #{var(--blu-light-02)};
+    --selected-row-background: #{var(--blu-light-02)};
+    --selected-row-color:  #{var(--blu-light-03)};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+}
+
+
+.tilebot-add-edit-form {
+    background-color: var(--content-background);
+    border: 1px solid var(--gray-light-02);
+    border-radius: 4px;
+    height: auto;
+    max-height: 0;
+    overflow: hidden;
+    box-shadow: none;
+    transition: max-height 0.3s ease-in;
+    padding: 20px 20px 30px;
+    &.active {
+        max-height: 38vh;
+    }
+
+    button {
+        text-align: right;
+        margin: 0px;
+    }
+    button.edit-form {
+        border-radius: 20px;
+        padding-right: 20px;
+        padding-top: 10px;
+        color: #fff;
+        min-height: 30px;
+        background-color: transparent;
+        box-shadow: none;
+        float: right;
+    }
+    button.edit-form .icon-label {
+        vertical-align: text-top;
+        display: inline-block;
+        overflow: hidden;
+        margin-right: 10px;
+        width: auto;
+    }
+
+
+
+    ::ng-deep .mat-expansion-indicator:after {
+        color: var(--text-color);
+        margin-top: -4px;
+    }
+
+    mat-expansion-panel {
+        box-shadow: none;
+        background: var(--background-color);
+        border: 0px solid #5f6368;
+        overflow: visible;
+        &.open-block {
+            pointer-events: none;
+        }
+        mat-expansion-panel-header {
+            height: 40px;
+            padding: 0 12px;
+        }
+        &.mat-expanded {
+            ::ng-deep .mat-expansion-panel-body {
+                opacity: 1;
+            }
+        }
+        ::ng-deep .mat-expansion-panel-body {
+            opacity: 0;
+            margin-top: 20px;
+            padding: 0px 20px 0px
+        }
+
+        .validation-field-title {
+            margin: 0;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+    }
+
+    .input-wrapper {
+        margin: 10px 0 0 0;
+    }
+}
+
+
+
+//  ****** TYPE REGEX + INPUT REGEX CUSTOM : end *********
+.input-group .input-group-addon {
+    border: 0;
+    background: transparent;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+}
+.cds-input-group {
+    // margin: 10px 10px;
+    display: flex;
+    flex-wrap: nowrap;
+
+}
+
+.field-box:last-child{
+    width: 100%;
+}
+cds-select#method ::ng-deep{
+    // padding: 6px 0;
+    min-width:120px;
+    .ng-select-container{
+        height: 37px;
+        border-radius: var(--input-border-radius-base) 0px 0px var(--input-border-radius-base);
+    }
+}
+cds-select#method.no-regex ::ng-deep{
+
+    .ng-select-container{
+        height: 37px;
+        border-radius: var(--input-border-radius-base);
+    }
+}
+
+cds-textarea#regex ::ng-deep {
+    display: flex;
+    width: 100%;
+    // padding: 6px 0px 0px 0;
+    textarea {
+        border-radius: 0px var(--input-border-radius-base) var(--input-border-radius-base) 0px;
+        resize: none !important; 
+        padding: 6px 16px !important;
+
+        height: 23px !important;
+        min-height: 23px !important;
+    }
+}
+//  ****** TYPE REGEX + INPUT REGEX CUSTOM : end *********
+
+
+
+.form-footer {
+    text-align: right;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+
+    button#add-button{
+        background-color: #45c351;
+    }
+}
+
+
+
+
+.input-prefix {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    color: #7d7d7d;
+    font-weight: 800;
+}
+
+.input-suffix {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #7d7d7d;
+    font-weight: 800;
+}

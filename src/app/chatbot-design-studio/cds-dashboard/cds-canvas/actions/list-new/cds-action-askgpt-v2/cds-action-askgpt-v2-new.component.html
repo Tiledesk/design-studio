@@ -1,0 +1,714 @@
+<div *ngIf="previewMode" class="cds-action-content cds-action-preview" style="position: relative;">
+    <div class="action-row">
+        <div class="action-row-left empty">
+            <mat-icon class="icon" svgIcon="brain" aria-hidden="true"></mat-icon>
+        </div>
+        <div *ngIf="action?.question" class="action-row-right">
+            {{ action?.namespaceAsName 
+                ? action?.namespace 
+                : (listOfNamespaces | find:{ key: 'value', value: action?.namespace })?.name 
+            }}
+        </div>
+    </div>
+    
+    <div class="action-row">
+        <div class="action-row-left empty">
+            <mat-icon class="icon" svgIcon="subject" aria-hidden="true"></mat-icon>
+        </div>
+        <div *ngIf="action?.question" class="action-row-right">
+            {{action?.question}}
+        </div>
+        <div *ngIf="!action?.question" class="action-row-right empty">
+            {{'CDSCanvas.EnterTheQuestion' | translate}}
+        </div>
+    </div>
+
+    <div class="action-row">
+        <!-- <div class="action-row-left">
+            <img src="assets/images/actions/openai_icon.svg">
+        </div> -->
+        <div id="gpt-icon" class="action-row-left icon-action">
+            <img src="assets/images/actions/openai_icon.svg">
+        </div>
+        <div *ngIf="action?.modelName" class="action-row-right">
+            <!-- {{getValue('name')}} -->
+            {{action?.modelName}}
+        </div>
+        <div *ngIf="!action?.modelName" class="action-row-right empty">
+            {{'CDSCanvas.SelectKnowledgeBaseModel' | translate}}
+        </div>
+    </div>
+
+    <div class="action-row">
+        <div class="tag-replyto" *ngIf="action?.assignReplyTo">
+            {{action?.assignReplyTo}}
+        </div>
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate}}</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate}}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.UserQuestion' | translate}}</label>
+        <cds-textarea id="question" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="4"[maxRow]="25" 
+            [text]="action?.question" 
+            [placeholder]="'CDSCanvas.QuestionToSubmit' | translate"
+            (blur)="onBlur($event, 'question')"
+            (changeTextarea)="onChangeTextarea($event, 'question')">
+        </cds-textarea>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox($event,'history')">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
+    </div>
+
+    <!-- // Section moved to textarea field box -->
+    <!-- <div class="field-box">
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.history"
+                (change)="onChangeCheckbox($event,'history')">
+                {{"CDSCanvas.UseChatHistoryInPrompt" | translate}}
+            </mat-checkbox>
+        </section>
+    </div> -->
+
+     <!-- PREVIEW - START -->
+     <div style="width: 100%; display: flex; justify-content: flex-end; margin: 30px 0px 10px 0px">
+        <button id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" 
+            [disabled]="!action.question" (click)="execPreview()">
+            <span class="material-icons">preview</span>
+            {{'CDSCanvas.Preview' | translate }}
+        </button>
+    </div>
+
+    <div class="answer-preview" *ngIf="showPreview">
+
+        <div *ngIf="!action?.chunks_only">
+            <div class="header-answer-preview">
+                <div class="label-and-button-container">
+                    <label class="title-label">{{'CDSCanvas.AnswerPreview' | translate }}
+                        <span class="subtitle-label">( {{'CDSCanvas.GeneratedWith' | translate }} {{llm_model_selected?.modelName}})</span>
+                    </label>
+                </div>
+            </div>
+    
+            <div id="preview-container" class="preview-container">
+                <div class="placeholder-container" *ngIf="searching">
+                    <loading-spinner class="custom-spinner"></loading-spinner>
+                    <span style="margin-left: 8px;">{{'CDSCanvas.GeneratingAnswer' | translate}} ...</span>
+                </div>
+                <div *ngIf="!searching && !showAiError && preview_response">
+                    {{ preview_response?.answer }}
+                </div>
+                <div *ngIf="showAiError">
+                    {{ ai_error }}
+                </div>
+            </div>
+    
+            <div class="usage-container" *ngIf="!searching && !showAiError ">
+                <span style="font-weight: 500;">{{'CDSCanvas.TokensUsage' | translate }}</span>
+                <!-- <span style="font-size: 13px;">{{'CDSCanvas.Prompt' | translate }}: {{ ai_response.usage.prompt_tokens }}</span> -->
+                <!-- <span>{{'CDSCanvas.MaxTokensForAnswer' | translate }}: {{ ai_response.usage.completion_tokens }}</span> -->
+                <span style="font-weight: 500;">{{'CDSCanvas.Total' | translate }}: {{ preview_response?.prompt_token_size }}</span>
+            </div>
+    
+        </div>
+        
+
+        <!-- ----------------------------- -->
+        <!-- Chunks Accordion -->
+        <!-- ----------------------------- -->
+        <div class="mat-accordion--wpr" style="margin-top: 3px;">
+            <mat-accordion>
+                <div class="placeholder-container" *ngIf="searching && action?.chunks_only">
+                    <loading-spinner class="custom-spinner"></loading-spinner>
+                    <!-- <span style="margin-left: 8px;">loading ...</span> -->
+                </div>
+                <mat-expansion-panel *ngIf="!searching" class="custom-expansion-panel" [expanded]="action?.chunks_only || chunksPanelOpenState" (opened)="chunksPanelOpenState = true" (closed)="chunksPanelOpenState = false">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <span *ngIf="!action?.chunks_only">Chunks used for the answer ({{chunks?.length}})</span>
+                            <span *ngIf="action?.chunks_only">Chunks returned ({{chunks?.length}})</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="content-chunks">
+                        <div class="chunk--wpr" *ngFor="let chunk of chunks">
+                            <article class="chunk">
+                                {{chunk}}
+                            </article>
+                        </div>
+                    </div>
+                    
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+
+
+    </div>
+    <!-- PREVIEW - END -->
+
+
+    <div class="field-box">
+        
+        <label class="title-label">{{'CDSCanvas.ChooseKB' | translate}}</label>
+        <cds-select *ngIf="!action?.namespaceAsName" id="text-condition" 
+            [items]="listOfNamespaces" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [optionalBindAdditionalText]="'kbTypeLabel'"
+            [additionalTextAsBadge]="true"
+            [itemSelected]="action.namespace" 
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [clearable]="false" 
+            (onSelected)="onChangeBlockSelect($event, 'namespace')"
+            (onReset)="onResetBlockSelect($event, 'namespace')">
+        </cds-select>
+        <!-- KEY -->
+
+        <cds-text *ngIf="action?.namespaceAsName" id="text"
+            class="sx-input" 
+            [text]="action.namespace"
+            [placeholder]="'CDSCanvas.SelectNamespace' | translate"
+            [autocompleteOptions]="autocompleteOptions"
+            (blur)="onBlur($event, 'namespace')"
+            (onChange)="onChangeTextarea($event, 'namespace')">
+        </cds-text>
+
+        <section class="disable-input-message-section">
+            <mat-checkbox 
+                [checked]="action?.namespaceAsName"
+                (change)="onChangeCheckbox($event,'namespaceAsName')">
+                {{ 'CDSCanvas.UseKnowledgeBaseName' | translate }}
+            </mat-checkbox>
+            <label class="field-description">{{ "CDSCanvas.UseKBNameDescription" | translate }}
+                <br>
+                <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.namespace_as_name.link" [target]="DOCS_LINK.namespace_as_name.target">{{ 'LearnMore' | translate }}</a>
+            </label>
+        </section>
+    </div>
+
+    
+    <div class="link-container">
+        <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
+    </div>
+
+
+    <mat-accordion>
+        <mat-expansion-panel (opened)="aiSettingsPanelOpenState = true" (closed)="aiSettingsPanelOpenState = false"
+            class="custom-expansion-panel">
+            <mat-expansion-panel-header class="disable_ripple">
+                <mat-panel-title>
+                    <div class="title-and-parameters-container">
+                        <div class="title-and-parameters-container">
+                            <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
+                            <div class="parameters-preview">
+                                <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
+                                    <span class="preview-badge-text">{{ action?.modelName || llm_model_selected?.modelName }}</span>
+                                </span>
+                                <span *ngIf="action?.max_tokens" class="preview-badge">
+                                    <mat-icon class="preview-icon" aria-label="tokens" title="tokens">token</mat-icon>
+                                    <span class="preview-badge-text">{{action.max_tokens | formatNumber}}</span>
+                                </span>
+                                <span *ngIf="action?.temperature !== undefined" class="preview-badge">
+                                    <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon>
+                                    <span class="preview-badge-text">{{action.temperature | formatNumber}}</span>
+                                </span>
+                                
+                                <span *ngIf="action?.top_k !== undefined" class="preview-badge">
+                                    <mat-icon class="preview-icon" aria-label="chunk limit" title="chunk limit">view_list</mat-icon>
+                                    <span class="preview-badge-text">{{action.top_k | formatNumber}}</span>
+                                </span>
+
+                                <span *ngIf="action?.context">system context: {{action.context}}</span>
+                                <span *ngIf="KB_HYBRID && action?.alpha !== undefined" class="preview-badge">
+                                    <mat-icon class="preview-icon" aria-label="search type" title="search type">manage_search</mat-icon>
+                                    <span class="preview-badge-text">{{action.alpha | formatNumber}}</span>
+                                </span>
+                                
+                                <span *ngIf="action?.reranking && action?.reranking_multiplier !== undefined" class="preview-badge">
+                                    <mat-icon class="preview-icon" aria-label="reranking multiplier" title="reranking multiplier">auto_graph</mat-icon>
+                                    <span class="preview-badge-text">{{action.reranking_multiplier | formatNumber}}</span>
+                                </span>
+                                
+                                <!-- Advanced/KB options preview (when panel is collapsed) -->
+                                <span *ngIf="action?.advancedPrompt" class="preview-flag">
+                                    <span class="label">{{"CDSCanvas.AdvancedContext" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.citations" class="preview-flag">
+                                    <span class="label">{{"CDSCanvas.Citations" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.chunks_only" class="preview-flag">
+                                    <span class="label">{{"CDSCanvas.ChunksOnly" | translate}}</span>
+                                </span>
+                                <span *ngIf="action?.skip_unanswered" class="preview-flag">
+                                    <span class="label">{{"CDSCanvas.SkipUnanswered" | translate}}</span>
+                                </span>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <hr class="custom-divider" style="margin-top: 10px;">
+            <div>
+
+                <!-- // model select  -->
+                <div class="field-box">
+                    <cds-select id="model-condition"
+                        [class]="!llm_model_selected?.configured ? 'not-configured' : ''"
+                        [items]="llm_models_flat" 
+                        [itemSelected]="llm_model_selected?.model"
+                        [bindLabelSelect]="'modelName'" 
+                        [bindValueSelect]="'model'"
+                        [groupByKey]="'llm'"
+                        [clearable]="false" 
+                        [searchable]="true"
+                        [optionalBindAdditionalText]="'multiplier'" 
+                        (onSelected)="onChangeSelect($event, 'llm_model')">
+                    </cds-select>
+                    <div class="bottom-row">
+                        <div class="configure-model-button" (click)="goToIntegrations()">{{'CDSCanvas.ConfigureModel' | translate }}</div>
+                    </div>
+                </div>
+
+
+                <!-- // max_tokens slider -->
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.MaxTokens' | translate }}</label>
+                    <div class="action-wait-content">
+                        <div class="action-wait-slider ">
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].min | formatNumber}}</div>
+                            <mat-slider 
+                                class="wait-slider" thumbLabel 
+                                [displayWith]="formatSliderLabel"
+                                [step]="ai_setting['max_tokens'].step"  
+                                [min]="ai_setting['max_tokens'].min"
+                                [max]="ai_setting['max_tokens'].max"
+                                [(ngModel)]="action.max_tokens"
+                                (change)="updateSliderValue($event.value, 'max_tokens')" 
+                                aria-label="units">
+                            </mat-slider>
+                            <div class="action-wait-range">{{ai_setting['max_tokens'].max | formatNumber}}</div>
+                        </div>
+                        <!-- // doesn't work propely -->
+                        <!-- <cds-text [text]="action.max_tokens.toString()" [inputType]="'number'" [maxlength]="3" [min]="1" [max]="512" (onChange)="updateSliderValue($event, 'max_tokens')" class="slider-input"></cds-text> -->
+                        <input type="number" 
+                               class="slider-input gpt-setting-input" 
+                               [(ngModel)]="action.max_tokens"
+                               [min]="ai_setting['max_tokens'].min"
+                               [max]="ai_setting['max_tokens'].max"
+                               (change)="updateSliderValue(action.max_tokens, 'max_tokens')">
+                        <!-- <cds-text [text]="action.max_tokens" [disabled]="true" class="slider-input"></cds-text> -->
+                    </div>
+                    <div class="slider-description"></div>
+                </div>
+
+                <!-- // temperature slider -->
+                <div class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.Temperature' | translate }}</label>
+                        <div class="action-wait-content">
+                            <div class="action-wait-slider" [class.disabled]="ai_setting['temperature'].disabled">
+                                <div class="action-wait-range">{{ai_setting['temperature'].min}}</div>
+                                <mat-slider 
+                                    class="wait-slider" thumbLabel
+                                    [step]="ai_setting['temperature'].step"  
+                                    [min]="ai_setting['temperature'].min"
+                                    [max]="ai_setting['temperature'].max"
+                                    [disabled]="ai_setting['temperature'].disabled" 
+                                    [(ngModel)]="action.temperature"
+                                    (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">{{ai_setting['temperature'].max | formatNumber}}</div>
+                            </div>
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.temperature}}" disabled>
+                        </div>
+                        <div class="slider-description"><span>{{'CDSCanvas.Deterministic' | translate }}</span><span>{{'CDSCanvas.Random' | translate }}</span></div>
+                    </div>
+                </div>
+
+                <!-- // alpha limit slider -->
+                <div *ngIf="KB_HYBRID" class="text-editor-wrapper">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.SearchTypeLimit' | translate }}</label>
+                        <div class="action-wait-content">
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">{{ai_setting['search_type'].min}}</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    [step]="ai_setting['search_type'].step"  
+                                    [min]="ai_setting['search_type'].min"
+                                    [max]="ai_setting['search_type'].max" 
+                                    [(ngModel)]="action.alpha"
+                                    (change)="updateSliderValue($event.value, 'alpha')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">{{ai_setting['search_type'].max}}</div>
+                            </div>
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.alpha}}" disabled>
+                        </div>
+                        <div class="slider-description"><span>{{'CDSCanvas.FullText' | translate }}</span><span>{{'CDSCanvas.Semantic' | translate }}</span></div>
+                    </div>
+                </div>
+
+                <!-- // chunk limit slider -->
+                <div class="text-editor-wrapper chunks-container">
+                    <div class="field-box">
+                        <label class="title-label">{{'CDSCanvas.ChunkLimit' | translate }}</label>
+                        <div class="action-wait-content">
+                            <div class="action-wait-slider">
+                                <div class="action-wait-range">{{ai_setting['chunk_limit'].min}}</div>
+                                <mat-slider 
+                                    class="wait-slider" 
+                                    thumbLabel 
+                                    [displayWith]="formatLabel" 
+                                    [step]="ai_setting['chunk_limit'].step"  
+                                    [min]="ai_setting['chunk_limit'].min"
+                                    [max]="ai_setting['chunk_limit'].max" 
+                                    [(ngModel)]="action.top_k"
+                                    (change)="updateSliderValue($event.value, 'chunk_limit')" aria-label="units">
+                                </mat-slider>
+                                <div class="action-wait-range">{{ai_setting['chunk_limit'].max}}</div>
+                            </div>
+                            <!-- // doesn't work propely -->
+                            <input type="number" class="slider-input gpt-setting-input" value="{{action.top_k}}" disabled>
+                        </div>
+                        <div class="slider-description"></div>
+
+                         <!-- // reranking -->
+                        <div *ngIf="rerankingAvailable">
+                            <section class="disable-input-message-section">
+                                <mat-checkbox 
+                                    [checked]="action?.reranking"
+                                    (change)="onChangeCheckbox($event, 'reranking')">
+                                    {{"CDSCanvas.Reranking" | translate}}
+                                </mat-checkbox>
+                            </section>
+                            <label class="field-description">{{ "CDSCanvas.RerankingInfo" | translate }}
+                                <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.reranking.link" [target]="DOCS_LINK.reranking.target">{{ 'LearnMore' | translate }}</a>
+                            </label> 
+                        </div>
+                    </div>
+
+
+                    <!-- // reranking multiplier slider (visible only when reranking is enabled) -->
+                    <div *ngIf="action?.reranking && rerankingAvailable" class="text-editor-wrapper">
+                        <div class="field-box">
+                            <label class="title-label">{{'CDSCanvas.RerankingMultiplierLabel' | translate }}</label>
+                            <div class="action-wait-content">
+                                <div class="action-wait-slider">
+                                    <div class="action-wait-range">{{ai_setting['reranking_multiplier'].min}}</div>
+                                    <mat-slider 
+                                        class="wait-slider" 
+                                        thumbLabel 
+                                        [displayWith]="formatLabel" 
+                                        [step]="ai_setting['reranking_multiplier'].step"  
+                                        [min]="ai_setting['reranking_multiplier'].min"
+                                        [max]="ai_setting['reranking_multiplier'].max" 
+                                        [(ngModel)]="action.reranking_multiplier"
+                                        (change)="updateSliderValue($event.value, 'reranking_multiplier')" aria-label="units">
+                                    </mat-slider>
+                                    <div class="action-wait-range">{{ai_setting['reranking_multiplier'].max}}</div>
+                                </div>
+                                <input type="number" class="slider-input gpt-setting-input" value="{{action.reranking_multiplier}}" disabled>
+                            </div>
+                            <div class="slider-description">
+                                <label class="field-description">{{ "CDSCanvas.MultiplierInfo" | translate }}: 
+                                    <b>{{action.reranking_multiplier * action.top_k > 100 ? 100 : action.reranking_multiplier * action.top_k | formatNumber}} ({{'CDSCanvas.MaxChunksMessage' | translate }})</b>
+                                </label> 
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                
+
+
+                <!-- // system context textarea -->
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
+                    <cds-textarea id="context"
+                        [emojiPikerBtn]="false" 
+                        [limitCharsText]="100000"
+                        [minRow]="1" [maxRow]="25" 
+                        [text]="action.context" 
+                        [placeholder]="'CDSCanvas.YouAreAwesomeAssistant' | translate"
+                        (blur)="onBlur($event,'context')"
+                        (changeTextarea)="onChangeTextarea($event, 'context')">
+                    </cds-textarea>
+                </div>
+
+                <!-- // advanced prompt -->                     
+                <div class="field-box advanced-prompt-container" [class.disabled]="action?.chunks_only">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [disabled]="action?.chunks_only"
+                            [checked]="action?.advancedPrompt"
+                            (change)="onChangeCheckbox($event,'advancedPrompt')">
+                            {{"CDSCanvas.AdvancedContext" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="field-description">{{ "CDSCanvas.AdvancedContextDesctiption" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.advanced_prompt.link" [target]="DOCS_LINK.advanced_prompt.target">{{ 'LearnMore' | translate }}</a>
+                    </label>
+                </div>
+
+                <!-- // tags --> 
+                <div class="field-box">
+                    <label class="title-label">{{'CDSCanvas.Tags' | translate}}</label>
+                    <div class="tags-input-row">
+                        <input type="text"
+                            class="tags-input"
+                            [value]="tagInputValue"
+                            (input)="tagInputValue = $any($event.target).value"
+                            [placeholder]="'CDSCanvas.TagsOptionalPlaceholder' | translate"
+                            (keydown.enter)="$event.preventDefault(); addTag()" />
+                        <button type="button"
+                            class="tags-send-btn"
+                            *ngIf="tagInputValue?.trim().length > 0"
+                            (click)="addTag()">
+                            {{'CDSCanvas.Send' | translate}}
+                        </button>
+                    </div>
+                    <div class="models--container" *ngIf="action?.tags?.length">
+                        <div aria-label="{{ 'CDSCanvas.Tags' | translate }}" *ngFor="let tag of action.tags" class="model-name-and-btn-wpr">
+                            <p class="model-name">{{ tag }}</p>
+                            <button type="button" class="delete-model" (click)="removeTag(tag)" [attr.aria-label]="('CDSCanvas.RemoveTag' | translate) + ' ' + tag">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" class="remove-tag-icon" aria-hidden="true">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                                    <path d="M0 0h24v24H0z" fill="none" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- // citations -->    
+                <div *ngIf="action.hasOwnProperty('citations')"
+                    class="field-box" 
+                    [class.disabled]="action?.chunks_only">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox
+                            [disabled]="action?.chunks_only" 
+                            [checked]="action?.citations"
+                            (change)="onChangeCheckbox($event, 'citations')">
+                            {{"CDSCanvas.Citations" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    </label>
+                </div>
+
+                <!-- // chunks_only --> 
+                <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.chunks_only"
+                            (change)="onChangeCheckbox($event, 'chunks_only')">
+                            {{"CDSCanvas.ChunksOnly" | translate}}
+                        </mat-checkbox>
+                    </section>
+                   
+                    <!-- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    </label>  -->
+                    
+                </div>
+
+                <!-- // skip_unanswered -->
+                <div class="field-box">
+                    <section class="disable-input-message-section">
+                        <mat-checkbox 
+                            [checked]="action?.skip_unanswered"
+                            (change)="onChangeCheckbox($event, 'skip_unanswered')">
+                            {{"CDSCanvas.SkipUnanswered" | translate}}
+                        </mat-checkbox>
+                    </section>
+                    
+                    <!-- <label class="field-description">{{ "CDSCanvas.CitationsDescription" | translate }}
+                        <a *ngIf="BRAND_BASE_INFO['DOCS']" [href]="DOCS_LINK.citations.link" [target]="DOCS_LINK.citations.target">{{ 'LearnMore' | translate }}</a>
+                    </label>  -->
+                    
+                </div>
+            
+
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <hr class="custom-divider" style="margin-top: 10px;">
+
+    <!-- <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Model' | translate}}</label>
+        <cds-select id="text-condition" 
+            [items]="model_list" 
+            [itemSelected]="action.model"
+            [bindLabelSelect]="'name'" 
+            [bindValueSelect]="'value'"
+            (onSelected)="onChangeSelect($event, 'model')">
+        </cds-select>
+    </div> -->
+
+    <!-- <div class="field-box">
+        <label class="title-label">Namespace</label>
+        <cds-select id="text-condition" 
+            [items]="namespace_list" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [searchable]=true
+            [clearable]=true
+            [itemSelected]="action?.namespace" 
+            (onSelected)="onChangeSelect($event)">
+        </cds-select>
+    </div> -->
+    
+    <!-- <hr class="custom-divider"> -->
+
+    <div class="field-box" [class.disabled]="action?.chunks_only">
+        
+        <label class="title-label">{{'CDSCanvas.KBReply' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignReplyTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignReplyTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box" [class.disabled]="action?.chunks_only">
+        <label class="title-label">{{'CDSCanvas.KBSource' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignSourceTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignSourceTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.KBChunks' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true"
+            [text]="action.assignChunksTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignChunksTo')">
+        </cds-textarea>
+    </div>
+    
+
+    <div class="field-box">
+        <label class="subtitle-label">{{'CDSCanvas.ErrorAutomaticAssign' | translate }}
+            <b>flowError</b>
+            <!-- <span class="tag-container">
+                <span class="tag-label">flowError</span>
+            </span> -->
+        </label> 
+    </div>
+
+    <hr class="custom-divider">
+
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate"
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="action.falseIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+        </cds-attributes> -->
+    </div>
+
+    
+
+
+</div>

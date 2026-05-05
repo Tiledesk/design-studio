@@ -1,0 +1,61 @@
+.material-icons{
+    color: var(--icon-color);
+    font-size: 18px;
+}
+
+// div.value-wrp{
+//     position: relative;
+//     .flex{
+//         position: absolute;
+//         top: 0px;
+//         bottom: 0px;
+//         right: 8px;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+
+//         .close{
+//             width: 17px;
+//             top: -7px;
+//             right: -7px;
+//             font-size: 15px;
+//             border-radius: 50%;
+//             background: white;
+//             cursor: pointer;
+//             position: absolute;
+//             display: flex;
+//             justify-content: center;
+//             align-items: center;
+//             opacity: 1;
+//             &:hover{
+//                 background: #ecb606;
+//                 color: white;
+//             }
+//         }
+//     }
+
+//     div.tag{
+//         position: absolute;
+//         top: 0;
+//         bottom: 0;
+//         left: 8px;
+//         right: unset;
+//         border-radius: 7px;
+//         margin: 5px;
+//         padding: 5px 10px;
+//         background-color: #ecb606;
+//         color: white;
+
+//     }
+// }
+
+// cds-textarea#assignTo ::ng-deep {
+//     display: flex;
+//     textarea {
+//         border: 1px solid rgb(118, 118, 118) !important;
+//         resize: none !important; 
+//         padding: 8px 20px !important;
+//         height: 25px !important;
+//         min-height: 25px !important;
+//     }
+// }

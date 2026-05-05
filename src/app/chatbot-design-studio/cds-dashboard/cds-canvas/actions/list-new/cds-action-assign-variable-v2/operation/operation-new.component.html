@@ -1,0 +1,32 @@
+<label class="title-label">{{'CDSCanvas.Operations' | translate}}:</label>
+
+<div class="block-wrp">
+    <div *ngFor="let op of list; let index = index; let last = last; trackBy:trackByIndex;">
+        <div *ngIf="index % 2 == 0" class="base-operand">
+            <div class="control-buttons" *ngIf="list && list.length > 0 || index!==0">
+                <div class="filter-remove" (click)="onDeleteGroup(index, last)">
+                    <span class="material-icons-outlined">delete</span>
+                </div>
+            </div>
+            <operand-v2 
+                [operand]="op"
+                [listOfFunctions]="listOfFunctions"
+                (onChangeOperand)="onChangeOperand($event, index)">
+            </operand-v2>
+        </div>
+
+        <div *ngIf="index % 2 == 1" class="basic-operator">
+            <operator-v2 
+                [operator]="op" 
+                (operatorChange)="onSelectedOperator($event, index)">
+            </operator-v2>   
+        </div>
+       
+       
+    </div>
+</div>
+<div class="add-filter-button" (click)="onClickOperator()">
+    <span class="material-icons">add</span>
+    {{'CDSCanvas.NewOperation' | translate}}
+</div>
+

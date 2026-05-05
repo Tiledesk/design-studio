@@ -1,0 +1,172 @@
+<div *ngIf="previewMode" class="cds-action-content cds-action-preview" style="position: relative;">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="none">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
+        </div>
+        <div *ngIf="action?.trackingNumber" class="action-row-right">
+            {{action?.trackingNumber}}
+        </div>
+        <div *ngIf="!action?.trackingNumber" class="action-row-right empty">
+            {{'CDSCanvas.EnterTrackingNumber' | translate}}
+        </div>
+    </div>
+
+    <div class="previewContent">
+        
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+
+        <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
+        
+        <cds-connector class="connector-true"
+            [idConnector] = "idConnectorTrue"
+            [idConnection] = "idConnectionTrue"
+            [isConnected] = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+       <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector] = "idConnectorFalse"
+            [idConnection] = "idConnectionFalse"
+            [isConnected] = "isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.TrackingNumber' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="false" 
+            [text]="action.trackingNumber"
+            [placeholder]="'CDSCanvas.TrackingNumberToSearch' | translate"
+            (blur)="onBlur($event)"
+            (changeTextarea)="changeTextarea($event, 'trackingNumber')">
+        </cds-textarea>
+    </div>
+
+    <!-- <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.QaplaApiKey' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="false" 
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="false" 
+            [text]="action.apiKey"
+            [placeholder]="'CDSCanvas.YourApiKey' | translate"
+            (blur)="onBlur($event)"
+            (changeTextarea)="changeTextarea($event, 'apiKey')">
+        </cds-textarea>
+    </div> -->
+
+    <a class="link" (click)="goToIntegration()">{{'CDSCanvas.ManageIntegration' | translate}}</a>
+    
+    <hr class="custom-divider">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Status' | translate}}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignStatusTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Result' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignResultTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.Error' | translate }}</label>
+        <cds-textarea id="assignTo" 
+            [textLimitBtn]="false" 
+            [emojiPikerBtn]="false" 
+            [setAttributeBtn]="true" 
+            [minRow]="1" [maxRow]="1" 
+            [readonly]="true" 
+            [text]="action.assignErrorTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+        </cds-textarea>
+    </div>
+
+    <hr class="custom-divider">
+
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.trueIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="trueIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'trueIntent')">
+        </cds-attributes> -->
+    </div>
+
+    <div class="field-box">
+        <div class="condition-container">
+            <label class="condition-text">{{'CDSCanvas.Else' | translate | titlecase}}</label>
+        </div>
+        <cds-select id="text-condition" 
+            [items]="listOfIntents" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'" 
+            [itemSelected]="action?.falseIntent" 
+            [placeholder]="'CDSCanvas.SelectABlock' | translate "
+            [clearable]="true" 
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+        <!-- <cds-attributes 
+            class="cds-attributes" 
+            [attributes]="action.falseIntentAttributes"
+            (changeAttributes)="onChangeAttributes($event, 'falseIntent')">
+        </cds-attributes> -->
+    </div>
+    
+</div>
+

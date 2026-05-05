@@ -1,0 +1,40 @@
+<div *ngIf="previewMode" class="cds-action-preview-new">
+
+    <!-- <div class="agent-handoff-icon-wpr" style="text-align: center; height: 33px;">
+
+        <svg version="1.1" id="Livello_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0px" y="0px" viewBox="0 0 1155 512" style="enable-background:new 0 0 1155 512;" xml:space="preserve"
+            style="width: 50px;height: 33px;">
+            <style type="text/css">
+                .ah-st0 {
+                    fill: #6C6859;
+                }
+            </style>
+            <g>
+                <circle class="ah-st0" cx="173.5" cy="160" r="16" />
+                <circle class="ah-st0" cx="275.5" cy="160" r="16" />
+                <path class="ah-st0" d="M77.8,223.9c24.6,56.6,81,96.1,146.7,96.1s122.1-39.5,146.7-96.1c16.4-1.4,29.3-15.1,29.3-31.9v-64
+		c0-16.8-12.9-30.5-29.3-31.9C346.6,39.5,290.2,0,224.5,0S102.4,39.5,77.8,96.1c-16.4,1.4-29.3,15.1-29.3,31.9v64
+		C48.5,208.8,61.4,222.5,77.8,223.9z M112.5,144c0-26.5,21.5-48,48-48h128c26.5,0,48,21.5,48,48v16c0,53-43,96-96,96h-32
+		c-53,0-96-43-96-96V144z" />
+                <path class="ah-st0" d="M335.3,316.5C303.9,338.8,265.5,352,224,352s-79.9-13.2-111.3-35.5C46.7,342.6,0,407,0,482.3
+		C0,498.7,13.3,512,29.7,512H128h192h98.3c16.4,0,29.7-13.3,29.7-29.7C448,407,401.3,342.6,335.3,316.5z" />
+                <circle class="ah-st0" cx="931" cy="128" r="128" />
+                <path class="ah-st0" d="M976.7,304h-91.4C786.8,304,707,383.8,707,482.3c0,16.4,13.3,29.7,29.7,29.7h388.6c16.4,0,29.7-13.3,29.7-29.7
+		C1155,383.8,1075.2,304,976.7,304z" />
+                <path class="ah-st0" d="M602.3,167.1c-3.8-3.7-8.9-5.9-14.2-5.9c-11.1,0-20.1,9-20.1,20.1v36.8h-75.8c-10.5,0-18.9,8.5-18.9,18.9v37.9
+		c0,10.5,8.5,18.9,18.9,18.9H568v36.8c0,11.1,9,20.1,20.1,20.1c5.3,0,10.4-2.1,14.2-5.9l72.7-72.7c4.3-4.3,6.7-10.1,6.7-16.2
+		s-2.4-11.9-6.7-16.2L602.3,167.1z" />
+            </g>
+        </svg>
+    </div> -->
+
+    <div class="action-row">
+        <label class="action-row-right">{{'CDSCanvas.TransferToAHuman' | translate}}</label>
+    </div>
+</div>
+
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail">
+    <div class="action-description" [innerHTML]="actions['AGENT']?.doc+'.DESCRIPTION' | translate"></div>
+</div>

@@ -1,0 +1,39 @@
+<div class="operand-wrp"
+    [ngClass]="{'opened' : openSlectFunction}">
+    
+    <div class="textarea-value">
+        <div class="value-wrp">
+            <label>{{'CDSCanvas.Value' | translate}}</label>
+            <cds-textarea id="operand"
+                [placeholder]="operandForm.value.isVariable? '' : 'CDSCanvas.InsertConstantValueOrChoise' | translate"
+                [textLimitBtn]="false"
+                [emojiPikerBtn]="false"
+                [text]="operandForm.value.value"
+                [limitCharsText]="10000"
+                [setAttributeBtn]="operandForm.value.value? false : true"
+                [readonly]="operandForm.value.isVariable? true : false" 
+                [minRow]="1" [maxRow]="4"
+                [control]="operandForm.get('value')"
+                (clearSelectedAttribute)="onClearSelectedAttribute()"
+                (selectedAttribute)="onSelectedAttribute($event)"
+                (blur)="onBlur($event)"
+                (changeTextarea)="onChangeTextArea($event)">
+            </cds-textarea>
+        </div>
+    </div>
+
+    <span class="material-icons" (click)="onToggleSelectFunction()">settings</span>
+    <div class="select-function">
+        <label>{{'CDSCanvas.Function' | translate}}</label>
+        <cds-select id="selectOperand"
+            [items]="listOfFunctions"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [placeholder]="'CDSCanvas.ApplyAFunctionToValue' | translate"
+            [itemSelected]="operandForm.value.function"
+            [clearable]="true"
+            (onSelected)="onSelectedFunction($event)">
+        </cds-select>
+    </div>
+    
+</div>

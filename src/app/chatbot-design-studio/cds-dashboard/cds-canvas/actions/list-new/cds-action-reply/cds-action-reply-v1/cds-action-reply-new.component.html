@@ -1,0 +1,254 @@
+<!-- Reply Inspector Layout (DS V3) -->
+<div class="cds-action-content-new" [class.previewMode]="previewMode">
+
+  <!-- ===== Header ===== -->
+  <div class="insp-head" *ngIf="!previewMode">
+    <div class="insp-icon">
+      <mat-icon>comment</mat-icon>
+    </div>
+    <div class="insp-title">{{ action._tdActionTitle || 'Reply' }}</div>
+    <button class="icon-btn" title="Collapse" [disabled]="true">
+      <mat-icon>unfold_less</mat-icon>
+    </button>
+  </div>
+
+  <!-- ===== Toolbar (Content Types) ===== -->
+  <div class="insp-toolbar" *ngIf="!previewMode">
+    <cds-action-reply-tools-new
+        [idAction]="idAction"
+        (addNewActionReply)="onAddNewActionReply($event)">
+    </cds-action-reply-tools-new>
+  </div>
+
+  <!-- ===== Empty State Placeholder ===== -->
+  <div *ngIf="arrayResponses?.length === 0" class="insp-empty-state">
+    <div class="insp-empty-text">
+      {{ 'CDSCanvas.AddContentsToReply' | translate }}
+    </div>
+  </div>
+
+  <!-- ===== Body (Messages Scroll Area) ===== -->
+  <div class="insp-body" [class.previewMode]="previewMode">
+
+    <div #scrollMe
+        id="scrollMe"
+        class="content draggable-list"
+        cdkDropList
+        (cdkDropListDropped)="drop($event)">
+
+      <!-- Message Block (Repeated) -->
+      <div *ngFor="let command of arrayResponses; let i = index; let odd = odd; let length = count">
+
+        <ng-container *ngIf="odd">
+
+          <!-- Text Message -->
+          <div *ngIf="command.message?.type === typeMessage.TEXT" class="msg" cdkDrag>
+            <!-- Move Stack (5 buttons) -->
+            <div class="move-stack" *ngIf="!previewMode">
+              <button class="move-btn trash-btn"
+                  title="Delete"
+                  (click)="onDeleteActionReply(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="move-btn" title="Move to top" (click)="onMoveUpResponse(Math.max(2, i-2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 11 12 5 18 11"/><polyline points="6 19 12 13 18 19"/></svg>
+              </button>
+              <button class="move-btn" title="Move up" (click)="onMoveUpResponse(i)" [disabled]="i < 2">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+              </button>
+              <button class="move-btn" title="Move down" (click)="onMoveDownResponse(i)" [disabled]="i >= arrayResponses.length - 1">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="move-btn" title="Move to bottom" (click)="onMoveDownResponse(Math.min(arrayResponses.length - 2, i + 2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 5 12 11 18 5"/><polyline points="6 13 12 19 18 13"/></svg>
+              </button>
+            </div>
+
+            <!-- Content -->
+            <div class="msg-content">
+              <cds-action-reply-text-new
+                  [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                  [index]="i"
+                  [idAction]="idAction"
+                  [response]="command.message"
+                  [wait]="arrayResponses[i-1]"
+                  [previewMode]="previewMode"
+                  (moveUpResponse)="onMoveUpResponse($event)"
+                  (moveDownResponse)="onMoveDownResponse($event)"
+                  (openButtonPanel)="onOpenButtonPanel($event)"
+                  (createNewButton)="onCreateNewButton($event)"
+                  (deleteButton)="onDeleteButton($event)"
+                  (deleteActionReply)="onDeleteActionReply($event)"
+                  (updateAndSaveAction)="onUpdateAndSaveAction($event)"
+                  (changeActionReply)="onChangeActionReply($event)"
+                  (changeJsonButtons)="onChangeJsonButtons($event, i)">
+              </cds-action-reply-text-new>
+            </div>
+          </div>
+
+          <!-- Image Message -->
+          <div *ngIf="command.message?.type === typeMessage.IMAGE" class="msg" cdkDrag>
+            <div class="move-stack" *ngIf="!previewMode">
+              <button class="move-btn trash-btn" (click)="onDeleteActionReply(i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="move-btn" title="Move to top" (click)="onMoveUpResponse(Math.max(2, i-2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 11 12 5 18 11"/><polyline points="6 19 12 13 18 19"/></svg>
+              </button>
+              <button class="move-btn" title="Move up" (click)="onMoveUpResponse(i)" [disabled]="i < 2">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+              </button>
+              <button class="move-btn" title="Move down" (click)="onMoveDownResponse(i)" [disabled]="i >= arrayResponses.length - 1">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="move-btn" title="Move to bottom" (click)="onMoveDownResponse(Math.min(arrayResponses.length - 2, i + 2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 5 12 11 18 5"/><polyline points="6 13 12 19 18 13"/></svg>
+              </button>
+            </div>
+
+            <div class="msg-content">
+              <cds-action-reply-image-new
+                  [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                  [index]="i"
+                  [idAction]="idAction"
+                  [response]="command.message"
+                  [wait]="arrayResponses[i-1]"
+                  [previewMode]="previewMode"
+                  (moveUpResponse)="onMoveUpResponse($event)"
+                  (moveDownResponse)="onMoveDownResponse($event)"
+                  (deleteActionReply)="onDeleteActionReply($event)"
+                  (changeActionReply)="onChangeActionReply($event)">
+              </cds-action-reply-image-new>
+            </div>
+          </div>
+
+          <!-- Frame Message -->
+          <div *ngIf="command.message?.type === typeMessage.FRAME" class="msg" cdkDrag>
+            <div class="move-stack" *ngIf="!previewMode">
+              <button class="move-btn trash-btn" (click)="onDeleteActionReply(i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="move-btn" title="Move to top" (click)="onMoveUpResponse(Math.max(2, i-2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 11 12 5 18 11"/><polyline points="6 19 12 13 18 19"/></svg>
+              </button>
+              <button class="move-btn" title="Move up" (click)="onMoveUpResponse(i)" [disabled]="i < 2">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+              </button>
+              <button class="move-btn" title="Move down" (click)="onMoveDownResponse(i)" [disabled]="i >= arrayResponses.length - 1">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="move-btn" title="Move to bottom" (click)="onMoveDownResponse(Math.min(arrayResponses.length - 2, i + 2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 5 12 11 18 5"/><polyline points="6 13 12 19 18 13"/></svg>
+              </button>
+            </div>
+
+            <div class="msg-content">
+              <cds-action-reply-frame-new
+                  [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                  [index]="i"
+                  [idAction]="idAction"
+                  [response]="command.message"
+                  [wait]="arrayResponses[i-1]"
+                  [previewMode]="previewMode"
+                  (moveUpResponse)="onMoveUpResponse($event)"
+                  (moveDownResponse)="onMoveDownResponse($event)"
+                  (deleteActionReply)="onDeleteActionReply($event)"
+                  (changeActionReply)="onChangeActionReply($event)">
+              </cds-action-reply-frame-new>
+            </div>
+          </div>
+
+          <!-- Redirect Message -->
+          <div *ngIf="command.message?.type === typeMessage.REDIRECT" class="msg" cdkDrag>
+            <div class="move-stack" *ngIf="!previewMode">
+              <button class="move-btn trash-btn" (click)="onDeleteActionReply(i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="move-btn" title="Move to top" (click)="onMoveUpResponse(Math.max(2, i-2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 11 12 5 18 11"/><polyline points="6 19 12 13 18 19"/></svg>
+              </button>
+              <button class="move-btn" title="Move up" (click)="onMoveUpResponse(i)" [disabled]="i < 2">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+              </button>
+              <button class="move-btn" title="Move down" (click)="onMoveDownResponse(i)" [disabled]="i >= arrayResponses.length - 1">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="move-btn" title="Move to bottom" (click)="onMoveDownResponse(Math.min(arrayResponses.length - 2, i + 2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 5 12 11 18 5"/><polyline points="6 13 12 19 18 13"/></svg>
+              </button>
+            </div>
+
+            <div class="msg-content">
+              <cds-action-reply-redirect-new
+                  [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                  [index]="i"
+                  [idAction]="idAction"
+                  [response]="command.message"
+                  [wait]="arrayResponses[i-1]"
+                  [previewMode]="previewMode"
+                  (moveUpResponse)="onMoveUpResponse($event)"
+                  (moveDownResponse)="onMoveDownResponse($event)"
+                  (deleteActionReply)="onDeleteActionReply($event)"
+                  (changeActionReply)="onChangeActionReply($event)">
+              </cds-action-reply-redirect-new>
+            </div>
+          </div>
+
+          <!-- Gallery Message -->
+          <div *ngIf="command.message?.type === typeMessage.GALLERY" class="msg" cdkDrag>
+            <div class="move-stack" *ngIf="!previewMode">
+              <button class="move-btn trash-btn" (click)="onDeleteActionReply(i)" title="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="move-btn" title="Move to top" (click)="onMoveUpResponse(Math.max(2, i-2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 11 12 5 18 11"/><polyline points="6 19 12 13 18 19"/></svg>
+              </button>
+              <button class="move-btn" title="Move up" (click)="onMoveUpResponse(i)" [disabled]="i < 2">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+              </button>
+              <button class="move-btn" title="Move down" (click)="onMoveDownResponse(i)" [disabled]="i >= arrayResponses.length - 1">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <button class="move-btn" title="Move to bottom" (click)="onMoveDownResponse(Math.min(arrayResponses.length - 2, i + 2))">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 5 12 11 18 5"/><polyline points="6 13 12 19 18 13"/></svg>
+              </button>
+            </div>
+
+            <div class="msg-content">
+              <cds-action-reply-gallery-new
+                  [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                  [index]="i"
+                  [idAction]="idAction"
+                  [response]="command.message"
+                  [wait]="arrayResponses[i-1]"
+                  [previewMode]="previewMode"
+                  (moveUpResponse)="onMoveUpResponse($event)"
+                  (moveDownResponse)="onMoveDownResponse($event)"
+                  (deleteActionReply)="onDeleteActionReply($event)"
+                  (changeActionReply)="onChangeActionReply($event)">
+              </cds-action-reply-gallery-new>
+            </div>
+          </div>
+
+          <!-- Divider between messages -->
+          <div class="msg-sep" *ngIf="i !== length - 1"></div>
+
+        </ng-container>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ===== Footer (Disable User Input) ===== -->
+  <div class="insp-foot" *ngIf="!previewMode">
+    <div class="switch"
+        [class.on]="action?.attributes?.disableInputMessage"
+        (click)="onDisableInputMessage()"
+        title="Toggle disable user input">
+    </div>
+    <span class="foot-label">{{ 'DisableUserInput' | translate }}</span>
+  </div>
+
+</div>

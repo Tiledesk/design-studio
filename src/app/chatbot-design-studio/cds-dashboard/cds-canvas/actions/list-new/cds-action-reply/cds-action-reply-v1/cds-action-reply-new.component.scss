@@ -1,0 +1,338 @@
+@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/_mixins.scss";
+
+// ============================================================================
+// cds-action-reply-v1-new Component
+// Reply Inspector Layout (DS V3)
+// ============================================================================
+
+:host {
+  display: block;
+  font-family: var(--ds-font-family);
+}
+
+.cds-action-content-new {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ds-surface, #ffffff);
+  border: 1px solid var(--ds-border, #e8e6e0);
+  border-radius: var(--ds-radius-lg, 14px);
+  box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20, 20, 18, 0.04));
+  overflow: hidden;
+}
+
+// ============ Header ============
+
+.insp-head {
+  @include flex-row(10px);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--ds-border, #e8e6e0);
+  background: var(--ds-surface, #ffffff);
+  flex-shrink: 0;
+
+  .insp-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--ds-canvas, #f7f6f3);
+    @include flex-row(0, center, center);
+    color: var(--ds-ink, #14140e);
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .insp-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ds-ink, #14140e);
+  }
+
+  .icon-btn {
+    width: 30px;
+    height: 30px;
+    @include flex-row(0, center, center);
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--ds-ink-2, #3a3935);
+    cursor: pointer;
+    @include transition();
+
+    &:hover:not(:disabled) {
+      background: var(--ds-canvas, #f7f6f3);
+      color: var(--ds-ink, #14140e);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// ============ Toolbar ============
+
+.insp-toolbar {
+  @include flex-row(4px);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ds-border, #e8e6e0);
+  background: var(--ds-surface, #ffffff);
+  overflow-x: auto;
+  flex-shrink: 0;
+
+  // Toolbar buttons inherited from cds-action-reply-tools-new
+  ::ng-deep {
+    .tool-btn {
+      width: 32px;
+      height: 32px;
+      @include flex-row(0, center, center);
+      border-radius: var(--ds-radius-sm, 6px);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ds-ink-2, #3a3935);
+      cursor: pointer;
+      flex-shrink: 0;
+      @include transition();
+
+      &:hover {
+        background: var(--ds-canvas, #f7f6f3);
+        color: var(--ds-ink, #14140e);
+      }
+
+      &.active {
+        background: var(--ds-canvas, #f7f6f3);
+        color: var(--ds-ink, #14140e);
+      }
+
+      svg, mat-icon {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .tool-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--ds-border, #e8e6e0);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// ============ Body (Content Area) ============
+
+.insp-body {
+  flex: 1;
+  padding: 18px 14px 20px;
+  @include flex-column(28px);
+  background: var(--ds-surface, #ffffff);
+  overflow: auto;
+
+  &.previewMode {
+    padding: 12px 14px;
+  }
+}
+
+// ============ Empty State ============
+
+.insp-empty-state {
+  @include empty-state(80px, 20px, 8px);
+  margin: 18px 14px;
+
+  .insp-empty-text {
+    font-size: 13px;
+    color: var(--ds-muted, #8a8884);
+  }
+}
+
+// ============ Message Block ============
+
+.content {
+  @include flex-column(0);
+  width: 100%;
+  @include scrollbar-custom();
+
+  .msg {
+    @include response-grid(32px, 8px);
+    position: relative;
+    width: 100%;
+  }
+
+  .msg-content {
+    @include flex-column(22px);
+    min-width: 0;
+  }
+}
+
+// ============ Move Stack ============
+
+.move-stack {
+  @include flex-column(2px);
+  margin-top: 4px;
+  flex-shrink: 0;
+
+  .move-btn {
+    width: 24px;
+    height: 22px;
+    @include flex-row(0, center, center);
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--ds-muted-2, #b3b1ac);
+    cursor: pointer;
+    @include transition();
+    flex-shrink: 0;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--ds-ink, #14140e);
+      background: var(--ds-canvas, #f7f6f3);
+      border-color: var(--ds-border, #e8e6e0);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &.trash-btn {
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--ds-border, #e8e6e0);
+      border-radius: 5px 5px 0 0;
+      color: var(--ds-muted-2, #b3b1ac);
+
+      &:hover {
+        color: var(--ds-red, oklch(0.55 0.2 25));
+        background: var(--ds-red-soft, oklch(0.98 0.02 25));
+        border-color: oklch(0.88 0.06 25);
+      }
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+// ============ Message Separator ============
+
+.msg-sep {
+  height: 1px;
+  background: var(--ds-border, #e8e6e0);
+  margin: 4px 0 4px 30px;
+  width: calc(100% - 30px);
+}
+
+// ============ Footer ============
+
+.insp-foot {
+  @include panel-footer();
+  padding: 14px 18px;
+  border-top: 1px solid var(--ds-border, #e8e6e0);
+  background: var(--ds-surface, #ffffff);
+  flex-shrink: 0;
+
+  .switch {
+    width: 32px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--ds-border, #e8e6e0);
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    @include transition();
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--ds-surface, #ffffff);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+      @include transition(left);
+    }
+
+    &.on {
+      background: var(--ds-green, oklch(0.68 0.14 155));
+
+      &::after {
+        left: 16px;
+      }
+    }
+  }
+
+  .foot-label {
+    font-size: 13.5px;
+    color: var(--ds-ink-2, #3a3935);
+  }
+}
+
+// ============ Sub-component Selectors ============
+
+cds-action-reply-text-new,
+cds-action-reply-image-new,
+cds-action-reply-frame-new,
+cds-action-reply-redirect-new,
+cds-action-reply-gallery-new {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ============ Preview Mode ============
+
+.previewMode {
+  .insp-body {
+    gap: 0;
+  }
+
+  .msg-sep {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+// ============ Remove Controls for RANDOM_REPLY ============
+
+cds-action-reply-text-new.no-controls ::ng-deep,
+cds-action-reply-image-new.no-controls ::ng-deep,
+cds-action-reply-frame-new.no-controls ::ng-deep,
+cds-action-reply-redirect-new.no-controls ::ng-deep,
+cds-action-reply-gallery-new.no-controls ::ng-deep {
+  .text-editor-drop,
+  .move-stack {
+    display: none;
+  }
+
+  .control-button:not(.delete) {
+    display: none;
+  }
+}

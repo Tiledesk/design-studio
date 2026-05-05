@@ -1,0 +1,40 @@
+<div class="ai-condition-container">
+    <div class="condition-header">
+        <label class="condition-number">Condition {{index+1}}</label>
+        <button class="delete-condition-btn" 
+                type="button" 
+                (click)="onDeleteCondition()"
+                [title]="'Delete Condition'">
+            <span class="material-icons">delete</span>
+        </button>
+    </div>
+    <cds-textarea id="question" 
+        [emojiPikerBtn]="false" 
+        [setAttributeBtn]="true" 
+        [limitCharsText]="100000"
+        [minRow]="4"[maxRow]="25" 
+        [text]="propmt" 
+        [placeholder]="placeholder"
+        (blur)="onBlur($event)"
+        (changeTextarea)="onChangeTextarea($event)">
+    </cds-textarea>
+</div>
+
+<div class="field-box ai-condition-select">
+    <div class="condition-container">
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+        <label class="condition-text">{{'CDSCanvas.Success' | translate }}</label>
+    </div>
+    <cds-select id="text-condition-{{index}}" 
+        [items]="listOfIntents" 
+        [bindLabelSelect]="'name'"
+        [bindValueSelect]="'value'" 
+        [itemSelected]="intent?.conditionIntentId" 
+        [placeholder]="'CDSCanvas.SelectABlock' | translate"
+        [clearable]="true" 
+        (onSelected)="onChangeBlockSelect($event)"
+        (onReset)="onResetBlockSelect($event)">
+    </cds-select>
+</div>

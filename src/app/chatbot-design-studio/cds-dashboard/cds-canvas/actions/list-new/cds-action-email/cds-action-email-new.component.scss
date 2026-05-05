@@ -1,0 +1,19 @@
+cds-textarea.subject-text-area ::ng-deep,
+cds-textarea.to-text-area ::ng-deep  {
+    textarea {
+        resize: none !important;
+    }
+}
+
+::ng-deep .set-attributes-panel {
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    max-height: 600px;
+    min-height: 200px;
+    box-shadow: 0 0 20px 4px rgb(154 161 177 / 15%), 0 4px 80px -8px rgb(36 40 47 / 25%),
+        0 4px 4px -2px rgb(91 94 105 / 15%);
+    background: rgb(255, 255, 255);
+    border-radius: 4px;
+    padding: 15px 0;
+}
