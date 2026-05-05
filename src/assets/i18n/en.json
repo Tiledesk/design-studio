@@ -382,6 +382,8 @@
         "MultiplierInfo": "Total retrieved chunks for re-ranking",
         "MaxChunksMessage": "Max chunks for re-ranking is 100",
         "SkipUnanswered": "Do not update unanswered list",
+        "HyDE": "HyDE",
+        "UseCache": "Use cache",
         "ErrorAutomaticAssign": "Errors will be automatically assigned to variable:",
         "ApplyAFunctionToValue": "Apply a function to the value",
         "InsertConstantValueOrChoise": "Insert a constant value or choose an attribute",
