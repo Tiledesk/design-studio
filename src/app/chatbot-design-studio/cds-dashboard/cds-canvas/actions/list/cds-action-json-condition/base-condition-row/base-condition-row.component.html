@@ -1,4 +1,4 @@
-<!-- ++++++++ STEP 0 ++++++++ -->
+<!-- Step 0: lista variabili -->
 <div *ngIf="step===0">
     <variable-list
         [variableListUserDefined]="variableListUserDefined"
@@ -7,7 +7,7 @@
     </variable-list>
 </div>
 
-<!-- ++++++++ STEP 1 ++++++++ -->
+<!-- Step 1: form condizione (operandi, operatore, valore) -->
 <div class="step2" *ngIf="step===1">
     <form class="filter-item-drop-down" [formGroup]="conditionForm" (submit)="onSubmitCondition()">
         <section class="header">
@@ -25,14 +25,13 @@
                 [placeholder]="'AttributeName' | translate "  
                 [readonly]="disableInput" 
                 name="operand1" />
-                <!-- (click)="openvariable-list()" <span class="material-icons close" (click)="onDeleteInputField()">close</span> -->
             </div>
         </section>
         
         <section class="condition">
             <div>{{'CDSCanvas.Condition' | translate }}</div>
             <div class="operators-list">
-                <div class="operator" [class.active]="conditionForm.value.operator === item.type" *ngFor="let item of operatorsList" (click)="onClickOperator(item)">
+                <div class="operator" [class.active]="conditionForm.value.operator === item.type" *ngFor="let item of operatorsList; trackBy: trackByOperatorType" (click)="onClickOperator(item)">
                     <img class="active-icon" *ngIf="item.src" width="10px" [src]="item.src">
                     <div>{{item.name | translate}}</div>
                 </div>
@@ -41,7 +40,6 @@
         <section class="value" formGroupName="operand2" *ngIf="canShowOperand2">
             <div>{{'CDSCanvas.Value' | translate }}</div>
             <div class="value-wrp">
-                <!-- //[readonly]="conditionForm.value.operand2.name? true : false" -->
                 <cds-textarea id="operand2"
                     [textLimitBtn]="false"
                     [emojiPikerBtn]="false"
@@ -59,7 +57,5 @@
             <button class="btn btn-primary pull-right cds-blue-button" [disabled]="disableSubmit" type="submit">{{'CDSCanvas.ApplyCondition' | translate }}</button>
         </section>
     </form>
-
 </div>
-
 

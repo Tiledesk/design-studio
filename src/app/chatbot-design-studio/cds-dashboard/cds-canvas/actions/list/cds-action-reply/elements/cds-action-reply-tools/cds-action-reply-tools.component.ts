@@ -32,6 +32,15 @@ export class CdsActionReplyToolsComponent implements OnInit {
           },
         } 
         break;
+      case TYPE_MESSAGE.URL_PREVIEW:
+        newElement = {
+          type: TYPE_COMMAND.MESSAGE,
+          message: {
+            text: '',
+            type: TYPE_MESSAGE.URL_PREVIEW
+          },
+        }
+        break;
       case TYPE_MESSAGE.IMAGE:
         newElement = {
           type: TYPE_COMMAND.MESSAGE,
@@ -123,6 +132,15 @@ export class CdsActionReplyToolsComponent implements OnInit {
               target: TYPE_URL.BLANK,
               type: TYPE_MESSAGE.REDIRECT
             }
+          },
+        } 
+        break;
+      case TYPE_MESSAGE.TTS:
+        newElement = {
+          type: TYPE_COMMAND.MESSAGE,
+          message: {
+            text: '',
+            type: TYPE_MESSAGE.TTS,
           },
         } 
         break;

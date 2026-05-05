@@ -51,6 +51,8 @@ import { CdsActionReplyGalleryComponent } from './cds-action-reply/elements/cds-
 import { CdsActionReplyImageComponent } from './cds-action-reply/elements/cds-action-reply-image/cds-action-reply-image.component';
 import { CdsActionReplyRedirectComponent } from './cds-action-reply/elements/cds-action-reply-redirect/cds-action-reply-redirect.component';
 import { CdsActionReplyTextComponent } from './cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text.component';
+import { CdsActionReplyUrlPreviewComponent } from './cds-action-reply/elements/cds-action-reply-url-preview/cds-action-reply-url-preview.component';
+import { CdsActionReplyTTSComponent } from './cds-action-reply/elements/cds-action-reply-tts/cds-action-reply-tts.component';
 import { CdsActionReplyToolsComponent } from './cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools.component';
 import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.component';
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
@@ -146,10 +148,12 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
+    CdsActionReplyUrlPreviewComponent,
     CdsActionReplyImageComponent,
     CdsActionReplyFrameComponent,
     CdsActionReplyRedirectComponent,
     CdsActionReplyGalleryComponent,
+    CdsActionReplyTTSComponent,
     CdsActionReplyButtonComponent,
     CdsActionReplySettingsComponent,
     // action REPLY elements: end //
@@ -257,6 +261,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
+    CdsActionReplyUrlPreviewComponent,
     CdsActionReplyImageComponent,
     CdsActionReplyFrameComponent,
     CdsActionReplyRedirectComponent,

@@ -1,5 +1,7 @@
+/* ============================================================
+   CONTAINER PRINCIPALE (badge + menu)
+============================================================ */
 .action-connector {
-
     z-index: 2;
     display: flex;
     align-items: center;
@@ -12,10 +14,13 @@
     position: absolute;
     left: -8px;
     top: -8px;
-}
-
-.label-connector{
-    color: #7485ae;
+  }
+  
+  /* ============================================================
+     BADGE NUMERICO
+  ============================================================ */
+  .label-connector {
+    color: #7485ae; /* NOTA: presente anche una seconda color sotto (invariata) */
     font-size: 10px;
     cursor: pointer;
     pointer-events: auto;
@@ -33,15 +38,18 @@
     box-shadow: none;
     border-radius: 50%;
     z-index: 1;
-}
-
-.connector-in-menu {
-    display: none;
+  }
+  
+  /* ============================================================
+     MENU (lista intent collegati)
+  ============================================================ */
+  .connector-in-menu {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     right: calc(100% - 4px);
     top: 1px;
     margin-right: 0;
-    flex-direction: column;
     background-color: white;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -49,25 +57,27 @@
     z-index: 0;
     width: max-content;
     overflow: hidden;
-
-    .menu-item {
-        padding: 4px 16px;
-        font-size: 10px;
-        color: var(--blu);
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        border-bottom: 1px solid rgb(240, 240, 240);
-        &:last-child {
-            border-bottom: none;
-        }
-
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+  
+    /* Nascosto quando menuVisible = false */
+    &.is-hidden {
+      display: none !important;
     }
-}
-
-.action-connector:hover .connector-in-menu,
-.connector-in-menu:hover {
-    display: flex;
-}
+  
+    /* Singola voce menu */
+    .menu-item {
+      padding: 4px 16px;
+      font-size: 10px;
+      color: var(--blu);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid rgb(240, 240, 240);
+  
+      &:last-child {
+        border-bottom: none;
+      }
+  
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }

@@ -13,6 +13,7 @@
     "Change": "Modifica",
     "Cancel": "Annulla",
     "Continue": "Continua",
+    "UrlPreview": "Anteprima URL",
     "Add": "Aggiungere",
     "Close": "Vicino",
     "Upload": "Caricamento",
@@ -194,6 +195,7 @@
     "WebhookmentUrlMustBeAValidUrl": "L'URL del webhook deve essere un URL valido",
     "CDSCanvas": {
       "DeprecationMessage": "Deprecato. Usa la nuova action <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a>.",
+      "KBJsonSources": "Assegna le sorgenti KB JSON a",
       "EnterIntentName": "Inserisci il nome del blocco",
       "ErrorBlockName": "Il nome del blocco deve essere univoco",
       "ErrorBlockCharacter": "Il nome del blocco non può contenere caratteri speciali",

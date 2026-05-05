@@ -5,6 +5,11 @@
         <!-- <span>{{'Text' | translate}}</span> -->
     </div>
 
+    <div class="add-response" (click)="addElement(TypeMessage.URL_PREVIEW)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'UrlPreview' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <img class="active-icon" src="assets/images/action-reply-types/launch.svg"/>
+    </div>
+
     <div class="add-response" (click)="addElement(TypeMessage.IMAGE)"
         matTooltipClass="custom-mat-tooltip" matTooltip="{{'Image' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
         <img class="active-icon" src="assets/images/action-reply-types/image.svg"/>
@@ -27,5 +32,10 @@
         <!-- <i class="material-icons">launch</i> -->
         <img class="active-icon" src="assets/images/action-reply-types/redirect.svg"/>
         <!-- <span>{{'Redirect' | translate}}</span> -->
+    </div>
+    <div class="add-response" (click)="addElement(TypeMessage.TTS)"
+        matTooltipClass="custom-mat-tooltip" matTooltip="{{'TTS' | translate}}" #tooltip="matTooltip" matTooltipPosition='below' matTooltipHideDelay="100">
+        <img class="active-icon" src="assets/images/action-reply-types/tts.svg"/>
+        <!-- <span>{{'TTS' | translate}}</span> -->
     </div>
 </div>

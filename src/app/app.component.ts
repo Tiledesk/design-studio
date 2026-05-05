@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     const appconfig = this.appConfigService.getConfig();
     this.persistence = appconfig.authPersistence;
-    this.appStorageService.initialize(environment.storage_prefix, this.persistence, '')
+    this.appStorageService.initialize(appconfig.storage_prefix, this.persistence, '')
 
     this.logger.setLoggerConfig(true, appconfig.logLevel)
     this.logger.info('[APP-COMP] logLevel: ', appconfig.logLevel);
