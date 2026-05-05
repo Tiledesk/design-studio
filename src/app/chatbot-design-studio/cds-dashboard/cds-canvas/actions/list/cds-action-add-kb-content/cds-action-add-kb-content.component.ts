@@ -73,9 +73,8 @@ export class CdsActionAddKbContentComponent implements OnInit {
   onChangeTextarea($event: string, property: string) {
     this.logger.log("[ACTION-ADD_KBCONTENT] onEditableDivTextChange event", $event);
     this.logger.log("[ACTION-ADD_KBCONTENT] onEditableDivTextChange property", property);
-    if(property === 'namespace'){
-      this.action[property] = $event;
-    } 
+    // Keep local model in sync while typing; saving happens on blur / explicit actions.
+    (this.action as any)[property] = $event;
     // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -165,14 +164,16 @@ export class CdsActionAddKbContentComponent implements OnInit {
   }
 
 
-  onBlur(event, property){
+  onBlur(event: any, property: string){
+    // `cds-textarea` / `cds-text` emit the value directly (string) on blur.
+    const value = (typeof event === 'string') ? event : (event?.target?.value ?? event);
+    (this.action as any)[property] = value;
+
     if(property === 'source'){
-      this.action.content = this.action.name?  this.action.name + '\n'+this.action[property] : this.action[property];
-    } else if(property === 'namespace'){
-      // this.action.namespace = event.target.value;
-      this.action[property] = event;
+      const source = (this.action as any).source ?? '';
+      const name = (this.action as any).name ?? '';
+      this.action.content = name ? `${name}\n${source}` : source;
     }
-    // this.updateAndSaveAction.emit()
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
  
