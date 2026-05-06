@@ -24,7 +24,7 @@
 // $action-item-color: #d2e3fc;
 // $action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
 // $action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
-// $action-color-selected: var(--blu); // rgba(179,141,38,1);
+// $action-color-selected: var(--ds-ink); // rgba(179,141,38,1);
 // $intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
 // $intent-preview-borderColor: var(--gray-light-02);
 // $empty-element-property:rgb(191, 35, 35);
@@ -118,6 +118,7 @@
     --ds-ink-2:         #3a3935;
     --ds-muted:         #8a8884;
     --ds-muted-2:       #b3b1ac;
+    --ds-white:         #ffffff;
 
     // Semantic colors
     --ds-accent:        oklch(0.66 0.15 50);
@@ -161,8 +162,8 @@
     --drag-preview-background: var(--color-white-hex);
 
     /** SCROLL-BAR **/
-    --scrollbar-track-background: #{var(--blu-light-01)};
-    --scrollbar-thumb-background: var(--blu);
+    --scrollbar-track-background: #{var(--ds-bg)};
+    --scrollbar-thumb-background: var(--ds-ink);
     --scrollbar-thumb-border-radius: 3px;
 
     /** CANVAS CONTAINER COLORS — Design Studio v3 */
@@ -188,16 +189,16 @@
     /** INTENT PREVIEW **/
     --action-item-background:rgba(255,255,255, 0.7); //rgba(66,85,117,1);
     --action-no-featured-item-background:rgba(255,255,255, 1); //rgba(66,85,117,1);
-    --action-color-selected: var(--blu); // rgba(179,141,38,1);
+    --action-color-selected: var(--ds-ink); // rgba(179,141,38,1);
     --intent-preview-background: var(--blu-light-03); //rgb(235, 226, 198);
     --intent-preview-borderColor: var(--gray-light-02);
-    --intent-header-icon-color: var(--blu);
+    --intent-header-icon-color: var(--ds-ink);
     --padding-base-preview: 0 10px 10px;
     --base-element-gap: 5px;
     --border-radius-base-preview: 8px;
     --add-action-btn-background-preview: var(--color-white-hex);
     --add-action-btn-color-preview: var(--gray);
-    --add-action-btn-hover-color-preview: var(--blu);
+    --add-action-btn-hover-color-preview: var(--ds-ink);
 
     /** SETTINGS section **/
     --input-placeholder: #a0a0a0;

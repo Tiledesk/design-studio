@@ -26,7 +26,7 @@
             input {
                 border-radius: var(--input-border-radius-base);
                 background: var(--color-white-hex);
-                border: 1px solid var(--blu-light-02);
+                border: 1px solid var(--border);
                 overflow-x: hidden;
                 overflow-y: auto;
                 // width: calc(100% - 2.5em);
@@ -80,8 +80,8 @@ mat-form-field.mat-form-field ::ng-deep {
         border-top: 0px !important;
         input{
             &:hover{
-                border: 1px solid var(--blu) !important;
-                outline: 0px solid var(--blu) !important;
+                border: 1px solid var(--ds-ink) !important;
+                outline: 0px solid var(--ds-ink) !important;
             }
         }
     }
@@ -93,8 +93,8 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 display: flex;
                 input {
-                    border: 1px solid var(--blu)!important;
-                    outline: 0px solid var(--blu)!important;
+                    border: 1px solid var(--ds-ink)!important;
+                    outline: 0px solid var(--ds-ink)!important;
                     transition: border .3s;
                     &.invalid{
                         border: 1px solid red !important;
@@ -151,7 +151,7 @@ input[type=number] {
     textarea {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
-        border: 1px solid var(--blu-light-02);
+        border: 1px solid var(--border);
         overflow-x: hidden;
         overflow-y: auto;
         color: var(--gray);
@@ -187,12 +187,12 @@ input[type=number] {
         transition: background-color 0.3s, color 0.3s;
         min-width: 45px;
         .num-chars {
-            background: var(--blu-light-01);
+            background: var(--ds-bg);
             flex-shrink: 0;
             padding: 0px 8px;
             border-radius: 10px;
             font-size: 0.8em;
-            color: var(--blu);
+            color: var(--ds-ink);
             float: right;
             line-height: 24px;
             font-weight: 700;
@@ -222,10 +222,10 @@ input[type=number] {
         height: 24px;
         width: 24px;
         justify-content: center;
-        color: var(--blu);
-        border: 1px solid var(--blu-light-02);
+        color: var(--ds-ink);
+        border: 1px solid var(--border);
         &:hover {
-            background: var(--blu);
+            background: var(--ds-ink);
             color:var(--color-white-hex) ;
         }
     }
@@ -240,10 +240,10 @@ input[type=number] {
             height: 24px;
             width: 24px;
             justify-content: center;
-            color: var(--blu);
-            border: 1px solid var(--blu-light-02);
+            color: var(--ds-ink);
+            border: 1px solid var(--border);
             &:hover {
-                background: var(--blu);
+                background: var(--ds-ink);
                 color:var(--color-white-hex) ;
             }
         }

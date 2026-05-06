@@ -1,6 +1,6 @@
 :host{
-    --icon-color: #{var(--blu)};
-    --textColor: #{var(--blu)};
+    --icon-color: #{var(--ds-ink)};
+    --textColor: #{var(--ds-ink)};
     --backGroundColor: #{var(--ds-canvas, #f7f6f3)};
     --hoverBackgroundColor: #{var(--blu-light-03)};
 
@@ -69,14 +69,14 @@
         }
     }
     .control-button:hover {
-        color: var(--blu-light-02);
+        color: var(--border);
         &.delete{
             em {
                 color: var(--color-red-hex);
             }
         }
         &.copy {
-            background-color: var(--hoverBackgroundColor);
+            background-color: var(--cds-canvas);
         }
     }
 }
@@ -91,7 +91,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: var(--blu) ;
+        background-color: var(--ds-ink) ;
     }
 }
 
@@ -144,7 +144,7 @@ loading-spinner.custom-spinner ::ng-deep {
         height: 36px;
         width: 36px;
         //background-color: var(--textColor);
-        color: var(--backGroundColor);
+        color: var(--ds-bg);
         display: flex;
         align-items: center;
         margin-right: 10px;
@@ -165,7 +165,7 @@ loading-spinner.custom-spinner ::ng-deep {
         height: 36px;
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
-        border: 1px solid var(--blu-light-02) !important;
+        border: 1px solid var(--border) !important;
         color: var(--gray);
         padding: 4px 8px;
         font-size: 14px;
@@ -319,8 +319,8 @@ button.icon-only {
     width: 40px;
     margin-left: 4px;
     border-radius: 8px;
-    background: var(--blu-light-02);
-    border: 1px solid var(--blu-light-02) !important;
+    background: var(--border);
+    border: 1px solid var(--border) !important;
     color: var(--color-white-hex);
 
     display: flex;

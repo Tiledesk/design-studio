@@ -1,8 +1,8 @@
 :host {
-    --background-color: #{var(--blu-light-01)};
-    --text-color: #{var(--blu)};
-    --icon-color: #{var(--blu-light-02)};
-    --selected-row-background: #{var(--blu-light-02)};
+    --background-color: #{var(--ds-bg)};
+    --text-color: #{var(--ds-ink)};
+    --icon-color: #{var(--border)};
+    --selected-row-background: #{var(--border)};
     --selected-row-color:  #{var(--blu-light-03)};
 }
 

@@ -76,14 +76,14 @@
         font-size: 17px;
         line-height: 17px;
         font-weight: 500;
-        color: var(--blu);
+        color: var(--ds-ink);
       }
       .subtitle{
         font-size: 13px;
         color: var(--gray);
       }
       span.material-icons-outlined{
-        color: var(--blu);
+        color: var(--ds-ink);
       }
       &:hover{
         cursor: pointer;
@@ -101,7 +101,7 @@
     gap: 10px;
 
     // #ignoreBtn{
-    //     background-color: var(--blu-light-02);
+    //     background-color: var(--border);
     // }
 
 }

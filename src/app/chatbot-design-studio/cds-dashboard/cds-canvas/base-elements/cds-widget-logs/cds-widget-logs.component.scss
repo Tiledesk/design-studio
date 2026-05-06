@@ -136,7 +136,7 @@
     color: var(--grey);
   }
   &.debug{
-    color: var(--blu);
+    color: var(--ds-ink);
   }
   &.info{
     color: #1b6ef3;
@@ -174,7 +174,7 @@
   .mat-icon{
     width: 18px;
     height: 18px;
-    fill:var(--blu);
+    fill:var(--ds-ink);
   }
 }
 
@@ -191,7 +191,7 @@
   align-items: center;
   height: 25px;
   padding: 2px 5px;
-  background: var(--blu-light-01);
+  background: var(--ds-bg);
   margin-bottom: 20px;
   .loading-loader {
     margin-left: 10px;
@@ -199,7 +199,7 @@
     position: relative;
     width: 16px;
     height: 16px;
-    border: 2px solid var(--blu); //#3498db;
+    border: 2px solid var(--ds-ink); //#3498db;
     border-top: 2px solid var(--gray-light-02);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -208,7 +208,7 @@
     font-size: 11px;
     margin: 0 10px;
     font-weight: 500;
-    color: var(--blu);
+    color: var(--ds-ink);
   }
 }
 
@@ -248,7 +248,7 @@
   top: 3px;
   label {
     font-family: var(--font-family-poppins);
-    color: var(--blu);
+    color: var(--ds-ink);
     font-size: 12px;
     padding-right: 10px;
   }
@@ -256,7 +256,7 @@
     padding: 0px;
     font-size: 12px;
     border: none;
-    color: var(--blu);
+    color: var(--ds-ink);
     background-color: #fafafa;
   }
 }
@@ -331,8 +331,8 @@
 }
 
 @keyframes fadeBackground {
-  0% { background-color: var(--blu-light-01); }
-  20% { background-color: var(--blu-light-01); }
+  0% { background-color: var(--ds-bg); }
+  20% { background-color: var(--ds-bg); }
   100% { background-color: #ffffff; }
 }
 

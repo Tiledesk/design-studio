@@ -1,6 +1,6 @@
 :host{
-    --icon-color: #{var(--blu)};
-    --textColor: #{var(--blu)};
+    --icon-color: #{var(--ds-ink)};
+    --textColor: #{var(--ds-ink)};
     --backGroundColor: #{var(--ds-canvas, #f7f6f3)};
     --hoverBackgroundColor: #{var(--blu-light-03)};
 
@@ -58,14 +58,14 @@
         span.material-icons,
         span.material-icons-outlined{
             font-size: 20px;
-            color: var(--backGroundColor);
+            color: var(--ds-bg);
         }
 
         &:hover{
             background-color: var(--textColor);
             span.material-icons,
             span.material-icons-outlined{
-                color: var(--backGroundColor);
+                color: var(--ds-bg);
             }
         }
     }
@@ -89,9 +89,9 @@
         user-select: none;
         box-sizing: border-box;
         outline: none;
-        border: 1px dashed var(--blu-light-02);
+        border: 1px dashed var(--border);
         border-radius: var(--button-border-radius-base);
-        color: var(--blu-light-02);
+        color: var(--border);
         cursor: pointer;
         font-size: 0.7em;
         font-weight: 400;
@@ -159,13 +159,13 @@
     padding: 4px 15px;
     transition: background-color 0.3s ease 0s, border 0.3s ease 0s, opacity 0.3s ease 0s;
     cursor: pointer;
-    background: var(--backGroundColor);
+    background: var(--ds-bg);
     border-width: 1px;
     border-style: solid;
-    border-color: var(--backGroundColor);
+    border-color: var(--ds-bg);
     border-image: initial;
     &:hover{
-        background: var(--hoverBackgroundColor);
+        background: var(--cds-canvas);
         border-color: var(--textColor);
         div.remove{
             opacity: 1;
@@ -196,7 +196,7 @@
             color: var(--textColor);
         }
         &:hover {
-            background-color: var(--hoverBackgroundColor);
+            background-color: var(--cds-canvas);
         }
     }
 

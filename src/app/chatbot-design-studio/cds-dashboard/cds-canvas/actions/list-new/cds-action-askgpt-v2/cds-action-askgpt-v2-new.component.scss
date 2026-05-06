@@ -3,9 +3,9 @@
 
 
 :host {
-    --background-color: #{var(--blu-light-01)};
+    --background-color: #{var(--ds-bg)};
     --slider-background-color: #{var(--blu-light-03)};
-    --text-color: #{var(--blu)};
+    --text-color: #{var(--ds-ink)};
     --text-color-gray: #{var(--gray)};
 }
 
@@ -42,7 +42,7 @@
         padding: 3px 7px;
         border: none;
         border-radius: 6px;
-        background: var(--blu);
+        background: var(--ds-ink);
         color: #fff;
         font-size: 12px;
         line-height: 12px;
@@ -69,7 +69,7 @@
     gap: 4px;
     padding: 0px;
     border-radius: 4px;
-    background-color: var(--blu-light-01);
+    background-color: var(--ds-bg);
     border: 0px solid #d2d4d6;
     font-size: 12px;
 }
@@ -77,7 +77,7 @@
 .model-name {
     margin: 0;
     font-weight: 300;
-    color: var(--blu);
+    color: var(--ds-ink);
     padding-left: 6px;
 }
 
@@ -97,7 +97,7 @@
     border-radius: 0px 4px 4px 0px;
 
     &:hover {
-        background: var(--blu);
+        background: var(--ds-ink);
         .remove-tag-icon {
             fill: var(--color-white-hex);
         }
@@ -219,7 +219,7 @@ mat-expansion-panel ::ng-deep {
             position: absolute;
             left: 0;
             top: 0;
-            color: var(--blu);
+            color: var(--ds-ink);
             font-weight: 700;
             font-size: 10px;
             line-height: 1;
@@ -251,7 +251,7 @@ cds-select#model-condition ::ng-deep{
 
     .ng-dropdown-panel-items.scroll-host .ng-optgroup {
         padding: 0 10px;
-        color: var(--blu);
+        color: var(--ds-ink);
         font-weight: 500;
         font-size: 14px;
         background: var(--blu-light-03);
@@ -381,7 +381,7 @@ cds-select#model-condition ::ng-deep{
     background-color: var(--color-white-hex);
     padding: 6px 12px;
     font-size: 14px;
-    border: 1px solid var(--blu-light-02);
+    border: 1px solid var(--border);
     color: var(--gray);
 }
 
@@ -403,7 +403,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: var(--blu) ;
+        background-color: var(--ds-ink) ;
     }
 }
 
@@ -510,7 +510,7 @@ mat-checkbox ::ng-deep {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    color: var(--blu);
+    color: var(--ds-ink);
     font-weight: 400;
     font-size: 12px;
 }
@@ -621,7 +621,7 @@ cds-select#model-condition.not-configured ::ng-deep {
     height: fit-content;
     padding: 0px 6px;
     max-width: calc(100% - 25px);
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
     color: var(--color-white-hex);
     flex-wrap: nowrap;
     text-align: end;
@@ -642,7 +642,7 @@ cds-select#model-condition.not-configured ::ng-deep {
     }
     .preview-badge {
         color: #fff;
-        background-color: var(--blu);
+        background-color: var(--ds-ink);
         display: inline-block;
         padding: 1px 5px;
         border-radius: 4px;

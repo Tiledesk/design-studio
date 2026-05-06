@@ -7,7 +7,7 @@
 
     //CASE: checked
     &.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
-        background-color: var(--blu-light-02);
+        background-color: var(--border);
     }
     &.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
         background-color: var(--blu-02);

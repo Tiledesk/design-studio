@@ -87,12 +87,12 @@
     transition: background-color 0.3s, color 0.3s;
     min-width: 45px;
     .num-chars {
-        background: var(--blu-light-01);
+        background: var(--ds-bg);
         flex-shrink: 0;
         padding: 0px 8px;
         border-radius: 10px;
         font-size: 0.8em;
-        color: var(--blu);
+        color: var(--ds-ink);
         float: right;
         line-height: 24px;
         font-weight: 700;

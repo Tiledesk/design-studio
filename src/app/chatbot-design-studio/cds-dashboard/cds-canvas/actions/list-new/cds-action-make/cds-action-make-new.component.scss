@@ -2,9 +2,9 @@
     width: 0px;
 }
 :host {
-    --background-color: #{var(--blu-light-01)};
+    --background-color: #{var(--ds-bg)};
     //--slider-background-color: #{var(--blu-light-03)};
-    --text-color: #{var(--blu)};
+    --text-color: #{var(--ds-ink)};
 }
 
 .custom-expansion-panel {

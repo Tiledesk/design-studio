@@ -3,8 +3,8 @@
 :host{
     --cardImageHeight: 150px;
     --cardWidth: 220px;
-    --border-color: #{var(--blu-light-01)};
-    --base-color: #{var(--blu-light-02)};
+    --border-color: #{var(--ds-bg)};
+    --base-color: #{var(--border)};
 }
 
 .previewMode{
@@ -468,7 +468,7 @@ cds-image-upload ::ng-deep {
                 position: absolute;
                 em {
                     font-size: 1.15em;
-                    color: var(--blu);
+                    color: var(--ds-ink);
                     transition: color .3s;
                 }
             }
@@ -519,8 +519,8 @@ cds-image-upload ::ng-deep {
     }
     .control-button {
         cursor: pointer;
-        background: var(--blu-light-02);
-        color: var(--blu);
+        background: var(--border);
+        color: var(--ds-ink);
         transition: color .3s;
         height: 24px;
         width: 24px;
@@ -531,7 +531,7 @@ cds-image-upload ::ng-deep {
         margin: 0 2px;
         em {
             font-size: 1.15em;
-            color: var(--blu);
+            color: var(--ds-ink);
             transition: color .3s;
         }
     }
@@ -724,7 +724,7 @@ cds-textarea#description.noButtons ::ng-deep{
 
 .image-from-url {
     margin: 0px 10px 10px;
-    border: 2px dashed var(--blu-light-02);
+    border: 2px dashed var(--border);
     border-radius: 6px;
     padding: 2px 10px 10px;
     text-align: center;
@@ -737,7 +737,7 @@ cds-textarea#description.noButtons ::ng-deep{
     .box-textarea textarea {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
-        border: 1px solid var(--blu-light-02);
+        border: 1px solid var(--border);
         outline: none;
         overflow-x: hidden;
         overflow-y: hidden;
@@ -769,7 +769,7 @@ cds-textarea#description.noButtons ::ng-deep{
 }
 
 .image-load-or {
-    color: var(--blu-light-02);
+    color: var(--border);
     font-size: 10px;
     line-height: 12px;
 }
@@ -792,7 +792,7 @@ cds-textarea#description.noButtons ::ng-deep{
         ::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder {
             font-size: 12px;
             display:block!important;
-            color: var(--blu);
+            color: var(--ds-ink);
         }
         ::ng-deep .ng-select .ng-select-container .ng-value-container {
             // justify-content: flex-end;
@@ -801,7 +801,7 @@ cds-textarea#description.noButtons ::ng-deep{
         }
         ::ng-deep .ng-select .ng-select-container {
             // justify-content: flex-end;
-            border: 0px solid var(--blu-light-02);
+            border: 0px solid var(--border);
             box-shadow: none;
         }
         ::ng-deep .ng-select .ng-select-container:hover {

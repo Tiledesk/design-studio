@@ -7,13 +7,13 @@
     position: relative;
     display: block;
     height: 53px;
-    border-bottom: 2px solid var(--blu-light-02);
+    border-bottom: 2px solid var(--border);
     cursor: pointer;
 }
 
 .cds-bottom-nav div a {
     padding: 0px 15px;
-    color: var(--blu-light-02);
+    color: var(--border);
     line-height: 20px;
 }
 
@@ -23,11 +23,11 @@
 }
 
 .li-active {
-    border-bottom: 2px solid var(--blu) !important;
+    border-bottom: 2px solid var(--ds-ink) !important;
     pointer-events: none;
 }
 .li-active a {
-    color: var(--blu) !important;
+    color: var(--ds-ink) !important;
 }
 .disabled-li {
     pointer-events: none;
@@ -69,7 +69,7 @@ ng-select {
 ::ng-deep {
     .ng-select .ng-select-container {
         border-radius: var(--input-border-radius-base);
-        border: 1px solid var(--blu-light-02);
+        border: 1px solid var(--border);
     }
 }
 
@@ -210,7 +210,7 @@ ng-select {
 
 .border-from-center {
     &:hover {
-        color: var(--blu);
+        color: var(--ds-ink);
     }
 
     // Set up base styles, we're going to scale instead of animating width/height
@@ -227,7 +227,7 @@ ng-select {
     // scale3d(<scale-horizontal>, <scale-vertical>, <scale-depth>);
     &::before {
         // border-top: 2px solid $purple;
-        border-bottom: 3px solid var(--blu);
+        border-bottom: 3px solid var(--ds-ink);
         transform: scale3d(0, 1, 1); // Shrink only width
     }
 

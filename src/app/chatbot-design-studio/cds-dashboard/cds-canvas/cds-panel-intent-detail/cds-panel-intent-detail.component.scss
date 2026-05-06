@@ -45,13 +45,13 @@
         position: relative;
         top: 0px;
         span.rocket {
-            color: var(--blu);
+            color: var(--ds-ink);
         }
         span.undo {
-            color: var(--blu);
+            color: var(--ds-ink);
         }
         span.webhook {
-            color: var(--blu);
+            color: var(--ds-ink);
         }
     }
     cds-action-description{
@@ -179,10 +179,10 @@
     background-color: #ffffff;
     transition: background-color 0.3s ease-in;
     &.checked{
-        border-color: var(--blu);
-        background-color: var(--blu);
+        border-color: var(--ds-ink);
+        background-color: var(--ds-ink);
         &:before {
-            border-color: var(--blu);
+            border-color: var(--ds-ink);
             right: 0px;
         }
     }
@@ -205,11 +205,11 @@
 }
 
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: var(--blu);
+    border-color: var(--ds-ink);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
     right: 0px;
@@ -246,7 +246,7 @@
     font-size: 12px;
     margin: 0px;
     padding: 0 10px 0 10px;
-    color: var(--blu);
+    color: var(--ds-ink);
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -270,21 +270,21 @@
         width: 20px;
         height: 20px;
         border-radius: 4px;
-        fill: var(--blu);
+        fill: var(--ds-ink);
         background: none;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: auto;
         svg {
-            fill: var(--blu);
+            fill: var(--ds-ink);
         }
     }
     img {
         width: 20px;
         height: 20px;
         border-radius: 4px;
-        color: var(--blu);
+        color: var(--ds-ink);
         background: none;
         display: flex;
         align-items: center;
@@ -355,10 +355,10 @@
     background-color: #ffffff;
     transition: background-color 0.3s ease-in;
     &.checked{
-        border-color: var(--blu);
-        background-color: var(--blu);
+        border-color: var(--ds-ink);
+        background-color: var(--ds-ink);
         &:before {
-            border-color: var(--blu);
+            border-color: var(--ds-ink);
             right: 0px;
         }
     }
@@ -381,11 +381,11 @@
 }
 
 .copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label {
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
 }
 .copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label,
 .copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label:before {
-    border-color: var(--blu);
+    border-color: var(--ds-ink);
 }
 .copilot-onoffswitch-checkbox:checked + .copilot-onoffswitch-label:before {
     right: 0px;

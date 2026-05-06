@@ -13,7 +13,7 @@
 
     .label-action {
         font-size: 12px !important;
-        color: var(--blu) !important;
+        color: var(--ds-ink) !important;
         width: 100%;
     }
 
@@ -164,7 +164,7 @@
         border-radius: 4px;
         // margin-right: 6px;
         // align-self: start;
-        color: var(--blu);
+        color: var(--ds-ink);
         background: none;
 
         display: flex;
@@ -185,7 +185,7 @@
         font-size: 14px;
         font-weight: 500;
         margin: 0;
-        color: var(--blu);
+        color: var(--ds-ink);
     }
 }
 
@@ -195,7 +195,7 @@
     align-items: center;
     justify-content: flex-start;
     font-size: 11px;
-    color: var(--blu-light-02);
+    color: var(--border);
     line-height: 1.5;
 
     span {

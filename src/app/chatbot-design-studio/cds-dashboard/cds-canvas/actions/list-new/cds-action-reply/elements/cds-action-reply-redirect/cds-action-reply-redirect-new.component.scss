@@ -66,7 +66,7 @@
 
 .control-label{
     font-family: var(--font-family-poppins);
-    color: var(--blu);
+    color: var(--ds-ink);
     text-align: left;
     line-height: 20px;
     font-size: 14px;
@@ -104,10 +104,10 @@ mat-button-toggle-group {
     border-radius: var(--input-border-radius-base);
 }
 mat-button-toggle.mat-button-toggle-checked{
-    background-color: var(--blu);
-    color: var(--blu-light-02);
+    background-color: var(--ds-ink);
+    color: var(--border);
 }
 
 mat-button-toggle.mat-button-toggle{
-    color: var(--blu-light-02);
+    color: var(--border);
 }

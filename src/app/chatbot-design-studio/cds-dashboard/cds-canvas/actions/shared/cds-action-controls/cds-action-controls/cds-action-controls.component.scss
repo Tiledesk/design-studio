@@ -37,7 +37,7 @@
 .action-control-btn:hover {
     mat-icon {
         ::ng-deep svg {
-            fill: var(--blu);
+            fill: var(--ds-ink);
         }
     }
 }

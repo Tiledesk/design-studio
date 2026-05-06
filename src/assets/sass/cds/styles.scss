@@ -79,7 +79,7 @@ button.close {
 /* Bottom Underline of the titles of the sections */
 .card_title__underlined {
     text-transform: none;
-    color: var(--blu);
+    color: var(--ds-ink);
     margin-bottom: 0px;
     height: 40px !important;
     position: relative;
@@ -95,8 +95,8 @@ button.close {
     top: 0;
     left: 0;
     bottom: -1px;
-    border-bottom: 2px solid var(--blu);
-    color: var(--blu);
+    border-bottom: 2px solid var(--ds-ink);
+    color: var(--ds-ink);
     z-index: 1;
 }
 
@@ -126,12 +126,12 @@ button.close {
 }
 
 .title-label {
-    color: var(--blu);
+    color: var(--ds-ink);
     font-size: 14px;
 }
 
 .subtitle-label {
-    color: var(--blu);
+    color: var(--ds-ink);
     font-size: 11px;
     font-style: italic;
 }
@@ -139,7 +139,7 @@ button.close {
 .condition-text {
     font-size: 14px;
     font-weight: 600;
-    color: var(--blu);
+    color: var(--ds-ink);
 }
 
 .condition-container {
@@ -300,7 +300,7 @@ cds-intent:hover > cds-panel-intent-controls > .intent-header-actions-container 
 
 .preview-divider {
     margin: 5px 0px;
-    border-top: 2px solid color-mix(in srgb, var(--blu) 70%, transparent);
+    border-top: 2px solid color-mix(in srgb, var(--ds-ink) 70%, transparent);
 }
 
 
@@ -308,7 +308,7 @@ cds-intent:hover > cds-panel-intent-controls > .intent-header-actions-container 
     margin-top: 40px;
     margin-bottom: 20px;
     border: 0;
-    border-top: 1px solid var(--blu);
+    border-top: 1px solid var(--ds-ink);
 }
 
 .btn.btn-primary.cds-blue-button {
@@ -341,7 +341,7 @@ appdashboard-cds-dashboard a {
 .cds-title {
     font-size: 18px;
     position: relative;
-    color: var(--blu);
+    color: var(--ds-ink);
     font-weight: 600;
 }
 
@@ -349,13 +349,12 @@ appdashboard-cds-dashboard a {
     width: 100%;
     position: absolute;
     bottom: 0;
-    // left: 0;
-    // right: 0;
     z-index: 2;
     height: var(--footer-panel-action-detail-height);
     margin: auto 0;
     padding: 7px 20px;
     border-top: 1px solid var(--gray-light-02);
+    background-color: var(--ds-white);
 }
 
 img.active-icon {

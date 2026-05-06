@@ -69,15 +69,15 @@ $margin-bottom: 15px;
 // }
 
 ::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
-    border-color: var(--blu) !important;
+    border-color: var(--ds-ink) !important;
 }
 
 // overwrite the checkbox background
 ::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
 .mat-checkbox-indeterminate .mat-checkbox-background {
-    background-color: var(--blu) !important;
+    background-color: var(--ds-ink) !important;
     .mat-checkbox-checkmark {
-        background: var(--blu) !important;;
+        background: var(--ds-ink) !important;;
         .mat-checkbox-checkmark-path {
           stroke: white;
           stroke-width: 5px;
@@ -109,7 +109,7 @@ $margin-bottom: 15px;
     // display: flex;
     margin: 0px 5px;
     .reply-info{
-        color: var(--blu);
+        color: var(--ds-ink);
         padding: 10px;
         font-size: 14px;
         text-align: center;

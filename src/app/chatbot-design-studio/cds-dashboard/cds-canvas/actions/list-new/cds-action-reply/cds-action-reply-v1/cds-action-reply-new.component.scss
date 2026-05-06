@@ -1,338 +1,582 @@
 @import "./src/assets/sass/cds/_variables.scss";
-@import "./src/assets/sass/cds/_mixins.scss";
 
-// ============================================================================
-// cds-action-reply-v1-new Component
-// Reply Inspector Layout (DS V3)
-// ============================================================================
-
-:host {
-  display: block;
-  font-family: var(--ds-font-family);
-}
+$min-height-content: 376px;
+$margin-left: 10px;
+$padding: 10px;
+$action-description-height: 100px;
+$margin-bottom: 15px;
 
 .cds-action-content-new {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: var(--ds-surface, #ffffff);
-  border: 1px solid var(--ds-border, #e8e6e0);
-  border-radius: var(--ds-radius-lg, 14px);
-  box-shadow: var(--ds-shadow-card, 0 1px 2px rgba(20, 20, 18, 0.04));
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
 }
 
-// ============ Header ============
 
-.insp-head {
-  @include flex-row(10px);
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--ds-border, #e8e6e0);
-  background: var(--ds-surface, #ffffff);
-  flex-shrink: 0;
+/**header**/
+.action_welcome {
+    margin-bottom: 5px;
+}
 
-  .insp-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
+.action_welcome .action-description {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 11px;
+    // color: #d2e3fc;
+    line-height: 1.5;
+}
+
+.action_welcome em{
+    font-size: 20px;
+    display: block;
+    margin: auto 4px auto 0;
+}
+
+
+.action_welcome input.action-input {
+    width: 100%;
+    border-radius: 4px;
+    border: 0;
+    padding: 5px 10px;
+    color: #22272d;
+    font-size: 1.15em;
+    line-height: 16px;
+}
+
+
+
+
+
+
+/**header**/
+
+
+
+
+
+
+/* customize scrollbar */
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+// .disable-input-message {
+//     position: absolute;
+//     bottom: 10px;
+//     left: 10px;
+//     color: white;
+// }
+
+::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
+    border-color: var(--ds-ink) !important;
+}
+
+// overwrite the checkbox background
+::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
+.mat-checkbox-indeterminate .mat-checkbox-background {
+    background-color: var(--ds-ink) !important;
+    .mat-checkbox-checkmark {
+        background: var(--ds-ink) !important;;
+        .mat-checkbox-checkmark-path {
+          stroke: white;
+          stroke-width: 5px;
+        }
+      }
+
+}
+
+// // overwrite the ripple overlay on hover and click
+// ::ng-deep .mat-checkbox:not(.mat-checkbox-disabled) .mat-checkbox-ripple .mat-ripple-element {
+//   background-color: black !important;
+// }
+
+.__box-up {
+    display: flex;
+    padding: 5px 10px;
     background: var(--ds-canvas, #f7f6f3);
-    @include flex-row(0, center, center);
-    color: var(--ds-ink, #14140e);
-    flex-shrink: 0;
-
-    mat-icon {
-      font-size: 14px;
-      width: 14px;
-      height: 14px;
-    }
-  }
-
-  .insp-title {
-    flex: 1;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--ds-ink, #14140e);
-  }
-
-  .icon-btn {
-    width: 30px;
-    height: 30px;
-    @include flex-row(0, center, center);
-    border: 1px solid transparent;
-    border-radius: 7px;
-    background: transparent;
-    color: var(--ds-ink-2, #3a3935);
-    cursor: pointer;
-    @include transition();
-
-    &:hover:not(:disabled) {
-      background: var(--ds-canvas, #f7f6f3);
-      color: var(--ds-ink, #14140e);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-  }
+    position: relative;
+    /* top: 0; */
+    width: 100%;
+    flex-direction: column;
+    align-content: flex-end;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
 }
 
-// ============ Toolbar ============
+.box-dw {
+    // display: flex;
+    margin: 0px 5px;
+    .reply-info{
+        color: var(--ds-ink);
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+        border: 1px solid var(--gray-light-01);
+        border-radius: 10px;
+        margin: 10px;
+        background: var(--blu-light-03);
+    }
+}
 
-.insp-toolbar {
-  @include flex-row(4px);
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--ds-border, #e8e6e0);
-  background: var(--ds-surface, #ffffff);
-  overflow-x: auto;
-  flex-shrink: 0;
+.cds-action-preview{
+    padding: 10px 0px;
+}
 
-  // Toolbar buttons inherited from cds-action-reply-tools-new
-  ::ng-deep {
-    .tool-btn {
-      width: 32px;
-      height: 32px;
-      @include flex-row(0, center, center);
-      border-radius: var(--ds-radius-sm, 6px);
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--ds-ink-2, #3a3935);
-      cursor: pointer;
-      flex-shrink: 0;
-      @include transition();
-
-      &:hover {
-        background: var(--ds-canvas, #f7f6f3);
-        color: var(--ds-ink, #14140e);
-      }
-
-      &.active {
-        background: var(--ds-canvas, #f7f6f3);
-        color: var(--ds-ink, #14140e);
-      }
-
-      svg, mat-icon {
-        width: 16px;
-        height: 16px;
-      }
+.previewMode{
+    &.box-dw{
+        margin: 0px;
+    }
+    #scrollMe{
+        padding: 0;
+        margin: 0; 
+        display: flex;
+        flex-direction: column;
+        overflow: unset;
+        // gap: 5px;
+    }
+    .content{
+        min-height: unset;
+        max-height: unset;
+        overflow: unset;
+    }
+    // .draggable-box{
+    //     padding-top: $padding-base-preview;
+    //     padding-bottom: $padding-base-preview;
+    //     border-bottom: 3px solid #ebe2c6
+    // }
+    .reply-info{
+        max-width: calc(100% - 20px);
+        margin: 5px auto;
+        padding: 5px;
+        font-size: .7em;
+        line-height: 16px;
     }
 
-    .tool-divider {
-      width: 1px;
-      height: 18px;
-      background: var(--ds-border, #e8e6e0);
-      margin: 0 4px;
-      flex-shrink: 0;
+    .preview-divider {
+        margin: 10px 0px;
     }
-  }
 }
-
-// ============ Body (Content Area) ============
-
-.insp-body {
-  flex: 1;
-  padding: 18px 14px 20px;
-  @include flex-column(28px);
-  background: var(--ds-surface, #ffffff);
-  overflow: auto;
-
-  &.previewMode {
-    padding: 12px 14px;
-  }
-}
-
-// ============ Empty State ============
-
-.insp-empty-state {
-  @include empty-state(80px, 20px, 8px);
-  margin: 18px 14px;
-
-  .insp-empty-text {
-    font-size: 13px;
-    color: var(--ds-muted, #8a8884);
-  }
-}
-
-// ============ Message Block ============
 
 .content {
-  @include flex-column(0);
-  width: 100%;
-  @include scrollbar-custom();
-
-  .msg {
-    @include response-grid(32px, 8px);
     position: relative;
+    display: block;
+    // display: flex;
+    // flex-direction: column;
+    // gap: 10px;
     width: 100%;
-  }
+    min-height: $min-height-content;
+    margin-top: 0px;
+    overflow: auto;
+    max-height: calc(100vh - 180px);
+    .response {
+        display: block;
+        position: relative;
+        height: auto;
+        width: 100%;
+        min-height: auto;
+        margin: 0px;
+        .response-drop {
+            position: absolute;
+            display: flex;
+            align-content: space-around;
+            width: 24px;
+            height: 26px;
+            left: 0px;
+            top: 27px;
+            margin: 0;
+            color: var(--blu-04);
+            cursor: grab;
+            background-color: transparent;
+            z-index: 1; 
+        }
+        .response-drop:hover {
+            color: var(--color-white-hex);
+            cursor: grab;  
+        }
+    }
+    
 
-  .msg-content {
-    @include flex-column(22px);
-    min-width: 0;
-  }
+
+    /** START DRAG AND DROP **/
+    // &.draggable-list {
+    //     width: 500px;
+    //     max-width: 100%;
+    //     // border: solid 1px $color-txt-3-hex;
+    //     min-height: 60px;
+    //     display: block;
+    //     background: var(--color-white-hex);
+    //     border-radius: 4px;
+    //     overflow: hidden;
+    // }
+      
+    .cdk-drag-preview {
+        box-sizing: border-box;
+        border-radius: 4px;
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+       
+    .draggable-box:last-child {
+        border: none;
+    }
+      
+    .draggable-list.cdk-drop-list-dragging .draggable-box:not(.cdk-drag-placeholder) {
+       transition: transform 250ms cubic-bezier(0, 0, 0.2, 1); 
+    }
+      
+    .custom-placeholder {
+        opacity: 0.4;
+        background: #CCCCCC;
+        border: dotted 2px #858585;
+        min-height: 60px;
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+    /** END DRAG AND DROP **/
 }
 
-// ============ Move Stack ============
 
-.move-stack {
-  @include flex-column(2px);
-  margin-top: 4px;
-  flex-shrink: 0;
 
-  .move-btn {
-    width: 24px;
-    height: 22px;
-    @include flex-row(0, center, center);
-    border: 1px solid transparent;
-    border-radius: 5px;
+.card-buttons {
+    position: absolute;
+    display: none;
+    top: 0;
+    right: 0;
+    margin: 0;
+    outline: none;
+    width: 380px;
+    height: 100%;
+    color: #fff;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     background: transparent;
-    color: var(--ds-muted-2, #b3b1ac);
-    cursor: pointer;
-    @include transition();
-    flex-shrink: 0;
-
-    svg {
-      width: 12px;
-      height: 12px;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      fill: none;
+    overflow: visible;
+    z-index: 14;
+    border-radius: 1em;
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+                0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    &.active{
+        display: block;
     }
+}
+
+
+.reply--action-placeholder {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 30px;
+    border-radius: var(--input-border-radius-base);
+    border: 1px dashed var(--brown);
+    padding: 6px 12px;
+    background: rgba(255,255,255,.8);
+    margin: 12px auto;
+    width: calc(100% - 5px);
+    .reply--action-placeholder-text {
+        font-weight: 400;
+        color: var(--brown);
+        font-size: 14px;
+    }
+}
+
+// cds-action-description {
+//     padding: 10px 0;
+//     margin-left: 10px;
+//     // margin-right: 30px;
+//     & ::ng-deep .action_welcome{
+//         margin-bottom: 0px;
+//     }
+// }
+
+/* ===== INSPECTOR HEADER ===== */
+.insp-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px 14px 18px;
+    border-bottom: 1px solid var(--border, #e8e6e0);
+    flex-shrink: 0;
+}
+
+.insp-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: var(--ink-2, #3a3935);
+    font-size: 18px;
+}
+
+.insp-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink, #14140e);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .version-icon {
+        color: #f59e0b;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        display: block;
+    }
+}
+
+.icon-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    color: var(--muted, #8a8884);
+    transition: background 0.12s, color 0.12s;
+    padding: 0;
 
     &:hover:not(:disabled) {
-      color: var(--ds-ink, #14140e);
-      background: var(--ds-canvas, #f7f6f3);
-      border-color: var(--ds-border, #e8e6e0);
+        background: var(--canvas, #f7f6f3);
+        color: var(--ink, #14140e);
     }
 
     &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    mat-icon {
+        display: block;
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+    }
+}
+
+/* ===== INSPECTOR TOOLBAR ===== */
+.insp-toolbar {
+    border-bottom: 1px solid var(--border, #e8e6e0);
+    flex-shrink: 0;
+}
+
+/* ===== INSPECTOR EMPTY STATE ===== */
+.insp-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--ink-2, #3a3935);
+    font-size: 13px;
+    flex: 1;
+}
+
+.insp-empty-text {
+    line-height: 1.5;
+}
+
+/* ===== INSPECTOR BODY ===== */
+.insp-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &.previewMode {
+        overflow: unset;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+/* ===== MESSAGE CONTENT ===== */
+.content {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: $min-height-content;
+    margin-top: 0;
+    overflow: auto;
+    max-height: calc(100vh - 180px);
+
+    &.previewMode {
+        min-height: unset;
+        max-height: unset;
+        overflow: unset;
+    }
+}
+
+.msg {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    align-items: flex-start;
+}
+
+.move-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.move-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: var(--canvas, #f7f6f3);
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-2, #3a3935);
+    transition: background 0.12s, color 0.12s;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+        background: var(--border-strong, #d8d6d0);
+        color: var(--ink, #14140e);
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
     }
 
     &.trash-btn {
-      margin-bottom: 4px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid var(--ds-border, #e8e6e0);
-      border-radius: 5px 5px 0 0;
-      color: var(--ds-muted-2, #b3b1ac);
+        background: transparent;
+        color: #ef4444;
 
-      &:hover {
-        color: var(--ds-red, oklch(0.55 0.2 25));
-        background: var(--ds-red-soft, oklch(0.98 0.02 25));
-        border-color: oklch(0.88 0.06 25);
-      }
-
-      mat-icon {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-      }
+        &:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
     }
-  }
+
+    .i {
+        width: 16px;
+        height: 16px;
+        display: block;
+    }
 }
 
-// ============ Message Separator ============
+.msg-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
 .msg-sep {
-  height: 1px;
-  background: var(--ds-border, #e8e6e0);
-  margin: 4px 0 4px 30px;
-  width: calc(100% - 30px);
+    height: 1px;
+    background: var(--border, #e8e6e0);
+    margin: 8px 16px;
 }
 
-// ============ Footer ============
-
+/* ===== INSPECTOR FOOTER ===== */
 .insp-foot {
-  @include panel-footer();
-  padding: 14px 18px;
-  border-top: 1px solid var(--ds-border, #e8e6e0);
-  background: var(--ds-surface, #ffffff);
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border, #e8e6e0);
+    flex-shrink: 0;
+}
 
-  .switch {
+.switch {
     width: 32px;
     height: 18px;
     border-radius: 999px;
-    background: var(--ds-border, #e8e6e0);
-    position: relative;
+    border: none;
+    background: var(--border, #e8e6e0);
     cursor: pointer;
+    position: relative;
+    transition: background 0.18s;
     flex-shrink: 0;
-    @include transition();
+    padding: 0;
 
     &::after {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--ds-surface, #ffffff);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-      @include transition(left);
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: white;
+        top: 2px;
+        left: 2px;
+        transition: left 0.18s;
+        box-shadow: 0 1px 2px rgba(20, 20, 18, 0.15);
     }
 
     &.on {
-      background: var(--ds-green, oklch(0.68 0.14 155));
-
-      &::after {
-        left: 16px;
-      }
+        background: oklch(0.68 0.14 155);
     }
-  }
 
-  .foot-label {
-    font-size: 13.5px;
-    color: var(--ds-ink-2, #3a3935);
-  }
+    &.on::after {
+        left: 16px;
+    }
 }
 
-// ============ Sub-component Selectors ============
+.foot-label {
+    font-size: 13px;
+    color: var(--ink-2, #3a3935);
+    flex: 1;
+}
 
+cds-action-reply-text,
+cds-action-reply-image,
+cds-action-reply-frame,
+cds-action-reply-redirect,
+cds-action-reply-gallery,
 cds-action-reply-text-new,
 cds-action-reply-image-new,
 cds-action-reply-frame-new,
 cds-action-reply-redirect-new,
-cds-action-reply-gallery-new {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+cds-action-reply-gallery-new{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-// ============ Preview Mode ============
 
-.previewMode {
-  .insp-body {
-    gap: 0;
-  }
-
-  .msg-sep {
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-}
-
-// ============ Remove Controls for RANDOM_REPLY ============
-
+/*  REMOVE DROP AND MOVE_UP/MOVE_DOWN INDICATORS for RANDOM_REPLY type only */
+cds-action-reply-text.no-controls ::ng-deep,
+cds-action-reply-image.no-controls ::ng-deep,
+cds-action-reply-frame.no-controls ::ng-deep,
+cds-action-reply-redirect.no-controls ::ng-deep,
+cds-action-reply-gallery.no-controls ::ng-deep,
 cds-action-reply-text-new.no-controls ::ng-deep,
 cds-action-reply-image-new.no-controls ::ng-deep,
 cds-action-reply-frame-new.no-controls ::ng-deep,
 cds-action-reply-redirect-new.no-controls ::ng-deep,
-cds-action-reply-gallery-new.no-controls ::ng-deep {
-  .text-editor-drop,
-  .move-stack {
-    display: none;
-  }
-
-  .control-button:not(.delete) {
-    display: none;
-  }
+cds-action-reply-gallery-new.no-controls ::ng-deep{
+    .text-editor-drop{
+        display: none;
+    }
+    .control-button:not(.delete){
+        display: none;
+    }
 }

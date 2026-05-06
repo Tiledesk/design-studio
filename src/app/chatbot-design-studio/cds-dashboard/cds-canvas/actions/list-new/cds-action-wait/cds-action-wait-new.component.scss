@@ -1,6 +1,6 @@
 :host {
-    --background-color: #{var(--blu-light-01)};
-    --text-color: #{var(--blu)};
+    --background-color: #{var(--ds-bg)};
+    --text-color: #{var(--ds-ink)};
 }
 
 .title-label {
@@ -62,7 +62,7 @@
 /* ------------------------ */
 .action-delay-preview {
     align-items: center;
-    background: var(--blu-light-01);;
+    background: var(--ds-bg);;
     border-radius: 13px;
     display: inline-flex;
     position: relative;
@@ -75,11 +75,11 @@
 }
 .action-delay-preview .delay--icon {
     padding-right: 4px;
-    color: var(--blu);
+    color: var(--ds-ink);
 }
 
 .action-delay-preview .delay--time {
-    color: var(--blu);
+    color: var(--ds-ink);
     cursor: pointer;
     font-size: 11px;
     font-weight: 400;
@@ -150,8 +150,8 @@ mat-form-field.mat-form-field ::ng-deep {
         border-top: 0px !important;
         input{
             &:hover{
-                // border: 1px solid var(--blu) !important;
-                outline: 0px solid var(--blu) !important;
+                // border: 1px solid var(--ds-ink) !important;
+                outline: 0px solid var(--ds-ink) !important;
                 outline-offset: -1px;
             }
         }
@@ -164,8 +164,8 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 display: flex;
                 input {
-                    // border: 1px solid var(--blu)!important;
-                    outline: 0px solid var(--blu)!important;
+                    // border: 1px solid var(--ds-ink)!important;
+                    outline: 0px solid var(--ds-ink)!important;
                     outline-offset: -1px;
                     // transition: border .3s;
                     &.invalid{

@@ -1,7 +1,7 @@
 :host{
     --backgroundColor: var(--color-white-hex);
-    --textColor: #{var(--blu)};
-    --hoverBackgroundColor: #{var(--blu)};
+    --textColor: #{var(--ds-ink)};
+    --hoverBackgroundColor: #{var(--ds-ink)};
     --hoverTextColor: var(--color-white-hex);
     --buttonFontSize: 0.7em;
     --max-width: #{var(--button-max-width-base)};
@@ -62,7 +62,7 @@
     &:focus,
     &:hover {
         color: var(--hoverTextColor);
-        background:  var(--hoverBackgroundColor);
+        background:  var(--cds-canvas);
         .icon-button-action, .icon-button-action-self {
             svg {
                 fill: var(--hoverTextColor);
@@ -121,8 +121,8 @@
     }
     .control-button {
         cursor: pointer;
-        background: var(--blu-light-02);
-        color: var(--blu);
+        background: var(--border);
+        color: var(--ds-ink);
         transition: color .3s;
         height: 20px;
         width: 20px;
@@ -132,7 +132,7 @@
         justify-content: center;
         em {
             font-size: 1.15em;
-            color: var(--blu);
+            color: var(--ds-ink);
             transition: color .3s;
         }
     }

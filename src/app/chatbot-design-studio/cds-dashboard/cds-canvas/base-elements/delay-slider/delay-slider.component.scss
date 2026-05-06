@@ -1,54 +1,51 @@
-$background-color: var(--blu-light-01);
-$text-color: var(--blu);
-
 .delay {
     align-items: center;
-    background: $background-color;
+    background: var(--ds-bg);
     border-radius: 13px;
     display: inline-flex;
     position: relative;
     height: 26px;
     padding: 0 9px 0 3px;
-    // width: 100px;
     text-align: center;
     transition: width .3s ease-in;
     font-size: var(--font-size-base);
 
-    &:hover{
+    &:hover {
         opacity: 0.8;
         cursor: pointer;
     }
-    // margin-top: 30px;
-    .delay-current{
+
+    .delay-current {
         display: contents;
         width: auto;
-        color: $text-color;
+        color: var(--ds-ink, #14140e);
         cursor: pointer;
         font-size: 0.8em;
         font-weight: 400;
         white-space: nowrap;
     }
-    .delay-slider{
+
+    .delay-slider {
         display: inline-block;
-        // opacity: 0;
         visibility: hidden;
         width: 0;
         transition: opacity .2s;
     }
+
     .delay-range {
         display: inline-flex;
-        color: $text-color;
+        color: var(--ds-ink, #14140e);
         font-size: 0.8em;
         font-weight: 600;
     }
+
     &.open {
         width: 100%;
-        .delay-current{
+        .delay-current {
             display: none;
         }
-        .delay-slider{
+        .delay-slider {
             width: 100%;
-            // opacity: 1;
             visibility: visible;
         }
     }
@@ -56,22 +53,18 @@ $text-color: var(--blu);
 
 .delay-button {
     padding-right: 4px;
-    color: $text-color;
+    color: var(--ds-ink, #14140e);
     cursor: pointer;
 }
 
-
-
 .delay-icon {
-    color: $text-color;
+    color: var(--ds-ink, #14140e);
     font-size: 1em;
     font-weight: 700;
     margin-right: 9px;
 }
 
-
-
-/** SLIDER **/ 
+/** SLIDER **/
 .vue-slider {
     margin: 0 5px;
     position: relative;
@@ -87,20 +80,18 @@ mat-slider {
     top: -14px;
 }
 
-.vue-slider ::ng-deep{
+.vue-slider ::ng-deep {
     .mat-accent .mat-slider-track-fill {
-        background-color: $text-color !important;
+        background-color: var(--ds-ink, #14140e) !important;
     }
     .mat-slider-thumb-label {
-        background-color: $text-color !important;
-        
+        background-color: var(--ds-ink, #14140e) !important;
     }
-    .mat-slider-thumb-label-text{
-        color: $background-color !important;
-        font-size: 8px!important;
+    .mat-slider-thumb-label-text {
+        color: var(--ds-border, #e8e6e0) !important;
+        font-size: 8px !important;
     }
     .mat-slider-thumb {
-        background-color: $text-color !important;
+        background-color: var(--ds-ink, #14140e) !important;
     }
-
 }

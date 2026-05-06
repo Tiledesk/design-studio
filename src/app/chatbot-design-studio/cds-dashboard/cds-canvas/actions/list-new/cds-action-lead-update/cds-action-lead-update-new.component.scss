@@ -1,6 +1,6 @@
 :host{
-    --icon-color: #{var(--blu)};
-    --textColor: #{var(--blu)};
+    --icon-color: #{var(--ds-ink)};
+    --textColor: #{var(--ds-ink)};
     --backGroundColor: #{var(--ds-canvas, #f7f6f3)};
     --hoverBackgroundColor: #{var(--blu-light-03)};
 
@@ -133,7 +133,7 @@
         }
 
         &:hover {
-            background-color: var(--hoverBackgroundColor);
+            background-color: var(--cds-canvas);
         }
     }
 }

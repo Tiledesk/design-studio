@@ -123,9 +123,9 @@
 .tools-select-btn {
     padding: 6px 10px;
     font-size: 12px;
-    background: var(--blu) !important;
+    background: var(--ds-ink) !important;
     color: #fff !important;
-    border-color: var(--blu) !important;
+    border-color: var(--ds-ink) !important;
 
     &:hover:enabled {
         opacity: 0.9;
@@ -205,7 +205,7 @@
         border-radius: 4px;
 
         &:hover {
-            background: var(--blu);
+            background: var(--ds-ink);
         }
     }
 

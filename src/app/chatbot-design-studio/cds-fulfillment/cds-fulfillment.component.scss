@@ -21,7 +21,7 @@
 }
 
 .title {
-    color: var(--blu) !important;
+    color: var(--ds-ink) !important;
 }
 
 .fulfillment-description {
@@ -48,7 +48,7 @@
         color: var(--gray);
 
         &.active{
-            color: var(--blu)
+            color: var(--ds-ink)
         }
     }
 }
@@ -96,11 +96,11 @@
     transition: all 0.3s ease-in 0s;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: var(--blu);
+    border-color: var(--ds-ink);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
     right: 0px;

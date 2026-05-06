@@ -1,7 +1,7 @@
 :host {
-    --background-color: #{var(--blu-light-01)};
-    --text-color: #{var(--blu)};
-    --icon-color: #{var(--blu-light-02)};
+    --background-color: #{var(--ds-bg)};
+    --text-color: #{var(--ds-ink)};
+    --icon-color: #{var(--border)};
 }
 
 .content-panel-intent-detail {

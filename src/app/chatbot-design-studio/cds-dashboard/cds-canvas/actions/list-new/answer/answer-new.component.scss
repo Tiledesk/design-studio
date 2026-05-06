@@ -46,8 +46,8 @@ mat-form-field.mat-focused ::ng-deep {
         .mat-form-field-flex {
             .mat-form-field-infix {
                 textarea {
-                    border: 1px solid var(--blu) !important;
-                    outline: 1px solid var(--blu) !important;
+                    border: 1px solid var(--ds-ink) !important;
+                    outline: 1px solid var(--ds-ink) !important;
                     transition: border .3s;
                 }
             }

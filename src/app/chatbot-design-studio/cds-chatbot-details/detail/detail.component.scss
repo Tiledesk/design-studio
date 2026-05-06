@@ -12,7 +12,7 @@ input[type="text"] {
     -moz-box-sizing: border-box;
     border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
+    border: solid 1px var(--border);
 }
 textarea[type="text"] {
     // min-width: 307px !important;
@@ -31,7 +31,7 @@ textarea[type="text"] {
     -moz-box-sizing: border-box;
     border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
+    border: solid 1px var(--border);
 }
 
 input[type="text"]:disabled {
@@ -135,11 +135,11 @@ input[type="file"] {
 }
 
 .custom-file-upload {
-    border: 1px solid var(--blu);
+    border: 1px solid var(--ds-ink);
     display: inline-block;
     padding: 11px 12px;
     cursor: pointer;
-    background: var(--blu) !important;
+    background: var(--ds-ink) !important;
     color: var(--color-white-hex);
     border-radius: var(--button-border-radius-base);
     border-top-right-radius: 0;
@@ -293,11 +293,11 @@ input[type="file"] {
     transition: all 0.3s ease-in 0s;
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label {
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label,
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
-    border-color: var(--blu);
+    border-color: var(--ds-ink);
 }
 .nw-onoffswitch-checkbox:checked + .nw-onoffswitch-label:before {
     right: 0px;

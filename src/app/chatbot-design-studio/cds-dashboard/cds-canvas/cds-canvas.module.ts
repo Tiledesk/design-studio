@@ -44,6 +44,8 @@ import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-n
 import { NoteControlsComponent } from './cds-notes/note-controls/note-controls.component';
 import { CdsPanelDetailComponent } from './cds-panel-detail/cds-panel-detail.component';
 import { NoteResizeStateService } from './note-resize-state.service';
+import { CdsActionReplyNewComponent } from './actions/list-new/cds-action-reply/cds-action-reply-v1/cds-action-reply-new.component';
+import { CdsActionReplyToolsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools-new.component';
 
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
@@ -110,6 +112,10 @@ const routes: Routes = [
     CdsActionControlsComponent,
     CdsActionArrowComponent,
     CdsAddActionMenuComponent,
+
+    //ACTIONS NEW (V3)
+    CdsActionReplyNewComponent,
+    CdsActionReplyToolsNewComponent,
 
     //MODALS
     MouseTipsComponent,

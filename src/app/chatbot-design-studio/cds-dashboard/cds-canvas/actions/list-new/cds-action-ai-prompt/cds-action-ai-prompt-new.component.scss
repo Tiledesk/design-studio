@@ -2,9 +2,9 @@
 
 
 :host {
-    --background-color: #{var(--blu-light-01)};
+    --background-color: #{var(--ds-bg)};
     --slider-background-color: #{var(--blu-light-03)};
-    --text-color: #{var(--blu)};
+    --text-color: #{var(--ds-ink)};
 }
 
 ::-webkit-scrollbar {
@@ -12,7 +12,7 @@
 }
 
 .custom-divider {
-    border-top: 1px solid var(--blu);
+    border-top: 1px solid var(--ds-ink);
 }
 
 
@@ -72,7 +72,7 @@ div {
         height: fit-content;
         padding: 0px 6px;
         max-width: calc(100% - 25px);
-        background-color: var(--blu);
+        background-color: var(--ds-ink);
         color: var(--color-white-hex);
         flex-wrap: nowrap;
         text-align: end;
@@ -178,7 +178,7 @@ mat-expansion-panel ::ng-deep {
         }
         .preview-badge {
             color: #fff;
-            background-color: var(--blu);
+            background-color: var(--ds-ink);
             display: inline-block;
             padding: 1px 5px;
             border-radius: 4px;
@@ -388,7 +388,7 @@ mat-checkbox ::ng-deep {
     background-color: var(--color-white-hex);
     padding: 6px 12px;
     font-size: 14px;
-    border: 1px solid var(--blu-light-02);
+    border: 1px solid var(--border);
     color: var(--gray);
 }
 
@@ -410,7 +410,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: var(--blu) ;
+        background-color: var(--ds-ink) ;
     }
 }
 
@@ -496,7 +496,7 @@ loading-spinner.custom-spinner ::ng-deep {
 
 
 .configure-model-button {    
-    color: var(--blu);
+    color: var(--ds-ink);
     text-align: right;
     padding: 0 5px;
     text-decoration: underline;
@@ -636,8 +636,8 @@ cds-select#model-condition.not-configured ::ng-deep {
     
     &:hover {
         background-color: #e8f4ff;
-        border-color: var(--blu);
-        color: var(--blu);
+        border-color: var(--ds-ink);
+        color: var(--ds-ink);
     }
 
     &.selected {

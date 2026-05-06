@@ -405,10 +405,10 @@ cds-panel-intent-header {
   padding: 10px;
   background: conic-gradient(
     from var(--outline-angle),
-    var(--blu) 60%,
+    var(--ds-ink) 60%,
     rgba(255, 255, 255, 0.5) 90%,
     transparent 10%,
-    var(--blu) 80%
+    var(--ds-ink) 80%
   );
   animation: outline-spin 3s linear infinite;
 }

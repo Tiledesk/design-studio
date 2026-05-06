@@ -1,10 +1,10 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
 
-$text-color: var(--blu);
+$text-color: var(--ds-ink);
 $icon-color: var(--gray-light-01);
-$text-hover-color: var(--blu);
-$icon-hover-color: var(--blu);
+$text-hover-color: var(--ds-ink);
+$icon-hover-color: var(--ds-ink);
 $base-padding: 6px;
 
 :host{
@@ -230,7 +230,7 @@ $base-padding: 6px;
     min-width: 100px;
     max-width: 400px;
     width: 270px;
-    color: var(--blu);
+    color: var(--ds-ink);
     font-size: 15px;
     line-height: 18px;
     list-style: none;
@@ -342,7 +342,7 @@ $base-padding: 6px;
             font-size: 12px;
             font-weight: 400;
             background: white;
-            color: var(--blu);
+            color: var(--ds-ink);
             border-radius: 8px;
             div{
                 line-height: normal;

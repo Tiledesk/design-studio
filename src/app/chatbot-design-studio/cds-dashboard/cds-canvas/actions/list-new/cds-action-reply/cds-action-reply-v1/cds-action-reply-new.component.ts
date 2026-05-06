@@ -9,7 +9,8 @@ import {
   TYPE_MESSAGE,
   TYPE_BUTTON,
   TYPE_URL,
-  generateShortUID
+  generateShortUID,
+  TYPE_RESPONSE
 } from '../../../../../../utils';
 import { ControllerService } from '../../../../../../services/controller.service';
 import { IntentService } from '../../../../../../services/intent.service';
@@ -24,36 +25,39 @@ import { TYPE_ACTION, ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-a
   styleUrls: ['./cds-action-reply-new.component.scss']
 })
 export class CdsActionReplyNewComponent implements OnInit, OnChanges {
-  // ============ Inputs & Outputs ============
-  @Input() action: ActionReply;
-  @Input() intentSelected: Intent;
-  @Input() connector: any;
-  @Input() previewMode: boolean = true;
 
-  @Output() updateAndSaveAction = new EventEmitter<ActionReply>();
-  @Output() onConnectorChange = new EventEmitter<{ type: 'create' | 'delete'; fromId: string; toId: string }>();
 
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
+  translateY: string;
 
-  // ============ State ============
-  arrayResponses: Command[] = [];
-  typeAction: string;
+  @Input() action: ActionReply;
+  @Input() intentSelected: Intent;
+  @Input() previewMode: boolean = true
+  @Output() updateAndSaveAction = new EventEmitter();
+  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
+
   idAction: string;
   openCardButton: boolean = false;
-  textGrabbing: boolean = false;
-  intentName: string = '';
-  intentNameResult: boolean = true;
+  typeCommand = TYPE_COMMAND;
+  typeResponse = TYPE_RESPONSE;
+  typeMessage = TYPE_MESSAGE;
+  typeActions = TYPE_ACTION;
+  actionList = ACTIONS_LIST;
 
-  // ============ Constants (Type Enums) ============
-  readonly typeCommand = TYPE_COMMAND;
-  readonly typeMessage = TYPE_MESSAGE;
-  readonly typeActions = TYPE_ACTION;
-  readonly actionList = ACTIONS_LIST;
+  intentName: string;
+  intentNameResult: boolean;
+  textGrabbing: boolean;
+  arrayResponses: Array<Command>;
+  typeAction: string;
 
-  // ============ View Model ============
   element: any;
+  showTip: boolean = true;
+  descriptionTooltip: string = "";
+  dataInput: string;
+  tipText: string;
+  titlePlaceholder: string;
 
-  // ============ Services ============
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -61,294 +65,258 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
     private readonly controllerService: ControllerService,
     private readonly connectorService: ConnectorService,
     private readonly changeDetectorRef: ChangeDetectorRef
-  ) {}
+  ) { }
 
-  // ============ Lifecycle Hooks ============
+  // manageTooltip(){}
+  // onChangeText(event){}
+  // addElement(event){}
 
+
+  // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    console.log('[CdsActionReplyNew] ngOnInit called');
-    console.log('[CdsActionReplyNew] this.action:', this.action);
-    console.log('[CdsActionReplyNew] this.intentSelected:', this.intentSelected);
-
-    this.logger.log('CdsActionReplyNewComponent ngOnInit', this.action, this.intentSelected);
-
-    if (!this.action) {
-      console.warn('[CdsActionReplyNew] Action is undefined in ngOnInit!');
-      return;
-    }
-
-    this.typeAction = this.action._tdActionType === TYPE_ACTION.RANDOM_REPLY
-      ? TYPE_ACTION.RANDOM_REPLY
-      : TYPE_ACTION.REPLY;
-
+    this.logger.log('ActionReplyComponent ngOnInit', this.action, this.intentSelected);
+    // // this.logger.log('ngOnInit panel-response::: ', this.typeAction);
+    this.typeAction = (this.action._tdActionType === TYPE_ACTION.RANDOM_REPLY ? TYPE_ACTION.RANDOM_REPLY : TYPE_ACTION.REPLY);
     try {
       this.element = Object.values(ACTIONS_LIST).find(item => item.type === this.action._tdActionType);
+      if(this.action._tdActionTitle && this.action._tdActionTitle != ""){
+        this.dataInput = this.action._tdActionTitle;
+      }
+      // this.settings = { no_input: null, timeout: 20 }
+      // if(this.action.noInput){
+      //   this.settings = { no_input: this.action.noInput}
+      // }
+      this.logger.log('ActionDescriptionComponent action:: ', this.element);
     } catch (error) {
-      this.logger.error('Failed to find action element', error);
+      this.logger.log("error ", error);
     }
-
-    if (!this.action._tdActionId) {
-      this.action._tdActionId = generateShortUID();
-    }
-    this.idAction = `${this.intentSelected.intent_id}/${this.action._tdActionId}`;
-
-    if (this.action && this.intentSelected) {
-      this.initialize();
-    }
-
+    this.action._tdActionId = this.action._tdActionId?this.action._tdActionId:generateShortUID();
+    this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
+    // this.initialize();
     this.changeDetectorRef.detectChanges();
   }
 
+
+
+  /**
+   * 
+   * @param changes 
+   * IMPORTANT! serve per aggiornare il dettaglio della action nel pannello
+   */
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.action && this.intentSelected) {
-      this.initialize();
-    }
+    if(this.action && this.intentSelected) this.initialize();
   }
 
-  // ============ Initialization ============
 
-  private initialize(): void {
+
+
+
+
+  // CUSTOM FUNCTIONS //
+  /** */
+  private initialize() {
     this.openCardButton = false;
     this.arrayResponses = [];
     this.intentName = '';
     this.intentNameResult = true;
     this.textGrabbing = false;
-
-    console.log('[CdsActionReplyNew] initialize() called with action:', this.action);
-    console.log('[CdsActionReplyNew] action.attributes:', this.action?.attributes);
-    console.log('[CdsActionReplyNew] action.attributes.commands:', this.action?.attributes?.commands);
-
-    try {
-      this.arrayResponses = this.action?.attributes?.commands ?? [];
-      console.log('[CdsActionReplyNew] arrayResponses set to:', this.arrayResponses);
-    } catch (error) {
-      this.logger.error('Failed to initialize arrayResponses', error);
-      this.arrayResponses = [];
+    if (this.action) {
+      try {
+        this.arrayResponses = this.action.attributes.commands;
+      } catch (error) {
+        this.logger.log('error:::', error);
+      }
     }
-
     this.scrollToBottom();
   }
 
-  private scrollToBottom(): void {
+
+  /** */
+  scrollToBottom(): void {
     setTimeout(() => {
       try {
-        const scrollElement = this.scrollContainer?.nativeElement;
-        if (scrollElement) {
-          scrollElement.scrollTop = scrollElement.scrollHeight;
-        }
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+        this.scrollContainer.nativeElement.animate({ scrollTop: 0 }, '500');
       } catch (error) {
-        this.logger.error('Failed to scroll to bottom', error);
+        this.logger.log('scrollToBottom ERROR: ', error);
       }
     }, 300);
   }
 
-  // ============ Drag & Drop Handlers ============
 
-  onMouseDown(): void {
+  // EVENT FUNCTIONS //
+
+
+  // on drag //
+  /** */
+  mouseDown() {
     this.textGrabbing = true;
   }
 
-  onMouseUp(): void {
+  /** */
+  mouseUp() {
     this.textGrabbing = false;
   }
 
-  async drop(event: CdkDragDrop<string[]>): Promise<void> {
+  /** */
+  async drop(event: CdkDragDrop<string[]>) {
+    // //this.logger.log( 'DROP REPLY ---> ',event, this.arrayResponses);
     this.textGrabbing = false;
-
     try {
-      const currentPos = event.currentIndex * 2 + 1;
-      const previousPos = event.previousIndex * 2 + 1;
-
-      // Swap wait + message pairs
-      const [waitCur, msgCur] = [this.arrayResponses[currentPos - 1], this.arrayResponses[currentPos]];
-      const [waitPre, msgPre] = [this.arrayResponses[previousPos - 1], this.arrayResponses[previousPos]];
-
-      this.arrayResponses[currentPos - 1] = waitPre;
+      let currentPos = event.currentIndex*2+1;
+      let previousPos = event.previousIndex*2+1;
+      const waitCur = this.arrayResponses[currentPos-1];
+      const msgCur = this.arrayResponses[currentPos];
+      const waitPre = this.arrayResponses[previousPos-1];
+      const msgPre = this.arrayResponses[previousPos];
+      this.arrayResponses[currentPos-1] = waitPre;
       this.arrayResponses[currentPos] = msgPre;
-      this.arrayResponses[previousPos - 1] = waitCur;
+      this.arrayResponses[previousPos-1] = waitCur;
       this.arrayResponses[previousPos] = msgCur;
-
+      // // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
       this.connectorService.updateConnector(this.intentSelected.intent_id);
-      await this.onUpdateAndSaveAction(this.action);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.intentSelected};
+      await this.onUpdateAndSaveAction(element);
     } catch (error) {
-      this.logger.error('Drop operation failed', error);
+      this.logger.log('drop ERROR', error);
     }
   }
 
-  // ============ Response Handlers ============
 
-  onMoveUpResponse(index: number): void {
-    if (index < 2) return;
-
+  // on action //
+  /** */
+  onMoveUpResponse(index: number) {
+    if(index<2)return;
     try {
-      this.swapResponsePair(index - 2, index);
+      let from = index - 1;
+      let to = from - 2;
+      this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]); 
+      from = index;
+      to = from - 2;
+      this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
+      // // this.logger.log( 'onMoveUpResponse ---> ', this.arrayResponses);
       this.connectorService.updateConnector(this.intentSelected.intent_id);
-      this.onUpdateAndSaveAction(this.action);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
     } catch (error) {
-      this.logger.error('Failed to move response up', error);
+      this.logger.log('onAddNewResponse ERROR', error);
     }
   }
 
-  onMoveDownResponse(index: number): void {
-    if (index >= this.arrayResponses.length - 1) return;
-
+  /** */
+  onMoveDownResponse(index: number) {
+    if(index === this.arrayResponses.length-1)return;
     try {
-      this.swapResponsePair(index, index + 2);
+      let from = index;
+      let to = from + 2;
+      this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]); 
+      from = index - 1;
+      to = from + 2;
+      this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
+      // this.logger.log( 'onMoveUpResponse ---> ', this.arrayResponses);
       this.connectorService.updateConnector(this.intentSelected.intent_id);
-      this.onUpdateAndSaveAction(this.action);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
     } catch (error) {
-      this.logger.error('Failed to move response down', error);
+      this.logger.log('onAddNewResponse ERROR', error);
     }
   }
 
-  private swapResponsePair(fromIndex: number, toIndex: number): void {
-    this.arrayResponses.splice(toIndex, 0, ...this.arrayResponses.splice(fromIndex, 2));
-  }
 
-  onAddNewActionReply(event: any): void {
-    this.logger.log('Adding new action reply', event);
-
+  /** onAddNewActionReply */
+  onAddNewActionReply(ele) {
+    this.logger.log('onAddNewActionReply: ', ele);
     try {
-      const message = new Message(event.message.type, event.message.text);
-      if (event.message.attributes) {
-        message.attributes = event.message.attributes;
+      let message = new Message(ele.message.type, ele.message.text);
+      if (ele.message.attributes) {
+        message.attributes = ele.message.attributes;
       }
-      if (event.message.metadata) {
-        message.metadata = event.message.metadata;
+      if (ele.message.metadata) {
+        message.metadata = ele.message.metadata;
       }
-
-      const command = new Command(event.type);
+      const wait = new Wait();
+      let command = new Command(ele.type);
       command.message = message;
-
-      this.arrayResponses.push(new Wait());
+      this.arrayResponses.push(wait);
       this.arrayResponses.push(command);
       this.scrollToBottom();
-      this.onUpdateAndSaveAction(this.action);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
     } catch (error) {
-      this.logger.error('Failed to add new action reply', error);
+      this.logger.log('onAddNewResponse ERROR', error);
     }
   }
 
-  onDeleteActionReply(index: number): void {
-    this.logger.log('Deleting action reply at index', index);
 
+  /** onDeleteActionReply */
+  onDeleteActionReply(index: number) {
+    this.logger.log('onDeleteActionReply: ', this.arrayResponses[index]);
+    // !!! cancello tutti i connettori di una action
+    var intentId = this.idAction.substring(0, this.idAction.indexOf('/'));
     try {
-      // Delete all connectors from buttons in this action
-      const intentId = this.idAction.substring(0, this.idAction.indexOf('/'));
-      const buttons = this.arrayResponses[index]?.message?.attributes?.attachment?.buttons;
-
-      if (buttons && Array.isArray(buttons)) {
-        buttons.forEach(button => {
-          if (button.__isConnected) {
-            this.connectorService.deleteConnectorFromAction(intentId, button.__idConnector);
-          }
-        });
-      }
-
-      // Delete the wait + message pair
-      const waitElement = this.arrayResponses[index - 1];
-      if (waitElement?.type === this.typeCommand.WAIT) {
-        this.arrayResponses.splice(index - 1, 2);
-      } else {
-        this.arrayResponses.splice(index, 1);
-      }
-
-      this.onUpdateAndSaveAction(this.action);
+      let buttons = this.arrayResponses[index].message.attributes.attachment.buttons;
+      buttons.forEach(button => {
+        this.logger.log('button: ', button);
+        if(button.__isConnected){
+          this.connectorService.deleteConnectorFromAction(intentId, button.__idConnector);
+          // this.connectorService.deleteConnector(button.__idConnector);
+        }
+      });
     } catch (error) {
-      this.logger.error('Failed to delete action reply', error);
+      this.logger.log('onAddNewResponse ERROR', error);
     }
+    // cancello l'elemento wait precedente 
+    this.logger.log('**** arrayResponses: ', this.arrayResponses, 'index-1: ', (index-1));
+    const wait = this.arrayResponses[index-1];
+    this.logger.log('wait: ', wait);
+    if( wait && wait.type === this.typeCommand.WAIT){
+      this.logger.log('CANCELLO WAIT E MESSAGE');
+      this.arrayResponses.splice(index-1, 2); 
+    } else {
+      this.logger.log('CANCELLO SOLO MESSAGE');
+      this.arrayResponses.splice(index, 1); 
+    }
+    this.logger.log('onDeleteActionReply', this.arrayResponses);
+    const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+    this.onUpdateAndSaveAction(element);
   }
 
-  onChangeActionReply(event: any): void {
-    this.onUpdateAndSaveAction(this.action);
+  /** onChangingReplyAction */
+  onChangeActionReply(event) {
+    const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+    this.logger.log('onChangeActionReply ************', element);
+    this.onUpdateAndSaveAction(element);
   }
 
-  onChangeJsonButtons(event: any, index: number): void {
-    this.logger.log('JSON buttons changed', event, index);
-    this.onChangeActionReply(event);
-  }
+  // on button action //
 
-  // ============ Button Handlers ============
-
-  onCreateNewButton(index: number): void {
-    this.logger.log('Creating new button at index', index);
-
+  /** onCreateNewButton */
+  onCreateNewButton(index){
+    this.logger.log('[cds-action-reply] onCreateNewButton: ', index);
     try {
-      const response = this.arrayResponses[index];
-      if (!response?.message?.attributes || !response.message.attributes.attachment) {
-        response.message.attributes = new MessageAttributes();
-      }
-
-      const newButton = this.createNewButton();
-      if (newButton) {
-        response.message.attributes.attachment.buttons.push(newButton);
-        this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
-        this.onUpdateAndSaveAction(this.action);
+      if(!this.arrayResponses[index].message.attributes || !this.arrayResponses[index].message.attributes.attachment){
+        this.arrayResponses[index].message.attributes = new MessageAttributes();
       }
     } catch (error) {
-      this.logger.error('Failed to create new button', error);
+      this.logger.error('error: ', error);
+    }
+    let buttonSelected = this.createNewButton();
+    if(buttonSelected){
+      this.arrayResponses[index].message.attributes.attachment.buttons.push(buttonSelected);
+      this.logger.log('[cds-action-reply] onCreateNewButton: ', this.action, this.arrayResponses);
+      // this.intentService.setIntentSelected(this.intentSelected.intent_id);
+      this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
     }
   }
 
-  onDeleteButton(event: { buttons: Button[]; index: number }): void {
-    try {
-      const button = event.buttons[event.index];
-      event.buttons.splice(event.index, 1);
-
-      const intentId = this.idAction.substring(0, this.idAction.indexOf('/'));
-      this.connectorService.deleteConnectorFromAction(intentId, button.__idConnector);
-      this.updateAndSaveAction.emit(this.action);
-    } catch (error) {
-      this.logger.error('Failed to delete button', error);
-    }
-  }
-
-  onOpenButtonPanel(buttonSelected: Button): void {
-    this.logger.log('Opening button panel', buttonSelected);
-    this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
-    this.controllerService.openButtonPanel(buttonSelected);
-  }
-
-  onOpenPanelActionDetail(command: Command): void {
-    if (!this.controllerService.isOpenActionDetailPanel$) {
-      this.intentService.setIntentSelected(this.intentSelected.intent_id);
-      this.controllerService.openActionDetailPanel(TYPE_INTENT_ELEMENT.ACTION, this.action);
-    }
-  }
-
-  // ============ Settings Handlers ============
-
-  onChangeIntentName(name: string): void {
-    try {
-      this.intentName = name.replace(/[^A-Z0-9_]+/gi, '');
-    } catch (error) {
-      this.logger.error('Failed to change intent name', error);
-    }
-  }
-
-  onBlurIntentName(): void {
-    this.intentNameResult = true;
-  }
-
-  onDisableInputMessage(): void {
-    try {
-      this.action.attributes.disableInputMessage = !this.action.attributes.disableInputMessage;
-      this.updateAndSaveAction.emit(this.action);
-    } catch (error) {
-      this.logger.error('Failed to toggle disable input message', error);
-    }
-  }
-
-  // ============ Internal Helpers ============
-
-  private createNewButton(): Button | null {
+  private createNewButton() {
     const idButton = generateShortUID();
-
-    if (this.intentSelected?.intent_id) {
-      this.idAction = `${this.intentSelected.intent_id}/${this.action._tdActionId}`;
-      const idActionConnector = `${this.idAction}/${idButton}`;
-
-      return new Button(
+    if(this.intentSelected.intent_id){
+      this.idAction = this.intentSelected.intent_id+'/'+this.action._tdActionId;
+      const idActionConnector = this.idAction+'/'+idButton;
+      let buttonSelected = new Button(
         idButton,
         idActionConnector,
         false,
@@ -360,15 +328,102 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
         '',
         true
       );
+      this.logger.log('[cds-action-reply] createNewButton: ', buttonSelected);
+      return buttonSelected;
     }
-
     return null;
   }
 
-  // ============ Public Event Emitter ============
-
-  async onUpdateAndSaveAction(element: ActionReply): Promise<void> {
-    this.logger.log('Saving action', element);
-    this.updateAndSaveAction.emit(element);
+  /** onDeleteButton */
+  onDeleteButton(event){
+    let button = event.buttons[event.index];
+    event.buttons.splice(event.index, 1);
+    let intentId = this.idAction.substring(0, this.idAction.indexOf('/'));
+    this.connectorService.deleteConnectorFromAction(intentId, button.__idConnector);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
+
+
+  /**  onUpdateAndSaveAction: 
+   * function called by all actions in @output whenever they are modified!
+   * 1 - update connectors
+   * 2 - update intent
+   * */
+  public async onUpdateAndSaveAction(element) {
+    this.logger.log('[cds-action-reply] onUpdateAndSaveAction:::: ', this.action, element);
+    // //this.connectorService.updateConnector(this.intentSelected.intent_id);
+    this.updateAndSaveAction.emit(this.action);
+  }
+
+  // on intent name //
+
+  /** onChangeIntentName */
+  onChangeIntentName(name: string) {
+    name.toString();
+    try {
+      this.intentName = name.replace(/[^A-Z0-9_]+/ig, "");
+    } catch (error) {
+      this.logger.log('name is not a string', error)
+    }
+  }
+
+  /** onBlurIntentName */
+  onBlurIntentName(name: string) {
+    this.intentNameResult = true;
+  }
+
+  /** onDisableInputMessage */
+  onDisableInputMessage() {
+    try {
+      this.action.attributes.disableInputMessage = !this.action.attributes.disableInputMessage;
+      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+    } catch (error) {
+      this.logger.log("Error: ", error);
+    }
+  }
+
+
+  /** appdashboard-button-configuration-panel: onOpenButtonPanel */
+  onOpenButtonPanel(buttonSelected) {
+    this.logger.log('onOpenButtonPanel 2 :: ', buttonSelected);
+    // this.intentService.setIntentSelected(this.intentSelected.intent_id);
+    this.intentService.selectAction(this.intentSelected.intent_id, this.action._tdActionId);
+    this.controllerService.openButtonPanel(buttonSelected);
+  }
+
+  onOpenPanelActionDetail(event){
+    this.logger.log('onOpenPanelActionDetail :: ',this.controllerService.isOpenActionDetailPanel$, event, this.action);
+    if(!this.controllerService.isOpenActionDetailPanel$){
+      this.intentService.setIntentSelected(this.intentSelected.intent_id);
+      this.controllerService.openActionDetailPanel(TYPE_INTENT_ELEMENT.ACTION, this.action);
+    }
+  }
+
+
+
+  /** appdashboard-button-configuration-panel: Save button */
+  onSaveButton(button) {
+    // this.logger.log('onSaveButton :: ', button, this.response);
+    // this.generateCommandsWithWaitOfElements();
+  }
+
+ 
+
+  /** appdashboard-button-configuration-panel: Close button panel */
+  onCloseButtonPanel() {
+    this.logger.log('onCloseButtonPanel :: ');
+    this.openCardButton = false;
+  }
+
+  onFocusOutEvent(event) {
+    // this.logger.log('onFocusOutEvent ::::::: ', event);
+    // this.onCloseButtonPanel()
+  }
+
+  onChangeJsonButtons(event: any, i: number){
+    this.logger.log('[cds-action-reply] onChangeJsonButtons ::::::: ', event, i);
+    // // this.arrayResponses[i].message = event;
+    this.onChangeActionReply(event);
+  }
+  
 }

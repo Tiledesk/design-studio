@@ -1,29 +1,35 @@
-@import "./src/assets/sass/cds/_variables.scss";
-
 .add-responses {
-    // grid-gap: 5px;
-    // display: grid;+
     display: flex;
-    float: right;
-    .add-response { 
-        text-align: center;
-        cursor: pointer;
-        box-sizing: border-box;
-        outline: none;
-        margin: 0;
-        padding: 3px 6px;
-        display: flex;
-        
-        &:not(:first-child){
-            border-left: 1px solid white;
-        }
-        
-        img{
-            width: 16px;
-            &:hover{
-                filter: brightness(0) saturate(100%) invert(83%) sepia(87%) saturate(3891%) hue-rotate(177deg) brightness(92%) contrast(89%);
-            }
-        }
-       
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border, #e8e6e0);
+}
+
+.add-response {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+
+    &:hover {
+        background: var(--border, #e8e6e0);
+    }
+
+    img {
+        width: 16px;
+        height: 16px;
+        display: block;
+        filter: brightness(0) saturate(100%) invert(40%);
+        transition: filter 0.12s;
+    }
+
+    &:hover img {
+        filter: brightness(0) saturate(100%) invert(15%);
     }
 }

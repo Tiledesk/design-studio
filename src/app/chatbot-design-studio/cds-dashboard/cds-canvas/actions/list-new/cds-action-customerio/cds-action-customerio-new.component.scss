@@ -3,9 +3,9 @@
     width: 0px;
 }
 :host {
-    --background-color: #{var(--blu-light-01)};
+    --background-color: #{var(--ds-bg)};
     //--slider-background-color: #{$blu-light-03};
-    --text-color: #{var(--blu)};
+    --text-color: #{var(--ds-ink)};
 }
 
 /** button TOOGLE */
@@ -17,12 +17,12 @@ mat-button-toggle-group ::ng-deep{
 mat-button-toggle{
     background-color: transparent;
     border: none;
-    color: var(--blu-light-02);
+    color: var(--border);
     border-bottom: 2px solid transparent;
 
     &.mat-button-toggle-checked{
-        border-color: var(--blu);
-        color: var(--blu);
+        border-color: var(--ds-ink);
+        color: var(--ds-ink);
         font-weight: 400;
 
     }

@@ -1,7 +1,7 @@
 :host {
-    --background-color: #{var(--blu-light-01)};
+    --background-color: #{var(--ds-bg)};
     --column-color: var(--blu-02);
-    --text-color: var(--blu);
+    --text-color: var(--ds-ink);
 
     --content-background: rgb(244, 246, 251, 0.4);
     --base-radius: 8px
@@ -29,7 +29,7 @@
 
 .material-icons,
 .material-icons-outlined{
-    color: var(--blu-light-02);
+    color: var(--border);
     font-size: 18px;
 
     &:hover.delete{
@@ -76,7 +76,7 @@
             }
             .material-icons,
             .material-icons-outlined {
-                color: var(--blu);
+                color: var(--ds-ink);
             }
         }
     }
@@ -147,12 +147,12 @@
     justify-content: center;
     .material-icons{
         margin-right: 15px;
-        color: var(--blu);
+        color: var(--ds-ink);
         font-size: 24px;
         font-weight: 500;
     }
     div {
-        color: var(--blu);
+        color: var(--ds-ink);
         font-size: 16px;
         font-weight: 600;
         line-height: 20px;

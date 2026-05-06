@@ -1,5 +1,5 @@
-$background-color: var(--blu-light-01);
-$text-color: var(--blu);
+$background-color: var(--ds-bg);
+$text-color: var(--ds-ink);
 
 .delay {
     align-items: center;
@@ -38,7 +38,7 @@ $text-color: var(--blu);
         text-align: right;
         display: block;
         max-width: 26px;
-        background: var(--blu-light-01);
+        background: var(--ds-bg);
     }
 
 

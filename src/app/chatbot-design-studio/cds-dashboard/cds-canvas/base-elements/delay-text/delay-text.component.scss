@@ -1,5 +1,5 @@
-$background-color: var(--blu-light-01);
-$text-color: var(--blu);
+$background-color: var(--ds-bg);
+$text-color: var(--ds-ink);
 
 .delay {
     align-items: center;
@@ -134,8 +134,8 @@ mat-form-field.mat-form-field ::ng-deep {
         border-top: 0px !important;
         input{
             &:hover{
-                // border: 1px solid var(--blu) !important;
-                outline: 0px solid var(--blu) !important;
+                // border: 1px solid var(--ds-ink) !important;
+                outline: 0px solid var(--ds-ink) !important;
                 outline-offset: -1px;
             }
         }
@@ -148,8 +148,8 @@ mat-form-field.mat-focused ::ng-deep {
             .mat-form-field-infix {
                 display: flex;
                 input {
-                    // border: 1px solid var(--blu)!important;
-                    outline: 0px solid var(--blu)!important;
+                    // border: 1px solid var(--ds-ink)!important;
+                    outline: 0px solid var(--ds-ink)!important;
                     outline-offset: -1px;
                     // transition: border .3s;
                     &.invalid{

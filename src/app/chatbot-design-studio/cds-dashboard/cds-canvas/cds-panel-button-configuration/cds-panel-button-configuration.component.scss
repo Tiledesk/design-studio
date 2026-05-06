@@ -69,13 +69,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--blu);
+            color: var(--ds-ink);
             transition: background-color 0.3s ease 0s;
         }
         &:hover{
             span.material-icons,
             span.material-icons-outlined{
-                background-color: var(--blu);
+                background-color: var(--ds-ink);
                 color: var(--ds-canvas, #f7f6f3);
             }
         }
@@ -96,7 +96,7 @@
         border-radius: 4px;
         // margin-right: 6px;
         // align-self: start;
-        color: var(--blu);
+        color: var(--ds-ink);
         background: none;
 
         display: flex;
@@ -112,7 +112,7 @@
         font-size: 14px;
         font-weight: 500;
         margin: 0;
-        color: var(--blu);
+        color: var(--ds-ink);
     }
 }
 

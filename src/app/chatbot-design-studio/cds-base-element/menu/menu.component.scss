@@ -1,8 +1,8 @@
 :host {
-    --text-color: #{var(--blu)};
+    --text-color: #{var(--ds-ink)};
     --icon-color-menu: #{var(--gray-light-01)};
-    --text-hover-color: #{var(--blu)};
-    --icon-hover-color: #{var(--blu)};
+    --text-hover-color: #{var(--ds-ink)};
+    --icon-hover-color: #{var(--ds-ink)};
     --base-padding: 6px;
 }
 
@@ -85,7 +85,7 @@
 .custom-divider {
     margin-top: 5px;
     margin-bottom: 5px;
-    border-top: 1px solid var(--blu);
+    border-top: 1px solid var(--ds-ink);
 }
 
 .current-user{

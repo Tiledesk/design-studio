@@ -57,7 +57,7 @@ cds-textarea#phone-number-id.is-invalid ::ng-deep {
         padding: 4px;
         border-radius: 50%;
         box-shadow: unset;
-        background-color: var(--blu-light-02);
+        background-color: var(--border);
         color: white;
         cursor: pointer;
     }
@@ -71,7 +71,7 @@ cds-textarea#phone-number-id.is-invalid ::ng-deep {
 
     .add-btn-text {
         cursor: pointer;
-        color: var(--blu-light-02);
+        color: var(--border);
         position: relative;
         width: 130px;
         top: -27px;
@@ -88,7 +88,7 @@ cds-textarea#phone-number-id.is-invalid ::ng-deep {
     //margin-top: -20px;
     //padding: 0 20px;
     display: none;
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
     border-radius: 4px;
     // animation: fadein 1s;
     // animation-delay: 1s;

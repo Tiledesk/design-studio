@@ -13,7 +13,7 @@ input[type="text"] {
     -moz-box-sizing: border-box;
     border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
+    border: solid 1px var(--border);
     color:#808080;
 }
 textarea[type="text"] {
@@ -33,7 +33,7 @@ textarea[type="text"] {
     -moz-box-sizing: border-box;
     border-radius: var(--input-border-radius-base);
     background-color: var(--color-white-hex);
-    border: solid 1px var(--blu-light-02);
+    border: solid 1px var(--border);
     color:#808080;
 }
 
@@ -75,6 +75,6 @@ input[type="text"]:disabled::placeholder {
 
 
 .cds--custom-label {
-    color: var(--blu);
+    color: var(--ds-ink);
     margin-bottom: 2px;
 }

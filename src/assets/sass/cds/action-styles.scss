@@ -44,12 +44,12 @@
         font-weight: 400;
         border-radius: 13px;
         transition: all 0.3s ease 0s;
-        background: var(--blu);
-        color: var(--blu-light-01);
+        background: var(--ds-bg);
+        color: var(--ds-link);
     
         span.material-icons-outlined{
             font-size: 20px;
-            color: var(--color-white-hex);
+            color: var(--ds-link);
         }
     
         &:hover{
@@ -132,8 +132,8 @@ appdashboard-filter{
     }
     &.json-shown {
         .button-json {
-            border: 1px solid var(--blu);
-            color: var(--blu);
+            border: 1px solid var(--ds-ink);
+            color: var(--ds-ink);
         }
     }
     .more-info {
@@ -155,18 +155,18 @@ appdashboard-filter{
         top: 0;
         .control-button {
             cursor: pointer;
-            color: var(--blu);
+            color: var(--ds-ink);
             transition: color 0.3s;
             height: 24px;
             width: 24px;
-            background: var(--blu-light-02);
+            background: var(--border);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             em {
                 font-size: 16px;
-                color: var(--blu);
+                color: var(--ds-ink);
                 transition: color 0.3s;
             }
         }
@@ -191,9 +191,9 @@ appdashboard-filter{
     user-select: none;
     box-sizing: border-box;
     outline: none;
-    border: 1px dashed var(--blu-light-02);
+    border: 1px dashed var(--border);
     border-radius: var(--button-border-radius-base);
-    color: var(--blu-light-02);
+    color: var(--border);
     cursor: pointer;
     font-size: 0.7em;
     font-weight: 400;
@@ -219,20 +219,20 @@ appdashboard-filter{
         &.delete{
             height: 24px;
             width: 24px;
-            background: var(--blu-light-02);
+            background: var(--border);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             em {
                 font-size: 1.15em;
-                color: var(--blu);
+                color: var(--ds-ink);
                 transition: color .3s;
             }
         }
     }
     .control-button:hover{
-        color: var(--blu-light-02);
+        color: var(--border);
         &.delete{
             box-shadow: 0 2px 6px 0 rgb(255 255 255 / 15%);
             em {
@@ -360,7 +360,7 @@ appdashboard-filter{
     height: fit-content;
     padding: 2px;
     max-width: calc(100% - 25px);
-    background-color: var(--blu);
+    background-color: var(--ds-ink);
     color: var(--color-white-hex);
     display: inline-flex;
     align-items: center;

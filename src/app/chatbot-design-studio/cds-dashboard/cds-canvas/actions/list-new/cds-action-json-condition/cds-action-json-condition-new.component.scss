@@ -1,6 +1,6 @@
 :host{
-    --icon-color: #{var(--blu)};
-    --textColor: #{var(--blu)};
+    --icon-color: #{var(--ds-ink)};
+    --textColor: #{var(--ds-ink)};
     --backGroundColor: #{var(--blu-light-03)};
     --hoverBackgroundColor: #{var(--blu-light-03)};
 
@@ -164,7 +164,7 @@ cds-select.operator ::ng-deep{
         }
 
         &:hover {
-            background-color: var(--hoverBackgroundColor);
+            background-color: var(--cds-canvas);
         }
     }
 }
@@ -183,15 +183,15 @@ cds-select.operator ::ng-deep{
 }
   
 ::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
-    border-color: var(--blu) !important;
+    border-color: var(--ds-ink) !important;
 }
   
 // overwrite the checkbox background
 ::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
 .mat-checkbox-indeterminate .mat-checkbox-background {
-    background-color: var(--blu) !important;
+    background-color: var(--ds-ink) !important;
     .mat-checkbox-checkmark {
-        background: var(--blu) !important;;
+        background: var(--ds-ink) !important;;
         .mat-checkbox-checkmark-path {
         stroke: white;
         stroke-width: 5px;

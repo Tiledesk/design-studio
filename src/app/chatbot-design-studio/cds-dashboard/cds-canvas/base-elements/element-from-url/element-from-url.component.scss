@@ -42,7 +42,7 @@
 }
 
 .response-frame-panel {
-    // border: 2px dashed var(--blu-light-02);
+    // border: 2px dashed var(--border);
     border-radius: 6px;
     display: flex;
     justify-content: center;
@@ -55,7 +55,7 @@
     display: flex;
     width: auto;
     border-radius: 6px;
-    background-color: var(--blu-light-01);
+    background-color: var(--ds-bg);
     height: calc(100vh - 450px);
     min-height: 200px;
     max-height: 400px;
@@ -69,7 +69,7 @@
             right: 0px;
             margin-right: 0px;
             opacity: 0;
-            color: var(--blu);
+            color: var(--ds-ink);
             cursor: pointer;
             transition: all .3s ease-in-out;
         }

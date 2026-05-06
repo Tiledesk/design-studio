@@ -14,8 +14,8 @@
         flex-wrap: nowrap;
         align-items: end;
         .button-reply-add{
-            color: var(--blu-light-02);
-            border-color: var(--blu-light-02);
+            color: var(--border);
+            border-color: var(--border);
             margin: 0 15px;
         }
     }
@@ -31,12 +31,12 @@
     margin: -20px 50px 0px 0px;
     float: right;
     .num-chars {
-        background: var(--blu-light-01);
+        background: var(--ds-bg);
         flex-shrink: 0;
         padding: 0px 8px;
         border-radius: 10px;
         font-size: 0.8em;
-        color: var(--blu);
+        color: var(--ds-ink);
         float: right;
         line-height: 24px;
         font-weight: 700;

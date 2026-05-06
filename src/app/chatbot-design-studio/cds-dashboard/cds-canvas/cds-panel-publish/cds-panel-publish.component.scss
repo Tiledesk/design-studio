@@ -2,9 +2,9 @@
 
 
 :host {
-  --background-color: #{var(--blu-light-01)};
+  --background-color: #{var(--ds-bg)};
   --slider-background-color: #{var(--blu-light-03)};
-  --text-color: #{var(--blu)};
+  --text-color: #{var(--ds-ink)};
   --panel-width: 480px;
 }
 
@@ -52,15 +52,15 @@
 //         top: 0px;
 
 //         span.rocket {
-//             color: var(--blu);
+//             color: var(--ds-ink);
 //         }
 
 //         span.undo {
-//             color: var(--blu);
+//             color: var(--ds-ink);
 //         }
 
 //         span.webhook {
-//             color: var(--blu);
+//             color: var(--ds-ink);
 //         }
 //     }
 
@@ -115,7 +115,7 @@
 //   .ng-select-container {
 //     height: 37px;
 //     border-radius: 9999px 0px 0px 9999px;
-//     border: 1px solid var(--blu-light-02) !important;
+//     border: 1px solid var(--border) !important;
 //     border-right: unset !important;
 //   }
 // }
@@ -130,7 +130,7 @@ ng-select.departments ::ng-deep {
   .ng-select-container {
     height: 37px;
     border-radius: 9999px 0px 0px 9999px !important;
-    border: 1px solid var(--blu-light-02) !important;
+    border: 1px solid var(--border) !important;
     border-right: unset !important;
   }
 }
@@ -370,7 +370,7 @@ ng-select.departments ::ng-deep {
 }
 
 .publish-success-content {
-  color: var(--blu);
+  color: var(--ds-ink);
   padding: 10px;
   border: 1px solid var(--gray-light-01);
   border-radius: 12px;
@@ -525,7 +525,7 @@ mat-expansion-panel ::ng-deep {
 
 .webhook-input {
   border: 1px solid var(--blu-light-03);
-  color: var(--blu);
+  color: var(--ds-ink);
   border-radius: 6px 0px 0px 6px;
   width: 100%;
 }

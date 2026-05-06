@@ -2,9 +2,9 @@
 
 
 :host {
-    --background-color: #{var(--blu-light-01)};
+    --background-color: #{var(--ds-bg)};
     --slider-background-color: #{var(--blu-light-03)};
-    --text-color: #{var(--blu)};
+    --text-color: #{var(--ds-ink)};
 }
 
 ::-webkit-scrollbar {
@@ -12,7 +12,7 @@
 }
 
 .custom-divider {
-    border-top: 1px solid var(--blu);
+    border-top: 1px solid var(--ds-ink);
 }
 
 
@@ -71,7 +71,7 @@ div {
         height: fit-content;
         padding: 0px 6px;
         max-width: calc(100% - 25px);
-        background-color: var(--blu);
+        background-color: var(--ds-ink);
         color: var(--color-white-hex);
         flex-wrap: nowrap;
         text-align: end;
@@ -204,7 +204,7 @@ mat-expansion-panel ::ng-deep {
         }
         .preview-badge {
             color: #fff;
-            background-color: var(--blu);
+            background-color: var(--ds-ink);
             display: inline-block;
             padding: 1px 5px;
             border-radius: 4px;
@@ -386,7 +386,7 @@ mat-checkbox ::ng-deep {
     background-color: var(--color-white-hex);
     padding: 6px 12px;
     font-size: 14px;
-    border: 1px solid var(--blu-light-02);
+    border: 1px solid var(--border);
     color: var(--gray);
 }
 
@@ -408,7 +408,7 @@ loading-spinner.custom-spinner ::ng-deep {
     }
 
     .sk-fading-circle .sk-circle:before {
-        background-color: var(--blu) ;
+        background-color: var(--ds-ink) ;
     }
 }
 
@@ -504,11 +504,11 @@ loading-spinner.custom-spinner ::ng-deep {
 .condition-number {
     font-size: 14px;
     font-weight: 600;
-    color: var(--blu);
+    color: var(--ds-ink);
 }
 
 // .condition-number2 {
-//     background-color: var(--blu);
+//     background-color: var(--ds-ink);
 //     color: white;
 //     padding: 4px 12px;
 //     border-radius: 16px;
@@ -530,9 +530,9 @@ loading-spinner.custom-spinner ::ng-deep {
     user-select: none;
     box-sizing: border-box;
     outline: none;
-    border: 1px dashed var(--blu-light-02);
+    border: 1px dashed var(--border);
     border-radius: var(--button-border-radius-base);
-    color: var(--blu-light-02);
+    color: var(--border);
     cursor: pointer;
     font-size: 0.7em;
     font-weight: 400;
@@ -547,9 +547,9 @@ loading-spinner.custom-spinner ::ng-deep {
     text-transform: none;
     box-shadow:none;
     &:hover {
-        border-color: var(--blu-light-02);
+        border-color: var(--border);
         color: var(--color-white-hex);
-        background-color: var(--blu);
+        background-color: var(--ds-ink);
     }
 
     .material-icons {
@@ -576,7 +576,7 @@ loading-spinner.custom-spinner ::ng-deep {
     .prompt-label {
         font-size: 11px;
         font-weight: 600;
-        color: var(--blu);
+        color: var(--ds-ink);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
