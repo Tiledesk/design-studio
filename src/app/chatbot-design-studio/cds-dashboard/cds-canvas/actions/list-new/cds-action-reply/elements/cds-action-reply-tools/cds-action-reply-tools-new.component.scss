@@ -1,27 +1,37 @@
-.add-responses {
+.insp-toolbar {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 2px;
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--border, #e8e6e0);
+    gap: 4px;
+    padding: 10px 14px;
+    background: var(--ds-surface, #ffffff);
+    overflow-x: auto;
 }
 
-.add-response {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
+.tool-btn {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm, 6px);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ds-ink-2, #3a3935);
     cursor: pointer;
-    transition: background 0.12s;
+    flex-shrink: 0;
+    transition: background 0.12s, color 0.12s;
+    padding: 0;
 
     &:hover {
-        background: var(--border, #e8e6e0);
+        background: var(--ds-canvas, #f7f6f3);
+        color: var(--ds-ink, #14140e);
     }
 
-    img {
+    &.active {
+        background: var(--ds-canvas, #f7f6f3);
+        color: var(--ds-ink, #14140e);
+    }
+
+    .i {
         width: 16px;
         height: 16px;
         display: block;
@@ -29,7 +39,7 @@
         transition: filter 0.12s;
     }
 
-    &:hover img {
+    &:hover .i {
         filter: brightness(0) saturate(100%) invert(15%);
     }
 }

@@ -166,16 +166,6 @@ cds-fulfillment {
       
 
       &:hover{
-        &::-webkit-scrollbar {
-          width: 3px;
-        }
-        &::-webkit-scrollbar-track {
-          background-color: var(--scrollbar-track-background);
-        }
-        &::-webkit-scrollbar-thumb {
-          background-color: var(--scrollbar-thumb-background);
-          border-radius: var(--scrollbar-thumb-border-radius);
-        }
       }
 
     }

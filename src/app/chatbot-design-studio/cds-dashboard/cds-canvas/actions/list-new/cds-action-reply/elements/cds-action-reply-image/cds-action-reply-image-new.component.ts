@@ -17,9 +17,6 @@ export class CdsActionReplyImageNewComponent implements OnInit {
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
-  @Output() deleteActionReply = new EventEmitter();
-  @Output() moveUpResponse = new EventEmitter();
-  @Output() moveDownResponse = new EventEmitter();
   @Output() createNewButton = new EventEmitter();
   @Output() deleteButton = new EventEmitter();
   @Output() openButtonPanel = new EventEmitter();
@@ -179,21 +176,6 @@ export class CdsActionReplyImageNewComponent implements OnInit {
   onChangeMetadata(metadata: Metadata){
     this.response.metadata = metadata;
     this.changeActionReply.emit();
-  }
-
-  /** onDeleteActionReply */
-  onDeleteActionReply(){
-    this.deleteActionReply.emit(this.index);
-  }
-
-  /** onMoveUpResponse */
-  onMoveUpResponse(){
-    this.moveUpResponse.emit(this.index);
-  }
-
-  /** onMoveDownResponse */
-  onMoveDownResponse(){
-    this.moveDownResponse.emit(this.index);
   }
 
   /** onChangeTextarea */

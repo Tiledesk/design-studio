@@ -55,10 +55,6 @@ $margin-bottom: 15px;
 
 
 /* customize scrollbar */
-::-webkit-scrollbar {
-    width: 0px;
-}
-
 // .disable-input-message {
 //     position: absolute;
 //     bottom: 10px;
@@ -103,30 +99,11 @@ $margin-bottom: 15px;
     justify-content: flex-start;
 }
 
-.box-dw {
-    // display: flex;
-    margin: 0px 5px;
-    .reply-info{
-        color: var(--ds-ink);
-        padding: 10px;
-        font-size: 14px;
-        text-align: center;
-        border: 1px solid var(--gray-light-01);
-        border-radius: 10px;
-        margin: 10px;
-        background: var(--blu-light-03);
-    }
-}
-
 .cds-action-preview{
     padding: 10px 0px;
 }
 
-.previewMode{
-    &.box-dw{
-        margin: 0px;
-    }
-    #scrollMe{
+.previewMode{    #scrollMe{
         padding: 0;
         margin: 0; 
         display: flex;

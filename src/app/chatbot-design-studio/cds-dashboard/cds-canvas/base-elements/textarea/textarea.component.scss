@@ -20,12 +20,15 @@ mat-form-field.mat-focused ::ng-deep {
             padding: 0px;
             .mat-form-field-infix {
                 textarea {
-                    border: 1px solid var(--ds-ink) ;
-                    // outline: 0px solid var(--ds-ink);
+                    border: 0px solid var(--border);
+                    box-shadow: 0 0 0 3px oklch(0.85 0.05 240 / 0.55);
                     transition: border 0.3s;
+                    color: var(--ink);
+                    font-size: 13px;
+                    line-height: 1.5;
+                    font-weight: 300;
                     &.invalid{
                         border: 1px solid red !important;
-                        // outline: 0px solid red !important;
                         transition: border 0.3s;
                     }
                 }
@@ -39,7 +42,6 @@ mat-form-field.box-textarea ::ng-deep {
         .mat-form-field-flex {
             border-radius: 4px 4px 0 0;
             padding: 0px;
-            // padding: 0 0.75em 0 0.75em;
             margin: 0;
             background-color: transparent !important;
         }
@@ -58,7 +60,6 @@ mat-form-field.box-textarea ::ng-deep {
 /** box-textarea **/
 .box-textarea {
     width: 100%;
-    // margin-left: 20px;
     textarea {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
@@ -66,19 +67,16 @@ mat-form-field.box-textarea ::ng-deep {
         overflow-x: hidden;
         overflow-y: auto;
         color: var(--gray);
-        font-size: 1.15em;
-        line-height: 25px;
+        font-size: 13px;
+        font-weight: 300;
+        line-height: 1.5;
         resize: vertical;
-
-        // width: calc(100% - 2.5em);
         padding: 10px;
         padding-top: 4px;
         padding-bottom: 4px;
         margin: 0px;
-        // resize: none;
         height: 26px;
         min-height: 26px;
-
     }
 }
 
@@ -214,30 +212,5 @@ mat-form-field.box-textarea ::ng-deep {
                 background: var(--blu-light-03);
             }
         }
-    }
-}
-
-
-.liquidjs-menu {
-    position: absolute;
-    display: flex;
-    color: var(--ds-ink);
-    cursor: pointer;
-    font-size: 0.8em;
-    font-weight: 400;
-    white-space: nowrap;
-    margin-top: -11px;
-    justify-content: flex-end;
-    width: 100%;
-    z-index: 2;
-    .liquidjs-button {
-        margin: auto 0;
-        display: inline-flex;
-    }
-    .mat-icon {
-        width: 14px;
-        height: 14px;
-        fill:initial;
-        display: flex;
     }
 }

@@ -132,10 +132,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 6px 8px 16px;
-  border-top: 1px solid var(--ds-border, #ececea);
-  scrollbar-width: thin;
-  scrollbar-color: var(--ds-border, #ececea) transparent;
-}
+  border-top: 1px solid var(--ds-border, #ececea);}
 
 
 // ── Block items (shared between pinned and accordion) ─────────────────────────

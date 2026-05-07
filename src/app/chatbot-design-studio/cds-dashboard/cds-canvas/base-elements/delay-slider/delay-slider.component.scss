@@ -1,24 +1,29 @@
 .delay {
-    align-items: center;
-    background: var(--ds-bg);
-    border-radius: 13px;
     display: inline-flex;
+    align-items: center;
+    gap: 0px;
+    height: 28px;
+    padding: 0 12px 0 2px;
+    border-radius: 999px;
+    border: 1px solid var(--border, #e8e6e0);
+    background: var(--surface, #ffffff);
+    color: var(--ink-2, #3a3935);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
     position: relative;
-    height: 26px;
-    padding: 0 9px 0 3px;
-    text-align: center;
-    transition: width .3s ease-in;
-    font-size: var(--font-size-base);
 
     &:hover {
-        opacity: 0.8;
-        cursor: pointer;
+        background: var(--ds-bg, #fbfbfa);
+        border-color: var(--border-strong, #d8d6d2);
+        color: var(--ink, #14140e);
     }
 
     .delay-current {
         display: contents;
         width: auto;
-        color: var(--ds-ink, #14140e);
+        color: var(--ds-link2, #3a3935);
         cursor: pointer;
         font-size: 0.8em;
         font-weight: 400;
@@ -34,13 +39,14 @@
 
     .delay-range {
         display: inline-flex;
-        color: var(--ds-ink, #14140e);
+        color: var(--ds-link2, #3a3935);
         font-size: 0.8em;
         font-weight: 600;
     }
 
     &.open {
         width: 100%;
+        background: var(--ds-bg, #fbfbfa);
         .delay-current {
             display: none;
         }
@@ -53,12 +59,12 @@
 
 .delay-button {
     padding-right: 4px;
-    color: var(--ds-ink, #14140e);
+    color: var(--ds-link2, #3a3935);
     cursor: pointer;
 }
 
 .delay-icon {
-    color: var(--ds-ink, #14140e);
+    color: var(--ds-link2, #3a3935);
     font-size: 1em;
     font-weight: 700;
     margin-right: 9px;
@@ -70,7 +76,7 @@
     position: relative;
     display: inline-flex;
     padding: 7px 0;
-    width: calc(100% - 80px);
+    width: calc(100% - 55px);
     height: 6px;
 }
 
@@ -78,20 +84,22 @@ mat-slider {
     width: 100%;
     position: absolute;
     top: -14px;
+    z-index: 100;
 }
 
 .vue-slider ::ng-deep {
     .mat-accent .mat-slider-track-fill {
-        background-color: var(--ds-ink, #14140e) !important;
+        background-color: var(--ds-link2, #3a3935) !important;
     }
     .mat-slider-thumb-label {
-        background-color: var(--ds-ink, #14140e) !important;
+        background-color: var(--ds-link2, #3a3935) !important;
+        z-index: 101 !important;
     }
     .mat-slider-thumb-label-text {
         color: var(--ds-border, #e8e6e0) !important;
         font-size: 8px !important;
     }
     .mat-slider-thumb {
-        background-color: var(--ds-ink, #14140e) !important;
+        background-color: var(--ds-link2, #3a3935) !important;
     }
 }

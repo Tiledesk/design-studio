@@ -6,7 +6,8 @@ $padding: 10px;
 $action-description-height: 100px;
 $margin-bottom: 15px;
 
-.cds-action-content-new {
+.cds-action-content-new,
+.cds-action-content {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -59,10 +60,6 @@ $margin-bottom: 15px;
 
 
 /* customize scrollbar */
-::-webkit-scrollbar {
-    width: 0px;
-}
-
 // .disable-input-message {
 //     position: absolute;
 //     bottom: 10px;
@@ -107,9 +104,7 @@ $margin-bottom: 15px;
     justify-content: flex-start;
 }
 
-.box-dw {
-    // display: flex;
-    margin: 0px 5px;
+.box-content {
     .reply-info{
         color: var(--ds-ink);
         padding: 10px;
@@ -127,7 +122,7 @@ $margin-bottom: 15px;
 }
 
 .previewMode{
-    &.box-dw{
+    &.box-content {
         margin: 0px;
     }
     #scrollMe{
@@ -171,8 +166,7 @@ $margin-bottom: 15px;
     min-height: $min-height-content;
     margin-top: 0px;
     overflow: auto;
-    max-height: calc(100vh - 180px);
-    .response {
+    max-height: calc(100vh - 180px);    .response {
         display: block;
         position: relative;
         height: auto;
@@ -558,7 +552,7 @@ cds-action-reply-redirect-new,
 cds-action-reply-gallery-new{
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 
@@ -579,4 +573,14 @@ cds-action-reply-gallery-new.no-controls ::ng-deep{
     .control-button:not(.delete){
         display: none;
     }
+}
+
+.content.reply-scroll-list {
+    min-height: 0;
+    max-height: none;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
 }

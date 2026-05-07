@@ -1,18 +1,11 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-cds-textarea.text-editable-div {
-    display: block;
-    margin-left: 30px;
-    margin-right: 30px;
-}
 
-::ng-deep .box-textarea {
-    textarea {
-        // line-height: 20px!important;
-        font-size: 0.9em!important;
-        // max-height: none!important;
-    }
-} 
+// ::ng-deep .box-textarea {
+//     textarea {
+//         font-size: 0.9em!important;
+//     }
+// } 
 
 
 

@@ -7,10 +7,6 @@
     --text-color: #{var(--ds-ink)};
 }
 
-::-webkit-scrollbar {
-    width: 0px;
-}
-
 .custom-divider {
     border-top: 1px solid var(--ds-ink);
 }

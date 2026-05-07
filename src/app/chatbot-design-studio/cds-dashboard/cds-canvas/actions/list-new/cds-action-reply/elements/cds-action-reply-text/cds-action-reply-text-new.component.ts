@@ -21,9 +21,6 @@ export class CdsActionReplyTextNewComponent implements OnInit {
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
-  @Output() deleteActionReply = new EventEmitter();
-  @Output() moveUpResponse = new EventEmitter();
-  @Output() moveDownResponse = new EventEmitter();
   @Output() createNewButton = new EventEmitter();
   @Output() deleteButton = new EventEmitter();
   @Output() openButtonPanel = new EventEmitter();
@@ -200,21 +197,6 @@ export class CdsActionReplyTextNewComponent implements OnInit {
     // // this.filterConditionExist = expression && expression?.conditions.length > 0?true:false;
     this.filterConditionExist = !!(expression && expression?.conditions.length > 0);
     this.changeActionReply.emit();
-  }
-
-  /** onDeleteActionReply */
-  onDeleteActionReply(){
-    this.deleteActionReply.emit(this.index);
-  }
-
-  /** onMoveUpResponse */
-  onMoveUpResponse(){
-    this.moveUpResponse.emit(this.index);
-  }
-
-  /** onMoveDownResponse */
-  onMoveDownResponse(){
-    this.moveDownResponse.emit(this.index);
   }
 
   /** onChangeTextarea */

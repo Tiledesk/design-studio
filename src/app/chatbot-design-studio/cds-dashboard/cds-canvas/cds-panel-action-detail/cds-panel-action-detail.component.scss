@@ -6,17 +6,16 @@
 
 .panel-intent-detail {
     // position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: var(--panel-width);
     min-width: 400px;
-    height: 100%; //auto
+    height: 100%;
     max-height: 100%;
-    // border-radius: 16px;
     overflow: hidden;
     padding: 0;
     background-color: white;
     border-left: 1px solid var(--gray-light-02);
-    // margin: 0 auto 0 auto; // nk
     inset: 0 0 0 200px;
 
     &.minimize {
@@ -29,6 +28,7 @@
 }
 
 .header-panel {
+    flex-shrink: 0;
     position: sticky;
     top: 0;
     left: 0;
@@ -51,11 +51,34 @@
     }
 }
 
-.content-panel{
-    // height: calc(100% - 73px); // nk
-    // height: calc(100% - 100px); // nk
-    // overflow: hidden; // nk
-    overflow: hidden auto;
+.content-panel {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    // passthrough per i div anonimi (*ngIf, [ngSwitch]) tra content-panel e .panel-response
+    & > div {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+
+        & > div {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
+
+.panel-response {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .panel-form { 

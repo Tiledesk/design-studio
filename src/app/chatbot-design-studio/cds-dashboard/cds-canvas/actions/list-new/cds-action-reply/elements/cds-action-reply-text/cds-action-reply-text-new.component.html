@@ -1,27 +1,11 @@
 <div class="extensions-response" *ngIf="!previewMode" >
-    
-    <div class="text-editor-drop">
-        <em class="material-icons">drag_indicator</em>
-    </div>
 
-    <div class="response-controls">
-        <div class="control-button delete" (click)="$event.stopPropagation();onDeleteActionReply()">
-            <em class="material-icons">delete</em>
-        </div>
-        <div class="control-button" (click)="$event.stopPropagation();onMoveUpResponse()">
-            <em class="material-icons">expand_less</em>
-        </div> 
-        <div class="control-button" (click)="$event.stopPropagation();onMoveDownResponse()">
-            <em class="material-icons">expand_more</em>
-        </div>
-    </div>
-    
     <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
-        <appdashboard-delay-slider
+        <appdashboard-delay-slider-new
             [delayTime]="delayTime"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
-        </appdashboard-delay-slider>
+        </appdashboard-delay-slider-new>
     </div>
     
     <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
@@ -79,14 +63,14 @@ cdkDropList
         <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
             [button]="button"
             [previewMode]="previewMode">
-        </cds-action-reply-button-new>
-        
+        </cds-action-reply-button>
+
         <cds-action-reply-button [class.connected]='button.__isConnected' cdkDragHandle
             (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
             [button]="button"
             [previewMode]="previewMode"
             (onButtonControl)="onButtonControl($event, i)">
-        </cds-action-reply-button-new>    
+        </cds-action-reply-button>    
 
         <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"
@@ -109,4 +93,4 @@ cdkDropList
     *ngIf="!previewMode"
     [jsonBody]="jsonBody"
     (changeJsonButtons)="onChangeJsonButtons($event)">
-</cds-action-reply-jsonbuttons-new>
+</cds-action-reply-jsonbuttons>

@@ -1,5 +1,4 @@
 import { Component, OnInit, OnChanges, Input, ViewChild, ElementRef, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Intent } from 'src/app/models/intent-model';
 import { Wait, Button, Message, Command, ActionReply, MessageAttributes } from 'src/app/models/action-model';
 import {
@@ -46,7 +45,6 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
 
   intentName: string;
   intentNameResult: boolean;
-  textGrabbing: boolean;
   arrayResponses: Array<Command>;
   typeAction: string;
 
@@ -119,7 +117,6 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
     this.arrayResponses = [];
     this.intentName = '';
     this.intentNameResult = true;
-    this.textGrabbing = false;
     if (this.action) {
       try {
         this.arrayResponses = this.action.attributes.commands;
@@ -145,43 +142,6 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
 
 
   // EVENT FUNCTIONS //
-
-
-  // on drag //
-  /** */
-  mouseDown() {
-    this.textGrabbing = true;
-  }
-
-  /** */
-  mouseUp() {
-    this.textGrabbing = false;
-  }
-
-  /** */
-  async drop(event: CdkDragDrop<string[]>) {
-    // //this.logger.log( 'DROP REPLY ---> ',event, this.arrayResponses);
-    this.textGrabbing = false;
-    try {
-      let currentPos = event.currentIndex*2+1;
-      let previousPos = event.previousIndex*2+1;
-      const waitCur = this.arrayResponses[currentPos-1];
-      const msgCur = this.arrayResponses[currentPos];
-      const waitPre = this.arrayResponses[previousPos-1];
-      const msgPre = this.arrayResponses[previousPos];
-      this.arrayResponses[currentPos-1] = waitPre;
-      this.arrayResponses[currentPos] = msgPre;
-      this.arrayResponses[previousPos-1] = waitCur;
-      this.arrayResponses[previousPos] = msgCur;
-      // // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
-      this.connectorService.updateConnector(this.intentSelected.intent_id);
-      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.intentSelected};
-      await this.onUpdateAndSaveAction(element);
-    } catch (error) {
-      this.logger.log('drop ERROR', error);
-    }
-  }
-
 
   // on action //
   /** */
@@ -209,7 +169,7 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
     try {
       let from = index;
       let to = from + 2;
-      this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]); 
+      this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
       from = index - 1;
       to = from + 2;
       this.arrayResponses.splice(to, 0, this.arrayResponses.splice(from, 1)[0]);
@@ -219,6 +179,38 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
       this.onUpdateAndSaveAction(element);
     } catch (error) {
       this.logger.log('onAddNewResponse ERROR', error);
+    }
+  }
+
+  /** */
+  onMoveToTopResponse(index: number) {
+    if(index < 2) return;
+    try {
+      const wait = this.arrayResponses.splice(index - 1, 1)[0];
+      const cmd  = this.arrayResponses.splice(index - 1, 1)[0];
+      this.arrayResponses.unshift(cmd);
+      this.arrayResponses.unshift(wait);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
+    } catch (error) {
+      this.logger.log('onMoveToTopResponse ERROR', error);
+    }
+  }
+
+  /** */
+  onMoveToBottomResponse(index: number) {
+    if(index === this.arrayResponses.length - 1) return;
+    try {
+      const wait = this.arrayResponses.splice(index - 1, 1)[0];
+      const cmd  = this.arrayResponses.splice(index - 1, 1)[0];
+      this.arrayResponses.push(wait);
+      this.arrayResponses.push(cmd);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
+    } catch (error) {
+      this.logger.log('onMoveToBottomResponse ERROR', error);
     }
   }
 

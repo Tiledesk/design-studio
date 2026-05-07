@@ -1,14 +1,13 @@
-<div class="insp-title">
+<!-- <div class="insp-title">
   <mat-icon class="version-icon" title="V3 Component">star</mat-icon>
-</div>
-
+</div> -->
 <div class="cds-action-content" [class.cds-action-preview]="previewMode">
     <div class="box-up" *ngIf="!previewMode">
 
         <cds-action-reply-tools-new
             [idAction]="idAction"
             (addNewActionReply) = onAddNewActionReply($event)>
-        </cds-action-reply-tools-new>        
+        </cds-action-reply-tools-new>
 
     </div>
 
@@ -22,87 +21,65 @@
         </div>
     </div>
 
-    <div class="box-dw" [class.previewMode]="previewMode">
+    <div class="box-content" [class.previewMode]="previewMode">
 
         <div class="reply-info" *ngIf="typeAction === typeActions.RANDOM_REPLY">{{actionList.RANDOM_REPLY.doc+'.DESCRIPTION' | translate }}</div>
 
-        <div #scrollMe id="scrollMe" 
-            class="content draggable-list"
-            cdkDropList 
-            (cdkDropListDropped)="drop($event)">
-            
+        <div #scrollMe id="scrollMe"
+            class="content draggable-list reply-scroll-list">
+
             <div *ngFor="let command of arrayResponses; let i = index; let odd = odd; let length = count">
 
-                <div *ngIf="odd" cdkDrag
+                <div *ngIf="odd"
                     class="draggable-box"
                     (onClick)="onOpenPanelActionDetail(command)"
                     [ngStyle]="{'border': command.type === typeCommand.WAIT? 'none' : ''}">
 
-                    <!-- TEXT RESPONSE: only odd element -->
-                    <div *ngIf="command.message?.type === typeMessage.TEXT" >
+                    <div class="reply-row">
 
+                        <cds-reply-controls-new *ngIf="!previewMode && typeAction !== typeActions.RANDOM_REPLY"
+                            [isFirst]="i === 1"
+                            [isLast]="i === length - 1"
+                            (deleteReply)="onDeleteActionReply(i)"
+                            (moveToTop)="onMoveToTopResponse(i)"
+                            (moveUp)="onMoveUpResponse(i)"
+                            (moveDown)="onMoveDownResponse(i)"
+                            (moveToBottom)="onMoveToBottomResponse(i)">
+                        </cds-reply-controls-new>
+
+                        <div class="reply-content">
+
+                        <!-- TEXT RESPONSE: only odd element -->
+                        <div *ngIf="command.message?.type === typeMessage.TEXT" >
                         <div class="response">
-                            <!-- *ngIf="typeAction === typeActions.REPLY" -->
-                            <div class="response-drop" 
-                                [ngClass]="{'grabbing':textGrabbing}"
-                                (mousedown)="mouseDown()" 
-                                (mouseup)="mouseUp()" 
-                                cdkDragHandle>
-                            </div>
-
-                            <cds-action-reply-text 
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
-                                [class.disabled-buttons] = ""
+                            <cds-action-reply-text-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                (moveUpResponse) = onMoveUpResponse($event)
-                                (moveDownResponse) = onMoveDownResponse($event)
                                 (openButtonPanel) = onOpenButtonPanel($event)
                                 (createNewButton) = onCreateNewButton($event)
                                 (deleteButton) = onDeleteButton($event)
-                                (deleteActionReply) = onDeleteActionReply($event)
                                 (updateAndSaveAction) = onUpdateAndSaveAction($event)
                                 (changeActionReply) = onChangeActionReply($event)
                                 (changeJsonButtons) = "onChangeJsonButtons($event, i)">
-                            </cds-action-reply-text>
-
+                            </cds-action-reply-text-new>
                         </div>
-
                     </div>
 
                     <!-- IMAGE RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.IMAGE">
-                        <!-- <div class="custom-placeholder" *cdkDragPlaceholder>
-                            <cds-action-reply-image
-                                [index] = i
-                                [typeAction] = typeAction
-                                [response] = message>
-                            </cds-action-reply-image>
-                        </div> -->
-                        
                         <div class="response">
-                            <div class="response-drop" 
-                                [ngClass]="{'grabbing':textGrabbing}"
-                                (mousedown)="mouseDown()" 
-                                (mouseup)="mouseUp()" 
-                                cdkDragHandle>
-                            </div> 
                             <cds-action-reply-image
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                (moveUpResponse) = onMoveUpResponse($event)
-                                (moveDownResponse) = onMoveDownResponse($event)
                                 (openButtonPanel) = onOpenButtonPanel($event)
                                 (createNewButton) = onCreateNewButton($event)
                                 (deleteButton) = onDeleteButton($event)
-                                (deleteActionReply) = onDeleteActionReply($event)
                                 (updateAndSaveAction) = onUpdateAndSaveAction($event)
                                 (changeActionReply) = onChangeActionReply($event)
                                 (changeJsonButtons) = "onChangeJsonButtons($event, i)">
@@ -112,31 +89,13 @@
 
                     <!-- FRAME RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.FRAME">
-                        <!-- <div class="custom-placeholder" *cdkDragPlaceholder>
-                            <cds-action-reply-frame
-                                [index] = i
-                                [typeAction] = typeAction
-                                [response] = message>
-                            </cds-action-reply-frame>
-                        </div> -->
-                        
                         <div class="response">
-                            <div class="response-drop" 
-                                [ngClass]="{'grabbing':textGrabbing}"
-                                (mousedown)="mouseDown()" 
-                                (mouseup)="mouseUp()" 
-                                cdkDragHandle>
-                            </div> 
                             <cds-action-reply-frame
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                (moveUpResponse) = onMoveUpResponse($event)
-                                (moveDownResponse) = onMoveDownResponse($event)
-                                (deleteActionReply) = onDeleteActionReply($event)
                                 (changeActionReply) = onChangeActionReply($event)>
                             </cds-action-reply-frame>
                         </div>
@@ -144,86 +103,52 @@
 
                     <!-- REDIRECT RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.REDIRECT">
-                        <!-- <div class="custom-placeholder" *cdkDragPlaceholder>
-                            <cds-action-reply-redirect
-                                [index] = i
-                                [typeAction] = typeAction
-                                [response] = message>
-                            </cds-action-reply-redirect>
-                        </div> -->
-                        
                         <div class="response">
-                            <div class="response-drop" 
-                                [ngClass]="{'grabbing':textGrabbing}"
-                                (mousedown)="mouseDown()" 
-                                (mouseup)="mouseUp()" 
-                                cdkDragHandle>
-                            </div> 
                             <cds-action-reply-redirect
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                (moveUpResponse) = onMoveUpResponse($event)
-                                (moveDownResponse) = onMoveDownResponse($event)
-                                (deleteActionReply) = onDeleteActionReply($event)
                                 (changeActionReply) = onChangeActionReply($event)>
                             </cds-action-reply-redirect>
                         </div>
                     </div>
 
-
-                    <!--  GALLERY RESPONSE -->
+                    <!-- GALLERY RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.GALLERY">
-                        <!-- <div class="custom-placeholder" *cdkDragPlaceholder>
-                            <cds-action-reply-gallery
-                                [index] = i
-                                [typeAction] = typeAction
-                                [response] = message>
-                            </cds-action-reply-gallery>
-                        </div> -->
-                        
                         <div class="response">
-                            <div class="response-drop" 
-                                [ngClass]="{'grabbing':textGrabbing}"
-                                (mousedown)="mouseDown()" 
-                                (mouseup)="mouseUp()" 
-                                cdkDragHandle>
-                            </div> 
                             <cds-action-reply-gallery
-                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                (moveUpResponse) = onMoveUpResponse($event)
-                                (moveDownResponse) = onMoveDownResponse($event)
                                 (openButtonPanel) = onOpenButtonPanel($event)
                                 (changeActionReply) = onChangeActionReply($event)
-                                (updateAndSaveAction) = onUpdateAndSaveAction($event)
-                                (deleteActionReply) = onDeleteActionReply($event)>
+                                (updateAndSaveAction) = onUpdateAndSaveAction($event)>
                             </cds-action-reply-gallery>
                         </div>
                     </div>
+
+                        </div><!-- /reply-content -->
+                    </div><!-- /reply-row -->
 
                     <hr class="preview-divider" *ngIf="i !==length-1 && previewMode">
 
                 </div>
 
             </div>
-            
+
         </div>
 
     </div>
 
 
-    <div class="footer-panel-intent-detail" *ngIf="!previewMode">
+    <div class="box-dw" *ngIf="!previewMode">
         <div class="disable-input-message">
             <section class="disable-input-message-section">
-                <mat-checkbox 
+                <mat-checkbox
                     [checked]="action?.attributes?.disableInputMessage"
                     (change)="onDisableInputMessage()">
                     {{"DisableUserInput" | translate}}
@@ -231,5 +156,5 @@
             </section>
         </div>
     </div>
-    
+
 </div>

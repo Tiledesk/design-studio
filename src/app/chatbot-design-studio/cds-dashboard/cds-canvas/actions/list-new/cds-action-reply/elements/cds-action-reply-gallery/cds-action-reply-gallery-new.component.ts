@@ -21,9 +21,6 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
-  @Output() deleteActionReply = new EventEmitter();
-  @Output() moveUpResponse = new EventEmitter();
-  @Output() moveDownResponse = new EventEmitter();
   @Output() openButtonPanel = new EventEmitter();
 
   @Input() idAction: string;
@@ -314,21 +311,6 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
     this.response._tdJSONCondition = expression;
     this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
     this.changeActionReply.emit();
-  }
-
-  /** onDeleteActionReply */
-  onDeleteActionReply(){
-    this.deleteActionReply.emit(this.index);
-  }
-
-  /** onMoveUpResponse */
-  onMoveUpResponse(){
-    this.moveUpResponse.emit(this.index);
-  }
-
-  /** onMoveDownResponse */
-  onMoveDownResponse(){
-    this.moveDownResponse.emit(this.index);
   }
 
   /** onChangeTextarea */

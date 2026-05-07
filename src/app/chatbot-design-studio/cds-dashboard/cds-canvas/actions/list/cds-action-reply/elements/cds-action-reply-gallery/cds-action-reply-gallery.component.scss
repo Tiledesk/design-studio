@@ -730,11 +730,7 @@ cds-textarea#description.noButtons ::ng-deep{
     text-align: center;
 }
 
-.image-from-url ::ng-deep .image-url-textarea {
-    .liquidjs-menu {
-        display: none;
-    }
-    .box-textarea textarea {
+.image-from-url ::ng-deep .image-url-textarea {    .box-textarea textarea {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
         border: 1px solid var(--border);
@@ -871,10 +867,7 @@ cds-textarea#description.noButtons ::ng-deep{
     overflow: hidden;
     gap: 10px;
     width: 100%;
-    padding: 10px 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
-}
+    padding: 10px 0;}
 
 /* Frecce di navigazione fisse */
 .gallery-nav-arrow {

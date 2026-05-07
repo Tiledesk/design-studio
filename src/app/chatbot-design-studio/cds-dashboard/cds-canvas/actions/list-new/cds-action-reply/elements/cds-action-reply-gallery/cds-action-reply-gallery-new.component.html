@@ -1,27 +1,11 @@
 <div class="extensions-response" *ngIf="!previewMode">
-   
-    <div class="text-editor-drop">
-        <em class="material-icons">drag_indicator</em>
-    </div>
-
-    <div class="response-controls">
-        <div class="control-button delete" (click)="onDeleteActionReply()">
-            <em class="material-icons">delete</em>
-        </div>
-        <div class="control-button" (click)="onMoveUpResponse()">
-            <em class="material-icons">expand_less</em>
-        </div> 
-        <div class="control-button" (click)="onMoveDownResponse()">
-            <em class="material-icons">expand_more</em>
-        </div>
-    </div>
     
     <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
         <appdashboard-delay-slider
             [delayTime]="delayTime"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
-        </appdashboard-delay-slider>
+        </appdashboard-delay-slider-new>
     </div>
     <!-- ||  -->
     <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
@@ -104,10 +88,7 @@
             (changeTextarea)="onChangeJsonTextarea($event)">
         </cds-textarea>
         <div class="button-controls">
-            <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteJsonButtons()">
-                <em class="material-icons">delete</em>
-            </div>
-        </div>
+</div>
     </div>
 
 </div>
@@ -218,30 +199,14 @@
                                                 <em class="material-icons">expand_more</em>
                                             </div> -->
                                         </div>
-                        
-                                        <div class="control-button delete" (click)="$event.stopPropagation();onDeleteButton(i,j)">
-                                            <em class="material-icons">delete</em>
-                                        </div>
-                                    </div>
+</div>
                                 </div>
                             </div>
                         </div>
                         <div class="button-controls" *ngIf="gallery.length > 1">
                             
                             <div class="buttonsToMove">
-                                <div class="control-button" (click)="onMoveLeftGallery(i)">
-                                    <em class="material-icons">chevron_left</em>
-                                </div> 
-                                <div class="control-button" (click)="onMoveRightGallery(i)">
-                                    <em class="material-icons">chevron_right</em>
-                                </div>
-                            </div>
-                
-                            <div class="control-button delete" (click)="onDeleteGallery(i)">
-                                <em class="material-icons">delete</em>
-                            </div>
-                
-                        </div>
+</div>
                     </div>
                     <!-- NEW BUTTON ADD-->
                     <div *ngIf="galleryEl.buttons.length < 3"class="gallery-buttons-add">

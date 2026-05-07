@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'appdashboard-delay-slider',
+  selector: 'appdashboard-delay-slider, appdashboard-delay-slider-new',
   templateUrl: './delay-slider.component.html',
   styleUrls: ['./delay-slider.component.scss']
 })

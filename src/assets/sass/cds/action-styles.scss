@@ -7,13 +7,12 @@
 .extensions-response{
     font-size: var(--font-size-base);
     position: relative;
-    width: calc(100% - 6px);
     height: auto;
-    margin: 27px 0px 5px 0px;
-    padding: 0px 30px;
+    margin: 0px;
+    padding: 0px;
     display: flex;
     flex-wrap: wrap;
-    row-gap: 5px;
+    row-gap: 10px;
     column-gap: 5px;
     align-content: center;
     .delay-wrapper,
@@ -21,7 +20,6 @@
         display: block;
         height: auto;
         width: auto;
-        // padding: 0em 0.75em 0;
     }
 
     .response-controls {
@@ -35,26 +33,27 @@
 
     .add-filter-btn-wrp {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        line-height: normal;
         gap: 5px;
         padding: 0px 9px;
-        height: 26px;
-        font-size: .9em;
-        font-weight: 400;
+        height: 27px;
+        font-size: 11px;
         border-radius: 13px;
-        transition: all 0.3s ease 0s;
         background: var(--ds-bg);
         color: var(--ds-link);
-    
-        span.material-icons-outlined{
-            font-size: 20px;
-            color: var(--ds-link);
-        }
+        border: 1px solid var(--border, #e8e6e0);
+        align-items: center;
     
         &:hover{
             opacity: 0.8;
             cursor: pointer;
+        }
+    }
+
+    .add-filter-btn {
+            span.material-icons-outlined{
+            font-size: 20px;
+            color: var(--ds-link);
         }
     }
 
@@ -110,7 +109,7 @@ appdashboard-filter{
     gap: 6px;
     width: 100%;
     font-size: 14px;
-    padding: 0 var(--input-base-margin);
+    padding: 0;
     flex-direction: row;
     float: right;
     justify-content: flex-start;
@@ -523,3 +522,111 @@ appdashboard-filter{
     }
 }
 
+
+.box-up {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+    border-top: 1px solid var(--ds-border, #e8e6e0);
+    border-bottom: 1px solid var(--ds-border, #e8e6e0);
+}
+
+.box-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+
+    .reply-info {
+        color: var(--ds-ink);
+        padding: 10px;
+        font-size: 14px;
+        text-align: center;
+        border: 1px solid var(--gray-light-01);
+        border-radius: 10px;
+        margin: 10px;
+        background: var(--blu-light-03);
+        flex-shrink: 0;
+    }
+}
+
+.previewMode.box-content {
+    margin: 0;
+}
+
+.box-dw {
+    height: var(--footer-panel-action-detail-height, 43px);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--ds-border, #ececea);
+    background: var(--ds-canvas, #f7f6f3);
+    padding: 0 18px;
+    width: 100%;
+}
+
+.reply-scroll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+/** cds-textarea inside reply actions **/
+cds-textarea.text-editable-div {
+    display: block;
+    ::ng-deep textarea {
+        line-height: 20px !important;
+        width: calc(100% - 20px) !important;
+        font-size: 0.9em !important;
+    }
+}
+
+.reply-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+    padding: 12px;
+}
+
+.reply-content {
+    flex: 1;
+    min-width: 0;
+    padding: 0 6px;
+}
+
+
+.liquidjs-menu {
+    position: absolute;
+    top: -12px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink-2);
+    display: grid;
+    place-items: center;
+    box-shadow: var(--shadow-card);
+    z-index: 2;
+    .liquidjs-button {
+        margin: auto 0;
+        display: inline-flex;
+    }
+    .mat-icon {
+        width: 14px;
+        height: 14px;
+        fill:initial;
+        display: flex;
+    }
+}

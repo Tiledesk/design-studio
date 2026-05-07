@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Intent } from 'src/app/models/intent-model';
 import { Wait, Button, Message, Command, ActionReply, MessageAttributes, Setting, ActionReplyV2 } from 'src/app/models/action-model';
 import { TYPE_UPDATE_ACTION, TYPE_INTENT_ELEMENT, TYPE_COMMAND, TYPE_RESPONSE, TYPE_BUTTON, TYPE_URL, TYPE_MESSAGE, generateShortUID } from '../../../../../../utils';
@@ -48,7 +47,6 @@ export class CdsActionReplyV2Component implements OnInit {
 
   intentName: string;
   intentNameResult: boolean;
-  textGrabbing: boolean;
   arrayResponses: Array<Command>;
   typeAction: string;
 
@@ -156,7 +154,6 @@ export class CdsActionReplyV2Component implements OnInit {
     this.arrayResponses = [];
     this.intentName = '';
     this.intentNameResult = true;
-    this.textGrabbing = false;
     if (this.action) {
       try {
         this.arrayResponses = this.action.attributes.commands;
@@ -182,43 +179,6 @@ export class CdsActionReplyV2Component implements OnInit {
 
 
   // EVENT FUNCTIONS //
-
-
-  // on drag //
-  /** */
-  mouseDown() {
-    this.textGrabbing = true;
-  }
-
-  /** */
-  mouseUp() {
-    this.textGrabbing = false;
-  }
-
-  /** */
-  drop(event: CdkDragDrop<string[]>) {
-    // this.logger.log( 'DROP REPLY ---> ',event, this.arrayResponses);
-    this.textGrabbing = false;
-    try {
-      let currentPos = event.currentIndex*2+1;
-      let previousPos = event.previousIndex*2+1;
-      const waitCur = this.arrayResponses[currentPos-1];
-      const msgCur = this.arrayResponses[currentPos];
-      const waitPre = this.arrayResponses[previousPos-1];
-      const msgPre = this.arrayResponses[previousPos];
-      this.arrayResponses[currentPos-1] = waitPre;
-      this.arrayResponses[currentPos] = msgPre;
-      this.arrayResponses[previousPos-1] = waitCur;
-      this.arrayResponses[previousPos] = msgCur;
-      // // this.logger.log( 'DROP REPLY ---> ', this.arrayResponses);
-      this.connectorService.updateConnector(this.intentSelected.intent_id);
-      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.intentSelected};
-      this.onUpdateAndSaveAction(element);
-    } catch (error) {
-      this.logger.log('drop ERROR', error);
-    }
-  }
-
 
   // on action //
   /** */
@@ -259,6 +219,38 @@ export class CdsActionReplyV2Component implements OnInit {
     }
   }
 
+
+  /** */
+  onMoveToTopResponse(index: number) {
+    if(index < 2) return;
+    try {
+      const wait = this.arrayResponses.splice(index - 1, 1)[0];
+      const cmd  = this.arrayResponses.splice(index - 1, 1)[0];
+      this.arrayResponses.unshift(cmd);
+      this.arrayResponses.unshift(wait);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
+    } catch (error) {
+      this.logger.log('onMoveToTopResponse ERROR', error);
+    }
+  }
+
+  /** */
+  onMoveToBottomResponse(index: number) {
+    if(index === this.arrayResponses.length - 1) return;
+    try {
+      const wait = this.arrayResponses.splice(index - 1, 1)[0];
+      const cmd  = this.arrayResponses.splice(index - 1, 1)[0];
+      this.arrayResponses.push(wait);
+      this.arrayResponses.push(cmd);
+      this.connectorService.updateConnector(this.intentSelected.intent_id);
+      const element = {type: TYPE_UPDATE_ACTION.ACTION, element: this.action};
+      this.onUpdateAndSaveAction(element);
+    } catch (error) {
+      this.logger.log('onMoveToBottomResponse ERROR', error);
+    }
+  }
 
   /** onAddNewActionReply */
   onAddNewActionReply(ele) {

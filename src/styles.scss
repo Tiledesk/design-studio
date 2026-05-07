@@ -1,6 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
 @import "./assets/sass/ds-tokens";
 
+/* ─── Global scrollbar ─────────────────────────────────────────────────────── */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ds-border-strong, #d8d6d2) transparent;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--ds-border-strong, #d8d6d2);
+    border-radius: 3px;
+    &:hover {
+        background: var(--ds-ink-2, #4a4a47);
+    }
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 
 .ng-dropdown-panel {
     // width: max-content !important;

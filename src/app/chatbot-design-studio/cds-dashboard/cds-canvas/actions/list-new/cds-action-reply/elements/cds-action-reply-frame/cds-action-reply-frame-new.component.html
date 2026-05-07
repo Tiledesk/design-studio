@@ -1,27 +1,11 @@
 <div class="extensions-response" *ngIf="!previewMode">
-    
-    <div class="text-editor-drop">
-        <em class="material-icons">drag_indicator</em>
-    </div>
-    
-    <div class="response-controls">
-        <div class="control-button delete" (click)="onDeleteActionReply()">
-            <em class="material-icons">delete</em>
-        </div>
-        <div class="control-button" (click)="onMoveUpResponse()">
-            <em class="material-icons">expand_less</em>
-        </div> 
-        <div class="control-button" (click)="onMoveDownResponse()">
-            <em class="material-icons">expand_more</em>
-        </div>
-    </div>
 
     <div *ngIf="!isOpenHeightSlider" class="delay-wrapper" [ngStyle]="{width: isOpenDelaySlider? '100%' : 'auto'}">
         <appdashboard-delay-slider
             [delayTime]="delayTime"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
-        </appdashboard-delay-slider>
+        </appdashboard-delay-slider-new>
     </div>
         
     <div *ngIf="!isOpenDelaySlider" class="height-wrapper" [ngStyle]="{width: isOpenHeightSlider? '100%' : 'auto'}">

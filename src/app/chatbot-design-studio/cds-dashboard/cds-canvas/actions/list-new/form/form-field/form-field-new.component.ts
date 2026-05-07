@@ -1,52 +1,41 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
-  selector: '  selector: 'appdashboard-form-field-new',-new',
+  selector: 'appdashboard-form-field-new',
   templateUrl: './form-field-new.component.html',
   styleUrls: ['./form-field-new.component.scss']
 })
-export class FormFieldComponent implements OnInit, OnChanges {
+export class FormFieldNewComponent implements OnInit, OnChanges {
 
   @Output() eventEditField = new EventEmitter();
   @Output() openDeleteFieldModal = new EventEmitter();
   @Output() eventDropField = new EventEmitter();
-  
+
   @Input() fields: [any];
 
-  // modal
-  displayMODAL = false;
   selectedObjectId: number;
-
-  // add edit form
   selectedField: any;
 
-  
-  constructor() { 
-    // void
-  }
+  constructor() {}
 
   ngOnInit(): void {
     this.selectedObjectId = null;
   }
 
-  ngOnChanges() {
-  }
+  ngOnChanges() {}
 
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.fields, event.previousIndex, event.currentIndex);
-    this.selectedField = null;
+  moveField(from: number, to: number) {
+    if (to < 0 || to >= this.fields.length) return;
+    const item = this.fields.splice(from, 1)[0];
+    this.fields.splice(to, 0, item);
     this.eventDropField.emit(this.fields);
   }
 
-  // EVENTS //
-  /** Event modal open delete field */
-  deleteFieldModal(index:number) {
+  deleteFieldModal(index: number) {
     this.openDeleteFieldModal.emit(index);
   }
 
-  /** Event edit field */
-  editField(index:number){
+  editField(index: number) {
     this.selectedObjectId = index;
     this.eventEditField.emit(index);
   }

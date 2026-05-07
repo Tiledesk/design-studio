@@ -1,11 +1,11 @@
 <div class="content element" [class.previewMode]="previewMode" style="width: 100%;">
     
     <div class="filter-row" *ngIf="expression?.conditions.length === 0">
-        <div class="add-filter-btn" 
-            [satPopoverAnchor]="addConditionFilter" 
+        <div class="add-filter-btn"
+            [satPopoverAnchor]="addConditionFilter"
             (click)="addConditionFilter.toggle()">
             <span class="material-icons-outlined">filter_alt</span>
-            {{ 'CDSCanvas.Filter' | translate }}
+            <span class="filter-label">{{ 'CDSCanvas.Filter' | translate }}</span>
         </div>
     </div>
 

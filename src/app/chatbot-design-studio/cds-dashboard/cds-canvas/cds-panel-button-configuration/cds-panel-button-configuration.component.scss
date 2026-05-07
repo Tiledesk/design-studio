@@ -186,12 +186,6 @@
 }
 
 /** box-textarea **/
-cds-textarea.text-editable-div ::ng-deep{
-    display: block;
-    textarea {
-        width: calc(100% - 1.5em) !important;
-    }
-}
 
 
 ::ng-deep .cds-attributes .box-textarea {

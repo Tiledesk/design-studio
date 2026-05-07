@@ -167,16 +167,6 @@
 
 
 /** box-textarea **/
-cds-textarea.text-editable-div ::ng-deep{
-    display: block;
-    margin-left: var(--base-margin);
-    margin-right: var(--base-margin);
-    // width: calc(100% - 66px);
-    textarea {
-        line-height: 20px !important; 
-        width: calc(100% - 20px) !important;
-        font-size: 0.9em !important;
-    }
 }
 
 .image-type-toggle,

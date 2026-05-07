@@ -1,6 +1,4 @@
 .add-responses {
-    // grid-gap: 5px;
-    // display: grid;+
     display: flex;
     float: right;
     .add-response { 
@@ -11,11 +9,9 @@
         margin: 0;
         padding: 3px 6px;
         display: flex;
-        
         &:not(:first-child){
             border-left: 1px solid white;
         }
-        
         img{
             width: 16px;
             &:hover{

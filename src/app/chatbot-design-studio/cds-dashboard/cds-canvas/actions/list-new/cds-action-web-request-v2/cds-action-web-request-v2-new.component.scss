@@ -1,6 +1,3 @@
-::-webkit-scrollbar {
-    width: 0px;
-}
 
 
 .content {
@@ -296,13 +293,4 @@ mat-button-toggle{
     opacity: 0.6;
 }
 
-.cds-attributes ::ng-deep{
-    .liquidjs-menu {
-        width: calc(100% - 15px);
-        .liquidjs-button {
-            margin-top: 16px!important;
-            margin-right: -25px !important;
-            z-index: 1;
-        }
-    }
-}
+.cds-attributes ::ng-deep{}

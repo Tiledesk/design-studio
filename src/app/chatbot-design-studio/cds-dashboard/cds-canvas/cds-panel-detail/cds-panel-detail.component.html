@@ -120,9 +120,9 @@
   <!-- ===== BODY: action detail ===== -->
   <div class="insp-body">
 
-    <div *ngIf="elementIntentSelectedType === typeIntentElement.ACTION && elementSelected">
-
-      <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
+    <div *ngIf="elementIntentSelectedType === typeIntentElement.ACTION && elementSelected && canShowActionByPlan.enabled"
+         [ngSwitch]="elementSelected._tdActionType"
+         class="action-content">
 
         <cds-action-reply-new *ngSwitchCase="TYPE_ACTION.REPLY"
             class="panel-response"
@@ -569,16 +569,15 @@
             (updateAndSaveAction)="onSaveIntent($event)">
         </cds-action-flow-log>
 
-      </div>
+    </div>
 
-      <div *ngIf="!canShowActionByPlan.enabled" class="block-overlay">
-        <span class="material-icons lock-icon">lock</span>
-        <p [innerHTML]="'CDSCanvas.FeatureAvailableFromPlan' | translate: canShowActionByPlan"></p>
-        <button class="btn btn-primary cds-blue-button" type="button" (click)="goToContactSales()">
-          {{ 'CDSCanvas.ContactSales' | translate }}
-        </button>
-      </div>
-
+    <div *ngIf="elementIntentSelectedType === typeIntentElement.ACTION && elementSelected && !canShowActionByPlan.enabled"
+         class="block-overlay">
+      <span class="material-icons lock-icon">lock</span>
+      <p [innerHTML]="'CDSCanvas.FeatureAvailableFromPlan' | translate: canShowActionByPlan"></p>
+      <button class="btn btn-primary cds-blue-button" type="button" (click)="goToContactSales()">
+        {{ 'CDSCanvas.ContactSales' | translate }}
+      </button>
     </div>
 
   </div>

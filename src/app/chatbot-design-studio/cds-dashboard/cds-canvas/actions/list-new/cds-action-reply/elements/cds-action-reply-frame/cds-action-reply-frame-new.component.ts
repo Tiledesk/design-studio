@@ -14,9 +14,6 @@ import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 export class CdsActionReplyFrameNewComponent implements OnInit {
 
   @Output() changeActionReply = new EventEmitter();
-  @Output() deleteActionReply = new EventEmitter();
-  @Output() moveUpResponse = new EventEmitter();
-  @Output() moveDownResponse = new EventEmitter();
 
   @Input() idAction: string;
   @Input() response: Message;
@@ -97,21 +94,6 @@ export class CdsActionReplyFrameNewComponent implements OnInit {
     this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
     // this.logger.log("[ActionReplyFrameComponent] onChangeExpression: ", this.response.metadata);
     this.changeActionReply.emit();
-  }
-
-  /** onDeleteActionReply */
-  onDeleteActionReply(){
-    this.deleteActionReply.emit(this.index);
-  }
-
-  /** onMoveUpResponse */
-  onMoveUpResponse(){
-    this.moveUpResponse.emit(this.index);
-  }
-
-  /** onMoveDownResponse */
-  onMoveDownResponse(){
-    this.moveDownResponse.emit(this.index);
   }
 
   /** onChangeTextarea */

@@ -36,6 +36,19 @@
   font-size: 14px;
   line-height: 1.5;
   overflow: hidden;
+
+  // ── icone globali ──────────────────────────────────────────
+  svg, mat-icon, .i, .material-icons, .material-icons-outlined,
+  img.active-icon, img.fold-icon {
+    color: var(--ds-ink, #1a1a19);
+    // fill: currentColor;
+  }
+
+  [class*="-btn"], [class*="-icon"], [class*="icon-"] {
+    &:hover {
+      background: var(--ds-canvas, #f7f6f3);
+    }
+  }
 }
 
 // ===== BLOCK HEADER =====
@@ -392,12 +405,22 @@
 
 .insp-body {
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
+.action-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .panel-response {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .block-overlay {

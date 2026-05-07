@@ -1,58 +1,39 @@
-<div *ngIf="fields.length > 0" id="scrollMe" class="card-content">
+<div *ngIf="fields.length > 0" class="field-list">
 
-    <table class="table table-hover form-fields-table">
-        <thead>
-            <tr>
-                <th class="col-30">
-                    {{ "Name" | translate }}
-                </th>
-                <th style="width:auto">
-                    {{ "Label" | translate }}
-                </th>
-                <th style="width:85px">
-                    {{ "Actions" | translate }}
-                </th>
-            </tr>
-        </thead>
+    <div class="field-row"
+        *ngFor="let field of fields; let i = index; let last = last"
+        [class.selected]="selectedObjectId === i">
 
-        <tbody cdkDropList (cdkDropListDropped)="drop($event)" style="display:block">
-            
-            <tr *ngFor="let field of fields; let i = index;" 
-                [ngClass]="{'selected':selectedObjectId === i}" 
-                cdkDrag cdkDragLockAxis="y">
-                <!-- ------------------- -->
-                <!-- FIELS NAME -->
-                <!-- ------------------- -->
-                <td class="ellips col-30" (click)='editField(i)'>
-                    <span class="label-field">
-                        {{ field.name }}
-                    </span>
-                </td>
-                <!-- LABEL -->
-                <td style="width:auto" (click)='editField(i)'>
-                    <span class="label-field">
-                        {{ field?.label }}
-                    </span>
-                </td>
-                <!-- ------------------------------------------------ -->
-                <!-- ACTIONS -->
-                <!-- ------------------------------------------------ -->
-                <td class="td-actions">
-                    <!-- EDIT -->
-                    <button type="button" class="btn btn-primary btn-simple btn-xs" (click)='editField(i)'>
-                        <span class="material-icons cds-edit-field-icon">edit</span>
-                    </button>
-                    <!-- DELETE -->
-                    <button type="button" class="btn btn-danger btn-simple btn-xs" (click)='deleteFieldModal(i)'>
-                        <span class="material-icons">close</span>
-                    </button>
-                    <!-- DRAG INDICATOR -->
-                    <button type="button" class="btn btn-danger btn-simple btn-xs">
-                        <span class="material-icons">drag_indicator</span>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
+        <!-- ===== MOVE CONTROLS ===== -->
+        <div class="move-stack">
+            <button class="move-btn trash-btn" title="Delete" (click)="deleteFieldModal(i)">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <button class="move-btn" title="Move to top" (click)="moveField(i, 0)" [disabled]="i === 0">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 11 12 5 18 11"/><polyline points="6 19 12 13 18 19"/></svg>
+            </button>
+            <button class="move-btn" title="Move up" (click)="moveField(i, i - 1)" [disabled]="i === 0">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>
+            </button>
+            <button class="move-btn" title="Move down" (click)="moveField(i, i + 1)" [disabled]="last">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <button class="move-btn" title="Move to bottom" (click)="moveField(i, fields.length - 1)" [disabled]="last">
+                <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 5 12 11 18 5"/><polyline points="6 13 12 19 18 13"/></svg>
+            </button>
+        </div>
 
-    </table>
+        <!-- ===== FIELD CONTENT ===== -->
+        <div class="field-content" (click)="editField(i)">
+            <span class="field-name">{{ field.name }}</span>
+            <span class="field-label">{{ field?.label }}</span>
+        </div>
+
+        <!-- ===== EDIT BUTTON ===== -->
+        <button class="move-btn edit-btn" title="Edit" (click)="editField(i)">
+            <mat-icon>edit</mat-icon>
+        </button>
+
+    </div>
+
 </div>

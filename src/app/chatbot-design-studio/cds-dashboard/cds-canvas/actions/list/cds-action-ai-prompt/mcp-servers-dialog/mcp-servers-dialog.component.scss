@@ -77,23 +77,8 @@
         border: none;
 
         // Custom scrollbar styles
-        &::-webkit-scrollbar {
-            width: 8px;
-        }
 
-        &::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 4px;
-        }
 
-        &::-webkit-scrollbar-thumb {
-            background: var(--blu-02);
-            border-radius: 4px;
-            
-            &:hover {
-                background: var(--ds-ink);
-            }
-        }
     }
     
     .tpl-modal-buttons {
