@@ -16,6 +16,12 @@ interface McpServer {
   name: string;
   url: string;
   transport: string;
+  customHeaders?: Array<{
+    enabled: boolean;
+    key: string;
+    value: string;
+    revealValue?: boolean;
+  }>;
   /** Available tools (from Connect / integrations). Persisted on Save. */
   tools?: McpTool[];
   /** Selected tools for this server. Persisted in integration so selection is kept even when server is not selected. */
@@ -76,6 +82,10 @@ export class McpServerEditDialogComponent implements OnInit {
   /** True when Refresh returned a different list of tools than the original, so Save should be enabled. */
   private availableToolsChangedAfterRefresh: boolean = false;
   private lastUrlBlurValue: string = '';
+  isAuthenticationOpen: boolean = false;
+  isHeadersJsonMode: boolean = false;
+  headersJsonText: string = '';
+  private originalHeadersSnapshot: string = '';
   
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -106,7 +116,8 @@ export class McpServerEditDialogComponent implements OnInit {
       this.editedServer = {
         name: '',
         url: '',
-        transport: 'streamable_http' // Default value
+        transport: 'streamable_http', // Default value
+        customHeaders: []
       };
       this.originalServer = null;
     } else {
@@ -119,6 +130,14 @@ export class McpServerEditDialogComponent implements OnInit {
         transport: this.data.server?.transport || ''
       };
     }
+
+    // Ensure headers array exists
+    if (!Array.isArray(this.editedServer.customHeaders)) {
+      this.editedServer.customHeaders = [];
+    }
+    // Snapshot initial headers for dirty check (normalize fields)
+    this.originalHeadersSnapshot = this.serializeHeaders(this.editedServer.customHeaders);
+    this.headersJsonText = this.buildHeadersJsonText();
     
     // Store all servers
     this.allMcpServers = [...this.data.allServers];
@@ -258,8 +277,110 @@ export class McpServerEditDialogComponent implements OnInit {
     const nameChanged = (this.editedServer?.name || '') !== snap.name;
     const transportChanged = (this.editedServer?.transport || '') !== snap.transport;
     const toolsSelectionChanged = !this.areSetsEqual(this.selectedToolNames, this.originalSelectedToolsSnapshot);
-    return nameChanged || transportChanged || toolsSelectionChanged || this.availableToolsChangedAfterRefresh;
+    const headersChanged = this.serializeHeaders(this.editedServer.customHeaders || []) !== this.originalHeadersSnapshot;
+    return nameChanged || transportChanged || toolsSelectionChanged || headersChanged || this.availableToolsChangedAfterRefresh;
   }
+
+  // -----------------------
+  // Custom headers UI
+  // -----------------------
+  toggleHeadersJsonMode(): void {
+    this.isHeadersJsonMode = !this.isHeadersJsonMode;
+    if (this.isHeadersJsonMode) {
+      this.headersJsonText = this.buildHeadersJsonText();
+    } else {
+      // When leaving JSON mode, try to apply (best-effort).
+      this.applyHeadersFromJson();
+    }
+  }
+
+  addCustomHeader(): void {
+    if (!Array.isArray(this.editedServer.customHeaders)) {
+      this.editedServer.customHeaders = [];
+    }
+    this.editedServer.customHeaders.push({
+      enabled: true,
+      key: '',
+      value: '',
+      revealValue: false
+    });
+  }
+
+  removeCustomHeader(index: number): void {
+    if (!Array.isArray(this.editedServer.customHeaders)) return;
+    if (index < 0 || index >= this.editedServer.customHeaders.length) return;
+    this.editedServer.customHeaders.splice(index, 1);
+  }
+
+  toggleHeaderEnabled(index: number): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.enabled = !h.enabled;
+  }
+
+  toggleHeaderReveal(index: number): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.revealValue = !h.revealValue;
+  }
+
+  onHeaderKeyChange(index: number, value: string): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.key = value ?? '';
+  }
+
+  onHeaderValueChange(index: number, value: string): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.value = value ?? '';
+  }
+
+  applyHeadersFromJson(): void {
+    if (!this.isHeadersJsonMode) {
+      // if called from blur while not in JSON mode, do nothing
+      return;
+    }
+    try {
+      const parsed = JSON.parse(this.headersJsonText || '[]');
+      if (!Array.isArray(parsed)) return;
+      const next = parsed
+        .filter((x: any) => x && typeof x === 'object')
+        .map((x: any) => ({
+          enabled: x.enabled !== false,
+          key: (x.key ?? x.name ?? '').toString(),
+          value: (x.value ?? '').toString(),
+          revealValue: false
+        }));
+      this.editedServer.customHeaders = next;
+    } catch {
+      // Keep current headers; invalid JSON shouldn't break the dialog.
+    }
+  }
+
+  private buildHeadersJsonText(): string {
+    const headers = (this.editedServer.customHeaders || []).map(h => ({
+      enabled: !!h.enabled,
+      key: (h.key ?? '').toString(),
+      value: (h.value ?? '').toString()
+    }));
+    return JSON.stringify(headers, null, 2);
+  }
+
+  private serializeHeaders(headers: Array<{ enabled: boolean; key: string; value: string }>): string {
+    // Stable serialize used only for dirty check (ignore revealValue)
+    try {
+      const normalized = (headers || []).map(h => ({
+        enabled: !!h.enabled,
+        key: (h.key ?? '').toString(),
+        value: (h.value ?? '').toString()
+      }));
+      return JSON.stringify(normalized);
+    } catch {
+      return '';
+    }
+  }
+
 
   get showConnectButton(): boolean {
     // Connect / Refresh button always visible (Connect when no tools, Refresh tools when loaded).
