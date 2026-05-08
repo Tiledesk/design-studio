@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.42-rc2
+- **changed**: added 'url_preview' in action response with 3 types: message, form, parameters
+
 # 1.39.42-rc1
 - **added**: custom header authentication in mcp server
 - **added**: use_hyde and use_cache parameters to ask KB AI settings
