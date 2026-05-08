@@ -1,5 +1,5 @@
 <div class="extensions-response" *ngIf="!previewMode" >
-    
+
     <div class="text-editor-drop">
         <em class="material-icons">drag_indicator</em>
     </div>
@@ -10,12 +10,12 @@
         </div>
         <div class="control-button" (click)="$event.stopPropagation();onMoveUpResponse()">
             <em class="material-icons">expand_less</em>
-        </div> 
+        </div>
         <div class="control-button" (click)="$event.stopPropagation();onMoveDownResponse()">
             <em class="material-icons">expand_more</em>
         </div>
     </div>
-    
+
     <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
         <appdashboard-delay-slider
             [delayTime]="delayTime"
@@ -23,38 +23,174 @@
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider>
     </div>
-    
+
     <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
         {{'CDSCanvas.Filter' | translate }}
     </div>
-    <div class="filter-wrapper" *ngIf="canShowFilter"
-        [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
-        <appdashboard-filter
-            [expression]="response._tdJSONCondition"
-            [booleanOperators]="booleanOperators"
-            [previewMode]="previewMode"
-            (onChangeExpression)="onChangeExpression($event)">
-        </appdashboard-filter>
-    </div>
+
 </div>
 
 <div *ngIf="previewMode" class="text-editor-wrapper previewMode">
-    <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
-    <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
-</div> 
+    <div class="response-wrp preview-url-title">
+        <ng-container *ngIf="previewActiveMode === 'list'">{{ 'UrlPreviewTitleText' | translate }}</ng-container>
+        <ng-container *ngIf="previewActiveMode === 'form'">{{ 'UrlPreviewTitleForm' | translate }}</ng-container>
+        <ng-container *ngIf="previewActiveMode === 'text'">{{ 'UrlPreviewTitleJson' | translate }}</ng-container>
+    </div>
+    <div class="response-wrp" *ngIf="previewText">{{ previewText }}</div>
+    <div class="response-wrp no-text" *ngIf="!previewText">{{'CDSCanvas.ClickToAddText' | translate }}</div>
+</div>
 
-<div  *ngIf="!previewMode" class="text-editor-wrapper">
-    <cds-textarea 
-        class="text-editable-div"
-        [activeFocus]="activeFocus"
-        [text]="response.text" 
-        [minRow]="1"
-        [limitCharsText]="limitCharsText"
-        popoverVerticalAlign="above"
-        (changeTextarea)="onChangeTextarea($event)"
-        (blur)="onBlur($event)"
-        (selectedAttribute)="onSelectedAttribute($event)">
-    </cds-textarea>    
-</div> 
+<div *ngIf="!previewMode" class="text-editor-wrapper">
 
+    <!-- Mode selector -->
+    <div class="url-mode-row">
+        <div class="url-mode-selector">
+            <label class="url-mode-tab" [class.active]="activeTab === 'list'">
+                <input type="radio" class="url-mode-check" name="urlPreviewMode"
+                    [checked]="activeTab === 'list'"
+                    (change)="setTab('list')" />
+                {{ 'UrlPreviewTabText' | translate }}
+            </label>
+            <label class="url-mode-tab" [class.active]="activeTab === 'form'">
+                <input type="radio" class="url-mode-check" name="urlPreviewMode"
+                    [checked]="activeTab === 'form'"
+                    (change)="setTab('form')" />
+                {{ 'UrlPreviewTabForm' | translate }}
+            </label>
+            <label class="url-mode-tab" [class.active]="activeTab === 'text'">
+                <input type="radio" class="url-mode-check" name="urlPreviewMode"
+                    [checked]="activeTab === 'text'"
+                    (change)="setTab('text')" />
+                {{ 'UrlPreviewTabJsonSources' | translate }}
+            </label>
+        </div>
+    </div>
+
+    <!-- Mode hint -->
+    <div class="url-mode-hint">
+        <span class="material-icons url-mode-hint__icon">info_outline</span>
+        <span class="url-mode-hint__text">
+            <ng-container *ngIf="activeTab === 'list'">{{ 'UrlPreviewHint' | translate }}</ng-container>
+            <ng-container *ngIf="activeTab === 'form'">{{ 'UrlPreviewHintForm' | translate }}</ng-container>
+            <ng-container *ngIf="activeTab === 'text'">{{ 'UrlPreviewHintJsonSources' | translate }}</ng-container>
+        </span>
+    </div>
+
+    <!-- Mode: List (free text) -->
+    <div *ngIf="activeTab === 'list'">
+        <cds-textarea
+            class="text-editable-div"
+            [activeFocus]="activeFocus"
+            [text]="rawText"
+            [minRow]="1"
+            [limitCharsText]="limitCharsText"
+            [showUtils]="false"
+            [setAttributeBtn]="false"
+            [emojiPikerBtn]="false"
+            popoverVerticalAlign="above"
+            (changeTextarea)="onChangeTextarea($event)"
+            (blur)="onBlur($event)"
+            (selectedAttribute)="onSelectedAttribute($event)">
+        </cds-textarea>
+    </div>
+
+    <!-- Mode: Form -->
+    <div *ngIf="activeTab === 'form'" class="url-form" (focusout)="onFormFocusOut($event)">
+        <div *ngFor="let item of urlFormItems; let i = index" class="url-form__item">
+            <div class="url-form__item-header">
+                <span class="url-form__item-index">Link {{ i + 1 }}</span>
+                <button
+                    *ngIf="urlFormItems.length > 1"
+                    type="button"
+                    class="url-form__remove-btn"
+                    (click)="removeFormItem(i)">
+                    <em class="material-icons">delete</em>
+                </button>
+            </div>
+            <div class="url-form__field url-form__field--required">
+                <label class="url-form__label">{{ 'UrlPreviewFormLink' | translate }} *</label>
+                <input
+                    class="url-form__input"
+                    type="url"
+                    [placeholder]="'UrlPreviewFormLinkPlaceholder' | translate"
+                    [(ngModel)]="item.source_name" />
+            </div>
+            <div class="url-form__field">
+                <label class="url-form__label">{{ 'UrlPreviewFormTitle' | translate }}</label>
+                <input
+                    class="url-form__input"
+                    type="text"
+                    [placeholder]="'UrlPreviewFormTitlePlaceholder' | translate"
+                    [(ngModel)]="item.source_file_name" />
+            </div>
+            <div class="url-form__field">
+                <label class="url-form__label">{{ 'UrlPreviewFormDescription' | translate }}</label>
+                <input
+                    class="url-form__input"
+                    type="text"
+                    [placeholder]="'UrlPreviewFormDescriptionPlaceholder' | translate"
+                    [(ngModel)]="item.source_description" />
+            </div>
+            <div class="url-form__field">
+                <div class="url-form__image-header">
+                    <label class="url-form__label">{{ 'UrlPreviewFormImage' | translate }}</label>
+                    <div class="url-form__image-toggle">
+                        <button type="button"
+                            [class.active]="item._imageMode !== 'upload'"
+                            (click)="setImageMode(i, 'url')">Link</button>
+                        <button type="button"
+                            [class.active]="item._imageMode === 'upload'"
+                            (click)="setImageMode(i, 'upload')">Upload</button>
+                    </div>
+                </div>
+                <ng-container *ngIf="item._imageMode !== 'upload'">
+                    <input
+                        class="url-form__input"
+                        type="url"
+                        [placeholder]="'UrlPreviewFormImagePlaceholder' | translate"
+                        [(ngModel)]="item.source_image" />
+                </ng-container>
+                <ng-container *ngIf="item._imageMode === 'upload'">
+                    <label class="url-form__upload-area">
+                        <input type="file" accept="image/*" hidden (change)="onImageFileChange($event, i)" />
+                        <ng-container *ngIf="!item.source_image">
+                            <em class="material-icons">add_photo_alternate</em>
+                            <span>{{ 'UrlPreviewFormImageUpload' | translate }}</span>
+                        </ng-container>
+                        <ng-container *ngIf="item.source_image">
+                            <img [src]="item.source_image" class="url-form__upload-thumb" alt="" />
+                            <span class="url-form__upload-remove" (click)="$event.preventDefault(); item.source_image = ''">
+                                <em class="material-icons">close</em>
+                            </span>
+                        </ng-container>
+                    </label>
+                </ng-container>
+            </div>
+        </div>
+        <button type="button" class="url-form__add-btn" (click)="addFormItem()">
+            <em class="material-icons">add</em>
+            {{ 'Add' | translate }}
+        </button>
+    </div>
+
+    <!-- Mode: Text (json parameter) -->
+    <div *ngIf="activeTab === 'text'" class="url-json-sources">
+        <cds-textarea
+            id="jsonSources"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1"
+            [maxRow]="1"
+            [readonly]="true"
+            [showUtils]="true"
+            [text]="jsonSourcesValue"
+            [placeholder]="'{{json_sources}}'"
+            (selectedAttribute)="onJsonSourcesChange($event?.value)"
+            (clearSelectedAttribute)="onJsonSourcesChange('')">
+        </cds-textarea>
+    </div>
+
+</div>
