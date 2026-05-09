@@ -84,6 +84,7 @@ cds-connector.button-connector {
     position: absolute;
     right: -23px;
     top: calc(50% - 10px);
+    z-index: 2;
 }
 
 cds-connector.connector-true,

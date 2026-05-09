@@ -102,7 +102,7 @@
                     'cds-last-action': last
                 }"
                 (keydown)="onKeydown($event)"
-                (click)="onSelectAction(action, i, action._tdActionId)">
+                (click)="$event.stopPropagation(); onSelectAction(action, i, action._tdActionId)">
 
                 <span class="action-element">
 

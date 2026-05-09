@@ -74,14 +74,15 @@
     border-radius: inherit;
   }
 
-  // Drag handle trasparente in alto
+  // Drag handle trasparente — copre l'intero blocco, z-index sotto connettori e bottoni
   .header-draggable {
     position: absolute;
     background-color: transparent;
-    width: calc(100% - 0px);
-    height: 40px;
+    width: 100%;
+    height: 100%;
     top: 0; left: 0;
     z-index: 1;
+    cursor: grab;
   }
 }
 

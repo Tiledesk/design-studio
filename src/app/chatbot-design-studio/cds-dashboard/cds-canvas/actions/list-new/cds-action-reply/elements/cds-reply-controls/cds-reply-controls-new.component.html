@@ -1,0 +1,48 @@
+<div class="reply-controls">
+
+    <button class="ctrl-btn ctrl-btn--delete"
+        title="Delete"
+        (click)="$event.stopPropagation(); deleteReply.emit()">
+        <!-- <mat-icon>delete</mat-icon> -->
+        <span class="material-icons-outlined">delete</span>
+    </button>
+
+    <button class="ctrl-btn"
+        title="Move to top"
+        [disabled]="isFirst"
+        (click)="$event.stopPropagation(); moveToTop.emit()">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 12 12 6 18 12"/>
+            <polyline points="6 18 12 12 18 18"/>
+        </svg>
+    </button>
+
+    <button class="ctrl-btn"
+        title="Move up"
+        [disabled]="isFirst"
+        (click)="$event.stopPropagation(); moveUp.emit()">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 15 12 9 18 15"/>
+        </svg>
+    </button>
+
+    <button class="ctrl-btn"
+        title="Move down"
+        [disabled]="isLast"
+        (click)="$event.stopPropagation(); moveDown.emit()">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+        </svg>
+    </button>
+
+    <button class="ctrl-btn"
+        title="Move to bottom"
+        [disabled]="isLast"
+        (click)="$event.stopPropagation(); moveToBottom.emit()">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 6 12 12 18 6"/>
+            <polyline points="6 12 12 18 18 12"/>
+        </svg>
+    </button>
+
+</div>
