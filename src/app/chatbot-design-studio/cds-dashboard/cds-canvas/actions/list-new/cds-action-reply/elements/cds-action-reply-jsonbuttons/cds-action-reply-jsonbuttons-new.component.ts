@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -6,6 +7,7 @@ import { LIST_JSON_MODEL_REPLY_V1, LIST_JSON_MODEL_REPLY_V2, JSON_MODEL_PLACEHOL
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { DOCS_LINK } from 'src/app/chatbot-design-studio/utils';
+import { CDSTextareaComponent } from 'src/app/chatbot-design-studio/cds-dashboard/cds-canvas/base-elements/textarea/textarea.component';
 
 @Component({
   selector: 'cds-action-reply-jsonbuttons-new',
@@ -16,93 +18,147 @@ export class CdsActionReplyJsonbuttonsNewComponent implements OnInit {
   @Input() jsonBody: string;
   @Output() changeJsonButtons = new EventEmitter();
 
-  showJsonButton: boolean =  false;
-  showJsonBody: boolean =  false;
+  @ViewChild('jsonCdsTextarea') jsonCdsTextarea: CDSTextareaComponent;
+
+  showJsonSection: boolean = false;
+  showJsonBody: boolean = false;
+  isEditing: boolean = false;
+  selectOpen: boolean = false;
+  selectedExample: any = null;
+  highlightedJson: SafeHtml = '';
   jsonPlaceholder: string = JSON_MODEL_PLACEHOLDER;
-  listType: any = {};
+  listType: any[] = [];
   link: any;
-  // exampleSelected: null;
-  
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private readonly intentService: IntentService,
-    // private cdr: ChangeDetectorRef
+    private readonly sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
     this.initialize();
   }
 
-  ngAfterViewInit (): void {
-    // // this.cdr.detectChanges();
-  }
-
-  initialize(){
-    this.listType = LIST_JSON_MODEL_REPLY_V1; 
-    if(this.intentService.selectedAction._tdActionType !== TYPE_ACTION.REPLY){
-      this.listType = LIST_JSON_MODEL_REPLY_V2; 
-    };
-    if(this.jsonBody && this.jsonBody.trim() !== ''){
-      this.showJsonBody = true;
-      this.showJsonButton = true;
-    } else {
-      this.jsonBody = '';
-      this.showJsonBody = false;
-      this.showJsonButton = false;
-    }
+  initialize() {
+    const baseList = this.intentService.selectedAction?._tdActionType !== TYPE_ACTION.REPLY
+      ? LIST_JSON_MODEL_REPLY_V2
+      : LIST_JSON_MODEL_REPLY_V1;
     this.link = DOCS_LINK.JSON_BUTTONS;
-  }
 
-
-  // ACTIONS //
-
-  /** onDeleteJsonButtons */
-  onChangeJsonButtonsType(event){
-    this.jsonBody = event['value']?event['value']:'';
-    this.showJsonBody = true;
-    this.showJsonButton = false;
-    this.changeJsonButtons.emit(this.jsonBody);
-  }
-
-  /** onDeleteJsonButtons */
-  onResetJsonButtonsType(event){
-    this.logger.log('[ACTION REPLY jsonbuttons] onResetJsonButtonsType ', this.jsonBody);
-    this.changeJsonButtons.emit(this.jsonBody);
-  }
-
-  /** onClickJsonButtons */
-  onClickJsonButtons(){
-    if(!this.showJsonBody){
+    if (this.jsonBody && this.jsonBody.trim() !== '') {
+      this.showJsonSection = true;
       this.showJsonBody = true;
-      this.showJsonButton = true;
+      this.updateHighlight(this.jsonBody);
+      const match = baseList.find(i => i.value.trim() === this.jsonBody.trim());
+      if (match) {
+        this.listType = baseList;
+        this.selectedExample = match;
+      } else {
+        const myItem = { name: 'My JSON Buttons', meta: 'saved', value: this.jsonBody };
+        this.listType = [myItem, ...baseList];
+        this.selectedExample = myItem;
+      }
+    } else {
+      this.listType = baseList;
+      this.jsonBody = '';
+      this.showJsonSection = false;
+      this.showJsonBody = false;
     }
   }
 
-  /** onDeleteJsonButtons */
-  onDeleteJsonButtons(){
-    this.jsonBody = '';
+  enterEditMode() {
+    this.isEditing = true;
+    setTimeout(() => {
+      this.jsonCdsTextarea?.elTextarea?.focus();
+    }, 0);
+  }
+
+  toggleSelect() {
+    this.selectOpen = !this.selectOpen;
+  }
+
+  closeSelect() {
+    this.selectOpen = false;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.selectOpen = false;
+  }
+
+  selectExample(item: any) {
+    this.selectedExample = item;
+    this.selectOpen = false;
+    this.jsonBody = item.value;
+    this.showJsonBody = true;
+    this.isEditing = false;
+    this.updateHighlight(item.value);
+    this.changeJsonButtons.emit(this.jsonBody);
+  }
+
+  onClickJsonButtons() {
+    this.showJsonSection = true;
     this.showJsonBody = false;
-    this.showJsonButton = false;
+    this.isEditing = false;
+  }
+
+  onDeleteJsonButtons() {
+    this.jsonBody = '';
+    this.showJsonSection = false;
+    this.showJsonBody = false;
+    this.isEditing = false;
+    this.selectedExample = null;
+    this.highlightedJson = '';
     this.changeJsonButtons.emit();
   }
 
-  /** onChangeJsonTextarea */
-  onChangeJsonTextarea(text:string) {
-    if(!text || text.trim() === ''){
-      this.showJsonButton = true;
-    } else {
-      this.jsonBody = text;
-      this.showJsonButton = false;
-    }
-    // // this.changeJsonButtons.emit(text);
+  onChangeJsonTextarea(text: string) {
+    this.jsonBody = text || '';
+    const match = this.listType.find(i => i.value.trim() === this.jsonBody.trim());
+    this.selectedExample = match ?? null;
   }
 
-  /** onBlurJsonTextarea */
-  onBlurJsonTextarea(event:any){
-    this.logger.log('[ACTION REPLY jsonbuttons] onBlurJsonTextarea ', event);
-    const json = event.target?.value;
-    this.changeJsonButtons.emit(json);
+  onBlurJsonTextarea(event: Event) {
+    this.logger.log('[ACTION REPLY jsonbuttons-new] onBlurJsonTextarea ', event);
+    const json = (event.target as HTMLTextAreaElement)?.value ?? this.jsonBody;
+    this.jsonBody = json;
+    this.isEditing = false;
+    if (this.jsonBody.trim()) {
+      this.showJsonBody = true;
+      this.updateHighlight(this.jsonBody);
+      this.syncMyJsonButton();
+    } else {
+      this.showJsonBody = false;
+    }
+    this.changeJsonButtons.emit(this.jsonBody);
   }
-    
+
+  private syncMyJsonButton() {
+    const baseList = this.listType.filter(i => i.meta !== 'saved');
+    const match = baseList.find(i => i.value.trim() === this.jsonBody.trim());
+    if (match) {
+      this.listType = baseList;
+      this.selectedExample = match;
+    } else {
+      const myItem = { name: 'My JSON Buttons', meta: 'saved', value: this.jsonBody };
+      this.listType = [myItem, ...baseList];
+      this.selectedExample = myItem;
+    }
+  }
+
+  private updateHighlight(json: string) {
+    const escaped = json
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    const highlighted = escaped
+      .replace(/"([^"]+)"(\s*:)/g, '<span class="jk">"$1"</span>$2')
+      .replace(/:\s*"([^"]*)"/g, ': <span class="js">"$1"</span>')
+      .replace(/([{}[\],])/g, '<span class="jp">$1</span>');
+
+    this.highlightedJson = this.sanitizer.bypassSecurityTrustHtml(highlighted);
+  }
 }

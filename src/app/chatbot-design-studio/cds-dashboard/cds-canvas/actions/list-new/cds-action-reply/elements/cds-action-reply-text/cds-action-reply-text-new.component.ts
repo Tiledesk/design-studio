@@ -1,6 +1,5 @@
 
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter, SimpleChanges, ChangeDetectorRef } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/models/action-model';
@@ -229,19 +228,16 @@ export class CdsActionReplyTextNewComponent implements OnInit {
       case 'moveLeft':
         break;
       case 'moveRight':
+        if (index < this.buttons.length - 1) {
+          [this.buttons[index], this.buttons[index + 1]] = [this.buttons[index + 1], this.buttons[index]];
+          this.changeActionReply.emit();
+        }
         break;
       case 'new': /** onCreateNewButton */
         this.createNewButton.emit(this.index);
         break;
     }
   }
-
-  /** dropButtons */
-  dropButtons(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.buttons, event.previousIndex, event.currentIndex);
-    this.connectorService.updateConnector(this.idIntent);
-    this.changeActionReply.emit();
-  }  
 
   /** checkForVariablesInsideText */
   checkForVariablesInsideText(text: string){

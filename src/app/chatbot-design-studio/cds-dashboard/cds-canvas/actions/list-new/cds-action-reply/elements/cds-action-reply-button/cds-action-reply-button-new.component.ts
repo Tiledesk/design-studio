@@ -10,6 +10,7 @@ export class CdsActionReplyButtonNewComponent implements OnInit {
 
   @Input() button: any
   @Input() previewMode: boolean = true;
+  @Input() isLast: boolean = false;
   @Output() onButtonControl = new EventEmitter()
   
   TYPE_BUTTON = TYPE_BUTTON

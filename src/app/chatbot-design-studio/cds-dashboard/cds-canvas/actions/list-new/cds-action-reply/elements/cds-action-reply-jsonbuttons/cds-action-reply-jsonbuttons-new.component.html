@@ -1,52 +1,79 @@
-<!-- *ngIf="!showJsonButton" -->
-<div class="buttons-json-response">
-    <div class="button-reply-add button-json single-btn-reply" 
-    [class.disabled]="showJsonButton"
-    (click)="!showJsonButton && $event.stopPropagation();onClickJsonButtons()">
+<!-- Add button -->
+<div class="buttons-json-response" *ngIf="!showJsonSection">
+    <div class="button-reply-add button-json single-btn-reply"
+        (click)="onClickJsonButtons()">
         + {{'CDSCanvas.JsonButtons' | translate }}
     </div>
 </div>
 
+<!-- Examples select + editor -->
+<div *ngIf="showJsonSection" class="json-examples-section">
 
-<div *ngIf="showJsonButton" class="buttons-json-response json-shown">
-    <cds-select 
-        class="text-condition" 
-        [items]="listType" 
-        [bindLabelSelect]="'name'"
-        [bindValueSelect]="'value'" 
-        [placeholder]="'CDSCanvas.Examples' | translate "
-        [deleteButton]="false"
-        [clearable]="false"
-        [searchable]="false"
-        (onSelected)="onChangeJsonButtonsType($event)"
-        (onReset)="onResetJsonButtonsType($event)"
-        [clearable]="true">
-    </cds-select>
-</div>
+    <div class="json-select-wrap" [class.open]="selectOpen" (clickOutside)="closeSelect()">
+        <div class="json-select-header">
+            <label class="json-select-label">{{ 'CDSCanvas.Examples' | translate }}</label>
+            <button class="ctrl-btn ctrl-btn--delete" title="Delete"
+                (click)="$event.stopPropagation(); onDeleteJsonButtons()">
+                <span class="material-icons-outlined">delete</span>
+            </button>
+        </div>
+        <button type="button" class="json-select-trigger" [class.open]="selectOpen"
+            (click)="$event.stopPropagation(); toggleSelect()">
+            <span class="json-select-value">
+                <svg class="json-select-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                </svg>
+                {{ selectedExample?.name || ('CDSCanvas.Examples' | translate) }}
+            </span>
+            <svg class="json-select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+            </svg>
+        </button>
 
-
-<div *ngIf="showJsonBody" class="json-text">
-    
-    <cds-textarea
-        class = "text-editable-div"
-        [text]="jsonBody"
-        [placeholder]="jsonPlaceholder"
-        [limitCharsText]="10000"
-        [emojiPikerBtn]="false"
-        [setAttributeBtn]="true"
-        [minRow]="5" [maxRow]="20"
-        [readonly]="false"
-        (blur)="onBlurJsonTextarea($event)"
-        (changeTextarea)="onChangeJsonTextarea($event)">
-    </cds-textarea>
-    <div class="button-controls">
-        <div class="control-button delete" (click)="$event.stopPropagation(); onDeleteJsonButtons()">
-            <em class="material-icons">delete</em>
+        <div class="json-select-menu" role="listbox">
+            <button *ngFor="let item of listType"
+                class="json-select-option"
+                [class.selected]="selectedExample?.name === item.name"
+                [class.json-select-option--mine]="item.meta === 'saved'"
+                role="option"
+                [attr.aria-selected]="selectedExample?.name === item.name"
+                type="button"
+                (click)="selectExample(item)">
+                <span class="json-select-opt-name">{{ item.name }}</span>
+                <span class="json-select-opt-meta">{{ item.meta }}</span>
+            </button>
         </div>
     </div>
-</div>
 
-<label *ngIf="showJsonBody" class="field-description more-info2">
-    <a [href]="link.more_json_uttons.link" [target]='link.more_json_uttons.target'>{{ 'CDSCanvas.More' | translate }} </a>
-    <span> on {{ "CDSCanvas.JSONButtons" | translate }}</span>
-</label>
+    <!-- Code preview: click to enter edit mode -->
+    <div *ngIf="showJsonBody && !isEditing"
+         #jsonCodeBlock
+         class="json-code-block"
+         title="Click to edit"
+         (click)="enterEditMode()">
+        <pre [innerHTML]="highlightedJson"></pre>
+    </div>
+
+    <!-- Textarea: shown while editing, hidden on blur -->
+    <cds-textarea *ngIf="isEditing"
+            #jsonCdsTextarea
+            class="text-editable-div json-textarea-edit"
+            [text]="jsonBody"
+            [placeholder]="jsonPlaceholder"
+            [limitCharsText]="10000"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="5" [maxRow]="20"
+            [readonly]="false"
+            (blur)="onBlurJsonTextarea($event)"
+            (changeTextarea)="onChangeJsonTextarea($event)">
+    </cds-textarea>
+
+    <div *ngIf="showJsonBody" class="json-section-footer">
+        <span class="field-description more-info2">
+            <a [href]="link.more_json_uttons.link" [target]='link.more_json_uttons.target'>{{ 'CDSCanvas.More' | translate }}</a>
+            <span> on {{ "CDSCanvas.JSONButtons" | translate }}</span>
+        </span>
+    </div>
+
+</div>

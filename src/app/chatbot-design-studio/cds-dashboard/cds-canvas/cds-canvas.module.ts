@@ -48,6 +48,8 @@ import { CdsActionReplyNewComponent } from './actions/list-new/cds-action-reply/
 import { CdsActionReplyToolsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools-new.component';
 import { CdsReplyControlsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-reply-controls/cds-reply-controls-new.component';
 import { CdsActionReplyTextNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text-new.component';
+import { CdsActionReplyButtonNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button-new.component';
+import { CdsActionReplyJsonbuttonsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons-new.component';
 
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
@@ -120,6 +122,8 @@ const routes: Routes = [
     CdsActionReplyToolsNewComponent,
     CdsReplyControlsNewComponent,
     CdsActionReplyTextNewComponent,
+    CdsActionReplyButtonNewComponent,
+    CdsActionReplyJsonbuttonsNewComponent,
 
     //MODALS
     MouseTipsComponent,

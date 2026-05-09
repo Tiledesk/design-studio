@@ -2,7 +2,7 @@
 
     <div class="box-up" *ngIf="!previewMode">
 
-        <cds-action-reply-tools
+        <cds-action-reply-tools-new
             [idAction]="idAction"
             (addNewActionReply) = onAddNewActionReply($event)>
         </cds-action-reply-tools-new>
@@ -50,7 +50,7 @@
                         <!-- TEXT RESPONSE: only odd element -->
                         <div *ngIf="command.message?.type === typeMessage.TEXT">
                         <div class="response">
-                            <cds-action-reply-text
+                            <cds-action-reply-text-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -70,7 +70,7 @@
                     <!-- IMAGE RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.IMAGE">
                         <div class="response">
-                            <cds-action-reply-image
+                            <cds-action-reply-image-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -89,7 +89,7 @@
                     <!-- FRAME RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.FRAME">
                         <div class="response">
-                            <cds-action-reply-frame
+                            <cds-action-reply-frame-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -103,7 +103,7 @@
                     <!-- REDIRECT RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.REDIRECT">
                         <div class="response">
-                            <cds-action-reply-redirect
+                            <cds-action-reply-redirect-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -117,7 +117,7 @@
                     <!-- GALLERY RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.GALLERY">
                         <div class="response">
-                            <cds-action-reply-gallery
+                            <cds-action-reply-gallery-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -134,7 +134,7 @@
                         </div><!-- /reply-content -->
                     </div><!-- /reply-row -->
 
-                    <hr class="preview-divider" *ngIf="i !==length-1 && previewMode">
+                    <hr class="msg-sep" *ngIf="i !== length - 1">
 
                 </div>
 
@@ -142,7 +142,7 @@
 
             <hr class="custom-divider" *ngIf="!previewMode" >
             <div class="response">
-                <cds-action-reply-settings
+                <cds-action-reply-settings-new
                     [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
                     [idAction] = "idAction"
                     [action] = "action"

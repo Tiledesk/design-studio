@@ -40,7 +40,7 @@ export class CdsActionReplyJsonbuttonsComponent implements OnInit {
 
   initialize(){
     this.listType = LIST_JSON_MODEL_REPLY_V1; 
-    if(this.intentService.selectedAction._tdActionType !== TYPE_ACTION.REPLY){
+    if(this.intentService.selectedAction?._tdActionType !== TYPE_ACTION.REPLY){
       this.listType = LIST_JSON_MODEL_REPLY_V2; 
     };
     if(this.jsonBody && this.jsonBody.trim() !== ''){

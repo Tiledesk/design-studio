@@ -39,6 +39,7 @@
     // grid-template-columns: minmax(0px, 1fr) 100px;
     grid-column-gap: 10px;
     grid-row-gap: 10px;
+    padding-bottom: 10px;
 }
 
 .control-buttons{
@@ -88,25 +89,27 @@
 .chip {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    height: 27px;
-    padding: 0 10px 0 4px;
+    height: 28px;
+    padding: 0 10px;
     border-radius: 999px;
-    border: 1px solid var(--ds-muted, #8a8884);
-    background: var(--surface, #ffffff);
-    color: var(--ink-2, #3a3935);
-    font-size: 12.5px;
-    font-weight: 500;
+    border: 1px dashed var(--ds-border-strong, #d8d6d2);
+    background: transparent;
+    color: var(--ds-muted, #8a8884);
     cursor: pointer;
+    font-size: 10px;
+    font-weight: 400;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
     transition: background 0.12s, border-color 0.12s, color 0.12s;
 
     &:hover {
-        background: var(--canvas, #f7f6f3);
-        border-color: var(--border-strong, #d8d6d2);
-        color: var(--ink, #14140e);
-        .filter-label {
+            border-color: var(--ds-muted, #8a8884);
             color: var(--ink-2, #3a3935);
-        }
+            background: var(--canvas, #f7f6f3);
+        // .filter-label {
+        //     color: var(--ink-2, #3a3935);
+        // }
     }
 }
 
@@ -120,17 +123,17 @@
         border-color: var(--ds-muted, #8a8884);
     }
 
-    .filter-label {
-        display: flex;
-        width: auto;
-        color: var(--ds-muted, #8a8884);
-        cursor: pointer;
-        font-size: 0.8em;
-        font-weight: 400;
-        white-space: nowrap;
-        align-items: center;
-        justify-content: flex-start;
-    }
+    // .filter-label {
+    //     display: flex;
+    //     width: auto;
+    //     color: var(--ds-muted, #8a8884);
+    //     cursor: pointer;
+    //     font-size: 0.8em;
+    //     font-weight: 400;
+    //     white-space: nowrap;
+    //     align-items: center;
+    //     justify-content: flex-start;
+    // }
 }
 
 .basic-filter-wrp{
@@ -142,36 +145,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    .add-filter-button{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-
-        user-select: none;
-        box-sizing: border-box;
-        outline: none;
-        border: 1px dashed var(--border);
-        border-radius: var(--button-border-radius);
-        color: var(--border);
-        cursor: pointer;
-        font-size: 0.7em;
-        font-weight: 400;
-        line-height: var(--button-height);
-        // margin: 0px 5px 0;
-        order: 1;
-        padding: 0 10px;
-        transition: all .3s;
-        min-width: 100px;
-        text-align: center;
-        width: fit-content;
-
-        
-        &:hover{
-            border-color: var(--textColor);
-            color: var(--textColor);
-        }
-    }
     
 }
 

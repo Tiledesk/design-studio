@@ -81,14 +81,14 @@ export const JSON_MODEL_ACTION_ALIAS_BUTTONS = `[
 
 
 export const LIST_JSON_MODEL_REPLY_V1 = [
-    {name: 'Action buttons', value: JSON_MODEL_ACTION_BUTTONS},
-    {name: 'URL buttons', value: JSON_MODEL_URL_BUTTONS},
-    {name: 'Text buttons', value: JSON_MODEL_TEXT_BUTTONS},
+    {name: 'Action buttons', meta: 'action', value: JSON_MODEL_ACTION_BUTTONS},
+    {name: 'URL buttons', meta: 'external link', value: JSON_MODEL_URL_BUTTONS},
+    {name: 'Text buttons', meta: 'postback', value: JSON_MODEL_TEXT_BUTTONS},
 ]
 
 export const LIST_JSON_MODEL_REPLY_V2 = [
-    {name: 'Action buttons', value: JSON_MODEL_ACTION_BUTTONS},
-    {name: 'URL buttons', value: JSON_MODEL_URL_BUTTONS},
-    {name: 'Text buttons', value: JSON_MODEL_TEXT_BUTTONS},
-    {name: 'Action alias buttons', value: JSON_MODEL_ACTION_ALIAS_BUTTONS}
+    {name: 'Action buttons', meta: 'action', value: JSON_MODEL_ACTION_BUTTONS},
+    {name: 'URL buttons', meta: 'external link', value: JSON_MODEL_URL_BUTTONS},
+    {name: 'Text buttons', meta: 'postback', value: JSON_MODEL_TEXT_BUTTONS},
+    {name: 'Action alias buttons', meta: 'handoff · variable', value: JSON_MODEL_ACTION_ALIAS_BUTTONS}
 ]

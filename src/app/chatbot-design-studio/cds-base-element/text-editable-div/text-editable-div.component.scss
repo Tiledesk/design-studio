@@ -54,7 +54,7 @@
     overflow: hidden auto;
     padding: 5px 10px;
     /* resize: vertical; */
-    max-height: 125px;
+    max-height: 400px;
 }
 
 .emoji-picker-button {
@@ -79,7 +79,9 @@
 }
 
 .emoji-picker-button:hover {
-    background: rgba(0, 108, 255, 0.3);
+    background: var(--ds-bg, #fbfbfa);
+    border-color: var(--border-strong, #d8d6d2);
+    color: var(--ink, #14140e);
 }
 
 .tpl-text-limit {
@@ -128,7 +130,9 @@
 }
 
 .insert-attribute-btn:hover {
-    background: rgba(0, 108, 255, .3);
+    background: var(--ds-bg, #fbfbfa);
+    border-color: var(--border-strong, #d8d6d2);
+    color: var(--ink, #14140e);
 }
 
 .material-icons-data-object {

@@ -45,7 +45,7 @@ import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot/cds-act
 import { CdsActionReplaceBotV3Component } from './cds-action-replace-bot/cds-action-replace-bot-v3/cds-action-replace-bot-v3.component';
 import { CdsActionReplaceBotNewComponent } from './cds-action-replace-bot/cds-action-replace-bot-v1/cds-action-replace-bot.component';
 import { CdsActionReplyNewComponent } from './cds-action-reply/cds-action-reply-v1/cds-action-reply.component';
-import { CdsActionReplyButtonNewComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
+import { CdsActionReplyButtonNewComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button-new.component';
 import { CdsActionReplyFrameNewComponent } from './cds-action-reply/elements/cds-action-reply-frame/cds-action-reply-frame.component';
 import { CdsActionReplyGalleryNewComponent } from './cds-action-reply/elements/cds-action-reply-gallery/cds-action-reply-gallery.component';
 import { CdsActionReplyImageNewComponent } from './cds-action-reply/elements/cds-action-reply-image/cds-action-reply-image.component';

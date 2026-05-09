@@ -207,21 +207,21 @@ export class CDSTextareaComponent implements OnInit {
     this.elTextarea = this.autosize['_textareaElement'] as HTMLInputElement;
     this.logger.log('[CDS-TEXAREA] - GET TEXT AREA2 - elTextarea ', this.elTextarea);
     this.logger.log('[CDS-TEXAREA] - activeFocus ', this.activeFocus);
-    if (this.elTextarea && this.activeFocus === true) {
-      setTimeout(() => {
-        this.elTextarea.focus();
-      }, 1000);
-    }
+    // if (this.elTextarea && this.activeFocus === true) {
+    //   setTimeout(() => {
+    //     this.elTextarea.focus();
+    //   }, 1000);
+    // }
   }
 
   private insertAtCursorPos(elem: HTMLInputElement, attribute) {
     let cursor_pos = elem.selectionStart;
-    var textarea_txt = elem.value;
+    let textarea_txt = elem.value;
     this.logger.log('[CDS-TEXAREA] - insertAtCursorPos ', this.isJsonAttribute, attribute);
     if(this.isJsonAttribute){
       attribute =this.checkAndSetJsonBody(attribute);
     }
-    var txt_to_add = attribute;
+    let txt_to_add = attribute;
     //clear '{' or '{{' cursor_pos -1/-2 chars
     if( textarea_txt.substring(cursor_pos -1, cursor_pos) === '{')  textarea_txt = textarea_txt.substring(0, cursor_pos-1)
     if( textarea_txt.substring(cursor_pos -2, cursor_pos) === '{{')  textarea_txt = textarea_txt.substring(0, cursor_pos-2)

@@ -117,10 +117,6 @@ $margin-bottom: 15px;
     }
 }
 
-.cds-action-preview{
-    padding: 10px 0px;
-}
-
 .previewMode{
     &.box-content {
         margin: 0px;
@@ -482,12 +478,6 @@ $margin-bottom: 15px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-}
-
-.msg-sep {
-    height: 1px;
-    background: var(--border, #e8e6e0);
-    margin: 8px 16px;
 }
 
 /* ===== INSPECTOR FOOTER ===== */

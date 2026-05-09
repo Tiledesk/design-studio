@@ -71,7 +71,7 @@
                     <!-- IMAGE RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.IMAGE">
                         <div class="response">
-                            <cds-action-reply-image
+                            <cds-action-reply-image-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -83,42 +83,42 @@
                                 (updateAndSaveAction) = onUpdateAndSaveAction($event)
                                 (changeActionReply) = onChangeActionReply($event)
                                 (changeJsonButtons) = "onChangeJsonButtons($event, i)">
-                            </cds-action-reply-image>
+                            </cds-action-reply-image-new>
                         </div>
                     </div>
 
                     <!-- FRAME RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.FRAME">
                         <div class="response">
-                            <cds-action-reply-frame
+                            <cds-action-reply-frame-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
                                 (changeActionReply) = onChangeActionReply($event)>
-                            </cds-action-reply-frame>
+                            </cds-action-reply-frame-new>
                         </div>
                     </div>
 
                     <!-- REDIRECT RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.REDIRECT">
                         <div class="response">
-                            <cds-action-reply-redirect
+                            <cds-action-reply-redirect-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
                                 (changeActionReply) = onChangeActionReply($event)>
-                            </cds-action-reply-redirect>
+                            </cds-action-reply-redirect-new>
                         </div>
                     </div>
 
                     <!-- GALLERY RESPONSE -->
                     <div *ngIf="command.message?.type === typeMessage.GALLERY">
                         <div class="response">
-                            <cds-action-reply-gallery
+                            <cds-action-reply-gallery-new
                                 [index] = i
                                 [idAction] = "idAction"
                                 [response] = "command.message"
@@ -127,14 +127,14 @@
                                 (openButtonPanel) = onOpenButtonPanel($event)
                                 (changeActionReply) = onChangeActionReply($event)
                                 (updateAndSaveAction) = onUpdateAndSaveAction($event)>
-                            </cds-action-reply-gallery>
+                            </cds-action-reply-gallery-new>
                         </div>
                     </div>
 
                         </div><!-- /reply-content -->
                     </div><!-- /reply-row -->
 
-                    <hr class="preview-divider" *ngIf="i !==length-1 && previewMode">
+                    <hr class="msg-sep" *ngIf="i !== length - 1">
 
                 </div>
 

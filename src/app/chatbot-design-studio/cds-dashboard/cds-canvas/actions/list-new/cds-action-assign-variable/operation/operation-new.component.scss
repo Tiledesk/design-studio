@@ -19,38 +19,6 @@
     gap: 25px;
 }
 
-.add-filter-button{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin: auto;
-
-    user-select: none;
-    box-sizing: border-box;
-    outline: none;
-    border: 1px dashed var(--border);
-    border-radius: var(--button-border-radius-base);
-    color: var(--border);
-    cursor: pointer;
-    font-size: 0.7em;
-    font-weight: 400;
-    line-height: var(--button-height-base);
-    // margin: 0px 5px 0;
-    order: 1;
-    padding: 0 10px;
-    transition: all .3s;
-    min-width: 100px;
-    text-align: center;
-    width: fit-content;
-
-    
-    &:hover{
-        border-color: var(--textColor);
-        color: var(--textColor);
-    }
-}
-
 .base-operand {
     position: relative;
     &:hover{
