@@ -19,7 +19,7 @@ import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
-  selector: '  selector: 'cds-action-askgpt-new',-new',
+  selector: 'cds-action-askgpt-new',
   templateUrl: './cds-action-askgpt-new.component.html',
   styleUrls: ['./cds-action-askgpt-new.component.scss']
 })

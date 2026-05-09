@@ -14,8 +14,8 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 
 //UTILS
-import { AttributesDialogAiConditionComponent } from './attributes-dialog/attributes-dialog.component';
-import { AiConditionComponent } from './ai-condition/ai-condition.component';
+import { AttributesDialogAiConditionComponent } from './attributes-dialog/attributes-dialog-new.component';
+import { AiConditionComponent } from './ai-condition/ai-condition-new.component';
 import { DOCS_LINK, generateShortUID, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';

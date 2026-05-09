@@ -25,6 +25,7 @@ import { CdsEventComponent } from '../cds-event/cds-event.component';
 import { CdsRuleComponent } from '../cds-rule/cds-rule.component';
 import { CdsPanelConnectorMenuComponent } from './cds-panel-connector-menu/cds-panel-connector-menu.component';
 import { CdsActionsModule } from './actions/list/cds-actions.module';
+import { CdsActionsNewModule } from './actions/list-new/cds-actions-new.module';
 import { CdsActionDetailPanelComponent } from './cds-panel-action-detail/cds-panel-action-detail.component';
 import { CdsPanelIntentDetailComponent } from './cds-panel-intent-detail/cds-panel-intent-detail.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
@@ -44,12 +45,6 @@ import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-n
 import { NoteControlsComponent } from './cds-notes/note-controls/note-controls.component';
 import { CdsPanelDetailComponent } from './cds-panel-detail/cds-panel-detail.component';
 import { NoteResizeStateService } from './note-resize-state.service';
-import { CdsActionReplyNewComponent } from './actions/list-new/cds-action-reply/cds-action-reply-v1/cds-action-reply-new.component';
-import { CdsActionReplyToolsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools-new.component';
-import { CdsReplyControlsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-reply-controls/cds-reply-controls-new.component';
-import { CdsActionReplyTextNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text-new.component';
-import { CdsActionReplyButtonNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button-new.component';
-import { CdsActionReplyJsonbuttonsNewComponent } from './actions/list-new/cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons-new.component';
 
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from "ngx-quill";
@@ -117,14 +112,6 @@ const routes: Routes = [
     CdsActionArrowComponent,
     CdsAddActionMenuComponent,
 
-    //ACTIONS NEW (V3)
-    CdsActionReplyNewComponent,
-    CdsActionReplyToolsNewComponent,
-    CdsReplyControlsNewComponent,
-    CdsActionReplyTextNewComponent,
-    CdsActionReplyButtonNewComponent,
-    CdsActionReplyJsonbuttonsNewComponent,
-
     //MODALS
     MouseTipsComponent,
     ChangeAlphaColorComponent,
@@ -146,6 +133,7 @@ const routes: Routes = [
     CdsBaseElementModule,
     BaseElementModule,
     CdsActionsModule,
+    CdsActionsNewModule,
     CdsVoiceActionsModule,
     RouterModule.forChild(routes),
     FormsModule,

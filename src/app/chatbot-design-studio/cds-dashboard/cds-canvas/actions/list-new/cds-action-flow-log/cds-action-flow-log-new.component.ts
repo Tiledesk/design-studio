@@ -5,7 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: '  selector: 'cds-action-flow-log-new',-new',
+  selector: 'cds-action-flow-log-new',
   templateUrl: './cds-action-flow-log-new.component.html',
   styleUrls: ['./cds-action-flow-log-new.component.scss']
 })

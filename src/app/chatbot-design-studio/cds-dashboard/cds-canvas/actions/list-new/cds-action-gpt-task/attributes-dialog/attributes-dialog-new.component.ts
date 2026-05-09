@@ -5,7 +5,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 
 
 @Component({
-  selector: '  selector: 'appdashboard-attributes-dialog-new',-new',
+  selector: 'appdashboard-attributes-dialog-new',
   templateUrl: './attributes-dialog-new.component.html',
   styleUrls: ['./attributes-dialog-new.component.scss']
 })

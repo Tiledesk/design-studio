@@ -9,7 +9,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: '  selector: 'cds-action-web-response-new',-new',
+  selector: 'cds-action-web-response-new',
   templateUrl: './cds-action-web-response-new.component.html',
   styleUrls: ['./cds-action-web-response-new.component.scss']
 })

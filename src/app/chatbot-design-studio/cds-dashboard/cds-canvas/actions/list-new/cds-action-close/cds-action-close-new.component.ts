@@ -3,7 +3,7 @@ import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 import { ActionClose } from 'src/app/models/action-model';
 
 @Component({
-  selector: '  selector: 'cds-action-close-new',-new',
+  selector: 'cds-action-close-new',
   templateUrl: './cds-action-close-new.component.html',
   styleUrls: ['./cds-action-close-new.component.scss']
 })

@@ -10,7 +10,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
-  selector: '  selector: 'cds-action-add-kb-content-new',-new',
+  selector: 'cds-action-add-kb-content-new',
   templateUrl: './cds-action-add-kb-content-new.component.html',
   styleUrls: ['./cds-action-add-kb-content-new.component.scss']
 })

@@ -22,7 +22,7 @@ export enum TYPE_REGEX {
 }
 
 @Component({
-  selector: '  selector: 'appdashboard-form-edit-add-new',-new',
+  selector: 'appdashboard-form-edit-add-new',
   templateUrl: './form-edit-add-new.component.html',
   styleUrls: ['./form-edit-add-new.component.scss']
 })

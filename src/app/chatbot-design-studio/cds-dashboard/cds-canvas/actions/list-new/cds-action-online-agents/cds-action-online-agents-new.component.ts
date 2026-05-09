@@ -11,7 +11,7 @@ import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-
 
 
 @Component({
-  selector: '  selector: 'cds-action-online-agents-new',-new',
+  selector: 'cds-action-online-agents-new',
   templateUrl: './cds-action-online-agents-new.component.html',
   styleUrls: ['./cds-action-online-agents-new.component.scss']
 })

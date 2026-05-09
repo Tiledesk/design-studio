@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, 
 import { ActionWait } from 'src/app/models/action-model';
 
 @Component({
-  selector: '  selector: 'cds-action-wait-new',-new',
+  selector: 'cds-action-wait-new',
   templateUrl: './cds-action-wait-new.component.html',
   styleUrls: ['./cds-action-wait-new.component.scss']
 })

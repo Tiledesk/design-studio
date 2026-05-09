@@ -72,11 +72,11 @@ mat-form-field.box-textarea ::ng-deep {
         line-height: 1.5;
         resize: vertical;
         padding: 10px;
-        padding-top: 4px;
-        padding-bottom: 4px;
+        padding-top: 5px;
+        padding-bottom: 5px;
         margin: 0px;
-        height: 26px;
-        min-height: 26px;
+        height: auto;
+        min-height: 13px;
     }
 }
 

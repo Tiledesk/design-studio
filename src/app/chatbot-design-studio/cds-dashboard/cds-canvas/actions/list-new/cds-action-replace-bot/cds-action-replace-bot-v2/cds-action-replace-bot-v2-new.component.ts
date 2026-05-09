@@ -9,7 +9,7 @@ import { Faq } from 'src/app/models/faq-model';
 import { Intent } from 'src/app/models/intent-model';
 
 @Component({
-  selector: '  selector: 'cds-action-replace-bot-v2-new',-new',
+  selector: 'cds-action-replace-bot-v2-new',
   templateUrl: './cds-action-replace-bot-v2-new.component.html',
   styleUrls: ['./cds-action-replace-bot-v2-new.component.scss']
 })

@@ -8,7 +8,7 @@ import { BrandService } from 'src/app/services/brand.service';
 import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
-  selector: '  selector: 'cds-action-description-new',-new',
+  selector: 'cds-action-description-new',
   templateUrl: './cds-action-description-new.component.html',
   styleUrls: ['./cds-action-description-new.component.scss']
 })

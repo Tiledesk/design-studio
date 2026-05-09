@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActionAgent } from 'src/app/models/action-model';
 
 @Component({
-  selector: '  selector: 'cds-action-agent-new',-new',
+  selector: 'cds-action-agent-new',
   templateUrl: './cds-action-agent-handoff-new.component.html',
   styleUrls: ['./cds-action-agent-handoff-new.component.scss']
 })

@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 @Component({
-  selector: '  selector: 'cds-action-delete-variable-new',-new',
+  selector: 'cds-action-delete-variable-new',
   templateUrl: './cds-action-delete-variable-new.component.html',
   styleUrls: ['./cds-action-delete-variable-new.component.scss']
 })

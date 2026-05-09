@@ -1,30 +1,30 @@
 <div class="extensions-response" *ngIf="!previewMode">
 
     <div class="delay-wrapper" [ngStyle]="{width: canShowFilter? 'auto': '100%'}">
-        <appdashboard-delay-slider
+        <appdashboard-delay-slider-new
             [delayTime]="delayTime"
             (changeDelayTime)="onChangeDelayTime($event)"
             (clickDelayTime)="onClickDelayTime($event)">
         </appdashboard-delay-slider-new>
     </div>
-    <!-- ||  -->
+
     <div class="add-filter-btn-wrp" *ngIf="canShowFilter && filterConditionExist">
         <span class="material-icons-outlined">filter_alt</span>
         {{'CDSCanvas.Filter' | translate }}
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
-        <appdashboard-filter
+        <appdashboard-filter-new
             [expression]="response._tdJSONCondition"
             [booleanOperators]="booleanOperators"
             [previewMode]="previewMode"
             (onChangeExpression)="onChangeExpression($event)">
-        </appdashboard-filter>
+        </appdashboard-filter-new>
     </div>
 </div>
 
-<div class="previewMode image-editor-wrapper" *ngIf="previewMode">
-    
+
+<div *ngIf="previewMode" class="image-editor-wrapper previewMode">
     <div class="image-editor">
         <div *ngIf="!response.metadata.src" class="response-image-uploader-wrapper no-image">
             <div class="image">
@@ -35,20 +35,16 @@
         <div *ngIf="response.metadata.src" class="response-image-uploader-wrapper">
             <cds-image-upload
                 class="image-upload"
-                [metadata] = response.metadata
+                [metadata]="response.metadata"
                 (onChangeMetadata)="onChangeMetadata($event)">
             </cds-image-upload>
         </div>
-
-        <div>
-            <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
-            <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
-        </div>
-
+        <div class="response-wrp" *ngIf="response.text">{{response.text}}</div>
+        <div class="response-wrp no-text" *ngIf="!response.text">{{'CDSCanvas.ClickToAddText' | translate }}</div>
     </div>
-
 </div>
-    
+
+
 <div class="image-type-toggle cds-toggle-group" *ngIf="!previewMode">
     <button type="button"
             value="upload"
@@ -69,73 +65,68 @@
 </div>
 
 <div class="image-editor-wrapper" *ngIf="!previewMode">
-        
-        <div class="image-editor">
-    
-            <div class="response-image-uploader-wrapper">
-                <cds-image-upload 
-                    *ngIf="imageType === 'upload'"
-                    class="image-upload"
-                    [metadata] = response.metadata
-                    (onChangeMetadata)="onChangeMetadata($event)"
-                    (onDeletedMetadata)="onDeletedMetadata($event)">
-                </cds-image-upload>
-                <cds-image-url 
-                    *ngIf="imageType === 'link'"
-                    class="image-upload"
-                    [metadata] = response.metadata
-                    (onChangeMetadata)="onChangeMetadata($event)"
-                    (onDeletedMetadata)="onDeletedMetadata($event)">
-                </cds-image-url>
-            </div>
+    <div class="image-editor">
+        <div class="response-image-uploader-wrapper">
+            <cds-image-upload
+                *ngIf="imageType === 'upload'"
+                class="image-upload"
+                [metadata]="response.metadata"
+                (onChangeMetadata)="onChangeMetadata($event)"
+                (onDeletedMetadata)="onDeletedMetadata($event)">
+            </cds-image-upload>
+            <cds-image-url
+                *ngIf="imageType === 'link'"
+                class="image-upload"
+                [metadata]="response.metadata"
+                (onChangeMetadata)="onChangeMetadata($event)"
+                (onDeletedMetadata)="onDeletedMetadata($event)">
+            </cds-image-url>
+        </div>
 
-            <cds-textarea 
-                class="text-editable-div"
-                [text]="response.text" 
-                [minRow]="1"
-                popoverVerticalAlign="above"
-                (blur)="onBlur($event)"
-                (changeTextarea)="onChangeTextarea($event)">
-            </cds-textarea>
-
-        </div> 
-
+        <cds-textarea
+            class="text-editable-div"
+            [text]="response.text"
+            [minRow]="1"
+            [maxRow]="3"
+            popoverVerticalAlign="above"
+            (blur)="onBlur($event)"
+            (changeTextarea)="onChangeTextarea($event)">
+        </cds-textarea>
+    </div>
 </div>
 
-<div class="buttons-response button-replies" [class.previewMode]="previewMode" [class.disabled]="response?.attributes?.attachment?.json_buttons" cdkDropListOrientation="vertical" cdkDropList (cdkDropListDropped)="dropButtons($event)" >
-    
-    <div *ngFor="let button of buttons; let i = index;" class="cds-reply-button-element" cdkDragBoundary=".button-replies" cdkDrag> 
-   
-        <!-- DRAG PLACEHOLDER -->
-        <cds-action-reply-button class="custom-placeholder" *cdkDragPlaceholder
-            (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
-            [button]="button"
-            [previewMode]="previewMode">
-        </cds-action-reply-button-new>
 
-        <cds-action-reply-button [class.connected]='button.__isConnected' cdkDragHandle
+<div
+    class="buttons-response button-replies"
+    [class.previewMode]="previewMode"
+    [class.disabled]="response?.attributes?.attachment?.json_buttons">
+    <div *ngFor="let button of buttons; let i = index; let last = last" class="cds-reply-button-element">
+
+        <cds-action-reply-button-new [class.connected]='button.__isConnected'
             (click)="$event.stopPropagation(); onOpenButtonPanel(button)"
             [button]="button"
             [previewMode]="previewMode"
+            [isLast]="last"
             (onButtonControl)="onButtonControl($event, i)">
         </cds-action-reply-button-new>
 
         <cds-connector *ngIf="previewMode && button.type !== TYPE_BUTTON.URL"
             class="button-connector"
-            cdkDragDisabled
             [idConnector]="button.__idConnector"
-            [idConnection] = "button.__idConnection"
+            [idConnection]="button.__idConnection"
             [isConnected]="button.__isConnected">
         </cds-connector>
-        
+
     </div>
 
     <div class="button-reply-add single-btn-reply" (click)="$event.stopPropagation();onButtonControl('new', index)">
-        + {{'CDSCanvas.AddButton' | translate }}
+    + {{'CDSCanvas.AddButton' | translate }}
     </div>
+
 </div>
 
-<cds-action-reply-jsonbuttons
+
+<cds-action-reply-jsonbuttons-new
     *ngIf="!previewMode"
     [jsonBody]="jsonBody"
     (changeJsonButtons)="onChangeJsonButtons($event)">

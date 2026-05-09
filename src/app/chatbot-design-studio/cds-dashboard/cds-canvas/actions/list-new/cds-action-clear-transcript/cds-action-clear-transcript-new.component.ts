@@ -3,7 +3,7 @@ import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 import { ActionClearTranscript } from 'src/app/models/action-model';
 
 @Component({
-  selector: '  selector: 'cds-action-clear-transcript-new',-new',
+  selector: 'cds-action-clear-transcript-new',
   templateUrl: './cds-action-clear-transcript-new.component.html',
   styleUrls: ['./cds-action-clear-transcript-new.component.scss']
 })

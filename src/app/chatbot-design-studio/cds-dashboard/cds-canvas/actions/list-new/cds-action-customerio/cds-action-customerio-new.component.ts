@@ -17,7 +17,7 @@ import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
-  selector: '  selector: 'cds-action-customerio-new',-new',
+  selector: 'cds-action-customerio-new',
   templateUrl: './cds-action-customerio-new.component.html',
   styleUrls: ['./cds-action-customerio-new.component.scss']
 })

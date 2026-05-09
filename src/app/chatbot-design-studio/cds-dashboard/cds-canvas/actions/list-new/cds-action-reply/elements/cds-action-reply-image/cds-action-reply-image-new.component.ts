@@ -81,6 +81,9 @@ export class CdsActionReplyImageNewComponent implements OnInit {
     if(this.response?.attributes?.attachment?.json_buttons){
       this.jsonBody = this.response?.attributes?.attachment?.json_buttons;
     }
+    if(!this.response.metadata){
+      this.response.metadata = new Metadata();
+    }
     this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
     this.checkButtons();
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);

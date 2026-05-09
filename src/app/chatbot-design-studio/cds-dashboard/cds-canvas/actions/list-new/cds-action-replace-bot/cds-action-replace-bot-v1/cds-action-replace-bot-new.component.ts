@@ -6,7 +6,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: '  selector: 'cds-action-replace-bot-new',-new',
+  selector: 'cds-action-replace-bot-new',
   templateUrl: './cds-action-replace-bot-new.component.html',
   styleUrls: ['./cds-action-replace-bot-new.component.scss']
 })

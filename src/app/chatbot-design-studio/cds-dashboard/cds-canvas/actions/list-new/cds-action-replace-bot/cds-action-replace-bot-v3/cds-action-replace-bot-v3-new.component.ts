@@ -10,7 +10,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
-  selector: '  selector: 'cds-action-replace-bot-v3-new',-new',
+  selector: 'cds-action-replace-bot-v3-new',
   templateUrl: './cds-action-replace-bot-v3-new.component.html',
   styleUrls: ['./cds-action-replace-bot-v3-new.component.scss']
 })

@@ -17,7 +17,7 @@ export interface ModalDeleteModel {
 }
 
 @Component({
-  selector: '  selector: 'cds-form-new',-new',
+  selector: 'cds-form-new',
   templateUrl: './form-new.component.html',
   styleUrls: ['./form-new.component.scss']
 })

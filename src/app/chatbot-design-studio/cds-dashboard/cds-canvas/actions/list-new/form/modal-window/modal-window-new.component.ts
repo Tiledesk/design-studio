@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
-  selector: '  selector: 'appdashboard-modal-window-new',-new',
+  selector: 'appdashboard-modal-window-new',
   templateUrl: './modal-window-new.component.html',
   styleUrls: ['./modal-window-new.component.scss']
 })

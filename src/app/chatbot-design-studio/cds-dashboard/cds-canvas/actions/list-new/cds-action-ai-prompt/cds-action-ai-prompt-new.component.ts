@@ -14,8 +14,8 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 
 //UTILS
-import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog.component';
-import { McpServersDialogComponent } from './mcp-servers-dialog/mcp-servers-dialog.component';
+import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog-new.component';
+import { McpServersDialogComponent } from './mcp-servers-dialog/mcp-servers-dialog-new.component';
 import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';

@@ -14,7 +14,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 
 //UTILS
-import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
+import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog-new.component';
 import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -28,7 +28,7 @@ import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
 @Component({
-  selector: '  selector: 'cds-action-gpt-task-new',-new',
+  selector: 'cds-action-gpt-task-new',
   templateUrl: './cds-action-gpt-task-new.component.html',
   styleUrls: ['./cds-action-gpt-task-new.component.scss']
 })

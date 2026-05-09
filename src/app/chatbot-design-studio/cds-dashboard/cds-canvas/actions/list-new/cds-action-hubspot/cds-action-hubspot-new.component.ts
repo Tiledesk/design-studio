@@ -15,7 +15,7 @@ import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
-  selector: '  selector: 'cds-action-hubspot-new',-new',
+  selector: 'cds-action-hubspot-new',
   templateUrl: './cds-action-hubspot-new.component.html',
   styleUrls: ['./cds-action-hubspot-new.component.scss']
 })

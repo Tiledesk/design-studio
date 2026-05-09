@@ -5,7 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: '  selector: 'cds-addkb-dialog-new',-new',
+  selector: 'cds-addkb-dialog-new',
   templateUrl: './addkb-dialog-new.component.html',
   styleUrls: ['./addkb-dialog-new.component.scss']
 })

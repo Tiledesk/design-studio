@@ -8,15 +8,18 @@
     &.image-editor-wrapper{
 
         .response-image-uploader-wrapper{
-            margin: 5px auto;
-            max-width: calc(100% - 5px);
-
+            margin: 0;
+            max-width: none;
+            padding-bottom: 12px;
+            .image-upload{
+                border-radius: var(--input-border-radius-base);
+                overflow: hidden;
+                border: 1px solid var(--border, #e8e6e0);
+            }
             img{
                 width: 100%;
-                border-radius: 8px;
+                border-radius: var(--input-border-radius-base);
             }
-
-
             &.no-image{
                 display: flex;
                 gap: 10px;
@@ -26,8 +29,6 @@
                 .image{
                     width: 40px;
                     height: 40px;
-                    // border-radius: 8px;
-                    // box-shadow: rgba(0, 0, 0, 0.12) 0px -1px 0px 0px inset;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -123,20 +124,16 @@
     position: relative;
     display: block;
     border-radius: 8px; 
-    margin-left: var(--base-margin);
-    margin-right: var(--base-margin);
-    // margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 0px;
+    margin: 0px;
+    padding: 0 0 16px 0;
     background: rgba(255, 255, 255, 0.383);
     overflow: visible;
-    // max-width: calc(100% - 66px);
     width: auto;
     height: auto;
     .image-upload {
-        border-radius: 6px;
+        border-radius: var(--input-border-radius-base);
         display: block;
-        overflow: hidden;
+        overflow: visible;
     }
     .control-button {
         &.delete {
@@ -164,7 +161,6 @@
 
 
 /** box-textarea **/
-}
 
 .image-type-toggle,
 .cds-toggle-group {
@@ -172,8 +168,6 @@
   flex-direction: row;
   gap: 4px;
   margin: 0;
-  margin-left: var(--base-margin);
-  margin-right: var(--base-margin);
   justify-content: center;
   align-items: center;
   background: var(--ds-bg);
@@ -181,7 +175,7 @@
   padding: 3px;
   box-shadow: none;
   border: 0px solid var(--border);
-  width: calc(100% - 2 * var(--base-margin));
+  width: 100%;
   min-width: 0;
 }
 

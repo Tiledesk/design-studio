@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: '  selector: 'cds-answer-new',-new',
+  selector: 'cds-answer-new',
   templateUrl: './answer-new.component.html',
   styleUrls: ['./answer-new.component.scss']
 })
@@ -14,7 +14,6 @@ export class CdsAnswerComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    // this.answer = JSON.parse(JSON.stringify(this.intentSelected.answer));
     this.answer = this.intentSelected.answer
   }
 
