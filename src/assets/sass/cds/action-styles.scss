@@ -7,19 +7,23 @@
 .extensions-response{
     font-size: var(--font-size-base);
     position: relative;
-    height: auto;
     margin: 0px;
     padding: 0px;
     display: flex;
     flex-wrap: wrap;
-    row-gap: 10px;
+    row-gap: 7px;
     column-gap: 5px;
-    align-content: center;
+    align-content: flex-start;
+    height: auto;
+    min-height: 28px;
     .delay-wrapper,
     .filter-wrapper {
         display: block;
         height: auto;
         width: auto;
+        &[style*="width: 100%"] {
+            flex: 1 1 100%;
+        }
     }
 
     .response-controls {
@@ -55,6 +59,10 @@ appdashboard-delay-text,
 appdashboard-filter{
     display: flex;
 }
+
+.delay-wrapper appdashboard-delay-slider {
+    width: 100%;
+}
 .previewMode{
     &.extensions-response{
         margin: 0;
@@ -84,7 +92,7 @@ appdashboard-filter{
     }
 
     .text-editor-wrapper {
-        padding-bottom: 7px;
+        padding: 12px 0;
     }
 
 }
@@ -104,11 +112,11 @@ appdashboard-filter{
 /** BUTTONS: start **/
 
 /* ── shared pill style ── */
-.add-filter-btn-wrp,
 .add-filter-button,
 .button-json.single-btn-reply,
 .button-reply-add,
-.single-btn-reply {
+.single-btn-reply,
+.add-filter-btn-wrp {
     display: inline-flex;
     align-items: center;
     height: 28px;
@@ -131,13 +139,20 @@ appdashboard-filter{
         background: var(--canvas, #f7f6f3);
     }
 }
+/* filter pill — active state (shown only when filterConditionExist=true) */
+.add-filter-btn-wrp {
+    border: 1px solid var(--border, #e8e6e0);
+    border-style: solid;
+    color: var(--ds-link2, #3a3935);
+}
+
 .buttons-response {
     display: flex;
-    margin: 15px 0 0 0;
+    margin: 0px 0 0 0;
     gap: 6px;
     width: 100%;
     font-size: 14px;
-    padding: 10px 0 0;
+    padding: 0;
     flex-direction: row;
     float: right;
     justify-content: flex-start;
@@ -152,6 +167,7 @@ appdashboard-filter{
 .buttons-json-response {
     display: flex;
     justify-content: flex-end;
+    width: 100%;
 
     .button-json {
         float: none;
@@ -441,9 +457,7 @@ appdashboard-filter{
     position: relative;
     width: 100%;
     height: auto;
-    margin: 0px; //5px 0 0 0;
-    // padding: 0;
-    // max-width: 100%;
+    margin: 0px; 
     .text-editor {
         position: relative;
         margin: 0;
@@ -787,6 +801,7 @@ appdashboard-filter{
 /** cds-textarea inside reply actions **/
 cds-textarea.text-editable-div {
     display: block;
+    padding-bottom: 16px;
     ::ng-deep textarea {
         line-height: 20px !important;
         width: calc(100% - 20px) !important;
@@ -842,7 +857,7 @@ cds-textarea.text-editable-div {
     align-items: center;
     gap: 5px;
     position: absolute;
-    bottom: -26px;
+    bottom: -16px;
     right: 20px;
     z-index: 1;
 

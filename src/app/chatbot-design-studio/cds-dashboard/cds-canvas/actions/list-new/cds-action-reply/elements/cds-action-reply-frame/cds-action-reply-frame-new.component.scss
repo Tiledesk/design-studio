@@ -60,13 +60,15 @@ $max-height: 230px;
         max-width: calc(100% - 5px); //calc(100% - 20px);
     }
 }
-
+.text-editor-wrapper {
+    padding-bottom: 24px;
+}
 .response-frame-wrapper{
     position: relative;
     display: block;
     border-radius: 8px; 
-    margin-left: var(--base-margin);
-    margin-right: var(--base-margin);
+    //margin-left: var(--base-margin);
+    //margin-right: var(--base-margin);
     // margin-top: 10px;
     margin-bottom: 10px;
     padding: 0px;
@@ -79,7 +81,7 @@ $max-height: 230px;
     .frame-panel {
         border-radius: 6px;
         display: block;
-        overflow: hidden;
+        // overflow: hidden;
     }
 }
 

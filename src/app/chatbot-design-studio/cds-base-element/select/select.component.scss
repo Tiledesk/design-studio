@@ -1,240 +1,299 @@
-.select-item-wrp{
-    width: 100%; 
-    display: flex; 
+@import "./src/assets/sass/cds/_variables.scss";
+
+$radius-sm: 6px;
+$radius:    10px;
+$shadow-pop: 0 12px 32px -12px rgba(20,20,18,0.18), 0 2px 6px rgba(20,20,18,0.05);
+$focus-ring: oklch(0.85 0.05 240 / 0.55);
+
+// ─── host ──────────────────────────────────────────────────────────────────────
+:host { display: block; }
+
+// ─── wrapper ───────────────────────────────────────────────────────────────────
+.select-bot-box { position: relative; }
+
+// ─── selected-item row (in trigger + in option) ────────────────────────────────
+.select-item-wrp {
+    width: 100%;
+    display: flex;
     flex-direction: row;
     align-items: center;
-    font-size: 14px;
+    gap: 10px;
+    font-size: 13.5px;
 }
 
-::ng-deep{
+// ─── ng-select overrides ───────────────────────────────────────────────────────
+::ng-deep {
 
-    
-    .ng-dropdown-panel .ng-dropdown-panel-items {
-        .ng-optgroup{
-            padding: 0 15px;
-            color: #9ba6b3;
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 20px;
+    // ── Trigger container ──────────────────────────────────────────────────────
+    .ng-select .ng-select-container {
+        height: 38px;
+        min-height: 38px;
+        border-radius: $radius-sm;
+        border: 1px solid var(--border, #e8e6e0);
+        background: var(--surface, #fff);
+        box-shadow: none;
+        cursor: pointer;
+        transition: border-color 0.12s, box-shadow 0.12s;
+
+        &:hover {
+            border-color: var(--border-strong, #d8d6d0);
         }
 
-        .ng-option{
+        .ng-value-container {
+            padding: 0 12px;
+            align-items: center;
+
+            .ng-input { display: flex; }
+
+            .ng-placeholder {
+                font-size: 13.5px;
+                color: var(--muted, #8a8884);
+                font-weight: 400;
+            }
+
+            .ng-value {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                font-size: 13.5px;
+                color: var(--ink, #14140e);
+
+                span.material-icons {
+                    font-size: 16px;
+                    padding: 0;
+                    color: var(--muted, #8a8884);
+                    flex-shrink: 0;
+
+                    &.intent-start         { color: oklch(0.62 0.17 145); }
+                    &.intent-defaultFallback,
+                    &.intent-close         { color: oklch(0.58 0.18 25); }
+                }
+
+                span.label-select {
+                    flex: 1;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    color: var(--ink, #14140e);
+                    margin-right: 0;
+                }
+
+                span.label-select-option { color: var(--muted, #8a8884); font-size: 12px; }
+
+                span.label-select-option.right-badge {
+                    margin-left: auto;
+                    background: var(--canvas, #f7f6f3);
+                    color: var(--ink, #14140e);
+                    padding: 1px 6px;
+                    border-radius: 999px;
+                    font-size: 11px;
+                    line-height: 16px;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .ng-arrow-wrapper {
+            padding-right: 12px;
+            width: auto;
+
+            .ng-arrow {
+                border-color: var(--muted, #8a8884) transparent transparent;
+                border-width: 5px 4px 0;
+            }
+        }
+
+        .ng-clear-wrapper {
+            height: 16px;
+            width: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted, #8a8884);
+        }
+    }
+
+    // ── Opened state ──────────────────────────────────────────────────────────
+    .ng-select.ng-select-opened > .ng-select-container {
+        box-shadow: 0 0 0 3px #{$focus-ring};
+        border-radius: $radius-sm;
+
+        .ng-arrow-wrapper .ng-arrow {
+            border-color: transparent transparent var(--ink-2, #3a3935);
+            border-width: 0 4px 5px;
+        }
+    }
+
+    // ── Dropdown panel ────────────────────────────────────────────────────────
+    .ng-dropdown-panel {
+        border: 1px solid var(--border, #e8e6e0);
+        border-radius: $radius;
+        box-shadow: #{$shadow-pop};
+        background: var(--surface, #fff);
+        padding: 4px;
+        margin-top: 6px;
+        overflow: hidden;
+
+        &.ng-select-bottom {
+            border-top: 1px solid var(--border, #e8e6e0);
+            border-radius: $radius;
+        }
+
+        .ng-dropdown-panel-items {
+            max-height: 260px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-strong, #d8d6d0) transparent;
+
+            &::-webkit-scrollbar { width: 8px; }
+            &::-webkit-scrollbar-thumb {
+                background: var(--border-strong, #d8d6d0);
+                border-radius: 999px;
+                border: 2px solid var(--surface, #fff);
+            }
+            &::-webkit-scrollbar-thumb:hover { background: var(--muted-2, #b3b1ac); }
+        }
+
+        // ── Option group header (section label) ───────────────────────────────
+        .ng-optgroup {
+            padding: 8px 10px 4px;
+            font-size: 10.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted, #8a8884);
+            line-height: 1;
+            user-select: none;
+        }
+
+        // ── Single option ─────────────────────────────────────────────────────
+        .ng-option {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 8px 10px;
+            border-radius: 7px;
             background: transparent;
+            font-size: 13.5px;
+            color: var(--ink, #14140e);
+            line-height: 1.4;
+            transition: background 0.1s;
+            margin-bottom: 1px;
+            cursor: pointer;
 
-            span.material-icons{
-                font-size: 20px;
-                padding: 0px 4px;
-                color: var(--border);
+            &:last-child { margin-bottom: 0; }
 
-                &.intent-start{
-                    color: var(--color-green-hex);
-                }
+            &.ng-option-marked,
+            &:hover {
+                background: var(--hover, #f3f2ee);
+            }
+
+            &.ng-option-selected {
+                background: var(--canvas, #f7f6f3);
+                font-weight: 500;
+            }
+
+            &.ng-option-disabled {
+                pointer-events: none;
+                opacity: 0.45;
+            }
+
+            // icon chip
+            span.material-icons {
+                flex-shrink: 0;
+                width: 24px;
+                height: 24px;
+                border-radius: 6px;
+                background: var(--canvas, #f7f6f3);
+                display: grid;
+                place-items: center;
+                font-size: 14px;
+                color: var(--muted, #8a8884);
+
+                &.intent-start         { background: oklch(0.96 0.04 145); color: oklch(0.62 0.17 145); }
                 &.intent-defaultFallback,
-                &.intent-close{
-                    color: var(--color-red-hex)
-                }
+                &.intent-close         { background: oklch(0.97 0.03 25);  color: oklch(0.58 0.18 25); }
             }
 
             span.label-select {
-                margin-right: 4px;
-                color: var(--ds-ink);
-                line-height: 17px;
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: var(--ink, #14140e);
+                margin-right: 0;
+                line-height: 1.4;
             }
 
             span.label-select-option {
-                color: #a8a8a8;
+                color: var(--muted, #8a8884);
+                font-size: 11px;
             }
 
-            // Opt-in: render additional text as a right-aligned badge (used e.g. for KB type).
             span.label-select-option.right-badge {
                 margin-left: auto;
-                background-color: var(--gray-light-02);
-                color: var(--ds-ink);
+                background: var(--canvas, #f7f6f3);
+                color: var(--ink, #14140e);
                 padding: 1px 6px;
                 border-radius: 999px;
                 font-size: 11px;
                 line-height: 16px;
                 white-space: nowrap;
-                font-weight: inherit;
             }
 
             span.description {
                 width: 80%;
-                font-size: 12px;
-                margin-bottom: 0px;
-                color: #a8a8a8;
+                font-size: 11px;
+                color: var(--muted, #8a8884);
                 overflow: hidden;
                 text-overflow: ellipsis;
-            }
-
-            span.description-margin{
-                margin-left: 28px
-            }
-
-
-            &.ng-option-disabled {
-                
-                pointer-events: none;
-                .label-select{
-                    color: #ccc;
-
-                }
-            }
-
-            // &.ng-option-marked {
-            //     // background-color: rgba(var(--border), .23) !important;
-            // }
-
-            // &.ng-option-selected{
-            //     // background-color: rgba(var(--border), .43) !important;
-
-            //     // span.label-select-option {
-            //     //     color: #848484;
-            //     // }
-
-            //     // span.description {
-            //     //     color: #848484;
-            //     // }
-            // }
-
-            &:hover {
-                .icon-container {
-                    display: flex;
-                }
-            }
-            
-        }
-    }
-
-    .ng-select .ng-select-container {
-        height: 43px;
-        border-radius: var(--input-border-radius-base);
-        border: 1px solid var(--border);
-        .ng-value {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-    
-            span.material-icons{
-                font-size: 20px;
-                padding: 0px 4px;
-                color: var(--blu-light-03);
-
-                &.intent-start{
-                    color: var(--color-green-hex);
-                }
-                &.intent-defaultFallback,
-                &.intent-close{
-                    color: var(--color-red-hex)
-                }
-            }
-
-            span.label-select {
-                margin-right: 4px;
-                color: var(--gray);
-            }
-
-            span.label-select-option {
-                color: #a8a8a8;
-            }
-
-            // Keep the selected label consistent with the dropdown: optional right-aligned badge.
-            span.label-select-option.right-badge {
-                margin-left: auto;
-                background-color: var(--gray-light-02);
-                color: var(--ds-ink);
-                padding: 1px 6px;
-                border-radius: 999px;
-                font-size: 11px;
-                line-height: 16px;
                 white-space: nowrap;
-                font-weight: inherit;
             }
-            
+
+            span.description-margin { margin-left: 34px; }
+
+            &:hover .icon-container { display: flex; }
         }
-
-        .ng-clear-wrapper{
-            height: 14px;
-            width: 14px;
-            display: flex;
-            align-items: center;
-        }
-
-    } 
-
-    .ng-value-container .ng-input{
-        display: flex;
     }
 
-    .ng-clear-wrapper{
-        height: 14px;
-        width: 14px;
-        display: flex;
-        align-items: center;
-    }
-
-    .ng-dropdown-panel,
-    .ng-select.ng-select-opened>.ng-select-container{
-        border: 1px solid var(--border);
-    }
+    // ── Dropdown footer ───────────────────────────────────────────────────────
     .ng-dropdown-panel .ng-dropdown-footer {
-        border-top: 1px solid #ededed;
-        padding: 0px !important;
+        border-top: 1px solid var(--border, #e8e6e0);
+        padding: 0 !important;
     }
-
-    .ng-dropdown-panel.ng-select-bottom,
-    .ng-dropdown-panel.ng-select-bottom .ng-dropdown-panel-items .ng-option:last-child{
-        border-bottom-right-radius: 8px;
-        border-bottom-left-radius: 8px;  
-    }
-
-    .ng-placeholder {
-        font-size: 14px;
-    }
-
-    
 }
 
+// ─── Footer add-button ──────────────────────────────────────────────────────────
 .add-new-kb-btn {
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    height: 37px;
+    gap: 8px;
+    height: 38px;
+    font-size: 13.5px;
+    font-weight: 500;
     cursor: pointer;
+    color: var(--ink-2, #3a3935);
+    border-radius: 0 0 $radius $radius;
 
-    &:hover {
-        background-color: #ededed;
-    }
+    &:hover { background: var(--hover, #f3f2ee); }
 
-    .material-icons-outlined {
-        font-size: 20px;
-        margin-right: 8px;
-    }
-
+    .material-icons-outlined { font-size: 18px; }
 }
 
+// ─── Delete icon in option ─────────────────────────────────────────────────────
 .icon-container {
     display: none;
-    justify-content: center;
     align-items: center;
-    //padding: 4px;
+    justify-content: center;
+    flex-shrink: 0;
 
-    .custom-icon {
-        color: #ff400060;
-    }
+    .custom-icon { color: rgba(255, 64, 0, 0.4); }
 
     &:hover {
         cursor: pointer;
-
-        .custom-icon {
-            color: #ff4000;
-        }
-
+        .custom-icon { color: #ff4000; }
     }
 }

@@ -1,55 +1,45 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
-:host{
-    --cardImageHeight: 150px;
-    --cardWidth: 220px;
-    --border-color: #{var(--ds-bg)};
-    --base-color: #{var(--border)};
-}
+// ─── Preview mode ─────────────────────────────────────────────────────────────
 
-.previewMode{
+.previewMode {
     display: flex;
     flex-direction: column;
     gap: var(--base-element-gap);
 
     .galleryElement {
         margin: 0;
-        // padding: 8px;
         gap: var(--base-element-gap);
         display: flex;
         flex-direction: column;
-        // background-color: #ffffff80; // nk
-        // border-radius: 6px;
-        // box-shadow: #0000000f 0 0 0 1px;
     }
 
-    .gallery-preview-wrp{
+    .gallery-preview-wrp {
         display: flex;
-        -webkit-box-align: center;
         align-items: center;
-        padding: 0px 10px;
+        padding: 0 10px;
         width: 100%;
         gap: 10px;
 
-        .image{
+        .image {
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            box-shadow: rgba(0, 0, 0, 0.12) 0px -1px 0px 0px inset;
+            box-shadow: rgba(0, 0, 0, 0.12) 0 -1px 0 0 inset;
             display: flex;
 
-            
             img {
                 max-height: 100%;
                 max-width: 100%;
                 border-radius: inherit;
                 object-fit: cover;
-                width: 100%;    
+                width: 100%;
                 height: 100%;
             }
         }
+
         .no-image,
-        &#placeholder{
+        &#placeholder {
             align-items: center;
             justify-content: center;
             border-radius: unset;
@@ -60,17 +50,15 @@
                 max-width: 90%;
                 border-radius: inherit;
             }
-
         }
 
-        .content{
+        .content {
             display: flex;
             flex-direction: column;
-            -webkit-box-align: center;
             align-items: flex-start;
             width: calc(100% - 50px);
 
-            .text{
+            .text {
                 white-space: nowrap;
                 text-overflow: ellipsis;
                 overflow: hidden;
@@ -79,673 +67,422 @@
                 width: 100%;
             }
 
-            .description{
+            .description {
                 font-size: 11px;
             }
         }
-
-        
-        
     }
 
-
-    /** BUTTONS **/
     .buttons-response {
         display: flex;
-        margin: 0px; //15px 0 0;
-        padding: 0px 0px 0px 0px;
+        margin: 0;
+        padding: 0;
         gap: var(--base-element-gap);
         width: 100%;
         font-size: 14px;
-        // padding: 0 5px;
         flex-direction: column;
         flex-wrap: nowrap;
-        float: right;
         justify-content: flex-start;
-        /* align-content: flex-end; */
         align-items: center;
-
     }
 
-    .custom-placeholder {
-        margin: 10px 5px;
-        background: #dfdfdf;
-        border: dotted 0px #999;
-        height: var(--button-height-base);
-        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
-
-    .button-controls{
-        top: -40%;
-    }
-    
-    .gallery-divider{
+    .gallery-divider {
         height: 2px;
-        margin: 8px 0px;
+        margin: 8px 0;
         background: #ebe2c6;
         display: flex;
     }
- 
 }
 
+// ─── Gallery carousel (edit mode) ─────────────────────────────────────────────
 
-/** BUTTONS **/
-.gallery-response {
-    display: flex;
-    overflow-y: visible;
-    gap: 10px;
-    margin: 0;
-    width: 100%;
-    font-size: var(--font-size-base);
-    padding: 0 32px 32px 32px;
-}
-
-
-
-//BUTTONS
-.gallery-buttons{
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
+.glr-carousel {
+    display: grid;
+    grid-template-columns: 36px 1fr 36px;
+    gap: 8px;
     align-items: center;
-    cursor: pointer;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    flex-direction: column;
-    // height: 42px;
-    justify-content: center;
-    // padding: 0 10px;
-    -webkit-transition: all .3s;
-    transition: all .3s;
     width: 100%;
-
-    .single-button{
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-        justify-content: center;
-        border-top: 1px solid var(--base-color);
-        cursor: pointer;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        // height: 45px;
-        -webkit-transition: all .3s;
-        transition: all .3s;
-        width: 100%;
-        position: relative;
-
-        line-height: var(--button-height-base);
-        padding: 5px 10px;
-        font-size: 0.7em;
-        font-weight: 500;
-
-        &:after {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 0;
-            top: 50%;
-            left: 50%;
-            transform-style: flat;
-            transform: translate3d(-50%,-50%,0);
-            background: rgba(white,.2);
-            border-radius: 100%;
-            transition: width .5s ease, height .5s ease;
-        }
-
-        &:hover{
-            .button-controls{
-                opacity: 1;
-            }
-        }
-
-    }
+    margin-top: 8px;
 }
 
-
-
-// ADD button - ADD card
-.gallery-buttons-add{
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    align-items: center;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    // margin-bottom: 5px;
-    width: 100%;
-
-    &.last{
-        flex-direction: row;
-
-        .gallery-buttons-add-lines{
-            border-top: 1px dashed var(--base-color);
-            border-bottom: 1px dashed var(--base-color);
-            width: 20px;
-            height: 0;
-        }
-    }
-
-    .gallery-buttons-add-lines{
-        border-left: 1px dashed var(--base-color);
-        border-right: 1px dashed var(--base-color);
-        height: 28px;
-        width: 0;
-    }
-    
-
-    .csd-add-button-btn-wpr{
-        position: relative;
-
-        .cds-add-action-btn {
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            -webkit-box-pack: center;
-            -ms-flex-pack: center;
-            align-items: center;
-            background: #fff;
-            border-radius: 100%;
-            -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.19);
-            box-shadow: 0 1px 4px 0 rgba(0,0,0,.19);
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            height: 22px;
-            justify-content: center;
-            -webkit-transition: background-color .6s;
-            transition: background-color .6s;
-            width: 22px;
-            margin: 0;
-            padding: 0;
-
-        }
-
-        .cds-add-action-btn {
-            background-color: var(--base-color);
-            color: white;
-        }
-
-        .cds-add-action-btn:hover,
-        .action--text:hover{
-            opacity: 0.5;
-        }
-
-        .action--text {
-            position: absolute;
-            top: 0;
-            left: 30px;
-            color: var(--base-color);
-            font-size: 14px;
-            white-space: nowrap;
-            // z-index: 1;
-            cursor: pointer;
-        }
-
-    }
- 
-}
-
-
-.gallery-reply-card {
-    width: 100%;
-    height: 100%;
-    max-width: var(--cardWidth);
-    user-select: none;
+// Nav arrows
+.glr-nav {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--ds-border);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ds-ink-2);
     cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-    line-height: var(--button-height-base);
-    border: 1px solid var(--border-color);
-    border-radius: var(--button-border-radius-base);
-    text-align: center;
-    box-sizing: border-box;
-    margin: 0;
+    flex-shrink: 0;
     padding: 0;
-    outline: none;
-    overflow: hidden!important;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.1s;
 
-    flex-shrink: 0;
-    opacity: 1;
+    .material-icons { font-size: 18px; }
+
+    &:hover {
+        background: var(--ds-bg);
+        border-color: var(--ds-border-strong);
+        color: var(--ds-ink);
+    }
+
+    &:active { transform: scale(0.94); }
+
+    &.glr-nav--hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+// Track wrapper: scrollable, scrollbar hidden
+.glr-track-wrap {
+    overflow-x: scroll;
+    overflow-y: visible;
+    padding: 14px 0 4px;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+}
+
+// Horizontal track
+.glr-track {
+    display: flex;
+    flex-direction: row;
+    gap: 14px;
+    align-items: flex-start;
+    transition: transform 0.25s ease;
+    width: max-content;
+    padding: 0 0 8px;
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+
+.glr-card {
+    flex: 0 0 240px;
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     position: relative;
-    -webkit-transition: opacity .3s;
-    transition: opacity .3s;
-    width: var(--cardWidth);
-
+    box-sizing: border-box;
 }
 
-.cards-scroll-spacer{
-    -ms-flex-negative: 0;
-    content: "";
-    flex-shrink: 0;
-    width: 17px;
+// Card hover toolbar
+.glr-card-toolbar {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.14s, transform 0.14s;
+    z-index: 2;
+
+    button {
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--ds-border);
+        border-radius: 50%;
+        background: #fff;
+        color: var(--ds-ink-2);
+        cursor: pointer;
+        padding: 0;
+        box-shadow: 0 1px 2px rgba(20, 20, 18, 0.06);
+        transition: color 0.12s, border-color 0.12s, background 0.12s;
+
+        .material-icons { font-size: 12px; }
+
+        &:hover {
+            color: var(--ds-ink);
+            border-color: var(--ds-border-strong);
+            background: var(--ds-bg);
+        }
+
+        &.glr-card-toolbar__danger:hover {
+            color: #c0392b;
+            border-color: #f5c6c2;
+            background: #fff5f5;
+        }
+    }
 }
 
+.glr-card:hover .glr-card-toolbar,
+.glr-card:focus-within .glr-card-toolbar {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(-2px);
+}
 
-// --- PREVIEW SECTION ---
-.gallery-image{
-    height: 150px;
+// Image dropzone
+.glr-dropzone {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    border: 1.5px dashed var(--ds-border-strong);
+    border-radius: 10px;
     background: #fff;
     overflow: hidden;
     position: relative;
-    width: 100%;
-    border-radius: var(--button-border-radius-base) var(--button-border-radius-base) 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: border-color 0.15s, background 0.15s;
 
-    .image-overlay{
-        flex-direction: column;
-        align-items: stretch;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        background-color: var(--border-color);
-        display: flex;
-
-        .image-upload{
-            width: 100%;
-            height: 100%;
-        }
-
+    &:hover {
+        border-color: var(--ds-ink-2);
+        background: var(--ds-bg);
     }
-
 }
 
-#image-url.text-editable-div,
-cds-textarea#image-url {
+.glr-image-upload {
+    width: 100%;
+    height: 100%;
     display: block;
-    margin-top: 8px;
-    margin-bottom: 0;
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
 }
 
-cds-image-upload ::ng-deep {
-
-    div.wrapper{
-        flex-direction: row;
-        div.toogle-wrp{ //hide Upload/link toogle 
-            display: none;
-        }
-    }
-    
-    div.dropUploadImage{
+cds-image-upload.glr-image-upload ::ng-deep {
+    div.dropUploadImage {
         min-height: unset !important;
-        margin: 10px 10px 0;
-        // height: 64px;
+        margin: 0;
+        width: 100%;
+        height: 100%;
     }
-    div.image{
-        height: 20px !important;
-        width: 20px !important;
-    }
-    div.labelDropUploadImage{
-        font-size: 12px;
-        line-height: 15px;
-    }
-    div.image-wrp{
-        height: var(--cardImageHeight);
-        img{
-            height: 100% !important;
+    div.image-wrp {
+        width: 100%;
+        height: 100%;
+        img {
             width: 100% !important;
-            -o-object-fit: contain;
-            object-fit: contain;
+            height: 100% !important;
+            object-fit: cover;
         }
-
-        &:hover{
-            img{ opacity: 0.5; }
-            .control-button {
-                &.delete {
-                    margin-right: 5px !important;
-                    margin-top: 5px !important;
-                    opacity: 1;
-                }
+        &:hover {
+            img { opacity: 0.5; }
+            .control-button.delete {
+                opacity: 1;
+                margin-right: 5px !important;
+                margin-top: 5px !important;
             }
         }
-
         .control-button {
-            cursor: pointer;
-            color: var(--blu-04);
-            transition: color .3s;
-            height: 20px;
             opacity: 0;
-            &.delete{
+            cursor: pointer;
+            &.delete {
                 height: 24px;
                 width: 24px;
-                background: var(--base-color);
+                background: #fff;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 position: absolute;
-                em {
-                    font-size: 1.15em;
-                    color: var(--ds-ink);
-                    transition: color .3s;
-                }
+                box-shadow: 0 1px 4px rgba(0,0,0,.12);
             }
         }
     }
-
-
-    
-}
-// --- PREVIEW SECTION: end ---
-
-
-.action-button-controls {
-    top: -12px;
-    opacity: 0;
-    .control-button:not(.delete){
-        cursor: grab;
-    }
+    div.image { height: 24px !important; width: 24px !important; }
+    div.labelDropUploadImage { font-size: 12px; line-height: 1.4; }
 }
 
-////////////////////////////
-//----DRAG_DROP: start ----
-.cdk-drag-preview {
-    box-sizing: border-box;
-    border-radius: 4px;
-    // box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-    //             0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    //             0 3px 14px 2px rgba(0, 0, 0, 0.12);
-
-    &.single-button{
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-        justify-content: center;
-        border-top: 1px solid var(--border-color);
-        box-sizing: border-box;
-        cursor: pointer;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        font-weight: 600;
-        // height: 45px;
-        // padding: 0 10px;
-        -webkit-transition: all .3s;
-        transition: all .3s;
-        width: 100%;
-        position: relative;
-
-        &:after {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 0;
-            top: 50%;
-            left: 50%;
-            transform-style: flat;
-            transform: translate3d(-50%,-50%,0);
-            background: rgba(white,.2);
-            border-radius: 100%;
-            transition: width .5s ease, height .5s ease;
-        }
-
-        &:hover{
-            .button-controls{
-                opacity: 1;
-            }
-        }
-
-    }
+// Fields: title + description grouped border
+.glr-fields {
+    border: 1px solid var(--ds-border);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
 }
 
-.cdk-drag-placeholder {
-    opacity: 0;
+.glr-field {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--ds-border);
+    cursor: text;
+
+    &:last-child { border-bottom: none; }
+
+    &.glr-field--title ::ng-deep textarea { font-weight: 600; }
 }
 
-.cdk-drag-animating {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
+.glr-field ::ng-deep {
+    .text-editor { display: flex; }
 
-.draggable-box:last-child {
-    border: none;
-}
-  
-.draggable-list.cdk-drop-list-dragging .draggable-box:not(.cdk-drag-placeholder) {
-   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-//----DRAG_DROP: end ----
-////////////////////////////
-
-////////////////////////////
-/** TEXT AREA: start **/
-cds-textarea#title ::ng-deep,
-cds-textarea#description ::ng-deep {
-
-    .text-editor{
-        display: flex;
-    }
-
-    mat-form-field.mat-focused,
-    mat-form-field:hover {
-        textarea {
-            border-bottom: 1px solid var(--base-color) !important;
-            border-top: 1px solid var(--base-color) !important;
-            // outline: 0px solid rgb(242 205 111) !important;
-            transition: border 0.3s;
-            
-        }
+    mat-form-field.mat-focused textarea,
+    mat-form-field:hover textarea {
+        border-radius: var(--input-border-radius-base);
+        background: var(--ds-canvas, #f7f6f3);
+        border: 1px solid var(--ds-border, #e8e6e0);
+        transition: border 0.3s;
     }
 
     textarea {
-        border-left: 0px solid white !important;
-        border-right: 0px solid white !important;
-        border-bottom: 1px solid white!important;
-        border-top: 1px solid white!important;
-        border-radius: 0px;
-        resize: none !important; 
-        padding: 5px 20px !important;
-        min-height: 25px !important;
-        line-height: 20px !important;
-        font-size: 0.9em !important;
-
+        border-left: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid transparent !important;
+        border-top: 1px solid transparent !important;
+        border-radius: 0 !important;
+        resize: none !important;
+        padding: 0 !important;
+        min-height: 22px !important;
+        line-height: 1.5 !important;
+        font-size: 13px !important;
+        background: transparent;
     }
 }
 
-cds-textarea#title ::ng-deep{
-    textarea {
-        font-weight: 600;
+// Buttons list inside card
+.glr-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.glr-btn-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 34px;
+    padding: 0 10px 0 14px;
+    border: 1px solid var(--ds-border);
+    border-radius: 999px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+
+    &:hover {
+        background: var(--ds-bg);
+        border-color: var(--ds-border-strong);
     }
 }
 
-cds-textarea#description.noButtons ::ng-deep{
-    textarea {
-        border-radius: 0px 0px var(--button-border-radius-base) var(--button-border-radius-base);
-    }
-}
-
-
-::ng-deep .cdk-drag-preview {
-
-    #title{
-        textarea {
-            font-weight: 600;
-        }
-    }
-
-    cds-image-upload {
-        div.dropUploadImage{
-            min-height: unset !important;
-        }
-        div.image-wrp{
-            height: var(--cardImageHeight);
-            img{
-                height: 100% !important;
-                width: 100% !important;
-                -o-object-fit: cover;
-                object-fit: cover;
-            }
-        }
-        
-    }
-}
-
-.text-editable-div {
-    display: block;
-    margin-left: 30px;
-    margin-right: 30px;
-}
-
-.action-reply-gallery .buttons-json-response {
-    width: 100%;
-    margin-bottom: -24px;
-    padding: 20px var(--input-base-margin);
-}
-
-.json-text .text-editable-div{
-    padding-top: 40px;
-}
-
-.json-text .button-controls{
-    padding-top: 40px;
-}
-
-
-
-.image-from-url {
-    margin: 0px 10px 10px;
-    border: 2px dashed var(--border);
-    border-radius: 6px;
-    padding: 2px 10px 10px;
+.glr-btn-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     text-align: center;
 }
 
-.image-from-url ::ng-deep .image-url-textarea {    .box-textarea textarea {
-        border-radius: var(--input-border-radius-base);
-        background: var(--color-white-hex);
-        border: 1px solid var(--border);
-        outline: none;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        color: var(--gray);
-        font-size: 13px;
-        line-height: 26px;
-        resize: none;
-        padding: 10px;
-        padding-top: 0px;
-        padding-bottom: 0px;
-        margin: 0px;
-        height: 26px;
-        min-height: 26px;
-        box-shadow: none;
-        width: 100%;
+.glr-btn-drag {
+    font-size: 16px;
+    color: var(--ds-muted, #8a8884);
+    cursor: grab;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+
+.glr-btn-item:hover .glr-btn-drag { opacity: 1; }
+
+// Add button row (under card buttons)
+.glr-add-btn-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 2px;
+}
+
+.glr-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    padding: 0 14px 0 6px;
+    border: 1px dashed var(--ds-border-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ds-muted, #8a8884);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+
+    &:hover {
+        color: var(--ds-ink-2);
+        border-color: var(--ds-ink-2);
+        background: #fff;
     }
 }
 
-.image-from-url ::ng-deep .image-url-textarea .box-textarea textarea {
-    white-space: nowrap;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    resize: none;
+.glr-add-btn__circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--ds-border-strong);
+    display: grid;
+    place-items: center;
+    color: var(--ds-ink-2);
+    flex-shrink: 0;
+
+    .material-icons { font-size: 14px; }
 }
 
-.image-from-url ::ng-deep .image-url-textarea .box-textarea textarea:focus {
-    border: 1px solid var(--gray-light-02)!important;
-    transition: border 0.3s;
+// Add card button (end of track) — compact circle
+.glr-add-card {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    border: 1px dashed var(--ds-border-strong);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ds-muted, #8a8884);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+
+    .material-icons { font-size: 18px; }
+
+    &:hover {
+        color: var(--ds-ink-2);
+        border-color: var(--ds-ink-2);
+        background: var(--ds-bg, #f7f6f3);
+    }
 }
 
-.image-load-or {
-    color: var(--border);
-    font-size: 10px;
-    line-height: 12px;
+// Dots indicator
+.glr-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
 }
 
+.glr-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ds-border-strong);
+    transition: width 0.18s, background 0.18s;
+}
 
+// CDK drag
+.cdk-drag-preview.glr-card {
+    box-shadow: 0 8px 24px -8px rgba(20, 20, 18, 0.18);
+    border-radius: 10px;
+    opacity: 0.9;
+}
 
+.cdk-drag-placeholder.glr-card {
+    opacity: 0.2;
+}
 
+.glr-track.cdk-drop-list-dragging .glr-card:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
 
-// .image-from-url ::ng-deep .mat-form-field-underline,
-// .image-from-url ::ng-deep .mat-form-field-wrapper,
-// .image-from-url ::ng-deep .mat-form-field-flex {
-//     display: none !important;
-// }
-/** TEXT AREA: end **/
-////////////////////////////
-
-// Adatta la larghezza della select cds-select.text-condition al contenuto più largo
+// JSON select override
 :host ::ng-deep cds-select.text-condition,
 :host ::ng-deep cds-select.text-condition .ng-select-container {
-  min-width: max-content;
-  width: auto;
-  box-sizing: border-box;
-}
-
-
-
-
-
-
-
-/* Contenitore principale con frecce fisse */
-.gallery-container {
-    position: relative;
-    width: 100%;
-    padding: 0 50px;
-}
-
-/* Contenuto scrollabile interno */
-.gallery-replies {
-    display: flex;
-    overflow: hidden;
-    gap: 10px;
-    width: 100%;
-    padding: 10px 0;}
-
-/* Frecce di navigazione fisse */
-.gallery-nav-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    background: var(--base-color);
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    opacity: 0;
-    transition: all 0.3s ease;
-    .material-icons {
-        font-size: 20px;
-        color: var(--border-color);
-        transition: color 0.3s ease;
-    }
-    &:hover .material-icons {
-        color: white;
-    }
-}
-
-.gallery-nav-arrow:hover {
-    color: white;
-    border-color: var(--base-color);
-}
-
-.gallery-nav-left {
-    left: 0;
-}
-
-.gallery-nav-right {
-    right: 0;
-}
-
-/* Mostra le frecce al passaggio del mouse sul container */
-.gallery-container:hover .gallery-nav-arrow {
-    opacity: 1;
+    min-width: max-content;
+    width: auto;
+    box-sizing: border-box;
 }

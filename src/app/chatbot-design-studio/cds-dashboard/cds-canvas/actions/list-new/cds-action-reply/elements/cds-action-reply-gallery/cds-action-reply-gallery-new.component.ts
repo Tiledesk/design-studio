@@ -1,4 +1,3 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ConnectorService } from '../../../../../../../services/connector.service';
@@ -272,12 +271,12 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
   }
 
   scrollToLeft(): void {
-    const that = this
+    const that = this;
     setTimeout(() => {
       try {
-        // this.scrollContainer.nativeElement.scrollLeft = this.scrollContainer.nativeElement.scrollWidth;
-        // this.scrollContainer.nativeElement.animate({ scrollLeft: 0 }, '1000');
-        that.scrollContainer.nativeElement.scrollTo({ left: (that.scrollContainer.nativeElement.scrollWidth ), behavior: 'smooth' });
+        const container = that.scrollContainer.nativeElement;
+        container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+        setTimeout(() => that.checkArrowsVisibility(), 320);
       } catch (error) {
         that.logger.log('scrollToBottom ERROR: ', error);
       }
@@ -361,12 +360,6 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
     }
   }
 
-  /** dropButtons */
-  dropButtons(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.buttons, event.previousIndex, event.currentIndex);
-    this.connectorService.updateConnector(this.idIntent);
-    this.changeActionReply.emit();
-  }  
 
 
   onChangeMetadata(metadata: Metadata, index: number){
@@ -397,15 +390,6 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
 
 
 
-  drop(event: CdkDragDrop<string[]>) {
-    // this.textGrabbing = false;
-    moveItemInArray(this.gallery, event.previousIndex, event.currentIndex);
-  }
-
-  dropButton(event: CdkDragDrop<string[]>, index) {
-    // this.textGrabbing = false;
-    moveItemInArray(this.gallery[index].buttons, event.previousIndex, event.currentIndex);
-  }
 
 
   
@@ -543,57 +527,25 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
   checkArrowsVisibility(): void {
     if (this.scrollContainer && this.scrollContainer.nativeElement) {
       const container = this.scrollContainer.nativeElement;
-      if((container.scrollWidth - container.clientWidth)>0){
-        this.showLeftArrow = true;
-        this.showRightArrow = true;
-      } else {
-        this.showLeftArrow = false;
-        this.showRightArrow = false;
-      }
+      const scrollable = container.scrollWidth - container.clientWidth;
+      this.showLeftArrow = scrollable > 0 && container.scrollLeft > 0;
+      this.showRightArrow = scrollable > 0 && container.scrollLeft < scrollable - 1;
     }
   }
 
-  /**
-   * Scorre a sinistra di un blocco alla volta
-   */
   scrollLeft(): void {
     if (this.scrollContainer && this.scrollContainer.nativeElement) {
       const container = this.scrollContainer.nativeElement;
-      const cardWidth = 220; // Larghezza della card (--cardWidth)
-      const gap = 10; // Gap tra le card
-      const scrollAmount = cardWidth + gap;
-      
-      container.scrollTo({
-        left: container.scrollLeft - scrollAmount,
-        behavior: 'smooth'
-      });
-      
-      // Aggiorna la visibilità delle frecce dopo lo scrolling
-      setTimeout(() => {
-        this.checkArrowsVisibility();
-      }, 300);
+      container.scrollTo({ left: container.scrollLeft - container.clientWidth, behavior: 'smooth' });
+      setTimeout(() => this.checkArrowsVisibility(), 300);
     }
   }
 
-  /**
-   * Scorre a destra di un blocco alla volta
-   */
   scrollRight(): void {
     if (this.scrollContainer && this.scrollContainer.nativeElement) {
       const container = this.scrollContainer.nativeElement;
-      const cardWidth = 220; // Larghezza della card (--cardWidth)
-      const gap = 10; // Gap tra le card
-      const scrollAmount = cardWidth + gap;
-      
-      container.scrollTo({
-        left: container.scrollLeft + scrollAmount,
-        behavior: 'smooth'
-      });
-      
-      // Aggiorna la visibilità delle frecce dopo lo scrolling
-      setTimeout(() => {
-        this.checkArrowsVisibility();
-      }, 300);
+      container.scrollTo({ left: container.scrollLeft + container.clientWidth, behavior: 'smooth' });
+      setTimeout(() => this.checkArrowsVisibility(), 300);
     }
   }
 

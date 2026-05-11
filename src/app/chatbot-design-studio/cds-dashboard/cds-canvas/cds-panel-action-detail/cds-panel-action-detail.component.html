@@ -30,14 +30,14 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-reply-new>
 
-                    <cds-action-reply-v2 *ngSwitchCase="TYPE_ACTION.REPLYV2"
+                    <cds-action-reply-v2-new *ngSwitchCase="TYPE_ACTION.REPLYV2"
                         class="panel-response"
                         [intentSelected]="intentSelected"
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)"
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
-                    </cds-action-reply-v2>
+                    </cds-action-reply-v2-new>
 
                     <cds-action-reply-new *ngSwitchCase="TYPE_ACTION.RANDOM_REPLY"
                         class="panel-response"

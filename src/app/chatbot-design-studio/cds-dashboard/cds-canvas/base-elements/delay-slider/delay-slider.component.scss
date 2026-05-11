@@ -1,5 +1,6 @@
 .delay {
-    display: inline-flex;
+    width: fit-content;;
+    display: flex;
     align-items: center;
     gap: 0px;
     height: 28px;
@@ -21,7 +22,7 @@
     }
 
     .delay-current {
-        display: contents;
+        display: flex;
         width: auto;
         color: var(--ds-link2, #3a3935);
         cursor: pointer;
@@ -31,10 +32,14 @@
     }
 
     .delay-slider {
-        display: inline-block;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         visibility: hidden;
         width: 0;
+        overflow: hidden;
         transition: opacity .2s;
+        flex: 1;
     }
 
     .delay-range {
@@ -45,14 +50,17 @@
     }
 
     &.open {
+        display: flex;
         width: 100%;
         background: var(--ds-bg, #fbfbfa);
         .delay-current {
             display: none;
         }
         .delay-slider {
-            width: 100%;
+            width: auto;
+            flex: 1;
             visibility: visible;
+            overflow: visible;
         }
     }
 }
@@ -76,14 +84,15 @@
     position: relative;
     display: inline-flex;
     padding: 7px 0;
-    width: calc(100% - 55px);
+    flex: 1;
+    min-width: 0;
     height: 6px;
 }
 
 mat-slider {
     width: 100%;
     position: absolute;
-    top: -14px;
+    top: -17px;
     z-index: 100;
 }
 

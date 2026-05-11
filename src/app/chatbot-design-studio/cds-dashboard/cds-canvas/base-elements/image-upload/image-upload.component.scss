@@ -1,7 +1,7 @@
 .wrapper{
     display: flex;
     height: 100%;
-    flex-direction: column;
+    // flex-direction: column;
 }
 
 .is-in-drop-event{
@@ -34,7 +34,7 @@
 }
 
 .dropUploadImage {
-    border: 2px dashed var(--border);
+    // border: 2px dashed var(--border);
     border-radius: 6px;
     display: flex;
     flex-direction: column;

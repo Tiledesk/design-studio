@@ -304,10 +304,8 @@ cds-intent:hover > cds-panel-intent-controls > .intent-header-actions-container 
 
 
 .custom-divider {
-    margin-top: 40px;
-    margin-bottom: 20px;
-    border: 0;
-    border-top: 1px solid var(--ds-ink);
+    border-top: 1px solid var(--ds-border, #e8e6e0);
+    opacity: 1;
 }
 
 .btn.btn-primary.cds-blue-button {

@@ -1,4 +1,4 @@
-<div class="cds-action-content-new" [class.cds-action-preview]="previewMode">
+<div class="cds-action-content" [class.cds-action-preview]="previewMode">
 
     <div class="box-up" *ngIf="!previewMode">
 
@@ -30,7 +30,7 @@
 
                 <div *ngIf="odd"
                     class="draggable-box"
-                    (click)="onOpenPanelActionDetail(command)"
+                    (onClick)="onOpenPanelActionDetail(command)"
                     [ngStyle]="{'border': command.type === typeCommand.WAIT? 'none' : ''}">
 
                     <div class="reply-row">
@@ -56,7 +56,6 @@
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                [limitCharsText]="4000"
                                 (openButtonPanel) = onOpenButtonPanel($event)
                                 (createNewButton) = onCreateNewButton($event)
                                 (deleteButton) = onDeleteButton($event)
@@ -123,7 +122,6 @@
                                 [response] = "command.message"
                                 [wait] = "arrayResponses[i-1]"
                                 [previewMode] = "previewMode"
-                                [limitCharsText]="4000"
                                 (openButtonPanel) = onOpenButtonPanel($event)
                                 (changeActionReply) = onChangeActionReply($event)
                                 (updateAndSaveAction) = onUpdateAndSaveAction($event)>
