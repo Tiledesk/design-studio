@@ -36,7 +36,8 @@ import { CdsActionHubspotNewComponent } from './cds-action-hubspot/cds-action-hu
 import { CdsActionIntentNewComponent } from './cds-action-intent/cds-action-intent-new.component';
 import { BaseFilterComponent } from './cds-action-json-condition/base-filter/base-filter-new.component';
 import { BaseConditionRowComponent } from './cds-action-json-condition/base-condition-row/base-condition-row-new.component';
-import { VariableListComponent as VariableListNewComponent } from './cds-action-json-condition/variable-list/variable-list-new.component';
+// VariableListComponent (variable-list-new) is declared in BaseElementModule and
+// imported here transitively — no local declaration needed.
 import { CdsActionJsonConditionNewComponent } from './cds-action-json-condition/cds-action-json-condition-new.component';
 import { CdsActionMakeNewComponent } from './cds-action-make/cds-action-make-new.component';
 import { CdsActionOnlineAgentsNewComponent } from './cds-action-online-agents/cds-action-online-agents-new.component';
@@ -167,7 +168,6 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     // action JSON-CONDITION elements: start //
     BaseConditionRowComponent,
     BaseFilterComponent,
-    VariableListNewComponent,
     // action JSON-CONDITION elements: end //
     // action ASKGPT elements: start //
     AddkbDialogComponent,

@@ -775,6 +775,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       return;
     }
     this.logger.log('[CDS-CANVAS] start-dragging ', el);
+    this.closeAllPanels();
     this.removeConnectorDraftAndCloseFloatMenu();
     this.intentService.setIntentSelectedById(el.id);
     this.startDraggingPosition = { x: el.offsetLeft, y: el.offsetTop };
@@ -811,6 +812,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log('[CDS-CANVAS] end-dragging ', el);
     this.logger.log('[CDS-CANVAS] end-dragging ', this.intentService.intentSelected?.attributes?.position);
     this.logger.log('[CDS-CANVAS] end-dragging ', this.startDraggingPosition);
+    // Reset the inline z-index lift applied at drag start.
+    el.style.zIndex = '';
       // Verifica se la posizione è cambiata (drag effettivo)
       if(this.intentService.intentSelected){
       const pos = this.intentService.intentSelected.attributes.position;
@@ -1122,6 +1125,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private async deleteIntent(intent) {
     this.logger.log('[CDS-CANVAS]  deleteIntent', intent);
     // this.intentSelected = null;
+    this.closeAllPanels();
     this.intentService.setIntentSelectedById();
     this.intentService.deleteIntentNew(intent);
     // return
@@ -1364,6 +1368,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.closeAllPanels();
     this.elementIntentSelected = intent;
     this.IS_OPEN_PANEL_DETAIL = true;
+    this.stageService.bringIntoViewBesidePanel(intent.intent_id);
   }
   // --------------------------------------------------------- //
  
@@ -1375,21 +1380,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   onIntentSelected(intent){
-    /// if (intent.intent_display_name === RESERVED_INTENT_NAMES.START || intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
-    //    return;
-    // }  
     this.logger.log('[CDS-CANVAS] onIntentSelected ', intent.intent_id);
     this.closeAllPanels();
     this.removeConnectorDraftAndCloseFloatMenu();
     this.intentService.setIntentSelectedById(intent.intent_id);
     this.closeActionDetailPanel();
-    setTimeout(() => {
-      this.elementIntentSelected = intent;
-      if(this.elementIntentSelected){
-        // empty
-      }
-      this.IS_OPEN_PANEL_INTENT_DETAIL = true;
-    }, 0);
+    this.elementIntentSelected = intent;
+    this.IS_OPEN_PANEL_INTENT_DETAIL = true;
+    this.stageService.bringIntoViewBesidePanel(intent.intent_id);
   }
 
   /**

@@ -10,9 +10,9 @@
 <div #resizeElement class="node tds_draggable"
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
-    (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.node--start]="isStart"
     [class.node--fallback]="isDefaultFallback"
+    [class.is-selected]="intent?.intent_id === intentService.intentSelectedID"
     [id]="'intent-content-'+ intent?.intent_id"
     [style.--intent-color]="intentColor">
 
@@ -27,8 +27,9 @@
         (onHideConnectorsIn)="onHideConnectorsIn()">
     </cds-connector-in>
 
-    <!-- drag handle -->
-    <div class="header-draggable tds_draggable"></div>
+    <!-- drag handle + click intercept area (covers the whole node) -->
+    <div class="header-draggable tds_draggable"
+         (click)="$event.stopPropagation(); onOpenIntentPanel(intent)"></div>
 
     <!-- ===== HEADER DEL NODO ===== -->
     <div [id]="'block-header-'+ intent?.intent_id" class="node-header">

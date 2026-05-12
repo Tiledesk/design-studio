@@ -174,6 +174,62 @@ export class StageService {
     return this.settings.maximize;
   }
 
+  /**
+   * Pans the stage horizontally only if the block identified by `intentId` is
+   * covered by the right-side detail panel. Vertical position and zoom are
+   * preserved. Reuses TiledeskStage.translateAndScale for the smooth pan.
+   *
+   * Notes:
+   * - Reads the panel width from the live DOM (`#panel-detail`), falling back
+   *   to `getMaximize()` (680/480). Works whether the panel is already open
+   *   (minimize/maximize) or about to be opened.
+   * - `overlap` is in viewport pixels — `getBoundingClientRect()` already
+   *   accounts for the current zoom. `translateAndScale` expects `pos` in
+   *   viewport pixels too, so the delta is applied as-is (no `/scale`).
+   * - The current `pos` is derived from the LIVE transform of the drawer
+   *   (`tiledeskStage.tx` / `getPositionNow()`), NOT from `tiledeskStage.position`:
+   *   manual pan and wheel-zoom update `tx`/`ty` only, leaving `position`
+   *   stale. Reading `position` would cause the offset to accumulate at
+   *   every click — exactly the bug we are fixing here.
+   * - Uses a double rAF so the calculation runs after the panel is laid out,
+   *   even when the panel was just (re-)created by *ngIf in the same CD cycle.
+   */
+  bringIntoViewBesidePanel(intentId: string, panelWidthPx?: number, marginPx: number = 24): void {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const blockEl = document.getElementById(intentId);
+      const container = this.tiledeskStage?.container ?? document.getElementById('tds_container');
+      if (!blockEl || !container || !this.tiledeskStage) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const blockRect = blockEl.getBoundingClientRect();
+
+      const panelEl = document.getElementById('panel-detail');
+      const livePanelWidth = panelEl?.getBoundingClientRect().width;
+      const panelWidth = panelWidthPx
+        ?? (livePanelWidth && livePanelWidth > 0 ? livePanelWidth : (this.getMaximize() ? 680 : 480));
+
+      const panelLeft = containerRect.right - panelWidth;
+      const overlap = blockRect.right - (panelLeft - marginPx);
+      if (overlap <= 0) return;
+
+      const scale = this.tiledeskStage.scale || 1;
+
+      // Sync tx/ty/scale with the actual rendered transform (covers manual
+      // drag/zoom that wrote only `tx`/`ty`, never updating `position`).
+      if (typeof this.tiledeskStage.getPositionNow === 'function') {
+        this.tiledeskStage.getPositionNow();
+      }
+      const tx = this.tiledeskStage.tx ?? 0;
+      const ty = this.tiledeskStage.ty ?? 0;
+      // Invert translateAndScale's `newX = (container.width/2) - pos.x`:
+      const currentPosX = (containerRect.width / 2) - tx;
+      const currentPosY = (containerRect.height / 2) - ty;
+
+      const newPos = { x: currentPosX + overlap, y: currentPosY };
+      this.tiledeskStage.translateAndScale(newPos, scale);
+    }));
+  }
+
   /** */
   getAlpha(): number {
     return this.alpha_connectors;

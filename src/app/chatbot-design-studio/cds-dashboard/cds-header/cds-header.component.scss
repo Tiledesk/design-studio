@@ -91,17 +91,14 @@
     cursor: pointer;
     opacity: 0.6;
     &:hover { opacity: 1; }
-  }
-}
 
-.draft-pill {
-  font-size: 11px;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: var(--ds-canvas, #f7f6f3);
-  color: var(--ds-ink-2, #4a4a47);
-  border: 1px solid var(--ds-border, #ececea);
-  font-weight: 500;
+    // Reserved hook for the future chatbot switcher.
+    &--disabled {
+      cursor: default;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+  }
 }
 
 
@@ -111,9 +108,9 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: var(--ds-surface, #fff);
-  border: 1px solid var(--ds-border, #ececea);
-  border-radius: 999px;
+  // background: var(--ds-surface, #fff);
+  // border: 1px solid var(--ds-border, #ececea);
+  // border-radius: 999px;
   padding: 3px;
   min-height: 38px;
 }
@@ -163,6 +160,34 @@
   .i { width: 16px; height: 16px; }
 
   ::ng-deep mat-icon { width: 16px; height: 16px; }
+
+  // Primary call-to-action variant (used by the play / test-it-out button).
+  // Rendered as a solid circle with a white filled icon centered inside.
+  &--primary {
+    border-radius: 50%;
+    background: var(--primary, #0074ca);
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(20, 20, 18, 0.12);
+    padding: 0;
+
+    &:hover {
+      background: var(--primary, #0074ca);
+      color: #ffffff;
+      filter: brightness(0.92);
+    }
+
+    &.icon-btn--active {
+      background: var(--primary, #0074ca);
+      color: #ffffff;
+    }
+
+    .i-play {
+      width: 14px;
+      height: 14px;
+      color: #ffffff;
+      display: block;
+    }
+  }
 }
 
 
@@ -185,6 +210,54 @@
   white-space: nowrap;
 
   &:hover { background: var(--ds-canvas, #f7f6f3); color: var(--ds-ink, #1a1a19); }
+
+  // Variant: button that opens a dropdown menu — gets a trailing chevron.
+  &--menu {
+    border: 1px solid var(--ds-border, #ececea);
+
+    .chev {
+      margin-left: 2px;
+      opacity: 0.7;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    &:hover .chev,
+    &[aria-expanded="true"] .chev { opacity: 1; }
+
+    &[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  }
+}
+
+
+// ── WhatsApp button ───────────────────────────────────────────────────────────
+
+.wa-btn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--ds-radius-sm, 6px);
+  background: #25d366; // official WhatsApp green
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 1px 2px rgba(20, 20, 18, 0.08);
+
+  &:hover { background: #1ebe57; }
+  &:active { background: #1aaa4d; }
+
+  .wa-icon {
+    width: 16px;
+    height: 16px;
+    color: #ffffff;
+    flex-shrink: 0;
+  }
 }
 
 
@@ -199,63 +272,52 @@
 }
 
 
-// ── Split publish button ──────────────────────────────────────────────────────
+// ── Publish button (direct action) ────────────────────────────────────────────
 
-.split-btn {
-  display: inline-flex;
-  align-items: stretch;
+.publish-btn {
+  position: relative;
   height: 32px;
+  padding: 0 14px;
   border-radius: var(--ds-radius-sm, 6px);
-  overflow: hidden;
   background: var(--ds-ink, #1a1a19);
   color: var(--ds-bg, #fbfbfa);
-  position: relative;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
 
   &:hover { opacity: 0.88; }
 
-  &__main {
-    padding: 0 14px;
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    position: relative;
-    font-family: inherit;
-  }
-
-  &__sep {
-    width: 1px;
-    background: rgba(255, 255, 255, 0.18);
-    flex-shrink: 0;
-    align-self: stretch;
-  }
-
-  &__arrow {
-    padding: 0 8px;
-    display: inline-flex;
-    align-items: center;
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-  }
-
   .publish-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: -6px;
+    right: -6px;
     background-color: #dc362e;
     border-radius: 50%;
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     display: block;
-    border: 1.5px solid var(--ds-bg, #fbfbfa);
+    border: 2px solid var(--ds-bg, #fbfbfa);
+    box-shadow: 0 0 0 1px rgba(220, 54, 46, 0.25),
+                0 2px 6px rgba(220, 54, 46, 0.35);
     z-index: 1;
+    animation: publish-badge-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes publish-badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(220, 54, 46, 0.25),
+                0 2px 6px rgba(220, 54, 46, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(220, 54, 46, 0.18),
+                0 2px 8px rgba(220, 54, 46, 0.45);
   }
 }
 

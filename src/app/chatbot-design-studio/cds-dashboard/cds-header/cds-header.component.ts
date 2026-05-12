@@ -225,9 +225,10 @@ export class CdsHeaderComponent implements OnInit {
   }
 
   onClickPublish(){
-    // this.publishPaneltoggleState = !this.publishPaneltoggleState
     this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState);
-    this.selectedChatbot.modified = false;
+    // Do NOT clear `selectedChatbot.modified` here: the badge must stay visible
+    // until the publish actually succeeds. The flag is cleared by
+    // cds-panel-publish.onClickPublish() in the publish success branch.
     this.controllerService.openPublishPanel()
   }
 

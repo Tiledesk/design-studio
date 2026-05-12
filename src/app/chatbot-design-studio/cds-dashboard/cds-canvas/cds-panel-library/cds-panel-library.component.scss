@@ -71,15 +71,15 @@
   gap: 7px;
   z-index: 20;
   pointer-events: auto;
+  overflow: hidden;
 }
 
 .stab {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  width: 36px;
+  gap: 8px;
   height: 32px;
-  padding: 0 10px;
+  padding: 0 12px 0 10px;
   border-radius: 0 var(--ds-radius-sm, 6px) var(--ds-radius-sm, 6px) 0;
   font-size: 12px;
   font-weight: 500;
@@ -87,45 +87,42 @@
   cursor: pointer;
   border: 1px solid var(--ds-border, #ececea);
   border-left: none;
-  background: var(--ds-surface, #fff);
-  color: var(--ds-muted, #8a8884);
-  box-shadow: 2px 1px 4px rgba(20,20,18,.06);
-  transition: background 0.12s, color 0.12s;
+  box-shadow: 2px 1px 4px rgba(20, 20, 18, 0.06);
+  transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
   white-space: nowrap;
   user-select: none;
-  overflow: hidden;
 
-  span {
-    max-width: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-width 0.2s ease, opacity 0.15s ease;
-  }
-
+  // Inactive tab — sidebar closed: soft outline pill on the surface color.
+  background: var(--ds-surface, #ffffff);
+  color: var(--ds-ink-2, #4a4a47);
+  transform: translateX(-24px);
   &:hover {
     background: var(--ds-canvas, #f7f6f3);
     color: var(--ds-ink, #1a1a19);
-    width: auto;
-    span {
-      max-width: 60px;
-      opacity: 1;
-    }
+    transform: translateX(0px);
+    margin-left: 0;
   }
 
+  // Active tab — sidebar open: primary brand color, no border, slight stick.
   &--active {
-    background: var(--ds-canvas, #f7f6f3);
-    color: var(--ds-ink, #1a1a19);
-    width: auto;
-    span {
-      max-width: 60px;
-      opacity: 1;
+    background: var(--primary, #0074ca);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 2px 2px 6px rgba(0, 116, 202, 0.28);
+    font-weight: 600;
+    transform: translateX(0px);
+    &:hover {
+      background: var(--primary, #0074ca);
+      color: #ffffff;
+      transform: translateX(0px);
+      filter: brightness(0.94);
     }
   }
 }
 
 .stab-icon {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
   stroke: currentColor;
   fill: none;
@@ -133,6 +130,7 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
 
 
 // ── Head ──────────────────────────────────────────────────────────────────────

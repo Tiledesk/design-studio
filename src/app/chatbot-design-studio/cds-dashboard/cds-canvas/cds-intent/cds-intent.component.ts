@@ -954,10 +954,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   onIntentMouseDown(event: MouseEvent): void {
     this.hasMouseMoved = false;
+    this.mouseDownX = event.clientX;
+    this.mouseDownY = event.clientY;
   }
 
   onIntentMouseMove(event: MouseEvent): void {
-    this.hasMouseMoved = true;
+    if (this.hasMouseMoved) return;
+    const dx = event.clientX - this.mouseDownX;
+    const dy = event.clientY - this.mouseDownY;
+    if (Math.hypot(dx, dy) > this.MOUSE_MOVE_THRESHOLD) {
+      this.hasMouseMoved = true;
+    }
   }
   /** ******************************
    * intent controls options: START

@@ -146,7 +146,6 @@ export class IntentService {
       this.intentSelected = this.listOfIntents.find(obj => ( obj.intent_id === intent_id));
       this.intentSelectedID = intent_id;
       this.intentActive = true;
-      this.controllerService.closeAllPanels();
       this.unselectAction();
       this.resetZindex();
     } else {
@@ -159,16 +158,10 @@ export class IntentService {
 
 
   private resetZindex(){
-    this.listOfIntents.forEach(element => {
-      let zIndex = 1;
-      const el = document.getElementById(element.intent_id);
-      if (el) {
-        el.style.zIndex = String(zIndex);
-        // // console.log('Elemento trovato:', el, intent_id, zIndex);
-      } else {
-        // // console.error('Elemento non trovato');
-      }
-    });
+    // No-op: the per-intent z-index is now driven by the [class.is-selected]
+    // binding in cds-intent.component.html. The drag lifecycle clears its own
+    // inline z-index in cds-canvas end-dragging handler. Kept as a stub so the
+    // existing callsites do not need to change.
   }
 
   public setIntentSelectedByIntent(intent){

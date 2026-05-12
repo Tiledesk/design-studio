@@ -23,6 +23,8 @@
   padding: 0;
   margin: 0;
 
+  &.is-selected { z-index: 2; }
+
   &:hover {
     box-shadow: var(--ds-shadow-pop, 0 8px 24px -8px rgba(20,20,18,.12), 0 2px 6px rgba(20,20,18,.05), 0 0 0 1px rgba(20,20,18,.06));
   }

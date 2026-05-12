@@ -128,17 +128,15 @@ export class CdsActionReplyNewComponent implements OnInit, OnChanges {
   }
 
 
-  /** */
-  scrollToBottom(): void {
-    setTimeout(() => {
-      try {
-        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-        this.scrollContainer.nativeElement.animate({ scrollTop: 0 }, '500');
-      } catch (error) {
-        this.logger.log('scrollToBottom ERROR: ', error);
-      }
-    }, 300);
-  }
+  /**
+   * No-op. The previous implementation set scrollTop to scrollHeight and then
+   * called Element.animate({scrollTop: 0}, '500') — an invalid Web Animations
+   * call that produced a visible "down-then-up" jump whenever the panel was
+   * opened on a reply with multiple elements. The panel renders at the top by
+   * default; if a future flow needs to animate to top, prefer:
+   *   this.scrollContainer.nativeElement.scrollTo({ top: 0, behavior: 'smooth' });
+   */
+  scrollToBottom(): void { /* intentionally left blank */ }
 
 
   // EVENT FUNCTIONS //

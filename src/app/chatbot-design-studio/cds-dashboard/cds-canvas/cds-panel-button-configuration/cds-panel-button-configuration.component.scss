@@ -1,5 +1,31 @@
 @import "./src/assets/sass/cds/_variables.scss";
 
+// Design tokens shared with variable-list-new (Variables Picker design).
+// Imported here so children rendered inside this panel (e.g. cds-textarea
+// → variable-list popup, base-condition-row-new, jsonbuttons-new …) can
+// resolve --primary, --canvas, --surface, --shadow-pop and the Geist font.
+:host {
+    --surface: #ffffff;
+    --canvas: #f7f6f3;
+    --ink: #14140e;
+    --ink-2: #3a3935;
+    --muted: #8a8884;
+    --border: #e8e6e0;
+    --border-strong: #d8d6d0;
+    --hover: #f3f2ee;
+    --primary: oklch(0.55 0.16 250);
+    --primary-2: oklch(0.45 0.18 250);
+    --primary-soft: oklch(0.96 0.03 250);
+    --focus-ring: oklch(0.85 0.05 240 / 0.55);
+    --radius-sm: 6px;
+    --radius: 10px;
+    --shadow-pop: 0 12px 32px -12px rgba(20, 20, 18, 0.18),
+                  0 2px 6px rgba(20, 20, 18, 0.05);
+
+    font-family: "Geist", system-ui, sans-serif;
+    letter-spacing: -0.005em;
+}
+
 .panel-button-configuration{
     display: flex;
     width: 450px;

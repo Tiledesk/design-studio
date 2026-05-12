@@ -292,6 +292,9 @@ export class CdsPanelPublishComponent implements OnInit {
         this.logger.log('[CDS DSBRD] publish  - RES ', data)
         if (data) {
           this.status = 'success';
+          // Clear the "unpublished changes" badge in the header only after the
+          // publish actually succeeded.
+          if (this.selectedChatbot) this.selectedChatbot.modified = false;
         }
         // const elapsed = (Date.now() - startTime) / 1000;
         // this.animationDuration = elapsed + 1; // Progress + 1s buffer

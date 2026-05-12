@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VariableListComponent } from './variable-list.component';
+import { VariableListComponent } from './variable-list-new.component';
 
 describe('VariableListComponent', () => {
   let component: VariableListComponent;
