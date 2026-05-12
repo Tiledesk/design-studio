@@ -183,7 +183,7 @@
   border-radius: 8px;
   padding: 3px;
   box-shadow: none;
-  border: 0px solid var(--border);
+  border: 1px solid var(--border);
   width: calc(100% - 2 * var(--base-margin));
   min-width: 0;
 }

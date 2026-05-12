@@ -2,23 +2,22 @@ $background-color: var(--ds-bg);
 $text-color: var(--ds-ink);
 
 .delay {
+    border: 1px solid var(--border, #e8e6e0);
+    background: var(--surface, #ffffff);
+    color: var(--ink-2, #3a3935);
     align-items: center;
-    background: $background-color;
     border-radius: 13px;
     display: inline-flex;
     position: relative;
     height: 26px;
     padding: 0 9px 0 3px;
-    // width: 100px;
     text-align: center;
     transition: width .3s ease-in;
     font-size: var(--font-size-base);
-
+    cursor: pointer;
     &:hover{
-        opacity: 0.8;
-        cursor: pointer;
+        color: var(--ink-2, #3a3935);
     }
-    // margin-top: 30px;
     .delay-current{
         display: contents;
         width: auto;
@@ -43,26 +42,31 @@ $text-color: var(--ds-ink);
 
 
     .delay-slider{
-        display: inline-block;
-        // opacity: 0;
+        display: none;
+        align-items: center;
+        flex: 1 1 auto;
+        min-width: 0;
         visibility: hidden;
         width: 0;
         transition: opacity .2s;
     }
     .delay-range {
-        display: inline-flex;
+        flex: 0 0 auto;
         color: $text-color;
         font-size: 0.8em;
         font-weight: 600;
+        white-space: nowrap;
     }
     &.open {
         width: 100%;
+        border-bottom: 1px solid var(--border, #e8e6e0);
+        background: var(--canvas, #f7f6f3);
         .delay-current{
             display: none;
         }
         .delay-slider{
+            display: inline-flex;
             width: 100%;
-            // opacity: 1;
             visibility: visible;
         }
     }
@@ -92,14 +96,15 @@ $text-color: var(--ds-ink);
     position: relative;
     display: inline-flex;
     padding: 7px 0;
-    width: calc(100% - 55px);
+    flex: 1 1 auto;
+    min-width: 0;
     height: 6px;
 }
 
 mat-slider {
     width: 100%;
     position: absolute;
-    top: -14px;
+    top: -16px;
 }
 
 .vue-slider ::ng-deep{

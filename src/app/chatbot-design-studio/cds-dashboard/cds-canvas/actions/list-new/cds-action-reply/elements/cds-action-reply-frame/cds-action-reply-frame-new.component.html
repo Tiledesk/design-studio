@@ -23,6 +23,7 @@
     </div>
 
     <div class="filter-wrapper"
+        *ngIf="!isOpenDelaySlider && !isOpenHeightSlider"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
         <appdashboard-filter
             [expression]="response._tdJSONCondition"
@@ -46,10 +47,11 @@
     <div class="text-editor">
         
         <div *ngIf="response.metadata.src" class="content-frame">
-            <cds-element-from-url 
+            <cds-element-from-url
                 class="frame-panel"
                 [metadata] = response.metadata
-                [previewMode]="previewMode">
+                [previewMode]="previewMode"
+                [showChrome]="true">
             </cds-element-from-url>
         </div>
     
@@ -71,6 +73,7 @@
             <cds-element-from-url class="frame-panel"
                 [metadata] = response.metadata
                 [previewMode]="previewMode"
+                [showChrome]="true"
                 (onChangeMetadata)="onLoadPathElement()"
                 (onDeletedMetadata)="onDeletedMetadata($event)">
             </cds-element-from-url>

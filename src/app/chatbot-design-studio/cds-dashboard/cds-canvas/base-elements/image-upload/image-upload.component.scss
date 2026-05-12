@@ -9,7 +9,8 @@
 }
 
 .inputUploadImage {
-    color: var(--border);;
+    color: var(--border);
+    width: 100%;
     cursor: pointer;
     div.image{
         width: 40px;
@@ -34,7 +35,7 @@
 }
 
 .dropUploadImage {
-    // border: 2px dashed var(--border);
+    border: 1px dashed var(--ds-border-strong, #d8d6d2);
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -44,12 +45,8 @@
     padding: 30px 20px;
     text-align: center;
     cursor: pointer;
-    // margin: 15px;
     position: relative;
-    // width: calc(100% - 30px);
-    // height: calc(100% - 30px);
     min-height: 210px;
-
     &.link{
         padding: 15px;
         min-height: unset;
@@ -62,7 +59,11 @@
         }
     }
     &:hover{
-        opacity: 0.5;
+        color: var(--ink-2, #3a3935);
+        border-color: var(--ds-muted, #8a8884);
+        .labelDropUploadImage{
+            color: var(--ink-2, #3a3935);
+        }
     }
 }
 

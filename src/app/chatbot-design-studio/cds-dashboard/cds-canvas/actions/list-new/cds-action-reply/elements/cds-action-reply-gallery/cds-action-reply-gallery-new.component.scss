@@ -138,6 +138,10 @@
 
 // Track wrapper: scrollable, scrollbar hidden
 .glr-track-wrap {
+    --glr-peek: 32px;     // visible sliver of side cards on each side
+    --glr-gap: 14px;
+
+    container-type: inline-size;
     overflow-x: scroll;
     overflow-y: visible;
     padding: 14px 0 4px;
@@ -149,18 +153,27 @@
 .glr-track {
     display: flex;
     flex-direction: row;
-    gap: 14px;
+    gap: var(--glr-gap);
     align-items: flex-start;
-    transition: transform 0.25s ease;
     width: max-content;
-    padding: 0 0 8px;
+    padding: 0 0 8px 0;
+}
+
+.glr-card {
+    transition: opacity 0.2s ease;
+}
+
+.glr-card:not(.glr-card--active) {
+    opacity: 0.55;
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
 .glr-card {
-    flex: 0 0 240px;
-    width: 240px;
+    // Card fills the viewport minus two side peeks and their gaps,
+    // capped at 240px so it never grows too wide on large containers.
+    flex: 0 0 min(240px, calc(100cqi - 2 * (var(--glr-peek) + var(--glr-gap))));
+    width: min(240px, calc(100cqi - 2 * (var(--glr-peek) + var(--glr-gap))));
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -425,26 +438,41 @@ cds-image-upload.glr-image-upload ::ng-deep {
 
 // Add card button (end of track) — compact circle
 .glr-add-card {
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
     align-self: center;
-    display: grid;
-    place-items: center;
-    border: 1px dashed var(--ds-border-strong);
-    border-radius: 50%;
-    background: #fff;
-    color: var(--ds-muted, #8a8884);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 0;
+    color: var(--primary, #0074ca);
     cursor: pointer;
     padding: 0;
-    transition: color 0.12s, border-color 0.12s, background 0.12s;
+    font-family: inherit;
 
-    .material-icons { font-size: 18px; }
+    .material-icons {
+        width: 32px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--surface, #ffffff);
+        border: 1px solid var(--primary, #0074ca);
+        font-size: 18px;
+        transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
 
-    &:hover {
-        color: var(--ds-ink-2);
-        border-color: var(--ds-ink-2);
-        background: var(--ds-bg, #f7f6f3);
+    .lbl {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--primary, #0074ca);
+        text-align: center;
+        line-height: 1;
+    }
+
+    &:hover .material-icons {
+        background: var(--primary, #0074ca);
+        color: var(--surface, #ffffff);
     }
 }
 
@@ -461,7 +489,14 @@ cds-image-upload.glr-image-upload ::ng-deep {
     height: 6px;
     border-radius: 50%;
     background: var(--ds-border-strong);
+    cursor: pointer;
     transition: width 0.18s, background 0.18s;
+
+    &--active {
+        width: 18px;
+        border-radius: 999px;
+        background: var(--ds-ink, #3a3935);
+    }
 }
 
 // CDK drag

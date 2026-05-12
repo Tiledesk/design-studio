@@ -84,6 +84,138 @@
     }
 }
 
+// ─── Frame chrome (design-studio "Frame Block") ─────────────────────────────
+.content-frame.frame-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    border: 1px solid var(--border, #e8e6e0);
+    border-radius: 10px;
+    background: var(--surface, #ffffff);
+    box-shadow: 0 1px 2px rgba(20, 20, 18, 0.04);
+    overflow: hidden;
+
+    .frame-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--border, #e8e6e0);
+        background: var(--canvas, #f7f6f3);
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 11px;
+        color: var(--muted, #8a8884);
+    }
+
+    .frame-dots {
+        display: inline-flex;
+        gap: 4px;
+        margin-right: 6px;
+        flex-shrink: 0;
+
+        span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-strong, #d8d6d0);
+        }
+    }
+
+    .frame-url {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .frame-close {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--muted, #8a8884);
+        cursor: pointer;
+        padding: 0;
+        transition: color 0.12s, background 0.12s;
+
+        svg { width: 12px; height: 12px; }
+
+        &:hover {
+            color: var(--ink, #14140e);
+            background: var(--hover, #f3f2ee);
+        }
+    }
+
+    .frame-body {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+
+        // Iframe acts as a static image: clip scrollbars + disable interaction.
+        iframe {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            border: none;
+            pointer-events: none;
+            // Push native scrollbars outside the visible area as a fallback
+            // for cross-origin iframes where CSS can't hide them directly.
+            margin-right: -17px;
+            margin-bottom: -17px;
+        }
+    }
+
+    .frame-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 60%, rgba(255, 255, 255, 0.55) 100%);
+        pointer-events: none;
+    }
+
+    .frame-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px 4px 8px;
+        border-radius: 999px;
+        background: rgba(20, 20, 18, 0.85);
+        color: #fff;
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 10.5px;
+        font-weight: 500;
+        backdrop-filter: blur(6px);
+        pointer-events: none;
+
+        .i {
+            width: 11px;
+            height: 11px;
+            stroke: currentColor;
+            stroke-width: 1.6;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+    }
+
+    .control-button.delete {
+        z-index: 2;
+    }
+}
+
 .preview-mode-wrapper {
     display: flex;
     flex-direction: row;

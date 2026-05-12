@@ -1,6 +1,7 @@
 import { FormControl } from '@angular/forms';
-import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener, SimpleChanges, SimpleChange } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Output, EventEmitter, ElementRef, HostListener, SimpleChanges, SimpleChange, NgZone } from '@angular/core';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { take } from 'rxjs/operators';
 import { calculatingRemainingCharacters, DOCS_LINK, TEXT_CHARS_LIMIT } from '../../../../utils';
 import { SatPopover } from '@ncstate/sat-popover';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -72,9 +73,16 @@ export class CDSTextareaComponent implements OnInit {
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
-    private translate: TranslateService
+    private translate: TranslateService,
+    private ngZone: NgZone
   ) {
     this.browserLang = this.translate.getBrowserLang();
+  }
+
+  private triggerResize() {
+    this.ngZone.onStable.pipe(take(1)).subscribe(() => {
+      if (this.autosize) this.autosize.resizeToFitContent(true);
+    });
   }
 
   ngOnInit(): void {
@@ -98,6 +106,7 @@ export class CDSTextareaComponent implements OnInit {
 
   ngAfterViewInit() {
     this.getTextArea();
+    this.triggerResize();
   }
 
 
@@ -135,6 +144,7 @@ export class CDSTextareaComponent implements OnInit {
   onChangeTextArea(event) {
     this.logger.log('[CDS-TEXAREA] onChangeTextarea-->', event, this.readonly);
     this.calculatingleftCharsText();
+    this.triggerResize();
     if(this.readonly && event){
       this.textTag = event;
       this.text = '';
@@ -207,11 +217,11 @@ export class CDSTextareaComponent implements OnInit {
     this.elTextarea = this.autosize['_textareaElement'] as HTMLInputElement;
     this.logger.log('[CDS-TEXAREA] - GET TEXT AREA2 - elTextarea ', this.elTextarea);
     this.logger.log('[CDS-TEXAREA] - activeFocus ', this.activeFocus);
-    // if (this.elTextarea && this.activeFocus === true) {
-    //   setTimeout(() => {
-    //     this.elTextarea.focus();
-    //   }, 1000);
-    // }
+    if (this.elTextarea && this.activeFocus === true) {
+      setTimeout(() => {
+        this.elTextarea.focus();
+      }, 1000);
+    }
   }
 
   private insertAtCursorPos(elem: HTMLInputElement, attribute) {

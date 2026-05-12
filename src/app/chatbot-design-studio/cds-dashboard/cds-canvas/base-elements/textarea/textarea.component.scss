@@ -49,7 +49,8 @@ mat-form-field.box-textarea ::ng-deep {
         .mat-form-field-infix {
             padding: 0px;
             border-top: 0px;
-            display: flex;
+            // do NOT use display: flex here — it breaks CdkTextareaAutosize scrollHeight measurement
+            display: block;
         }
     }
     .mat-form-field-underline {
@@ -64,19 +65,21 @@ mat-form-field.box-textarea ::ng-deep {
         border-radius: var(--input-border-radius-base);
         background: var(--color-white-hex);
         border: 1px solid var(--border);
+        // CdkTextareaAutosize manages height + overflow-y based on cdkAutosizeMinRows / cdkAutosizeMaxRows.
+        // Do NOT set height/min-height/max-height/overflow-y/resize here — they override autosize.
         overflow-x: hidden;
-        overflow-y: auto;
         color: var(--gray);
         font-size: 13px;
         font-weight: 300;
         line-height: 1.5;
-        resize: vertical;
-        padding: 10px;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        margin: 0px;
-        height: auto;
-        min-height: 13px;
+        resize: none;
+        padding: 5px 10px;
+        margin: 0;
+        // content-box: CDK Autosize calcola max-height senza considerare il border;
+        // con border-box i 2px del border riducono l'area interna e generano scrollbar a maxRow righe.
+        box-sizing: content-box;
+        // width: con content-box dobbiamo sottrarre il padding orizzontale (10+10) e il border (1+1)
+        width: calc(100% - 22px);
     }
 }
 

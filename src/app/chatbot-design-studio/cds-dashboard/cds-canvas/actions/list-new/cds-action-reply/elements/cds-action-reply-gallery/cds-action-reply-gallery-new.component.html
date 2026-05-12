@@ -47,49 +47,15 @@
         (selectedAttribute)="onSelectedAttribute($event)">
     </cds-textarea> 
 
-    <!-- *ngIf="!showJsonBody" -->
-    <div class="buttons-json-response">
-        <div class="button-reply-add button-json single-btn-reply" 
-             [class.disabled]="showJsonBody"
-             [disabled]="showJsonBody"
-             (click)="!showJsonBody && $event.stopPropagation();onClickJsonButtons()">
-            + {{'CDSCanvas.JsonGallery' | translate }}
-        </div>
-    </div>
-    
-    <div *ngIf="showJsonButton" class="buttons-json-response json-shown">
-        <cds-select 
-            class="text-condition" 
-            [items]="listType" 
-            [bindLabelSelect]="'name'"
-            [bindValueSelect]="'value'" 
-            [placeholder]="'CDSCanvas.Examples' | translate "
-            [deleteButton]="false"
-            [clearable]="false"
-            [searchable]="false"
-            (onSelected)="onChangeJsonButtonsType($event)"
-            (onReset)="onResetJsonButtonsType($event)"
-            [clearable]="true">
-        </cds-select>
-    </div> 
-    
-    
-    <div *ngIf="showJsonBody" class="json-text">
-        <cds-textarea
-            class = "text-editable-div"
-            [text]="json_gallery"
-            [placeholder]="jsonPlaceholder"
-            [limitCharsText]="10000"
-            [emojiPikerBtn]="false"
-            [setAttributeBtn]="true"
-            [minRow]="5" [maxRow]="10"
-            [readonly]="false"
-            (blur)="onBlurJsonTextarea($event)"
-            (changeTextarea)="onChangeJsonTextarea($event)">
-        </cds-textarea>
-        <div class="button-controls">
-</div>
-    </div>
+    <cds-action-reply-jsonbuttons-new
+        [jsonBody]="json_gallery"
+        [examplesList]="listType"
+        [addLabelKey]="'CDSCanvas.JsonGallery'"
+        [footerTitleKey]="'CDSCanvas.JsonGallery'"
+        [docsLink]="docsLink"
+        [savedItemName]="'My JSON Gallery'"
+        (changeJsonButtons)="onChangeJsonGallery($event)">
+    </cds-action-reply-jsonbuttons-new>
 
 </div>
 
@@ -105,12 +71,13 @@
     </button>
 
     <!-- Scrollable track -->
-    <div class="glr-track-wrap" #galleryContainer>
+    <div class="glr-track-wrap" #galleryContainer (scroll)="onScroll($event)">
         <div class="glr-track">
 
             <!-- Card -->
             <article *ngFor="let galleryEl of gallery; let i = index"
-                     class="glr-card">
+                     class="glr-card"
+                     [class.glr-card--active]="i === activeIndex">
 
                 <!-- Card toolbar: shown on hover -->
                 <div class="glr-card-toolbar">
@@ -201,7 +168,9 @@
                     [title]="'CDSCanvas.AddCard' | translate"
                     (click)="$event.stopPropagation(); onAdd()">
                 <em class="material-icons">add</em>
+                <span class="lbl">Add card</span>
             </button>
+
 
         </div>
     </div>
@@ -218,7 +187,10 @@
 
 <!-- Dots indicator -->
 <div class="glr-dots" *ngIf="!previewMode && !showJsonBody && gallery.length > 1">
-    <span *ngFor="let d of gallery; let i=index" class="glr-dot"></span>
+    <span *ngFor="let d of gallery; let i=index"
+          class="glr-dot"
+          [class.glr-dot--active]="i === activeIndex"
+          (click)="goToCard(i)"></span>
 </div>
 
 

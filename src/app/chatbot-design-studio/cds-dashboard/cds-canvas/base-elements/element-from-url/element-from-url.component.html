@@ -1,15 +1,33 @@
-<div *ngIf="metadata.src && !previewMode" class="content-frame">
-    <iframe 
-        id="contentFrame" 
-        #iframe allowfullscreen
-        style= "border:none;"
-        [width]="widthElement"
-        [height]="heightElement"
-        [src]="sanitizerUrl()">
-    </iframe>
-
-    <div class="control-button delete" (click)="onDeletePathElement()">
-        <em class="material-icons">clear</em>
+<div *ngIf="metadata.src && !previewMode" class="content-frame" [class.frame-preview]="showChrome"
+     [style.height]="showChrome && metadata.height ? metadata.height : null">
+    <div class="frame-toolbar" *ngIf="showChrome">
+        <span class="frame-dots"><span></span><span></span><span></span></span>
+        <span class="frame-url">{{ metadata.src }}</span>
+        <button type="button"
+                class="frame-close"
+                title="Close preview"
+                (click)="onDeletePathElement($event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+        </button>
+    </div>
+    <div class="frame-body">
+        <iframe
+            id="contentFrame"
+            #iframe allowfullscreen
+            scrolling="no"
+            style= "border:none;"
+            [width]="widthElement"
+            [height]="heightElement"
+            [src]="sanitizerUrl()">
+        </iframe>
+        <span class="frame-overlay" *ngIf="showChrome"></span>
+        <span class="frame-badge" *ngIf="showChrome">
+            <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l3-4h12l3 4"/></svg>
+            live preview
+        </span>
+        <!-- <div class="control-button delete" (click)="onDeletePathElement()">
+            <em class="material-icons">clear</em>
+        </div> -->
     </div>
 </div>
 <div *ngIf="!previewMode" class="response-frame-panel">

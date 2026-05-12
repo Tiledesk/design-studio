@@ -32,6 +32,9 @@ export const DOCS_LINK = {
     JSON_BUTTONS: {
         more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
     },
+    JSON_GALLERY: {
+        more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-gallery', target: '_blank'},
+    },
     VOICE_SETTINGS: {
         tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
         stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},

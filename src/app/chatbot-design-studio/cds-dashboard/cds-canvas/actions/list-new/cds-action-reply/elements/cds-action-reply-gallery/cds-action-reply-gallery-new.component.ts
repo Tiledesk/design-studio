@@ -9,6 +9,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { LIST_JSON_MODEL_GALLERY } from 'src/app/chatbot-design-studio/utils-json-gallery';
+import { DOCS_LINK } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-action-reply-gallery-new',
@@ -51,10 +52,13 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
   json_gallery: string;
   jsonPlaceholder: string;
   listType: any = {};
+  docsLink: any = DOCS_LINK.JSON_GALLERY;
   
   // Navigation arrows visibility
   showLeftArrow: boolean = false;
   showRightArrow: boolean = false;
+  // Currently centered card index
+  activeIndex: number = 0;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -502,6 +506,20 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
     this.changeActionReply.emit();
   }
 
+  /** onChangeJsonGallery - emitted by cds-action-reply-jsonbuttons-new */
+  onChangeJsonGallery(text: string){
+    this.json_gallery = text || '';
+    if (this.json_gallery && this.json_gallery.trim() !== '') {
+      this.showJsonBody = true;
+      this.showJsonButton = true;
+    } else {
+      this.showJsonBody = false;
+      this.showJsonButton = false;
+    }
+    this.response.attributes.attachment.json_gallery = this.json_gallery;
+    this.changeActionReply.emit();
+  }
+
   /** onDeleteJsonButtons */
   onChangeJsonButtonsType(event){
     this.json_gallery = event['value']?event['value']:'';
@@ -534,19 +552,65 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
   }
 
   scrollLeft(): void {
-    if (this.scrollContainer && this.scrollContainer.nativeElement) {
-      const container = this.scrollContainer.nativeElement;
-      container.scrollTo({ left: container.scrollLeft - container.clientWidth, behavior: 'smooth' });
-      setTimeout(() => this.checkArrowsVisibility(), 300);
-    }
+    this.goToCard(Math.max(0, this.activeIndex - 1));
   }
 
   scrollRight(): void {
-    if (this.scrollContainer && this.scrollContainer.nativeElement) {
-      const container = this.scrollContainer.nativeElement;
-      container.scrollTo({ left: container.scrollLeft + container.clientWidth, behavior: 'smooth' });
+    const maxIndex = (this.gallery?.length || 1) - 1;
+    this.goToCard(Math.min(maxIndex, this.activeIndex + 1));
+  }
+
+  goToCard(index: number): void {
+    if (!this.scrollContainer || !this.scrollContainer.nativeElement) return;
+    this.activeIndex = index;
+    // Wait for Angular to apply the --first class on the wrapper so that
+    // the track's start padding reflects the new active index before we
+    // compute the scroll target (padding affects card.offsetLeft).
+    setTimeout(() => {
+      const container = this.scrollContainer.nativeElement as HTMLElement;
+      const cards = container.querySelectorAll('.glr-card');
+      const card = cards[index] as HTMLElement;
+      if (!card) return;
+      const isLast = index === (this.gallery?.length || 0) - 1;
+      let target: number;
+      if (index === 0) {
+        target = 0;
+      } else if (isLast) {
+        // Align last card to the left edge so the trailing "+" add-card
+        // button is fully revealed on the right.
+        target = card.offsetLeft;
+      } else {
+        target = card.offsetLeft - (container.clientWidth - card.offsetWidth) / 2;
+      }
+      target = Math.max(0, target);
+      container.scrollTo({ left: target, behavior: 'smooth' });
       setTimeout(() => this.checkArrowsVisibility(), 300);
+    }, 0);
+  }
+
+  private updateActiveIndexFromScroll(): void {
+    if (!this.scrollContainer || !this.scrollContainer.nativeElement) return;
+    const container = this.scrollContainer.nativeElement as HTMLElement;
+    const cards = container.querySelectorAll('.glr-card');
+    if (!cards.length) return;
+    const viewportCenter = container.scrollLeft + container.clientWidth / 2;
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    cards.forEach((el: Element, i: number) => {
+      const c = el as HTMLElement;
+      const cardCenter = c.offsetLeft + c.offsetWidth / 2;
+      const distance = Math.abs(cardCenter - viewportCenter);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = i;
+      }
+    });
+    if (container.scrollLeft <= 2) bestIndex = 0;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    if (maxScroll > 0 && container.scrollLeft >= maxScroll - 2) {
+      bestIndex = cards.length - 1;
     }
+    this.activeIndex = bestIndex;
   }
 
   /**
@@ -578,6 +642,7 @@ export class CdsActionReplyGalleryNewComponent implements OnInit, AfterViewInit,
    */
   @HostListener('scroll', ['$event'])
   onScroll(event: Event): void {
+    this.updateActiveIndexFromScroll();
     this.checkArrowsVisibility();
   }
   // ----- NAVIGATION ARROWS FUNCTIONS: end

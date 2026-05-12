@@ -16,6 +16,16 @@ import { CDSTextareaComponent } from 'src/app/chatbot-design-studio/cds-dashboar
 })
 export class CdsActionReplyJsonbuttonsNewComponent implements OnInit {
   @Input() jsonBody: string;
+  /** Optional override of the examples list. When provided, takes precedence over the default buttons/gallery list. */
+  @Input() examplesList: any[] | null = null;
+  /** Translation key for the "+ Add" pill and section title. Defaults to JSON buttons. */
+  @Input() addLabelKey: string = 'CDSCanvas.JsonButtons';
+  /** Translation key for the trailing "More on …" footer label. */
+  @Input() footerTitleKey: string = 'CDSCanvas.JSONButtons';
+  /** Optional override of the docs link object. */
+  @Input() docsLink: any = null;
+  /** Label used for the locally-saved entry at the top of the menu. */
+  @Input() savedItemName: string = 'My JSON Buttons';
   @Output() changeJsonButtons = new EventEmitter();
 
   @ViewChild('jsonCdsTextarea') jsonCdsTextarea: CDSTextareaComponent;
@@ -42,10 +52,12 @@ export class CdsActionReplyJsonbuttonsNewComponent implements OnInit {
   }
 
   initialize() {
-    const baseList = this.intentService.selectedAction?._tdActionType !== TYPE_ACTION.REPLY
-      ? LIST_JSON_MODEL_REPLY_V2
-      : LIST_JSON_MODEL_REPLY_V1;
-    this.link = DOCS_LINK.JSON_BUTTONS;
+    const baseList = this.examplesList && this.examplesList.length
+      ? this.examplesList
+      : (this.intentService.selectedAction?._tdActionType !== TYPE_ACTION.REPLY
+          ? LIST_JSON_MODEL_REPLY_V2
+          : LIST_JSON_MODEL_REPLY_V1);
+    this.link = this.docsLink || DOCS_LINK.JSON_BUTTONS;
 
     if (this.jsonBody && this.jsonBody.trim() !== '') {
       this.showJsonSection = true;
@@ -56,7 +68,7 @@ export class CdsActionReplyJsonbuttonsNewComponent implements OnInit {
         this.listType = baseList;
         this.selectedExample = match;
       } else {
-        const myItem = { name: 'My JSON Buttons', meta: 'saved', value: this.jsonBody };
+        const myItem = { name: this.savedItemName, meta: 'saved', value: this.jsonBody };
         this.listType = [myItem, ...baseList];
         this.selectedExample = myItem;
       }
@@ -142,7 +154,7 @@ export class CdsActionReplyJsonbuttonsNewComponent implements OnInit {
       this.listType = baseList;
       this.selectedExample = match;
     } else {
-      const myItem = { name: 'My JSON Buttons', meta: 'saved', value: this.jsonBody };
+      const myItem = { name: this.savedItemName, meta: 'saved', value: this.jsonBody };
       this.listType = [myItem, ...baseList];
       this.selectedExample = myItem;
     }

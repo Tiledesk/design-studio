@@ -15,6 +15,7 @@ export class CDSElementFromUrlComponent implements OnInit, AfterViewInit {
   
   @Input() metadata: Metadata;
   @Input() previewMode: boolean = false;
+  @Input() showChrome: boolean = false;
   @Output() onChangeMetadata = new EventEmitter();
   @Output() onDeletedMetadata = new EventEmitter<any>();
 

@@ -2,7 +2,7 @@
 <div class="buttons-json-response" *ngIf="!showJsonSection">
     <div class="button-reply-add button-json single-btn-reply"
         (click)="onClickJsonButtons()">
-        + {{'CDSCanvas.JsonButtons' | translate }}
+        + {{ addLabelKey | translate }}
     </div>
 </div>
 
@@ -72,7 +72,7 @@
     <div *ngIf="showJsonBody" class="json-section-footer">
         <span class="field-description more-info2">
             <a [href]="link.more_json_uttons.link" [target]='link.more_json_uttons.target'>{{ 'CDSCanvas.More' | translate }}</a>
-            <span> on {{ "CDSCanvas.JSONButtons" | translate }}</span>
+            <span> on {{ footerTitleKey | translate }}</span>
         </span>
     </div>
 
