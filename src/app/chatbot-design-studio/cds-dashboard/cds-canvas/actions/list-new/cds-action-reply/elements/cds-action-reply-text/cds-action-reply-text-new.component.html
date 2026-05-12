@@ -14,12 +14,12 @@
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
-        <appdashboard-filter
+        <base-filter
             [expression]="response._tdJSONCondition"
             [booleanOperators]="booleanOperators"
             [previewMode]="previewMode"
             (onChangeExpression)="onChangeExpression($event)">
-        </appdashboard-filter>
+        </base-filter>
     </div>
 </div>
 

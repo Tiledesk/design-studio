@@ -1056,18 +1056,15 @@ cds-textarea.text-editable-div {
 }
 
 .base-filter--add-filter-panel {
-    box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
-    background: #ffffff;
-    border-radius: 4px;
-    margin: auto;
+    background: transparent;
     width: 500px;
-    max-height: 80%;
-    min-height: 385px;
-    overflow: auto;
     max-width: 500px;
+    max-height: 80%;
+    min-height: 0;
+    overflow: visible;
+    margin: 0;
+    margin-left: -50px;
     display: inline-block;
-    top: 50% !important;
-    margin-top: -20%;
 
     .category-row-name {
         text-overflow: ellipsis;

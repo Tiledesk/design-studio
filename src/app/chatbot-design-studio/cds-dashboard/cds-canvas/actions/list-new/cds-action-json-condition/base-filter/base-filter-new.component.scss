@@ -1,36 +1,36 @@
-:host {
-    --textColor: #{var(--ds-ink)};
-    --backGroundColor: #{var(--ds-canvas, #f7f6f3)};
-    --content-background: rgb(244, 246, 251, 0.4);
-    --border-radius-base: 8px;
-}
+// :host {
+//     --textColor: #{var(--ds-ink)};
+//     --backGroundColor: #{var(--ds-canvas, #f7f6f3)};
+//     --content-background: rgb(244, 246, 251, 0.4);
+//     --border-radius-base: 8px;
+// }
 
-::ng-deep .base-filter--add-filter-panel {
-    box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
-    background: rgb(255, 255, 255);
-    border-radius: 4px;
-    margin: auto;
-    width: 500px;
-    max-height: 80%;
-    min-height: 385px;
-    overflow: auto;
-    max-width: 500px;
-    display: inline-block;
-    top: 50% !important;
-    margin-top: -20%;
+// ::ng-deep .base-filter--add-filter-panel {
+//     box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
+//     background: rgb(255, 255, 255);
+//     border-radius: 4px;
+//     margin: auto;
+//     width: 500px;
+//     max-height: 80%;
+//     min-height: 385px;
+//     overflow: auto;
+//     max-width: 500px;
+//     display: inline-block;
+//     top: 50% !important;
+//     margin-top: -20%;
 
-    .category-row-name {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden !important;
-    }
-}
+//     .category-row-name {
+//         text-overflow: ellipsis;
+//         white-space: nowrap;
+//         overflow: hidden !important;
+//     }
+// }
 
-::ng-deep .filter-operator {
-    .select-bot-box {
-        width: max-content;
-        min-width: 70px;
-        text-align: center;
-        margin: 10px auto;
-    }
-}
+// ::ng-deep .filter-operator {
+//     .select-bot-box {
+//         width: max-content;
+//         min-width: 70px;
+//         text-align: center;
+//         margin: 10px auto;
+//     }
+// }

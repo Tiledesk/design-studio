@@ -7,7 +7,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: 'base-condition-row',
+  selector: 'base-condition-row-new',
   templateUrl: './base-condition-row-new.component.html',
   styleUrls: ['./base-condition-row-new.component.scss']
 })

@@ -14,12 +14,12 @@
     </div>
     <div class="filter-wrapper" *ngIf="canShowFilter"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
-        <appdashboard-filter
+        <base-filter
             [expression]="response._tdJSONCondition"
             [booleanOperators]="booleanOperators"
             [previewMode]="previewMode"
             (onChangeExpression)="onChangeExpression($event)">
-        </appdashboard-filter>
+        </base-filter>
     </div>
 </div>
 
@@ -222,12 +222,12 @@
         <div class="buttons-response button-replies">
             <div *ngFor="let button of galleryEl.buttons; let j= index;" class="cds-reply-button-element">
 
-                <cds-action-reply-button [class.connected]='button.__isConnected'
+                <cds-action-reply-button-new [class.connected]='button.__isConnected'
                     (click)="onOpenButtonPanel(button)"
                     [button]="button"
                     [previewMode]="previewMode"
                     (onButtonControl)="onButtonControl($event, i, j)">
-                </cds-action-reply-button>
+                </cds-action-reply-button-new>
 
                 <cds-connector class="button-connector"
                     [idConnector]="button.__idConnector"

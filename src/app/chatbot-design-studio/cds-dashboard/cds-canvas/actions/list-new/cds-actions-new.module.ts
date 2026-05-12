@@ -35,6 +35,8 @@ import { CdsActionHideMessageNewComponent } from './cds-action-hide-message/cds-
 import { CdsActionHubspotNewComponent } from './cds-action-hubspot/cds-action-hubspot-new.component';
 import { CdsActionIntentNewComponent } from './cds-action-intent/cds-action-intent-new.component';
 import { BaseFilterComponent } from './cds-action-json-condition/base-filter/base-filter-new.component';
+import { BaseConditionRowComponent } from './cds-action-json-condition/base-condition-row/base-condition-row-new.component';
+import { VariableListComponent as VariableListNewComponent } from './cds-action-json-condition/variable-list/variable-list-new.component';
 import { CdsActionJsonConditionNewComponent } from './cds-action-json-condition/cds-action-json-condition-new.component';
 import { CdsActionMakeNewComponent } from './cds-action-make/cds-action-make-new.component';
 import { CdsActionOnlineAgentsNewComponent } from './cds-action-online-agents/cds-action-online-agents-new.component';
@@ -163,9 +165,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
       OperandV2Component,
       // action ASSIGN-VARIABLE-V2 elements: end //
     // action JSON-CONDITION elements: start //
-    // BaseConditionRowComponent,
+    BaseConditionRowComponent,
     BaseFilterComponent,
-    // VariableListComponent,
+    VariableListNewComponent,
     // action JSON-CONDITION elements: end //
     // action ASKGPT elements: start //
     AddkbDialogComponent,

@@ -54,10 +54,10 @@
     (backdropClicked)="addConditionFilter.close();onDismiss($event)"
     panelClass="base-filter--add-filter-panel"
     interactiveClose="false">
-    <base-condition-row
+    <base-condition-row-new
         [condition]="selectedCondition"
         (close)="onDismiss($event)">
-    </base-condition-row>
+    </base-condition-row-new>
 </sat-popover>
 
 

@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
-  selector: 'variable-list',
+  selector: 'variable-list-new',
   templateUrl: './variable-list-new.component.html',
   styleUrls: ['./variable-list-new.component.scss']
 })
@@ -34,6 +34,24 @@ export class VariableListComponent implements OnInit {
 
   isEmpty: boolean = false
   isSearching: boolean = false
+
+  // Collapsible sections — first system-defined section open by default,
+  // user-defined open, globals collapsed.
+  collapsed: { [key: string]: boolean } = {
+    userDefined: false,
+    globals: true,
+  }
+
+  toggleSection(key: string){
+    this.collapsed[key] = !this.collapsed[key];
+  }
+
+  isSectionCollapsed(key: string, index: number): boolean {
+    if (this.isSearching) return false;
+    if (this.collapsed[key] !== undefined) return this.collapsed[key];
+    // Default: only first system section is open.
+    return index !== 0;
+  }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO
 
