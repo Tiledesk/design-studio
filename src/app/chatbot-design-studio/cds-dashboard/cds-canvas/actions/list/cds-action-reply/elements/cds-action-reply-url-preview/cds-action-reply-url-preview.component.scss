@@ -77,6 +77,70 @@
     background: #f8fafc;
     border: 1px solid #e4e6eb;
     border-radius: 6px;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+
+    &--has-tooltip {
+        cursor: help;
+
+        &:hover .url-mode-hint__tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0);
+        }
+    }
+
+    &__tooltip {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        transform: translate(-50%, -4px);
+        width: 260px;
+        padding: 12px 14px;
+        background: #1f2937;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 11.5px;
+        line-height: 1.5;
+        z-index: 50;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 140ms ease, transform 140ms ease, visibility 140ms;
+        pointer-events: auto;
+
+        &::before {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: #1f2937;
+        }
+
+        &-text {
+            margin-bottom: 10px;
+        }
+
+        &-link {
+            display: block;
+            text-align: center;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            transition: background 120ms ease;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.16);
+            }
+        }
+    }
 }
 
 .url-mode-hint__icon {
@@ -294,5 +358,20 @@
 /* ---- JSON Sources mode ---- */
 .url-json-sources {
     margin: 0 30px 8px;
+
+    &__badge {
+        display: flex;
+        width: fit-content;
+        border-radius: 4px;
+        font-size: 10px;
+        margin: 5px;
+        height: fit-content;
+        padding: 0px 6px;
+        max-width: calc(100% - 25px);
+        background-color: var(--blu);
+        color: var(--color-white-hex);
+        flex-wrap: nowrap;
+        text-align: end;
+    }
 }
 

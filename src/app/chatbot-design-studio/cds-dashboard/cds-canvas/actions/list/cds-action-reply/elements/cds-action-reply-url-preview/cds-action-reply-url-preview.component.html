@@ -37,8 +37,9 @@
         <ng-container *ngIf="previewActiveMode === 'form'">{{ 'UrlPreviewTitleForm' | translate }}</ng-container>
         <ng-container *ngIf="previewActiveMode === 'text'">{{ 'UrlPreviewTitleJson' | translate }}</ng-container>
     </div>
-    <div class="response-wrp" *ngIf="previewText">{{ previewText }}</div>
-    <div class="response-wrp no-text" *ngIf="!previewText">{{'CDSCanvas.ClickToAddText' | translate }}</div>
+    <span class="url-json-sources__badge" *ngIf="previewActiveMode === 'text' && jsonSourcesBadgeLabel">{{ jsonSourcesBadgeLabel }}</span>
+    <div class="response-wrp" style="white-space: pre-line;" *ngIf="previewActiveMode !== 'text' && previewText">{{ previewText }}</div>
+    <div class="response-wrp no-text" *ngIf="(previewActiveMode === 'text' && !jsonSourcesBadgeLabel) || (previewActiveMode !== 'text' && !previewText)">{{'CDSCanvas.ClickToAddText' | translate }}</div>
 </div>
 
 <div *ngIf="!previewMode" class="text-editor-wrapper">
@@ -46,6 +47,12 @@
     <!-- Mode selector -->
     <div class="url-mode-row">
         <div class="url-mode-selector">
+            <label class="url-mode-tab" [class.active]="activeTab === 'text'">
+                <input type="radio" class="url-mode-check" name="urlPreviewMode"
+                    [checked]="activeTab === 'text'"
+                    (change)="setTab('text')" />
+                {{ 'UrlPreviewTabJsonSources' | translate }}
+            </label>
             <label class="url-mode-tab" [class.active]="activeTab === 'list'">
                 <input type="radio" class="url-mode-check" name="urlPreviewMode"
                     [checked]="activeTab === 'list'"
@@ -58,23 +65,21 @@
                     (change)="setTab('form')" />
                 {{ 'UrlPreviewTabForm' | translate }}
             </label>
-            <label class="url-mode-tab" [class.active]="activeTab === 'text'">
-                <input type="radio" class="url-mode-check" name="urlPreviewMode"
-                    [checked]="activeTab === 'text'"
-                    (change)="setTab('text')" />
-                {{ 'UrlPreviewTabJsonSources' | translate }}
-            </label>
         </div>
     </div>
 
     <!-- Mode hint -->
-    <div class="url-mode-hint">
+    <div class="url-mode-hint" [class.url-mode-hint--has-tooltip]="activeTab === 'text'">
         <span class="material-icons url-mode-hint__icon">info_outline</span>
         <span class="url-mode-hint__text">
             <ng-container *ngIf="activeTab === 'list'">{{ 'UrlPreviewHint' | translate }}</ng-container>
             <ng-container *ngIf="activeTab === 'form'">{{ 'UrlPreviewHintForm' | translate }}</ng-container>
             <ng-container *ngIf="activeTab === 'text'">{{ 'UrlPreviewHintJsonSources' | translate }}</ng-container>
         </span>
+        <div *ngIf="activeTab === 'text'" class="url-mode-hint__tooltip">
+            <div class="url-mode-hint__tooltip-text">{{ 'UrlPreviewHintJsonSourcesTooltip' | translate }}</div>
+            <a class="url-mode-hint__tooltip-link" [href]="DOCS_LINK.advanced_prompt.link" [target]="DOCS_LINK.advanced_prompt.target" rel="noopener noreferrer">{{ 'LearnMore' | translate }}</a>
+        </div>
     </div>
 
     <!-- Mode: List (free text) -->
@@ -176,21 +181,7 @@
 
     <!-- Mode: Text (json parameter) -->
     <div *ngIf="activeTab === 'text'" class="url-json-sources">
-        <cds-textarea
-            id="jsonSources"
-            [textLimitBtn]="false"
-            [emojiPikerBtn]="false"
-            [setAttributeBtn]="true"
-            [isLiquidjs]="false"
-            [minRow]="1"
-            [maxRow]="1"
-            [readonly]="true"
-            [showUtils]="true"
-            [text]="jsonSourcesValue"
-            [placeholder]="'{{json_sources}}'"
-            (selectedAttribute)="onJsonSourcesChange($event?.value)"
-            (clearSelectedAttribute)="onJsonSourcesChange('')">
-        </cds-textarea>
+        <span class="url-json-sources__badge">{{ jsonSourcesBadgeLabel }}</span>
     </div>
 
 </div>

@@ -328,9 +328,6 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_reply')) {
       new_attributes.push({ name: "kb_reply", value: "kb_reply" });
     }
-    if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_source')) {
-      new_attributes.push({ name: "kb_source", value: "kb_source" });
-    }
     if (!variableList.find(el => el.key ==='userDefined').elements.some(v => v.name === 'kb_json_sources')) {
       new_attributes.push({ name: "kb_json_sources", value: "kb_json_sources" });
     }

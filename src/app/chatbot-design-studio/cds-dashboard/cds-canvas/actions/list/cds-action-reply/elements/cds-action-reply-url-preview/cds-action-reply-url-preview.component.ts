@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, ViewChild, Inpu
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Expression } from 'src/app/models/action-model';
-import { TEXT_CHARS_LIMIT } from '../../../../../../../utils';
+import { DOCS_LINK, TEXT_CHARS_LIMIT } from '../../../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -30,6 +30,7 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   @Input() limitCharsText: number = TEXT_CHARS_LIMIT;
   @Input() previewMode: boolean = true;
 
+  DOCS_LINK = DOCS_LINK.ASKGPTV2;
   delayTime: number = 0;
   canShowFilter: boolean = true;
   filterConditionExist: boolean = false;
@@ -37,7 +38,7 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   activeFocus: boolean = true;
 
   // 'list' = free text links, 'form' = form array, 'text' = json parameter
-  activeTab: UrlPreviewTab = 'list';
+  activeTab: UrlPreviewTab = 'text';
 
   // 'list' tab: free text
   rawText: string = '';
@@ -48,7 +49,7 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   ];
 
   // 'text' tab: json parameter value
-  jsonSourcesValue: string = '';
+  jsonSourcesValue: string = '{{kb_json_sources | json}}';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -88,48 +89,77 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   private detectAndRestore(): void {
     const r = this.response as any;
     if (r?.type === 'url_preview') {
-      this.activeTab = (r.activeMode as UrlPreviewTab) || 'list';
-      this.rawText = typeof r.list === 'string' ? r.list : '';
-      this.jsonSourcesValue = typeof r.text === 'string' ? r.text : '';
-      if (Array.isArray(r.form?.sources) && r.form.sources.length > 0) {
-        this.urlFormItems = r.form.sources.map(i => ({
-          source_name: i.source_name || '',
-          source_file_name: i.source_file_name || '',
-          source_description: i.source_description || '',
-          source_image: i.source_image || '',
-          _imageMode: i.source_image?.startsWith('data:') ? 'upload' : 'url'
-        }));
+      this.activeTab = (r.activeMode as UrlPreviewTab) || 'text';
+      const textValue = typeof r.text === 'string' ? r.text : '';
+
+      if (this.activeTab === 'form') {
+        let parsed: any = null;
+        try { parsed = textValue ? JSON.parse(textValue) : null; } catch { parsed = null; }
+        const formSources = Array.isArray(parsed)
+          ? parsed
+          : (Array.isArray(r.form?.sources) ? r.form.sources : (Array.isArray(r.list) ? r.list : null));
+        if (formSources && formSources.length > 0) {
+          this.urlFormItems = formSources.map((i: any) => ({
+            source_name: i.source_name || '',
+            source_file_name: i.source_file_name || '',
+            source_description: i.source_description || '',
+            source_image: i.source_image || '',
+            _imageMode: i.source_image?.startsWith('data:') ? 'upload' : 'url'
+          }));
+        }
+        this.rawText = '';
+        this.jsonSourcesValue = '{{kb_json_sources | json}}';
+      } else if (this.activeTab === 'list') {
+        this.rawText = textValue || (typeof r.list === 'string' ? r.list : '');
+        this.jsonSourcesValue = '{{kb_json_sources | json}}';
+      } else {
+        this.jsonSourcesValue = textValue || '{{kb_json_sources | json}}';
+        this.rawText = '';
       }
+      this.saveAll();
       return;
     }
-    this.activeTab = 'list';
+    this.activeTab = 'text';
     this.rawText = '';
+    this.jsonSourcesValue = '{{kb_json_sources | json}}';
   }
 
   private saveAll(): void {
     const r = this.response as any;
     r.activeMode = this.activeTab;
-    r.text = this.jsonSourcesValue;
-    r.list = this.rawText;
-    r.form = { sources: this.urlFormItems };
+    if (r.form !== undefined) { delete r.form; }
+    if (r.list !== undefined) { delete r.list; }
+    if (this.activeTab === 'form') {
+      const sources = this.urlFormItems.map(({ _imageMode, ...rest }) => rest);
+      r.text = JSON.stringify(sources);
+    } else if (this.activeTab === 'list') {
+      r.text = this.rawText;
+    } else {
+      r.text = this.jsonSourcesValue;
+    }
+  }
+
+  get jsonSourcesBadgeLabel(): string {
+    return (this.jsonSourcesValue || '')
+      .replace(/^\{\{|\}\}$/g, '')
+      .replace(/\s*\|\s*json\s*$/, '')
+      .trim();
   }
 
   get previewText(): string {
     const r = this.response as any;
-    if (r?.type !== 'url_preview') { return r?.list || r?.text || ''; }
-    const mode: UrlPreviewTab = r.activeMode || 'list';
-    if (mode === 'list') {
-      return typeof r.list === 'string' ? r.list : '';
-    }
-    if (mode === 'form') {
-      return Array.isArray(r.form?.sources)
-        ? r.form.sources.map(i => i.source_name).filter(u => !!u).join('\n')
-        : '';
-    }
-    if (mode === 'text') {
-      return typeof r.text === 'string' ? r.text : '';
-    }
-    return '';
+    const textValue = typeof r?.text === 'string' ? r.text : '';
+    if (!textValue) { return ''; }
+    try {
+      const parsed = JSON.parse(textValue);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((i: any) => (typeof i === 'string' ? i : i?.source_name))
+          .filter((u: string) => !!u)
+          .join('\n');
+      }
+    } catch { /* not JSON, fall through */ }
+    return textValue;
   }
 
   get previewActiveMode(): UrlPreviewTab {
@@ -178,11 +208,15 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
     }
   }
 
+  // Attributes that hold object/array values and require the `| json` filter
+  private static readonly OBJECT_ATTRIBUTES = new Set<string>(['kb_json_sources', 'kb_chunks']);
+
   onJsonSourcesChange(value: string): void {
     let jsonValue = '';
     if (value) {
       const inner = value.replace(/^\{\{|\}\}$/g, '').replace(/\s*\|\s*json\s*$/, '').trim();
-      jsonValue = `{{${inner} | json}}`;
+      const isObject = CdsActionReplyUrlPreviewComponent.OBJECT_ATTRIBUTES.has(inner);
+      jsonValue = isObject ? `{{${inner} | json}}` : `{{${inner}}}`;
     }
     this.jsonSourcesValue = jsonValue;
     this.saveAll();

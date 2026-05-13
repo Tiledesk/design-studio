@@ -1130,13 +1130,11 @@ export class IntentService {
       action = new ActionAskGPT();
       action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
-      action.assignSourceTo = 'kb_source';
     }
     if(typeAction === TYPE_ACTION.ASKGPTV2) {
       action = new ActionAskGPTV2();
       action.question = '{{lastUserText}}'
       action.assignReplyTo = 'kb_reply';
-      action.assignSourceTo = 'kb_source';
       action.assignJsonSourcesTo = 'kb_json_sources';
       action.assignChunksTo = 'kb_chunks';
       // Default max tokens for Ask Knowledge Base
