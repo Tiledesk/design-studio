@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.43-rc1
+- **changed**: updated parameters in the "kb-json-resources" URL preview action
 
 # 1.39.42-rc2
 - **changed**: added 'url_preview' in action response with 3 types: message, form, parameters
