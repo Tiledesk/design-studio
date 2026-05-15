@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "Вы уверены, что хотите удалить поле?",
         "DeleteForm": "Удалить форму",
         "ConfirmDeleteForm": "Вы уверены, что хотите удалить форму?",
-        "MarkbotLabel": "Вы можете использовать <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' Target='_blank'> Markbot </a> для форматирования ваших меток Анкет",
+        "MarkbotLabel": "Вы можете использовать <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> для форматирования ваших меток.",
         "InfoMessages": {
             "field_name": "Дайте имя в поле формы (например: имя _ пользователь). Имя может содержать только номера букв и _",
             "field_type": "Выберите тип данного, который будет вставлен в этом поле (например: текст).",

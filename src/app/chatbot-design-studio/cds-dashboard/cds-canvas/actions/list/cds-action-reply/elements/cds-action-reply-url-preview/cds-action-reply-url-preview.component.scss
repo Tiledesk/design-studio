@@ -8,6 +8,7 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 2px;
+    padding: 4px 10px;
 }
 
 /* ---- Mode selector row (segmented control + info icon) ---- */
@@ -93,9 +94,9 @@
 
     &__tooltip {
         position: absolute;
-        top: calc(100% + 8px);
+        bottom: calc(100% + 8px);
         left: 50%;
-        transform: translate(-50%, -4px);
+        transform: translate(-50%, 4px);
         width: 260px;
         padding: 12px 14px;
         background: #1f2937;
@@ -113,11 +114,11 @@
         &::before {
             content: "";
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-bottom-color: #1f2937;
+            border-top-color: #1f2937;
         }
 
         &-text {

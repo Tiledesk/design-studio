@@ -714,7 +714,7 @@
         "DeleteForm": "Delete form",
         "ConfirmDeleteForm": "Are you sure you want to delete the form?",
         "AreYouSureDeleteField": "Are you sure you want to delete the field?",
-        "MarkbotLabel": "You can use <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' target='_blank'>Markbot</a> to format your labels.",
+        "MarkbotLabel": "You can use <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> to format your labels.",
         "InfoMessages": {
             "field_name": "Give a name to the Form field (ex: name _ User). The name can contain only letters numbers and _",
             "field_type": "Select the type of given that will be inserted in this field (ex: Text).",
@@ -843,14 +843,14 @@
                 "DESCRIPTION": "This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc",
                 "IMAGE": "assets/images/doc/REPLY.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/reply-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action"
             },
             "ReplyV2": {
                 "TITLE": "Advanced reply management with input timeout and no-match",
                 "DESCRIPTION": "This action sends back to the user different pieces of contents as simple text or images, buttons, carousels etc.",
                 "IMAGE": "assets/images/doc/REPLY.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/reply-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action"
             },
             "RandomReply": {
                 "TITLE": "Random messages in a set",
@@ -864,7 +864,7 @@
                 "DESCRIPTION": "This action removes the chatbot from the conversation and moves the flow to a human",
                 "IMAGE": "assets/images/doc/AGENT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/agent-handoff-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/transfer-to-a-human"
             },
             "Close": {
                 "TITLE": "Close the conversation",
@@ -885,7 +885,7 @@
                 "DESCRIPTION": "This action checks if there is an available agent in the current department",
                 "IMAGE": "assets/images/doc/ONLINE_AGENTS.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/the-if-online-agent-action-and-its-role-in-conversation-design/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/if-online-agent"
             },
             "Condition": {
                 "TITLE": "Condition based branching",
@@ -927,14 +927,14 @@
                 "DESCRIPTION": "Replaces the current chatbot with the specied one",
                 "IMAGE": "assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
             },
             "ReplaceAIAgent":{
                 "TITLE":"Replaces the current Agent with the specied one",
                 "DESCRIPTION":"",
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/"
+                "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
             },
             "Wait": {
                 "TITLE": "Wait before next action",
@@ -948,7 +948,7 @@
                 "DESCRIPTION": "Configure and invoke a remote REST API",
                 "IMAGE": "assets/images/doc/WEB_REQUESTV2.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/web-request-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/web-request-action"
             },
             "WebResponse": {
                 "TITLE": "",
@@ -962,21 +962,21 @@
                 "DESCRIPTION": "Sends an email with the specified fields",
                 "IMAGE": "assets/images/doc/EMAIL.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/how-the-send-email-action-works/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/send-email"
             },
             "WhatsAppStatic": {
                 "TITLE": "Send whatsapp message",
                 "DESCRIPTION": "Used to configure a Whatsapp message using a template and use the JSON to send massive Whatsapp messages",
                 "IMAGE": "assets/images/doc/WHATSAPP_STATIC.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/#use-the-fast-prototyping-trick-to-generate-the-request-payload"
+                "DOC_URL": "https://guide.tiledesk.com/channels/whatsapp/how-to-perform-a-whatsapp-broadcast-using-tiledesk#use-the-fast-prototyping-trick-to-generate-the-request-payload"
             },
             "WhatsAppByAttribute": {
                 "TITLE": "Used to send multi Whatsapp messages",
                 "DESCRIPTION": "Used to send massive whatsapp messages using a flow",
                 "IMAGE": "assets/images/doc/WHATSAPP_ATTRIBUTE.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/how-to-perform-a-whatsapp-broadcast-using-tiledesk/"
+                "DOC_URL": "https://guide.tiledesk.com/channels/whatsapp/how-to-perform-a-whatsapp-broadcast-using-tiledesk"
             },
             "WhatsAppBySegment": {
                 "TITLE": "",
@@ -990,21 +990,21 @@
                 "DESCRIPTION": "Send a Whatsapp message using the specified template",
                 "IMAGE": "assets/images/doc/WHATSAPP.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/send-whatsapp-message/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/send-whatsapp-message"
             },
             "AskTheKnowledgeBase": {
                 "TITLE": "Prompt the KB",
                 "DESCRIPTION": "This action prompts the selected knowledge base to find the best suitable answer from the uploaded contents",
                 "IMAGE": "assets/images/doc/ASKGPT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base"
             },
             "AddKBContent": {
                 "TITLE": "Add Content to the KB",
                 "DESCRIPTION": "Use this action to populare the Knowledge Base using an automation flow",
                 "IMAGE": "assets/images/doc/ADD_KB_CONTENT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/add-to-knowledge-base-action"
             },
             "GPTTask": {
                 "TITLE": "ChatGPT Prompt",
@@ -1018,14 +1018,14 @@
                 "DESCRIPTION": "This action allows you to prompt the connected OpenAI Assistant",
                 "IMAGE": "assets/images/doc/GPT_ASSISTANT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/chatgpt-assistant-action-beta/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/chatgpt-assistant-beta"
             },
             "AiPrompt": {
                 "TITLE": "AI Prompt multiple LLM",
                 "DESCRIPTION": "The AI Prompt Action is designed to execute LLM-prompts from multiple AI Providers, including on-prem (based on Ollama).",
                 "IMAGE": "assets/images/doc/AI_PROMPT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/ai-prompt-action-multi-llm/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ai-prompt-multi-llm"
             },
             "AiCondition": {
                 "TITLE": "AI Condition",
@@ -1053,7 +1053,7 @@
                 "DESCRIPTION": "Execute this code snippet (Nodejs)",
                 "IMAGE": "assets/images/doc/CODE.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/code-action/"
+                "DOC_URL": "https://guide.tiledesk.com/actions-explained/code-action"
             },
             "SetFunction": {
                 "TITLE": "",
@@ -1067,7 +1067,7 @@
                 "DESCRIPTION": "Wait until user replies, then capture and save the user reply in the specified attribute",
                 "IMAGE": "assets/images/doc/CAPTURE_USER_REPLY.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/capture-user-reply-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/capture-user-reply-action"
             },
             "LeadUpdate": {
                 "TITLE": "Update lead data",
@@ -1081,49 +1081,49 @@
                 "DESCRIPTION": "",
                 "IMAGE": "assets/images/doc/CLEAR_TRANSCRIPT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/reset-transcript-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/clear-transcript-action"
             },
             "MoveToUnassigned": {
                 "TITLE": "Move chat to unassigned",
                 "DESCRIPTION": "",
                 "IMAGE": "assets/images/doc/MOVE_TO_UNASSIGNED.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/move-to-unassigned-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/move-to-unassigned-action"
             },
             "AddTag": {
                 "TITLE": "Add a new tag",
                 "DESCRIPTION": "This action allow chatbot to automatically tags a conversation or a contact during the conversation flow",
                 "IMAGE": "assets/images/doc/ADD_TAGS.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/tag-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/add-tag"
             },
             "FlowLog": {
                 "TITLE":"Add a log",
                 "DESCRIPTION":"This action allows you to add the log to the conversation flow.",
                 "IMAGE":"assets/images/doc/LOG.png",
                 "VIDEO_URL":"",
-                "DOC_URL":"https://gethelp.tiledesk.com/articles/action-log"
+                "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/flow-log"
             },
             "Qapla": {
                 "TITLE": "Ask an order status to Qapla'",
                 "DESCRIPTION": "Query the remove Qapla' service",
                 "IMAGE": "assets/images/doc/QAPLA.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/qapla-integration/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/qapla"
             },
             "Make": {
                 "TITLE": "Invoke Make.com webhook",
                 "DESCRIPTION": "Invoke the wemote Make webhook",
                 "IMAGE": "assets/images/doc/MAKE.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/makecom-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/make.com-action"
             },
             "Hubspot": {
                 "TITLE": "Hubspot CRM",
                 "DESCRIPTION": "Send lead data to Hubspot",
                 "IMAGE": "assets/images/doc/HUBSPOT.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/hubspot-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/hubspot"
             },
             "Customerio": {
                 "TITLE": "Customer.io CRM",
@@ -1137,14 +1137,14 @@
                 "DESCRIPTION": "Send lead data to Brevo",
                 "IMAGE": "assets/images/doc/BREVO.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/brevo-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/brevo"
             },
             "N8n": {
                 "TITLE": "Invoke n8n webhook",
                 "DESCRIPTION": "Invoke the wemote n8n webhook",
                 "IMAGE": "assets/images/doc/N8N.png",
                 "VIDEO_URL": "",
-                "DOC_URL": "https://gethelp.tiledesk.com/articles/n8nio-action/"
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/n8n.io"
             },
             "DTMFForm": {
                 "TITLE": "",

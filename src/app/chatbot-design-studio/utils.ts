@@ -12,13 +12,13 @@ export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
-        namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
-        advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
-        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' },
+        namespace_as_name: { link: 'https://guide.tiledesk.com/', target: '_blank'},
+        advanced_prompt: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#advanced-context', target: '_blank' }, 
+        citations: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#get-contents-sources', target: '_blank' },
         reranking: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/knowledge-base/re-ranking', target: '_blank' }
     }, 
     ADD_TO_KB: {
-        namespace_as_name: { link: 'https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/', target: '_blank'},
+        namespace_as_name: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/add-to-knowledge-base-action', target: '_blank'},
     },
     GPT_TASK : {
         json_mode: { link: 'https://platform.openai.com/docs/guides/structured-outputs/json-mode', target: '_blank' }
@@ -27,10 +27,10 @@ export const DOCS_LINK = {
         webhook_data_model: { link: 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model', target: '_blank' }
     },
     BOT_DETAIL: {
-        chatbot_slug: { link: 'https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/#replace-bot-using-the-chatbot-slug', target: '_blank' }
+        chatbot_slug: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action#replace-bot-using-the-chatbot-slug', target: '_blank' }
     },
     JSON_BUTTONS: {
-        more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
+        more_json_uttons: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
         'twilio': {

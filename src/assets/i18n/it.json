@@ -272,7 +272,7 @@
       "ErrorMessage": "Messaggio di errore",
       "DeleteField": "Elimina campo",
       "AreYouSureDeleteField": "Sei sicuro di voler eliminare il campo?",
-      "MarkbotLabel": "Puoi usare <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' target='_blank'>Markbot</a> per formattare le etichette.",
+      "MarkbotLabel": "Puoi usare <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> per formattare le etichette.",
       "InfoMessages": {
         "field_name": "Dai un nome al campo Modulo (es: nome_Utente). ",
         "field_type": "Selezionare la tipologia di dati che verrà inserita in questo campo (es: Testo).",
