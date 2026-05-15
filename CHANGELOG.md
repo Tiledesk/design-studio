@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.43-rc2
+- **bug fix**: bug fix preview url 
+- **changed**: updated documentation URLs from gethelp.tiledesk.com to https://guide.tiledesk.com/
+
 # 1.39.43-rc1
 - **changed**: updated parameters in the "kb-json-resources" URL preview action
 
