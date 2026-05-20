@@ -140,7 +140,11 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   }
 
   get jsonSourcesBadgeLabel(): string {
-    return (this.jsonSourcesValue || '')
+    const r = this.response as any;
+    const source = this.previewMode
+      ? (typeof r?.text === 'string' ? r.text : '')
+      : (this.jsonSourcesValue || '');
+    return source
       .replace(/^\{\{|\}\}$/g, '')
       .replace(/\s*\|\s*json\s*$/, '')
       .trim();
@@ -208,15 +212,11 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
     }
   }
 
-  // Attributes that hold object/array values and require the `| json` filter
-  private static readonly OBJECT_ATTRIBUTES = new Set<string>(['kb_json_sources', 'kb_chunks']);
-
   onJsonSourcesChange(value: string): void {
     let jsonValue = '';
     if (value) {
       const inner = value.replace(/^\{\{|\}\}$/g, '').replace(/\s*\|\s*json\s*$/, '').trim();
-      const isObject = CdsActionReplyUrlPreviewComponent.OBJECT_ATTRIBUTES.has(inner);
-      jsonValue = isObject ? `{{${inner} | json}}` : `{{${inner}}}`;
+      jsonValue = `{{${inner} | json}}`;
     }
     this.jsonSourcesValue = jsonValue;
     this.saveAll();
@@ -266,5 +266,8 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
     this.changeActionReply.emit();
   }
 
-  onSelectedAttribute(variableSelected: { name: string; value: string }) {}
+  onSelectedAttribute(variableSelected: { name: string; value: string }, _key?: string) {
+    const value = variableSelected?.value || '';
+    this.onJsonSourcesChange(value);
+  }
 }

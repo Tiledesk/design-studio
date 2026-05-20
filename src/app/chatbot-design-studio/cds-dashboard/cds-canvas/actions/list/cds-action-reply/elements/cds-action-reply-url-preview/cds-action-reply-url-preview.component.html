@@ -78,7 +78,7 @@
         </span>
         <div *ngIf="activeTab === 'text'" class="url-mode-hint__tooltip">
             <div class="url-mode-hint__tooltip-text">{{ 'UrlPreviewHintJsonSourcesTooltip' | translate }}</div>
-            <a class="url-mode-hint__tooltip-link" [href]="DOCS_LINK.advanced_prompt.link" [target]="DOCS_LINK.advanced_prompt.target" rel="noopener noreferrer">{{ 'LearnMore' | translate }}</a>
+            <a class="url-mode-hint__tooltip-link" [href]="DOCS_LINK.json_sources.link" [target]="DOCS_LINK.json_sources.target" rel="noopener noreferrer">{{ 'LearnMore' | translate }}</a>
         </div>
     </div>
 
@@ -181,7 +181,20 @@
 
     <!-- Mode: Text (json parameter) -->
     <div *ngIf="activeTab === 'text'" class="url-json-sources">
-        <span class="url-json-sources__badge">{{ jsonSourcesBadgeLabel }}</span>
+        <!-- <span class="url-json-sources__badge">{{ jsonSourcesBadgeLabel }}</span> -->
+
+               <label class="title-label">{{'CDSCanvas.KBJsonSources' | translate}}</label>
+                <cds-textarea id="assignTo" 
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false" 
+                    [setAttributeBtn]="true"
+                    [isLiquidjs]="false"
+                    [minRow]="1" [maxRow]="1" 
+                    [readonly]="true" 
+                    [text]="jsonSourcesValue"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignJsonSourcesTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignJsonSourcesTo')">
+                </cds-textarea>
     </div>
 
 </div>

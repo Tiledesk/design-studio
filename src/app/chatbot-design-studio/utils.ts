@@ -13,8 +13,9 @@ export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
 export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://guide.tiledesk.com/', target: '_blank'},
-        advanced_prompt: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#advanced-context', target: '_blank' }, 
+        advanced_prompt: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#advanced-context', target: '_blank' },
         citations: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#get-contents-sources', target: '_blank' },
+        json_sources: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#url-preview', target: '_blank' },
         reranking: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/knowledge-base/re-ranking', target: '_blank' }
     }, 
     ADD_TO_KB: {
