@@ -416,7 +416,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   onSelectedAttribute(variableSelected: { name: string, value: string }, key) {
     this.action[key] = variableSelected.value;
     this.updateAndSaveAction.emit()
-}
+  }
   
 
   onChangeSelect(event, target) {
