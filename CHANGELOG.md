@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.39.44
+- **changed**: set custom attribute in JSON sources in URL preview in action reply
+
 # 1.39.43
 - **added**: added "use cache" and "use_hyde" to the ask KB keys: use_hyde and use_cache
 - **added**: added url preview in action reply
