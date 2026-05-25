@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.43-rc3
+- **bug fix**: fix to narrow the gpt-model filter to the OpenAI provider only, which avoids duplication.
+
 # 1.39.43-rc2
 - **bug fix**: bug fix preview url 
 - **changed**: updated documentation URLs from gethelp.tiledesk.com to https://guide.tiledesk.com/
