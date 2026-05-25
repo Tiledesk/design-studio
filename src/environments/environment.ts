@@ -5,7 +5,7 @@ export const environment = {
     remoteConfig: true, 
     //remoteConfigUrl: './design-studio-config.json',
     //remoteConfigUrl: './real_data/cds-config-native-prod.json',
-    remoteConfigUrl: './real_data/cds-config-aws-stage.json',
+    remoteConfigUrl: './cds-config-aws-stage.json',
     apiUrl: 'CHANGEIT',
     widgetBaseUrl: 'CHANGEIT',
     dashboardBaseUrl: 'CHANGEIT',
