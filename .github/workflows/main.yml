@@ -24,6 +24,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Debug docker auth
+      run: docker info
+      
     - name: Generate Docker metadata
       id: meta
       uses: docker/metadata-action@v3
