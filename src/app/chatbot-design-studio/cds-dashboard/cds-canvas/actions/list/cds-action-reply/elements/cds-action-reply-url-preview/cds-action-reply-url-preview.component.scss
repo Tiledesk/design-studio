@@ -376,3 +376,220 @@
     }
 }
 
+/* ---- Fields config (button + panel) ---- */
+.url-mode-config-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #d4d7dd;
+    border-radius: 7px;
+    background: #f4f5f7;
+    color: #64748b;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+
+    em {
+        font-size: 17px;
+    }
+
+    &:hover {
+        background: #eaecef;
+        color: #0f172a;
+    }
+
+    &.active {
+        background: #0f172a;
+        border-color: #0f172a;
+        color: #fff;
+    }
+}
+
+.url-fields-config {
+    margin: 4px 30px 10px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e4e6eb;
+    border-radius: 8px;
+
+    &__title {
+        font-size: 10px;
+        font-weight: 700;
+        color: #0f172a;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+    }
+
+    &__options {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__example-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 12px 0 5px;
+    }
+
+    &__example-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    &__bg-swatches {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+}
+
+.url-bg-swatch {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid #d4d7dd;
+    cursor: pointer;
+    transition: transform 100ms ease, box-shadow 100ms ease;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+
+    &.active {
+        border-color: #0f172a;
+        box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.15);
+    }
+}
+
+.url-field-check {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+        width: 13px;
+        height: 13px;
+        margin: 0;
+        cursor: pointer;
+        accent-color: #0f172a;
+        flex-shrink: 0;
+    }
+
+    &__label {
+        font-size: 12px;
+        color: #0f172a;
+    }
+
+    &__badge {
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #94a3b8;
+        background: #eef1f5;
+        border-radius: 4px;
+        padding: 1px 6px;
+    }
+
+    &--locked {
+        cursor: default;
+
+        input[type="checkbox"] {
+            cursor: not-allowed;
+        }
+
+        .url-field-check__label {
+            color: #64748b;
+        }
+    }
+}
+
+.url-preview-example {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #e4e6eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+
+    &__body {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__title {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #0f172a;
+        line-height: 1.3;
+    }
+
+    &__title-link {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #2563eb;
+        line-height: 1.3;
+        text-decoration: underline;
+        word-break: break-all;
+        cursor: pointer;
+    }
+
+    &__desc {
+        font-size: 11.5px;
+        color: #64748b;
+        line-height: 1.4;
+    }
+
+    &__source {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+    }
+
+    &__dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        flex-shrink: 0;
+    }
+
+    &__domain {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    &__image {
+        width: 64px;
+        height: 64px;
+        flex-shrink: 0;
+        border-radius: 6px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        em {
+            font-size: 26px;
+            color: #cbd5e1;
+        }
+    }
+}
+
