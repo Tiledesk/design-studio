@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.39.43-rc4
+# 1.39.43-rc5
 - **changed**: updated url preview, added displayed fields
 
 # 1.39.43-rc3
