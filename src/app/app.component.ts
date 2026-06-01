@@ -359,7 +359,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.logger.warn('[APP-COMP] >>> I AM NOT LOGGED IN <<<')
       this.IS_ONLINE = false;
-      this.goToDashboardLogin()
+      // Su localhost non eseguiamo il redirect alla pagina di login quando il token non viene trovato (sviluppo locale)
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      if (!isLocalhost) {
+        this.goToDashboardLogin()
+      }
     }
   }
 

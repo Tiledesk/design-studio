@@ -66,6 +66,60 @@
                 {{ 'UrlPreviewTabForm' | translate }}
             </label>
         </div>
+        <button type="button" class="url-mode-config-btn" [class.active]="showFieldsConfig"
+            [title]="'UrlPreviewFieldsConfigTitle' | translate"
+            (click)="toggleFieldsConfig()">
+            <em class="material-icons">tune</em>
+        </button>
+    </div>
+
+    <!-- Fields config panel -->
+    <div *ngIf="showFieldsConfig" class="url-fields-config">
+        <div class="url-fields-config__title">{{ 'UrlPreviewFieldsConfigTitle' | translate }}</div>
+
+        <div class="url-fields-config__options">
+            <label class="url-field-check url-field-check--locked">
+                <input type="checkbox" checked disabled />
+                <span class="url-field-check__label">{{ 'UrlPreviewFormLink' | translate }}</span>
+                <span class="url-field-check__badge">{{ 'UrlPreviewFieldRequired' | translate }}</span>
+            </label>
+            <label class="url-field-check">
+                <input type="checkbox" [checked]="displayFields.title" (change)="onToggleField('title')" />
+                <span class="url-field-check__label">{{ 'UrlPreviewFormTitle' | translate }}</span>
+            </label>
+            <label class="url-field-check">
+                <input type="checkbox" [checked]="displayFields.description" (change)="onToggleField('description')" />
+                <span class="url-field-check__label">{{ 'UrlPreviewFormDescription' | translate }}</span>
+            </label>
+            <label class="url-field-check">
+                <input type="checkbox" [checked]="displayFields.image" (change)="onToggleField('image')" />
+                <span class="url-field-check__label">{{ 'UrlPreviewFieldImage' | translate }}</span>
+            </label>
+        </div>
+
+        <div class="url-fields-config__example-row">
+            <div class="url-fields-config__example-label">{{ 'UrlPreviewFieldsExample' | translate }}</div>
+            <div class="url-fields-config__bg-swatches">
+                <button *ngFor="let c of previewBgColors" type="button"
+                    class="url-bg-swatch" [class.active]="previewBgColor === c"
+                    [style.background]="c" [title]="c"
+                    (click)="onSelectBgColor(c)"></button>
+            </div>
+        </div>
+        <div class="url-preview-example" [style.background]="previewBgColor">
+            <div class="url-preview-example__body">
+                <div *ngIf="displayFields.title" class="url-preview-example__title">{{ exampleTitle }}</div>
+                <a *ngIf="!displayFields.title" class="url-preview-example__title-link">{{ exampleUrl }}</a>
+                <div *ngIf="displayFields.description" class="url-preview-example__desc">{{ exampleDescription }}</div>
+                <div class="url-preview-example__source">
+                    <span class="url-preview-example__dot"></span>
+                    <span class="url-preview-example__domain">{{ exampleDomain }}</span>
+                </div>
+            </div>
+            <div *ngIf="displayFields.image" class="url-preview-example__image">
+                <em class="material-icons">image</em>
+            </div>
+        </div>
     </div>
 
     <!-- Mode hint -->
