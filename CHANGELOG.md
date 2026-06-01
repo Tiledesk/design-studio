@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.43-rc4
+- **changed**: updated url preview, added displayed fields
+
 # 1.39.43-rc3
 - **bug fix**: fix to narrow the gpt-model filter to the OpenAI provider only, which avoids duplication.
 
