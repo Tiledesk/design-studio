@@ -258,7 +258,7 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
   const allowedModelIds = Object.keys(ai_models);
   const isGptModel = (modelId: string) => modelId?.toLowerCase().startsWith('gpt-');
   llm_models_flat = llm_models_flat.filter(model =>
-    !isGptModel(model.model) || allowedModelIds.includes(model.model)
+    model.llm !== 'openai' || !isGptModel(model.model) || allowedModelIds.includes(model.model)
   );
   llm_models_flat.forEach(model => {
     if (ai_models[model.model] != null) {
