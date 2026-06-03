@@ -51,6 +51,20 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   // 'text' tab: json parameter value
   jsonSourcesValue: string = '{{kb_json_sources | json}}';
 
+  // Fields config: which URL fields are rendered in the preview cards (link is always shown)
+  showFieldsConfig: boolean = false;
+  displayFields: { title: boolean; description: boolean; image: boolean } = { title: true, description: true, image: true };
+
+  // Sample data for the config example preview card
+  readonly exampleTitle: string = 'Lorem ipsum dolor sit amet';
+  readonly exampleDescription: string = 'Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+  readonly exampleDomain: string = 'example.com';
+  readonly exampleUrl: string = 'www.lorem-ipsum.com/dolor-sit-amet';
+
+  // Background colors selectable for the URL preview card
+  readonly previewBgColors: string[] = ['#ffffff', '#f7f8fa', '#f6f7fb', '#f6f6f6'];
+  previewBgColor: string = '#f6f6f6';
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor() {}
@@ -90,6 +104,12 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
     const r = this.response as any;
     if (r?.type === 'url_preview') {
       this.activeTab = (r.activeMode as UrlPreviewTab) || 'text';
+      if (r.displayFields && typeof r.displayFields === 'object') {
+        this.displayFields = { ...this.displayFields, ...r.displayFields };
+      }
+      if (typeof r.previewBackgroundColor === 'string' && r.previewBackgroundColor) {
+        this.previewBgColor = r.previewBackgroundColor;
+      }
       const textValue = typeof r.text === 'string' ? r.text : '';
 
       if (this.activeTab === 'form') {
@@ -127,6 +147,8 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   private saveAll(): void {
     const r = this.response as any;
     r.activeMode = this.activeTab;
+    r.displayFields = { ...this.displayFields };
+    r.previewBackgroundColor = this.previewBgColor;
     if (r.form !== undefined) { delete r.form; }
     if (r.list !== undefined) { delete r.list; }
     if (this.activeTab === 'form') {
@@ -168,6 +190,22 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
 
   get previewActiveMode(): UrlPreviewTab {
     return ((this.response as any)?.activeMode as UrlPreviewTab) || this.activeTab;
+  }
+
+  toggleFieldsConfig(): void {
+    this.showFieldsConfig = !this.showFieldsConfig;
+  }
+
+  onToggleField(field: 'title' | 'description' | 'image'): void {
+    this.displayFields[field] = !this.displayFields[field];
+    this.saveAll();
+    this.changeActionReply.emit();
+  }
+
+  onSelectBgColor(color: string): void {
+    this.previewBgColor = color;
+    this.saveAll();
+    this.changeActionReply.emit();
   }
 
   setTab(tab: UrlPreviewTab): void {
