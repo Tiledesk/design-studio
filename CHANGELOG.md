@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.45
+- **changed**: updated url preview, added displayed fields
 
 # 1.39.44
 - **changed**: set custom attribute in JSON sources in URL preview in action reply
