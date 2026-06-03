@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.39.43-rc6
+- **changed**: changed default bck color in url preview
+
 # 1.39.43-rc5
 - **changed**: updated url preview, added displayed fields
 

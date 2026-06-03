@@ -63,7 +63,7 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
 
   // Background colors selectable for the URL preview card
   readonly previewBgColors: string[] = ['#ffffff', '#f7f8fa', '#f6f7fb', '#f6f6f6'];
-  previewBgColor: string = '#ffffff';
+  previewBgColor: string = '#f6f6f6';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
