@@ -2,9 +2,10 @@ export const environment = {
   production: true,
   t2y12PruGU9wUtEGzBJfolMIgK: 'CHANGEIT',
   VERSION: require('../../package.json').version,
-  DS_VERSION: '3',
+  DS_VERSION: '4',
   remoteConfig: true, 
-  remoteConfigUrl: './design-studio-config.json',
+  // remoteConfigUrl: './design-studio-config.json',  // template with ${...} placeholders, only usable when envsubst runs at deploy time
+  remoteConfigUrl: './real_data/cds-config-native-prod.json',
   apiUrl: 'CHANGEIT',
   widgetBaseUrl: 'CHANGEIT',
   dashboardBaseUrl: 'CHANGEIT',

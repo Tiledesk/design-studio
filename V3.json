@@ -1,0 +1,199 @@
+[
+    {
+        "_id": "6a169cb1b03c2d00135e900b",
+        "webhook_enabled": false,
+        "enabled": true,
+        "topic": "default",
+        "status": "live",
+        "actions": [
+            {
+                "_tdActionType": "reply",
+                "attributes": {
+                    "disableInputMessage": false,
+                    "commands": [
+                        {
+                            "type": "wait",
+                            "time": 500
+                        },
+                        {
+                            "type": "message",
+                            "message": {
+                                "type": "text",
+                                "text": "Hi, how can I help you?"
+                            }
+                        }
+                    ]
+                },
+                "text": "Hi, how can I help you?\r\n"
+            }
+        ],
+        "id_faq_kb": "6a169cb1b03c2d00135e9006",
+        "intent_id": "29a191f4-e7b5-4b30-9d53-c57cb774f178",
+        "intent_display_name": "welcome",
+        "language": "en",
+        "attributes": {
+            "position": {
+                "x": 714,
+                "y": 113
+            }
+        },
+        "id_project": "6565047fdd64fd001323f37c",
+        "createdBy": "63de31d2bc57e900139f1553",
+        "agents_available": false,
+        "createdAt": "2026-05-27T07:26:41.217Z",
+        "updatedAt": "2026-05-27T07:26:41.217Z",
+        "__v": 0,
+        "faq_kb": [
+            {
+                "_id": "6a169cb1b03c2d00135e9006",
+                "webhook_enabled": false,
+                "type": "tilebot",
+                "language": "en",
+                "public": false,
+                "certified": false,
+                "intentsEngine": "none",
+                "tags": [],
+                "score": 0,
+                "trained": true,
+                "certifiedTags": [],
+                "name": "Test V4",
+                "slug": "test-v4",
+                "id_project": "6565047fdd64fd001323f37c",
+                "subtype": "chatbot",
+                "trashed": false,
+                "createdBy": "63de31d2bc57e900139f1553",
+                "agents_available": false,
+                "createdAt": "2026-05-27T07:26:41.200Z",
+                "updatedAt": "2026-05-27T07:26:41.217Z",
+                "__v": 0,
+                "url": "http://my-tiledesk-prod-chatbot/ext/6a169cb1b03c2d00135e9006"
+            }
+        ]
+    },
+    {
+        "_id": "6a169cb1b03c2d00135e900a",
+        "webhook_enabled": false,
+        "enabled": true,
+        "topic": "default",
+        "status": "live",
+        "actions": [
+            {
+                "_tdActionType": "intent",
+                "intentName": "#29a191f4-e7b5-4b30-9d53-c57cb774f178"
+            }
+        ],
+        "id_faq_kb": "6a169cb1b03c2d00135e9006",
+        "intent_id": "0c2aac34-13c6-4d90-aab1-7ac5d48769eb",
+        "question": "\\start",
+        "intent_display_name": "start",
+        "language": "en",
+        "attributes": {
+            "position": {
+                "x": 172,
+                "y": 384
+            }
+        },
+        "id_project": "6565047fdd64fd001323f37c",
+        "createdBy": "63de31d2bc57e900139f1553",
+        "agents_available": false,
+        "createdAt": "2026-05-27T07:26:41.217Z",
+        "updatedAt": "2026-05-27T07:26:41.217Z",
+        "__v": 0,
+        "faq_kb": [
+            {
+                "_id": "6a169cb1b03c2d00135e9006",
+                "webhook_enabled": false,
+                "type": "tilebot",
+                "language": "en",
+                "public": false,
+                "certified": false,
+                "intentsEngine": "none",
+                "tags": [],
+                "score": 0,
+                "trained": true,
+                "certifiedTags": [],
+                "name": "Test V4",
+                "slug": "test-v4",
+                "id_project": "6565047fdd64fd001323f37c",
+                "subtype": "chatbot",
+                "trashed": false,
+                "createdBy": "63de31d2bc57e900139f1553",
+                "agents_available": false,
+                "createdAt": "2026-05-27T07:26:41.200Z",
+                "updatedAt": "2026-05-27T07:26:41.217Z",
+                "__v": 0,
+                "url": "http://my-tiledesk-prod-chatbot/ext/6a169cb1b03c2d00135e9006"
+            }
+        ]
+    },
+    {
+        "_id": "6a169cb1b03c2d00135e9009",
+        "webhook_enabled": false,
+        "enabled": true,
+        "topic": "default",
+        "status": "live",
+        "actions": [
+            {
+                "_tdActionType": "reply",
+                "text": "I didn't understand. Can you rephrase your question?",
+                "attributes": {
+                    "commands": [
+                        {
+                            "type": "wait",
+                            "time": 500
+                        },
+                        {
+                            "type": "message",
+                            "message": {
+                                "type": "text",
+                                "text": "I didn't understand. Can you rephrase your question?"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "id_faq_kb": "6a169cb1b03c2d00135e9006",
+        "intent_id": "de1f5d87-70ab-4b6c-9f9a-bad0cf2d1b61",
+        "intent_display_name": "defaultFallback",
+        "language": "en",
+        "attributes": {
+            "position": {
+                "x": 714,
+                "y": 528
+            }
+        },
+        "id_project": "6565047fdd64fd001323f37c",
+        "createdBy": "63de31d2bc57e900139f1553",
+        "agents_available": false,
+        "createdAt": "2026-05-27T07:26:41.217Z",
+        "updatedAt": "2026-05-27T07:26:41.217Z",
+        "__v": 0,
+        "faq_kb": [
+            {
+                "_id": "6a169cb1b03c2d00135e9006",
+                "webhook_enabled": false,
+                "type": "tilebot",
+                "language": "en",
+                "public": false,
+                "certified": false,
+                "intentsEngine": "none",
+                "tags": [],
+                "score": 0,
+                "trained": true,
+                "certifiedTags": [],
+                "name": "Test V4",
+                "slug": "test-v4",
+                "id_project": "6565047fdd64fd001323f37c",
+                "subtype": "chatbot",
+                "trashed": false,
+                "createdBy": "63de31d2bc57e900139f1553",
+                "agents_available": false,
+                "createdAt": "2026-05-27T07:26:41.200Z",
+                "updatedAt": "2026-05-27T07:26:41.217Z",
+                "__v": 0,
+                "url": "http://my-tiledesk-prod-chatbot/ext/6a169cb1b03c2d00135e9006"
+            }
+        ]
+    }
+]

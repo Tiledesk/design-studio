@@ -1,0 +1,206 @@
+[
+    {
+        "position": {
+            "x": -546.8054566194271,
+            "y": -1490.196568983294
+        },
+        "agents_available": false,
+        "_id": "6a0e1b427b0ce68af43ce9f4",
+        "id": "649ed192",
+        "id_project": "69f1cbdb6feaec8a287caf1a",
+        "id_faq_kb": "69f1ccba6feaec8a287caf4b",
+        "name": "untitled_reply",
+        "type": "reply",
+        "createdBy": "69f1b9246feaec8a287cad5e",
+        "createdAt": "2026-05-20T20:36:18.761Z",
+        "updatedAt": "2026-05-26T17:49:30.520Z",
+        "__v": 0,
+        "meta": {
+            "agentsAvailable": false
+        },
+        "data": {
+            "attributes": {
+                "disableInputMessage": false,
+                "commands": [
+                    {
+                        "type": "message",
+                        "message": {
+                            "type": "text",
+                            "text": "123{{xxx}}😶‍🌫️🫡\ndcsèpàcklèccc cccc {{ai_reply}} cccc\nsldjvlsdkjvlkdsj {{var_01}}😙🈂️🤹\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd\nd",
+                            "_tdJSONCondition": {
+                                "type": "expression",
+                                "conditions": [
+                                    {
+                                        "type": "condition",
+                                        "operand1": "xxx",
+                                        "operator": "equalAsStrings",
+                                        "operand2": {
+                                            "type": "const",
+                                            "value": "2"
+                                        }
+                                    },
+                                    {
+                                        "type": "operator",
+                                        "operator": "OR"
+                                    },
+                                    {
+                                        "type": "condition",
+                                        "operand1": "var_01",
+                                        "operator": "notEqualAsStrings",
+                                        "operand2": {
+                                            "type": "const",
+                                            "value": "x"
+                                        }
+                                    }
+                                ]
+                            },
+                            "attributes": {
+                                "attachment": {
+                                    "type": "template",
+                                    "buttons": [
+                                        {
+                                            "uid": "738512c9-ac87-48b1-ad86-822b1cdb640d",
+                                            "__idConnector": "9ad92b3b-3219-46da-b56d-eac5aa50a379",
+                                            "type": "url",
+                                            "value": "Ferrari",
+                                            "link": "https://www.ferrari.com/",
+                                            "target": "blank"
+                                        },
+                                        {
+                                            "uid": "16f78ef5-1440-4874-bc95-32812b24ac0e",
+                                            "__idConnector": "bc466613-825a-46c5-a1cc-5c40100ed327",
+                                            "type": "url",
+                                            "value": "SITE 2",
+                                            "link": "http://www.ietf.org",
+                                            "target": "parent"
+                                        },
+                                        {
+                                            "uid": "5e6bf579-57b5-4d9f-ae5f-af05739d76b5",
+                                            "__idConnector": "c3c60987-b02f-4dff-be0b-91da8166b696",
+                                            "type": "url",
+                                            "value": "Dante",
+                                            "link": "https://en.m.wikipedia.org/wiki/Dante_Alighieri",
+                                            "target": "self"
+                                        },
+                                        {
+                                            "uid": "5658bbe6-c8ce-4968-b4fc-e37cdc0b17c2",
+                                            "__idConnector": "f00889b0-eb2d-48b7-9833-e663302d8144",
+                                            "type": "url",
+                                            "value": "Pulsante",
+                                            "link": "http://google.com"
+                                        }
+                                    ],
+                                    "buttons_source": "json"
+                                }
+                            }
+                        },
+                        "time": 4300
+                    },
+                    {
+                        "type": "message",
+                        "message": {
+                            "type": "text",
+                            "text": "wrwerwe\newrqwerqwò q òwekròwekj klò efw jeòfj eòkl jd fakdjfdkjhfkjldhf lskjdhf lksadjdhf lskjdf hldskj flksdaj flkdsjhf ldskjhf lsdkjhf ksdlj  fhlkdsj fldkjs flkdsj fjd sjjd wrwerwe\newrqwerqwò q òwekròwekj klò efw jeòfj eòkl jd fakdjfdkjhfkjldhf lskjdhf lksadjdhf lskjdf hldskj flksdaj flkdsjhf ldskjhf lsdkjhf ksdlj  fhlkdsj fldkjs flkdsj fjd sjjdwrwerwe\newrqwerqwò q òwekròwekj klò efw jeòfj eòkl jd fakdjfdkjhfkjldhfc\n1\n1",
+                            "attributes": {
+                                "attachment": {
+                                    "type": "template",
+                                    "buttons": [
+                                        {
+                                            "uid": "64e029ae-3f41-4d4f-b89f-b16ccc36b047",
+                                            "__idConnector": "44742bd5-0673-4efe-8385-ac1eab1100b8",
+                                            "type": "text",
+                                            "value": "Pulsante"
+                                        },
+                                        {
+                                            "uid": "0b62b3a2-5685-46bb-8c97-1228deefa65b",
+                                            "__idConnector": "88ff4170-48d7-4fc3-b996-239870589db5",
+                                            "type": "url",
+                                            "value": "Pulsante",
+                                            "__isConnected": false,
+                                            "target": "self"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "time": 700
+                    },
+                    {
+                        "type": "message",
+                        "message": {
+                            "type": "text",
+                            "text": "",
+                            "attributes": {
+                                "attachment": {
+                                    "type": "template",
+                                    "buttons": [
+                                        {
+                                            "uid": "b344ba3f-e942-4ee5-972e-dc867dc223f8",
+                                            "__idConnector": "52c6fbbf-6bda-4106-a059-46a1832a3836",
+                                            "type": "text",
+                                            "value": "Pulsante"
+                                        }
+                                    ],
+                                    "buttons_source": "json"
+                                }
+                            }
+                        },
+                        "time": 5000
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "position": {
+            "x": -891.4423692892392,
+            "y": -1464.1608359416946
+        },
+        "agents_available": true,
+        "_id": "6a06d48fb9c0c500139337d1",
+        "createdAt": "2026-05-19T18:01:17.447Z",
+        "createdBy": "69f1b9246feaec8a287cad5e",
+        "id": "01000001",
+        "meta": {
+            "agentsAvailable": true
+        },
+        "name": "start",
+        "type": "start",
+        "updatedAt": "2026-05-25T09:57:16.160Z",
+        "id_faq_kb": "69f1ccba6feaec8a287caf4b",
+        "id_project": "69f1cbdb6feaec8a287caf1a"
+    },
+    {
+        "position": {
+            "x": -888.6105255998202,
+            "y": -1348.213683653289
+        },
+        "agents_available": true,
+        "_id": "6a06d48fb9c0c500139337d5",
+        "createdAt": "2026-05-19T18:01:17.447Z",
+        "createdBy": "69f1b9246feaec8a287cad5e",
+        "data": {
+            "query": "{{lastUserText}}",
+            "model": "gpt-4o",
+            "maxTokens": 512,
+            "temperature": 0.7,
+            "topK": 5,
+            "namespace": "6a06d48ec1f6f80013b9406c",
+            "assignReplyTo": "kb_reply",
+            "assignSourceTo": "kb_source",
+            "branches": {
+                "if": "bb000001",
+                "else": "bb000002"
+            }
+        },
+        "id": "05000005",
+        "meta": {
+            "readonly": true
+        },
+        "name": "defaultFallback",
+        "type": "defaultFallback",
+        "updatedAt": "2026-05-25T09:57:19.994Z",
+        "id_faq_kb": "69f1ccba6feaec8a287caf4b",
+        "id_project": "69f1cbdb6feaec8a287caf1a"
+    }
+]
