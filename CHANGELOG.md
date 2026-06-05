@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.0
+- **added**: added voice reply and settings in chatbot to allow voice conversational experience 
+
 # 1.39.45
 - **changed**: updated url preview, added displayed fields
 
