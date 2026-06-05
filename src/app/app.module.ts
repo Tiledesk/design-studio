@@ -23,7 +23,6 @@ import { ProjectService } from './services/projects.service';
 import { UsersService } from './services/users.service';
 import { KnowledgeBaseService } from './services/knowledge-base.service';
 import { OpenaiService } from './services/openai.service';
-import { AiService } from './services/ai.service';
 import { WhatsappService } from './services/whatsapp.service';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { BrandService } from './services/brand.service';
@@ -208,7 +207,6 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     UsersService,
     KnowledgeBaseService,
     OpenaiService,
-    AiService,
     WhatsappService,
     BrandService,
     MultichannelService,

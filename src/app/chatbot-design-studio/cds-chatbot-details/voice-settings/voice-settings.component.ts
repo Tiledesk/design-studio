@@ -8,7 +8,6 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { variableList } from '../../utils-variables';
 import { SelectComponent } from '../../cds-base-element/select/select.component';
 import { DOCS_LINK } from '../../utils';
-import { AiService } from 'src/app/services/ai.service';
 
 @Component({
   selector: 'cds-voice-settings',
@@ -45,7 +44,6 @@ export class CDSVoiceSettingsComponent implements OnInit {
 
   constructor(
     private faqKbService: FaqKbService,
-    private aiService: AiService,
   ) {}
 
   ngOnInit(): void {}
@@ -55,10 +53,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.initialize();
   }
 
-  private async initialize() {
-    await this.loadElevenLabsVoices();
-    await this.loadElevenLabsModels();
-
+  private initialize() {
     this.voiceProvider = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'VOICE_PROVIDER')?.value;
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value;
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value;
@@ -75,50 +70,6 @@ export class CDSVoiceSettingsComponent implements OnInit {
 
     if (this.selectedChatbot?.attributes?.globals) {
       this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
-    }
-  }
-
-  private async loadElevenLabsVoices() {
-    const elevenLabsProvider = voiceProviderList.find(el => el.key === 'elevenlabs');
-    if (!elevenLabsProvider || elevenLabsProvider.tts_voice.length > 0) return;
-    try {
-      const resp = await this.aiService.getElevenLabsVoices();
-      this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsVoices ', resp);
-      if (resp && Array.isArray(resp)) {
-        resp.forEach(voice => {
-          elevenLabsProvider.tts_voice.push({
-            voiceId: voice.voice_id,
-            preview_url: voice.preview_url,
-            name: voice.name,
-            type: 'standard',
-            status: 'active',
-            description: voice.description,
-            labels: { ...voice.labels },
-          });
-        });
-      }
-    } catch (error) {
-      this.logger.error('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsVoices error: ', error);
-    }
-  }
-
-  private async loadElevenLabsModels() {
-    const elevenLabsProvider = voiceProviderList.find(el => el.key === 'elevenlabs');
-    if (!elevenLabsProvider || elevenLabsProvider.tts_model.length > 0) return;
-    try {
-      const resp = await this.aiService.getElevenLabsModels();
-      this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels ', resp);
-      if (resp && Array.isArray(resp)) {
-        resp.forEach(model => {
-          elevenLabsProvider.tts_model.push({
-            model: model.model_id,
-            name: model.name,
-            status: 'active',
-          });
-        });
-      }
-    } catch (error) {
-      this.logger.error('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels error: ', error);
     }
   }
 
