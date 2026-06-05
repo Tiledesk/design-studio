@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Project } from 'src/app/models/project-model';
 import { voiceProviderList } from '../../utils-voice';
+import { TYPE_CHATBOT } from '../../utils-actions';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
@@ -22,7 +23,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
   @Input() selectedChatbot: Chatbot;
   @Input() project: Project;
 
-  voiceProviderList = voiceProviderList;
+  voiceProviderList = [];
   DOCS_LINK = DOCS_LINK;
 
   list = [];
@@ -54,18 +55,26 @@ export class CDSVoiceSettingsComponent implements OnInit {
   }
 
   private initialize() {
+    if (this.selectedChatbot?.subtype === TYPE_CHATBOT.CHATBOT) {
+      this.voiceProviderList = voiceProviderList.filter(p => p.key === 'elevenlabs');
+    } else if (this.selectedChatbot?.subtype === TYPE_CHATBOT.VOICE_TWILIO) {
+      this.voiceProviderList = voiceProviderList.filter(p => p.key === 'twilio' || p.key === 'openai');
+    } else {
+      this.voiceProviderList = voiceProviderList;
+    }
+
     this.voiceProvider = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'VOICE_PROVIDER')?.value;
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value;
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value;
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value;
-    this.voice_language_list = Array.from(new Map(voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values());
-    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
-    this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code;
+    this.voice_language_list = Array.from(new Map(this.voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values());
+    this.voice_name_list = this.voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+    this.voice_language = this.voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code;
 
     if (this.voiceProvider === 'openai' || this.voiceProvider === 'elevenlabs') {
-      this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
-      this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
-      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+      this.tts_model_list = this.voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+      this.stt_model_list = this.voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+      this.voice_name_list = this.voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
     }
 
     if (this.selectedChatbot?.attributes?.globals) {
@@ -84,12 +93,12 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty('STT_MODEL', null);
         this.voiceNameSelect?.onResetValue(null);
         this.voiceProvider = event.key;
-        this.voice_language_list = Array.from(new Map(voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values());
+        this.voice_language_list = Array.from(new Map(this.voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values());
         this.voice_name_list = [];
         if (event?.key === 'openai' || event?.key === 'elevenlabs') {
-          this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
-          this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
-          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+          this.tts_model_list = this.voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+          this.stt_model_list = this.voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
+          this.voice_name_list = this.voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }));
           this.findAndUpdateProperty('TTS_VOICE_LANGUAGE', null);
           this.voiceLanguageSelect?.onResetValue(null);
           this.voice_language = null;
@@ -100,8 +109,8 @@ export class CDSVoiceSettingsComponent implements OnInit {
         this.findAndUpdateProperty('TTS_VOICE_LANGUAGE', event.language_code);
         this.voice_language = event.language_code;
         this.voice_name_list = this.voiceProvider === 'twilio'
-          ? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
-          : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice;
+          ? this.voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, description: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
+          : this.voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice;
         break;
       }
       case 'TTS_VOICE_NAME': {
