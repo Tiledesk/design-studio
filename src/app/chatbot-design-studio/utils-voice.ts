@@ -239,6 +239,7 @@ export var voiceProviderList: Array<{key: string, label: string, elements?: Arra
         tts_voice: [],
         tts_model: [],
         stt_model: [
+            { model: 'scribe_v2_realtime',      name: 'scribe_v2_realtime',     status: 'active' },
             { model: 'scribe_v1',               name: 'scribe_v1',              status: 'active' },
             { model: 'scribe_v1_experimental',  name: 'scribe_v1_experimental', status: 'active' },
         ]
