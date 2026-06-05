@@ -13,6 +13,7 @@ import { SETTINGS_SECTION } from '../utils';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BRAND_BASE_INFO } from '../utils-resources';
+import { IntegrationService } from 'src/app/services/integration.service';
 const swal = require('sweetalert');
 
 @Component({
@@ -44,6 +45,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
   constructor(
     public appConfigService: AppConfigService,
     private projectService: ProjectService,
+    private integrationService: IntegrationService,
     private translate: TranslateService,
     private dashboardService: DashboardService,
     private router: Router,
@@ -57,6 +59,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     // this.getParamsBotIdAndThenInit();
     this.getOSCODE();
     this.project = this.projectService.getCurrentProject()
+    this.integrationService.initialize(this.appConfigService.getConfig().serverBaseUrl, this.project._id)
     this.getTranslations();
     this.selectedChatbot = this.dashboardService.selectedChatbot;
 

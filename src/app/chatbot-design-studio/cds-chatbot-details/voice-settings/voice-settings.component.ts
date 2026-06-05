@@ -206,8 +206,9 @@ export class CDSVoiceSettingsComponent implements OnInit {
     const existingKey = this.list.findIndex((item: any) => item.key === key);
     if (existingKey > -1) {
       this.list[existingKey].value = value;
+      this.list[existingKey].visible = false;
     } else {
-      this.list.push({ key: key, value: value });
+      this.list.push({ key: key, value: value, visible: false });
     }
   }
 
