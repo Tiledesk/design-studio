@@ -19,6 +19,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
 import { OpenaiService } from 'src/app/services/openai.service';
+import { AiService } from 'src/app/services/ai.service';
 import { WhatsappService } from 'src/app/services/whatsapp.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DepartmentService } from 'src/app/services/department.service';
@@ -68,6 +69,7 @@ export class CdsDashboardComponent implements OnInit {
     public faqKbService: FaqKbService,
     public faqService: FaqService,
     private openaiService: OpenaiService,
+    private aiService: AiService,
     private whatsappService: WhatsappService,
     private stageService: StageService, 
     private readonly webhookService: WebhookService
@@ -187,6 +189,7 @@ export class CdsDashboardComponent implements OnInit {
     this.faqService.initialize(serverBaseURL, this.project._id)
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.aiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
     this.uploadService.initialize(this.project._id);
