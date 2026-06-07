@@ -938,3 +938,30 @@ export class ActionMoveToUnassigned extends Action {
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
     }
 }
+
+export class ActionDataTable extends Action {
+    tableId: string;
+    tableName: string;
+    operation: string;          // 'get' | 'insert' | 'update' | 'upsert' | 'delete'
+    must_match: string;         // 'all' | 'any'
+    conditions: Array<{ column: string; operator: string; value?: string }>;
+    id_row: string;
+    data: { [key: string]: string };   // { [columnName]: value }
+    multi: boolean;
+    assignResultTo: string;
+    assignErrorTo: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.DATA_TABLE;
+        this.tableId = '';
+        this.tableName = '';
+        this.operation = 'get';
+        this.must_match = 'all';
+        this.conditions = [];
+        this.id_row = '';
+        this.data = {};
+        this.multi = false;
+        this.assignResultTo = 'result';
+        this.assignErrorTo = 'error';
+    }
+}

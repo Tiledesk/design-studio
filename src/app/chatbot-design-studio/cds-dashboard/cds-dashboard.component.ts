@@ -18,6 +18,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
+import { DataTableService } from 'src/app/services/data-table.service';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { WhatsappService } from 'src/app/services/whatsapp.service';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -63,6 +64,7 @@ export class CdsDashboardComponent implements OnInit {
     private appStorageService: AppStorageService,
     private dashboardService: DashboardService,
     private kbService: KnowledgeBaseService,
+    private dataTableService: DataTableService,
     public departmentService: DepartmentService,
     private uploadService: UploadService,
     public faqKbService: FaqKbService,
@@ -186,6 +188,7 @@ export class CdsDashboardComponent implements OnInit {
     this.faqKbService.initialize(serverBaseURL, this.project._id)
     this.faqService.initialize(serverBaseURL, this.project._id)
     this.kbService.initialize(serverBaseURL, this.project._id)
+    this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);

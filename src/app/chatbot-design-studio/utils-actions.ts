@@ -51,7 +51,8 @@ export enum TYPE_ACTION {
     SEND_WHATSAPP       = 'send_whatsapp',
     AI_PROMPT           = 'ai_prompt',
     AI_CONDITION        = 'ai_condition',
-    WEB_RESPONSE        = 'web_response'
+    WEB_RESPONSE        = 'web_response',
+    DATA_TABLE          = 'data_table'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -180,6 +181,7 @@ export const ACTIONS_LIST: {
     CUSTOMERIO :            { name: 'CDSActionList.NAME.Customerio',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.CUSTOMERIO,           src:"assets/images/actions/customerio.svg",             status: "active", plan: PLAN_NAME.E,    doc: "CDSActionList.DOC.Customerio"                                     },
     BREVO :                 { name: 'CDSActionList.NAME.Brevo',                 chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.BREVO,                src:"assets/images/actions/brevo.svg",                  status: "active", plan: PLAN_NAME.E,    doc: "CDSActionList.DOC.Brevo"                                          },
     N8N :                   { name: 'CDSActionList.NAME.N8n',                   chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.N8N,                  src:"assets/images/actions/n8n.svg",                    status: "active", plan: PLAN_NAME.E,    doc: "CDSActionList.DOC.N8n"                                            },
+    DATA_TABLE :            { name: 'CDSActionList.NAME.DataTable',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.DATA_TABLE,           src:"assets/images/actions/data_table.svg",             status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.DataTable"                                      },
 
     DFTM_FORM:              { name: 'CDSActionList.NAME.DTMFForm',              chatbot_types: [TYPE_CHATBOT.VOICE ],                                                                                                category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_FORM,       src:"assets/images/actions-voice/dtmf_form.svg",        status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     DTMF_MENU:              { name: 'CDSActionList.NAME.DTMFMenu',              chatbot_types: [TYPE_CHATBOT.VOICE ],                                                                                                category: TYPE_ACTION_CATEGORY.VOICE,               type: TYPE_ACTION_VXML.DTMF_MENU,       src:"assets/images/actions-voice/dtmf_menu.svg",        status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
@@ -194,3 +196,34 @@ export const ACTIONS_LIST: {
     PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
 }
+
+// ----- Data Table action constants -----
+export const DATA_TABLE_OPERATIONS: Array<{ name: string, value: string }> = [
+    { name: 'Get',    value: 'get' },
+    { name: 'Insert', value: 'insert' },
+    { name: 'Update', value: 'update' },
+    { name: 'Upsert', value: 'upsert' },
+    { name: 'Delete', value: 'delete' }
+];
+
+export const DATA_TABLE_OPERATORS: Array<{ name: string, value: string }> = [
+    { name: 'Equal',            value: 'equal' },
+    { name: 'Not equal',        value: 'not_equal' },
+    { name: 'Contains',         value: 'contains' },
+    { name: 'Starts with',      value: 'starts_with' },
+    { name: 'Ends with',        value: 'ends_with' },
+    { name: 'Greater than',     value: 'greater_than' },
+    { name: 'Greater or equal', value: 'greater_or_equal' },
+    { name: 'Less than',        value: 'less_than' },
+    { name: 'Less or equal',    value: 'less_or_equal' },
+    { name: 'Exists',           value: 'exists' },
+    { name: 'Not exists',       value: 'not_exists' }
+];
+
+// Operators that don't require a value
+export const DATA_TABLE_OPERATORS_NO_VALUE: string[] = ['exists', 'not_exists'];
+
+export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
+    { name: 'all (AND)', value: 'all' },
+    { name: 'any (OR)',  value: 'any' }
+];

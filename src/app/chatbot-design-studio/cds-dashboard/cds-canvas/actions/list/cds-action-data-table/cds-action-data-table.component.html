@@ -1,0 +1,217 @@
+<!-- ============ PREVIEW (canvas node) ============ -->
+<div *ngIf="previewMode" class="cds-action-preview">
+    <div class="dt-preview-row">
+        <span class="dt-preview-op">{{ action?.operation | uppercase }}</span>
+        <span class="dt-preview-table" *ngIf="action?.tableName">{{ action?.tableName }}</span>
+        <span class="dt-preview-table empty" *ngIf="!action?.tableName">{{ 'CDSCanvas.DataTableSelectTable' | translate }}</span>
+    </div>
+</div>
+
+
+<!-- ============ DETAIL (edit panel) ============ -->
+<div *ngIf="!previewMode" class="content-panel-intent-detail dt-detail">
+
+    <!-- Table -->
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.DataTableTable' | translate }}</label>
+        <cds-select
+            [items]="tables"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'_id'"
+            [searchable]="true"
+            [placeholder]="'CDSCanvas.DataTableSelectTable' | translate"
+            [itemSelected]="action?.tableId"
+            (onSelected)="onChangeTable($event)">
+        </cds-select>
+    </div>
+
+    <!-- Operation -->
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.DataTableOperation' | translate }}</label>
+        <cds-select
+            [items]="operations"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [sortAlphabetically]="false"
+            [itemSelected]="action?.operation"
+            (onSelected)="onChangeOperation($event)">
+        </cds-select>
+    </div>
+
+    <hr class="custom-divider">
+
+    <!-- Row identification by id (update / upsert / delete) -->
+    <div class="field-box" *ngIf="showIdRow">
+        <label class="title-label">{{ 'CDSCanvas.DataTableIdRow' | translate }}</label>
+        <label class="subtitle-label">{{ 'CDSCanvas.DataTableIdRowInfo' | translate }}</label>
+        <cds-textarea id="idRow"
+            class="text-editable-div"
+            [text]="action?.id_row"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1"
+            popoverVerticalAlign="above"
+            (blur)="onBlurIdRow()"
+            (changeTextarea)="onChangeIdRow($event)">
+        </cds-textarea>
+    </div>
+
+    <!-- Conditions / filters (get / update / upsert / delete) -->
+    <ng-container *ngIf="showConditions">
+        <div class="field-box">
+            <label class="title-label">{{ 'CDSCanvas.DataTableMatchMode' | translate }}</label>
+            <cds-select
+                [items]="matchModes"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [sortAlphabetically]="false"
+                [itemSelected]="action?.must_match"
+                (onSelected)="onChangeMatch($event)">
+            </cds-select>
+        </div>
+
+        <label class="title-label section-label">{{ 'CDSCanvas.DataTableConditions' | translate }}</label>
+
+        <div class="content" *ngFor="let cond of action?.conditions; let i = index">
+            <div class="control-buttons">
+                <div class="filter-remove" (click)="onDeleteCondition(i)">
+                    <span class="material-icons-outlined">delete</span>
+                </div>
+            </div>
+            <div class="setting-wrapper">
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.DataTableColumn' | translate }}</label>
+                    <cds-select
+                        [items]="columns"
+                        [bindLabelSelect]="'label'"
+                        [bindValueSelect]="'value'"
+                        [searchable]="true"
+                        [itemSelected]="cond.column"
+                        (onSelected)="onChangeConditionColumn($event, i)">
+                    </cds-select>
+                </div>
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.DataTableOperator' | translate }}</label>
+                    <cds-select
+                        [items]="operators"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'value'"
+                        [sortAlphabetically]="false"
+                        [itemSelected]="cond.operator"
+                        (onSelected)="onChangeConditionOperator($event, i)">
+                    </cds-select>
+                </div>
+                <div class="field-box" *ngIf="operatorHasValue(cond.operator)">
+                    <label class="title-label">{{ 'CDSCanvas.Value' | translate }}</label>
+                    <cds-textarea class="text-editable-div"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [text]="cond.value"
+                        [minRow]="1" [maxRow]="1"
+                        popoverVerticalAlign="above"
+                        (blur)="onBlurCondition()"
+                        (changeTextarea)="onChangeConditionValue($event, i)">
+                    </cds-textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-add-group-wrapper add-conditions-group">
+            <div class="filter-add-group" (click)="onAddCondition()">
+                <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
+                <span class="text">{{ 'CDSCanvas.DataTableAddCondition' | translate }}</span>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Data (insert / update / upsert) -->
+    <ng-container *ngIf="showData">
+        <hr class="custom-divider">
+        <label class="title-label section-label">{{ 'CDSCanvas.DataTableData' | translate }}</label>
+
+        <div class="content" *ngFor="let row of dataRows; let i = index">
+            <div class="control-buttons">
+                <div class="filter-remove" (click)="onDeleteDataRow(i)">
+                    <span class="material-icons-outlined">delete</span>
+                </div>
+            </div>
+            <div class="setting-wrapper">
+                <div class="field-box" style="width: 100%;">
+                    <label class="title-label">{{ 'CDSCanvas.DataTableColumn' | translate }}</label>
+                    <cds-select
+                        [items]="columns"
+                        [bindLabelSelect]="'label'"
+                        [bindValueSelect]="'value'"
+                        [searchable]="true"
+                        [itemSelected]="row.column"
+                        (onSelected)="onChangeDataColumn($event, i)">
+                    </cds-select>
+                </div>
+                <div class="field-box" style="width: 100%;">
+                    <label class="title-label">{{ 'CDSCanvas.Value' | translate }}</label>
+                    <cds-textarea class="text-editable-div"
+                        [emojiPikerBtn]="false"
+                        [textLimitBtn]="false"
+                        [text]="row.value"
+                        [minRow]="1" [maxRow]="1"
+                        popoverVerticalAlign="above"
+                        (blur)="onBlurDataRow()"
+                        (changeTextarea)="onChangeDataValue($event, i)">
+                    </cds-textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-add-group-wrapper add-conditions-group">
+            <div class="filter-add-group" (click)="onAddDataRow()">
+                <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
+                <span class="text">{{ 'CDSCanvas.DataTableAddData' | translate }}</span>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Multi (upsert) -->
+    <div class="field-box dt-multi" *ngIf="showMulti">
+        <mat-checkbox
+            [checked]="action?.multi"
+            (change)="onChangeMulti($event.checked)">
+            {{ 'CDSCanvas.DataTableMulti' | translate }}
+        </mat-checkbox>
+        <label class="subtitle-label">{{ 'CDSCanvas.DataTableMultiInfo' | translate }}</label>
+    </div>
+
+    <hr class="custom-divider">
+
+    <!-- Assign result / error -->
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.AssignResultTo' | translate }}</label>
+        <cds-textarea id="assignResultTo"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            [text]="action?.assignResultTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+        </cds-textarea>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.AssignErrorTo' | translate }}</label>
+        <cds-textarea id="assignErrorTo"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            [text]="action?.assignErrorTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+        </cds-textarea>
+    </div>
+
+</div>
