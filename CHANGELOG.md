@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.1-rc3
+- **changed**: added tag "BETA"
+
 # 1.40.1-rc2
 - **bug fix**: bug fix css panel detail action data table
 
