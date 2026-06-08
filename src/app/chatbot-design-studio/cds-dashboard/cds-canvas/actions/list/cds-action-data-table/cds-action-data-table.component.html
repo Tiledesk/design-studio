@@ -1,9 +1,32 @@
 <!-- ============ PREVIEW (canvas node) ============ -->
-<div *ngIf="previewMode" class="cds-action-preview">
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
     <div class="dt-preview-row">
         <span class="dt-preview-op">{{ action?.operation | uppercase }}</span>
         <span class="dt-preview-table" *ngIf="action?.tableName">{{ action?.tableName }}</span>
         <span class="dt-preview-table empty" *ngIf="!action?.tableName">{{ 'CDSCanvas.DataTableSelectTable' | translate }}</span>
+    </div>
+
+    <div class="previewContent">
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+        <label class="title-preview-label">{{ 'CDSCanvas.Success' | translate }}</label>
+        <cds-connector class="connector-true"
+            [idConnector]="idConnectorTrue"
+            [idConnection]="idConnectionTrue"
+            [isConnected]="isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{ 'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector]="idConnectorFalse"
+            [idConnection]="idConnectionFalse"
+            [isConnected]="isConnectedFalse">
+        </cds-connector>
     </div>
 </div>
 
@@ -40,23 +63,6 @@
 
     <hr class="custom-divider">
 
-    <!-- Row identification by id (update / upsert / delete) -->
-    <div class="field-box" *ngIf="showIdRow">
-        <label class="title-label">{{ 'CDSCanvas.DataTableIdRow' | translate }}</label>
-        <label class="subtitle-label">{{ 'CDSCanvas.DataTableIdRowInfo' | translate }}</label>
-        <cds-textarea id="idRow"
-            class="text-editable-div"
-            [text]="action?.id_row"
-            [textLimitBtn]="false"
-            [emojiPikerBtn]="false"
-            [setAttributeBtn]="true"
-            [minRow]="1" [maxRow]="1"
-            popoverVerticalAlign="above"
-            (blur)="onBlurIdRow()"
-            (changeTextarea)="onChangeIdRow($event)">
-        </cds-textarea>
-    </div>
-
     <!-- Conditions / filters (get / update / upsert / delete) -->
     <ng-container *ngIf="showConditions">
         <div class="field-box">
@@ -71,10 +77,14 @@
             </cds-select>
         </div>
 
-        <label class="title-label section-label">{{ 'CDSCanvas.DataTableConditions' | translate }}</label>
+        <label class="title-label section-label">
+            {{ 'CDSCanvas.DataTableConditions' | translate }}
+            <span class="required-mark" *ngIf="conditionsRequired">*</span>
+        </label>
+        <label class="subtitle-label" *ngIf="conditionsRequired">{{ 'CDSCanvas.DataTableConditionsRequired' | translate }}</label>
 
         <div class="content" *ngFor="let cond of action?.conditions; let i = index">
-            <div class="control-buttons">
+            <div class="control-buttons" *ngIf="!(conditionsRequired && action.conditions.length === 1)">
                 <div class="filter-remove" (click)="onDeleteCondition(i)">
                     <span class="material-icons-outlined">delete</span>
                 </div>
@@ -170,16 +180,6 @@
             </div>
         </div>
     </ng-container>
-
-    <!-- Multi (upsert) -->
-    <div class="field-box dt-multi" *ngIf="showMulti">
-        <mat-checkbox
-            [checked]="action?.multi"
-            (change)="onChangeMulti($event.checked)">
-            {{ 'CDSCanvas.DataTableMulti' | translate }}
-        </mat-checkbox>
-        <label class="subtitle-label">{{ 'CDSCanvas.DataTableMultiInfo' | translate }}</label>
-    </div>
 
     <hr class="custom-divider">
 

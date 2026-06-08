@@ -945,11 +945,11 @@ export class ActionDataTable extends Action {
     operation: string;          // 'get' | 'insert' | 'update' | 'upsert' | 'delete'
     must_match: string;         // 'all' | 'any'
     conditions: Array<{ column: string; operator: string; value?: string }>;
-    id_row: string;
     data: { [key: string]: string };   // { [columnName]: value }
-    multi: boolean;
     assignResultTo: string;
     assignErrorTo: string;
+    trueIntent: string;     // success branch connector
+    falseIntent: string;    // error/else branch connector
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.DATA_TABLE;
@@ -958,10 +958,8 @@ export class ActionDataTable extends Action {
         this.operation = 'get';
         this.must_match = 'all';
         this.conditions = [];
-        this.id_row = '';
         this.data = {};
-        this.multi = false;
-        this.assignResultTo = 'result';
+        this.assignResultTo = 'data_table_result';
         this.assignErrorTo = 'error';
     }
 }
