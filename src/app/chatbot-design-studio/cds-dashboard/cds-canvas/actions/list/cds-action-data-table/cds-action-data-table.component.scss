@@ -43,6 +43,11 @@
     margin: 10px 0 6px;
 }
 
+// guard: long unbreakable labels must wrap instead of overflowing the panel
+.title-label {
+    overflow-wrap: anywhere;
+}
+
 .required-mark {
     color: #ef4444;
     font-weight: 700;
@@ -67,7 +72,7 @@
     position: relative;
     background-color: var(--content-background);
     border: 1px solid var(--gray-light-02);
-    padding: 20px;
+    padding: 14px;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -90,6 +95,12 @@
     grid-template-columns: repeat(2, 1fr);
     justify-content: space-between;
     gap: 5px;
+
+    // allow grid children (cds-select / cds-textarea) to shrink below their
+    // intrinsic width instead of overflowing the 480px detail panel
+    & > * {
+        min-width: 0;
+    }
 
     & > *:nth-child(odd):last-child {
         grid-column: span 2;
