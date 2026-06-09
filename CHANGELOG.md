@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.1-rc6
+- **bug fix**: retrocompatibility jsonCondition
+
 # 1.40.1-rc5
 - **changed**: refactoring jsonCondition. added "when"
 
