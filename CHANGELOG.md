@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.1-rc5
+- **changed**: refactoring jsonCondition. added "when"
 
 # 1.40.1-rc4
 - **changed**: display Custom Headers in MCP server
