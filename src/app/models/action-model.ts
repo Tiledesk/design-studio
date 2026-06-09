@@ -494,11 +494,16 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+/** Livello di reasoning: low | medium | high */
+export type ReasoningLevel = 'low' | 'medium' | 'high';
+
 export class ActionAiPrompt extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
     history: boolean;
+    reasoning?: boolean;
+    reasoningLevel?: ReasoningLevel;
     max_tokens: number;
     temperature: number;
     labelModel: string;
@@ -942,5 +947,30 @@ export class ActionMoveToUnassigned extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
+    }
+}
+
+export class ActionDataTable extends Action {
+    tableId: string;
+    tableName: string;
+    operation: string;          // 'get' | 'insert' | 'update' | 'upsert' | 'delete'
+    must_match: string;         // 'all' | 'any'
+    conditions: Array<{ column: string; operator: string; value?: string }>;
+    data: { [key: string]: string };   // { [columnName]: value }
+    assignResultTo: string;
+    assignErrorTo: string;
+    trueIntent: string;     // success branch connector
+    falseIntent: string;    // error/else branch connector
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.DATA_TABLE;
+        this.tableId = '';
+        this.tableName = '';
+        this.operation = 'get';
+        this.must_match = 'all';
+        this.conditions = [];
+        this.data = {};
+        this.assignResultTo = 'data_table_result';
+        this.assignErrorTo = 'error';
     }
 }
