@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.40.1-rc4
+- **changed**: display Custom Headers in MCP server
+
 # 1.40.1-rc3
 - **changed**: added tag "BETA"
 
