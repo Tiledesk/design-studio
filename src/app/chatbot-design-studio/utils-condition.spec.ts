@@ -5,6 +5,8 @@ import {
   serializeExpression,
   conditionToWhen,
   escapeString,
+  applyConditionSaveModeToPayload,
+  SAVE_ONLY_WHEN,
 } from './utils-condition';
 
 /** Helpers di costruzione AST */
@@ -121,6 +123,44 @@ describe('utils-condition · serializeConditionToWhen', () => {
   it('singola condizione, singolo gruppo: nessuna parentesi', () => {
     const groups = [expr(cond('ai_reply', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Ciao' }))];
     expect(serializeConditionToWhen(groups)).toBe('ai_reply == "Ciao"');
+  });
+
+  it('save mode: azione jsoncondition -> `when` valorizzato; in TEST `groups` svuotato', () => {
+    const action: any = {
+      _tdActionType: 'jsoncondition',
+      groups: [ expr(cond('ai_reply', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Ciao' })) ],
+      when: ''
+    };
+    const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
+    applyConditionSaveModeToPayload(payload);
+    expect(action.when).toBe('ai_reply == "Ciao"');
+    if (SAVE_ONLY_WHEN) {
+      expect(action.groups).toEqual([]);
+    } else {
+      expect(action.groups.length).toBe(1); // modalità "entrambi": AST preservato
+    }
+  });
+
+  it('save mode: filtro reply (_tdJSONCondition annidato) -> `when` valorizzato; in TEST `conditions` svuotate', () => {
+    const tdJSONCondition: any = expr(cond('user_city', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Roma' }));
+    const action: any = {
+      _tdActionType: 'reply',
+      attributes: { message: { _tdJSONCondition: tdJSONCondition } }
+    };
+    const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
+    applyConditionSaveModeToPayload(payload);
+    expect(tdJSONCondition.when).toBe('user_city == "Roma"');
+    if (SAVE_ONLY_WHEN) {
+      expect(tdJSONCondition.conditions).toEqual([]);
+    } else {
+      expect(tdJSONCondition.conditions.length).toBe(1);
+    }
+  });
+
+  it('save mode: payload nullo/malformato non lancia', () => {
+    expect(() => applyConditionSaveModeToPayload(null)).not.toThrow();
+    expect(() => applyConditionSaveModeToPayload({})).not.toThrow();
+    expect(() => applyConditionSaveModeToPayload({ operations: [{ intent: {} }] })).not.toThrow();
   });
 
   it('casi vuoti / malformati non lanciano e producono stringa vuota o pulita', () => {

@@ -155,3 +155,74 @@ export function serializeConditionToWhen(groups: Array<Expression | Operator>): 
   });
   return joinTokens(tokens);
 }
+
+/* ============================================================================
+ * Modalità di salvataggio delle condizioni
+ * ==========================================================================*/
+
+/**
+ * Modalità di salvataggio (TEST).
+ * - true  (TEST attuale): le condizioni sono salvate SOLO in `when`; l'AST
+ *   (`groups` / `_tdJSONCondition.conditions`) viene svuotato nel payload persistito.
+ * - false (retrocompatibilità): salva ENTRAMBI (AST + `when`).
+ *
+ * NB: la trasformazione agisce solo sul payload inviato al backend (un clone),
+ * MAI sul modello in memoria → l'interfaccia del Design Studio resta invariata.
+ */
+export const SAVE_ONLY_WHEN = false;
+
+/** type-id dell'azione JSON Condition (hardcoded per evitare import circolari da utils-actions). */
+const JSON_CONDITION_TYPE = 'jsoncondition';
+
+/** Genera `when` su un'Expression (filtri reply, ecc.) e, in modalità TEST, ne svuota `conditions`. */
+function applyExpressionSaveMode(expr: any): void {
+  if (!expr || typeof expr !== 'object' || !Array.isArray(expr.conditions)) return;
+  expr.when = serializeExpression(expr as Expression);
+  if (SAVE_ONLY_WHEN) expr.conditions = [];
+}
+
+/** Cerca ricorsivamente `_tdJSONCondition` (Expression) dentro un nodo e vi applica la modalità di salvataggio. */
+function applyNestedExpressionSaveMode(node: any): void {
+  if (!node || typeof node !== 'object') return;
+  if (Array.isArray(node)) { node.forEach(applyNestedExpressionSaveMode); return; }
+  if (node._tdJSONCondition && typeof node._tdJSONCondition === 'object') {
+    applyExpressionSaveMode(node._tdJSONCondition);
+  }
+  for (const key of Object.keys(node)) {
+    const value = node[key];
+    if (value && typeof value === 'object') applyNestedExpressionSaveMode(value);
+  }
+}
+
+/** Applica la modalità di salvataggio a una singola action (JSON Condition + eventuali filtri annidati). */
+function applyConditionSaveModeToAction(action: any): void {
+  if (!action || typeof action !== 'object') return;
+  // Azione JSON Condition: condizioni in `groups` -> `when` (root azione)
+  if (action._tdActionType === JSON_CONDITION_TYPE && Array.isArray(action.groups)) {
+    action.when = serializeConditionToWhen(action.groups);
+    if (SAVE_ONLY_WHEN) action.groups = [];
+  }
+  // Filtri (reply, ecc.): `_tdJSONCondition` annidato a qualsiasi profondità
+  applyNestedExpressionSaveMode(action);
+}
+
+/**
+ * Trasforma il payload di salvataggio (già clonato) applicando la modalità di salvataggio
+ * delle condizioni a tutte le action di tutti gli intent. Non lancia MAI: in caso di errore
+ * ritorna il payload invariato (un errore qui non deve rompere il salvataggio).
+ * Da invocare nel chokepoint di invio al backend (opsUpdate).
+ */
+export function applyConditionSaveModeToPayload(payload: any): any {
+  try {
+    if (!payload || !Array.isArray(payload.operations)) return payload;
+    payload.operations.forEach((op: any) => {
+      const intent = op && op.intent;
+      if (intent && Array.isArray(intent.actions)) {
+        intent.actions.forEach((action: any) => applyConditionSaveModeToAction(action));
+      }
+    });
+  } catch (_e) {
+    // Sicurezza: non interrompere mai il salvataggio.
+  }
+  return payload;
+}
