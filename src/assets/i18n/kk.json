@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "Өрісті жойғыңыз келе ме?",
         "DeleteForm": "Нысанды жою",
         "ConfirmDeleteForm": "Пішінді жойғыңыз келе ме?",
-        "MarkbotLabel": "You can use <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' target='_blank'>Markbot</a> to format your labels .",
+        "MarkbotLabel": "You can use <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> to format your labels .",
         "InfoMessages": {
             "field_name": "Пішін өрісіне атау беріңіз (мысалы: _ Пайдаланушы). Атауда тек әріптер саны және _ болуы мүмкін",
             "field_type": "Осы өріске енгізілетін берілген түрін таңдаңыз (мысалы, мәтін).",

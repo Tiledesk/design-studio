@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "هل أنت متأكد من أنك تريد حذف الحقل؟",
         "DeleteForm": "حذف النموذج",
         "ConfirmDeleteForm": "هل أنت متأكد من أنك تريد حذف النموذج؟",
-        "MarkbotLabel": "يمكنك استخدام <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' target='_blank'> markbot </a> لتنسيق ملصقاتك .",
+        "MarkbotLabel": "يمكنك استخدام <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'> markbot </a> لتنسيق ملصقاتك .",
         "InfoMessages": {
             "field_name": "أعط اسمًا لحقل النموذج (على سبيل المثال: الاسم _ المستخدم). يمكن أن يحتوي الاسم على أرقام أحرف فقط و _",
             "field_type": "حدد نوع المعطى الذي سيتم إدراجه في هذا الحقل (على سبيل المثال: النص).",

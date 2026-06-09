@@ -35,11 +35,10 @@
               "src/assets",
               "src/design-studio-config-template.json",
               "src/design-studio-config.json",
-              {
-                "glob": "**/*",
-                "input": "src/environments/real_data",
-                "output": "/real_data"
-              }
+              { "glob": "cds-config-firebase.json", "input": "src/environments/real_data", "output": "/" },
+              { "glob": "cds-config-native-prod.json", "input": "src/environments/real_data", "output": "/" },
+              { "glob": "cds-config-native-collaudo.json", "input": "src/environments/real_data", "output": "/" },
+              { "glob": "cds-config-aws-stage.json", "input": "src/environments/real_data", "output": "/" }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

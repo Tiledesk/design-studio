@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "Sahəni silmək istədiyinizə əminsiniz?",
         "DeleteForm": "Formanı silmək",
         "ConfirmDeleteForm": "Formanı silmək istədiyinizə əminsiniz?",
-        "MarkbotLabel": "Siz <a href='https://gethelp.tiledesk.com/articles/sending-Images-videos-quick-replies-d-more/' hədəf='_blank/'tik .",
+        "MarkbotLabel": "Siz <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> istifadə edə bilərsiniz etiketlərinizi formatlamaq üçün.",
         "InfoMessages": {
             "field_name": "Forma sahəsinə bir ad verin (ex: ad _ istifadəçi). Adı yalnız hərflər nömrələrini ehtiva edə bilər və _",
             "field_type": "Bu sahədə (ex: mətn) daxil ediləcək verilən növü seçin.",

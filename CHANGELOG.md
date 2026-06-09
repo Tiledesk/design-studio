@@ -7,9 +7,33 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
-- **added**: Added "use cache" and "use_hyde" to the ask KB keys: use_hyde and use_cache
-- **added**: Added Custom Headers In MCP Server section
+# 1.40.1-rc3
+- **changed**: added tag "BETA"
+
+# 1.40.1-rc2
+- **bug fix**: bug fix css panel detail action data table
+
+# 1.40.1-rc1
+- **added**: added action "data-table"
+
+# 1.40.0
+- **added**: added voice reply and settings in chatbot to allow voice conversational experience 
+
+# 1.39.45
+- **changed**: updated url preview, added displayed fields
+
+# 1.39.44
+- **changed**: set custom attribute in JSON sources in URL preview in action reply
+
+# 1.39.43
+- **added**: added "use cache" and "use_hyde" to the ask KB keys: use_hyde and use_cache
+- **added**: added url preview in action reply
+
+# 1.39.42
+- **changed**: updated ai_models
+
+# 1.39.41
+- **bug fix**: fixed an error in the "Add to Knowledge Base" action: information was not saved.
 
 # 1.39.40
 - **added**: added PINECONE_RERANKING in environment to set reranking
