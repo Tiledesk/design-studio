@@ -7,19 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
-# 1.39.41-rc5
-- **added**: ability to add a 'url_preview' reply message type
-
-# 1.39.41-rc4
-- **changed**: enabled voice-settings for type:'chatbot' and 'voice-twilio'
-
-# 1.39.41-rc2
-- **changed**: minor UI changes
-
-# 1.39.41-rc1
-- **added**: ability to add a 'tts' reply message type
-- **changed**: visibility mode for voiceSettings global properties in 'Globals' tab
+# this branch 
+- **added**: Added "use cache" and "use_hyde" to the ask KB keys: use_hyde and use_cache
+- **added**: Added Custom Headers In MCP Server section
 
 # 1.39.40
 - **added**: added PINECONE_RERANKING in environment to set reranking
