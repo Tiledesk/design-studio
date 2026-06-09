@@ -11,6 +11,8 @@ import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
 import { LLM_MODEL, OPENAI_MODEL } from '../utils-ai_models';
 
+import { applyConditionSaveModeToPayload } from '../utils-condition';
+
 // SERVICES //
 import { StageService } from '../services/stage.service';
 import { ConnectorService } from '../services/connector.service';
@@ -1818,6 +1820,9 @@ export class IntentService {
     private async opsUpdate(payload: any, UndoRedo=true): Promise<boolean> { 
       // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', payload);
       payload = removeNodesStartingWith(payload, '__');
+      // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`
+      // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
+      payload = applyConditionSaveModeToPayload(payload);
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {
