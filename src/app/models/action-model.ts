@@ -285,6 +285,7 @@ export class ActionJsonCondition extends Action {
     falseIntent: string;
     stopOnConditionMet: boolean;
     groups: Array<Expression | Operator>;
+    when?: string; // tutte le condizioni in un'unica stringa, derivata da `groups` (vedi utils-condition.ts)
     trueIntentAttributes?: string;
     falseIntentAttributes?: string;
     constructor() {
@@ -292,6 +293,7 @@ export class ActionJsonCondition extends Action {
         this._tdActionType = TYPE_ACTION.JSON_CONDITION;
         this.groups = [];
         this.stopOnConditionMet = true;
+        this.when = '';
     }
 }
 
@@ -300,6 +302,7 @@ export class ActionCondition extends Action {
     trueIntent: string;
     stopOnConditionMet: boolean;
     groups: Array<Expression | Operator>;
+    when?: string; // tutte le condizioni in un'unica stringa, derivata da `groups` (vedi utils-condition.ts)
     trueIntentAttributes?: string;
     constructor() {
         super();
@@ -307,6 +310,7 @@ export class ActionCondition extends Action {
         this.groups = [];
         this.stopOnConditionMet = true;
         this.noelse = true;
+        this.when = '';
     }
 }
 
@@ -747,9 +751,11 @@ export interface GalleryElement{
 export class Expression {
     type: string = 'expression';
     conditions: Array<Condition | Operator>
+    when?: string; // condizioni in un'unica stringa, derivata da `conditions` (vedi utils-condition.ts). Usata dai filtri (reply, ecc.)
     constructor(){
         // this.conditions = [ new Condition()]
         this.conditions = []
+        this.when = '';
     }
 }
 
@@ -941,5 +947,30 @@ export class ActionMoveToUnassigned extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
+    }
+}
+
+export class ActionDataTable extends Action {
+    tableId: string;
+    tableName: string;
+    operation: string;          // 'get' | 'insert' | 'update' | 'upsert' | 'delete'
+    must_match: string;         // 'all' | 'any'
+    conditions: Array<{ column: string; operator: string; value?: string }>;
+    data: { [key: string]: string };   // { [columnName]: value }
+    assignResultTo: string;
+    assignErrorTo: string;
+    trueIntent: string;     // success branch connector
+    falseIntent: string;    // error/else branch connector
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.DATA_TABLE;
+        this.tableId = '';
+        this.tableName = '';
+        this.operation = 'get';
+        this.must_match = 'all';
+        this.conditions = [];
+        this.data = {};
+        this.assignResultTo = 'data_table_result';
+        this.assignErrorTo = 'error';
     }
 }

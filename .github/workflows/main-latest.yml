@@ -1,5 +1,9 @@
 name: Docker Image Community latest CI
 
+env:
+  REGISTRY: tiledesk
+  IMAGE_NAME: design-studio
+
 on:	
   push:	 
     branches: [ master ]
@@ -27,4 +31,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: tiledesk/design-studio:latest
+        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

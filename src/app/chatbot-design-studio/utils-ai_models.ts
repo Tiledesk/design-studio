@@ -233,7 +233,7 @@ export const ANTHROPIC_MODEL: Array<{ name: string, value: string, description:s
     reasoning: true
   },
   {
-    name: "Claude-3.5 Sonnet",
+    name: "Claude 3.5 Sonnet",
     value: "claude-3-5-sonnet-20240620",
     description: "TYPE_GPT_MODEL.text-davinci-003.description",
     status: "inactive",
@@ -516,7 +516,16 @@ export const DEEPSEEK_MODEL: Array<{ name: string, value: string, description:st
   }
 ]
 
-export var OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number, reasoning: boolean}> = [
+export const OPENAI_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number, reasoning: boolean}> = [
+  {
+    name: "Gpt-5.5",
+    value: "gpt-5.5",
+    description: "TYPE_GPT_MODEL.gpt-5.5.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 128000,
+    reasoning: true
+  },
   {
     name: "Gpt-5.4 Nano",
     value: "gpt-5.4-nano",

@@ -175,14 +175,43 @@ export async function getIntegrationModels(
   for (const model of llmModelList) {
     if (model.value === modelName) {
       const NEW_MODELS = await getIntegrationByName(projectService, dashboardService, logger, modelName);
-      if (NEW_MODELS?.value?.models) {
-        logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, NEW_MODELS.value.models);
-        const models = NEW_MODELS.value.models.map(item => ({
+      const value = NEW_MODELS?.value;
+      if (!value) {
+        continue;
+      }
+      // Collect model names supporting BOTH integration shapes:
+      // - multi-endpoint (refactored vLLM): value.servers[].models
+      // - legacy flat (e.g. ollama / old vLLM): value.models
+      let modelNames: any[] = [];
+      if (Array.isArray(value.servers)) {
+        modelNames = value.servers.reduce((acc: any[], server: any) => {
+          if (Array.isArray(server?.models)) {
+            acc.push(...server.models);
+          }
+          return acc;
+        }, []);
+      } else if (Array.isArray(value.models)) {
+        modelNames = value.models;
+      }
+      // Keep only non-empty strings, de-duplicate preserving order.
+      const seen = new Set<string>();
+      const models = modelNames
+        .filter((item: any) => typeof item === 'string' && item.trim().length > 0)
+        .filter((item: string) => {
+          if (seen.has(item)) {
+            return false;
+          }
+          seen.add(item);
+          return true;
+        })
+        .map((item: string) => ({
           name: item,
           value: item,
           description: '',
           status: 'active' as const
         }));
+      if (models.length > 0) {
+        logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, models);
         model.models = models;
       }
     }

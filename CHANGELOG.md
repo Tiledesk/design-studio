@@ -7,42 +7,50 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.39.43-rc6
-- **changed**: changed default bck color in url preview
 
-# 1.39.43-rc5
+# 1.40.1-rc8
+- **bug fix**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.1-rc7
+- **added**: OAuth 2.0 Flow in MCP server authentication (Client ID, Client Secret, Redirect URL, Scope)
+
+# 1.40.1-rc6
+- **bug fix**: retrocompatibility jsonCondition
+
+# 1.40.1-rc5
+- **changed**: refactoring jsonCondition. added "when"
+
+# 1.40.1-rc4
+- **changed**: display Custom Headers in MCP server
+
+# 1.40.1-rc3
+- **changed**: added tag "BETA"
+
+# 1.40.1-rc2
+- **bug fix**: bug fix css panel detail action data table
+
+# 1.40.1-rc1
+- **added**: added action "data-table"
+
+# 1.40.0
+- **added**: added voice reply and settings in chatbot to allow voice conversational experience 
+
+# 1.39.45
 - **changed**: updated url preview, added displayed fields
 
-# 1.39.43-rc3
-- **bug fix**: fix to narrow the gpt-model filter to the OpenAI provider only, which avoids duplication.
+# 1.39.44
+- **changed**: set custom attribute in JSON sources in URL preview in action reply
 
-# 1.39.43-rc2
-- **bug fix**: bug fix preview url 
-- **changed**: updated documentation URLs from gethelp.tiledesk.com to https://guide.tiledesk.com/
+# 1.39.43
+- **added**: added "use cache" and "use_hyde" to the ask KB keys: use_hyde and use_cache
+- **added**: added url preview in action reply
 
-# 1.39.43-rc1
-- **changed**: updated parameters in the "kb-json-resources" URL preview action
+# 1.39.42
+- **changed**: updated ai_models
 
-# 1.39.42-rc2
-- **changed**: added 'url_preview' in action response with 3 types: message, form, parameters
-
-# 1.39.42-rc1
-- **added**: custom header authentication in mcp server
-- **added**: use_hyde and use_cache parameters to ask KB AI settings
+# 1.39.41
 - **bug fix**: fixed an error in the "Add to Knowledge Base" action: information was not saved.
-
-# 1.39.41-rc5
-- **added**: ability to add a 'url_preview' reply message type
-
-# 1.39.41-rc4
-- **changed**: enabled voice-settings for type:'chatbot' and 'voice-twilio'
-
-# 1.39.41-rc2
-- **changed**: minor UI changes
-
-# 1.39.41-rc1
-- **added**: ability to add a 'tts' reply message type
-- **changed**: visibility mode for voiceSettings global properties in 'Globals' tab
 
 # 1.39.40
 - **added**: added PINECONE_RERANKING in environment to set reranking

@@ -9,6 +9,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionJsonCondition, Expression, Operator } from 'src/app/models/action-model';
 import { TYPE_UPDATE_ACTION, OPERATORS_LIST, OperatorValidator } from '../../../../../utils';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { serializeConditionToWhen } from 'src/app/chatbot-design-studio/utils-condition';
 
 /** Componente per l’azione condizione JSON: gruppi di condizioni, connector true/false, intent. */
 @Component({
@@ -122,14 +123,21 @@ export class CdsActionJsonConditionComponent implements OnInit, OnDestroy {
         this.action.stopOnConditionMet = this.actionJsonConditionFormGroup.value.stopOnConditionMet;
       }
     });
-    this.trueIntentAttributes = this.action.trueIntentAttributes;
-    this.falseIntentAttributes = this.action.falseIntentAttributes;
+    this.trueIntentAttributes = this.action.trueIntentAttributes ?? '';
+    this.falseIntentAttributes = this.action.falseIntentAttributes ?? '';
     if (this.intentSelected) {
       this.initializeConnector();
     }
-    this.logger.log('[ACTION-JSON-CONDITION] actionnn-->', this.action);
     if (this.action) {
       this.setFormValue();
+      this.updateWhen(); // popola `when` anche per le action già salvate (vecchio formato senza `when`)
+    }
+  }
+
+  /** Rigenera l'unica stringa `when` (campo derivato, root azione) da tutto l'AST `groups`. Retrocompatibile: non tocca `groups`. */
+  private updateWhen(): void {
+    if (this.action) {
+      this.action.when = serializeConditionToWhen(this.action.groups);
     }
   }
 
@@ -182,6 +190,7 @@ export class CdsActionJsonConditionComponent implements OnInit, OnDestroy {
     this.action.groups.push(new Operator());
     this.action.groups.push(new Expression());
     this.logger.log('onClickAddGroup-->', this.action);
+    this.updateWhen();
     this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
   }
 
@@ -196,17 +205,19 @@ export class CdsActionJsonConditionComponent implements OnInit, OnDestroy {
     if (this.action.groups.length === 0) {
       this.action.groups.push(new Expression());
     }
+    this.updateWhen();
     this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
   }
 
-  /** Aggiorna l’operatore (AND/OR) del gruppo in posizione index. */
+  /** Cambia l’operatore logico (AND/OR) di un gruppo e salva. */
   onChangeOperator(event: any, index: number): void {
     (this.action.groups[index] as Operator).operator = event['type'];
     this.logger.log('onChangeOperator actionsss', this.action, this.actionJsonConditionFormGroup);
+    this.updateWhen();
     this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
   }
 
-  /** Imposta trueIntent o falseIntent e notifica il cambio connector. */
+  /** Imposta trueIntent/falseIntent dal select, notifica create connector e salva. */
   onChangeForm(event: { name: string; value: string }, type: 'trueIntent' | 'falseIntent'): void {
     if (event) {
       this.action[type] = event.value;
@@ -236,8 +247,10 @@ export class CdsActionJsonConditionComponent implements OnInit, OnDestroy {
     this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
   }
 
-  /** Chiamato quando cambia l’expression da base-filter; emette salvataggio. */
+  /** Chiamato quando cambia l’expression da base-filter; rigenera `when` ed emette salvataggio. */
   onChangeExpression(event: any): void {
+    this.logger.log('onChangeExpression actionsss', this.action, event);
+    this.updateWhen();
     this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
   }
 
@@ -290,4 +303,3 @@ export class CdsActionJsonConditionComponent implements OnInit, OnDestroy {
     return !(this.action as ActionJsonCondition & { noelse?: boolean })?.noelse;
   }
 }
-  
