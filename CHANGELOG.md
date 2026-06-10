@@ -9,6 +9,8 @@
 
 
 # 1.40.1-rc8
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
 - **bug fix**: vllm list
 - **bug fix**: drag intent when connector is contract
 
