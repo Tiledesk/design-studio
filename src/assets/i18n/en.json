@@ -55,6 +55,7 @@
     "UrlPreviewFormImageUpload": "Click to upload an image",
     "UrlPreviewFieldsConfigTitle": "Displayed fields",
     "UrlPreviewFieldImage": "Image",
+    "UrlPreviewFieldSource": "Source (favicon and domain)",
     "UrlPreviewFieldRequired": "required",
     "UrlPreviewFieldsExample": "Preview example",
     "SendUsEmail": "Send us an email",
