@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { SatPopover } from '@ncstate/sat-popover';
 import { OPERATORS_LIST } from '../../utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
+import { serializeExpression } from 'src/app/chatbot-design-studio/utils-condition';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -35,6 +36,14 @@ export class CDSFilterComponent implements OnInit {
 
   ngOnChanges(){
     this.logger.log('[BASE_FILTER] expression selected-->', this.expression)
+    this.updateWhen(); // popola `when` anche per i filtri già salvati (vecchio formato senza `when`)
+  }
+
+  /** Rigenera la stringa `when` (campo derivato) DENTRO l'expression, dai suoi `conditions`. Retrocompatibile: non tocca `conditions`. */
+  private updateWhen(){
+    if(this.expression){
+      this.expression.when = serializeExpression(this.expression);
+    }
   }
 
   onOpenConditionDetail(index: number){
@@ -49,12 +58,14 @@ export class CDSFilterComponent implements OnInit {
       this.expression.conditions.splice(index-1, 2)
     }
     this.onReset()
+    this.updateWhen()
     this.onChangeExpression.emit(this.expression)
   }
 
   onChangeOperator(event, index: number){
     (this.expression.conditions[index] as Operator).operator= event['type']
     this.logger.log('onChangeOperator expressionn', this.expression)
+    this.updateWhen()
     this.onChangeExpression.emit(this.expression)
   }
 
@@ -78,6 +89,7 @@ export class CDSFilterComponent implements OnInit {
     }
     this.addConditionFilter.close();
     this.onReset()
+    this.updateWhen()
     this.onChangeExpression.emit(this.expression)
   }
 
@@ -85,6 +97,14 @@ export class CDSFilterComponent implements OnInit {
   onReset(){
     this.selectedCondition = null
     this.selectedIndex= null
+  }
+
+  trackByConditionIndex(index: number): number {
+    return index;
+  }
+
+  getOperatorName(operatorKey: string): string {
+    return this.OPERATORS_LIST[operatorKey]?.name ?? '';
   }
 
 }
