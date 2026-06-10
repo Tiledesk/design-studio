@@ -51,6 +51,8 @@ import { CdsActionReplyGalleryComponent } from './cds-action-reply/elements/cds-
 import { CdsActionReplyImageComponent } from './cds-action-reply/elements/cds-action-reply-image/cds-action-reply-image.component';
 import { CdsActionReplyRedirectComponent } from './cds-action-reply/elements/cds-action-reply-redirect/cds-action-reply-redirect.component';
 import { CdsActionReplyTextComponent } from './cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text.component';
+import { CdsActionReplyUrlPreviewComponent } from './cds-action-reply/elements/cds-action-reply-url-preview/cds-action-reply-url-preview.component';
+import { CdsActionReplyTTSComponent } from './cds-action-reply/elements/cds-action-reply-tts/cds-action-reply-tts.component';
 import { CdsActionReplyToolsComponent } from './cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools.component';
 import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.component';
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
@@ -73,6 +75,7 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionDataTableComponent } from './cds-action-data-table/cds-action-data-table.component';
 import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
 import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
 import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
@@ -143,13 +146,16 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
+    CdsActionReplyUrlPreviewComponent,
     CdsActionReplyImageComponent,
     CdsActionReplyFrameComponent,
     CdsActionReplyRedirectComponent,
     CdsActionReplyGalleryComponent,
+    CdsActionReplyTTSComponent,
     CdsActionReplyButtonComponent,
     CdsActionReplySettingsComponent,
     // action REPLY elements: end //
@@ -254,9 +260,11 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
+    CdsActionReplyUrlPreviewComponent,
     CdsActionReplyImageComponent,
     CdsActionReplyFrameComponent,
     CdsActionReplyRedirectComponent,

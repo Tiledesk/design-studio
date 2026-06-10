@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "Tem certeza de que deseja excluir o campo?",
         "DeleteForm": "Excluir forma",
         "ConfirmDeleteForm": "Tem certeza de que deseja excluir o formulário?",
-        "MarkbotLabel": "Você pode usar <a href='https://gethelp.tuiledesk.com/articles/sending-images-videos-quick-replies-and-more/'arget='_blank'> Markbot </a> Para formatar seus rótulos.",
+        "MarkbotLabel": "Você pode usar <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> para formatar seus rótulos.",
         "InfoMessages": {
             "field_name": "Dê um nome ao campo do formulário (ex: nome _ usuário). O nome pode conter apenas números de letras e _",
             "field_type": "Selecione o tipo de dado que será inserido neste campo (ex: texto).",

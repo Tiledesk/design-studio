@@ -12,13 +12,14 @@ export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
-        namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
-        advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
-        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' },
+        namespace_as_name: { link: 'https://guide.tiledesk.com/', target: '_blank'},
+        advanced_prompt: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#advanced-context', target: '_blank' },
+        citations: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/ask-knowledge-base#get-contents-sources', target: '_blank' },
+        json_sources: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#url-preview', target: '_blank' },
         reranking: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/knowledge-base/re-ranking', target: '_blank' }
     }, 
     ADD_TO_KB: {
-        namespace_as_name: { link: 'https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/', target: '_blank'},
+        namespace_as_name: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/add-to-knowledge-base-action', target: '_blank'},
     },
     GPT_TASK : {
         json_mode: { link: 'https://platform.openai.com/docs/guides/structured-outputs/json-mode', target: '_blank' }
@@ -27,16 +28,25 @@ export const DOCS_LINK = {
         webhook_data_model: { link: 'https://developer.tiledesk.com/resolution-bot-programming/webhook-data-model', target: '_blank' }
     },
     BOT_DETAIL: {
-        chatbot_slug: { link: 'https://gethelp.tiledesk.com/articles/enhancing-conversation-flows-with-replace-bot-action/#replace-bot-using-the-chatbot-slug', target: '_blank' }
+        chatbot_slug: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action#replace-bot-using-the-chatbot-slug', target: '_blank' }
     },
     JSON_BUTTONS: {
-        more_json_uttons: { link: 'https://gethelp.tiledesk.com/articles/reply-action/#json-buttons', target: '_blank'},
+        more_json_uttons: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-        stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
-        voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
-        voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        'twilio': {
+            voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
+        },
+        'openai': {
+            tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
+            voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
+        },
+        'elevenlabs': {
+            tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+        },
     },
     LIQUIDJS: {
         home: { link: 'https://liquidjs.com/tutorials/intro-to-liquid.html', target: '_blank'},
@@ -186,7 +196,9 @@ export enum TYPE_MESSAGE {
     FRAME       = 'frame',
     GALLERY     = 'gallery',
     REDIRECT    = 'redirect',
-    AUDIO       = 'audio'
+    URL_PREVIEW = 'url_preview',
+    AUDIO       = 'audio',
+    TTS         = 'tts'
 }
 
 export enum TYPE_EVENT_CATEGORY {
@@ -249,21 +261,6 @@ export enum OPTIONS {
     MOUSE       = 'mouse',
     ALPHA       = 'alpha'
 }
-
-export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
-    { name: "GPT-4.1",                          value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 mini",                     value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 nano",                     value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
-    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
-    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
-    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
-    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
-    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "inactive"    },
-    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "inactive"    }
-]
-
 
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
@@ -773,4 +770,158 @@ export class ColorUtils {
     // fallback sul colore di default (già con alpha desiderato)
     return defaultColor;
   }
+}
+// =============================
+// INTENT UTILITY FUNCTIONS
+// =============================
+
+/**
+ * Verifica se il colore fornito è valido.
+ * 
+ * @param color - Colore da validare
+ * @returns true se il colore è valido, false altrimenti
+ */
+export function isValidColor(color: any): boolean {
+  return color && color !== undefined && color !== null && color !== '';
+}
+
+/**
+ * Verifica se gli ID sono validi per la creazione di un connettore.
+ * 
+ * @param fromId - ID di origine
+ * @param toId - ID di destinazione
+ * @returns true se gli ID sono validi, false altrimenti
+ */
+export function areValidIds(fromId: string | null, toId: string | null): boolean {
+  return fromId !== null && toId !== null && fromId !== '' && toId !== '';
+}
+
+/**
+ * Trova la chiave dell'enum corrispondente al tipo di azione.
+ * 
+ * @param actionType - Il tipo di azione da cercare
+ * @param TYPE_ACTION - L'enum dei tipi di azione
+ * @returns La chiave dell'enum o null se non trovata
+ */
+export function findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+  const enumKeys = Object.keys(TYPE_ACTION);
+  
+  for (const key of enumKeys) {
+    if (TYPE_ACTION[key] === actionType) {
+      return key;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Aggiunge una classe CSS a un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da aggiungere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function addCssClassToElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log("[UTILS] Aggiunta classe CSS:", className, "a elemento:", componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element) {
+      element.classList.add(className);
+      if (logger) {
+        logger.log("[UTILS] Classe aggiunta con successo");
+      }
+    } else {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nell'aggiunta della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Rimuove una classe CSS da un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da rimuovere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function removeCssClassFromElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log('[UTILS] Rimozione classe CSS:', className, 'da elemento:', componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+      if (logger) {
+        logger.log("[UTILS] Classe rimossa con successo");
+      }
+    } else if (!element) {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    } else {
+      if (logger) {
+        logger.debug("[UTILS] Classe non presente sull'elemento:", className);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nella rimozione della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Calcola il numero di domande da una stringa di testo.
+ * 
+ * @param questionText - Testo contenente le domande
+ * @returns Numero di domande calcolato
+ */
+export function calculateQuestionCount(questionText: string): number {
+  if (!questionText) {
+    return 0;
+  }
+  
+  const questionSegments = questionText
+    .split(/\r?\n/)
+    .filter(segment => segment.trim() !== '');
+  
+  return questionSegments.length;
+}
+
+/**
+ * Calcola la dimensione di un form.
+ * 
+ * @param form - Oggetto form da analizzare
+ * @returns Dimensione del form (numero di campi)
+ */
+export function calculateFormSize(form: any): number {
+  if (form && form !== null) {
+    return Object.keys(form).length;
+  }
+  return 0;
 }

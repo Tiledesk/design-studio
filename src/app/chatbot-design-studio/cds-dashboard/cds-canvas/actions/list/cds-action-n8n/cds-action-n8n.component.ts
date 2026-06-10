@@ -44,7 +44,7 @@ export class CdsActionN8nComponent implements OnInit {
   connector: any;
   private subscriptionChangedConnector: Subscription;
   
-  helpUrl = "https://gethelp.tiledesk.com/articles/n8nio-action/";
+  helpUrl = "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/n8n.io";
   pattern = "^[a-zA-Z_]*[a-zA-Z_]+[a-zA-Z0-9_]*$";
   limitCharsText = TEXT_CHARS_LIMIT;
   jsonParameters: string; 

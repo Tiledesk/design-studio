@@ -2381,7 +2381,7 @@
 		"ConfirmDeleteField": "Sind Sie sicher, dass Sie das Feld löschen möchten?",
 		"DeleteForm": "Formular löschen",
 		"ConfirmDeleteForm": "Sind Sie sicher, dass Sie das Formular löschen möchten?",
-		"MarkbotLabel": "Sie können <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/'darget='_blank'> markbot </a> verwenden, um Ihre Labels zu formatieren .",
+		"MarkbotLabel": "Sie können <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> verwenden, um Ihre Labels zu formatieren.",
 		"InfoMessages": {
 			"field_name": "Geben Sie dem Feld Formular einen Namen an (z. B. Name _ Benutzer). Der Name kann nur Buchstabenzahlen und _ enthalten",
 			"field_type": "Wählen Sie den angegebenen Typ aus, der in diesem Feld eingefügt wird (Beispiel: Text).",

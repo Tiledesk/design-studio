@@ -1,32 +1,28 @@
-import { SatPopover } from '@ncstate/sat-popover';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Component, Input, OnInit, SimpleChanges, EventEmitter, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
-import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
 import { Condition } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
 
 @Component({
   selector: 'base-condition-row',
   templateUrl: './base-condition-row.component.html',
   styleUrls: ['./base-condition-row.component.scss']
 })
-export class BaseConditionRowComponent implements OnInit {
+export class BaseConditionRowComponent implements OnInit, OnChanges {
   @ViewChild('operand1') inputOperand1: ElementRef;
   @Input() condition: Condition;
   @Output() close = new EventEmitter();
 
-  textVariable: string = '';
-  filteredVariableList: Array<{name: string, value: string}> = []
-  filteredIntentVariableList: Array<{name: string, value: string, src?: string}>
-  operatorsList: Array<{}> = []
+  operatorsList: Array<{}> = [];
   step: number = 0;
   disableInput: boolean = true;
   disableSubmit: boolean = true;
   conditionForm: FormGroup;
   readonlyTextarea: boolean = false;
   setAttributeBtnOperand2: boolean = false;
-  canShowOperand2: boolean = true
+  canShowOperand2: boolean = true;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -34,77 +30,81 @@ export class BaseConditionRowComponent implements OnInit {
     private formBuilder: FormBuilder
   ) { }
 
+  /** Inizializza la lista operatori (usata nel template). */
   ngOnInit(): void {
     this.logger.log('[BASE_CONDITION_ROW] ******* ngOnInit-->');
+    this.operatorsList = Object.keys(OPERATORS_LIST).map(key => OPERATORS_LIST[key]);
   }
 
-  ngOnChanges(changes: SimpleChanges){
+  /** All’arrivo di condition: resetta form e step, eventualmente imposta valori e step 1. */
+  ngOnChanges(changes: SimpleChanges): void {
     this.logger.log('[BASE_CONDITION_ROW] ******* ngOnChanges-->');
-    this.conditionForm = this.createConditionGroup()
-    this.step=0;
-    this.operatorsList = Object.keys(OPERATORS_LIST).map(key => (OPERATORS_LIST[key]))
-    if(this.condition){
-      this.logger.log('[BASE_CONDITION_ROW] selectedConditionnnn-->', this.condition)
-      this.setFormValue()
+    this.conditionForm = this.createConditionGroup();
+    this.step = 0;
+    if (this.condition) {
+      this.logger.log('[BASE_CONDITION_ROW] selectedConditionnnn-->', this.condition);
+      this.setFormValue();
       this.step = 1;
     }
   }
 
-  createConditionGroup(): FormGroup{
+  /** Crea il FormGroup per una singola condizione (operandi, operatore, operand2). */
+  private createConditionGroup(): FormGroup {
     return this.formBuilder.group({
-      type: ["condition", Validators.required],
-      operand1 : [ '', Validators.required],
+      type: ['condition', Validators.required],
+      operand1: ['', Validators.required],
       operator: ['equalAsNumbers', [Validators.required, OperatorValidator]],
       operand2: this.formBuilder.group({
         type: ['const', Validators.required],
         value: ['', Validators.nullValidator],
         name: ['', Validators.nullValidator]
       })
-    })
+    });
   }
 
-  setFormValue(){
+  private setFormValue(): void {
     this.conditionForm.patchValue({
-      operand1 : this.condition.operand1,
+      operand1: this.condition.operand1,
       operator: this.condition.operator,
       operand2: this.condition.operand2
     });
-    if(this.condition.operand2){
+    if (this.condition.operand2) {
       this.setAttributeBtnOperand2 = false;
-      if(this.condition.operand2.type === 'var'){
-        this.readonlyTextarea = true
+      if (this.condition.operand2.type === 'var') {
+        this.readonlyTextarea = true;
       }
     } else {
       this.setAttributeBtnOperand2 = true;
       this.readonlyTextarea = false;
     }
-}
+  }
 
-/** START EVENTS cds-textarea **/
-  onChangeTextArea(text: string){
+  /** Aggiorna stato submit/operand2 in base al testo della textarea (gestione placeholder {{ }}). */
+  onChangeTextArea(text: string): void {
     this.logger.log('textttt', text, text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g)));
-    if(text){
+    if (text) {
       this.disableSubmit = false;
       this.setAttributeBtnOperand2 = false;
-    }else{
+    } else {
       this.disableSubmit = true;
       this.setAttributeBtnOperand2 = true;
     }
-    if(text && text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))){
+    if (text && text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g))) {
       text.match(new RegExp(/(?<=\{\{)(.*)(?=\}\})/g)).forEach(match => {
-        text = text.replace(text,match)
-        this.conditionForm.patchValue({ operand2: {type: 'const', name: text}}, {emitEvent: false})
+        text = text.replace(text, match);
+        this.conditionForm.patchValue({ operand2: { type: 'const', name: text } }, { emitEvent: false });
       });
-    } 
+    }
   }
 
-  onSelectedAttribute(variableSelected: {name: string, value: string}, step: number){ 
+  /** Imposta operand1 (step 0) o operand2 (step 1) con la variabile selezionata dalla lista. */
+  onSelectedAttribute(variableSelected: { name: string; value: string }, step: number): void {
     this.logger.log('1 onVariableSelected-->', step, this.conditionForm, variableSelected);
-    if(step === 0){
-      this.conditionForm.patchValue({ operand1: variableSelected.value}, {emitEvent: false})
-      this.step +=1;
-    }else if (step == 1){
-      this.conditionForm.patchValue({ operand2: { type: 'var', name: variableSelected.name, value: variableSelected.value}}, {emitEvent: false});
+    if (step === 0) {
+      this.conditionForm.patchValue({ operand1: variableSelected.value }, { emitEvent: false });
+      this.step += 1;
+    } else if (step === 1) {
+      this.conditionForm.patchValue({ operand2: { type: 'var', name: variableSelected.name, value: variableSelected.value } }, { emitEvent: false });
       this.logger.log('formmmmm', this.conditionForm);
       this.readonlyTextarea = true;
       this.setAttributeBtnOperand2 = false;
@@ -113,86 +113,88 @@ export class BaseConditionRowComponent implements OnInit {
     this.logger.log('******* onVariableSelected-->', step, variableSelected);
   }
 
-  onClearSelectedAttribute(){
-    this.logger.log('onClearSelectedAttribute-->');   
-    this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
+  /** Resetta operand2 a tipo const vuoto e riabilita il campo valore. */
+  onClearSelectedAttribute(): void {
+    this.logger.log('onClearSelectedAttribute-->');
+    this.conditionForm.patchValue({ operand2: { type: 'const', name: '', value: '' } }, { emitEvent: false });
     this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
   }
-  /** END EVENTS cds-textarea **/
 
-
-
-  onClearInput(){
-    this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
+  /** Svuota il campo valore (operand2) del form. */
+  onClearInput(): void {
+    this.conditionForm.patchValue({ operand2: { type: 'const', name: '', value: '' } }, { emitEvent: false });
   }
 
-  onAddCustomAttribute(){
-    this.step +=1
-    this.disableInput = false
-    setTimeout(()=>{
-      this.inputOperand1.nativeElement.focus()
-    },300)
+  /** Passa allo step di inserimento manuale attributo e fa focus sull’input. */
+  onAddCustomAttribute(): void {
+    this.step += 1;
+    this.disableInput = false;
+    setTimeout(() => {
+      this.inputOperand1.nativeElement.focus();
+    }, 300);
   }
 
-  onClickOperator(operator: {}){
-    this.conditionForm.patchValue({ operator: operator['type']})
-    
-    // this.disableSubmit = true;
+  /** Imposta l’operatore della condizione; per isEmpty/isNull/isUndefined nasconde il campo valore. */
+  onClickOperator(operator: { type?: string }): void {
+    this.conditionForm.patchValue({ operator: operator['type'] });
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
     this.canShowOperand2 = true;
 
-    //activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty'
-    if(operator['type'] === TYPE_OPERATOR.isEmpty|| 
+    if (operator['type'] === TYPE_OPERATOR.isEmpty || 
         operator['type'] === TYPE_OPERATOR.isNull || 
         operator['type'] === TYPE_OPERATOR.isUndefined ){
       
-      this.onClearInput()
-      this.canShowOperand2 = false
-
+      this.onClearInput();
+      this.canShowOperand2 = false;
       this.disableSubmit = false;
       this.readonlyTextarea = true;
       this.setAttributeBtnOperand2 = false;
     }
   }
 
-  onSubmitCondition(){
-    this.logger.log('onSubmitCondition-->', this.conditionForm)
-    if(this.conditionForm.valid){
-      let condition: Condition = new Condition()
-      condition = Object.assign(condition, this.conditionForm.value);
-      condition.operand2.type == 'var'? condition.operand2.name = condition.operand2.value: null;
+  /** Valida il form, costruisce la Condition, emette al parent e resetta lo step. */
+  onSubmitCondition(): void {
+    this.logger.log('onSubmitCondition-->', this.conditionForm);
+    if (this.conditionForm.valid) {
+      const condition: Condition = Object.assign(new Condition(), this.conditionForm.value);
+      if (condition.operand2.type === 'var') {
+        condition.operand2.name = condition.operand2.value;
+      }
       this.step = 0;
-      this.conditionForm = this.createConditionGroup()
-      this.close.emit(condition)
+      this.conditionForm = this.createConditionGroup();
+      this.close.emit(condition);
     }
   }
 
-  onClose(){
-    this.logger.log('onClose pressed')
+  /** Chiude il popover senza salvare: resetta form e step, emette close. */
+  onClose(): void {
+    this.logger.log('onClose pressed');
     this.step = 0;
-    this.disableInput = true
-    this.conditionForm = this.createConditionGroup()
-    this.close.emit() // CLOSE BASE-FILTER POPOVER (IN PARENT)
+    this.disableInput = true;
+    this.conditionForm = this.createConditionGroup();
+    this.close.emit();
   }
 
-  onDeleteInputField(){
-    this.conditionForm.patchValue({ operand1:'' }, {emitEvent: false});
+  /** Svuota il campo operand1 del form. */
+  onDeleteInputField(): void {
+    this.conditionForm.patchValue({ operand1: '' }, { emitEvent: false });
   }
 
-  private _filter(value: string, array: Array<any>): Array<any> {
-    const filterValue = value.toLowerCase();
-    return array.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-
+  /** Chiude il popover alla pressione di Esc. */
   @HostListener('document:keydown', ['$event'])
-  onKeyPress(event){
-    const keyCode = event.which || event.keyCode;
-    if (keyCode === 27) { // Esc keyboard code
+  onKeyPress(event: KeyboardEvent): void {
+    const keyCode = (event as any).which || (event as any).keyCode;
+    if (keyCode === 27) {
       this.onClose();
     }
+  }
+
+  /** trackBy per l’*ngFor sugli operatori (stabilizza il render). */
+  trackByOperatorType(index: number, item: { type?: string }): string | number {
+    return item?.type ?? index;
   }
 
 }

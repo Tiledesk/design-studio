@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "Är du säker på att du vill ta bort fältet?",
         "DeleteForm": "Radera formulär",
         "ConfirmDeleteForm": "Är du säker på att du vill ta bort formuläret?",
-        "MarkbotLabel": "Du kan använda <a href='https://gethelp.tiledesk.com/articles/sending-images-videos-quick-replies-and-more/' Target='_blank'> Markbot </a> för att formatera dina etiketter.",
+        "MarkbotLabel": "Du kan använda <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> för att formatera dina etiketter.",
         "InfoMessages": {
             "field_name": "Ge ett namn till formuläret Form (Ex: Namn _ Användare). Namnet kan bara innehålla bokstäver och _",
             "field_type": "Välj vilken typ av angivet som kommer att infogas i detta fält (ex: text).",

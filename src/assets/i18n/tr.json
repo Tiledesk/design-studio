@@ -2381,7 +2381,7 @@
         "ConfirmDeleteField": "Alanı silmek istediğinden emin misiniz?",
         "DeleteForm": "Formu Sil",
         "ConfirmDeleteForm": "Formu silmek istediğinizden emin misiniz?",
-        "MarkbotLabel": "Etiketlerinizi biçimlendirmek için <a href='https://gethelp.tiledesk.com/articles/sing-mages-videos-quick-repies-and/'gert='_blank'> markbot </a> kullanabilirsiniz.",
+        "MarkbotLabel": "Etiketlerinizi biçimlendirmek için <a href='https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action' target='_blank'>Markbot</a> kullanabilirsiniz.",
         "InfoMessages": {
             "field_name": "Form alanına bir isim verin (Örn: Name _ Kullanıcı). Ad yalnızca harf numaraları ve _",
             "field_type": "Bu alana yerleştirilecek verilen türü seçin (Örn: Metin).",
