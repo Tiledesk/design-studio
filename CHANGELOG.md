@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.1
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
+
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
 
