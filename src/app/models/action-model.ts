@@ -414,6 +414,7 @@ export class ActionKBContent extends Action {
     type: string;
     namespace: string;
     namespaceAsName: boolean;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.KB_CONTENT;
@@ -447,7 +448,9 @@ export class ActionAskGPTV2 extends Action {
     chunks_only: boolean;
     skip_unanswered: boolean;
     reranking: boolean;
+    reranking_multiplier?: number;
   value: string;
+    tags?: string[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.ASKGPTV2
@@ -532,6 +535,18 @@ export class ActionCaptureUserReply extends Action {
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.CAPTURE_USER_REPLY
+    }   
+}
+
+export class ActionIteration extends Action {
+    iterable: any;
+    assignOutputTo: string;
+    goToIntent: string;
+    fallbackIntent: string;
+    delay: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.ITERATION
     }   
 }
 

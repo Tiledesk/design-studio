@@ -1,0 +1,29 @@
+<div class="note-controls" [class.is-visible]="visible" [attr.aria-hidden]="visible ? 'false' : 'true'">
+  <div class="note-controls__pill" role="toolbar" aria-label="Note controls">
+    <!--
+    TEMP: Open details button is hidden/disabled by requirement.
+    <button class="note-controls__btn" type="button" title="Open details" aria-label="Open details" (click)="onOpenDetail($event)">
+      <svg viewBox="0 -960 960 960" width="16" height="16" aria-hidden="true" focusable="false">
+        <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/>
+      </svg>
+    </button>
+    -->
+
+    <button *ngIf="!isMedia" class="note-controls__btn" type="button" title="Duplicate" aria-label="Duplicate" (click)="onDuplicate($event)">
+      <!-- Same icon as panel-intent-controls: assets/images/icons/copy.svg -->
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+      </svg>
+    </button>
+
+    <button class="note-controls__btn note-controls__btn--danger" type="button" title="Delete" aria-label="Delete" (click)="onRemove($event)">
+      <!-- Same icon as panel-intent-controls: assets/images/icons/bin.svg -->
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+        <path d="M15.4,3.1V2H8.6v1.1H3v2.2h1.1v14.4c0,0.6,0.2,1.2,0.7,1.6c0.4,0.4,1,0.7,1.6,0.7l11.2,0c0.6,0,1.2-0.2,1.6-0.7
+	c0.4-0.4,0.7-1,0.7-1.6V5.3H21V3.1H15.4z M17.6,19.8H6.4V5.3h11.3V19.8z"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+

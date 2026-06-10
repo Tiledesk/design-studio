@@ -12,6 +12,7 @@ export const environment = {
   baseImageUrl: 'CHANGEIT',
   logLevel: 'error',
   storage_prefix: "CHANGEIT",
+  pineconeReranking: "CHANGEIT",
   firebaseConfig: {
     apiKey: 'CHANGEIT',
     authDomain: 'CHANGEIT',

@@ -40,7 +40,17 @@ export class CdsWidgetLogsComponent implements OnInit {
   LOG_LEVELS = LOG_LEVELS;
   selectedLogLevel = LOG_LEVELS.NATIVE;
   nLevels = { error: 0, warn: 1, info: 2, debug: 3, native: 4 };
-  logLevelsArray = Object.entries(LOG_LEVELS).map(([key, value]) => ({ key, value }));
+  /**
+   * Stable order for UI select options.
+   * Avoid relying on Object.entries() enumeration order.
+   */
+  logLevelsArray = [
+    { key: 'native', value: LOG_LEVELS.NATIVE },
+    { key: 'debug', value: LOG_LEVELS.DEBUG },
+    { key: 'info', value: LOG_LEVELS.INFO },
+    { key: 'warn', value: LOG_LEVELS.WARN },
+    { key: 'error', value: LOG_LEVELS.ERROR },
+  ];
   expandedLogs = new Set<number>();
   isOpenPanelWidget: boolean;
   mqtt_token: string;

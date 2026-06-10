@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { MatDialog } from '@angular/material/dialog';
 import { ActionAskGPTV2 } from 'src/app/models/action-model';
@@ -15,7 +15,7 @@ import { OpenaiService } from 'src/app/services/openai.service';
 
 //UTILS
 import { AttributesDialogComponent } from '../cds-action-gpt-task/attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_UPDATE_ACTION, TYPE_GPT_MODEL } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
@@ -27,6 +27,7 @@ import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -34,7 +35,8 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   templateUrl: './cds-action-askgpt-v2.component.html',
   styleUrls: ['./cds-action-askgpt-v2.component.scss']
 })
-export class CdsActionAskgptV2Component implements OnInit {
+export class CdsActionAskgptV2Component implements OnInit, OnChanges {
+  private readonly DEFAULT_MAX_TOKENS = 10000;
 
   @Input() intentSelected: Intent;
   @Input() action: ActionAskGPTV2;
@@ -43,7 +45,7 @@ export class CdsActionAskgptV2Component implements OnInit {
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
-  listOfNamespaces: Array<{name: string, value: string, icon?:string, hybrid:boolean}>;
+  listOfNamespaces: Array<{name: string, displayName: string, kbTypeLabel: string, value: string, icon?:string, hybrid:boolean}>;
 
   project_id: string;
   selectedNamespace: string;
@@ -80,18 +82,26 @@ export class CdsActionAskgptV2Component implements OnInit {
     "max_tokens": { name: "max_tokens",  min: 10, max: 8192, step: 1, disabled: false},
     "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false},
     "chunk_limit": { name: "chunk_limit", min: 1, max: 40, step: 1, disabled: false },
-    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false }
+    "search_type": { name: "search_type", min: 0, max: 1, step: 0.05, disabled: false },
+    "reranking_multiplier": { name: "reranking_multiplier", min: 2, max: 50, step: 1, disabled: false }
   }
   KB_HYBRID = false;
+  readonly pineconeRerankingEnabled: boolean = !!environment?.['pineconeReranking'] || false;
+
+  get rerankingAvailable(): boolean {
+    return !!this.KB_HYBRID || this.pineconeRerankingEnabled;
+  }
 
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   DOCS_LINK = DOCS_LINK.ASKGPTV2;
 
 
-  default_model = DEFAULT_MODEL;
+  default_model = DEFAULT_MODEL
   llm_model = LLM_MODEL;
   llm_models_flat: Array<LlmModel>;
   llm_model_selected: LlmModel = {} as LlmModel;
+
+  tagInputValue = '';
 
   private isInitializing = {
     'llm_model': true,
@@ -116,6 +126,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
+    // Locale for Angular number pipe (we only register 'it' explicitly; fallback to 'en')
+    const lang = this.translate.getBrowserLang() || 'en';
+    this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.project_id = this.dashboardService.projectID
     this.logger.log("[ACTION-ASKGPTV2] action detail action: ", this.action);
     // aggiorno llm_model con i modelli dell'integration
@@ -135,8 +148,44 @@ export class CdsActionAskgptV2Component implements OnInit {
       this.action.preview = []; // per retrocompatibilità
     }
     this.getListNamespaces();
+    this.ensureTags();
     // this.patchActionsKey();
     await this.initialize();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // When the action changes while the detail panel stays mounted,
+    if (changes['action'] && this.llm_models_flat?.length) {
+      const modelName = this.resolveModelNameFromAction();
+      this.setModel(modelName, { resetMaxTokens: false, resetTemperature: false });
+    }
+  }
+
+  // ensure the selected model + dependent UI constraints are updated.
+  private ensureTags(): void {
+    if (!Array.isArray(this.action.tags)) {
+      this.action.tags = [];
+    }
+  }
+
+  addTag(): void {
+    const value = this.tagInputValue?.trim() || '';
+    if (!value) return;
+    this.ensureTags();
+    if (this.action.tags.indexOf(value) === -1) {
+      this.action.tags.push(value);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
+    }
+    this.tagInputValue = '';
+  }
+
+  removeTag(tag: string): void {
+    this.ensureTags();
+    const index = this.action.tags.indexOf(tag);
+    if (index !== -1) {
+      this.action.tags.splice(index, 1);
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
+    }
   }
 
   ngOnDestroy() {
@@ -148,8 +197,33 @@ export class CdsActionAskgptV2Component implements OnInit {
   private async initialize(){
     await this.initLLMModels();
     this.logger.log("[ACTION ASKGPTV2] 0 initialize llm_options_models: ", this.action);
-    this.setModel(this.action.modelName?this.action.modelName:this.default_model.name);
+    this.setModel(this.resolveModelNameFromAction(), { resetMaxTokens: false, resetTemperature: false });
     
+  }
+
+  private resolveModelNameFromAction(): string {
+    // Prefer the explicit modelName when available (new format).
+    const explicitModelName = (this.action?.modelName ?? '').trim();
+    if (explicitModelName) {
+      return explicitModelName;
+    }
+
+    // Backward compatibility: some saved actions may have only `model` and/or `llm`.
+    const actionModel = (this.action?.model ?? '').trim();
+    if (actionModel && this.llm_models_flat?.length) {
+      const actionLlm = (this.action?.llm ?? '').trim().toLowerCase();
+      const match = this.llm_models_flat.find(m => {
+        const sameModel = (m?.model ?? '') === actionModel;
+        if (!sameModel) return false;
+        if (!actionLlm) return true;
+        return (m?.llm ?? '').toLowerCase() === actionLlm;
+      });
+      if (match?.modelName) {
+        return match.modelName;
+      }
+    }
+
+    return this.default_model?.name;
   }
 
 
@@ -167,24 +241,49 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
 
-  setModel(modelName: string){
+  setModel(
+    modelName: string,
+    options?: { resetMaxTokens?: boolean; resetTemperature?: boolean }
+  ) {
+    const { resetMaxTokens = true, resetTemperature = true } = options ?? {};
     const result = setModel(modelName, this.llm_models_flat, this.logger);
-    this.llm_model_selected = result;
+    this.llm_model_selected = result ?? ({} as LlmModel);
     this.logger.log("[ACTION ASKGPTV2] llm_model_selected: ", this.llm_model_selected);
-    this.action.llm = result?.llm?result.llm:'';
-    this.action.model = result?.model?result.model:'';
-    this.action.modelName = result?.modelName?result.modelName:'';
+    this.action.llm = result?.llm ? result.llm : '';
+    this.action.model = result?.model ? result.model : '';
+    this.action.modelName = result?.modelName ? result.modelName : '';
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
-    this.ai_setting['max_tokens'].max = this.llm_model_selected.max_output_tokens;
-    this.ai_setting['max_tokens'].min = this.llm_model_selected.min_tokens;
-    if(this.action.max_tokens > this.llm_model_selected.max_output_tokens){
-      this.action.max_tokens = this.llm_model_selected.max_output_tokens;
-    }
-    if(modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5')){
-      this.action.temperature = 1
-      this.ai_setting['temperature'].disabled= true
-    } else {
-      this.ai_setting['temperature'].disabled= false
+    if (result) {
+      this.ai_setting['max_tokens'].max = result.max_output_tokens;
+      // Preserve any higher min constraint (e.g. citations => min 1024)
+      const modelMin = result.min_tokens;
+      const citationsMin = this.action?.citations ? 1024 : 0;
+      this.ai_setting['max_tokens'].min = Math.max(modelMin, citationsMin);
+
+      const min = this.ai_setting['max_tokens'].min;
+      const max = this.ai_setting['max_tokens'].max;
+
+      // Init/detail-panel open: keep the saved max_tokens, just clamp it into the model range.
+      // User-triggered model change: reset to default (capped by model max).
+      const currentMaxTokens = typeof this.action?.max_tokens === 'number' ? this.action.max_tokens : Number(this.action?.max_tokens);
+      if (resetMaxTokens || !Number.isFinite(currentMaxTokens)) {
+        let next = Math.min(this.DEFAULT_MAX_TOKENS, max);
+        if (next < min) next = min;
+        this.action.max_tokens = next;
+      } else {
+        this.action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
+      }
+
+      const isGpt5 = modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5');
+      if (isGpt5) {
+        this.ai_setting['temperature'].disabled = true;
+        const currentTemp = typeof this.action?.temperature === 'number' ? this.action.temperature : Number(this.action?.temperature);
+        if (resetTemperature || !Number.isFinite(currentTemp)) {
+          this.action.temperature = 1;
+        }
+      } else {
+        this.ai_setting['temperature'].disabled = false;
+      }
     }
   }
 
@@ -240,7 +339,11 @@ export class CdsActionAskgptV2Component implements OnInit {
   private getListNamespaces(){
     this.openaiService.getAllNamespaces().subscribe((namaspaceList) => {
       this.logger.log("[ACTION-ASKGPTV2] getListNamespaces", namaspaceList)
-      this.listOfNamespaces = namaspaceList.map((el) => { return { name: el.name, value: el.id, hybrid: el.hybrid? el.hybrid:false } })
+      this.listOfNamespaces = namaspaceList.map((el) => {
+        const isHybrid = el.hybrid ? el.hybrid : false;
+        const kbTypeLabel = isHybrid ? 'Hybrid' : 'Semantic';
+        return { name: el.name, displayName: el.name, kbTypeLabel, value: el.id, hybrid: isHybrid };
+      })
       // namaspaceList.forEach(el => this.autocompleteOptions.push({label: el.name, value: el.name}))
       this.initializeNamespaceSelector();
     })
@@ -261,8 +364,9 @@ export class CdsActionAskgptV2Component implements OnInit {
   }
 
   selectKB(namespace){
-    const result = this.listOfNamespaces.find(el => el.value === namespace);
-    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, result);
+    const type = this.action?.namespaceAsName ? 'name' : 'value';
+    const result = this.listOfNamespaces?.find(el => type === 'value' ? el.value === namespace : el.name === namespace);
+    this.logger.log("[ACTION-ASKGPTV2] selectKB", namespace, this.listOfNamespaces, result);
     if(result){
       this.KB_HYBRID = result.hybrid;
     }
@@ -270,18 +374,40 @@ export class CdsActionAskgptV2Component implements OnInit {
 
 
   onChangeTextarea(event: string, property: string) {
-    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event);
+    this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange event", event, this.listOfNamespaces);
     this.logger.log("[ACTION-ASKGPTV2] onEditableDivTextChange property", property);
-    if (this.isInitializing[property]) {
-      this.isInitializing[property] = false;
+
+    if(property === 'namespace'){
+      this.selectKB(event);
       return;
     }
-    this.action[property] = event;
+    const nextValue = (event ?? '').toString();
+    const currentValue = ((this.action && (this.action as any)[property]) ?? '').toString();
+
+    /**
+     * NOTE:
+     * `cds-textarea` may emit `changeTextarea` during init only when it has a non-empty initial value.
+     * When the initial value is empty, the first real user input/paste is the first emission.
+     * The previous implementation always dropped the first emission, causing "context not saved" on first edit.
+     */
+    if (this.isInitializing[property]) {
+      this.isInitializing[property] = false;
+      if (nextValue === currentValue) {
+        return;
+      }
+    }
+
+    (this.action as any)[property] = nextValue;
     this.logger.log("[ACTION-ASKGPTV2] updated action", this.action);
   }
   
-  onBlur(event){
-    this.updateAndSaveAction.emit();
+  onBlur(event, property){
+    if(property === 'namespace'){
+      this.action[property] = event;
+    } else {
+      this.action[property] = event.target.value;
+    }
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
   onSelectedAttribute(variableSelected: { name: string, value: string }, key) {
@@ -293,7 +419,8 @@ export class CdsActionAskgptV2Component implements OnInit {
   onChangeSelect(event, target) {
     this.logger.log("[ACTION-ASKGPTV2] onChangeSelect event", event);
     if (target === 'llm_model'){
-      this.setModel(event.modelName);
+      // User explicitly changed model from UI: apply model constraints and reset defaults.
+      this.setModel(event.modelName, { resetMaxTokens: true, resetTemperature: true });
     } 
     if (event.clickEvent === 'footer') {
       // this.openAddKbDialog();  moved in knowledge base settings
@@ -372,7 +499,12 @@ export class CdsActionAskgptV2Component implements OnInit {
               this.action.max_tokens = 1024;
             }
           }else{
-            this.ai_setting['max_tokens'].min=10;
+            this.ai_setting['max_tokens'].min=this.llm_model_selected.min_tokens;
+          }
+        } else if (target === 'reranking') {
+          // Initialize multiplier when reranking is enabled
+          if (this.action[target] && (this.action['reranking_multiplier'] === null || this.action['reranking_multiplier'] === undefined)) {
+            this.action['reranking_multiplier'] = this.ai_setting['reranking_multiplier'].min; // default = 2
           }
         }
         this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
@@ -392,6 +524,15 @@ export class CdsActionAskgptV2Component implements OnInit {
         this.action.max_tokens = this.ai_setting['max_tokens'].max;
       } else {
         this.action.max_tokens = event;
+      }
+    } else if (target === 'reranking_multiplier') {
+      const min = this.ai_setting['reranking_multiplier'].min;
+      const max = this.ai_setting['reranking_multiplier'].max;
+      const v = typeof event === 'number' ? event : Number(event);
+      if (Number.isFinite(v)) {
+        this.action.reranking_multiplier = Math.min(Math.max(v, min), max);
+      } else {
+        this.action.reranking_multiplier = min;
       }
     }
     this.updateAndSaveAction.emit();

@@ -116,6 +116,12 @@
     opacity: 1;
     margin-left: -4px;
     cursor: pointer;
+    position: relative;
+
+    &:hover {
+        padding-right: 4px;
+        margin-right: -4px;
+    }
 }
 
 .connector-line {
@@ -139,4 +145,63 @@
     border-radius: 6px;
     margin: 0px;
     align-items: center;
+}
+
+.connector-text-menu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    margin-left: -5px;
+    padding-left: 10px;
+    flex-direction: row;
+    align-items: center;
+    z-index: 1;
+    width: max-content;
+    overflow: hidden;
+
+    .menu-item {
+        padding: 4px 6px;
+        font-size: 10px;
+        color: var(--blu);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-bottom: 1px solid rgb(240, 240, 240);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    .menu-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        background-color: white;
+        border: 1px solid rgb(230, 230, 230);
+        border-radius: 6px;
+        mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            color: var(--blu);
+        }
+        &:hover {
+            padding: 2px;
+            border: 2px solid rgb(230, 230, 230);
+        }
+    }
+}
+
+.block-contract-connector:hover .connector-text-menu,
+.block-contract-connector:hover .connector-text-menu:hover,
+.connector-text-menu:hover {
+    display: flex;
 }

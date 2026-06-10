@@ -255,7 +255,7 @@ export class CDSAudioUploadComponent implements OnInit {
     // const file = this.selectedFiles.item(0);
     const currentUpload = new UploadModel(file);
  
-    this.uploadService.upload(this.user.uid, currentUpload).then(data => {
+    this.uploadService.uploadAsset(this.user.uid, currentUpload).then(data => {
       that.logger.debug(`[AUDIO-UPLOAD] Successfully uploaded file and got download link -`, data);
 
       metadata.src = data.src;
@@ -403,7 +403,7 @@ export class CDSAudioUploadComponent implements OnInit {
 
   onDeletePathElement(event){
     this.logger.log('[AUDIO-UPLOAD] onDeletePathElement', event)
-    this.uploadService.delete(this.user.uid, this.metadata.src).then((result)=>{
+    this.uploadService.deleteAsset(this.user.uid, this.metadata.src).then((result)=>{
       
       this.isFilePendingToUpload = false;
       this.onDeletedMetadata.emit();

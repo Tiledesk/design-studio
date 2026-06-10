@@ -21,6 +21,7 @@ import { OperandComponent } from './cds-action-assign-variable/operand/operand.c
 import { OperationComponent } from './cds-action-assign-variable/operation/operation.component';
 import { OperatorComponent } from './cds-action-assign-variable/operator/operator.component';
 import { CdsActionCaptureUserReplyComponent } from './cds-action-capture-user-reply/cds-action-capture-user-reply.component';
+import { CdsActionIterationComponent } from './cds-action-iteration/cds-action-iteration.component';
 import { CdsActionChangeDepartmentComponent } from './cds-action-change-department/cds-action-change-department.component';
 import { CdsActionCloseComponent } from './cds-action-close/cds-action-close.component';
 import { CdsActionCodeComponent } from './cds-action-code/cds-action-code.component';
@@ -132,6 +133,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAskgptComponent,
     CdsActionGPTTaskComponent,
     CdsActionCaptureUserReplyComponent,
+    CdsActionIterationComponent,
     CdsActionGptAssistantComponent,
     CdsActionQaplaComponent,
     CdsActionCodeComponent,
@@ -243,6 +245,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionGPTTaskComponent,
     CdsActionGptAssistantComponent,
     CdsActionCaptureUserReplyComponent,
+    CdsActionIterationComponent,
     CdsActionQaplaComponent,
     CdsActionCodeComponent,
     CdsActionAskgptV2Component,

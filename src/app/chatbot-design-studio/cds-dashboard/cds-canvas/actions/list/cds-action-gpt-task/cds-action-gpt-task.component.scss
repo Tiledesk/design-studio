@@ -181,11 +181,38 @@ mat-expansion-panel ::ng-deep {
     }
     .parameters-preview {
         font-size: 11px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(100% - 80px);
         height: 24px;
+        line-height: normal;
+        span {
+            line-height: 16px;
+            margin-right: 5px;
+        }
+        .preview-badge {
+            color: #fff;
+            background-color: var(--blu);
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 4px;
+            .preview-badge-text {
+                padding: 0;
+                margin:0;
+            }
+        }
+        .preview-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 12px;
+            height: 12px;
+            font-size: 12px;
+            line-height: 12px;
+            margin: 0;
+            vertical-align: middle;
+            color: var(--color-white-hex);
+        }
+        .preview-flag{
+            margin:0;
+        }
     }
 }
 
@@ -270,7 +297,8 @@ mat-checkbox ::ng-deep {
 
 .slider-input ::ng-deep {
     width: 60px;
-
+    min-width: 60px;
+    font-size: 12px;
     input {
         text-align: center;
     }

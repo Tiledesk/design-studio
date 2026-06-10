@@ -248,6 +248,54 @@ mat-button-toggle{
     display: block;
 }
 
+.output-assignments {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 11px;
+    line-height: 16px;
+    flex-wrap: wrap;
+    .tag {
+        display: flex;
+        width: fit-content;
+        border-radius: 4px;
+        font-size: 10px;
+        margin: 3px;
+        height: fit-content;
+        padding: 0px 6px;
+        background-color: var(--blu);
+        color: var(--color-white-hex);
+        flex-wrap: nowrap;
+        text-align: end;
+    }
+}
+
+.output-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.output-key {
+    opacity: 0.75;
+    white-space: nowrap;
+}
+
+.output-val {
+    min-width: 0;
+    max-width: 140px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.output-empty {
+    opacity: 0.6;
+}
+
 .cds-attributes ::ng-deep{
     .liquidjs-menu {
         width: calc(100% - 15px);

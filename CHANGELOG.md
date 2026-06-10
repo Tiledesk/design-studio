@@ -7,64 +7,136 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# this branch 
+- **added**: Added "use cache" and "use_hyde" to the ask KB keys: use_hyde and use_cache
+- **added**: Added Custom Headers In MCP Server section
+
+# 1.39.40
+- **added**: added PINECONE_RERANKING in environment to set reranking
+
+# 1.39.39
+- **bug-fix**: set minimum tokens when unchecking "Get contents sources"
+- **changed**: updated ai_models
+
+# 1.39.38 
+- **bug fix**: change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
+
+# 1.39.37  
+- **changed**: In the "Flow log" action, sort error types with icons and colors in the select box.
+- **changed**: Removed the "Chatgpt task" action from the list of actions. If already used, add the "deprecated" tag.
+- **bug-fix**: Modified the ability to drag an action outside the intent block.
+- **bug-fix**: Modified CSS for actions with AI Settings.
+
+# 1.39.36 
+- **changed**: hide the "rules" button if there are no "rules" set
+- **changed**: updated AI models
+
+# 1.39.35
+- **bug-fix**: Removed "manage kb" from webhook detail panel
+- **bug-fix**: in action Ask KB shows the selected template's default value and max-token
+- **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
+
+# 1.39.34
+- **bug-fix**: action blind trasfer not display voice commands
+
+# 1.39.33
+- **Added**: Added the ability to insert tags into the KB ask action and the KB create action
+
+# 1.39.32 
+- **bug-fix**: GptTask Preview broken
+- **bug-fix**: Condition blocks not saved when changing Boolean operators
+- **bug-fix**: OpenAI models present in the select even if they are missing from the environment variable
+
+# 1.39.31
 - **bug-fix**: bug fixed in selecting and refreshing MCP server tools.
 - **bug-fix**: Css changes to the preview of selected tools.
+
+# 1.39.30
+- **Modified**: Changed the position of the cds-note-controls panel
+- **Added**: Added a note title to the rectangle note
+- **Modified**: Removed the note border in the rectangle note
+- **Modified**: Disabled the maximum height on rectangle note and set a minimum size
+- **Bug Fix**: Fixed an issue with resizing rectangle note. The corner opposite the one being dragged now remains locked.
+- **Bug Fix**: Fixed horizontal resizing of text notes; eliminated flickering.
+- **changed**: show MCP server in alphabetical order
+- **changed**: show MCP tools in alphabetical order
+- **changed**: Manage saving and refreshing MCP tools better
+- **changed**: change the color of the badges in the list models
+- **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
+
+# 1.39.29
+- **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
+
+# 1.39.28
 - **added**: added tools MCP server
 
-# 1.39.23
-- **bug-fix**: deleted duplicate AI model chatGPT 5.2
+# 1.39.27
+- **changed**: API for upload a file/images
 
-# 1.39.22
-- **changed**: sorted the list of Intents in alphabetical order
-- **added**: added the LLM model gpt-5.2
-- **bug-fix**: Fixed bug when changing the height of iframe
-- **added**: added tag-replyto in mode preview ai condition and ask kb
-- **bug-fix**: change link "learn more" ai condition
-- **bug-fix**: hidden connectors should remain hidden if update the arrival block
-- **changed**: do not allow text selection in cds-panel-elements and cds-panel-intent-list
-- **added**: added settings summary in AI action templates and all actions with AISEttings
-- **added**: added tag-replyto in mode preview
-- **added**: added badge on publish button
-- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
+# 1.39.26
+- **added**: added iteration action
 
-# 1.39.21
-- **added**: added the LLM model gpt-5.2
+# 1.39.25
+- **bug-fix**: Fixed a filter error when selecting a KB.
+- **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
+- **changed**: Set the "Max chunks for re-ranking" to 100.
 
-# 1.39.20
-- **bug-fix**: sorted the list of intents in the intent selection select
+# 1.39.24
+- **bug-fixed**: note - video note resizing is not smooth
+- **bug-fixed**: note - fixed max_output_tokens error
+- **changed**: note - handles have been added to the rectangle note vertices
+- **bug-fixed**: note - disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: note - disabled the note-controls menu when it is transparent
+- **changed**: note - restored the note detail panel opening when clicking on the note, except for the video note
+- **bug-fixed**: note - when change the color, the note detail panel closes
+- **changed**: note - change default colors
+- **changed**: note - store the last colors in the LS
+- **added**: note - add the same intent menu to notebooks
+- **changed**: note - limit uploads to images and GIFs only
+- **added**: note - allow uploading videos from links
+- **added**: Add the text: Total retrieved chunks for re-ranking: 
+- **changed**: Combine chunk limit, re-ranking, and multiplier into a single block, so pay attention to the spacing.
+- **changed**: In the settings, I replace the token icon and add badges in place of the pipe.
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name.
+- **changed**: Updated format-number with browser language formatting
+- **changed**: Edit AI preview settings: replace text with icons
+- **changed**: Set the default max-token value to 10000
+- **added**: Added reranking multiplier
+- **added**: Intercepted Chrome background throttling / standby to refresh the page
+- **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
+- **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
+- **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
+- **changed**: added text and links in reranking: Improve the accuracy of your answers
+- **changed**: web Request does not show output attributes in the stage preview
+- **changed**: change attribute preview in the AI ​​settings panel
+- **bug-fix**: show and save system context textarea in askgpt-v2
+- **changed**: 10K token minimo (dipende dai modelli)
+- **added**: added sortedItems in selection intent
+- **added**: added go to block in panel intent detail;
+- **added**: added multi rows in url iframe;
+- **added**: showed connectors-in only if they are contract connectors
+- **added**: added connector-in-menu to display the list of blocks connected to the input
+- **added**: added menu on contract-connector to reset connector and move on connector
+- **changed**: Intent block title hidden if "untitled"
+- **changed**: Form button and question button hidden if empty
+- **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
+- **changed**: If the chatbot is new, only one action per intent
 
-# 1.39.19
-- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
-
-# 1.39.18
-- **bug-fix**: Fixed display of iframe URL in action playback
-
-# 1.39.17
-- **added**: added the ability to put notes on the stage
-
-# 1.39.16
-- **added**: pipe find to show namespace name in action ask-kb-v2
-- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
-
-# 1.39.15
-- **bug-fix**: cannot able to update key or value in action lead_update
-
-# 1.39.14
-- **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
-- **bug-fix**: added the "globals" variables created in the DS to the variable list
-- **changed**: open the Intent panel details by clicking on "start intent"
-- **bug-fix**: drag intent "start action"
-- **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
-- **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
-- **bug-fix**: changed knwoledge to knowledge 
-- **bug-fix**: Text correction on replace AI agent
-- **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
-
+- **added**: Supportare rettangolo
+- **bug-fixed**: Supportare spessore bordo
+- **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
+- **added**: aggiungi submenu con le varie tipologie di note
+- **added**: Inserimento con drag&drop
+- **added**: Supportare tipo Immagine
+- **added**: Supportare tipo Video
+- **bug-fixed**:Appena inserita la Nota testo dovrebbe subito permetterti di scrivere con focus su testo
+- **bug-fixed**: centra non funziona nel blocco
+- **bug-fixed**: bug fixed text align
+- **added**: added note
 
 # 1.39.13
 - **added**: implemented queue for connector rendering management
-- **bug-fix**: set Id Contract Connector
+- **bug-fixed**: set Id Contract Connector
 - **changed**: changed label "Add MCP tools"
 
 # 1.39.12
@@ -73,8 +145,8 @@
 # 1.39.11
 
 # 1.39.10
-- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
-- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+- **bug-fixed**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
+- **bug-fixed**: Ctr-z is enabled in the text area when creating a new MCP server.
 
 # 1.39.9 
 
@@ -89,13 +161,13 @@
 - **changed**: set max_tokens from 8192 to 100000
 
 # 1.39.5
-- **bug-fix**: added gpt-5 in aiModels env
+- **bug-fixed**: added gpt-5 in aiModels env
 - **added**: added a temperature filter if the model is gpt-5
 
 # 1.39.4
 
 # 1.39.3
-- **bug-fix**: added filter status "active" in generateLlmModels
+- **bug-fixed**: added filter status "active" in generateLlmModels
 
 # 1.39.2
 
@@ -104,12 +176,12 @@
 # 1.39.0
 
 # 1.39.0-rc26
-- **bug-fix**: css ai-condition fixed bug with long text in preview
+- **bug-fixed**: css ai-condition fixed bug with long text in preview
 
 # 1.39.0-rc25
 - **changed**: change css tag "new", "beta"
-- **bug-fix**: disable scroll on preview button in ai-prompt
-- **bug-fix**: css ai-condition
+- **bug-fixed**: disable scroll on preview button in ai-prompt
+- **bug-fixed**: css ai-condition
 
 # 1.39.0-rc24
 - **changed**: set isLiquidjs to false in web request from data
@@ -121,7 +193,7 @@
 
 # 1.39.0-rc21
 - **added**: changed the selection of LLM and model to only one select in ai-condition
-- **bug-fix**: fixed prompt saving error in "ai-condoition"
+- **bug-fixed**: fixed prompt saving error in "ai-condoition"
 - **changed**: graphical changes in the "ai-condition" action preview
 
 # 1.39.0-rc20
@@ -130,13 +202,13 @@
 - **added**: noMatch for action DTMF_Form for voice bot
 
 # 1.39.0-rc18
-- **bug-fix**: new order, openai and ollama never red
+- **bug-fixed**: new order, openai and ollama never red
 
 # 1.39.0-rc17
-- **bug-fix**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
+- **bug-fixed**: added catch (error) in getElevenLabsVoices and getElevenLabsModels
 
 # 1.39.0-rc16
-- **bug-fix**: Fixed save prompt error
+- **bug-fixed**: Fixed save prompt error
 
 # 1.39.0-rc15
 - **added**: Added text area with autocomplete in LLM model selection
@@ -151,13 +223,13 @@
 - **added**: deprecation message and badge status. GPT Task action set as deprecated
 
 # 1.39.0-rc10
-- **bug-fix**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
+- **bug-fixed**: on Action AI-prompt, if I add a variable to the model, it doesn't save correctly.
 
 # 1.39.0-rc9
-- **bug-fix**: fixed bug new connector in action ai-condition 
+- **bug-fixed**: fixed bug new connector in action ai-condition 
 
 # 1.39.0-rc8
-- **bug-fix**: fixed bugs in action ai-condition
+- **bug-fixed**: fixed bugs in action ai-condition
 
 # 1.39.0-rc7
 - **added**: disabled property for mat-slider in ai-settings section

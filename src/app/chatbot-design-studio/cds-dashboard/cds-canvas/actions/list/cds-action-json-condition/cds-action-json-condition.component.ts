@@ -213,7 +213,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
     }
   
     onChangeOperator(event, index: number){
-      (this.action.groups[index] as Operator).operator= event['type']
+      (this.action.groups[index] as Operator).operator = event['type']
       this.logger.log('onChangeOperator actionsss', this.action, this.actionJsonConditionFormGroup)
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
@@ -249,6 +249,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
   
     onChangeExpression(event){
       // this.connectorService.updateConnector(this.intentSelected.intent_id);
+      this.logger.log('onChangeExpression actionsss', this.action, event)
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   

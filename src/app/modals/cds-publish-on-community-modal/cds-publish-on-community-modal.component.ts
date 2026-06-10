@@ -160,7 +160,7 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
     this.showSpinnerInUploadImageBtn = true;
     const file = event.target.files[0]
     
-    this.uploadService.uploadProfile(this.selectedChatbot._id, file).then((downloadUrl)=> {
+    this.uploadService.uploadProfile('bot_' + this.selectedChatbot._id, file).then((downloadUrl)=> {
       this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE upload with native service - RES downoloadurl', downloadUrl);
 
       this.selectedChatbot.url = downloadUrl
@@ -177,7 +177,7 @@ export class CdsPublishOnCommunityModalComponent implements OnInit {
   deleteBotProfileImage() {
     // const file = event.target.files[0]
     this.logger.log('[CDS-CHATBOT-DTLS] BOT PROFILE IMAGE (FAQ-COMP) deleteBotProfileImage')
-    this.uploadService.delete(this.selectedChatbot._id, this.selectedChatbot.url).then((result)=>{
+    this.uploadService.deleteProfile(this.selectedChatbot._id, this.selectedChatbot.url).then((result)=>{
       this.botProfileImageExist = false;
       this.botImageHasBeenUploaded = false;
 

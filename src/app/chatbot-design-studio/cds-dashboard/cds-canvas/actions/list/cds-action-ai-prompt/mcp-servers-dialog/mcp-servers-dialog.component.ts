@@ -4,6 +4,17 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 
+/** Lightweight MCP server shape passed around the servers dialog (auth config travels with selection). */
+interface McpServerRef {
+  name: string;
+  url: string;
+  transport: string;
+  customHeaders?: Array<{ enabled: boolean, key: string, value: string }>;
+  oauth?: { clientId: string, clientSecret: string, redirectUrl: string, scope: string };
+  tools?: Array<{ name: string }>;
+  selectedTools?: Array<{ name: string }>;
+}
+
 
 @Component({
   selector: 'mcp-servers-dialog',
@@ -12,8 +23,8 @@ import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-serv
 })
 export class McpServersDialogComponent implements OnInit {
 
-  selectedServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }> = [];
-  filteredServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }> = [];
+  selectedServers: McpServerRef[] = [];
+  filteredServers: McpServerRef[] = [];
   searchFilter: string = '';
   onUpdateCallback: (data: any) => void;
   
@@ -22,10 +33,10 @@ export class McpServersDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<McpServersDialogComponent>,
     private dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public data: { 
+    @Inject(MAT_DIALOG_DATA) public data: {
       // mcpServers from integrations: tools = available, selectedTools = last selection (kept even when server not selected).
-      mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }>,
-      selectedServers?: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }>,
+      mcpServers: McpServerRef[],
+      selectedServers?: McpServerRef[],
       onUpdate?: (data: any) => void
     }
   ) { }
@@ -41,8 +52,8 @@ export class McpServersDialogComponent implements OnInit {
     if (this.data.onUpdate) {
       this.onUpdateCallback = this.data.onUpdate;
     }
-    // Initialize filtered servers
-    this.filteredServers = [...this.data.mcpServers];
+    // Initialize filtered servers (alphabetically by name)
+    this.filteredServers = [...this.data.mcpServers].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   onCloseDialog(): void {
@@ -50,7 +61,7 @@ export class McpServersDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  toggleServerSelection(server: { name: string, url: string, transport: string, selectedTools?: Array<{ name: string }> }, event?: Event): void {
+  toggleServerSelection(server: McpServerRef, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent triggering the button click
     }
@@ -65,6 +76,8 @@ export class McpServersDialogComponent implements OnInit {
         name: server.name,
         url: server.url,
         transport: server.transport,
+        customHeaders: stored?.customHeaders,
+        oauth: stored?.oauth,
         tools
       });
     }
@@ -87,13 +100,15 @@ export class McpServersDialogComponent implements OnInit {
     const filter = this.searchFilter.toLowerCase().trim();
     
     if (!filter) {
-      this.filteredServers = [...this.data.mcpServers];
+      this.filteredServers = [...this.data.mcpServers].sort((a, b) => a.name.localeCompare(b.name));
     } else {
-      this.filteredServers = this.data.mcpServers.filter(server => 
-        server.name.toLowerCase().includes(filter) ||
-        server.url.toLowerCase().includes(filter) ||
-        server.transport.toLowerCase().includes(filter)
-      );
+      this.filteredServers = this.data.mcpServers
+        .filter(server =>
+          server.name.toLowerCase().includes(filter) ||
+          server.url.toLowerCase().includes(filter) ||
+          server.transport.toLowerCase().includes(filter)
+        )
+        .sort((a, b) => a.name.localeCompare(b.name));
     }
     
     this.logger.log("[McpServersDialog] Filtered servers:", this.filteredServers.length);
@@ -145,6 +160,8 @@ export class McpServersDialogComponent implements OnInit {
           name: createdServer.name,
           url: createdServer.url,
           transport: createdServer.transport,
+          customHeaders: createdServer.customHeaders,
+          oauth: createdServer.oauth,
           tools: result?.selectedTools || []
         });
         this.logger.log("[McpServersDialog] New server added:", createdServer);
@@ -158,7 +175,7 @@ export class McpServersDialogComponent implements OnInit {
     });
   }
 
-  openEditServerDialog(server: { name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }, event?: Event): void {
+  openEditServerDialog(server: McpServerRef, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent any unwanted propagation
     }
@@ -197,6 +214,8 @@ export class McpServersDialogComponent implements OnInit {
               name: updatedServer.name,
               url: updatedServer.url,
               transport: updatedServer.transport,
+              customHeaders: updatedServer.customHeaders,
+              oauth: updatedServer.oauth,
               tools: Array.from(unique.values())
             };
           }

@@ -30,6 +30,7 @@
             [bindLabelSelect]="'value'"
             [bindValueSelect]="'value'" 
             [itemSelected]="selectedLogLevel" 
+            [sortAlphabetically]="false"
             [clearable]="false"  
             [searchable]="false"
             (onSelected)="onLogLevelChange($event, 'bugsLevel')">

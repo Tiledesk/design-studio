@@ -4,11 +4,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
+/**
+ * Cutoff date used to determine whether a chatbot is considered "new".
+ * ISO string format, compared lexicographically against `createdAt` (also ISO).
+ */
+export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+
 export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://gethelp.tiledesk.com/', target: '_blank'},
         advanced_prompt: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#advanced-context', target: '_blank' }, 
-        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' }
+        citations: { link: 'https://gethelp.tiledesk.com/articles/ask-knowledge-base-and-its-role-in-building-custom-ai-agents/#get-contents-sources', target: '_blank' },
+        reranking: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/knowledge-base/re-ranking', target: '_blank' }
     }, 
     ADD_TO_KB: {
         namespace_as_name: { link: 'https://gethelp.tiledesk.com/articles/add-to-knowledge-base-action/', target: '_blank'},
@@ -110,6 +117,7 @@ export enum TYPE_INTENT_NAME {
     WEBHOOK            = 'webhook',
     CLOSE              = "close"
 }
+
 
 export enum TYPE_MATH_OPERATOR {
     addAsNumber         = "addAsNumber",

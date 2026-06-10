@@ -16,6 +16,23 @@ interface McpServer {
   name: string;
   url: string;
   transport: string;
+  customHeaders?: Array<{
+    enabled: boolean;
+    key: string;
+    value: string;
+    revealValue?: boolean;
+  }>;
+  /**
+   * OAuth 2.0 Authorization Code flow config.
+   * Persisted as plain config; the actual flow (browser login / token exchange)
+   * is executed by the backend/runtime, not here. Persisted only when at least one field is filled.
+   */
+  oauth?: {
+    clientId: string;
+    clientSecret: string;
+    redirectUrl: string;
+    scope: string;
+  };
   /** Available tools (from Connect / integrations). Persisted on Save. */
   tools?: McpTool[];
   /** Selected tools for this server. Persisted in integration so selection is kept even when server is not selected. */
@@ -76,6 +93,13 @@ export class McpServerEditDialogComponent implements OnInit {
   /** True when Refresh returned a different list of tools than the original, so Save should be enabled. */
   private availableToolsChangedAfterRefresh: boolean = false;
   private lastUrlBlurValue: string = '';
+  isAuthenticationOpen: boolean = false;
+  isHeadersJsonMode: boolean = false;
+  headersJsonText: string = '';
+  private originalHeadersSnapshot: string = '';
+  /** Show/hide the OAuth Client Secret value (UI only, not persisted). */
+  revealClientSecret: boolean = false;
+  private originalOAuthSnapshot: string = '';
   
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -106,7 +130,8 @@ export class McpServerEditDialogComponent implements OnInit {
       this.editedServer = {
         name: '',
         url: '',
-        transport: 'streamable_http' // Default value
+        transport: 'streamable_http', // Default value
+        customHeaders: []
       };
       this.originalServer = null;
     } else {
@@ -119,6 +144,24 @@ export class McpServerEditDialogComponent implements OnInit {
         transport: this.data.server?.transport || ''
       };
     }
+
+    // Ensure headers array exists
+    if (!Array.isArray(this.editedServer.customHeaders)) {
+      this.editedServer.customHeaders = [];
+    }
+    // Snapshot initial headers for dirty check (normalize fields)
+    this.originalHeadersSnapshot = this.serializeHeaders(this.editedServer.customHeaders);
+    this.headersJsonText = this.buildHeadersJsonText();
+
+    // Ensure OAuth object exists (kept in-memory for binding; persisted only if at least one field is filled).
+    // A fresh object avoids mutating the original server reference while editing.
+    this.editedServer.oauth = {
+      clientId: this.editedServer.oauth?.clientId || '',
+      clientSecret: this.editedServer.oauth?.clientSecret || '',
+      redirectUrl: this.editedServer.oauth?.redirectUrl || '',
+      scope: this.editedServer.oauth?.scope || ''
+    };
+    this.originalOAuthSnapshot = this.serializeOAuth(this.editedServer.oauth);
     
     // Store all servers
     this.allMcpServers = [...this.data.allServers];
@@ -157,6 +200,11 @@ export class McpServerEditDialogComponent implements OnInit {
       // Keep this as a safe refresh: tools are optional anyway.
       this.refreshAvailableTools();
     }
+    if (field === 'url') {
+      // As soon as URL is modified: hide Save and show Connect (no need to wait for blur).
+      const current = (this.editedServer.url || '').trim();
+      this.urlChangedSinceLastConnect = this.isNewServer ? true : (current !== ((this.originalSnapshot?.url || '').trim()));
+    }
   }
 
   /**
@@ -185,7 +233,7 @@ export class McpServerEditDialogComponent implements OnInit {
   private refreshAvailableTools(): void {
     // Prefer tools from the server currently being edited (after Connect/Refresh).
     if (Array.isArray(this.editedServer?.tools)) {
-      this.availableTools = this.editedServer.tools;
+      this.availableTools = [...this.editedServer.tools].sort((a, b) => a.name.localeCompare(b.name));
     } else {
       const serverName = this.isNewServer ? this.editedServer?.name : this.originalServer?.name;
       if (!serverName) {
@@ -193,7 +241,8 @@ export class McpServerEditDialogComponent implements OnInit {
         return;
       }
       const found = this.allMcpServers.find(s => s.name === serverName);
-      this.availableTools = Array.isArray(found?.tools) ? found.tools : [];
+      const tools = Array.isArray(found?.tools) ? found.tools : [];
+      this.availableTools = [...tools].sort((a, b) => a.name.localeCompare(b.name));
     }
 
     // Keep selection consistent: drop selected tools that are no longer available (avoid stale names).
@@ -252,13 +301,159 @@ export class McpServerEditDialogComponent implements OnInit {
     const nameChanged = (this.editedServer?.name || '') !== snap.name;
     const transportChanged = (this.editedServer?.transport || '') !== snap.transport;
     const toolsSelectionChanged = !this.areSetsEqual(this.selectedToolNames, this.originalSelectedToolsSnapshot);
-    return nameChanged || transportChanged || toolsSelectionChanged || this.availableToolsChangedAfterRefresh;
+    const headersChanged = this.serializeHeaders(this.editedServer.customHeaders || []) !== this.originalHeadersSnapshot;
+    const oauthChanged = this.serializeOAuth(this.editedServer.oauth) !== this.originalOAuthSnapshot;
+    return nameChanged || transportChanged || toolsSelectionChanged || headersChanged || oauthChanged || this.availableToolsChangedAfterRefresh;
   }
 
+  // -----------------------
+  // Custom headers UI
+  // -----------------------
+  toggleHeadersJsonMode(): void {
+    this.isHeadersJsonMode = !this.isHeadersJsonMode;
+    if (this.isHeadersJsonMode) {
+      this.headersJsonText = this.buildHeadersJsonText();
+    } else {
+      // When leaving JSON mode, try to apply (best-effort).
+      this.applyHeadersFromJson();
+    }
+  }
+
+  addCustomHeader(): void {
+    if (!Array.isArray(this.editedServer.customHeaders)) {
+      this.editedServer.customHeaders = [];
+    }
+    this.editedServer.customHeaders.push({
+      enabled: true,
+      key: '',
+      value: '',
+      revealValue: false
+    });
+  }
+
+  removeCustomHeader(index: number): void {
+    if (!Array.isArray(this.editedServer.customHeaders)) return;
+    if (index < 0 || index >= this.editedServer.customHeaders.length) return;
+    this.editedServer.customHeaders.splice(index, 1);
+  }
+
+  toggleHeaderEnabled(index: number): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.enabled = !h.enabled;
+  }
+
+  toggleHeaderReveal(index: number): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.revealValue = !h.revealValue;
+  }
+
+  onHeaderKeyChange(index: number, value: string): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.key = value ?? '';
+  }
+
+  onHeaderValueChange(index: number, value: string): void {
+    const h = this.editedServer.customHeaders?.[index];
+    if (!h) return;
+    h.value = value ?? '';
+  }
+
+  applyHeadersFromJson(): void {
+    if (!this.isHeadersJsonMode) {
+      // if called from blur while not in JSON mode, do nothing
+      return;
+    }
+    try {
+      const parsed = JSON.parse(this.headersJsonText || '[]');
+      if (!Array.isArray(parsed)) return;
+      const next = parsed
+        .filter((x: any) => x && typeof x === 'object')
+        .map((x: any) => ({
+          enabled: x.enabled !== false,
+          key: (x.key ?? x.name ?? '').toString(),
+          value: (x.value ?? '').toString(),
+          revealValue: false
+        }));
+      this.editedServer.customHeaders = next;
+    } catch {
+      // Keep current headers; invalid JSON shouldn't break the dialog.
+    }
+  }
+
+  private buildHeadersJsonText(): string {
+    const headers = (this.editedServer.customHeaders || []).map(h => ({
+      enabled: !!h.enabled,
+      key: (h.key ?? '').toString(),
+      value: (h.value ?? '').toString()
+    }));
+    return JSON.stringify(headers, null, 2);
+  }
+
+  private serializeHeaders(headers: Array<{ enabled: boolean; key: string; value: string }>): string {
+    // Stable serialize used only for dirty check (ignore revealValue)
+    try {
+      const normalized = (headers || []).map(h => ({
+        enabled: !!h.enabled,
+        key: (h.key ?? '').toString(),
+        value: (h.value ?? '').toString()
+      }));
+      return JSON.stringify(normalized);
+    } catch {
+      return '';
+    }
+  }
+
+  // -----------------------
+  // OAuth 2.0 flow config
+  // -----------------------
+  onOAuthFieldChange(field: 'clientId' | 'clientSecret' | 'redirectUrl' | 'scope', value: string): void {
+    if (!this.editedServer.oauth) {
+      this.editedServer.oauth = { clientId: '', clientSecret: '', redirectUrl: '', scope: '' };
+    }
+    this.editedServer.oauth[field] = value ?? '';
+  }
+
+  toggleOAuthSecretReveal(): void {
+    this.revealClientSecret = !this.revealClientSecret;
+  }
+
+  /** Stable serialize used only for the dirty check. */
+  private serializeOAuth(oauth?: McpServer['oauth']): string {
+    try {
+      const o = oauth || { clientId: '', clientSecret: '', redirectUrl: '', scope: '' };
+      return JSON.stringify({
+        clientId: (o.clientId ?? '').toString(),
+        clientSecret: (o.clientSecret ?? '').toString(),
+        redirectUrl: (o.redirectUrl ?? '').toString(),
+        scope: (o.scope ?? '').toString()
+      });
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Returns the OAuth config trimmed, but only when at least one field is filled.
+   * Returns undefined otherwise, so empty OAuth is never persisted (keeps existing servers clean).
+   */
+  private buildOAuthPayload(): McpServer['oauth'] | undefined {
+    const o = this.editedServer.oauth;
+    if (!o) return undefined;
+    const clientId = (o.clientId || '').trim();
+    const clientSecret = (o.clientSecret || '').trim();
+    const redirectUrl = (o.redirectUrl || '').trim();
+    const scope = (o.scope || '').trim();
+    if (!clientId && !clientSecret && !redirectUrl && !scope) return undefined;
+    return { clientId, clientSecret, redirectUrl, scope };
+  }
+
+
   get showConnectButton(): boolean {
-    // In Edit: connect ONLY when URL has been modified.
-    // In Add: connect is the discovery step.
-    return this.isNewServer ? true : this.urlChangedSinceLastConnect;
+    // Connect / Refresh button always visible (Connect when no tools, Refresh tools when loaded).
+    return true;
   }
 
   get showSaveButton(): boolean {
@@ -271,8 +466,9 @@ export class McpServerEditDialogComponent implements OnInit {
   get isSaveDisabled(): boolean {
     if (this.isSaving || this.isLoadingTools) return true;
     if (!this.isFormValid()) return true;
-    if (!this.toolsLoaded) return true;
-    if (this.isNewServer) return false; // create: connect gates, not dirty
+    // Add mode: Save enabled only after Connect (tools loaded).
+    if (this.isNewServer) return !this.toolsLoaded;
+    // Edit mode: enable Save whenever any value except URL was modified (dirty).
     return !this.isDirty;
   }
 
@@ -389,6 +585,18 @@ export class McpServerEditDialogComponent implements OnInit {
     }, 500);
 
     try {
+      const selectedTools = this.buildSelectedToolsPayload();
+      // Persist total available tools count from last Connect/Refresh so list dialog can show correct "X available".
+      const availableToolsCount = this.availableTools?.length ?? 0;
+      // OAuth: trimmed config, undefined when empty (so it is not persisted as noise).
+      const oauthPayload = this.buildOAuthPayload();
+      const serverToSave = {
+        ...this.editedServer,
+        oauth: oauthPayload,
+        tools: selectedTools,
+        availableToolsCount
+      };
+
       if (this.isNewServer) {
         // Check if server name already exists
         const nameExists = this.allMcpServers.some(s => s.name === this.editedServer.name);
@@ -403,6 +611,7 @@ export class McpServerEditDialogComponent implements OnInit {
         // Add new server to the array (include tools + selectedTools for persistence)
         this.allMcpServers.push({
           ...this.editedServer,
+          oauth: oauthPayload,
           tools: this.editedServer.tools,
           selectedTools: this.buildSelectedToolsPayload()
         });
@@ -412,6 +621,7 @@ export class McpServerEditDialogComponent implements OnInit {
         if (serverIndex > -1) {
           this.allMcpServers[serverIndex] = {
             ...this.editedServer,
+            oauth: oauthPayload,
             tools: this.editedServer.tools,
             selectedTools: this.buildSelectedToolsPayload()
           };
@@ -446,6 +656,7 @@ export class McpServerEditDialogComponent implements OnInit {
       this.dialogRef.close({
         server: {
           ...this.editedServer,
+          oauth: oauthPayload,
           tools: this.editedServer.tools,
           selectedTools: selectedToolsPayload
         },

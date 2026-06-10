@@ -64,6 +64,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { NetworkService } from './services/network.service';
 import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.service';
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
+import { AppInterruptionComponent } from './modals/app-interruption/app-interruption.component';
 import { BrandResources } from './chatbot-design-studio/BrandResources';
 
 import localeIt from '@angular/common/locales/it';
@@ -123,7 +124,8 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     UnauthorizedComponent,
     HomeComponent,
     NotFoundComponent,
-    NetworkOfflineComponent
+    NetworkOfflineComponent,
+    AppInterruptionComponent
   ],
   imports: [
     // TooltipModule.forRoot(CutomTooltipOptions as TooltipOptions),
