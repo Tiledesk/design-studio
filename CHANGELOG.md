@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.40.1-rc8
 - **bug fix**: vllm list
 - **bug fix**: drag intent when connector is contract
 
