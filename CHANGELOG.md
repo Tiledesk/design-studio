@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.1-rc7
+- **added**: OAuth 2.0 Flow in MCP server authentication (Client ID, Client Secret, Redirect URL, Scope)
+
 # 1.40.1-rc6
 - **bug fix**: retrocompatibility jsonCondition
 
