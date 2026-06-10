@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **bug fix**: vllm list
+- **bug fix**: drag intent when connector is contract
+
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
 
