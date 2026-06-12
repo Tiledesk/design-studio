@@ -205,6 +205,12 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.llm = result?.llm ? result.llm : '';
     this.action.model = result?.model ? result.model : '';
     this.action.modelName = result?.modelName ? result.modelName : '';
+    // vLLM: persist the endpoint url on the action; clear it for any other provider.
+    if (result?.llm === 'vllm' && result?.vllmServer) {
+      this.action.vllmServer = result.vllmServer;
+    } else {
+      delete this.action.vllmServer;
+    }
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
     if (result) {
       this.ai_setting['max_tokens'].max = result.max_output_tokens;
