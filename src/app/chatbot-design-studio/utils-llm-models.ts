@@ -22,6 +22,8 @@ export interface LlmModel {
   min_tokens?: number;
   max_output_tokens?: number;
   reasoning?: boolean;
+  /** vLLM endpoint url this model belongs to. Set only when llm === 'vllm'. */
+  vllmServer?: string;
 }
 
 export interface AutocompleteOption {
@@ -34,6 +36,8 @@ export interface ModelOption {
   value: string;
   description: string;
   status: "active" | "inactive";
+  /** vLLM endpoint url this model belongs to (carried through to the flat model). */
+  vllmServer?: string;
 }
 
 export interface ActionModel {
@@ -179,36 +183,42 @@ export async function getIntegrationModels(
       if (!value) {
         continue;
       }
-      // Collect model names supporting BOTH integration shapes:
-      // - multi-endpoint (refactored vLLM): value.servers[].models
-      // - legacy flat (e.g. ollama / old vLLM): value.models
-      let modelNames: any[] = [];
+      // Build model entries supporting BOTH integration shapes:
+      // - multi-endpoint (refactored vLLM): value.servers[].models -> label = "url ・ model" (value = model id)
+      // - legacy flat (e.g. ollama / old vLLM): value.models -> label = value = model id
+      let entries: Array<{ name: string; value: string; vllmServer?: string }> = [];
       if (Array.isArray(value.servers)) {
-        modelNames = value.servers.reduce((acc: any[], server: any) => {
-          if (Array.isArray(server?.models)) {
-            acc.push(...server.models);
+        for (const server of value.servers) {
+          const url = (server?.url ?? '').toString().trim();
+          const serverModels = Array.isArray(server?.models) ? server.models : [];
+          for (const m of serverModels) {
+            if (typeof m !== 'string' || m.trim().length === 0) {
+              continue;
+            }
+            entries.push({ name: url ? `${url} ・ ${m}` : m, value: m, vllmServer: url || undefined });
           }
-          return acc;
-        }, []);
+        }
       } else if (Array.isArray(value.models)) {
-        modelNames = value.models;
+        entries = value.models
+          .filter((m: any) => typeof m === 'string' && m.trim().length > 0)
+          .map((m: string) => ({ name: m, value: m }));
       }
-      // Keep only non-empty strings, de-duplicate preserving order.
+      // De-duplicate by display label, preserving order.
       const seen = new Set<string>();
-      const models = modelNames
-        .filter((item: any) => typeof item === 'string' && item.trim().length > 0)
-        .filter((item: string) => {
-          if (seen.has(item)) {
+      const models = entries
+        .filter((e) => {
+          if (seen.has(e.name)) {
             return false;
           }
-          seen.add(item);
+          seen.add(e.name);
           return true;
         })
-        .map((item: string) => ({
-          name: item,
-          value: item,
+        .map((e) => ({
+          name: e.name,
+          value: e.value,
           description: '',
-          status: 'active' as const
+          status: 'active' as const,
+          vllmServer: e.vllmServer
         }));
       if (models.length > 0) {
         logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, models);
