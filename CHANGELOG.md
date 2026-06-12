@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc4
+- **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
+
 # 1.40.3-rc3
 - **bug fix**: integrate customHeaders and auth in "tools" paylosd
 
