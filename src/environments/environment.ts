@@ -4,7 +4,7 @@ export const environment = {
     VERSION: require('../../package.json').version,
     remoteConfig: true, 
     // remoteConfigUrl: './real_data/cds-config-native-prod.json',
-    remoteConfigUrl: './real_data/cds-config-aws-stage.json',
+    remoteConfigUrl: './cds-config-aws-stage.json',
     // remoteConfigUrl: './design-studio-config.json',
     apiUrl: 'CHANGEIT',
     widgetBaseUrl: 'CHANGEIT',
