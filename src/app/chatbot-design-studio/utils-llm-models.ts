@@ -22,6 +22,8 @@ export interface LlmModel {
   min_tokens?: number;
   max_output_tokens?: number;
   reasoning?: boolean;
+  /** vLLM endpoint url this model belongs to. Set only when llm === 'vllm'. */
+  vllmServer?: string;
 }
 
 export interface AutocompleteOption {
@@ -34,6 +36,8 @@ export interface ModelOption {
   value: string;
   description: string;
   status: "active" | "inactive";
+  /** vLLM endpoint url this model belongs to (carried through to the flat model). */
+  vllmServer?: string;
 }
 
 export interface ActionModel {
@@ -175,14 +179,50 @@ export async function getIntegrationModels(
   for (const model of llmModelList) {
     if (model.value === modelName) {
       const NEW_MODELS = await getIntegrationByName(projectService, dashboardService, logger, modelName);
-      if (NEW_MODELS?.value?.models) {
-        logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, NEW_MODELS.value.models);
-        const models = NEW_MODELS.value.models.map(item => ({
-          name: item,
-          value: item,
+      const value = NEW_MODELS?.value;
+      if (!value) {
+        continue;
+      }
+      // Build model entries supporting BOTH integration shapes:
+      // - multi-endpoint (refactored vLLM): value.servers[].models
+      //   -> modelName label = "<server name> ・ model" and vllmServer = server NAME (the server's name, NOT the url)
+      // - legacy flat (e.g. ollama / old vLLM): value.models -> label = value = model id
+      let entries: Array<{ name: string; value: string; vllmServer?: string }> = [];
+      if (Array.isArray(value.servers)) {
+        for (const server of value.servers) {
+          const serverName = (server?.name ?? '').toString().trim();
+          const serverModels = Array.isArray(server?.models) ? server.models : [];
+          for (const m of serverModels) {
+            if (typeof m !== 'string' || m.trim().length === 0) {
+              continue;
+            }
+            entries.push({ name: serverName ? `${serverName} ・ ${m}` : m, value: m, vllmServer: serverName || undefined });
+          }
+        }
+      } else if (Array.isArray(value.models)) {
+        entries = value.models
+          .filter((m: any) => typeof m === 'string' && m.trim().length > 0)
+          .map((m: string) => ({ name: m, value: m }));
+      }
+      // De-duplicate by display label, preserving order.
+      const seen = new Set<string>();
+      const models = entries
+        .filter((e) => {
+          if (seen.has(e.name)) {
+            return false;
+          }
+          seen.add(e.name);
+          return true;
+        })
+        .map((e) => ({
+          name: e.name,
+          value: e.value,
           description: '',
-          status: 'active' as const
+          status: 'active' as const,
+          vllmServer: e.vllmServer
         }));
+      if (models.length > 0) {
+        logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, models);
         model.models = models;
       }
     }
