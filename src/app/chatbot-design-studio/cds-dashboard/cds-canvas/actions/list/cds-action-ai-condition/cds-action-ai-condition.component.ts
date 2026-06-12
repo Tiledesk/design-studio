@@ -567,13 +567,20 @@ export class CdsActionAiConditionComponent implements OnInit {
 
   getResponse(question) {
     this.logger.log("getResponse called...")
-    let data = {
+    let data: any = {
       question: question,
       llm: this.action.llm,
       model: this.action.model,
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
     }
+
+    // vLLM: the preview API needs the target server to route the request.
+    // Without it the backend responds: "vllmServer attribute is undefined".
+    if (this.action.llm === 'vllm' && this.action.vllmServer) {
+      data.vllmServer = this.action.vllmServer;
+    }
+
     this.showAiError = false;
     this.searching = true;
     this.showPreview = true;

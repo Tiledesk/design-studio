@@ -632,7 +632,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   async getResponse(question, namespace) {
     this.logger.log("getResponse called...")
 
-    let data = {
+    let data: any = {
       question: question,
       system_context: this.action.context,
       llm: this.action.llm,
@@ -648,6 +648,13 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     // if(this.action?.chunks_only && this.action?.chunks_only === true){
     //   data['search_type'] = 'chunks';
     // }
+
+    // vLLM: the preview API needs the target server to route the request.
+    // Without it the backend responds: "vllmServer attribute is undefined".
+    if (this.action.llm === 'vllm' && this.action.vllmServer) {
+      data.vllmServer = this.action.vllmServer;
+    }
+
     if(this.action.namespaceAsName){
       data.namespace = await this.nameToId(namespace)
     }
