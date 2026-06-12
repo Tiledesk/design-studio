@@ -183,18 +183,19 @@ export async function getIntegrationModels(
         continue;
       }
       // Build model entries supporting BOTH integration shapes:
-      // - multi-endpoint (refactored vLLM): value.servers[].models -> label = "url ・ model" (value = model id)
+      // - multi-endpoint (refactored vLLM): value.servers[].models
+      //   -> modelName label = "<server name> ・ model" and vllmServer = server NAME (the server's name, NOT the url)
       // - legacy flat (e.g. ollama / old vLLM): value.models -> label = value = model id
       let entries: Array<{ name: string; value: string; vllmServer?: string }> = [];
       if (Array.isArray(value.servers)) {
         for (const server of value.servers) {
-          const url = (server?.url ?? '').toString().trim();
+          const serverName = (server?.name ?? '').toString().trim();
           const serverModels = Array.isArray(server?.models) ? server.models : [];
           for (const m of serverModels) {
             if (typeof m !== 'string' || m.trim().length === 0) {
               continue;
             }
-            entries.push({ name: url ? `${url} ・ ${m}` : m, value: m, vllmServer: url || undefined });
+            entries.push({ name: serverName ? `${serverName} ・ ${m}` : m, value: m, vllmServer: serverName || undefined });
           }
         }
       } else if (Array.isArray(value.models)) {
