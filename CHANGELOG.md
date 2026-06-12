@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.40.3-rc1
+- **bug fix**: added vllm url in vllm models
+
 # 1.40.1-rc9
 - **changed**: filter voice provider list based on chatbot subtype (chatbot: elevenlabs only, voice twilio: twilio and openai only)
 - **bug fix**: voice settings initialization - removed duplicated logic
