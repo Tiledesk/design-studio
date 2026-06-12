@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc2
+- **bug fix**: vllmServer
 
 # 1.40.3-rc1
 - **bug fix**: added vllm url in vllm models
