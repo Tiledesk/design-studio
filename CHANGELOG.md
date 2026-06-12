@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc3
+- **bug fix**: integrate customHeaders and auth in "tools" paylosd
+
 # 1.40.3-rc2
 - **bug fix**: vllmServer
 
