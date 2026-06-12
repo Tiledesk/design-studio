@@ -7,8 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.1-rc9
+- **changed**: filter voice provider list based on chatbot subtype (chatbot: elevenlabs only, voice twilio: twilio and openai only)
+- **bug fix**: voice settings initialization - removed duplicated logic
 
-# this branch
+# 1.40.1-rc8
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
 - **bug fix**: vllm list
 - **bug fix**: drag intent when connector is contract
 
