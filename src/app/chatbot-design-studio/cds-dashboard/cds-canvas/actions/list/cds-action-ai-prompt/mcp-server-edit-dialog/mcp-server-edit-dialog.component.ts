@@ -450,6 +450,17 @@ export class McpServerEditDialogComponent implements OnInit {
     return { clientId, clientSecret, redirectUrl, scope };
   }
 
+  /**
+   * Enabled custom headers with both key and value filled, as forwarded to the tools
+   * discovery call. Mirrors the UI note "Only enabled headers with both name and value
+   * will be sent". Returns [] when none apply.
+   */
+  private buildEnabledHeadersPayload(): Array<{ key: string; value: string }> {
+    return (this.editedServer.customHeaders || [])
+      .filter(h => h && h.enabled && (h.key || '').trim() && (h.value || '').trim())
+      .map(h => ({ key: h.key.trim(), value: h.value.trim() }));
+  }
+
 
   get showConnectButton(): boolean {
     // Connect / Refresh button always visible (Connect when no tools, Refresh tools when loaded).
@@ -499,7 +510,14 @@ export class McpServerEditDialogComponent implements OnInit {
     this.isToolsModalOpen = false;
 
     try {
-      const res = await firstValueFrom(this.projectService.getMcpTools(this.project_id, this.editedServer.url));
+      // Forward auth context so discovery reaches authenticated MCP servers:
+      // - enabled custom headers (e.g. X-MCP-API-key)
+      // - OAuth 2.0 config when at least one field is filled
+      const customHeaders = this.buildEnabledHeadersPayload();
+      const oauth = this.buildOAuthPayload();
+      const res = await firstValueFrom(
+        this.projectService.getMcpTools(this.project_id, this.editedServer.url, { customHeaders, oauth })
+      );
       const rawTools = Array.isArray(res) ? res : (Array.isArray(res?.tools) ? res.tools : []);
 
       const tools: McpTool[] = (rawTools || [])
