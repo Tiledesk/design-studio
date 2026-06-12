@@ -38,7 +38,7 @@
               {
                 "glob": "**/*",
                 "input": "src/environments/real_data",
-                "output": "/real_data"
+                "output": "/environments/real_data"
               }
             ],
             "styles": [
