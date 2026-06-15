@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc6
+- **changed**: refatoring action conditions
+
 # 1.40.3-rc5
 - **bug fix**: bug fix env
 
