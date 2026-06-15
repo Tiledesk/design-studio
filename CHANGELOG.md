@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.5
+- **bug fix**: change env
+
 # 1.40.4
 - **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
 
