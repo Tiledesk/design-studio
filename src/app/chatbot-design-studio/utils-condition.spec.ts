@@ -81,10 +81,11 @@ describe('utils-condition · serializeConditionToWhen', () => {
   it('operatori-funzione su stringa', () => {
     expect(conditionToWhen(cond('lang', TYPE_OPERATOR.startsWith, { type: 'const', value: 'it' }))).toBe('startsWith(lang, "it")');
     expect(conditionToWhen(cond('lang', TYPE_OPERATOR.notStartsWith, { type: 'const', value: 'it' }))).toBe('!startsWith(lang, "it")');
-    expect(conditionToWhen(cond('lang', TYPE_OPERATOR.startsWithIgnoreCase, { type: 'const', value: 'IT' }))).toBe('startsWithIgnoreCase(lang, "IT")');
     expect(conditionToWhen(cond('msg', TYPE_OPERATOR.contains, { type: 'const', value: 'hi' }))).toBe('contains(msg, "hi")');
-    expect(conditionToWhen(cond('msg', TYPE_OPERATOR.containsIgnoreCase, { type: 'const', value: 'HI' }))).toBe('containsIgnoreCase(msg, "HI")');
     expect(conditionToWhen(cond('file', TYPE_OPERATOR.endsWith, { type: 'const', value: '.pdf' }))).toBe('endsWith(file, ".pdf")');
+    // Legacy ignore-case operators (removed) are normalized to case-sensitive.
+    expect(conditionToWhen(cond('lang', 'startsWithIgnoreCase' as any, { type: 'const', value: 'IT' }))).toBe('startsWith(lang, "IT")');
+    expect(conditionToWhen(cond('msg', 'containsIgnoreCase' as any, { type: 'const', value: 'HI' }))).toBe('contains(msg, "HI")');
     expect(conditionToWhen(cond('email', TYPE_OPERATOR.matches, { type: 'const', value: '^.+@.+$' }))).toBe('matches(email, "^.+@.+$")');
   });
 

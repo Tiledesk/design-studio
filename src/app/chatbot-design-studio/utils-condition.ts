@@ -65,6 +65,17 @@ export function stripLiquidWrapper(value: string): string {
   return m ? m[1].trim() : String(value || '').trim();
 }
 
+/**
+ * Operatori legacy rimossi (ignore-case): mappati ai corrispettivi case-sensitive.
+ * Da ora tutte le condizioni sono case sensitive; le condizioni già salvate con
+ * `containsIgnoreCase`/`startsWithIgnoreCase` continuano a funzionare come `contains`/`startsWith`.
+ */
+export function normalizeLegacyOperator(op: string): string {
+  if (op === 'containsIgnoreCase') return TYPE_OPERATOR.contains;
+  if (op === 'startsWithIgnoreCase') return TYPE_OPERATOR.startsWith;
+  return op;
+}
+
 function booleanToken(node: Operator): string {
   return node && node.operator === 'AND' ? '&&' : '||';
 }
@@ -89,7 +100,7 @@ export function conditionToWhen(condition: Condition): string {
   if (!condition || !condition.operator) return '';
   const left = stripLiquidWrapper(condition.operand1);
   if (!left) return '';
-  const op = condition.operator;
+  const op = normalizeLegacyOperator(condition.operator);
 
   // --- Unari (nessun RHS) ---
   switch (op) {
@@ -118,10 +129,8 @@ export function conditionToWhen(condition: Condition): string {
     case TYPE_OPERATOR.lessThanOrEqual:       return `${left} <= ${right}`;
     case TYPE_OPERATOR.startsWith:            return `startsWith(${left}, ${right})`;
     case TYPE_OPERATOR.notStartsWith:         return `!startsWith(${left}, ${right})`;
-    case TYPE_OPERATOR.startsWithIgnoreCase:  return `startsWithIgnoreCase(${left}, ${right})`;
     case TYPE_OPERATOR.contains:              return `contains(${left}, ${right})`;
     case TYPE_OPERATOR.notContains:           return `!contains(${left}, ${right})`;
-    case TYPE_OPERATOR.containsIgnoreCase:    return `containsIgnoreCase(${left}, ${right})`;
     case TYPE_OPERATOR.endsWith:              return `endsWith(${left}, ${right})`;
     case TYPE_OPERATOR.notEndsWith:           return `!endsWith(${left}, ${right})`;
     case TYPE_OPERATOR.matches:               return `matches(${left}, ${right})`;
