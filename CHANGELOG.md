@@ -7,6 +7,37 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc5
+- **bug fix**: bug fix env
+
+# 1.40.3-rc4
+- **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
+
+# 1.40.3-rc3
+- **bug fix**: integrate customHeaders and auth in "tools" paylosd
+
+# 1.40.3-rc2
+- **bug fix**: vllmServer
+
+# 1.40.3-rc1
+- **bug fix**: added vllm url in vllm models
+
+# 1.40.1-rc9
+- **changed**: filter voice provider list based on chatbot subtype (chatbot: elevenlabs only, voice twilio: twilio and openai only)
+- **bug fix**: voice settings initialization - removed duplicated logic
+
+# 1.40.1-rc8
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
+- **bug fix**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.1-rc7
+- **added**: OAuth 2.0 Flow in MCP server authentication (Client ID, Client Secret, Redirect URL, Scope)
+
+# 1.40.1-rc6
+- **bug fix**: retrocompatibility jsonCondition
+
 # 1.40.1-rc5
 - **changed**: refactoring jsonCondition. added "when"
 

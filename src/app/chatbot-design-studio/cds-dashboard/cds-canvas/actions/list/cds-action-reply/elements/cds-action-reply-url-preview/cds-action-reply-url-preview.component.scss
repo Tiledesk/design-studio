@@ -1,14 +1,34 @@
 @import "../cds-action-reply-text/cds-action-reply-text.component.scss";
 
 /* ---- Preview ---- */
+.preview-url-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+}
+
 .preview-url-title {
     font-size: 10px;
     font-weight: 700;
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-bottom: 2px;
-    padding: 4px 10px;
+}
+
+/* Type tag — same style as the variable chip (.tag-replyto) */
+.preview-url-type-tag {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+    border-radius: 4px;
+    font-size: 10px;
+    padding: 0px 6px;
+    background-color: var(--blu);
+    color: var(--color-white-hex);
+    white-space: nowrap;
+    text-transform: uppercase;
 }
 
 /* ---- Mode selector row (segmented control + info icon) ---- */

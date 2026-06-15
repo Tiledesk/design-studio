@@ -463,6 +463,70 @@
     color: #64748b;
 }
 
+/* OAuth 2.0 Flow Card */
+.oauth-card {
+    background: #ffffff;
+    border: 1px solid #e4e6eb;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    padding: 18px;
+    margin-top: 12px;
+}
+
+.oauth-head {
+    margin-bottom: 14px;
+}
+
+.oauth-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.oauth-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.oauth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.oauth-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.oauth-label--with-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.oauth-info-icon {
+    font-size: 15px;
+    line-height: 1;
+    color: #94a3b8;
+    cursor: help;
+    transition: color 120ms ease;
+
+    &:hover {
+        color: #64748b;
+    }
+}
+
+/* Wrapper so the absolutely-positioned .eye aligns inside the secret input */
+.oauth-secret {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 /* Header Rows */
 .rows {
     display: flex;
