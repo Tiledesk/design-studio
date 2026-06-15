@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.40.5
+# 1.40.6
 - **bug fix**: change env
 
 # 1.40.4
