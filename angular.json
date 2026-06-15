@@ -38,7 +38,7 @@
               { "glob": "cds-config-firebase.json", "input": "src/environments/real_data", "output": "/" },
               { "glob": "cds-config-native-prod.json", "input": "src/environments/real_data", "output": "/" },
               { "glob": "cds-config-native-collaudo.json", "input": "src/environments/real_data", "output": "/" },
-              { "glob": "cds-config-aws-stage.json", "input": "src/environments/real_data", "output": "/" }
+              { "glob": "cds-config-aws-stage.json", "input": "src/environments/real_data", "output": "/environment/real_data" }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.css",

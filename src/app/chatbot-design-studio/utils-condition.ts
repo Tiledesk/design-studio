@@ -27,13 +27,25 @@ const NUMERIC_OPERATORS = new Set<string>([
   TYPE_OPERATOR.greaterThanOrEqual,
   TYPE_OPERATOR.lessThan,
   TYPE_OPERATOR.lessThanOrEqual,
+  // Array length: il RHS è la lunghezza (numero, senza apici)
+  TYPE_OPERATOR.lengthEqualTo,
+  TYPE_OPERATOR.lengthNotEqualTo,
+  TYPE_OPERATOR.lengthGreaterThan,
+  TYPE_OPERATOR.lengthLessThan,
+  TYPE_OPERATOR.lengthGreaterThanOrEqual,
+  TYPE_OPERATOR.lengthLessThanOrEqual,
 ]);
 
-/** Operatori unari (nessun RHS). */
-const UNARY_OPERATORS = new Set<string>([
+/** Operatori unari (nessun RHS). Esportato per riuso lato UI (mostra/nascondi Value). */
+export const UNARY_OPERATORS = new Set<string>([
   TYPE_OPERATOR.isEmpty,
+  TYPE_OPERATOR.isNotEmpty,
   TYPE_OPERATOR.isNull,
   TYPE_OPERATOR.isUndefined,
+  TYPE_OPERATOR.exists,
+  TYPE_OPERATOR.doesNotExist,
+  TYPE_OPERATOR.isTrue,
+  TYPE_OPERATOR.isFalse,
 ]);
 
 /** Escape per un letterale racchiuso tra doppi apici. */
@@ -41,6 +53,27 @@ export function escapeString(value: string): string {
   return String(value == null ? '' : value)
     .replace(/\\/g, '\\\\')
     .replace(/"/g, '\\"');
+}
+
+/**
+ * L'attributo (operand1) può essere inserito via picker come `{{attr}}` (formato liquidjs
+ * standard del Design Studio) oppure digitato nudo. Nel `when` il left è un identificatore
+ * nudo, quindi togliamo un eventuale wrapper `{{ ... }}` completo. Lascia invariato il resto.
+ */
+export function stripLiquidWrapper(value: string): string {
+  const m = String(value || '').trim().match(/^\{\{\s*([\s\S]*?)\s*\}\}$/);
+  return m ? m[1].trim() : String(value || '').trim();
+}
+
+/**
+ * Operatori legacy rimossi (ignore-case): mappati ai corrispettivi case-sensitive.
+ * Da ora tutte le condizioni sono case sensitive; le condizioni già salvate con
+ * `containsIgnoreCase`/`startsWithIgnoreCase` continuano a funzionare come `contains`/`startsWith`.
+ */
+export function normalizeLegacyOperator(op: string): string {
+  if (op === 'containsIgnoreCase') return TYPE_OPERATOR.contains;
+  if (op === 'startsWithIgnoreCase') return TYPE_OPERATOR.startsWith;
+  return op;
 }
 
 function booleanToken(node: Operator): string {
@@ -65,14 +98,20 @@ function renderOperand2(condition: Condition): string {
 /** Traduce una singola Condition nella sua forma `when`. '' se incompleta. */
 export function conditionToWhen(condition: Condition): string {
   if (!condition || !condition.operator) return '';
-  const left = String(condition.operand1 || '').trim();
+  const left = stripLiquidWrapper(condition.operand1);
   if (!left) return '';
-  const op = condition.operator;
+  const op = normalizeLegacyOperator(condition.operator);
 
+  // --- Unari (nessun RHS) ---
   switch (op) {
-    case TYPE_OPERATOR.isEmpty:     return `isEmpty(${left})`;
-    case TYPE_OPERATOR.isNull:      return `isNull(${left})`;
-    case TYPE_OPERATOR.isUndefined: return `isUndefined(${left})`;
+    case TYPE_OPERATOR.isEmpty:      return `isEmpty(${left})`;
+    case TYPE_OPERATOR.isNotEmpty:   return `!isEmpty(${left})`;
+    case TYPE_OPERATOR.isNull:       return `isNull(${left})`;
+    case TYPE_OPERATOR.isUndefined:  return `isUndefined(${left})`;
+    case TYPE_OPERATOR.exists:       return `!isUndefined(${left})`;
+    case TYPE_OPERATOR.doesNotExist: return `isUndefined(${left})`;
+    case TYPE_OPERATOR.isTrue:       return `${left} == true`;
+    case TYPE_OPERATOR.isFalse:      return `${left} == false`;
   }
 
   const right = renderOperand2(condition);
@@ -90,11 +129,28 @@ export function conditionToWhen(condition: Condition): string {
     case TYPE_OPERATOR.lessThanOrEqual:       return `${left} <= ${right}`;
     case TYPE_OPERATOR.startsWith:            return `startsWith(${left}, ${right})`;
     case TYPE_OPERATOR.notStartsWith:         return `!startsWith(${left}, ${right})`;
-    case TYPE_OPERATOR.startsWithIgnoreCase:  return `startsWithIgnoreCase(${left}, ${right})`;
     case TYPE_OPERATOR.contains:              return `contains(${left}, ${right})`;
-    case TYPE_OPERATOR.containsIgnoreCase:    return `containsIgnoreCase(${left}, ${right})`;
+    case TYPE_OPERATOR.notContains:           return `!contains(${left}, ${right})`;
     case TYPE_OPERATOR.endsWith:              return `endsWith(${left}, ${right})`;
+    case TYPE_OPERATOR.notEndsWith:           return `!endsWith(${left}, ${right})`;
     case TYPE_OPERATOR.matches:               return `matches(${left}, ${right})`;
+    case TYPE_OPERATOR.notMatches:            return `!matches(${left}, ${right})`;
+    // --- Date & Time (RHS stringa ISO quotata) ---
+    case TYPE_OPERATOR.equalAsDate:           return `dateEqual(${left}, ${right})`;
+    case TYPE_OPERATOR.notEqualAsDate:        return `!dateEqual(${left}, ${right})`;
+    case TYPE_OPERATOR.isAfter:               return `isAfter(${left}, ${right})`;
+    case TYPE_OPERATOR.isBefore:              return `isBefore(${left}, ${right})`;
+    case TYPE_OPERATOR.isAfterOrEqual:        return `isAfterOrEqual(${left}, ${right})`;
+    case TYPE_OPERATOR.isBeforeOrEqual:       return `isBeforeOrEqual(${left}, ${right})`;
+    // --- Array ---
+    case TYPE_OPERATOR.arrayContains:         return `arrayContains(${left}, ${right})`;
+    case TYPE_OPERATOR.arrayNotContains:      return `!arrayContains(${left}, ${right})`;
+    case TYPE_OPERATOR.lengthEqualTo:         return `length(${left}) == ${right}`;
+    case TYPE_OPERATOR.lengthNotEqualTo:      return `length(${left}) != ${right}`;
+    case TYPE_OPERATOR.lengthGreaterThan:     return `length(${left}) > ${right}`;
+    case TYPE_OPERATOR.lengthLessThan:        return `length(${left}) < ${right}`;
+    case TYPE_OPERATOR.lengthGreaterThanOrEqual: return `length(${left}) >= ${right}`;
+    case TYPE_OPERATOR.lengthLessThanOrEqual: return `length(${left}) <= ${right}`;
     default:                                  return '';
   }
 }

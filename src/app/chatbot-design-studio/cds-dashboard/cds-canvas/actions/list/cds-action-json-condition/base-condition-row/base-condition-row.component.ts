@@ -1,9 +1,10 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
+import { UNARY_OPERATORS, stripLiquidWrapper, normalizeLegacyOperator } from '../../../../../../utils-condition';
 import { Condition } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
 
 @Component({
   selector: 'base-condition-row',
@@ -64,8 +65,8 @@ export class BaseConditionRowComponent implements OnInit, OnChanges {
 
   private setFormValue(): void {
     this.conditionForm.patchValue({
-      operand1: this.condition.operand1,
-      operator: this.condition.operator,
+      operand1 : stripLiquidWrapper(this.condition.operand1),
+      operator: normalizeLegacyOperator(this.condition.operator),
       operand2: this.condition.operand2
     });
     if (this.condition.operand2) {
@@ -77,7 +78,9 @@ export class BaseConditionRowComponent implements OnInit, OnChanges {
       this.setAttributeBtnOperand2 = true;
       this.readonlyTextarea = false;
     }
-  }
+    // Unary operators have no Value: hide the field when reopening a saved condition.
+    this.canShowOperand2 = !UNARY_OPERATORS.has(this.condition.operator);
+}
 
   /** Aggiorna stato submit/operand2 in base al testo della textarea (gestione placeholder {{ }}). */
   onChangeTextArea(text: string): void {
@@ -113,42 +116,56 @@ export class BaseConditionRowComponent implements OnInit, OnChanges {
     this.logger.log('******* onVariableSelected-->', step, variableSelected);
   }
 
-  /** Resetta operand2 a tipo const vuoto e riabilita il campo valore. */
-  onClearSelectedAttribute(): void {
+  onClearSelectedAttribute(){
     this.logger.log('onClearSelectedAttribute-->');
-    this.conditionForm.patchValue({ operand2: { type: 'const', name: '', value: '' } }, { emitEvent: false });
+    this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
     this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
   }
 
-  /** Svuota il campo valore (operand2) del form. */
-  onClearInput(): void {
-    this.conditionForm.patchValue({ operand2: { type: 'const', name: '', value: '' } }, { emitEvent: false });
+  /** START EVENTS cds-textarea operand1 (Attribute name) — editable + attribute picker **/
+  onChangeOperand1(text: string){
+    // Editable attribute name: keep operand1 in sync with the textarea text (typed or edited).
+    this.conditionForm.patchValue({ operand1: text ?? '' }, { emitEvent: false });
   }
 
-  /** Passa allo step di inserimento manuale attributo e fa focus sull’input. */
-  onAddCustomAttribute(): void {
-    this.step += 1;
-    this.disableInput = false;
-    setTimeout(() => {
-      this.inputOperand1.nativeElement.focus();
-    }, 300);
+  onSelectedAttributeOperand1(variableSelected: { name: string, value: string }){
+    // Insert the bare attribute path (no {{ }} wrapper), appended to any existing text.
+    const current = this.conditionForm.value.operand1 || '';
+    this.conditionForm.patchValue({ operand1: current + variableSelected.value }, { emitEvent: false });
+  }
+  /** END EVENTS cds-textarea operand1 **/
+
+
+
+  onClearInput(){
+    this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
   }
 
-  /** Imposta l’operatore della condizione; per isEmpty/isNull/isUndefined nasconde il campo valore. */
-  onClickOperator(operator: { type?: string }): void {
-    this.conditionForm.patchValue({ operator: operator['type'] });
+  onAddCustomAttribute(){
+    this.step +=1
+    this.disableInput = false
+    setTimeout(()=>{
+      this.inputOperand1?.nativeElement?.focus()
+    },300)
+  }
+
+  onClickOperator(operator: {}){
+    this.conditionForm.patchValue({ operator: operator['type']})
+
+    // this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
     this.canShowOperand2 = true;
 
-    if (operator['type'] === TYPE_OPERATOR.isEmpty || 
-        operator['type'] === TYPE_OPERATOR.isNull || 
-        operator['type'] === TYPE_OPERATOR.isUndefined ){
-      
-      this.onClearInput();
-      this.canShowOperand2 = false;
+    // Unary operators (isEmpty/isNotEmpty/isNull/isUndefined/exists/doesNotExist/isTrue/isFalse):
+    // no Value needed -> hide the 'Value' textarea and enable submit.
+    if(UNARY_OPERATORS.has(operator['type'])){
+
+      this.onClearInput()
+      this.canShowOperand2 = false
+
       this.disableSubmit = false;
       this.readonlyTextarea = true;
       this.setAttributeBtnOperand2 = false;
