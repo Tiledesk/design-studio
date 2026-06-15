@@ -27,13 +27,25 @@ const NUMERIC_OPERATORS = new Set<string>([
   TYPE_OPERATOR.greaterThanOrEqual,
   TYPE_OPERATOR.lessThan,
   TYPE_OPERATOR.lessThanOrEqual,
+  // Array length: il RHS è la lunghezza (numero, senza apici)
+  TYPE_OPERATOR.lengthEqualTo,
+  TYPE_OPERATOR.lengthNotEqualTo,
+  TYPE_OPERATOR.lengthGreaterThan,
+  TYPE_OPERATOR.lengthLessThan,
+  TYPE_OPERATOR.lengthGreaterThanOrEqual,
+  TYPE_OPERATOR.lengthLessThanOrEqual,
 ]);
 
-/** Operatori unari (nessun RHS). */
-const UNARY_OPERATORS = new Set<string>([
+/** Operatori unari (nessun RHS). Esportato per riuso lato UI (mostra/nascondi Value). */
+export const UNARY_OPERATORS = new Set<string>([
   TYPE_OPERATOR.isEmpty,
+  TYPE_OPERATOR.isNotEmpty,
   TYPE_OPERATOR.isNull,
   TYPE_OPERATOR.isUndefined,
+  TYPE_OPERATOR.exists,
+  TYPE_OPERATOR.doesNotExist,
+  TYPE_OPERATOR.isTrue,
+  TYPE_OPERATOR.isFalse,
 ]);
 
 /** Escape per un letterale racchiuso tra doppi apici. */
@@ -69,10 +81,16 @@ export function conditionToWhen(condition: Condition): string {
   if (!left) return '';
   const op = condition.operator;
 
+  // --- Unari (nessun RHS) ---
   switch (op) {
-    case TYPE_OPERATOR.isEmpty:     return `isEmpty(${left})`;
-    case TYPE_OPERATOR.isNull:      return `isNull(${left})`;
-    case TYPE_OPERATOR.isUndefined: return `isUndefined(${left})`;
+    case TYPE_OPERATOR.isEmpty:      return `isEmpty(${left})`;
+    case TYPE_OPERATOR.isNotEmpty:   return `!isEmpty(${left})`;
+    case TYPE_OPERATOR.isNull:       return `isNull(${left})`;
+    case TYPE_OPERATOR.isUndefined:  return `isUndefined(${left})`;
+    case TYPE_OPERATOR.exists:       return `!isUndefined(${left})`;
+    case TYPE_OPERATOR.doesNotExist: return `isUndefined(${left})`;
+    case TYPE_OPERATOR.isTrue:       return `${left} == true`;
+    case TYPE_OPERATOR.isFalse:      return `${left} == false`;
   }
 
   const right = renderOperand2(condition);
@@ -92,9 +110,28 @@ export function conditionToWhen(condition: Condition): string {
     case TYPE_OPERATOR.notStartsWith:         return `!startsWith(${left}, ${right})`;
     case TYPE_OPERATOR.startsWithIgnoreCase:  return `startsWithIgnoreCase(${left}, ${right})`;
     case TYPE_OPERATOR.contains:              return `contains(${left}, ${right})`;
+    case TYPE_OPERATOR.notContains:           return `!contains(${left}, ${right})`;
     case TYPE_OPERATOR.containsIgnoreCase:    return `containsIgnoreCase(${left}, ${right})`;
     case TYPE_OPERATOR.endsWith:              return `endsWith(${left}, ${right})`;
+    case TYPE_OPERATOR.notEndsWith:           return `!endsWith(${left}, ${right})`;
     case TYPE_OPERATOR.matches:               return `matches(${left}, ${right})`;
+    case TYPE_OPERATOR.notMatches:            return `!matches(${left}, ${right})`;
+    // --- Date & Time (RHS stringa ISO quotata) ---
+    case TYPE_OPERATOR.equalAsDate:           return `dateEqual(${left}, ${right})`;
+    case TYPE_OPERATOR.notEqualAsDate:        return `!dateEqual(${left}, ${right})`;
+    case TYPE_OPERATOR.isAfter:               return `isAfter(${left}, ${right})`;
+    case TYPE_OPERATOR.isBefore:              return `isBefore(${left}, ${right})`;
+    case TYPE_OPERATOR.isAfterOrEqual:        return `isAfterOrEqual(${left}, ${right})`;
+    case TYPE_OPERATOR.isBeforeOrEqual:       return `isBeforeOrEqual(${left}, ${right})`;
+    // --- Array ---
+    case TYPE_OPERATOR.arrayContains:         return `arrayContains(${left}, ${right})`;
+    case TYPE_OPERATOR.arrayNotContains:      return `!arrayContains(${left}, ${right})`;
+    case TYPE_OPERATOR.lengthEqualTo:         return `length(${left}) == ${right}`;
+    case TYPE_OPERATOR.lengthNotEqualTo:      return `length(${left}) != ${right}`;
+    case TYPE_OPERATOR.lengthGreaterThan:     return `length(${left}) > ${right}`;
+    case TYPE_OPERATOR.lengthLessThan:        return `length(${left}) < ${right}`;
+    case TYPE_OPERATOR.lengthGreaterThanOrEqual: return `length(${left}) >= ${right}`;
+    case TYPE_OPERATOR.lengthLessThanOrEqual: return `length(${left}) <= ${right}`;
     default:                                  return '';
   }
 }

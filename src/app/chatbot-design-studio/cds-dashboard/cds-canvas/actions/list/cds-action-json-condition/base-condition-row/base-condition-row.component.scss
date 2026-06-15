@@ -219,36 +219,16 @@ section.condition{
     }
 
     div.operators-list{
-        display: flex;
-        flex-wrap: wrap;
-        margin: -5px;
+        width: 100%;
     }
 
-    .operator{
-        display: flex;
-        gap: 5px;
-        font-size: 15px;
-        font-weight: 400;
-        line-height: 19px;
-        align-items: center;
+    // Allinea la select della condition agli input Attribute/Value (altezza 36px, stesso border).
+    // Override scoped (component ::ng-deep): NON tocca le altre cds-select dell'app.
+    ::ng-deep .ng-select .ng-select-container{
+        min-height: 36px;
+        height: 36px;
+        border-color: #c6cdd4;
         border-radius: 6px;
-        margin: 5px;
-        padding: 10px 15px;
-        transition: all 0.3s ease 0s;
-        background-color: var(--blu-light-01);
-        color: var(--blu);
-        cursor: pointer;
-
-        &.active,
-        &:hover{
-            background: var(--blu);
-            color: var(--blu-light-03);
-            img{
-                filter: brightness(0) saturate(100%) invert(100%) sepia(20%) saturate(7023%) hue-rotate(179deg) brightness(106%) contrast(89%);
-            }
-        }
-
-
     }
 }
 

@@ -207,24 +207,52 @@ export enum TYPE_EVENT_CATEGORY {
 }
 
 export enum TYPE_OPERATOR {
-    equalAsNumbers          = "equalAsNumbers",
+    // Existence / generic (unary, type-agnostic)
+    exists                  = "exists",
+    doesNotExist            = "doesNotExist",
+    isEmpty                 = "isEmpty",
+    isNotEmpty              = "isNotEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    // Text (string coercion)
     equalAsStrings          = "equalAsStrings",
-    notEqualAsNumbers       = "notEqualAsNumbers",
     notEqualAsStrings       = "notEqualAsStrings",
+    contains                = "contains",
+    notContains             = "notContains",
+    containsIgnoreCase      = "containsIgnoreCase",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    startsWithIgnoreCase    = "startsWithIgnoreCase",
+    endsWith                = "endsWith",
+    notEndsWith             = "notEndsWith",
+    matches                 = "matches",
+    notMatches              = "notMatches",
+    // Number (number coercion)
+    equalAsNumbers          = "equalAsNumbers",
+    notEqualAsNumbers       = "notEqualAsNumbers",
     greaterThan             = "greaterThan",
     greaterThanOrEqual      = "greaterThanOrEqual",
     lessThan                = "lessThan",
     lessThanOrEqual         = "lessThanOrEqual",
-    startsWith              = "startsWith",
-    notStartsWith           = 'notStartsWith',
-    startsWithIgnoreCase    = "startsWithIgnoreCase",
-    contains                = "contains",
-    containsIgnoreCase      = "containsIgnoreCase",
-    endsWith                = "endsWith",
-    isEmpty                 = "isEmpty",
-    isNull                  = "isNull",
-    isUndefined             = "isUndefined",
-    matches                 = "matches"
+    // Boolean (unary)
+    isTrue                  = "isTrue",
+    isFalse                 = "isFalse",
+    // Date & Time (date coercion)
+    equalAsDate             = "equalAsDate",
+    notEqualAsDate          = "notEqualAsDate",
+    isAfter                 = "isAfter",
+    isBefore                = "isBefore",
+    isAfterOrEqual          = "isAfterOrEqual",
+    isBeforeOrEqual         = "isBeforeOrEqual",
+    // Array (length -> number; contains -> string)
+    arrayContains           = "arrayContains",
+    arrayNotContains        = "arrayNotContains",
+    lengthEqualTo           = "lengthEqualTo",
+    lengthNotEqualTo        = "lengthNotEqualTo",
+    lengthGreaterThan       = "lengthGreaterThan",
+    lengthLessThan          = "lengthLessThan",
+    lengthGreaterThanOrEqual = "lengthGreaterThanOrEqual",
+    lengthLessThanOrEqual   = "lengthLessThanOrEqual"
 }
 
 export enum TYPE_ATTACHMENT {
@@ -314,25 +342,53 @@ export const EVENTS_LIST = {
     RULE:       { name: 'Rule',     type: TYPE_EVENT_CATEGORY.RULE,     src: "assets/images/events/rule.svg"    },
 }
 
-export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATOR, src?: string } } = {
-    "equalAsNumbers":           { name: "CDSOperatorList.equalAsNumbers",                   type: TYPE_OPERATOR.equalAsNumbers,                 src: "assets/images/operators/equal.svg"        },
-    "equalAsStrings":           { name: "CDSOperatorList.equalAsStrings",                   type: TYPE_OPERATOR.equalAsStrings,                 src: "assets/images/operators/equal.svg"        },
-    "notEqualAsNumbers":        { name: "CDSOperatorList.notEqualAsNumbers",                type: TYPE_OPERATOR.notEqualAsNumbers,              src: "assets/images/operators/not-equal.svg"    },
-    "notEqualAsStrings":        { name: "CDSOperatorList.notEqualAsStrings",                type: TYPE_OPERATOR.notEqualAsStrings,              src: "assets/images/operators/not-equal.svg"    },
-    "greaterThan":              { name: "CDSOperatorList.greaterThan",                      type: TYPE_OPERATOR.greaterThan,                    src: "assets/images/operators/grather.svg"      },
-    "greaterThanOrEqual":       { name: "CDSOperatorList.greaterThanOrEqual",               type: TYPE_OPERATOR.greaterThanOrEqual,             src: "assets/images/operators/gratherEqual.svg" },
-    "lessThan":                 { name: "CDSOperatorList.lessThan",                         type: TYPE_OPERATOR.lessThan,                       src: "assets/images/operators/less.svg"         },
-    "lessThanOrEqual":          { name: "CDSOperatorList.lessThanOrEqual",                  type: TYPE_OPERATOR.lessThanOrEqual,                src: "assets/images/operators/lessEqual.svg"    },
-    "startsWith":               { name: "CDSOperatorList.startsWith",                       type: TYPE_OPERATOR.startsWith                                                                      },
-    "notStartsWith":            { name: "CDSOperatorList.notStartsWith",                    type: TYPE_OPERATOR.notStartsWith                                                                   },
-    "startsWithIgnoreCase":     { name: "CDSOperatorList.startsWithIgnoreCase",             type: TYPE_OPERATOR.startsWithIgnoreCase                                                            },
-    "endsWith":                 { name: "CDSOperatorList.endsWith",                         type: TYPE_OPERATOR.endsWith                                                                        },
-    "contains":                 { name: "CDSOperatorList.contains",                         type: TYPE_OPERATOR.contains                                                                        },
-    "containsIgnoreCase":       { name: "CDSOperatorList.containsIgnoreCase",               type: TYPE_OPERATOR.containsIgnoreCase                                                              },
-    "isEmpty":                  { name: "CDSOperatorList.isEmpty",                          type: TYPE_OPERATOR.isEmpty                                                                         },
-    "isNull":                   { name: "CDSOperatorList.isNull",                           type: TYPE_OPERATOR.isNull                                                                          },
-    "isUndefined":              { name: "CDSOperatorList.isUndefined",                      type: TYPE_OPERATOR.isUndefined                                                                     },
-    "matches":                  { name: "CDSOperatorList.matches",                          type: TYPE_OPERATOR.matches                                                                         }
+export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATOR, src?: string, group?: string } } = {
+    // --- Existence / generic (unary) ---
+    "exists":                   { name: "CDSOperatorList.exists",                          type: TYPE_OPERATOR.exists,                         group: "Existence"   },
+    "doesNotExist":             { name: "CDSOperatorList.doesNotExist",                    type: TYPE_OPERATOR.doesNotExist,                   group: "Existence"   },
+    "isEmpty":                  { name: "CDSOperatorList.isEmpty",                         type: TYPE_OPERATOR.isEmpty,                        group: "Existence"   },
+    "isNotEmpty":               { name: "CDSOperatorList.isNotEmpty",                      type: TYPE_OPERATOR.isNotEmpty,                     group: "Existence"   },
+    "isNull":                   { name: "CDSOperatorList.isNull",                          type: TYPE_OPERATOR.isNull,                         group: "Existence"   },
+    "isUndefined":              { name: "CDSOperatorList.isUndefined",                     type: TYPE_OPERATOR.isUndefined,                    group: "Existence"   },
+    // --- Text (string coercion) ---
+    "equalAsStrings":           { name: "CDSOperatorList.equalAsStrings",                  type: TYPE_OPERATOR.equalAsStrings,                 src: "assets/images/operators/equal.svg",     group: "Text" },
+    "notEqualAsStrings":        { name: "CDSOperatorList.notEqualAsStrings",               type: TYPE_OPERATOR.notEqualAsStrings,              src: "assets/images/operators/not-equal.svg", group: "Text" },
+    "contains":                 { name: "CDSOperatorList.contains",                        type: TYPE_OPERATOR.contains,                       group: "Text" },
+    "notContains":              { name: "CDSOperatorList.notContains",                     type: TYPE_OPERATOR.notContains,                    group: "Text" },
+    "containsIgnoreCase":       { name: "CDSOperatorList.containsIgnoreCase",              type: TYPE_OPERATOR.containsIgnoreCase,             group: "Text" },
+    "startsWith":               { name: "CDSOperatorList.startsWith",                      type: TYPE_OPERATOR.startsWith,                     group: "Text" },
+    "notStartsWith":            { name: "CDSOperatorList.notStartsWith",                   type: TYPE_OPERATOR.notStartsWith,                  group: "Text" },
+    "startsWithIgnoreCase":     { name: "CDSOperatorList.startsWithIgnoreCase",            type: TYPE_OPERATOR.startsWithIgnoreCase,           group: "Text" },
+    "endsWith":                 { name: "CDSOperatorList.endsWith",                        type: TYPE_OPERATOR.endsWith,                       group: "Text" },
+    "notEndsWith":              { name: "CDSOperatorList.notEndsWith",                     type: TYPE_OPERATOR.notEndsWith,                    group: "Text" },
+    "matches":                  { name: "CDSOperatorList.matches",                         type: TYPE_OPERATOR.matches,                        group: "Text" },
+    "notMatches":               { name: "CDSOperatorList.notMatches",                      type: TYPE_OPERATOR.notMatches,                     group: "Text" },
+    // --- Number (number coercion) ---
+    "equalAsNumbers":           { name: "CDSOperatorList.equalAsNumbers",                  type: TYPE_OPERATOR.equalAsNumbers,                 src: "assets/images/operators/equal.svg",     group: "Number" },
+    "notEqualAsNumbers":        { name: "CDSOperatorList.notEqualAsNumbers",               type: TYPE_OPERATOR.notEqualAsNumbers,              src: "assets/images/operators/not-equal.svg", group: "Number" },
+    "greaterThan":              { name: "CDSOperatorList.greaterThan",                     type: TYPE_OPERATOR.greaterThan,                    src: "assets/images/operators/grather.svg",   group: "Number" },
+    "greaterThanOrEqual":       { name: "CDSOperatorList.greaterThanOrEqual",              type: TYPE_OPERATOR.greaterThanOrEqual,             src: "assets/images/operators/gratherEqual.svg", group: "Number" },
+    "lessThan":                 { name: "CDSOperatorList.lessThan",                        type: TYPE_OPERATOR.lessThan,                       src: "assets/images/operators/less.svg",      group: "Number" },
+    "lessThanOrEqual":          { name: "CDSOperatorList.lessThanOrEqual",                 type: TYPE_OPERATOR.lessThanOrEqual,                src: "assets/images/operators/lessEqual.svg", group: "Number" },
+    // --- Boolean (unary) ---
+    "isTrue":                   { name: "CDSOperatorList.isTrue",                          type: TYPE_OPERATOR.isTrue,                         group: "Boolean" },
+    "isFalse":                  { name: "CDSOperatorList.isFalse",                         type: TYPE_OPERATOR.isFalse,                        group: "Boolean" },
+    // --- Date & Time (date coercion) ---
+    "equalAsDate":              { name: "CDSOperatorList.equalAsDate",                     type: TYPE_OPERATOR.equalAsDate,                    group: "Date & Time" },
+    "notEqualAsDate":           { name: "CDSOperatorList.notEqualAsDate",                  type: TYPE_OPERATOR.notEqualAsDate,                 group: "Date & Time" },
+    "isAfter":                  { name: "CDSOperatorList.isAfter",                         type: TYPE_OPERATOR.isAfter,                        group: "Date & Time" },
+    "isBefore":                 { name: "CDSOperatorList.isBefore",                        type: TYPE_OPERATOR.isBefore,                       group: "Date & Time" },
+    "isAfterOrEqual":           { name: "CDSOperatorList.isAfterOrEqual",                  type: TYPE_OPERATOR.isAfterOrEqual,                 group: "Date & Time" },
+    "isBeforeOrEqual":          { name: "CDSOperatorList.isBeforeOrEqual",                 type: TYPE_OPERATOR.isBeforeOrEqual,                group: "Date & Time" },
+    // --- Array (length -> number; contains -> string) ---
+    "arrayContains":            { name: "CDSOperatorList.arrayContains",                   type: TYPE_OPERATOR.arrayContains,                  group: "Array" },
+    "arrayNotContains":         { name: "CDSOperatorList.arrayNotContains",                type: TYPE_OPERATOR.arrayNotContains,               group: "Array" },
+    "lengthEqualTo":            { name: "CDSOperatorList.lengthEqualTo",                   type: TYPE_OPERATOR.lengthEqualTo,                  group: "Array" },
+    "lengthNotEqualTo":         { name: "CDSOperatorList.lengthNotEqualTo",                type: TYPE_OPERATOR.lengthNotEqualTo,               group: "Array" },
+    "lengthGreaterThan":        { name: "CDSOperatorList.lengthGreaterThan",               type: TYPE_OPERATOR.lengthGreaterThan,              group: "Array" },
+    "lengthLessThan":           { name: "CDSOperatorList.lengthLessThan",                  type: TYPE_OPERATOR.lengthLessThan,                 group: "Array" },
+    "lengthGreaterThanOrEqual": { name: "CDSOperatorList.lengthGreaterThanOrEqual",        type: TYPE_OPERATOR.lengthGreaterThanOrEqual,       group: "Array" },
+    "lengthLessThanOrEqual":    { name: "CDSOperatorList.lengthLessThanOrEqual",           type: TYPE_OPERATOR.lengthLessThanOrEqual,          group: "Array" }
 }
 
 export const TYPE_MATH_OPERATOR_LIST: { [key: string]: { name: string, type: TYPE_MATH_OPERATOR, src?: string } } = {

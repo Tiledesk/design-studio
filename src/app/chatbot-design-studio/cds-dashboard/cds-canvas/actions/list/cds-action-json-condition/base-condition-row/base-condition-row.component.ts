@@ -2,6 +2,7 @@ import { SatPopover } from '@ncstate/sat-popover';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, SimpleChanges, EventEmitter, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
+import { UNARY_OPERATORS } from '../../../../../../utils-condition';
 import { Condition } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -78,6 +79,8 @@ export class BaseConditionRowComponent implements OnInit {
       this.setAttributeBtnOperand2 = true;
       this.readonlyTextarea = false;
     }
+    // Unary operators have no Value: hide the field when reopening a saved condition.
+    this.canShowOperand2 = !UNARY_OPERATORS.has(this.condition.operator);
 }
 
 /** START EVENTS cds-textarea **/
@@ -138,17 +141,16 @@ export class BaseConditionRowComponent implements OnInit {
 
   onClickOperator(operator: {}){
     this.conditionForm.patchValue({ operator: operator['type']})
-    
+
     // this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
     this.canShowOperand2 = true;
 
-    //activate submit button and disable 'Value' textarea i operator is equal to 'isEmpty'
-    if(operator['type'] === TYPE_OPERATOR.isEmpty|| 
-        operator['type'] === TYPE_OPERATOR.isNull || 
-        operator['type'] === TYPE_OPERATOR.isUndefined ){
-      
+    // Unary operators (isEmpty/isNotEmpty/isNull/isUndefined/exists/doesNotExist/isTrue/isFalse):
+    // no Value needed -> hide the 'Value' textarea and enable submit.
+    if(UNARY_OPERATORS.has(operator['type'])){
+
       this.onClearInput()
       this.canShowOperand2 = false
 
