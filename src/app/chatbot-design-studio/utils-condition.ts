@@ -55,6 +55,16 @@ export function escapeString(value: string): string {
     .replace(/"/g, '\\"');
 }
 
+/**
+ * L'attributo (operand1) può essere inserito via picker come `{{attr}}` (formato liquidjs
+ * standard del Design Studio) oppure digitato nudo. Nel `when` il left è un identificatore
+ * nudo, quindi togliamo un eventuale wrapper `{{ ... }}` completo. Lascia invariato il resto.
+ */
+export function stripLiquidWrapper(value: string): string {
+  const m = String(value || '').trim().match(/^\{\{\s*([\s\S]*?)\s*\}\}$/);
+  return m ? m[1].trim() : String(value || '').trim();
+}
+
 function booleanToken(node: Operator): string {
   return node && node.operator === 'AND' ? '&&' : '||';
 }
@@ -77,7 +87,7 @@ function renderOperand2(condition: Condition): string {
 /** Traduce una singola Condition nella sua forma `when`. '' se incompleta. */
 export function conditionToWhen(condition: Condition): string {
   if (!condition || !condition.operator) return '';
-  const left = String(condition.operand1 || '').trim();
+  const left = stripLiquidWrapper(condition.operand1);
   if (!left) return '';
   const op = condition.operator;
 

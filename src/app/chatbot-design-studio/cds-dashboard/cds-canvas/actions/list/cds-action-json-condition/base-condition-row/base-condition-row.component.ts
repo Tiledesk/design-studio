@@ -2,7 +2,7 @@ import { SatPopover } from '@ncstate/sat-popover';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, SimpleChanges, EventEmitter, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { OPERATORS_LIST, OperatorValidator, TYPE_OPERATOR } from '../../../../../../utils';
-import { UNARY_OPERATORS } from '../../../../../../utils-condition';
+import { UNARY_OPERATORS, stripLiquidWrapper } from '../../../../../../utils-condition';
 import { Condition } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -66,7 +66,7 @@ export class BaseConditionRowComponent implements OnInit {
 
   setFormValue(){
     this.conditionForm.patchValue({
-      operand1 : this.condition.operand1,
+      operand1 : stripLiquidWrapper(this.condition.operand1),
       operator: this.condition.operator,
       operand2: this.condition.operand2
     });
@@ -117,13 +117,26 @@ export class BaseConditionRowComponent implements OnInit {
   }
 
   onClearSelectedAttribute(){
-    this.logger.log('onClearSelectedAttribute-->');   
+    this.logger.log('onClearSelectedAttribute-->');
     this.conditionForm.patchValue({ operand2: {type: 'const', name: '', value: ''}}, {emitEvent: false})
     this.disableSubmit = true;
     this.readonlyTextarea = false;
     this.setAttributeBtnOperand2 = true;
   }
   /** END EVENTS cds-textarea **/
+
+  /** START EVENTS cds-textarea operand1 (Attribute name) — editable + attribute picker **/
+  onChangeOperand1(text: string){
+    // Editable attribute name: keep operand1 in sync with the textarea text (typed or edited).
+    this.conditionForm.patchValue({ operand1: text ?? '' }, { emitEvent: false });
+  }
+
+  onSelectedAttributeOperand1(variableSelected: { name: string, value: string }){
+    // Insert the bare attribute path (no {{ }} wrapper), appended to any existing text.
+    const current = this.conditionForm.value.operand1 || '';
+    this.conditionForm.patchValue({ operand1: current + variableSelected.value }, { emitEvent: false });
+  }
+  /** END EVENTS cds-textarea operand1 **/
 
 
 
@@ -135,7 +148,7 @@ export class BaseConditionRowComponent implements OnInit {
     this.step +=1
     this.disableInput = false
     setTimeout(()=>{
-      this.inputOperand1.nativeElement.focus()
+      this.inputOperand1?.nativeElement?.focus()
     },300)
   }
 
