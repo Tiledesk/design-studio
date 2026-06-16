@@ -148,6 +148,28 @@ export class CdsActionJsonConditionComponent implements OnInit {
         // groups: this.action.groups,
       })
     }
+
+    /**
+     * Etichetta sicura per un operatore. Tollera operatori vecchi/nuovi/sconosciuti (es. action
+     * json condition di versione diversa) senza mai crashare: se l'operatore non è in OPERATORS_LIST
+     * ritorna la chiave grezza (la pipe translate la mostra invariata).
+     */
+    operatorLabel(operator: string): string {
+      if (!operator) return '';
+      return OPERATORS_LIST[operator]?.name || operator;
+    }
+
+    /**
+     * Valore destro della condizione, tollerante al modello VECCHIO (operand2 = stringa) e a quello
+     * NUOVO (operand2 = { type, value, name }). Non crasha mai su shape inattesi.
+     */
+    operandRightDisplay(condition: any): string {
+      const o2 = condition?.operand2;
+      if (o2 === null || o2 === undefined) return '';
+      if (typeof o2 !== 'object') return String(o2);            // modello vecchio: stringa/numero
+      if (o2.type === 'var') return o2.name ?? o2.value ?? '';  // riferimento a variabile
+      return o2.value ?? o2.name ?? '';                         // const o shape sconosciuto
+    }
   
     buildForm(): FormGroup{
       return this.formBuilder.group({

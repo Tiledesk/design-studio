@@ -9,6 +9,11 @@
 
 
 # this branch
+- **added**: json condition "when" grammar reference doc (for chatbot prompt)
+- **bug fix**: json condition crash with legacy/new action format (safe operator & operand render)
+- **bug fix**: avoid page-reload dialog while the widget test simulator is open
+- **bug fix**: keep the widget iframe alive on tab inactivity (prevent Chrome freeze/discard reload)
+
 - **bug fix**: vllm list
 - **bug fix**: drag intent when connector is contract
 
