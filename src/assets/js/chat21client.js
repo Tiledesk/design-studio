@@ -19,7 +19,7 @@ const CALLBACK_TYPE_ON_MESSAGE_ADDED_FOR_CONVERSATION = "onMessageAddedForConver
 
 class Chat21Client {
     constructor(options) {
-        // console.log('CHAT21-CLIENT.JS  HELLO ', mqtt)
+        console.log('CHAT21-CLIENT.JS  HELLO ', mqtt)
         this.client = null;
         this.reconnections = 0 // just to check how many reconnections
         this.client_id = this.uuidv4();
@@ -99,9 +99,9 @@ class Chat21Client {
     }
 
     sendMessage(text, type, recipient_id, recipient_fullname, sender_fullname, attributes, metadata, channel_type, callback) {
-        // console.log("sendMessage sattributes:", attributes);
+        console.log("sendMessage sattributes:", attributes);
         let dest_topic = `apps/${this.appid}/outgoing/users/${this.user_id}/messages/${recipient_id}/outgoing`
-        // console.log("dest_topic:", dest_topic)
+        console.log("dest_topic:", dest_topic)
         let outgoing_message = {
             text: text,
             type: type,
@@ -111,7 +111,7 @@ class Chat21Client {
             metadata: metadata,
             channel_type: channel_type
         }
-        // console.log("outgoing_message:", outgoing_message)
+        console.log("outgoing_message:", outgoing_message)
         const payload = JSON.stringify(outgoing_message)
         this.client.publish(dest_topic, payload, null, (err) => {
             callback(err, outgoing_message)
@@ -133,7 +133,7 @@ class Chat21Client {
 
     sendMessageRaw(outgoing_message, recipient_id, callback) {
         // callback - function (err)
-        // console.log("recipient_id:", recipient_id)
+        console.log("recipient_id:", recipient_id)
         let dest_topic = `apps/${this.appid}/outgoing/users/${this.user_id}/messages/${recipient_id}/outgoing`
         if (this.log) {
             console.log("dest_topic:", dest_topic)
@@ -147,7 +147,7 @@ class Chat21Client {
         //     metadata: metadata,
         //     channel_type: channel_type
         // }
-        // console.log("outgoing_message:", outgoing_message)
+        console.log("outgoing_message:", outgoing_message)
         const payload = JSON.stringify(outgoing_message)
         this.client.publish(dest_topic, payload, null, (err) => {
             callback(err, outgoing_message)
@@ -259,7 +259,7 @@ class Chat21Client {
 
     groupData(group_id, callback) {
         const URL = `${this.APIendpoint}/${this.appid}/groups/${group_id}`
-        // console.log("creating group...", URL)
+        console.log("creating group...", URL)
         let options = {
             url: URL,
             headers: {
@@ -277,7 +277,7 @@ class Chat21Client {
             }
         }, this.log);
         // const URL = `${this.APIendpoint}/${this.appid}/groups/${group_id}`
-        // console.log("getting group...", URL)
+        console.log("getting group...", URL)
         // var xmlhttp = new XMLHttpRequest();
         // xmlhttp.open("GET", URL, true);
         // xmlhttp.setRequestHeader("authorization", this.jwt);
@@ -431,7 +431,7 @@ class Chat21Client {
         //     action: 'archive'
         // }
         const payload = JSON.stringify({})
-        // console.log("payload:", payload)
+        console.log("payload:", payload)
         this.client.publish(dest_topic, payload, null, (err) => {
             if (callback) {
                 callback(err)
@@ -549,7 +549,7 @@ class Chat21Client {
         }
         this.subscribeToMyConversations(() => {
             // no more than one "on_message" handler, thanks.
-            // console.log("Subscribed to MyConversations.");
+            console.log("Subscribed to MyConversations.");
             this.on_message_handler = this.client.on('message', (topic, message) => {
                 if (this.log) {
                     console.log("topic:" + topic + "\nmessage payload:" + message)
@@ -629,12 +629,12 @@ class Chat21Client {
                     if (topic.includes("/messages/") && topic.endsWith(_CLIENTADDED)) {
                         if (this.onMessageAddedCallbacks) {
                             this.onMessageAddedCallbacks.forEach((callback, handler, map) => {
-                                // console.log("DEBUG: MESSAGE:", message)
+                                console.log("DEBUG: MESSAGE:", message)
                                 callback(JSON.parse(message.toString()), _topic)
                             });
                         }
                         // Observing conversations added from messages
-                        // console.log("Observing conversations added from messages", message_json);
+                        console.log("Observing conversations added from messages", message_json);
                         // if (this.onConversationAddedCallbacks) {
                         let update_conversation = true;
                         
@@ -714,7 +714,7 @@ class Chat21Client {
             subscribedCallback();
         })
         
-        // console.log("HANDLER_:", this.on_message_handler)
+        console.log("HANDLER_:", this.on_message_handler)
     }
 
     parseTopic(topic) {
@@ -742,7 +742,7 @@ class Chat21Client {
         xmlhttp.open("GET", URL, true);
         xmlhttp.setRequestHeader("authorization", this.jwt);
         xmlhttp.onreadystatechange = function() {
-            // console.log("onreadystatechange!")
+            console.log("onreadystatechange!")
             if (callback && xmlhttp.readyState == 4 && xmlhttp.status == 200 && xmlhttp.responseText) {
                 try {
                     const json = JSON.parse(xmlhttp.responseText)
@@ -766,7 +766,7 @@ class Chat21Client {
         xmlhttp.open("GET", URL, true);
         xmlhttp.setRequestHeader("authorization", this.jwt);
         xmlhttp.onreadystatechange = function() {
-            // console.log("onreadystatechange!")
+            console.log("onreadystatechange!")
             if (callback && xmlhttp.readyState == 4 && xmlhttp.status == 200 && xmlhttp.responseText) {
                 try {
                     const json = JSON.parse(xmlhttp.responseText)
@@ -855,20 +855,20 @@ class Chat21Client {
     }
 
     lastMessages(convers_with, callback) {
-        // console.log("START: ", this.user_id)
+        console.log("START: ", this.user_id)
         // ex.: http://localhost:8004/tilechat/04-ANDREASPONZIELLO/conversations
         const URL = this.APIendpoint + "/" + this.appid + "/" + this.user_id + "/conversations/" + convers_with + "/messages"
-        // console.log("getting last messages", URL)
-        // console.log("END")
+        console.log("getting last messages", URL)
+        console.log("END")
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.open("GET", URL, true);
         xmlhttp.setRequestHeader("authorization", this.jwt);
         xmlhttp.onreadystatechange = function() {
-            // console.log("onreadystatechange messages!")
+            console.log("onreadystatechange messages!")
             if (callback && xmlhttp.readyState == 4 && xmlhttp.status == 200 && xmlhttp.responseText) {
-                // console.log("xmlhttp...", xmlhttp.responseText)
+                console.log("xmlhttp...", xmlhttp.responseText)
                 try {
-                    // console.log("parsing json messages")
+                    console.log("parsing json messages")
                     const json = JSON.parse(xmlhttp.responseText)
                     callback(null, json.result)
                 }
@@ -962,7 +962,7 @@ class Chat21Client {
 
     connect(user_id, jwt, callback) {
         this.user_id = user_id;
-        // console.log("userid:", this.user_id)
+        console.log("userid:", this.user_id)
         this.jwt = jwt
         if (this.log) {
             console.log("connecting user_id:", user_id)
@@ -993,7 +993,7 @@ class Chat21Client {
         }
         if (this.log) {console.log("starting mqtt connection with LWT on:", this.presence_topic, this.endpoint)}
         // client = mqtt.connect('mqtt://127.0.0.1:15675/ws',options)
-        //console.log("starting mqtt connection with LWT on:", this.presence_topic, this.endpoint)
+        console.log("starting mqtt connection with LWT on:", this.presence_topic, this.endpoint)
         this.client = mqtt.connect(this.endpoint,options)
         
         this.client.on('connect', // TODO if token is wrong it must reply with an error!

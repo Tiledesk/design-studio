@@ -35,6 +35,8 @@ export class CDSTextareaComponent implements OnInit {
   @Input() popoverVerticalAlign: string = 'below';
   @Input() isJsonAttribute: boolean = false;
   @Input() isLiquidjs: boolean = true;
+  /** When false, picking an attribute inserts the bare path (no `{{ }}` wrapper). Default keeps liquidjs `{{ }}`. */
+  @Input() wrapAttributeWithBraces: boolean = true;
  
   @Output() changeTextarea = new EventEmitter();
   @Output() selectedAttribute = new EventEmitter();
@@ -173,7 +175,8 @@ export class CDSTextareaComponent implements OnInit {
     this.isSelected = true;
     let valueTextArea = {name: '', value: ''};
     if (this.elTextarea) {
-      this.insertAtCursorPos(this.elTextarea, '{{' + variableSelected.value + '}}');
+      const inserted = this.wrapAttributeWithBraces ? '{{' + variableSelected.value + '}}' : variableSelected.value;
+      this.insertAtCursorPos(this.elTextarea, inserted);
       valueTextArea.name = this.elTextarea.value;
       valueTextArea.value = this.elTextarea.value;
     }
