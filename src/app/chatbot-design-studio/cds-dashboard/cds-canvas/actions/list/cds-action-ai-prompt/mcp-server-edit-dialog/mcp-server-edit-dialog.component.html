@@ -58,7 +58,7 @@
             </div>
 
             <!-- Authentication accordion -->
-            <div style="display: none" class="form-field">
+            <div class="form-field">
                 <mat-accordion class="auth-accordion">
                     <mat-expansion-panel [expanded]="isAuthenticationOpen" (opened)="isAuthenticationOpen = true" (closed)="isAuthenticationOpen = false">
                         <mat-expansion-panel-header class="auth-header">
@@ -152,6 +152,77 @@
                             </div>
 
                             <p class="note">{{'CDSCanvas.CustomHeadersHint' | translate}}</p>
+                        </div>
+
+                        <!-- OAuth 2.0 Flow card (alternative auth: filled only when the server requires Authorization Code flow) -->
+                        <div class="oauth-card">
+                            <div class="oauth-head">
+                                <h3 class="oauth-title">{{'CDSCanvas.OAuthFlow' | translate}}</h3>
+                            </div>
+
+                            <div class="oauth-fields">
+                                <!-- Client ID -->
+                                <div class="oauth-field">
+                                    <label class="oauth-label">{{'CDSCanvas.ClientID' | translate}}</label>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        [placeholder]="'CDSCanvas.ClientID' | translate"
+                                        [value]="editedServer.oauth?.clientId || ''"
+                                        (input)="onOAuthFieldChange('clientId', $any($event.target).value)" />
+                                </div>
+
+                                <!-- Client Secret -->
+                                <div class="oauth-field">
+                                    <label class="oauth-label">{{'CDSCanvas.ClientSecret' | translate}}</label>
+                                    <div class="oauth-secret">
+                                        <input
+                                            class="input secret"
+                                            [type]="revealClientSecret ? 'text' : 'password'"
+                                            [placeholder]="'CDSCanvas.ClientSecretPlaceholder' | translate"
+                                            [value]="editedServer.oauth?.clientSecret || ''"
+                                            (input)="onOAuthFieldChange('clientSecret', $any($event.target).value)" />
+                                        <button
+                                            type="button"
+                                            class="eye"
+                                            (click)="toggleOAuthSecretReveal()"
+                                            [attr.aria-label]="revealClientSecret ? 'Hide value' : 'Show value'">
+                                            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+                                                <path d="M1.5 8s2.5-4.5 6.5-4.5S14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z" stroke="currentColor" stroke-width="1.3"/>
+                                                <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Redirect URL -->
+                                <div class="oauth-field">
+                                    <label class="oauth-label">{{'CDSCanvas.RedirectURL' | translate}}</label>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        placeholder="http://localhost:6274/oauth/callback"
+                                        [value]="editedServer.oauth?.redirectUrl || ''"
+                                        (input)="onOAuthFieldChange('redirectUrl', $any($event.target).value)" />
+                                </div>
+
+                                <!-- Scope -->
+                                <div class="oauth-field">
+                                    <label class="oauth-label oauth-label--with-info">
+                                        <span>{{'CDSCanvas.Scope' | translate}}</span>
+                                        <span class="material-icons oauth-info-icon"
+                                              matTooltipClass="cds-custom-tooltip"
+                                              [matTooltip]="'CDSCanvas.ScopeInfo' | translate"
+                                              matTooltipPosition="above">info_outline</span>
+                                    </label>
+                                    <input
+                                        class="input"
+                                        type="text"
+                                        [placeholder]="'CDSCanvas.ScopePlaceholder' | translate"
+                                        [value]="editedServer.oauth?.scope || ''"
+                                        (input)="onOAuthFieldChange('scope', $any($event.target).value)" />
+                                </div>
+                            </div>
                         </div>
                     </mat-expansion-panel>
                 </mat-accordion>

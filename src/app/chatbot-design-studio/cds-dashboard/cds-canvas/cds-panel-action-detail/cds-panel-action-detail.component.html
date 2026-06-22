@@ -317,6 +317,15 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-qapla>
 
+                    <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-data-table>
+
                     <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
                         class="panel-response"
                         [intentSelected]="intentSelected"
