@@ -99,6 +99,11 @@ export class CDSFilterComponent implements OnInit {
     this.selectedIndex= null
   }
 
+  /** trackBy per l'*ngFor sulle conditions (stabilizza il render). */
+  trackByConditionIndex(index: number): number {
+    return index;
+  }
+
   /** Etichetta operatore robusta a formati legacy/sconosciuti (no crash). Usata nei template. */
   operatorLabel(operator: string): string {
     return operatorLabelKey(operator);
