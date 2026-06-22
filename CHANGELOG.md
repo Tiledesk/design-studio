@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch
+- **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
+
 # 1.40.6
 - **bug fix**: change env
 

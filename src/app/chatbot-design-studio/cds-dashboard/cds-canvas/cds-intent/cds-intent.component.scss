@@ -273,6 +273,26 @@
   }
 }
 
+// Handle di riordino azione: unico punto che trascina/riordina (cdkDragHandle).
+// Posizionato dove stava il drag_indicator (in alto a destra dell'header).
+.action-reorder-handle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: #394f5a;
+  z-index: 2;
+  img {
+    width: 16px;
+    height: auto;
+  }
+}
+
 /* Drag placeholder 
 /* ******************************** */
 .cdk-drag-preview {

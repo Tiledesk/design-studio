@@ -114,8 +114,8 @@
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
             (cdkDragMoved)="onDragMove($event)"
-            [id]="action._tdActionId" 
-            class="box-action" 
+            [id]="action._tdActionId"
+            class="box-action tds_draggable"
             tabindex=-1
             [ngClass]="{
                 'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
@@ -131,6 +131,12 @@
             <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
             <!-- <span *ngIf="!first" class="action-element"> -->
 
+            <!-- handle di riordino: SOLO questo (il drag_indicator) trascina/riordina l'azione;
+                 trascinando qualsiasi altro punto si sposta il blocco intent (tds_draggable) -->
+            <div class="action-reorder-handle" cdkDragHandle [title]="'CDSCanvas.Drag' | translate">
+                <img class="active-icon" src="assets/images/icons/drag_indicator.svg" alt="">
+            </div>
+
             <span class="action-element">
 
                 <div *cdkDragPreview id="customDragPreview">
@@ -143,13 +149,12 @@
             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
-                    class="header-action" 
-                    cdkDragHandle
+                <cds-action-description
+                    class="header-action"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
-                <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
+                <div cdkDragDisabled class="body-action tds_draggable" [ngSwitch]="action._tdActionType">
 
                     <cds-action-controls *ngIf="!isNewChatbot"
                         (onClickControl)="onClickControl($event, action, i)">
