@@ -7,6 +7,18 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch
+- **bug fix**: JSON Condition no longer crashes when opening a chatbot whose condition was created with a different/legacy version (safe operator label & operand rendering on unknown operators or missing operand2)
+- **bug fix**: keep the operand2 value when editing legacy conditions (string operand2) and hide the Value field for legacy unary operators
+- **bug fix**: added the missing trackBy in the base filter (fixes JSON Condition build/template error)
+- **changed**: JSON Condition normalizes legacy ignore-case operators across the whole condition on open (explicit case-sensitive migration) and warns instead of silently dropping unknown operators from the serialized `when`
+- **changed**: no operator preset when opening a Custom Attribute condition; "Apply Condition" stays disabled until an operator is selected
+- **added**: info icon next to "Attribute name" with a tooltip explaining the attribute syntax (array indexes, nested properties)
+- **added**: "Learn more" link to the JSON Condition guide in the Condition and Condition w/ else action info popups
+- **added**: JSON Condition action documentation page
+
+
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
 
