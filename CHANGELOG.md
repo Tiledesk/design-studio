@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.40.3-rc8
+- **changed**: no operator preset when opening a Custom Attribute condition; "Apply Condition" stays disabled until an operator is selected
+- **added**: info icon next to "Attribute name" with a tooltip explaining the attribute syntax (array indexes, nested properties)
+- **added**: "Learn more" link to the JSON Condition guide in the Condition and Condition w/ else action info popups
+- **added**: JSON Condition action documentation page
+
 # 1.40.3-rc7
 - **added**: json condition "when" grammar reference doc (for chatbot prompt)
 - **bug fix**: json condition crash with legacy/new action format (safe operator & operand render)
