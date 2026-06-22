@@ -17,7 +17,13 @@
         </section>
         <hr class="custom-hr" style="margin-top:3px; margin-bottom:3px">
         <section class="attribute">
-            <div>{{'CDSCanvas.AttributeName' | translate }}</div>
+            <div class="attribute-label">
+                {{'CDSCanvas.AttributeName' | translate }}
+                <span class="material-icons-outlined attribute-info-icon"
+                    matTooltipClass="cds-mat-tooltip cds-mat-tooltip-multiline"
+                    matTooltipPosition="above"
+                    [matTooltip]="'CDSCanvas.AttributeNameSyntaxHelp' | translate">info</span>
+            </div>
             <div class="operand-attribute">
                 <cds-textarea id="operand1"
                     [textLimitBtn]="false"
@@ -69,7 +75,7 @@
             </div>
         </section>
         <section class="submit">
-            <button class="btn btn-primary pull-right cds-blue-button" [disabled]="disableSubmit" type="submit">{{'CDSCanvas.ApplyCondition' | translate }}</button>
+            <button class="btn btn-primary pull-right cds-blue-button" [disabled]="disableSubmit || !conditionForm.value.operator" type="submit">{{'CDSCanvas.ApplyCondition' | translate }}</button>
         </section>
     </form>
 

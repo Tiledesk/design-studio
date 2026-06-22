@@ -10,7 +10,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { serializeConditionToWhen } from 'src/app/chatbot-design-studio/utils-condition';
+import { serializeConditionToWhen, normalizeLegacyOperator, operatorLabelKey, operandRightDisplay } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-json-condition',
@@ -135,6 +135,7 @@ export class CdsActionJsonConditionComponent implements OnInit {
       }
       this.logger.log('[ACTION-JSON-CONDITION] actionnn-->', this.action)
       if (this.action) {
+        this.migrateLegacyOperators(); // retrocompat: normalizza gli operatori legacy sull'AST in apertura
         this.setFormValue()
         this.updateWhen(); // popola `when` anche per le action già salvate (vecchio formato senza `when`)
       }
@@ -147,6 +148,34 @@ export class CdsActionJsonConditionComponent implements OnInit {
       if(this.action){
         this.action.when = serializeConditionToWhen(this.action.groups);
       }
+    }
+
+    /**
+     * Retrocompat: normalizza gli operatori legacy (es. *IgnoreCase) su tutto l'AST `groups`,
+     * così UI/preview e `when` sono coerenti e la conversione case-sensitive è esplicita
+     * (non silenziosa al primo salvataggio). Solo in memoria: viene persistito al primo save.
+     */
+    private migrateLegacyOperators(){
+      if(!this.action || !Array.isArray(this.action.groups)) return;
+      this.action.groups.forEach((node: any) => {
+        if(node && node.type === 'expression' && Array.isArray(node.conditions)){
+          node.conditions.forEach((c: any) => {
+            if(c && c.type === 'condition' && c.operator){
+              c.operator = normalizeLegacyOperator(c.operator);
+            }
+          });
+        }
+      });
+    }
+
+    /** Etichetta operatore robusta a formati legacy/sconosciuti (no crash). Usata nel template preview. */
+    operatorLabel(operator: string): string {
+      return operatorLabelKey(operator);
+    }
+
+    /** Lato destro (operand2) robusto a formati vecchi/nuovi (no crash). Usata nel template preview. */
+    operandRightDisplay(condition: any): string {
+      return operandRightDisplay(condition);
     }
   
     private setFormValue(){

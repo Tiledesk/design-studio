@@ -14,11 +14,10 @@
                     <span class="material-icons">data_object</span>
                 </div>
                 <div class="filter-text no-ellips">
-                    <b>{{group?.operand1}}</b> 
-                    {{OPERATORS_LIST[group?.operator].name | translate }}
-                    <b *ngIf="group?.operand2.type === 'const'">{{group?.operand2?.value}}</b>
-                    <b *ngIf="group?.operand2.type === 'var'">{{group?.operand2?.name}}</b>
-                </div>                    
+                    <b>{{group?.operand1}}</b>
+                    {{ operatorLabel(group?.operator) | translate }}
+                    <b>{{ operandRightDisplay(group) }}</b>
+                </div>
             </div>
             <!-- OPERATOR [i]-->
             <div *ngIf="i%2 === 1">

@@ -161,10 +161,9 @@
                             <span class="material-icons">data_object</span>
                         </div>
                         <div class="filter-text no-ellips">
-                            <b>{{condition?.operand1}}</b> 
-                            {{OPERATORS_LIST[condition?.operator].name | translate }}
-                            <b *ngIf="condition?.operand2.type === 'const'">{{condition?.operand2?.value}}</b>
-                            <b *ngIf="condition?.operand2.type === 'var'">{{condition?.operand2?.name}}</b>
+                            <b>{{condition?.operand1}}</b>
+                            {{ operatorLabel(condition?.operator) | translate }}
+                            <b>{{ operandRightDisplay(condition) }}</b>
                         </div>
                        
                     </div>

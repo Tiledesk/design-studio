@@ -55,7 +55,7 @@ export class BaseConditionRowComponent implements OnInit {
     return this.formBuilder.group({
       type: ["condition", Validators.required],
       operand1 : [ '', Validators.required],
-      operator: ['equalAsNumbers', [Validators.required, OperatorValidator]],
+      operator: ['', [Validators.required, OperatorValidator]], // nessun operatore di default: l'utente deve sceglierlo
       operand2: this.formBuilder.group({
         type: ['const', Validators.required],
         value: ['', Validators.nullValidator],
@@ -65,14 +65,24 @@ export class BaseConditionRowComponent implements OnInit {
   }
 
   setFormValue(){
+    const normalizedOperator = normalizeLegacyOperator(this.condition.operator);
+    // Retrocompat: operand2 può essere un formato molto vecchio (stringa/numero) invece di
+    // { type, value, name }. In quel caso lo normalizziamo a costante per non perdere il valore in edit.
+    const rawOperand2: any = this.condition.operand2;
+    const operand2 = (rawOperand2 && typeof rawOperand2 === 'object')
+      ? rawOperand2
+      : (rawOperand2 === null || rawOperand2 === undefined)
+        ? rawOperand2
+        : { type: 'const', value: String(rawOperand2), name: '' };
+
     this.conditionForm.patchValue({
       operand1 : stripLiquidWrapper(this.condition.operand1),
-      operator: normalizeLegacyOperator(this.condition.operator),
-      operand2: this.condition.operand2
+      operator: normalizedOperator,
+      operand2: operand2
     });
-    if(this.condition.operand2){
+    if(operand2){
       this.setAttributeBtnOperand2 = false;
-      if(this.condition.operand2.type === 'var'){
+      if(operand2.type === 'var'){
         this.readonlyTextarea = true
       }
     } else {
@@ -80,7 +90,8 @@ export class BaseConditionRowComponent implements OnInit {
       this.readonlyTextarea = false;
     }
     // Unary operators have no Value: hide the field when reopening a saved condition.
-    this.canShowOperand2 = !UNARY_OPERATORS.has(this.condition.operator);
+    // Usa l'operatore NORMALIZZATO (un legacy *IgnoreCase non è unario).
+    this.canShowOperand2 = !UNARY_OPERATORS.has(normalizedOperator);
 }
 
 /** START EVENTS cds-textarea **/

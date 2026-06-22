@@ -1,4 +1,4 @@
-import { TYPE_OPERATOR } from './utils';
+import { TYPE_OPERATOR, OPERATORS_LIST } from './utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
 
 /**
@@ -76,6 +76,33 @@ export function normalizeLegacyOperator(op: string): string {
   return op;
 }
 
+/**
+ * Etichetta i18n dell'operatore, robusta ai formati legacy/sconosciuti (mai crash).
+ * Normalizza prima gli operatori legacy (es. *IgnoreCase) e, se la chiave non è nel
+ * catalogo, ritorna la chiave grezza (il translate pipe la mostra invariata).
+ * Usata dai renderer al posto di `OPERATORS_LIST[op].name` (che lancia su op sconosciuto).
+ */
+export function operatorLabelKey(operator: string): string {
+  if (!operator) return '';
+  const key = normalizeLegacyOperator(operator);
+  return OPERATORS_LIST[key]?.name || key;
+}
+
+/**
+ * Rappresentazione del lato destro (operand2) robusta a formati vecchi/nuovi (mai crash):
+ *  - null/undefined -> ''
+ *  - stringa/numero (formato molto vecchio) -> String(o2)
+ *  - { type:'var' } -> name ?? value
+ *  - { type:'const' } o altro oggetto -> value ?? name
+ */
+export function operandRightDisplay(condition: any): string {
+  const o2 = condition?.operand2;
+  if (o2 === null || o2 === undefined) return '';
+  if (typeof o2 !== 'object') return String(o2);
+  if (o2.type === 'var') return o2.name ?? o2.value ?? '';
+  return o2.value ?? o2.name ?? '';
+}
+
 function booleanToken(node: Operator): string {
   return node && node.operator === 'AND' ? '&&' : '||';
 }
@@ -151,7 +178,11 @@ export function conditionToWhen(condition: Condition): string {
     case TYPE_OPERATOR.lengthLessThan:        return `length(${left}) < ${right}`;
     case TYPE_OPERATOR.lengthGreaterThanOrEqual: return `length(${left}) >= ${right}`;
     case TYPE_OPERATOR.lengthLessThanOrEqual: return `length(${left}) <= ${right}`;
-    default:                                  return '';
+    default:
+      // Operatore non riconosciuto: la condizione verrebbe esclusa dal `when`.
+      // Segnaliamo invece di scartarla silenziosamente (l'AST `groups` resta integro).
+      console.warn('[JSON-Condition] operatore non riconosciuto, escluso dal when:', condition.operator);
+      return '';
   }
 }
 

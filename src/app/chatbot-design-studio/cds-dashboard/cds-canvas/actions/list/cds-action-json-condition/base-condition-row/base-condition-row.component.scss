@@ -169,6 +169,20 @@ section.attribute{
         font-size: 16px;
         line-height: 20px;
     }
+    .attribute-label{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .attribute-info-icon{
+        font-size: 16px;
+        color: #9ba6b3;
+        cursor: help;
+        transition: color .2s;
+        &:hover{
+            color: var(--primary-color, #1f64ef);
+        }
+    }
     input {
         background: #fff;
         border: 1px solid #c6cdd4;

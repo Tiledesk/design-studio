@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { SatPopover } from '@ncstate/sat-popover';
 import { OPERATORS_LIST } from '../../utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
-import { serializeExpression } from 'src/app/chatbot-design-studio/utils-condition';
+import { serializeExpression, operatorLabelKey, operandRightDisplay } from 'src/app/chatbot-design-studio/utils-condition';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -97,6 +97,16 @@ export class CDSFilterComponent implements OnInit {
   onReset(){
     this.selectedCondition = null
     this.selectedIndex= null
+  }
+
+  /** Etichetta operatore robusta a formati legacy/sconosciuti (no crash). Usata nei template. */
+  operatorLabel(operator: string): string {
+    return operatorLabelKey(operator);
+  }
+
+  /** Lato destro (operand2) robusto a formati vecchi/nuovi (no crash). Usata nei template. */
+  operandRightDisplay(condition: any): string {
+    return operandRightDisplay(condition);
   }
 
 }
