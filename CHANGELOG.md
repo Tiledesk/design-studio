@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.40.3-rc9
+- **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
+
 # 1.40.3-rc8
 - **changed**: no operator preset when opening a Custom Attribute condition; "Apply Condition" stays disabled until an operator is selected
 - **added**: info icon next to "Attribute name" with a tooltip explaining the attribute syntax (array indexes, nested properties)
