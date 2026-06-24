@@ -23,8 +23,8 @@ Wiring: `angular.json` test configuration `connector` → `src/test.connector.ts
 1. **Install record** — when a connector is installed for a project, Tiledesk stores an
    `integration` record `{ name: '<connectorId>', value: { installed, baseUrl } }`.
 2. **Catalog load** — `cds-panel-elements` calls `loadConnectorActions()` after building the
-   static palette: it reads the project's integrations (`IntegrationService.getIntegrations`),
-   and for each with a `value.baseUrl` calls `ConnectorCatalogService.fetchManifest(baseUrl)`
+   static palette: it reads the project's integrations (`ProjectService.getIntegrations`),
+   and for each with `value.installed === true` and a `value.baseUrl` calls `ConnectorCatalogService.fetchManifest(baseUrl)`
    (GET `{baseUrl}/api/manifest`) and `toPaletteEntries(manifest)`.
 3. **Palette** — the resulting `ConnectorPaletteEntry[]` (type `TYPE_ACTION.CONNECTOR`, category
    `INTEGRATIONS`) are merged into `actionsByCategory['INTEGRATIONS']`. Each entry carries its

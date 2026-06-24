@@ -10,7 +10,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ConnectorCatalogService } from '../../../connector/connector-catalog.service';
-import { IntegrationService } from 'src/app/services/integration.service';
+import { ProjectService } from 'src/app/services/projects.service';
 
 
 @Component({
@@ -50,7 +50,7 @@ export class CdsPanelElementsComponent implements OnInit {
     private readonly projectPlanUtils: ProjectPlanUtils,
     private readonly dashboardService: DashboardService,
     private readonly connectorCatalogService: ConnectorCatalogService,
-    private readonly integrationService: IntegrationService
+    private readonly projectService: ProjectService
   ) { }
 
   ngOnInit(): void {
@@ -148,13 +148,13 @@ export class CdsPanelElementsComponent implements OnInit {
   loadConnectorActions() {
     const projectId = this.dashboardService.projectID;
     if (!projectId) { return; }
-    this.integrationService.getIntegrations(projectId).pipe(
+    this.projectService.getIntegrations(projectId).pipe(
       catchError(() => of(null))
     ).subscribe((integrations: any) => {
       if (!Array.isArray(integrations)) { return; }
       integrations.forEach((integration: any) => {
         const baseUrl = integration?.value?.baseUrl;
-        if (!baseUrl) { return; }
+        if (!baseUrl || integration?.value?.installed !== true) { return; }
         this.connectorCatalogService.fetchManifest(baseUrl).pipe(
           catchError(() => of(null))
         ).subscribe(manifest => {
