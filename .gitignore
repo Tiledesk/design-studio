@@ -59,3 +59,5 @@ Thumbs.db
 settings.json
 docs
 .claude
+.superpowers/
+.connector-sdd-*.md
