@@ -170,6 +170,13 @@
               "src/styles.scss"
             ],
             "scripts": []
+          },
+          "configurations": {
+            "connector": {
+              "main": "src/test.connector.ts",
+              "tsConfig": "tsconfig.spec.connector.json",
+              "karmaConfig": "karma.connector.conf.js"
+            }
           }
         }
       }
