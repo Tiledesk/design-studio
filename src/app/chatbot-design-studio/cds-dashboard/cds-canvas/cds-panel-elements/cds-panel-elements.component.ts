@@ -7,6 +7,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ConnectorCatalogService } from '../../../connector/connector-catalog.service';
+import { IntegrationService } from 'src/app/services/integration.service';
 
 
 @Component({
@@ -44,11 +48,14 @@ export class CdsPanelElementsComponent implements OnInit {
   
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
+    private readonly integrationService: IntegrationService
   ) { }
 
   ngOnInit(): void {
     this.createActionListByCategory();
+    this.loadConnectorActions();
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -136,6 +143,36 @@ export class CdsPanelElementsComponent implements OnInit {
       this.logger.log('[CDS-PANEL-ELEMENTS] menuItemsList:: ', category.type, menuItemsList);
     });
     this.logger.log('[CDS-PANEL-ELEMENTS] actionsByCategory:: ', this.actionsByCategory);
+  }
+
+  loadConnectorActions() {
+    const projectId = this.dashboardService.projectID;
+    if (!projectId) { return; }
+    this.integrationService.getIntegrations(projectId).pipe(
+      catchError(() => of(null))
+    ).subscribe((integrations: any) => {
+      if (!Array.isArray(integrations)) { return; }
+      integrations.forEach((integration: any) => {
+        const baseUrl = integration?.value?.baseUrl;
+        if (!baseUrl) { return; }
+        this.connectorCatalogService.fetchManifest(baseUrl).pipe(
+          catchError(() => of(null))
+        ).subscribe(manifest => {
+          if (!manifest) { return; }
+          const paletteEntries = this.connectorCatalogService.toPaletteEntries(manifest);
+          if (!this.actionsByCategory['INTEGRATIONS']) {
+            this.actionsByCategory['INTEGRATIONS'] = [];
+          }
+          paletteEntries.forEach(entry => {
+            this.actionsByCategory['INTEGRATIONS'].push({
+              type: TYPE_OF_MENU.ACTION,
+              value: entry,
+              canLoad: true
+            });
+          });
+        });
+      });
+    });
   }
 
 }
