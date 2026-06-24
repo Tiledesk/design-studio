@@ -9,6 +9,8 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
+import { buildConnectorAction } from '../connector/connector-action.factory';
+import { ConnectorActionEntry } from '../connector/connector-manifest.model';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -683,7 +685,7 @@ export class IntentService {
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
-    let newAction = this.createNewAction(action.value.type);
+    let newAction = this.createNewAction(action.value.type, { connectorEntry: action.value.connectorEntry });
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
@@ -945,9 +947,14 @@ export class IntentService {
    * @param typeAction 
    * @returns 
    */
-  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
+  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML, options?: { connectorEntry?: ConnectorActionEntry }) {
     this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
+
+    if (typeAction === TYPE_ACTION.CONNECTOR && options?.connectorEntry) {
+      action = buildConnectorAction(options.connectorEntry);
+      return action;
+    }
 
     if(typeAction === TYPE_ACTION.REPLY){
       action = new ActionReply();
