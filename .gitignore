@@ -60,3 +60,5 @@ settings.json
 docs
 .claude
 json-condition-when-grammar.md
+.superpowers/
+.connector-sdd-*.md
