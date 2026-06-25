@@ -215,7 +215,7 @@ export class IntentService {
   }
 
   public addActionToIntentSelected(action){
-    if(this.intentSelected){
+    if(action && this.intentSelected){
       this.intentSelected.actions.push(action);
       this.updateIntent(this.intentSelected);
     }
@@ -362,7 +362,9 @@ export class IntentService {
     if(color){
       intent.attributes.color = color;
     }
-    intent.actions.push(action);
+    if (action) {
+      intent.actions.push(action);
+    }
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }
@@ -681,6 +683,9 @@ export class IntentService {
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
     let newAction = this.createNewAction(action.value.type, { connectorEntry: action.value.connectorEntry });
+    if (!newAction) {
+      return;
+    }
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
@@ -946,9 +951,14 @@ export class IntentService {
     this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
 
-    if (typeAction === TYPE_ACTION.CONNECTOR && options?.connectorEntry) {
-      action = buildConnectorAction(options.connectorEntry);
-      return action;
+    if (typeAction === TYPE_ACTION.CONNECTOR) {
+      if (options?.connectorEntry) {
+        return buildConnectorAction(options.connectorEntry);
+      }
+      // No connector descriptor reached us: never return undefined (it would be
+      // inserted as a null action and crash the canvas). Skip instead.
+      this.logger.error('[INTENT-SERV] connector action requested without a connectorEntry; skipping');
+      return null;
     }
 
     if(typeAction === TYPE_ACTION.REPLY){
