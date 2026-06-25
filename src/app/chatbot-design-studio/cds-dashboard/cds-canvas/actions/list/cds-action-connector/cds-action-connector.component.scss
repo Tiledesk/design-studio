@@ -44,3 +44,13 @@
     }
   }
 }
+
+.connector-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+
+  input[type="checkbox"] { width: 16px; height: 16px; }
+  .connector-toggle-label { font-size: 12px; color: #677283; }
+}
