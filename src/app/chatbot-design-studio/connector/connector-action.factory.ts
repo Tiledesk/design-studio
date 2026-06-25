@@ -15,8 +15,10 @@ export function buildConnectorAction(entry: ConnectorActionEntry): ActionWebRequ
   a.assignErrorTo = 'error';
   (a as any)._tdConnectorRef = entry.id;
   (a as any)._tdConnectorMeta = connectorMetaFromEntry(entry);
-  const emptyValues: { [id: string]: string } = {};
-  (entry.inputs || []).forEach(i => { emptyValues[i.id] = ''; });
-  writeConnectorInputs(a, emptyValues);
+  const seededValues: { [id: string]: string } = {};
+  (entry.inputs || []).forEach(i => {
+    seededValues[i.id] = (i.default !== undefined && i.default !== null) ? String(i.default) : '';
+  });
+  writeConnectorInputs(a, seededValues);
   return a as ActionWebRequestV2 & { _tdConnectorRef: string };
 }
