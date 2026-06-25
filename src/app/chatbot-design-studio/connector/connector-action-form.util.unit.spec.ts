@@ -20,6 +20,11 @@ describe('connectorMetaFromEntry', () => {
     expect(m.inputs.map(i => i.id)).toEqual(['to', 'subject']);
     expect(m.inputs[0]).toEqual({ id: 'to', name: 'To', type: 'string', required: true, description: 'Recipient' });
   });
+
+  it('carries the icon into the meta', () => {
+    const m = connectorMetaFromEntry({ ...entry, icon: 'https://c/assets/connector-icon.svg' } as any);
+    expect(m.icon).toBe('https://c/assets/connector-icon.svg');
+  });
 });
 
 describe('readConnectorInputs', () => {

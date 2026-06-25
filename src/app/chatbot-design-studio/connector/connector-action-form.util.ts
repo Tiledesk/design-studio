@@ -2,7 +2,7 @@
 import { ConnectorActionEntry } from './connector-manifest.model';
 
 export interface ConnectorFormInput { id: string; name: string; type: string; required: boolean; description: string; }
-export interface ConnectorMeta { name: string; inputs: ConnectorFormInput[]; }
+export interface ConnectorMeta { name: string; inputs: ConnectorFormInput[]; icon?: string; }
 
 export function connectorMetaFromEntry(entry: ConnectorActionEntry): ConnectorMeta {
   return {
@@ -10,6 +10,7 @@ export function connectorMetaFromEntry(entry: ConnectorActionEntry): ConnectorMe
     inputs: (entry.inputs || []).map(i => ({
       id: i.id, name: i.name, type: i.type, required: !!i.required, description: i.description || '',
     })),
+    icon: entry.icon,
   };
 }
 
