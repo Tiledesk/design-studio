@@ -43,25 +43,46 @@
 
     <div class="connector-action-title" *ngIf="meta.name">{{ meta.name }}</div>
 
-    <!-- One field per declared input -->
-    <div class="field-box connector-field" *ngFor="let input of meta.inputs">
+    <!-- One control per declared input, chosen by type -->
+    <div class="field-box connector-field" *ngFor="let input of meta.inputs" [ngSwitch]="controlType(input)">
         <label class="title-label">
             {{ input.name }}<span class="req" *ngIf="input.required"> *</span>
         </label>
-        <textarea *ngIf="input.id === 'body' || input.type === 'object'"
-                  [(ngModel)]="values[input.id]"
-                  (ngModelChange)="onInputChange()"
-                  [disabled]="previewMode"
-                  rows="3"
-                  class="form-control cds-textarea-input"
-                  placeholder="Value or {{'{{'}}variable{{'}}'}}"></textarea>
-        <input *ngIf="!(input.id === 'body' || input.type === 'object')"
-               type="text"
-               [(ngModel)]="values[input.id]"
-               (ngModelChange)="onInputChange()"
-               [disabled]="previewMode"
-               class="form-control"
-               placeholder="Value or {{'{{'}}variable{{'}}'}}" />
+
+        <!-- Fixed-choice dropdown -->
+        <select *ngSwitchCase="'select'"
+                [(ngModel)]="values[input.id]"
+                (ngModelChange)="onInputChange()"
+                [disabled]="previewMode"
+                class="form-control">
+            <option *ngIf="!input.required" [ngValue]="''">—</option>
+            <option *ngFor="let opt of input.options" [ngValue]="opt.value">{{ opt.label }}</option>
+        </select>
+
+        <!-- Boolean toggle -->
+        <label *ngSwitchCase="'toggle'" class="connector-toggle">
+            <input type="checkbox"
+                   [checked]="values[input.id] === 'true'"
+                   (change)="onToggle(input, $event)"
+                   [disabled]="previewMode" />
+            <span class="connector-toggle-label">{{ values[input.id] === 'true' ? 'On' : 'Off' }}</span>
+        </label>
+
+        <!-- Text / number / object / array — variable-capable -->
+        <cds-textarea *ngSwitchDefault
+            [text]="values[input.id]"
+            [minRow]="isJsonInput(input) ? 3 : 1" [maxRow]="isJsonInput(input) ? 8 : 4"
+            [setAttributeBtn]="true"
+            [emojiPikerBtn]="false"
+            [textLimitBtn]="false"
+            [isLiquidjs]="false"
+            [isJsonAttribute]="isJsonInput(input)"
+            [readonly]="false"
+            [placeholder]="'Enter a value or variable'"
+            (changeTextarea)="onFieldChange(input.id, $event)"
+            (blur)="onFieldBlur()">
+        </cds-textarea>
+
         <div class="hint" *ngIf="input.description">{{ input.description }}</div>
     </div>
 

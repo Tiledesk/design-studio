@@ -13,7 +13,7 @@ import { ActionWebRequestV2 } from 'src/app/models/action-model';
 // UTILS
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { ConnectorMeta, readConnectorInputs, writeConnectorInputs } from 'src/app/chatbot-design-studio/connector/connector-action-form.util';
+import { ConnectorMeta, ConnectorFormInput, readConnectorInputs, writeConnectorInputs } from 'src/app/chatbot-design-studio/connector/connector-action-form.util';
 
 @Component({
   selector: 'cds-action-connector',
@@ -115,6 +115,34 @@ export class CdsActionConnectorComponent implements OnInit, OnDestroy, OnChanges
   // EVENT HANDLERS
 
   onInputChange(): void {
+    writeConnectorInputs(this.action, this.values);
+    this.save();
+  }
+
+  controlType(input: ConnectorFormInput): 'select' | 'toggle' | 'textarea' {
+    if (input.options && input.options.length) { return 'select'; }
+    if (input.type === 'boolean') { return 'toggle'; }
+    return 'textarea';
+  }
+
+  isJsonInput(input: ConnectorFormInput): boolean {
+    return input.type === 'object' || input.type === 'array';
+  }
+
+  onFieldChange(inputId: string, value: any): void {
+    this.values[inputId] = (value === null || value === undefined) ? '' : String(value);
+    writeConnectorInputs(this.action, this.values);
+    this.save();
+  }
+
+  onFieldBlur(): void {
+    writeConnectorInputs(this.action, this.values);
+    this.save();
+  }
+
+  onToggle(input: ConnectorFormInput, event: any): void {
+    const checked = !!(event && event.target && event.target.checked);
+    this.values[input.id] = checked ? 'true' : 'false';
     writeConnectorInputs(this.action, this.values);
     this.save();
   }
