@@ -427,6 +427,8 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     llm: string;
     modelName: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignJsonSourcesTo: string;
@@ -501,6 +503,8 @@ export class ActionAiPrompt extends Action {
     llm: string;
     modelName: string;
     model: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
@@ -517,6 +521,8 @@ export class ActionAiCondition extends Action {
     llm: string;
     modelName: string;
     model: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     max_tokens: number;
     temperature: number;
     labelModel: string;

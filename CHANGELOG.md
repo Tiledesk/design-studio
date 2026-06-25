@@ -7,6 +7,23 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.6
+- **bug fix**: change env
+
+# 1.40.4
+- **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
+
+# 1.40.3
+- **changed**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.2
+- **changed**: refactor(voice-settings): streamline voice and model retrieval from ElevenLabs API; update angular.json for environment asset handling
+
+# 1.40.1
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
+
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
 
