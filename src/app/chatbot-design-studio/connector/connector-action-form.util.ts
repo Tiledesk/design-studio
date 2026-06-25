@@ -1,7 +1,7 @@
 // connector-action-form.util.ts
 import { ConnectorActionEntry } from './connector-manifest.model';
 
-export interface ConnectorFormInput { id: string; name: string; type: string; required: boolean; description: string; }
+export interface ConnectorFormInput { id: string; name: string; type: string; required: boolean; description: string; options?: { label: string; value: string }[]; default?: unknown; }
 export interface ConnectorMeta { name: string; inputs: ConnectorFormInput[]; icon?: string; }
 
 export function connectorMetaFromEntry(entry: ConnectorActionEntry): ConnectorMeta {
@@ -9,6 +9,7 @@ export function connectorMetaFromEntry(entry: ConnectorActionEntry): ConnectorMe
     name: entry.name,
     inputs: (entry.inputs || []).map(i => ({
       id: i.id, name: i.name, type: i.type, required: !!i.required, description: i.description || '',
+      options: i.options, default: i.default,
     })),
     icon: entry.icon,
   };
