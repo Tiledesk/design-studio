@@ -50,4 +50,17 @@ describe('buildConnectorAction', () => {
     expect(body.inputs.pageSize).toBe('10');
     expect(body.inputs.query).toBe('');
   });
+  it('seeds falsy-but-valid defaults (0, false) rather than dropping them to empty', () => {
+    const withFalsyDefaults: any = {
+      ...entry,
+      inputs: [
+        { id: 'count', type: 'number', name: 'Count', required: false, description: 'c', default: 0 },
+        { id: 'enabled', type: 'boolean', name: 'Enabled', required: false, description: 'e', default: false },
+      ],
+    };
+    const a: any = buildConnectorAction(withFalsyDefaults);
+    const body = JSON.parse(a.jsonBody);
+    expect(body.inputs.count).toBe('0');
+    expect(body.inputs.enabled).toBe('false');
+  });
 });
