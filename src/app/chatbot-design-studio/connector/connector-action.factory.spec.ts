@@ -37,4 +37,17 @@ describe('buildConnectorAction', () => {
     expect(body.id).toBe('gmail.send-email');
     expect(body.external_id).toBe('{projectId}');
   });
+  it('seeds input values from default when present, empty otherwise', () => {
+    const withDefault: any = {
+      ...entry,
+      inputs: [
+        { id: 'pageSize', type: 'number', name: 'Page Size', required: false, description: 'n', default: 10 },
+        { id: 'query', type: 'string', name: 'Query', required: false, description: 'q' },
+      ],
+    };
+    const a: any = buildConnectorAction(withDefault);
+    const body = JSON.parse(a.jsonBody);
+    expect(body.inputs.pageSize).toBe('10');
+    expect(body.inputs.query).toBe('');
+  });
 });
