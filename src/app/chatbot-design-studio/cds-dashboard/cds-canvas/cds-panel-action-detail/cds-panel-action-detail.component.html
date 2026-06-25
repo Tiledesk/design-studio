@@ -20,7 +20,17 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
+                <cds-action-connector *ngIf="elementSelected._tdConnectorRef"
+                    class="panel-response"
+                    [intentSelected]="intentSelected"
+                    [action]="elementSelected"
+                    [previewMode]="false"
+                    (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                    (updateAndSaveAction)="onSaveIntent($event)">
+                </cds-action-connector>
+
+                <div [ngSwitch]="elementSelected._tdActionType"
+                     *ngIf="!elementSelected._tdConnectorRef && canShowActionByPlan.enabled">
 
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY"
                         class="panel-response"
