@@ -11,6 +11,7 @@ import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../
 import { LLM_MODEL } from '../utils-ai_models';
 import { buildConnectorAction } from '../connector/connector-action.factory';
 import { ConnectorActionEntry } from '../connector/connector-manifest.model';
+import { patchActionIds } from './patch-action-id.util';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -347,13 +348,7 @@ export class IntentService {
    * perchè generati dal server. In questo caso è necessario assegnarne uno.
    */
   public patchActionId(faqs){
-    faqs.forEach(element => {
-      element.actions.forEach(action => {
-        if(!action._tdActionId || action._tdActionId === "UUIDV4"){
-          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
-        }
-      });
-    });
+    patchActionIds(faqs);
   }
  
 
