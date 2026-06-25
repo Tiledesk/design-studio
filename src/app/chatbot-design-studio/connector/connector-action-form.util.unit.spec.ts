@@ -18,12 +18,26 @@ describe('connectorMetaFromEntry', () => {
     const m = connectorMetaFromEntry(entry);
     expect(m.name).toBe('Send Email');
     expect(m.inputs.map(i => i.id)).toEqual(['to', 'subject']);
-    expect(m.inputs[0]).toEqual({ id: 'to', name: 'To', type: 'string', required: true, description: 'Recipient' });
+    expect(m.inputs[0]).toEqual(jasmine.objectContaining({ id: 'to', name: 'To', type: 'string', required: true, description: 'Recipient' }));
   });
 
   it('carries the icon into the meta', () => {
     const m = connectorMetaFromEntry({ ...entry, icon: 'https://c/assets/connector-icon.svg' } as any);
     expect(m.icon).toBe('https://c/assets/connector-icon.svg');
+  });
+
+  it('carries options and default onto the meta inputs', () => {
+    const withMeta = connectorMetaFromEntry({
+      ...entry,
+      inputs: [
+        { id: 'visibility', type: 'string', name: 'Visibility', required: false, description: 'v',
+          options: [{ label: 'Default', value: 'default' }, { label: 'Public', value: 'public' }] },
+        { id: 'pageSize', type: 'number', name: 'Page Size', required: false, description: 'n', default: 10 },
+      ],
+    } as any);
+    const vis = withMeta.inputs.find(i => i.id === 'visibility')!;
+    expect(vis.options).toEqual([{ label: 'Default', value: 'default' }, { label: 'Public', value: 'public' }]);
+    expect(withMeta.inputs.find(i => i.id === 'pageSize')!.default).toBe(10);
   });
 });
 

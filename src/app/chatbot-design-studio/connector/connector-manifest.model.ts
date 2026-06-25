@@ -1,10 +1,15 @@
+export interface ConnectorPropertyOption {
+  label: string;
+  value: string;
+}
+
 export interface ConnectorProperty {
   id: string;
   type: string;
   name: string;
   required: boolean;
   description: string;
-  allowedValues?: string[];
+  options?: ConnectorPropertyOption[];
   default?: unknown;
 }
 
