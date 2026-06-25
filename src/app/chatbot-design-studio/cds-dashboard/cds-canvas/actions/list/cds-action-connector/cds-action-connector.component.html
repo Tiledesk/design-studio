@@ -1,0 +1,125 @@
+<!-- Preview mode: show compact summary with connectors -->
+<div *ngIf="previewMode" class="cds-action-preview">
+    <div class="action-row-left">
+        <span class="connector-action-name" *ngIf="meta.name">{{ meta.name }}</span>
+    </div>
+
+    <div class="action-row">
+        <div class="output-assignments">
+            <span class="output-item" *ngIf="action?.assignResultTo">
+                <span class="output-key">Store in:</span>
+                <span class="tag output-val ellips">{{ action.assignResultTo }}</span>
+            </span>
+            <span class="output-empty" *ngIf="!action?.assignResultTo">—</span>
+        </div>
+    </div>
+
+    <div class="previewContent">
+        <div class="icon-action">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+        <label class="title-preview-label">Success</label>
+        <cds-connector class="connector-true"
+            [idConnector]   = "idConnectorTrue"
+            [idConnection]  = "idConnectionTrue"
+            [isConnected]   = "isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">Else</label>
+        <cds-connector class="connector-false"
+            [idConnector]   = "idConnectorFalse"
+            [idConnection]  = "idConnectionFalse"
+            [isConnected]   = "isConnectedFalse">
+        </cds-connector>
+    </div>
+</div>
+
+<!-- Edit mode: schema-driven form -->
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer cds-action-connector">
+
+    <div class="connector-action-title" *ngIf="meta.name">{{ meta.name }}</div>
+
+    <!-- One field per declared input -->
+    <div class="field-box connector-field" *ngFor="let input of meta.inputs">
+        <label class="title-label">
+            {{ input.name }}<span class="req" *ngIf="input.required"> *</span>
+        </label>
+        <textarea *ngIf="input.id === 'body' || input.type === 'object'"
+                  [(ngModel)]="values[input.id]"
+                  (ngModelChange)="onInputChange()"
+                  [disabled]="previewMode"
+                  rows="3"
+                  class="form-control cds-textarea-input"
+                  placeholder="Value or {{'{{'}}variable{{'}}'}}"></textarea>
+        <input *ngIf="!(input.id === 'body' || input.type === 'object')"
+               type="text"
+               [(ngModel)]="values[input.id]"
+               (ngModelChange)="onInputChange()"
+               [disabled]="previewMode"
+               class="form-control"
+               placeholder="Value or {{'{{'}}variable{{'}}'}}" />
+        <div class="hint" *ngIf="input.description">{{ input.description }}</div>
+    </div>
+
+    <hr class="custom-divider">
+
+    <!-- Store response in -->
+    <div class="field-box">
+        <label class="title-label">Store response in</label>
+        <cds-textarea id="assignResultTo"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [isLiquidjs]="false"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            [text]="action.assignResultTo"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+        </cds-textarea>
+    </div>
+
+    <hr class="custom-divider">
+
+    <!-- Success branch -->
+    <div class="field-box">
+        <div class="condition-container">
+            <div class="icon-action">
+                <img class="active-icon" src="assets/images/icons/if_condition.svg">
+            </div>
+            <span class="condition-text">Success</span>
+        </div>
+        <cds-select id="connector-true-select"
+            [items]="listOfIntents"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [itemSelected]="action?.trueIntent"
+            [placeholder]="'Select a block'"
+            [clearable]="true"
+            (onSelected)="onChangeBlockSelect($event, 'trueIntent')"
+            (onReset)="onResetBlockSelect($event, 'trueIntent')">
+        </cds-select>
+    </div>
+
+    <!-- Else / error branch -->
+    <div class="field-box">
+        <div class="condition-container">
+            <span class="condition-text">Else</span>
+        </div>
+        <cds-select id="connector-false-select"
+            [items]="listOfIntents"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [itemSelected]="action?.falseIntent"
+            [placeholder]="'Select a block'"
+            [clearable]="true"
+            (onSelected)="onChangeBlockSelect($event, 'falseIntent')"
+            (onReset)="onResetBlockSelect($event, 'falseIntent')">
+        </cds-select>
+    </div>
+
+</div>
