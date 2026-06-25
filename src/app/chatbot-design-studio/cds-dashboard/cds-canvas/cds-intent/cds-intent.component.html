@@ -134,18 +134,20 @@
             <span class="action-element">
 
                 <div *cdkDragPreview id="customDragPreview">
-                    <cds-action-description 
-                        class="header-action" 
+                    <cds-action-description
+                        class="header-action"
                         [previewMode]="false"
+                        [actionSelected]="action"
                         [elementType]="action._tdActionType">
                     </cds-action-description>
                 </div>
             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
-                    class="header-action" 
+                <cds-action-description
+                    class="header-action"
                     cdkDragHandle
+                    [actionSelected]="action"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
