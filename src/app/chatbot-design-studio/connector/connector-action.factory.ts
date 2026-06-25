@@ -1,5 +1,6 @@
 import { ActionWebRequestV2 } from '../../models/action-model';
 import { ConnectorActionEntry } from './connector-manifest.model';
+import { connectorMetaFromEntry, writeConnectorInputs } from './connector-action-form.util';
 
 // Returns a persistence-ready webrequestv2 action carrying the connector ref.
 export function buildConnectorAction(entry: ConnectorActionEntry): ActionWebRequestV2 & { _tdConnectorRef: string } {
@@ -13,5 +14,9 @@ export function buildConnectorAction(entry: ConnectorActionEntry): ActionWebRequ
   a.assignStatusTo = 'status';
   a.assignErrorTo = 'error';
   (a as any)._tdConnectorRef = entry.id;
+  (a as any)._tdConnectorMeta = connectorMetaFromEntry(entry);
+  const emptyValues: { [id: string]: string } = {};
+  (entry.inputs || []).forEach(i => { emptyValues[i.id] = ''; });
+  writeConnectorInputs(a, emptyValues);
   return a as ActionWebRequestV2 & { _tdConnectorRef: string };
 }

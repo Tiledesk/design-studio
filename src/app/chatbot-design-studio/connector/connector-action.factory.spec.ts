@@ -20,12 +20,21 @@ describe('buildConnectorAction', () => {
     expect(a.method).toBe('POST');
     expect(a.url).toBe('https://conn.example.com/api/actions');
     expect(a.bodyType).toBe('json');
-    expect(JSON.parse(a.jsonBody).inputs.to).toBe('{{to}}');
+    expect(JSON.parse(a.jsonBody).inputs.to).toBe('');
     expect(a.assignResultTo).toBe('result');
     expect(a.settings.timeout).toBe(20000);
   });
   it('merges connector headers over the defaults', () => {
     const a: any = buildConnectorAction(entry);
     expect(a.headersString['Content-Type']).toBe('application/json');
+  });
+  it('stamps _tdConnectorMeta from the entry and seeds empty input values', () => {
+    const a: any = buildConnectorAction(entry);   // `entry` already defined in this spec (gmail.send-email with a `to` input)
+    expect(a._tdConnectorMeta.name).toBe('Send Email');
+    expect(a._tdConnectorMeta.inputs.map((i: any) => i.id)).toContain('to');
+    const body = JSON.parse(a.jsonBody);
+    expect(body.inputs.to).toBe('');     // seeded empty, not the {{to}} placeholder
+    expect(body.id).toBe('gmail.send-email');
+    expect(body.external_id).toBe('{projectId}');
   });
 });
