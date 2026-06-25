@@ -23,6 +23,7 @@ export interface ConnectorActionEntry {
   inputs: ConnectorProperty[];
   outputs: ConnectorProperty[];
   webrequest: ConnectorWebRequestHint;
+  icon?: string;
 }
 
 export interface ConnectorManifest {
@@ -33,6 +34,7 @@ export interface ConnectorManifest {
     description: string;
     baseUrl: string;
     auth: { type: string; installPath: string; scopes: string[] };
+    icon?: string;
   };
   actions: ConnectorActionEntry[];
   triggers: ConnectorActionEntry[];

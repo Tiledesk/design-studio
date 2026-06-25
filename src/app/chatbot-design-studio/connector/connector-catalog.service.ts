@@ -32,10 +32,10 @@ export class ConnectorCatalogService {
       chatbot_types: [],
       category: TYPE_ACTION_CATEGORY.INTEGRATIONS,
       type: TYPE_ACTION.CONNECTOR,
-      src: 'assets/images/actions/web_request.svg',
+      src: manifest.connector?.icon || 'assets/images/actions/web_request.svg',
       status: 'active' as const,
       connectorRef: a.id,
-      connectorEntry: a
+      connectorEntry: { ...a, icon: manifest.connector?.icon }
     }));
   }
 }

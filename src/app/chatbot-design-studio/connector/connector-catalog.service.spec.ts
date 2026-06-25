@@ -37,4 +37,11 @@ describe('ConnectorCatalogService', () => {
     expect(entries[0].connectorRef).toBe('gmail.send-email');
     expect(entries[0].connectorEntry.id).toBe('gmail.send-email');
   });
+
+  it('injects the connector icon into palette entries and src', () => {
+    const withIcon = { ...manifest, connector: { ...manifest.connector, icon: 'https://c/assets/connector-icon.svg' } };
+    const entries = svc.toPaletteEntries(withIcon);
+    expect(entries[0].src).toBe('https://c/assets/connector-icon.svg');
+    expect((entries[0].connectorEntry as any).icon).toBe('https://c/assets/connector-icon.svg');
+  });
 });
