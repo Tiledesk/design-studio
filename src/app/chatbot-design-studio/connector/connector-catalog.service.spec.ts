@@ -44,4 +44,19 @@ describe('ConnectorCatalogService', () => {
     expect(entries[0].src).toBe('https://c/assets/connector-icon.svg');
     expect((entries[0].connectorEntry as any).icon).toBe('https://c/assets/connector-icon.svg');
   });
+
+  it('projects a manifest into a connector group (id/name/icon + entries)', () => {
+    const withIcon = { ...manifest, connector: { ...manifest.connector, name: 'Google Services', icon: 'https://c/icon.svg' } };
+    const group = svc.toConnectorGroup(withIcon);
+    expect(group.id).toBe('google');
+    expect(group.name).toBe('Google Services');
+    expect(group.icon).toBe('https://c/icon.svg');
+    expect(group.entries.length).toBe(1);
+    expect(group.entries[0].connectorRef).toBe('gmail.send-email');
+  });
+
+  it('falls back to the web_request icon when the manifest connector has none', () => {
+    const group = svc.toConnectorGroup(manifest);
+    expect(group.icon).toBe('assets/images/actions/web_request.svg');
+  });
 });
