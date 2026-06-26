@@ -13,9 +13,15 @@ interface McpTool {
 }
 
 interface McpServer {
+  /** nativeId: presente solo sui server MCP nativi Tiledesk (usato per Connect/Save dei nativi). */
+  id?: string;
   name: string;
   url: string;
   transport: string;
+  /** true = server MCP nativo di Tiledesk (badge "native", name readonly, url nascosto, Connect via nativeId). */
+  native?: boolean;
+  /** descrizione (fornita dal catalogo nativo). */
+  description?: string;
   customHeaders?: Array<{
     enabled: boolean;
     key: string;
@@ -421,6 +427,11 @@ export class McpServerEditDialogComponent implements OnInit {
       this.errorMessage = "Please fill Name and URL before connecting.";
       return;
     }
+    if (this.isNative && !this.editedServer.id) {
+      this.showError = true;
+      this.errorMessage = "Missing native server id.";
+      return;
+    }
     if (this.isLoadingTools) return;
 
     this.showError = false;
@@ -430,7 +441,12 @@ export class McpServerEditDialogComponent implements OnInit {
     this.isToolsModalOpen = false;
 
     try {
-      const res = await firstValueFrom(this.projectService.getMcpTools(this.project_id, this.editedServer.url));
+      // Server nativo: Connect via nativeId (GET {proj}/mcp/native/{id}/connect). Custom: discovery via url.
+      const res = await firstValueFrom(
+        this.isNative
+          ? this.projectService.getNativeMcpServerTools(this.project_id, this.editedServer.id)
+          : this.projectService.getMcpTools(this.project_id, this.editedServer.url)
+      );
       const rawTools = Array.isArray(res) ? res : (Array.isArray(res?.tools) ? res.tools : []);
 
       const tools: McpTool[] = (rawTools || [])
@@ -485,9 +501,18 @@ export class McpServerEditDialogComponent implements OnInit {
       .map(name => ({ name }));
   }
 
+  /** Server MCP nativo Tiledesk: name readonly, url nascosto, Connect via nativeId, Save su /mcp/servers. */
+  get isNative(): boolean {
+    return !!this.editedServer?.native;
+  }
+
   isFormValid(): boolean {
-    return !!(this.editedServer.name && 
-              this.editedServer.url && 
+    if (this.isNative) {
+      // I server nativi non hanno url editabile: bastano name + transport.
+      return !!(this.editedServer.name && this.editedServer.transport);
+    }
+    return !!(this.editedServer.name &&
+              this.editedServer.url &&
               this.editedServer.transport);
   }
 
@@ -545,16 +570,20 @@ export class McpServerEditDialogComponent implements OnInit {
       } else {
         // Find and update the server in the array (include tools + selectedTools for persistence)
         const serverIndex = this.allMcpServers.findIndex(s => s.name === this.originalServer.name);
+        const updatedServer = {
+          ...this.editedServer,
+          tools: this.editedServer.tools,
+          selectedTools: this.buildSelectedToolsPayload()
+        };
         if (serverIndex > -1) {
-          this.allMcpServers[serverIndex] = {
-            ...this.editedServer,
-            tools: this.editedServer.tools,
-            selectedTools: this.buildSelectedToolsPayload()
-          };
+          this.allMcpServers[serverIndex] = updatedServer;
+        } else {
+          // Server non ancora presente (es. server nativo configurato per la prima volta): aggiungilo alla lista.
+          this.allMcpServers.push(updatedServer);
         }
       }
 
-      // Prepare the integration object
+      // Persistenza: custom e nativi (una volta configurati) salvati insieme nell'integration "mcp".
       const mcpIntegration: McpIntegration = {
         id_project: this.project_id,
         name: "mcp",
@@ -562,15 +591,12 @@ export class McpServerEditDialogComponent implements OnInit {
           servers: this.allMcpServers
         }
       };
-
       this.logger.log("[McpServerEditDialog] Saving integration:", mcpIntegration);
-
-      // Call service to save the entire MCP integration
       const response = await firstValueFrom(
         this.projectService.saveIntegration(this.project_id, mcpIntegration)
       );
-      
-      this.logger.log("[McpServerEditDialog] Integration saved successfully:", response);
+
+      this.logger.log("[McpServerEditDialog] MCP servers saved successfully:", response);
       
       // Clear the loader timer and hide states
       clearTimeout(loaderTimer);

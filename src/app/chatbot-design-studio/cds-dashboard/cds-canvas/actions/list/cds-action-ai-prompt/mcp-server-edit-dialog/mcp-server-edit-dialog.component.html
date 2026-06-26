@@ -25,21 +25,22 @@
         </div>
 
         <form class="edit-form">
-            <!-- Nome -->
+            <!-- Nome (server nativi: non modificabile) -->
             <div class="form-field">
                 <label class="field-label">{{'CDSCanvas.Name' | translate}}</label>
-                <cds-text 
+                <cds-text *ngIf="!isNative"
                     [text]="editedServer.name"
                     [setAttributeBtn]="false"
                     [placeholder]="'CDSCanvas.EnterServerName' | translate"
                     (onChange)="onChangeField($event, 'name')">
                 </cds-text>
+                <div *ngIf="isNative" class="readonly-field">{{ editedServer.name }}</div>
             </div>
 
-            <!-- URL -->
-            <div class="form-field">
+            <!-- URL (nascosto per i server nativi) -->
+            <div class="form-field" *ngIf="!isNative">
                 <label class="field-label">URL</label>
-                <cds-text 
+                <cds-text
                     [text]="editedServer.url"
                     [setAttributeBtn]="false"
                     [placeholder]="'CDSCanvas.EnterServerURL' | translate"
