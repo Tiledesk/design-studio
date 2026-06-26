@@ -164,6 +164,12 @@ export class CdsPanelActionsComponent implements OnInit {
     this.hoveredElement = null;
   }
 
+  onChildDragging(isDragging: boolean) {
+    this.isDragging = isDragging;
+    if (isDragging) { this.isOpen = false; }
+    this.isDraggingMenuElement.emit(isDragging);
+  }
+
   onDragStarted(event:CdkDragStart, currentIndex: number) {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
     this.controllerService.closeActionDetailPanel();

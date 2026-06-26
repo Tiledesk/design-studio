@@ -1,64 +1,21 @@
 <div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
-    <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
+    <!-- ACTION: shared draggable list -->
+    <cds-action-drag-list *ngIf="menuType === TYPE_OF_MENU.ACTION"
+        [items]="menuItemsList"
+        (isDragging)="onChildDragging($event)"
+        (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
+        (hoverItem)="openInfo($event.element, $event.value)">
+    </cds-action-drag-list>
+
+    <!-- EVENT: unchanged -->
+    <div *ngIf="menuType === TYPE_OF_MENU.EVENT" class="action-list" id="action_list_drop_connect"
         cdkDropList [cdkDropListData]="menuItemsList">
-        
-
-        <!-- <div [style.display]="isDragging?'block':'none'" class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;">
-                <div *ngIf="indexDrag===i" class="example-custom-placeholder"></div>
-                <div *ngIf="indexDrag!==i" class="actions-btns-wpr">
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <button class="btn btn-tdblu-no-boxshadow action-btn">
-                            <img [src]="item.value.src" [title]="item.value.name">
-                        </button>
-                    </div>
-                    <div *ngIf="item.value.name" class="action-btn-text">{{item.value.name}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-        <div *ngIf="menuType === TYPE_OF_MENU.ACTION"
-            [style.display]="isDragging?'none':'block'" class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
-                (cdkDragEnded)="onDragEnd($event)"
-                [cdkDragDisabled]="item.value.disabled">
-
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
-
-                <div class="actions-btns-wpr" #divAction
-                    (mouseover)="openInfo(divAction, item.value)" 
-                    [attr.id]="'menu-trigger-' + i">
-                    
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
-                        <!-- <img [src]="item.value.src" [title]="item.value.name | translate" alt=""> -->
-                    </div>
-                    <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
-                    <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
-                    <!-- <span *ngIf="item.value.badge" class="trigger-beta-badge" [class.deprecation-badge]="item.value.badge==='DEP'" [class.beta-badge]="item.value.badge==='beta'" [class.new-badge]="item.value.badge==='new'">{{item.value.badge}}</span> -->
-                    <span *ngIf="item.value.badge" [class]="'trigger-beta-badge badge-' + item.value.badge">{{item.value.badge}}</span>
-
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                            <mat-icon class="svg-icon" svgIcon="drag_indicator" aria-hidden="true"></mat-icon>
-                            <!-- <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt=""> -->
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div *ngIf="menuType === TYPE_OF_MENU.EVENT" 
-            [style.display]="isDragging?'none':'block'" class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
+        <div [style.display]="isDragging?'none':'block'" class="menu-dragging">
+            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
+                cdkDrag
+                (cdkDragStarted)="onDragStarted($event, i)"
+                (cdkDragMoved)="onDragMoved($event)"
                 (cdkDragEnded)="onDragEnd($event)">
 
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
@@ -76,7 +33,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
 

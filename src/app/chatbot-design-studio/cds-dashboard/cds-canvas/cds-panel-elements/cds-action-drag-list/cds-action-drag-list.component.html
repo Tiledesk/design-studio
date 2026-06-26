@@ -1,0 +1,31 @@
+<div class="action-list" cdkDropList [cdkDropListData]="items">
+  <div [style.display]="dragging?'none':'block'" class="menu-dragging">
+    <div class="action-box" *ngFor="let item of items; let i = index;"
+        cdkDrag
+        (cdkDragStarted)="onDragStarted($event, i)"
+        (cdkDragMoved)="onDragMoved($event)"
+        (cdkDragEnded)="onDragEnd($event)"
+        [cdkDragDisabled]="item.value.disabled">
+
+      <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+
+      <div class="actions-btns-wpr" #divAction
+          (mouseover)="onHover(divAction, item.value)"
+          [attr.id]="'menu-trigger-' + i">
+
+        <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
+          <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+        </div>
+        <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
+        <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
+        <span *ngIf="item.value.badge" [class]="'trigger-beta-badge badge-' + item.value.badge">{{item.value.badge}}</span>
+
+        <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
+          <button class="btn btn-tdblu-no-boxshadow drag-btn">
+            <mat-icon class="svg-icon" svgIcon="drag_indicator" aria-hidden="true"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
