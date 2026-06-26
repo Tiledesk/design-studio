@@ -17,6 +17,7 @@ import { CdsActionControlsComponent } from './actions/shared/cds-action-controls
 import { CdsAddActionMenuComponent } from './actions/shared/cds-add-action-menu/cds-add-action-menu.component';
 import { CdsPanelActionsComponent } from './cds-panel-elements/cds-panel-actions/cds-panel-actions.component';
 import { CdsPanelElementsComponent } from './cds-panel-elements/cds-panel-elements.component';
+import { CdsActionDragListComponent } from './cds-panel-elements/cds-action-drag-list/cds-action-drag-list.component';
 import { MouseTipsComponent } from 'src/app/modals/mouse-tips/mouse-tips.component';
 import { CdsOptionsComponent } from './cds-options/cds-options.component';
 import { CdsPanelButtonConfigurationComponent } from './cds-panel-button-configuration/cds-panel-button-configuration.component';
@@ -82,6 +83,7 @@ const routes: Routes = [
     //CDS PANEL ELEMENTS
     CdsPanelElementsComponent,
     CdsPanelActionsComponent,
+    CdsActionDragListComponent,
 
     //CDS PANEL BUTTON CONFIGURATION
     CdsPanelButtonConfigurationComponent,

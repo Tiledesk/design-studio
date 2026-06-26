@@ -15,11 +15,6 @@ $base-padding: 6px;
     // position: absolute;
     padding: 0px;
     box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
-    .menu-dragging,
-    .coming-soon {
-        overflow: hidden;
-        padding: $base-padding 0px ;
-    }
     .section-title {
         padding-top: 3px;
         font-size: 11px;
@@ -35,195 +30,17 @@ $base-padding: 6px;
 }
 
 
-.action-box {
-    padding: 0px $base-padding;
-}
-
+// EVENT branch: component-scoped copies of the drag rules (view encapsulation requires them here)
+.action-box { padding: 0px 6px; }
 .actions-btns-wpr {
-    // width: 136px; // dp
-    width: 100%; // nk
-    height: 30px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-    padding: 0px 2px;
-    &:hover{
-        cursor: -webkit-grab; 
-        cursor: grab;
-        box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
-
-        img{
-            filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
-            cursor: -webkit-grab; 
-            cursor: grab;
-        }
-
-        .action-btn-text{
-            color: $text-hover-color
-        }
-    }
-
+  width: 100%; height: 30px; border-radius: 6px; display: flex; align-items: center;
+  justify-content: space-between; gap: 5px; padding: 0px 2px;
+  &:hover { cursor: grab; box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px; }
 }
-
-
-.action-btn-icon {
-    display: inline-flex;
-    color: $text-color;
-    padding: 0;
-    vertical-align: middle;
-    // margin: 0 6px;
-    .btn-tdblu-no-boxshadow {
-        margin: 0;
-        padding: 0!important;
-        background: transparent !important;
-        height: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: none;
-    }
-}
-
-
-.truncate {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 100%
-}
-
-.trigger-beta-badge {
-    font-weight: 400;
-    background: linear-gradient(45deg, #3167e2, #a736ff);
-    padding: 1px 8px;
-    border-radius: 5px;
-    padding: 0px 6px;
-    height: 16px;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #fff;
-    position: relative;
-    margin: 0px 3px;
-    display: flex;
-    align-items: center;
-}
-
-.badge-NEW {
-    background: linear-gradient(45deg, #3167e2, #a736ff);
-}
-
-.badge-BETA {
-    background: linear-gradient(45deg, #e23131, #ff8736);
-}
-
-
-.deprecation-badge,
-.badge-DEP {
-    background: linear-gradient(45deg, #e23131, #640b0b)
-}
-
-.action-btn-icon img{
-    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
-}
-
-.action-btn-icon img,
-.drag-btn img{
-    width: 16px;
-}
-
-.action-btn-icon .svg-icon {
-    width: 16px;
-    color: var(--gray-light-01);
-    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
-}
-
-
-.action-btn-text{
-    // display: inline-flex;
-    color: $text-color;
-    padding: 0;
-    vertical-align: middle;
-    font-size: 10px;
-    font-weight: 400;
-}
-
-
-.example-custom-placeholder {
-    height: 30px;
-    width: 100%;
-    border-radius: 6px;
-    display: block;
-    background: #e7eeefcc;
-}
-
-
-/* Drag placeholder 
-/* ******************************** */
-
-.cdk-drag-preview {
-
-    // cursor: -webkit-grabbing; 
-    // cursor: grabbing;
-
-    .actions-btns-wpr{
-        transform: rotate(-3deg);
-        background-color: white;
-        box-sizing: border-box;
-        border-radius: 6px;
-        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-        0 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0 3px 14px 2px rgba(0, 0, 0, 0.12);
-
-        // cursor: -webkit-grabbing; 
-        // cursor: grabbing;
-    }
-   
-    img{
-        filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
-    }
-
-    .action-btn-text {
-        color: $text-hover-color;
-        font-size: 10px;
-        font-weight: 300;
-    }
-}
-  
-  
-.cdk-drag-animating {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-  
-.action-box:last-child {
-    border: none;
-}
-
-.action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.action-drag-placeholder {
-    background: #ccc;
-    // background: rgba(221,228,234,.8);
-    border: dotted 3px #999;
-    // border: dashed 1px var(--brown);
-    min-height: 60px;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    border-radius: 8px;
-}
-
-.cdk-drag-disabled{
-    background: var(--gray-02);
-    .actions-btns-wpr,
-    .actions-btns-wpr:hover{
-        cursor: not-allowed;
-        user-select: none;
-        box-shadow: none;
-    }
-}
-
+.action-btn-icon { display: inline-flex; color: var(--blu); }
+.action-btn-icon img, .drag-btn img { width: 16px; }
+.action-btn-text { color: var(--blu); font-size: 10px; font-weight: 400; }
+.menu-dragging { overflow: hidden; padding: 6px 0px; }
 
 
 #menuInfo {
@@ -316,7 +133,7 @@ $base-padding: 6px;
         display: flex;
         flex-direction: column;
         gap: 5px;
-        
+
         .title{
             font-size: 14px;
         }
