@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.40.3-rc10
+- **added**: added server mcp native tiledesk
+
 # 1.40.3-rc9
 - **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
 
