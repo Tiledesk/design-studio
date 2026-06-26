@@ -131,6 +131,12 @@ export class CdsPanelActionsComponent implements OnInit {
       items: (group.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true }))
     }));
 
+    if (this.menuType !== TYPE_OF_MENU.ACTION) {
+      this.activeGroup = null;
+      this.activeItems = [];
+      this.isOverNested = false;
+    }
+
   }
 
 
