@@ -5,7 +5,12 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 import { McpNativeCatalogDialogComponent } from '../mcp-native-catalog-dialog/mcp-native-catalog-dialog.component';
 
-/** Server MCP nel dialog. `native` = server Tiledesk (catalogo /mcp/native), `id` = nativeId. */
+/**
+ * Server MCP nel dialog. Unifica le due feature aggiunte in parallelo:
+ *  - server NATIVI Tiledesk (catalogo /mcp/native): `id` = nativeId, `native`, `description`
+ *  - autenticazione OAuth (da master-pre): `oauth` (clientId/clientSecret/redirectUrl/scope)
+ * `customHeaders`/`oauth` viaggiano con la selezione; `tools` = disponibili, `selectedTools` = selezionati.
+ */
 interface McpServerLite {
   id?: string;
   name: string;
@@ -14,6 +19,7 @@ interface McpServerLite {
   native?: boolean;
   description?: string;
   customHeaders?: Array<{ enabled: boolean, key: string, value: string }>;
+  oauth?: { clientId: string, clientSecret: string, redirectUrl: string, scope: string };
   tools?: Array<{ name: string }>;
   selectedTools?: Array<{ name: string }>;
 }
@@ -82,6 +88,7 @@ export class McpServersDialogComponent implements OnInit {
         transport: server.transport,
         native: server.native,
         customHeaders: stored?.customHeaders,
+        oauth: stored?.oauth,
         tools
       });
     }
@@ -215,6 +222,7 @@ export class McpServersDialogComponent implements OnInit {
           transport: createdServer.transport,
           native: createdServer.native,
           customHeaders: createdServer.customHeaders,
+          oauth: createdServer.oauth,
           tools: result?.selectedTools || []
         });
         this.logger.log("[McpServersDialog] New server added:", createdServer);
@@ -270,6 +278,7 @@ export class McpServersDialogComponent implements OnInit {
               transport: updatedServer.transport,
               native: updatedServer.native,
               customHeaders: updatedServer.customHeaders,
+              oauth: updatedServer.oauth,
               tools: Array.from(unique.values())
             };
           }

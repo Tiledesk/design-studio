@@ -75,6 +75,7 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionDataTableComponent } from './cds-action-data-table/cds-action-data-table.component';
 import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
 import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
 import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
@@ -146,6 +147,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -260,6 +262,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,

@@ -1,80 +1,54 @@
-<div class="intent-header-actions-container" 
-    [ngClass]="{'intent-header-actions-container-on-start': isStart}">
-
+<div class="intent-header-actions-container"
+     [ngClass]="{'intent-header-actions-container-on-start': isStart}">
     <div class="intent-header-actions-wpr">
-        <!-- ---------------------------------- -->
-        <!-- Panel intent -->
-        <!-- ---------------------------------- -->
         <button *ngIf="showMore"
-            class="intent-header-action-btn"
-            (click)="$event.stopPropagation();onOpenIntentPanel()" 
-            matTooltipClass="cds-mat-tooltip"
-            [matTooltip]="'CDSCanvas.IntentPanel' | translate" 
-            #tooltip="matTooltip" 
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100">
+                class="intent-header-action-btn"
+                matTooltipClass="cds-mat-tooltip"
+                [matTooltip]="'CDSCanvas.IntentPanel' | translate"
+                matTooltipPosition="above"
+                matTooltipHideDelay="100"
+                (click)="$event.stopPropagation(); onOpenIntentPanel()">
             <mat-icon class="icon" svgIcon="more_vert" aria-hidden="true"></mat-icon>
-            <!-- <img src="assets/images/icons/more_vert.svg" alt="open intent panel"> -->
         </button>
 
-        <!-- ---------------------------------- -->
-        <!-- Color intent  -->
-        <!-- ---------------------------------- -->
         <button *ngIf="showColor"
-            class="intent-header-action-btn"
-            (click)="$event.stopPropagation();onColorIntent()" 
-            matTooltipClass="cds-mat-tooltip"
-            [matTooltip]="'CDSCanvas.ColorBlock' | translate" 
-            #tooltip="matTooltip" 
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100">
+                class="intent-header-action-btn"
+                matTooltipClass="cds-mat-tooltip"
+                [matTooltip]="'CDSCanvas.ColorBlock' | translate"
+                matTooltipPosition="above"
+                matTooltipHideDelay="100"
+                (click)="$event.stopPropagation(); onColorIntent()">
             <mat-icon class="icon" svgIcon="palette" aria-hidden="true"></mat-icon>
-            <!-- <img src="assets/images/icons/palette.svg" alt="change color"> -->
         </button>
 
-        <!-- ---------------------------------- -->
-        <!-- Delete intent  -->
-        <!-- ---------------------------------- -->
         <button *ngIf="showDelete"
-            class="intent-header-action-btn"
-            (click)="$event.stopPropagation();onDeleteIntent()" 
-            matTooltipClass="cds-mat-tooltip"
-            [matTooltip]="'CDSCanvas.DeleteBlock' | translate" 
-            #tooltip="matTooltip" 
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100">
+                class="intent-header-action-btn"
+                matTooltipClass="cds-mat-tooltip"
+                [matTooltip]="'CDSCanvas.DeleteBlock' | translate"
+                matTooltipPosition="above"
+                matTooltipHideDelay="100"
+                (click)="$event.stopPropagation(); onDeleteIntent()">
             <mat-icon class="icon" svgIcon="bin" aria-hidden="true"></mat-icon>
-            <!-- <img src="assets/images/icons/bin.svg" alt="delete"> -->
         </button>
 
-        <!-- ---------------------------------- -->
-        <!-- copy intent  -->
-        <!-- ---------------------------------- -->
         <button *ngIf="showCopy"
-            class="intent-header-action-btn"
-            matTooltipClass="cds-mat-tooltip" 
-            [matTooltip]="'CDSCanvas.CopyBlock' | translate" 
-            #tooltip="matTooltip"
-            matTooltipPosition='above' 
-            matTooltipHideDelay="100"
-            (click)="onCopyIntent()">
+                class="intent-header-action-btn"
+                matTooltipClass="cds-mat-tooltip"
+                [matTooltip]="'CDSCanvas.CopyBlock' | translate"
+                matTooltipPosition="above"
+                matTooltipHideDelay="100"
+                (click)="onCopyIntent()">
             <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
-            <!-- <img src="assets/images/icons/copy.svg" alt="copy"> -->
         </button>
 
-        <!-- ---------------------------------- -->
-        <!-- Test intent play btn  -->
-        <!-- ---------------------------------- -->
-        <button *ngIf="showPlay" 
-            class="intent-header-action-btn"
-            (click)="openTestSiteInPopupWindow()" 
-            matTooltipClass="cds-mat-tooltip"
-            [matTooltip]="'CDSCanvas.StartTest' | translate" 
-            #tooltip="matTooltip" 
-            matTooltipPosition='above'
-            matTooltipHideDelay="100">
+        <button *ngIf="showPlay"
+                class="intent-header-action-btn"
+                matTooltipClass="cds-mat-tooltip"
+                [matTooltip]="'CDSCanvas.StartTest' | translate"
+                matTooltipPosition="above"
+                matTooltipHideDelay="100"
+                (click)="openTestSiteInPopupWindow()">
             <mat-icon class="icon" svgIcon="play" aria-hidden="true"></mat-icon>
-            <!-- <img src="assets/images/icons/play.svg" alt="play"> -->
         </button>
     </div>
 </div>
