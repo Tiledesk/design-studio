@@ -32,6 +32,11 @@ export class CdsPanelActionsComponent implements OnInit {
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   menuItemsList: any;
+  groupRows: Array<{ group: ConnectorGroup; items: any[] }> = [];
+  activeGroup: ConnectorGroup | null = null;
+  activeItems: any[] = [];
+  activeGroupPos: any = { x: 200, y: 0 };
+  isOverNested = false;
   isDragging: any = false;
   indexDrag: number;
 
@@ -121,6 +126,11 @@ export class CdsPanelActionsComponent implements OnInit {
       this.pos = {'x': 0, 'y':0};
     }
 
+    this.groupRows = (this.connectorGroups || []).map(group => ({
+      group,
+      items: (group.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true }))
+    }));
+
   }
 
 
@@ -171,6 +181,20 @@ export class CdsPanelActionsComponent implements OnInit {
     if (isDragging) { this.isOpen = false; }
     this.isDraggingMenuElement.emit(isDragging);
   }
+
+  openGroup(rowEl: HTMLElement, row: { group: ConnectorGroup; items: any[] }) {
+    this.activeGroup = row.group;
+    this.activeItems = row.items;
+    this.activeGroupPos = { x: 200, y: rowEl.offsetTop };
+  }
+
+  closeGroup() {
+    setTimeout(() => { if (!this.isOverNested) { this.activeGroup = null; } }, 0);
+  }
+
+  onOverNested() { this.isOverNested = true; }
+
+  onLeaveNested() { this.isOverNested = false; this.closeGroup(); }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);

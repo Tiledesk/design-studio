@@ -171,3 +171,30 @@ $base-padding: 6px;
         }
     }
 }
+
+.connector-groups { padding: 0 6px 6px; }
+
+.connector-group-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  .action-btn-text { flex: 1; }
+  .group-chevron { font-size: 16px; color: var(--gray-light-01); line-height: 1; padding-right: 2px; }
+  &:hover {
+    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    .action-btn-text, .group-chevron { color: var(--blu); }
+  }
+}
+
+.connector-flyout {
+  position: absolute;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+  z-index: 10;
+}
