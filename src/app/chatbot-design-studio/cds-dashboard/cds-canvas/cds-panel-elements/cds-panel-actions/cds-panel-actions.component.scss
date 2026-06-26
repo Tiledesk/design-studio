@@ -199,3 +199,49 @@ $base-padding: 6px;
   box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
   z-index: 10;
 }
+
+// EVENT branch drag placeholder/preview rules (component-scoped; shared cds-action-drag-list
+// uses Emulated encapsulation so its styles don't reach this host's EVENT template)
+.example-custom-placeholder {
+    height: 30px;
+    width: 100%;
+    border-radius: 6px;
+    display: block;
+    background: #e7eeefcc;
+}
+
+.cdk-drag-preview {
+    .actions-btns-wpr {
+        transform: rotate(-3deg);
+        background-color: white;
+        box-sizing: border-box;
+        border-radius: 6px;
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+    img { filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%); }
+    .action-btn-text { color: var(--blu); font-size: 10px; font-weight: 300; }
+}
+
+.cdk-drag-animating { transition: transform 250ms cubic-bezier(0, 0, 0.2, 1); }
+
+.action-box:last-child { border: none; }
+
+.action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.action-drag-placeholder {
+    background: #ccc;
+    border: dotted 3px #999;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    border-radius: 8px;
+}
+
+.cdk-drag-disabled {
+    background: var(--gray-02);
+    .actions-btns-wpr,
+    .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; }
+}

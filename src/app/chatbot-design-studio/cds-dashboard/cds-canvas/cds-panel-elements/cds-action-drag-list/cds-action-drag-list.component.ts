@@ -1,10 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
-import { TYPE_OF_MENU } from '../../../../utils';
 import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 
 @Component({
   selector: 'cds-action-drag-list',
@@ -17,8 +15,6 @@ export class CdsActionDragListComponent {
   @Output() hideActionPlaceholder = new EventEmitter<boolean>();
   @Output() hoverItem = new EventEmitter<{ element: HTMLElement; value: any }>();
 
-  TYPE_OF_MENU = TYPE_OF_MENU;
-  BRAND_BASE_INFO = BRAND_BASE_INFO;
   dragging = false;
   indexDrag: number;
 
