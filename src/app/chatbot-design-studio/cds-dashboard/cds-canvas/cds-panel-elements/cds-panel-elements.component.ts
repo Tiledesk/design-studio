@@ -9,7 +9,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ConnectorCatalogService } from '../../../connector/connector-catalog.service';
+import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 
 
@@ -42,6 +42,7 @@ export class CdsPanelElementsComponent implements OnInit {
 
   actionsByCategory = {};
   actionsList: Array<any> = [];
+  connectorGroups: ConnectorGroup[] = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   actionCategory: any;
@@ -159,17 +160,9 @@ export class CdsPanelElementsComponent implements OnInit {
           catchError(() => of(null))
         ).subscribe(manifest => {
           if (!manifest) { return; }
-          const paletteEntries = this.connectorCatalogService.toPaletteEntries(manifest);
-          if (!this.actionsByCategory['INTEGRATIONS']) {
-            this.actionsByCategory['INTEGRATIONS'] = [];
-          }
-          paletteEntries.forEach(entry => {
-            this.actionsByCategory['INTEGRATIONS'].push({
-              type: TYPE_OF_MENU.ACTION,
-              value: entry,
-              canLoad: true
-            });
-          });
+          const group = this.connectorCatalogService.toConnectorGroup(manifest);
+          if (!group.entries || group.entries.length === 0) { return; }
+          this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
         });
       });
     });

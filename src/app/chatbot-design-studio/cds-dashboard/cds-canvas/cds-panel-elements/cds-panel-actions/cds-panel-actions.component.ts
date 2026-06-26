@@ -8,6 +8,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+import { ConnectorGroup } from '../../../../connector/connector-catalog.service';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -22,6 +23,7 @@ export class CdsPanelActionsComponent implements OnInit {
   @Input() menuType: string;
   @Input() menuCategory: string;
   @Input() pos: any;
+  @Input() connectorGroups: ConnectorGroup[] = [];
   @Output() isDraggingMenuElement = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
 
