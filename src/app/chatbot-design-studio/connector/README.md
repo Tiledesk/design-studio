@@ -60,7 +60,7 @@ under an expandable sub-menu row in the palette. The data flow is:
    events identically to the main palette list, preserving the free-pointer drag UX.
 5. **Drop behavior** — dragging an action from the nested list drops the same `webrequestv2`
    action structure, pre-filled with the manifest hint and carrying both `_tdConnectorRef`
-   (the connector's ID) and `_tdConnectorMeta` (additional context, e.g., API key or auth token).
+   (the connector's ID) and `_tdConnectorMeta` (display metadata — name, icon, and input field descriptors used by the editor to render the form).
    The existing runtime and editor handle it as a standard webrequestv2 action.
 
 The key implementation detail: the nested flyout is a **sibling of (not a descendant of)
