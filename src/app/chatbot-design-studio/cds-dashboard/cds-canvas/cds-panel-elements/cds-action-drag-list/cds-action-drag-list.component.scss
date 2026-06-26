@@ -4,7 +4,12 @@ $text-color: var(--blu);
 $text-hover-color: var(--blu);
 $base-padding: 6px;
 
-.action-list .menu-dragging { overflow: hidden; padding: $base-padding 0px; }
+.action-list {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.action-list .menu-dragging { padding: $base-padding 0px; }
 
 .action-box { padding: 0px $base-padding; }
 
