@@ -16,6 +16,13 @@ export interface ConnectorPaletteEntry {
   connectorEntry: ConnectorActionEntry;
 }
 
+export interface ConnectorGroup {
+  id: string;
+  name: string;
+  icon: string;
+  entries: ConnectorPaletteEntry[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ConnectorCatalogService {
   constructor(private http: HttpClient) {}
@@ -37,5 +44,14 @@ export class ConnectorCatalogService {
       connectorRef: a.id,
       connectorEntry: { ...a, icon: manifest.connector?.icon }
     }));
+  }
+
+  toConnectorGroup(manifest: ConnectorManifest): ConnectorGroup {
+    return {
+      id: manifest.connector?.id,
+      name: manifest.connector?.name,
+      icon: manifest.connector?.icon || 'assets/images/actions/web_request.svg',
+      entries: this.toPaletteEntries(manifest),
+    };
   }
 }
