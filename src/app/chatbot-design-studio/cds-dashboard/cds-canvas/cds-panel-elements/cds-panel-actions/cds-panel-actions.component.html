@@ -8,6 +8,35 @@
         (hoverItem)="openInfo($event.element, $event.value)">
     </cds-action-drag-list>
 
+    <!-- CONNECTOR GROUP ROWS -->
+    <div *ngIf="menuType === TYPE_OF_MENU.ACTION && groupRows.length > 0"
+        [style.display]="isDragging?'none':'block'" class="connector-groups">
+        <div class="connector-group-row" *ngFor="let row of groupRows" #groupRowEl
+            (mouseover)="openGroup(groupRowEl, row)"
+            (mouseleave)="closeGroup()">
+            <span class="action-btn-icon">
+                <mat-icon class="svg-icon" [svgIcon]="row.group.icon" aria-hidden="true"></mat-icon>
+            </span>
+            <span class="action-btn-text truncate">{{ row.group.name }}</span>
+            <span class="group-chevron">&rsaquo;</span>
+        </div>
+    </div>
+
+    <!-- NESTED CONNECTOR FLYOUT -->
+    <div id="connector_flyout" class="connector-flyout"
+        [style.display]="activeGroup ? 'block' : 'none'"
+        [style.top.px]="activeGroupPos.y"
+        [style.left.px]="activeGroupPos.x"
+        (mouseover)="onOverNested()"
+        (mouseleave)="onLeaveNested()">
+        <cds-action-drag-list
+            [items]="activeItems"
+            (isDragging)="onChildDragging($event)"
+            (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
+            (hoverItem)="openInfo($event.element, $event.value)">
+        </cds-action-drag-list>
+    </div>
+
     <!-- EVENT: unchanged -->
     <div *ngIf="menuType === TYPE_OF_MENU.EVENT" class="action-list" id="action_list_drop_connect"
         cdkDropList [cdkDropListData]="menuItemsList">
