@@ -41,3 +41,28 @@ Wiring: `angular.json` test configuration `connector` → `src/test.connector.ts
 
 Adding a new connector requires **zero** further design-studio changes: it just needs to be
 installed (an integration record with a `baseUrl`) and to serve a valid `/api/manifest`.
+
+## Connector palette grouping (cascading sub-menu)
+
+To improve UX for flows with many connectors, each installed connector's actions are grouped
+under an expandable sub-menu row in the palette. The data flow is:
+
+1. **Catalog → groups** — after loading a manifest, `toConnectorGroup(manifest)` projects
+   the manifest into a `ConnectorGroup { id, name, icon, entries }` object. `entries`
+   holds the connector's actions (from `manifest.actions`) for later rendering.
+2. **Panel build** — `cds-panel-elements` collects all installed connectors' groups into
+   `connectorGroups[]` and passes it to `cds-panel-actions` via `@Input()`.
+3. **Expandable rows** — `cds-panel-actions` renders one expandable row per connector group,
+   labeled with the connector's `name` and `icon`. The row hosts a flyout region (absolute
+   positioning, outside the `.action-list` container to avoid clipping).
+4. **Nested action list** — when expanded, the flyout renders a single **shared** `cds-action-drag-list`
+   instance parameterized with the group's `entries`. This component handles drag start/move/end
+   events identically to the main palette list, preserving the free-pointer drag UX.
+5. **Drop behavior** — dragging an action from the nested list drops the same `webrequestv2`
+   action structure, pre-filled with the manifest hint and carrying both `_tdConnectorRef`
+   (the connector's ID) and `_tdConnectorMeta` (additional context, e.g., API key or auth token).
+   The existing runtime and editor handle it as a standard webrequestv2 action.
+
+The key implementation detail: the nested flyout is a **sibling of (not a descendant of)
+the scrollable `.action-list` container**. This allows the flyout to overflow freely without
+being clipped by the parent's scroll boundary.
