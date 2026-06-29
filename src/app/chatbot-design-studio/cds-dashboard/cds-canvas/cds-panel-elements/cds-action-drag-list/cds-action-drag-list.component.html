@@ -14,7 +14,11 @@
           [attr.id]="'menu-trigger-' + i">
 
         <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-          <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+          <img *ngIf="isUrlIcon(item.value.src); else nativeIcon"
+               class="connector-action-icon" [src]="item.value.src" alt="" aria-hidden="true">
+          <ng-template #nativeIcon>
+            <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+          </ng-template>
         </div>
         <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
         <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>

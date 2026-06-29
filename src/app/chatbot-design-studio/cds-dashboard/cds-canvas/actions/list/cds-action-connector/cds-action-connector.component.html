@@ -1,18 +1,24 @@
 <!-- Preview mode: show compact summary with connectors -->
-<div *ngIf="previewMode" class="cds-action-preview">
-    <div class="action-row-left">
-        <span class="connector-action-name" *ngIf="meta.name">{{ meta.name }}</span>
+<div *ngIf="previewMode" class="cds-action-preview connector-preview">
+    <div class="connector-card-title" *ngIf="meta.name">
+        <span class="connector-action-name ellips">{{ meta.name }}</span>
     </div>
 
-    <div class="action-row">
-        <div class="output-assignments">
-            <span class="output-item" *ngIf="action?.assignResultTo">
-                <span class="output-key">Store in:</span>
-                <span class="tag output-val ellips">{{ action.assignResultTo }}</span>
-            </span>
-            <span class="output-empty" *ngIf="!action?.assignResultTo">—</span>
+    <!-- Required inputs: read-only label: value summary -->
+    <div class="required-summary" *ngIf="requiredInputs.length">
+        <div class="required-row" *ngFor="let input of requiredInputs">
+            <span class="required-label">{{ input.name }}<span class="req"> *</span></span>
+            <span class="required-value ellips" *ngIf="displayValue(input) as v; else notSet">{{ v }}</span>
+            <ng-template #notSet><span class="required-value not-set">Not set</span></ng-template>
         </div>
     </div>
+
+    <div class="output-assignments" *ngIf="action?.assignResultTo">
+        <span class="output-key">Store in</span>
+        <span class="output-val ellips">{{ action.assignResultTo }}</span>
+    </div>
+
+    <hr class="connector-divider">
 
     <div class="previewContent">
         <div class="icon-action">
@@ -25,8 +31,6 @@
             [isConnected]   = "isConnectedTrue">
         </cds-connector>
     </div>
-
-    <hr class="preview-divider">
 
     <div class="previewContent">
         <label class="title-preview-label">Else</label>

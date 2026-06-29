@@ -1,4 +1,4 @@
-<div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
+<div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()" (wheel)="$event.stopPropagation()">
 
     <!-- ACTION: shared draggable list -->
     <cds-action-drag-list *ngIf="menuType === TYPE_OF_MENU.ACTION"
@@ -15,7 +15,7 @@
             (mouseover)="openGroup(groupRowEl, row)"
             (mouseleave)="closeGroup()">
             <span class="action-btn-icon">
-                <mat-icon class="svg-icon" [svgIcon]="row.group.icon" aria-hidden="true"></mat-icon>
+                <img class="connector-group-icon" [src]="row.group.icon" alt="" aria-hidden="true">
             </span>
             <span class="action-btn-text truncate">{{ row.group.name }}</span>
             <span class="group-chevron">&rsaquo;</span>

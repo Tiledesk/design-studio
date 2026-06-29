@@ -112,6 +112,41 @@ export class CdsActionConnectorComponent implements OnInit, OnDestroy, OnChanges
     }
   }
 
+  // READ-ONLY PREVIEW (canvas card)
+
+  /** The required inputs only — shown as a read-only summary on the canvas card. */
+  get requiredInputs(): ConnectorFormInput[] {
+    return (this.meta?.inputs || []).filter(i => i.required);
+  }
+
+  // The sidebar editor mutates the SAME action object's jsonBody in place, so
+  // ngOnChanges never re-fires here and the init-time `this.values` snapshot goes
+  // stale. Read values live from the action on each change-detection pass instead,
+  // memoized by the jsonBody string so we only re-parse when it actually changes.
+  private previewValuesKey: string | undefined;
+  private previewValuesCache: { [id: string]: string } = {};
+
+  private previewValues(): { [id: string]: string } {
+    const key = this.action?.jsonBody;
+    if (key !== this.previewValuesKey) {
+      this.previewValuesKey = key;
+      this.previewValuesCache = readConnectorInputs(this.action);
+    }
+    return this.previewValuesCache;
+  }
+
+  /** Display string for a required input on the card: option label for selects,
+   *  the stored value otherwise, or '' when unset (template shows "Not set"). */
+  displayValue(input: ConnectorFormInput): string {
+    const raw = this.previewValues()[input.id];
+    if (raw === undefined || raw === null || raw === '') { return ''; }
+    if (input.options && input.options.length) {
+      const match = input.options.find(o => o.value === raw);
+      if (match) { return match.label; }
+    }
+    return String(raw);
+  }
+
   // EVENT HANDLERS
 
   onInputChange(): void {

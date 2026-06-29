@@ -292,12 +292,24 @@
                         [action]="action">
                     </cds-action-web-request>
     
-                    <cds-action-web-request-v2 *ngSwitchCase="TYPE_ACTION.WEB_REQUESTV2"    
-                        class="panel-response"
-                        [intentSelected]="intent" 
-                        [action]="action"
-                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-web-request-v2>
+                    <ng-container *ngSwitchCase="TYPE_ACTION.WEB_REQUESTV2">
+                        <!-- Connector actions persist as webrequestv2: show the connector's
+                             required-input summary instead of the generic web-request preview -->
+                        <cds-action-connector *ngIf="action._tdConnectorRef"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            [previewMode]="true"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-connector>
+
+                        <cds-action-web-request-v2 *ngIf="!action._tdConnectorRef"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-web-request-v2>
+                    </ng-container>
 
                     <cds-action-web-response *ngSwitchCase="TYPE_ACTION.WEB_RESPONSE"    
                         class="panel-response"

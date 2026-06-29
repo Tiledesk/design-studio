@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 import { TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
 import { ControllerService } from '../../../../services/controller.service';
@@ -18,6 +18,7 @@ import { ConnectorGroup } from '../../../../connector/connector-catalog.service'
 })
 export class CdsPanelActionsComponent implements OnInit {
   @ViewChild('action_list_drop_connect') actionListDropConnect: CdkDropList;
+  @ViewChild('panel_actions_div') panelDiv: ElementRef;
 
   @Input() actionsList: Array<any>;
   @Input() menuType: string;
@@ -191,7 +192,18 @@ export class CdsPanelActionsComponent implements OnInit {
   openGroup(rowEl: HTMLElement, row: { group: ConnectorGroup; items: any[] }) {
     this.activeGroup = row.group;
     this.activeItems = row.items;
-    this.activeGroupPos = { x: 200, y: rowEl.offsetTop };
+    // A connector can expose many actions, so the nested flyout's (max-height-capped,
+    // scrollable) box can be tall. Anchor it to the hovered row, but shift it up if it would
+    // run past the bottom of the viewport — otherwise the scrollable box opens off-screen and
+    // feels unscrollable. Must match the .action-list max-height: min(70vh, 560px).
+    const margin = 8;
+    const maxFlyoutH = Math.min(window.innerHeight * 0.7, 560);
+    const panelTop = this.panelDiv ? this.panelDiv.nativeElement.getBoundingClientRect().top : 0;
+    let screenTop = rowEl.getBoundingClientRect().top;
+    if (screenTop + maxFlyoutH > window.innerHeight - margin) {
+      screenTop = Math.max(margin, window.innerHeight - margin - maxFlyoutH);
+    }
+    this.activeGroupPos = { x: 200, y: Math.max(0, Math.round(screenTop - panelTop)) };
   }
 
   closeGroup() {

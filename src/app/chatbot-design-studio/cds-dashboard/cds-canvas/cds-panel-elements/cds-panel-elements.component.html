@@ -83,7 +83,7 @@
             [actionsList]="actionsList"
             [menuType]="menuType"
             [menuCategory]="menuCategory"
-            [connectorGroups]="menuCategory === TYPE_ACTION_CATEGORY.INTEGRATIONS ? connectorGroups : []"
+            [connectorGroups]="menuCategory === INTEGRATIONS_CATEGORY_KEY ? connectorGroups : []"
             (isDraggingMenuElement)="onDraggingMenuElement($event)"
             (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
         </cds-panel-actions>

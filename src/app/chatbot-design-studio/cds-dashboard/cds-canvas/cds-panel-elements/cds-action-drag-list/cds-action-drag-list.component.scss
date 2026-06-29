@@ -61,6 +61,12 @@ $base-padding: 6px;
 
 .action-btn-icon img, .drag-btn img { width: 16px; }
 .action-btn-icon img { filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%); }
+
+// Connector action icons are real (multi-colour) logos, not tintable SVGs —
+// keep their original colours through the default, hover and drag-preview states.
+.action-btn-icon img.connector-action-icon { width: 16px; height: 16px; object-fit: contain; filter: none; }
+.actions-btns-wpr:hover .action-btn-icon img.connector-action-icon,
+.cdk-drag-preview img.connector-action-icon { filter: none; }
 .action-btn-icon .svg-icon { width: 16px; color: var(--gray-light-01); filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%); }
 
 .action-btn-text { color: $text-color; padding: 0; vertical-align: middle; font-size: 10px; font-weight: 400; }
