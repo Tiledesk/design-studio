@@ -12,7 +12,7 @@
     <button class="te-auth-btn" *ngIf="!authByGroup[g.id]" (click)="onConnect(g)">{{ 'CDSCanvas.Connect' | translate }}</button>
   </div>
 
-  <div class="te-add" *ngIf="availableEntries.length">
+  <div class="te-add" *ngIf="availableSelectItems.length">
     <cds-select
         [items]="availableSelectItems"
         [bindLabelSelect]="'label'"
