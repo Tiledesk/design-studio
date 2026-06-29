@@ -22,16 +22,12 @@ export class CdsTriggerEntrypointComponent {
   }
 
   async onSaveFilters(sub: ConnectorTriggerSub): Promise<void> {
-    const group = this.orchestrator.groupForRef(sub.ref);
-    if (group) {
-      await this.orchestrator.updateTriggerFilters(this.intent, group, sub.ref, sub.filters);
-    }
+    try { await this.orchestrator.updateTriggerFilters(this.intent, sub.ref, sub.filters); }
+    catch (e) { console.error('[triggers] save filters failed', e); }
   }
 
   async onRemove(sub: ConnectorTriggerSub): Promise<void> {
-    const group = this.orchestrator.groupForRef(sub.ref);
-    if (group) {
-      await this.orchestrator.removeTrigger(this.intent, group, sub.ref);
-    }
+    try { await this.orchestrator.removeTrigger(this.intent, sub.ref); }
+    catch (e) { console.error('[triggers] remove failed', e); }
   }
 }

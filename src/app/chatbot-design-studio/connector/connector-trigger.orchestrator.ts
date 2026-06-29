@@ -14,10 +14,12 @@ import { ConnectorTriggerGroup, ConnectorTriggerEntry, ConnectorTriggerSub,
 export class ConnectorTriggerOrchestrator {
   /** In-memory registry: entry.id (trigger ref) → ConnectorTriggerGroup.
    *  Populated whenever addTrigger is called in the current session.
-   *  NOTE: this map is cleared on a full page reload. After reload, groupForRef()
-   *  returns undefined, so onSaveFilters / onRemove in the entrypoint editor are
-   *  no-ops for network calls (attribute changes already persisted, but the
-   *  connector cannot re-subscribe / unsubscribe until addTrigger is called again). */
+   *  NOTE: this map is session-only and is cleared on a full page reload.
+   *  After reload, groupForRef() returns undefined.  The local flow change
+   *  (writeTriggerSubs + updateIntent) is ALWAYS persisted unconditionally.
+   *  The connector subscribe/unsubscribe network call is BEST-EFFORT: it is
+   *  skipped when the group is not present in the cache (e.g. after reload)
+   *  and does not prevent the local change from being saved. */
   private readonly groupsByRef = new Map<string, ConnectorTriggerGroup>();
 
   constructor(
@@ -90,32 +92,43 @@ export class ConnectorTriggerOrchestrator {
     return intent;
   }
 
-  async updateTriggerFilters(intent: Intent, group: ConnectorTriggerGroup, ref: string, filters: { [id: string]: string }): Promise<void> {
+  /** ALWAYS persists the filter update to the local flow (writeTriggerSubs + updateIntent).
+   *  THEN best-effort: re-subscribes via the connector if the group is in the session cache.
+   *  If the group is absent (e.g. after a page reload) the local change is still saved. */
+  async updateTriggerFilters(intent: Intent, ref: string, filters: { [id: string]: string }): Promise<void> {
     const subs = readTriggerSubs(intent);
     const sub = subs.find(s => s.ref === ref);
     if (!sub) { return; }
     sub.filters = filters;
     writeTriggerSubs(intent, subs);
     await this.intentService.updateIntent(intent);
-    const webhookId = await this.ensureWebhookId(intent);
-    if (webhookId) {
-      await firstValueFrom(this.triggerService.subscribe(group.baseUrl, group.apiKey, {
-        id: ref, external_id: this.dashboardService.projectID,
-        webhook: this.prodWebhookUrl(webhookId), inputs: filters,
-      })).catch(err => console.error('[triggers] re-subscribe failed', err));
+    const group = this.groupForRef(ref);
+    if (group) {
+      const webhookId = await this.ensureWebhookId(intent);
+      if (webhookId) {
+        firstValueFrom(this.triggerService.subscribe(group.baseUrl, group.apiKey, {
+          id: ref, external_id: this.dashboardService.projectID,
+          webhook: this.prodWebhookUrl(webhookId), inputs: filters,
+        })).catch(err => console.error('[triggers] re-subscribe failed', err));
+      }
     }
   }
 
-  async removeTrigger(intent: Intent, group: ConnectorTriggerGroup, ref: string): Promise<void> {
-    const subs = readTriggerSubs(intent).filter(s => s.ref !== ref);
-    writeTriggerSubs(intent, subs);
+  /** ALWAYS persists the removal to the local flow (writeTriggerSubs + updateIntent).
+   *  THEN best-effort: unsubscribes via the connector if the group is in the session cache.
+   *  If the group is absent (e.g. after a page reload) the local change is still saved. */
+  async removeTrigger(intent: Intent, ref: string): Promise<void> {
+    writeTriggerSubs(intent, readTriggerSubs(intent).filter(s => s.ref !== ref));
     await this.intentService.updateIntent(intent);
-    const webhookId = await this.ensureWebhookId(intent);
-    if (webhookId) {
-      await firstValueFrom(this.triggerService.unsubscribe(group.baseUrl, group.apiKey, {
-        id: ref, external_id: this.dashboardService.projectID,
-        webhook: this.prodWebhookUrl(webhookId),
-      })).catch(err => console.error('[triggers] unsubscribe failed', err));
+    const group = this.groupForRef(ref);
+    if (group) {
+      const webhookId = await this.ensureWebhookId(intent);
+      if (webhookId) {
+        firstValueFrom(this.triggerService.unsubscribe(group.baseUrl, group.apiKey, {
+          id: ref, external_id: this.dashboardService.projectID,
+          webhook: this.prodWebhookUrl(webhookId),
+        })).catch(err => console.error('[triggers] unsubscribe failed', err));
+      }
     }
   }
 }
