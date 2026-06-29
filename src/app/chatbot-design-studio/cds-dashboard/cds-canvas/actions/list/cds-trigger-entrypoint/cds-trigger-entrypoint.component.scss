@@ -20,3 +20,9 @@
 .te-auth-info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .te-auth-email { font-size: 11px; color: #677283; }
 .ellips { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.te-add { display: flex; align-items: center; gap: 8px; }
+.te-add-select { flex: 1; min-width: 0; }
+.te-add-btn { border: 1px solid var(--blu, #1a2b4a); background: var(--blu, #1a2b4a); color: #fff; border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.te-add-btn:hover { opacity: .92; }
+.te-add-btn:disabled { opacity: .45; cursor: default; }

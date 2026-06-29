@@ -104,16 +104,22 @@ export class CdsTriggerEntrypointComponent implements OnInit {
    *  resets if the [items] reference changes on every change-detection pass, so this is
    *  cached and recomputed only when the loaded groups or the added subs actually change. */
   availableSelectItems: Array<{ label: string; value: string }> = [];
+  /** Trigger chosen in the dropdown but not yet added — the Add button commits it. */
+  selectedRef: string = '';
 
   private recomputeSelectItems(): void {
     this.availableSelectItems = this.availableEntries.map(x => ({ label: `${x.group.name} — ${x.entry.name}`, value: x.entry.id }));
   }
 
-  async onAddTriggerSelect(event: any): Promise<void> {
-    const ref = event && event.value;
-    const match = this.availableEntries.find(x => x.entry.id === ref);
+  onSelectTrigger(event: any): void {
+    this.selectedRef = (event && event.value) || '';
+  }
+
+  async onAddSelected(): Promise<void> {
+    const match = this.availableEntries.find(x => x.entry.id === this.selectedRef);
     if (!match) { return; }
     await this.orchestrator.addTrigger(this.intent, this.webhookUrl, match.group, match.entry);
+    this.selectedRef = '';
     this.recomputeSelectItems();
   }
 
