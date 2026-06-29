@@ -31,6 +31,13 @@ export interface ConnectorActionEntry {
   icon?: string;
 }
 
+export interface ConnectorManifestGroup {
+  id: string;
+  name: string;
+  icon?: string;
+  order?: number;
+}
+
 export interface ConnectorManifest {
   connector: {
     id: string;
@@ -43,4 +50,5 @@ export interface ConnectorManifest {
   };
   actions: ConnectorActionEntry[];
   triggers: ConnectorActionEntry[];
+  groups?: ConnectorManifestGroup[];
 }
