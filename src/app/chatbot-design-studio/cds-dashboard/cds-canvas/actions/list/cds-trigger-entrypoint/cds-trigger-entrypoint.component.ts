@@ -4,6 +4,7 @@ import { catchError } from 'rxjs/operators';
 import { Intent } from 'src/app/models/intent-model';
 import { ConnectorTriggerSub, ConnectorTriggerGroup, ConnectorTriggerEntry, readTriggerSubs } from '../../../../../connector/connector-trigger.model';
 import { ConnectorTriggerOrchestrator } from '../../../../../connector/connector-trigger.orchestrator';
+import { ConnectorTriggerService } from '../../../../../connector/connector-trigger.service';
 import { ConnectorCatalogService } from '../../../../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -14,12 +15,14 @@ export class CdsTriggerEntrypointComponent implements OnInit {
   @Input() intent: Intent;
   @Input() webhookUrl: string = '';
   availableGroups: ConnectorTriggerGroup[] = [];
+  authByGroup: { [id: string]: boolean } = {};
 
   constructor(
     private readonly orchestrator: ConnectorTriggerOrchestrator,
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
     private readonly dashboardService: DashboardService,
+    private readonly triggerService: ConnectorTriggerService,
   ) {}
 
   ngOnInit(): void {
@@ -49,7 +52,36 @@ export class CdsTriggerEntrypointComponent implements OnInit {
   }
 
   private addGroup(g: ConnectorTriggerGroup) {
-    if (g.entries && g.entries.length > 0) { this.availableGroups = [...this.availableGroups.filter(x => x.id !== g.id), g]; }
+    if (g.entries && g.entries.length > 0) {
+      this.availableGroups = [...this.availableGroups.filter(x => x.id !== g.id), g];
+      this.checkAuth(g);
+    }
+  }
+
+  /** Refresh the connector's Google connection state for the auth row. */
+  checkAuth(g: ConnectorTriggerGroup): void {
+    const projectId = this.dashboardService.projectID;
+    if (!projectId || !g.baseUrl) { return; }
+    this.triggerService.authStatus(g.baseUrl, projectId).subscribe({
+      next: r => { this.authByGroup[g.id] = !!(r && r.connected); },
+      error: () => { this.authByGroup[g.id] = false; },
+    });
+  }
+
+  /** Open the connector's Google consent flow in a popup; re-check status on return. */
+  onConnect(g: ConnectorTriggerGroup): void {
+    const projectId = this.dashboardService.projectID;
+    if (!projectId || !g.baseUrl) { return; }
+    this.triggerService.install(g.baseUrl, projectId).subscribe({
+      next: r => {
+        if (r && r.authUrl) {
+          window.open(r.authUrl, '_blank', 'width=520,height=680');
+          const onFocus = () => { this.checkAuth(g); window.removeEventListener('focus', onFocus); };
+          window.addEventListener('focus', onFocus);
+        }
+      },
+      error: e => console.error('[triggers] connect failed', e),
+    });
   }
 
   get subs(): ConnectorTriggerSub[] { return readTriggerSubs(this.intent); }
