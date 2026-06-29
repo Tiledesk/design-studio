@@ -28,6 +28,8 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
+import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
+import { ProjectService } from 'src/app/services/projects.service';
 
 const swal = require('sweetalert');
 
@@ -93,6 +95,8 @@ export class CdsHeaderComponent implements OnInit {
     private readonly webhookService: WebhookService,
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
+    private readonly triggerService: ConnectorTriggerService,
+    private readonly projectService: ProjectService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -369,12 +373,39 @@ export class CdsHeaderComponent implements OnInit {
 
 
 
+  /** Arm/disarm connector dev-mirroring for the current chatbot webhook across every
+   *  configured/installed connector, so Test-It-Out also delivers trigger events to the
+   *  draft (/dev) bot. Best-effort — never blocks the test session. */
+  private async setConnectorsDebug(arm: boolean): Promise<void> {
+    if (!this.webhookId) { return; }
+    const conns: Array<{ baseUrl: string; apiKey?: string }> = [];
+    ((environment as any).connectorBaseUrls || []).forEach((b: string) => { if (b) { conns.push({ baseUrl: b }); } });
+    try {
+      const integrations: any = await firstValueFrom((this.projectService as any).getIntegrations(this.projectID));
+      if (Array.isArray(integrations)) {
+        integrations.forEach((i: any) => {
+          const b = i?.value?.baseUrl;
+          if (b && i?.value?.installed === true && !conns.find(c => c.baseUrl === b)) {
+            conns.push({ baseUrl: b, apiKey: i?.value?.apiKey });
+          }
+        });
+      }
+    } catch { /* ignore — dev path still arms via connectorBaseUrls */ }
+    conns.forEach(c => {
+      const call$ = arm
+        ? this.triggerService.armDebug(c.baseUrl, c.apiKey || '', this.webhookId, 3600)
+        : this.triggerService.disarmDebug(c.baseUrl, c.apiKey || '', this.webhookId);
+      call$.subscribe({ error: (e: any) => this.logger.error('[triggers] ' + (arm ? 'armDebug' : 'disarmDebug') + ' failed', e) });
+    });
+  }
+
   async onOpenTestItOut(){
     let request_id: string | Promise<void>;
     this.logService.initialize(null);
     if(this.isWebhook){
       this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
       request_id = await this.webhookStarterLog();
+      this.setConnectorsDebug(true);
     } else {
       request_id = this.logService.request_id;
     }
@@ -396,6 +427,7 @@ export class CdsHeaderComponent implements OnInit {
   onCloseTestItOut(){
     if(this.isWebhook){
       this.stopWebhook();
+      this.setConnectorsDebug(false);
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
