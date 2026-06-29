@@ -324,6 +324,7 @@
         "ShowConnector": "show connector",
         "Triggers": "Triggers",
         "NoTriggers": "No triggers yet",
+        "AddTrigger": "Add a trigger…",
         "LineText": "Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock": "Block color",

@@ -10,8 +10,6 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
-import { ConnectorTriggerGroup } from '../../../connector/connector-trigger.model';
-import { ConnectorTriggerOrchestrator } from '../../../connector/connector-trigger.orchestrator';
 import { ProjectService } from 'src/app/services/projects.service';
 import { environment } from 'src/environments/environment';
 
@@ -48,8 +46,7 @@ export class CdsPanelElementsComponent implements OnInit {
   actionsByCategory = {};
   actionsList: Array<any> = [];
   connectorGroups: ConnectorGroup[] = [];
-  triggerGroups: ConnectorTriggerGroup[] = [];
-  
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   actionCategory: any;
   
@@ -58,7 +55,6 @@ export class CdsPanelElementsComponent implements OnInit {
     private readonly dashboardService: DashboardService,
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
-    private readonly triggerOrchestrator: ConnectorTriggerOrchestrator,
   ) { }
 
   ngOnInit(): void {
@@ -169,12 +165,6 @@ export class CdsPanelElementsComponent implements OnInit {
         ).subscribe(manifest => {
           if (!manifest) { return; }
           const group = this.connectorCatalogService.toConnectorGroup(manifest);
-          const apiKey = integration?.value?.apiKey;
-          const tGroup = this.connectorCatalogService.toTriggerGroup(manifest, baseUrl, apiKey);
-          if (tGroup.entries && tGroup.entries.length > 0) {
-            this.triggerGroups = [...this.triggerGroups.filter(g => g.id !== tGroup.id), tGroup];
-            this.triggerOrchestrator.registerGroup(tGroup);
-          }
           if (!group.entries || group.entries.length === 0) { return; }
           this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
         });
@@ -194,11 +184,6 @@ export class CdsPanelElementsComponent implements OnInit {
       ).subscribe(manifest => {
         if (!manifest) { return; }
         const group = this.connectorCatalogService.toConnectorGroup(manifest);
-        const tGroup = this.connectorCatalogService.toTriggerGroup(manifest, baseUrl, undefined);
-        if (tGroup.entries && tGroup.entries.length > 0) {
-          this.triggerGroups = [...this.triggerGroups.filter(g => g.id !== tGroup.id), tGroup];
-          this.triggerOrchestrator.registerGroup(tGroup);
-        }
         if (!group.entries || group.entries.length === 0) { return; }
         this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
       });

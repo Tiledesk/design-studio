@@ -110,6 +110,8 @@
             <!-- <div class="link-container">
                 <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
             </div> -->
+
+            <cds-trigger-entrypoint [intent]="intent" [webhookUrl]="webhookUrl"></cds-trigger-entrypoint>
         </div>
 
         <!-- ---------------------------------------------------------- -->
@@ -130,13 +132,6 @@
                 </cds-select>
             </div>
         </div>
-
-        <!-- ---------------------------------------------------------- -->
-        <!-- Connector Trigger Entrypoint Editor -->
-        <!-- ---------------------------------------------------------- -->
-        <cds-trigger-entrypoint *ngIf="intent?.attributes?._tdConnectorTriggerEntrypoint"
-            [intent]="intent">
-        </cds-trigger-entrypoint>
 
     </div>
 

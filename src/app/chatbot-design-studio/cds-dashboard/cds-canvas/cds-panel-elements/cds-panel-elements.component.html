@@ -84,7 +84,6 @@
             [menuType]="menuType"
             [menuCategory]="menuCategory"
             [connectorGroups]="menuCategory === INTEGRATIONS_CATEGORY_KEY ? connectorGroups : []"
-            [triggerGroups]="menuCategory === INTEGRATIONS_CATEGORY_KEY ? triggerGroups : []"
             (isDraggingMenuElement)="onDraggingMenuElement($event)"
             (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
         </cds-panel-actions>

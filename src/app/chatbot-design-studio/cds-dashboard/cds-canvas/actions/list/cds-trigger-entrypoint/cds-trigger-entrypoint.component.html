@@ -1,5 +1,14 @@
 <div class="trigger-entrypoint">
   <div class="te-title">{{ 'CDSCanvas.Triggers' | translate }}</div>
+
+  <div class="te-add" *ngIf="availableEntries.length">
+    <select [(ngModel)]="selectedRefToAdd">
+      <option value="">{{ 'CDSCanvas.AddTrigger' | translate }}</option>
+      <option *ngFor="let opt of availableEntries" [value]="opt.entry.id">{{ opt.group.name }} — {{ opt.entry.name }}</option>
+    </select>
+    <button class="te-add-btn" [disabled]="!selectedRefToAdd" (click)="onAddSelected()">+</button>
+  </div>
+
   <div class="te-row" *ngFor="let sub of subs">
     <div class="te-head">
       <img class="te-icon" *ngIf="sub.icon" [src]="sub.icon" alt="">
@@ -9,8 +18,7 @@
     <div class="te-field" *ngFor="let input of sub.inputs">
       <label>{{ input.name }}<span *ngIf="input.required" class="req"> *</span></label>
       <input type="text" [value]="sub.filters[input.id] || ''"
-             (input)="onFilterChange(sub, input.id, $any($event.target).value)"
-             (blur)="onSaveFilters(sub)">
+             (input)="onFilterChange(sub, input.id, $any($event.target).value)" (blur)="onSaveFilters(sub)">
     </div>
   </div>
   <div class="te-empty" *ngIf="subs.length === 0">{{ 'CDSCanvas.NoTriggers' | translate }}</div>
