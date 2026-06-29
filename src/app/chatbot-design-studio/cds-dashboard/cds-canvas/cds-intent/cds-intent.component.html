@@ -35,11 +35,12 @@
 
 
 
-        <cds-panel-intent-header *ngIf="!isUntitledBlock" 
-            class="pic-title-text tds_draggable" 
+        <cds-panel-intent-header *ngIf="!isUntitledBlock"
+            class="pic-title-text tds_draggable"
             [class.isStart]="isStart"
             [intentColor]="intentColor"
             [intent]="intent"
+            [isTriggerEntrypoint]="isTriggerEntrypoint"
             (click)="onOptionClicked($event)">
         </cds-panel-intent-header>
 

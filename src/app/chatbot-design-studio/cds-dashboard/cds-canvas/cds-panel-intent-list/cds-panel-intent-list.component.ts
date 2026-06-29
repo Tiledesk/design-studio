@@ -146,6 +146,9 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     } else if (name.trim() === TYPE_INTENT_NAME.CLOSE && readonly){
       icon = this.ICON_CLOSE;
     }
+    if (intent.attributes && (intent.attributes as any)._tdConnectorTriggerEntrypoint === true) {
+      icon = 'bolt';
+    }
     return icon;
   }
 

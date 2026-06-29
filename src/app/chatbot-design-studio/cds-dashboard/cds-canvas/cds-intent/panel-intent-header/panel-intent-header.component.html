@@ -1,4 +1,4 @@
-<div class="header" (click)="onSelectIntent($event)" [class.is-start]="isStart || isWebhook">
+<div class="header" (click)="onSelectIntent($event)" [class.is-start]="isStart || isWebhook || isTriggerEntrypoint">
 
     <div *ngIf="isStart" class="intent-icon">
         <span class="material-icons rocket">rocket_launch</span>
@@ -9,13 +9,16 @@
     <div *ngIf="isWebhook" class="intent-icon">
         <span class="material-icons webhook">webhook</span>
     </div>
+    <div *ngIf="isTriggerEntrypoint" class="intent-icon">
+        <span class="material-icons">bolt</span>
+    </div>
     <div *ngIf="intentName === RESERVED_INTENT_NAMES.CLOSE && intent.attributes.readonly" class="intent-icon">
         <span class="material-icons call_end ">call_end</span>
     </div>
 
-    <div class="form-group" 
+    <div class="form-group"
         [class.is-error]="!isNotErrorName"
-        [class.is-start]="isStart || isWebhook">
+        [class.is-start]="isStart || isWebhook || isTriggerEntrypoint">
         <input 
             #inputIntentName type="text" 
             class="input ellips form-control tds_draggable"

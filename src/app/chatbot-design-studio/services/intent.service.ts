@@ -335,7 +335,7 @@ export class IntentService {
       if (intent.actions) {
         intent.actions = intent.actions.filter(obj => obj !== null);
       }
-      if (this.isReservedIntent(intent.intent_display_name)) {
+      if (this.isReservedIntent(intent.intent_display_name) || (intent.attributes && (intent.attributes as any)._tdConnectorTriggerEntrypoint === true)) {
         intent.attributes.readonly = true;
       }
     });

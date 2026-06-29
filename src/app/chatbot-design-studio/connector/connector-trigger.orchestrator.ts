@@ -56,6 +56,8 @@ export class ConnectorTriggerOrchestrator {
     (entry as any).webhook_enabled = true;
     entry.attributes = entry.attributes || ({} as any);
     (entry.attributes as any)._tdConnectorTriggerEntrypoint = true;
+    entry.intent_display_name = 'Triggers';
+    (entry.attributes as any).readonly = true;
     writeTriggerSubs(entry, []);
     this.intentService.addNewIntentToListOfIntents(entry);
     await this.intentService.updateIntent(entry);
