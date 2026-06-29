@@ -131,6 +131,13 @@
             </div>
         </div>
 
+        <!-- ---------------------------------------------------------- -->
+        <!-- Connector Trigger Entrypoint Editor -->
+        <!-- ---------------------------------------------------------- -->
+        <cds-trigger-entrypoint *ngIf="intent?.attributes?._tdConnectorTriggerEntrypoint"
+            [intent]="intent">
+        </cds-trigger-entrypoint>
+
     </div>
 
 </div>

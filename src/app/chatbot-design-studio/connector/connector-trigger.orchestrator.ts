@@ -12,6 +12,14 @@ import { ConnectorTriggerGroup, ConnectorTriggerEntry, ConnectorTriggerSub,
 
 @Injectable({ providedIn: 'root' })
 export class ConnectorTriggerOrchestrator {
+  /** In-memory registry: entry.id (trigger ref) → ConnectorTriggerGroup.
+   *  Populated whenever addTrigger is called in the current session.
+   *  NOTE: this map is cleared on a full page reload. After reload, groupForRef()
+   *  returns undefined, so onSaveFilters / onRemove in the entrypoint editor are
+   *  no-ops for network calls (attribute changes already persisted, but the
+   *  connector cannot re-subscribe / unsubscribe until addTrigger is called again). */
+  private readonly groupsByRef = new Map<string, ConnectorTriggerGroup>();
+
   constructor(
     private readonly intentService: IntentService,
     private readonly webhookService: WebhookService,
@@ -19,6 +27,12 @@ export class ConnectorTriggerOrchestrator {
     private readonly appConfigService: AppConfigService,
     private readonly triggerService: ConnectorTriggerService,
   ) {}
+
+  /** Returns the ConnectorTriggerGroup associated with the given trigger ref, or
+   *  undefined if addTrigger has not been called for this ref in the current session. */
+  groupForRef(ref: string): ConnectorTriggerGroup | undefined {
+    return this.groupsByRef.get(ref);
+  }
 
   findEntrypoint(): Intent | undefined {
     return (this.intentService.listOfIntents || []).find(
@@ -56,6 +70,8 @@ export class ConnectorTriggerOrchestrator {
   }
 
   async addTrigger(group: ConnectorTriggerGroup, entry: ConnectorTriggerEntry): Promise<Intent> {
+    // Cache the group so the entrypoint editor can resolve it via groupForRef().
+    this.groupsByRef.set(entry.id, group);
     const intent = await this.ensureEntrypoint();
     const subs = readTriggerSubs(intent);
     if (!subs.find(s => s.ref === entry.id)) {
