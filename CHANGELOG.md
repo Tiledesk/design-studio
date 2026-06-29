@@ -7,6 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc11
+- **bug fix**: restore customHeaders
 
 # 1.40.3-rc10
 - **added**: added server mcp native tiledesk
