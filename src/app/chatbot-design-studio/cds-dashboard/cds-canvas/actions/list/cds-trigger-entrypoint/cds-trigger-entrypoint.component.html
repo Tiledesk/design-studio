@@ -3,8 +3,12 @@
 
   <div class="te-auth" *ngFor="let g of availableGroups">
     <img class="te-icon" *ngIf="g.icon" [src]="g.icon" alt="">
-    <span class="te-auth-name ellips">{{ g.name }}</span>
+    <div class="te-auth-info">
+      <span class="te-auth-name ellips">{{ g.name }}</span>
+      <span class="te-auth-email ellips" *ngIf="authByGroup[g.id] && emailByGroup[g.id]">{{ emailByGroup[g.id] }}</span>
+    </div>
     <span class="te-auth-ok" *ngIf="authByGroup[g.id]">{{ 'CDSCanvas.Connected' | translate }}</span>
+    <button class="te-auth-btn ghost" *ngIf="authByGroup[g.id]" (click)="onConnect(g, true)">{{ 'CDSCanvas.ChangeAccount' | translate }}</button>
     <button class="te-auth-btn" *ngIf="!authByGroup[g.id]" (click)="onConnect(g)">{{ 'CDSCanvas.Connect' | translate }}</button>
   </div>
 
