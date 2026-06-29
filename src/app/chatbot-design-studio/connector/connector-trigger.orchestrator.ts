@@ -36,6 +36,12 @@ export class ConnectorTriggerOrchestrator {
     return this.groupsByRef.get(ref);
   }
 
+  /** Re-hydrate the session group cache from a loaded trigger group (so edit/remove/debug
+   *  can resolve baseUrl/apiKey after a page reload, not only within the add session). */
+  registerGroup(group: ConnectorTriggerGroup): void {
+    (group.entries || []).forEach(e => this.groupsByRef.set(e.id, group));
+  }
+
   findEntrypoint(): Intent | undefined {
     return (this.intentService.listOfIntents || []).find(
       (i: any) => i?.attributes?._tdConnectorTriggerEntrypoint === true);
