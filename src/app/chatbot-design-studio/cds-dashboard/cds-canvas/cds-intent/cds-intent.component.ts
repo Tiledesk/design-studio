@@ -71,7 +71,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
-  isTriggerEntrypoint = false;
 
   startAction: any;
   isDragging: boolean = false;
@@ -261,8 +260,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      this.isTriggerEntrypoint = !!(this.intent.attributes && (this.intent.attributes as any)._tdConnectorTriggerEntrypoint);
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || this.isTriggerEntrypoint){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
         this.isStart = true;
         if(this.intent.actions.length === 0){
           let action = new Action;
