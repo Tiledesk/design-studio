@@ -54,7 +54,7 @@
 
     <!-- TRIGGER FLYOUT (click-to-add, no drag) -->
     <div id="trigger_flyout" class="connector-flyout"
-        [style.display]="activeTriggerGroup ? 'block' : 'none'"
+        *ngIf="activeTriggerGroup"
         [style.top.px]="activeGroupPos.y"
         [style.left.px]="activeGroupPos.x"
         (mouseover)="onOverTriggerNested()"

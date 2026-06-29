@@ -211,6 +211,7 @@ export class CdsPanelActionsComponent implements OnInit {
     this.activeGroup = row.group;
     this.activeItems = row.items;
     this.activeTriggerGroup = null;
+    this.activeTriggerItems = [];
     this.isOverTriggerNested = false;
     // A connector can expose many actions, so the nested flyout's (max-height-capped,
     // scrollable) box can be tall. Anchor it to the hovered row, but shift it up if it would
@@ -250,7 +251,7 @@ export class CdsPanelActionsComponent implements OnInit {
   }
 
   closeTriggerGroup() {
-    setTimeout(() => { if (!this.isOverTriggerNested) { this.activeTriggerGroup = null; } }, 0);
+    setTimeout(() => { if (!this.isOverTriggerNested) { this.activeTriggerGroup = null; this.activeTriggerItems = []; } }, 0);
   }
 
   onOverTriggerNested() { this.isOverTriggerNested = true; }
