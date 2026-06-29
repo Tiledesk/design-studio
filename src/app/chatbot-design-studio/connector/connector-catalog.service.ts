@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TYPE_ACTION, TYPE_ACTION_CATEGORY } from '../utils-actions';
 import { ConnectorActionEntry, ConnectorManifest } from './connector-manifest.model';
+import { ConnectorTriggerGroup } from './connector-trigger.model';
 
 export interface ConnectorPaletteEntry {
   name: string;
@@ -52,6 +53,17 @@ export class ConnectorCatalogService {
       name: manifest.connector?.name,
       icon: manifest.connector?.icon || 'assets/images/actions/web_request.svg',
       entries: this.toPaletteEntries(manifest),
+    };
+  }
+
+  toTriggerGroup(manifest: ConnectorManifest, baseUrl: string, apiKey?: string): ConnectorTriggerGroup {
+    return {
+      id: manifest.connector?.id,
+      name: manifest.connector?.name,
+      icon: manifest.connector?.icon || 'assets/images/actions/web_request.svg',
+      baseUrl,
+      apiKey,
+      entries: (manifest.triggers || []).map(t => ({ ...t, icon: manifest.connector?.icon })),
     };
   }
 }
