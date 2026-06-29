@@ -167,13 +167,13 @@ export class CdsPanelElementsComponent implements OnInit {
         ).subscribe(manifest => {
           if (!manifest) { return; }
           const group = this.connectorCatalogService.toConnectorGroup(manifest);
-          if (!group.entries || group.entries.length === 0) { return; }
-          this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
           const apiKey = integration?.value?.apiKey;
           const tGroup = this.connectorCatalogService.toTriggerGroup(manifest, baseUrl, apiKey);
           if (tGroup.entries && tGroup.entries.length > 0) {
             this.triggerGroups = [...this.triggerGroups.filter(g => g.id !== tGroup.id), tGroup];
           }
+          if (!group.entries || group.entries.length === 0) { return; }
+          this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
         });
       });
     });
@@ -191,12 +191,12 @@ export class CdsPanelElementsComponent implements OnInit {
       ).subscribe(manifest => {
         if (!manifest) { return; }
         const group = this.connectorCatalogService.toConnectorGroup(manifest);
-        if (!group.entries || group.entries.length === 0) { return; }
-        this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
         const tGroup = this.connectorCatalogService.toTriggerGroup(manifest, baseUrl, undefined);
         if (tGroup.entries && tGroup.entries.length > 0) {
           this.triggerGroups = [...this.triggerGroups.filter(g => g.id !== tGroup.id), tGroup];
         }
+        if (!group.entries || group.entries.length === 0) { return; }
+        this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
       });
     });
   }
