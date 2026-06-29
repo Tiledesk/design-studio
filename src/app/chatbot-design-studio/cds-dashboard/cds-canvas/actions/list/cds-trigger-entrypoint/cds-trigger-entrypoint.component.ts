@@ -14,7 +14,6 @@ export class CdsTriggerEntrypointComponent implements OnInit {
   @Input() intent: Intent;
   @Input() webhookUrl: string = '';
   availableGroups: ConnectorTriggerGroup[] = [];
-  selectedRefToAdd: string = '';
 
   constructor(
     private readonly orchestrator: ConnectorTriggerOrchestrator,
@@ -66,11 +65,16 @@ export class CdsTriggerEntrypointComponent implements OnInit {
     return this.availableGroups.find(g => (g.entries || []).some(e => e.id === ref));
   }
 
-  async onAddSelected(): Promise<void> {
-    const match = this.availableEntries.find(x => x.entry.id === this.selectedRefToAdd);
+  /** Options for the cds-select add-dropdown: label "Connector — Trigger", value = ref. */
+  get availableSelectItems(): Array<{ label: string; value: string }> {
+    return this.availableEntries.map(x => ({ label: `${x.group.name} — ${x.entry.name}`, value: x.entry.id }));
+  }
+
+  async onAddTriggerSelect(event: any): Promise<void> {
+    const ref = event && event.value;
+    const match = this.availableEntries.find(x => x.entry.id === ref);
     if (!match) { return; }
     await this.orchestrator.addTrigger(this.intent, this.webhookUrl, match.group, match.entry);
-    this.selectedRefToAdd = '';
   }
 
   onFilterChange(sub: ConnectorTriggerSub, inputId: string, value: string) { sub.filters[inputId] = value; }

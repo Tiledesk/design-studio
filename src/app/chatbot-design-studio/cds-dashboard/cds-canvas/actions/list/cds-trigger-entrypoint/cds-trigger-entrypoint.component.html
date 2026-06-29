@@ -2,11 +2,15 @@
   <div class="te-title">{{ 'CDSCanvas.Triggers' | translate }}</div>
 
   <div class="te-add" *ngIf="availableEntries.length">
-    <select [(ngModel)]="selectedRefToAdd">
-      <option value="">{{ 'CDSCanvas.AddTrigger' | translate }}</option>
-      <option *ngFor="let opt of availableEntries" [value]="opt.entry.id">{{ opt.group.name }} — {{ opt.entry.name }}</option>
-    </select>
-    <button class="te-add-btn" [disabled]="!selectedRefToAdd" (click)="onAddSelected()">+</button>
+    <cds-select
+        [items]="availableSelectItems"
+        [bindLabelSelect]="'label'"
+        [bindValueSelect]="'value'"
+        [placeholder]="('CDSCanvas.AddTrigger' | translate)"
+        [searchable]="true"
+        [clearable]="false"
+        (onSelected)="onAddTriggerSelect($event)">
+    </cds-select>
   </div>
 
   <div class="te-row" *ngFor="let sub of subs">
