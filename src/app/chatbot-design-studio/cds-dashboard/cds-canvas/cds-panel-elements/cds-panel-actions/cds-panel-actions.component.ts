@@ -210,6 +210,8 @@ export class CdsPanelActionsComponent implements OnInit {
   openGroup(rowEl: HTMLElement, row: { group: ConnectorGroup; items: any[] }) {
     this.activeGroup = row.group;
     this.activeItems = row.items;
+    this.activeTriggerGroup = null;
+    this.isOverTriggerNested = false;
     // A connector can expose many actions, so the nested flyout's (max-height-capped,
     // scrollable) box can be tall. Anchor it to the hovered row, but shift it up if it would
     // run past the bottom of the viewport — otherwise the scrollable box opens off-screen and
@@ -235,6 +237,8 @@ export class CdsPanelActionsComponent implements OnInit {
   openTriggerGroup(rowEl: HTMLElement, row: { group: ConnectorTriggerGroup; items: ConnectorTriggerEntry[] }) {
     this.activeTriggerGroup = row;
     this.activeTriggerItems = row.items;
+    this.activeGroup = null;
+    this.isOverNested = false;
     const margin = 8;
     const maxFlyoutH = Math.min(window.innerHeight * 0.7, 560);
     const panelTop = this.panelDiv ? this.panelDiv.nativeElement.getBoundingClientRect().top : 0;
