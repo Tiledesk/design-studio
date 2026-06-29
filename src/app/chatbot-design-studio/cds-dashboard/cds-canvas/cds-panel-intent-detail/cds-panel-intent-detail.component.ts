@@ -34,7 +34,6 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
 
   isStart: boolean = false;
   isWebhook: boolean = false;
-  isTriggerEntrypoint: boolean = false;
 
   // Connector management
   listOfIntents: Array<{name: string, value: string, icon?:string}> = [];
@@ -66,7 +65,6 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.maximize = this.stageService.getMaximize();
-    this.isTriggerEntrypoint = !!(this.intent.attributes && (this.intent.attributes as any)._tdConnectorTriggerEntrypoint);
     if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.START) {
       this.initializeStart();
     } else if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
@@ -74,7 +72,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     }
 
     // Inizializza la lista degli intent per la select del connettore
-    if (!this.isStart && !this.isWebhook && !this.isTriggerEntrypoint) {
+    if (!this.isStart && !this.isWebhook) {
       this.initializeConnectorSelect();
     }
   }

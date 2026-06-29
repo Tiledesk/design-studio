@@ -15,7 +15,6 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   @Input() intent: Intent;
   @Input() intentColor: string;
-  @Input() isTriggerEntrypoint: boolean = false;
   @Output() saveIntent = new EventEmitter();
 
   RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;

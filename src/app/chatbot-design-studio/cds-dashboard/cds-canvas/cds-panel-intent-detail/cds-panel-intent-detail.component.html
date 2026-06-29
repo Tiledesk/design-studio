@@ -13,7 +13,7 @@
         <!-- ---------------------------------------------------------- -->
         <!-- Agents available -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook && !isTriggerEntrypoint" class="row">
+        <div *ngIf="!isWebhook" class="row">
 
             <div class="nw-onoffswitch-wrapper"> 
                 <div *ngIf="intent.agents_available" class="agents-available"><span class="material-icons">boy</span></div>
@@ -117,7 +117,7 @@
         <!-- ---------------------------------------------------------- -->
         <!-- Next Block Connector -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook && !isStart && !isTriggerEntrypoint" class="row">
+        <div *ngIf="!isWebhook && !isStart" class="row">
             <div class="field-box">
                 <label class="title-label">{{'CDSCanvas.GoToBlock' | translate}}</label>
                 <cds-select id="next-intent-select"
