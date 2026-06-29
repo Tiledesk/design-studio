@@ -16,6 +16,7 @@ export class CdsTriggerEntrypointComponent implements OnInit {
   @Input() webhookUrl: string = '';
   availableGroups: ConnectorTriggerGroup[] = [];
   authByGroup: { [id: string]: boolean } = {};
+  emailByGroup: { [id: string]: string } = {};
 
   constructor(
     private readonly orchestrator: ConnectorTriggerOrchestrator,
@@ -63,16 +64,17 @@ export class CdsTriggerEntrypointComponent implements OnInit {
     const projectId = this.dashboardService.projectID;
     if (!projectId || !g.baseUrl) { return; }
     this.triggerService.authStatus(g.baseUrl, projectId).subscribe({
-      next: r => { this.authByGroup[g.id] = !!(r && r.connected); },
+      next: r => { this.authByGroup[g.id] = !!(r && r.connected); this.emailByGroup[g.id] = (r && r.email) || ''; },
       error: () => { this.authByGroup[g.id] = false; },
     });
   }
 
-  /** Open the connector's Google consent flow in a popup; re-check status on return. */
-  onConnect(g: ConnectorTriggerGroup): void {
+  /** Open the connector's Google consent flow in a popup; re-check status on return.
+   *  selectAccount forces Google's account chooser (Change account). */
+  onConnect(g: ConnectorTriggerGroup, selectAccount: boolean = false): void {
     const projectId = this.dashboardService.projectID;
     if (!projectId || !g.baseUrl) { return; }
-    this.triggerService.install(g.baseUrl, projectId).subscribe({
+    this.triggerService.install(g.baseUrl, projectId, selectAccount).subscribe({
       next: r => {
         if (r && r.authUrl) {
           window.open(r.authUrl, '_blank', 'width=520,height=680');

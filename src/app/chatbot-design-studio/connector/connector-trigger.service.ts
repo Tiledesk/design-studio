@@ -29,13 +29,14 @@ export class ConnectorTriggerService {
     return this.http.request('delete', `${baseUrl}/api/triggers/debug`, { body: { webhook_id: webhookId }, ...this.opts(apiKey) });
   }
 
-  /** Whether the connector has Google OAuth credentials for this project. */
-  authStatus(baseUrl: string, projectId: string): Observable<{ connected: boolean }> {
-    return this.http.get<{ connected: boolean }>(`${baseUrl}/tiledesk/auth-status?external_id=${encodeURIComponent(projectId)}`);
+  /** Whether the connector has Google OAuth credentials for this project (+ the connected account email). */
+  authStatus(baseUrl: string, projectId: string): Observable<{ connected: boolean; email?: string }> {
+    return this.http.get<{ connected: boolean; email?: string }>(`${baseUrl}/tiledesk/auth-status?external_id=${encodeURIComponent(projectId)}`);
   }
 
-  /** Start the connector's project-scoped OAuth install; returns the Google consent URL. */
-  install(baseUrl: string, projectId: string): Observable<{ authUrl: string }> {
-    return this.http.post<{ authUrl: string }>(`${baseUrl}/tiledesk/install`, { projectId });
+  /** Start the connector's project-scoped OAuth install; returns the Google consent URL.
+   *  selectAccount forces Google's account chooser (used to change the connected account). */
+  install(baseUrl: string, projectId: string, selectAccount: boolean = false): Observable<{ authUrl: string }> {
+    return this.http.post<{ authUrl: string }>(`${baseUrl}/tiledesk/install`, { projectId, selectAccount });
   }
 }
