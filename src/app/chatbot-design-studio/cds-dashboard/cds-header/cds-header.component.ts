@@ -28,6 +28,8 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
+import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
+import { ConnectorTriggerOrchestrator } from '../../connector/connector-trigger.orchestrator';
 
 const swal = require('sweetalert');
 
@@ -93,7 +95,9 @@ export class CdsHeaderComponent implements OnInit {
     private readonly webhookService: WebhookService,
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
-  ) { 
+    private readonly triggerService: ConnectorTriggerService,
+    private readonly triggerOrchestrator: ConnectorTriggerOrchestrator,
+  ) {
     this.manageRouteChanges();
     this.setSubscriptions();
   }
@@ -369,14 +373,32 @@ export class CdsHeaderComponent implements OnInit {
 
 
 
+  /** Returns the entrypoint connector's { baseUrl, apiKey } from the session-cache,
+   *  or null if there is no entrypoint, no trigger subs, or the group was not registered
+   *  in this session (e.g. after a page reload — known/acceptable v1 limitation). */
+  private entrypointConnector(): { baseUrl: string; apiKey?: string } | null {
+    const ep = this.triggerOrchestrator.findEntrypoint();
+    const subs = ep ? (ep.attributes as any)?._tdConnectorTriggers : null;
+    if (!subs || subs.length === 0) { return null; }
+    const group = this.triggerOrchestrator.groupForRef(subs[0].ref);
+    return group ? { baseUrl: group.baseUrl, apiKey: group.apiKey } : null;
+  }
+
   async onOpenTestItOut(){
     let request_id: string | Promise<void>;
-    this.logService.initialize(null); 
+    this.logService.initialize(null);
     if(this.isWebhook){
       this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
       request_id = await this.webhookStarterLog();
     } else {
       request_id = this.logService.request_id;
+    }
+    // Arm debug mirroring (best-effort). Session-only: only arms when triggers were added
+    // in the current session; silently skips after a page reload (groupForRef returns null).
+    const conn = this.entrypointConnector();
+    if (conn && this.webhookId) {
+      this.triggerService.armDebug(conn.baseUrl, conn.apiKey, this.webhookId, 600)
+        .subscribe({ error: (e) => this.logger.error('[triggers] armDebug failed', e) });
     }
     const tokenResp = await this.getToken(request_id);
     if (!tokenResp) {
@@ -393,6 +415,12 @@ export class CdsHeaderComponent implements OnInit {
 
 
   onCloseTestItOut(){
+    // Disarm debug mirroring (best-effort). Session-only: silently skips after a page reload.
+    const conn = this.entrypointConnector();
+    if (conn && this.webhookId) {
+      this.triggerService.disarmDebug(conn.baseUrl, conn.apiKey, this.webhookId)
+        .subscribe({ error: (e) => this.logger.error('[triggers] disarmDebug failed', e) });
+    }
     if(this.isWebhook){
       this.stopWebhook();
     }
