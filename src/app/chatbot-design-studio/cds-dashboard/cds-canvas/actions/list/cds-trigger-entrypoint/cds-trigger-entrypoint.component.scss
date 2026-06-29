@@ -10,3 +10,10 @@
 .te-field .req { color: #e74c3c; }
 .te-field input { border: 1px solid #ccc; border-radius: 4px; padding: 6px 8px; font-size: 13px; }
 .te-empty { color: #9aa3ad; font-style: italic; }
+
+.te-auth { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #e8ebf0; border-radius: 8px; }
+.te-auth-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 500; color: #14181f; }
+.te-auth-ok { font-size: 12px; color: #2bbf6a; font-weight: 600; }
+.te-auth-btn { border: 1px solid var(--blu, #1a2b4a); background: var(--blu, #1a2b4a); color: #fff; border-radius: 6px; padding: 4px 12px; font-size: 12px; cursor: pointer; }
+.te-auth-btn:hover { opacity: .92; }
+.ellips { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

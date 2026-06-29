@@ -325,6 +325,8 @@
         "Triggers": "Triggers",
         "NoTriggers": "No triggers yet",
         "AddTrigger": "Add a trigger…",
+        "Connect": "Connect",
+        "Connected": "Connected",
         "LineText": "Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock": "Block color",
