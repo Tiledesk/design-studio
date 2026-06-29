@@ -322,6 +322,7 @@
         "DeleteConnector": "Delete connector",
         "HideConnector": "hide connector",
         "ShowConnector": "show connector",
+        "Triggers": "Triggers",
         "LineText": "Line text",
         "IntentPanel": "Settings panel",
         "ColorBlock": "Block color",
