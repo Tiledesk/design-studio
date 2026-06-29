@@ -13,15 +13,17 @@
   </div>
 
   <div class="te-add" *ngIf="availableSelectItems.length">
-    <cds-select
+    <cds-select class="te-add-select"
         [items]="availableSelectItems"
+        [itemSelected]="selectedRef"
         [bindLabelSelect]="'label'"
         [bindValueSelect]="'value'"
         [placeholder]="('CDSCanvas.AddTrigger' | translate)"
         [searchable]="true"
         [clearable]="false"
-        (onSelected)="onAddTriggerSelect($event)">
+        (onSelected)="onSelectTrigger($event)">
     </cds-select>
+    <button class="te-add-btn" [disabled]="!selectedRef" (click)="onAddSelected()">{{ 'CDSCanvas.Add' | translate }}</button>
   </div>
 
   <div class="te-row" *ngFor="let sub of subs">
