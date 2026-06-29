@@ -1,0 +1,12 @@
+.trigger-entrypoint { display: flex; flex-direction: column; gap: 10px; padding: 8px 10px; }
+.te-title { font-weight: 600; font-size: 14px; color: var(--blu, #1a2b4a); }
+.te-row { border: 1px solid #e8ebf0; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.te-head { display: flex; align-items: center; gap: 6px; }
+.te-icon { width: 16px; height: 16px; object-fit: contain; }
+.te-name { font-weight: 500; flex: 1; }
+.te-remove { border: none; background: transparent; cursor: pointer; color: #9aa3ad; }
+.te-field { display: flex; flex-direction: column; gap: 2px; }
+.te-field label { font-size: 12px; color: #677283; }
+.te-field .req { color: #e74c3c; }
+.te-field input { border: 1px solid #ccc; border-radius: 4px; padding: 6px 8px; font-size: 13px; }
+.te-empty { color: #9aa3ad; font-style: italic; }
