@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
-import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -11,6 +11,7 @@ import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -39,6 +40,8 @@ export class CdsPanelElementsComponent implements OnInit {
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   ACTION_CATEGORY = ACTION_CATEGORY;
+  // menuCategory holds the enum KEY (ACTION_CATEGORY[].type === getKeyByValue(...)), not the value.
+  INTEGRATIONS_CATEGORY_KEY = getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY);
 
   actionsByCategory = {};
   actionsList: Array<any> = [];
@@ -57,6 +60,7 @@ export class CdsPanelElementsComponent implements OnInit {
   ngOnInit(): void {
     this.createActionListByCategory();
     this.loadConnectorActions();
+    this.loadConfiguredConnectors();
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -164,6 +168,24 @@ export class CdsPanelElementsComponent implements OnInit {
           if (!group.entries || group.entries.length === 0) { return; }
           this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
         });
+      });
+    });
+  }
+
+  // TEMP: surface connectors from a statically configured base URL (environment.connectorBaseUrls)
+  // until the per-project install / integration-record flow exists. Feeds the same connectorGroups
+  // as loadConnectorActions(); dedupe-by-id keeps it from doubling once the dynamic path is live.
+  loadConfiguredConnectors() {
+    const urls: string[] = (environment as any).connectorBaseUrls || [];
+    urls.forEach((baseUrl: string) => {
+      if (!baseUrl) { return; }
+      this.connectorCatalogService.fetchManifest(baseUrl).pipe(
+        catchError(() => of(null))
+      ).subscribe(manifest => {
+        if (!manifest) { return; }
+        const group = this.connectorCatalogService.toConnectorGroup(manifest);
+        if (!group.entries || group.entries.length === 0) { return; }
+        this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
       });
     });
   }

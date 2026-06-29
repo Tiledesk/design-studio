@@ -22,6 +22,13 @@ export class CdsActionDragListComponent {
 
   constructor(private readonly controllerService: ControllerService) {}
 
+  /** Connector action icons are absolute URLs (the connector's icon) and must be
+   *  rendered with <img>; native action icons are MatIconRegistry names rendered
+   *  with <mat-icon [svgIcon]>. */
+  isUrlIcon(src: any): boolean {
+    return typeof src === 'string' && /^https?:\/\//i.test(src);
+  }
+
   onHover(element: HTMLElement, value: any) {
     this.hoverItem.emit({ element, value });
   }

@@ -183,6 +183,7 @@ $base-padding: 6px;
   padding: 0 2px;
   border-radius: 6px;
   cursor: pointer;
+  .connector-group-icon { width: 16px; height: 16px; object-fit: contain; display: block; }
   .action-btn-text { flex: 1; }
   .group-chevron { font-size: 16px; color: var(--gray-light-01); line-height: 1; padding-right: 2px; }
   &:hover {

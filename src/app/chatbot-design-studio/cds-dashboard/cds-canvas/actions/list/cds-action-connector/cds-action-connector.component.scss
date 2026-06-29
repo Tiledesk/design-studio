@@ -54,3 +54,92 @@
   input[type="checkbox"] { width: 16px; height: 16px; }
   .connector-toggle-label { font-size: 12px; color: #677283; }
 }
+
+// ── Canvas card preview (connector action): refined read-only summary ──────────
+// All scoped to this component (Emulated encapsulation) so the shared
+// .cds-action-preview / .action-row* globals are unaffected for other actions.
+
+.connector-preview {
+  gap: 6px;
+}
+
+// Title — was wrongly nested in the global 18px .action-row-left icon slot,
+// which forced the name to wrap. Give it a real, full-width container.
+.connector-card-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-bottom: 2px;
+
+  .connector-action-name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+    color: var(--blu, #1a2b4a);
+    max-width: 100%;
+  }
+}
+
+// Required inputs: two-column grid so every label/value pair lines up.
+.required-summary {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 10px;
+  margin: 0 0 2px;
+}
+.required-row {
+  display: contents;
+}
+.required-label {
+  color: #677283;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+
+  .req { color: #e74c3c; margin-left: 1px; }
+}
+.required-value {
+  color: #14181f;
+  font-size: 12px;
+  line-height: 16px;
+  min-width: 0;
+
+  &.not-set { color: #9aa3ad; font-style: italic; }
+}
+
+// "Store in" output assignment — keyed label + value pill.
+.output-assignments {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+
+  .output-key {
+    color: #677283;
+    font-size: 12px;
+    flex: 0 0 auto;
+  }
+  .output-val {
+    display: inline-block;
+    max-width: 100%;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: #eef1f6;
+    color: var(--blu, #1a2b4a);
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+.connector-divider {
+  border: none;
+  border-top: 1px solid #e8ebf0;
+  margin: 4px 0 2px;
+  width: 100%;
+}
+
+.ellips {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
