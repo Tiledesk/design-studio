@@ -66,3 +66,116 @@ under an expandable sub-menu row in the palette. The data flow is:
 The key implementation detail: the nested flyout is a **sibling of (not a descendant of)
 the scrollable `.action-list` container**. This allows the flyout to overflow freely without
 being clipped by the parent's scroll boundary.
+
+## Manifest `groups[]` & per-service grouping
+
+When a connector hosts multiple services (e.g. Gmail, Calendar, Drive), the manifest carries
+a `groups[]` table so the design-studio can render per-service section headers in the palette
+flyout and per-service option groups in the triggers dropdown — without any hardcoded knowledge
+of what services exist.
+
+### 1. Manifest `groups[]` table (backend — `buildManifest`)
+
+`GET /api/manifest` now includes a top-level `groups` array alongside `actions` and `triggers`:
+
+```json
+{
+  "groups": [
+    { "id": "email",    "name": "Gmail",    "order": 10 },
+    { "id": "calendar", "name": "Calendar", "order": 20 },
+    { "id": "files",    "name": "Drive · Files", "order": 30 }
+  ]
+}
+```
+
+Each entry is a `ManifestGroup { id, name, icon?, order? }`.  The backend builds this by
+collecting the distinct `group` ids used across all (non-hidden) actions and triggers, looking
+each id up in `GROUP_REGISTRY` (in `src/config/groups.ts`) for its display name, optional icon,
+and sort order, then sorting first by `order` (ascending) then alphabetically by name.
+
+Groups declared with `hidden: true` in `GROUP_REGISTRY` (currently only `auth`) are excluded
+from `groups[]` **and** all actions/triggers carrying that group id are filtered out of
+`actions[]` and `triggers[]` entirely.  The `auth` group covers the OAuth install flow, which
+uses dedicated `/auth/*` and `/tiledesk/auth-status` routes — not the `/api/actions` dispatcher
+— so exposing its entries in the palette would be incorrect.
+
+### 2. `ConnectorManifestGroup` model (design-studio)
+
+`ConnectorManifest` (in `connector-manifest.model.ts`) mirrors the backend shape with an
+optional field:
+
+```ts
+groups?: ConnectorManifestGroup[];   // { id, name, icon?, order? }
+```
+
+`ConnectorActionEntry` already carried a `group: string` field (the raw group id) — this is
+the join key used by `toConnectorSubgroups`.
+
+### 3. `toConnectorSubgroups` — bucketing, label/icon resolution, ordering
+
+`ConnectorCatalogService.toConnectorSubgroups(manifest)` (in `connector-catalog.service.ts`)
+turns a manifest into a `ConnectorSubgroup[]` for the palette flyout:
+
+1. **Bucket** — iterates the palette entries produced by `toPaletteEntries(manifest)` and
+   groups them by `entry.connectorEntry.group` (the raw group id from the manifest action).
+2. **Resolve** — for each bucket, looks up the corresponding `ConnectorManifestGroup` from
+   `manifest.groups` to obtain the display name and icon.  If no entry is found (unknown group
+   id), the label falls back to a title-cased version of the raw id and the icon falls back to
+   the connector-level icon (or the generic web-request SVG).
+3. **Order** — buckets are sorted by the `order` field of their matching `ManifestGroup`
+   (ascending), with groups absent from the table sorted last; ties are broken alphabetically
+   by name.
+
+`toConnectorGroup` calls `toConnectorSubgroups` and stores the result on
+`ConnectorGroup.subgroups`.  `toTriggerGroup` passes `manifest.groups` through unchanged as
+`ConnectorTriggerGroup.groups`, so trigger-side consumers can resolve the same display metadata.
+
+### 4. Per-service section headers in the palette flyout (Task 3)
+
+When `cds-panel-actions` opens the nested flyout for a connector row, it checks whether the
+active `ConnectorGroup` carries a non-empty `subgroups` array.  If so, the flyout template
+iterates `activeSubgroups` and renders one `<div class="connector-subgroup">` per service,
+each containing:
+
+- A **section header** (`connector-subgroup-header`) with the subgroup icon and name.
+- A **`cds-action-drag-list`** instance for that subgroup's entries.
+
+When `subgroups` is empty (a single-service connector), the flyout falls back to a plain flat
+`cds-action-drag-list` (`#flatConnectorList` template reference).
+
+The section headers are rendered inside the flyout `<div id="connector_flyout">` which is
+positioned as a sibling of the scrollable `.action-list`, so the headers themselves are never
+clipped by scroll overflow.
+
+### 5. Per-service option groups in the triggers dropdown (Task 4)
+
+The add-trigger `cds-select` inside `cds-trigger-entrypoint` uses the `[groupByKey]` binding:
+
+```html
+<cds-select
+    [bindLabelSelect]="'label'"
+    [bindValueSelect]="'value'"
+    [groupByKey]="'group'"
+    ...>
+</cds-select>
+```
+
+Each select item carries a `group` property set to the resolved display name of the trigger's
+group (looked up from `ConnectorTriggerGroup.groups`, falling back to title-case).  The
+`cds-select` component reads `[groupByKey]` to render visual optgroup separators, grouping
+triggers from the same service together.  The dropdown uses the component's default
+alpha-sorting within each group (acceptable per spec; strict ordering is only required for the
+palette flyout, where `toConnectorSubgroups` controls it).
+
+### Summary: what each layer does
+
+| Layer | Where | Responsibility |
+|---|---|---|
+| `GROUP_REGISTRY` | `src/config/groups.ts` (backend) | Central name/icon/order/hidden map for all Google service group ids |
+| `buildManifest` | `src/core/manifest.ts` (backend) | Emits `groups[]`; strips `auth` entries and the `auth` group itself |
+| `ConnectorManifestGroup` | `connector-manifest.model.ts` (DS) | TS interface mirroring the backend `ManifestGroup` shape |
+| `toConnectorSubgroups` | `connector-catalog.service.ts` (DS) | Buckets palette entries by group, resolves labels/icons, orders |
+| `ConnectorGroup.subgroups` | `connector-catalog.service.ts` (DS) | Carries the per-service buckets into the palette panel |
+| `ConnectorTriggerGroup.groups` | `connector-trigger.model.ts` (DS) | Passes the raw `groups[]` table through to the trigger editor |
+| `cds-panel-actions` flyout | `cds-panel-actions.component.*` (DS) | Renders one section header + drag-list per subgroup |
+| `cds-select [groupByKey]` | `cds-trigger-entrypoint.component.*` (DS) | Groups trigger options by service in the add-trigger dropdown |
