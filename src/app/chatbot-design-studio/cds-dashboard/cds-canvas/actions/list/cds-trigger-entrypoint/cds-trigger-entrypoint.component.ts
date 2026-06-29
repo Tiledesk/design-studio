@@ -108,7 +108,17 @@ export class CdsTriggerEntrypointComponent implements OnInit {
   selectedRef: string = '';
 
   private recomputeSelectItems(): void {
-    this.availableSelectItems = this.availableEntries.map(x => ({ label: `${x.group.name} — ${x.entry.name}`, value: x.entry.id }));
+    this.availableSelectItems = this.availableEntries.map(x => ({
+      label: x.entry.name,
+      value: x.entry.id,
+      group: this.groupLabel(x.group, x.entry.group),
+    }));
+  }
+
+  private groupLabel(g: ConnectorTriggerGroup, id: string): string {
+    const def = (g.groups || []).find(x => x.id === id);
+    if (def && def.name) { return def.name; }
+    return id ? id.charAt(0).toUpperCase() + id.slice(1) : id;
   }
 
   onSelectTrigger(event: any): void {
