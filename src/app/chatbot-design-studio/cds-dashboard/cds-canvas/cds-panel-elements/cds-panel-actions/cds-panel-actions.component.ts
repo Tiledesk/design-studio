@@ -8,7 +8,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
-import { ConnectorGroup } from '../../../../connector/connector-catalog.service';
+import { ConnectorGroup, ConnectorSubgroup } from '../../../../connector/connector-catalog.service';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -36,6 +36,7 @@ export class CdsPanelActionsComponent implements OnInit {
   groupRows: Array<{ group: ConnectorGroup; items: any[] }> = [];
   activeGroup: ConnectorGroup | null = null;
   activeItems: any[] = [];
+  activeSubgroups: Array<{ id: string; name: string; icon: string; items: any[] }> = [];
   activeGroupPos: any = { x: 200, y: 0 };
   isOverNested = false;
   isDragging: any = false;
@@ -135,6 +136,7 @@ export class CdsPanelActionsComponent implements OnInit {
     if (this.menuType !== TYPE_OF_MENU.ACTION) {
       this.activeGroup = null;
       this.activeItems = [];
+      this.activeSubgroups = [];
       this.isOverNested = false;
     }
 
@@ -192,6 +194,12 @@ export class CdsPanelActionsComponent implements OnInit {
   openGroup(rowEl: HTMLElement, row: { group: ConnectorGroup; items: any[] }) {
     this.activeGroup = row.group;
     this.activeItems = row.items;
+    this.activeSubgroups = (row.group.subgroups || []).map(sg => ({
+      id: sg.id,
+      name: sg.name,
+      icon: sg.icon,
+      items: (sg.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true })),
+    }));
     // A connector can expose many actions, so the nested flyout's (max-height-capped,
     // scrollable) box can be tall. Anchor it to the hovered row, but shift it up if it would
     // run past the bottom of the viewport — otherwise the scrollable box opens off-screen and

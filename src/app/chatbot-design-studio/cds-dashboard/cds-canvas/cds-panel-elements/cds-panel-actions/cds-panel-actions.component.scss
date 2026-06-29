@@ -246,3 +246,19 @@ $base-padding: 6px;
     .actions-btns-wpr,
     .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; }
 }
+
+.connector-subgroup + .connector-subgroup { border-top: 1px solid var(--gray-02, #eceef1); }
+
+.connector-subgroup-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 2px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--gray-light-01, #99a3ad);
+  .connector-group-icon { width: 14px; height: 14px; object-fit: contain; }
+  .action-btn-text { color: inherit; }
+}
