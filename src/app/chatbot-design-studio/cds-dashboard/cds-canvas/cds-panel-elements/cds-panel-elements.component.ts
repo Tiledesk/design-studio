@@ -10,6 +10,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
+import { ConnectorTriggerGroup } from '../../../connector/connector-trigger.model';
 import { ProjectService } from 'src/app/services/projects.service';
 import { environment } from 'src/environments/environment';
 
@@ -46,6 +47,7 @@ export class CdsPanelElementsComponent implements OnInit {
   actionsByCategory = {};
   actionsList: Array<any> = [];
   connectorGroups: ConnectorGroup[] = [];
+  triggerGroups: ConnectorTriggerGroup[] = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   actionCategory: any;
@@ -167,6 +169,11 @@ export class CdsPanelElementsComponent implements OnInit {
           const group = this.connectorCatalogService.toConnectorGroup(manifest);
           if (!group.entries || group.entries.length === 0) { return; }
           this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
+          const apiKey = integration?.value?.apiKey;
+          const tGroup = this.connectorCatalogService.toTriggerGroup(manifest, baseUrl, apiKey);
+          if (tGroup.entries && tGroup.entries.length > 0) {
+            this.triggerGroups = [...this.triggerGroups.filter(g => g.id !== tGroup.id), tGroup];
+          }
         });
       });
     });
@@ -186,6 +193,10 @@ export class CdsPanelElementsComponent implements OnInit {
         const group = this.connectorCatalogService.toConnectorGroup(manifest);
         if (!group.entries || group.entries.length === 0) { return; }
         this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
+        const tGroup = this.connectorCatalogService.toTriggerGroup(manifest, baseUrl, undefined);
+        if (tGroup.entries && tGroup.entries.length > 0) {
+          this.triggerGroups = [...this.triggerGroups.filter(g => g.id !== tGroup.id), tGroup];
+        }
       });
     });
   }

@@ -9,6 +9,9 @@ import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbo
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { ConnectorGroup } from '../../../../connector/connector-catalog.service';
+import { ConnectorTriggerGroup, ConnectorTriggerEntry } from '../../../../connector/connector-trigger.model';
+import { ConnectorTriggerOrchestrator } from '../../../../connector/connector-trigger.orchestrator';
+import { IntentService } from '../../../../services/intent.service';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -25,19 +28,24 @@ export class CdsPanelActionsComponent implements OnInit {
   @Input() menuCategory: string;
   @Input() pos: any;
   @Input() connectorGroups: ConnectorGroup[] = [];
+  @Input() triggerGroups: ConnectorTriggerGroup[] = [];
   @Output() isDraggingMenuElement = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
-  
+
   menuItemsList: any;
   groupRows: Array<{ group: ConnectorGroup; items: any[] }> = [];
   activeGroup: ConnectorGroup | null = null;
   activeItems: any[] = [];
   activeGroupPos: any = { x: 200, y: 0 };
   isOverNested = false;
+  triggerRows: Array<{ group: ConnectorTriggerGroup; items: ConnectorTriggerEntry[] }> = [];
+  activeTriggerGroup: { group: ConnectorTriggerGroup; items: ConnectorTriggerEntry[] } | null = null;
+  activeTriggerItems: ConnectorTriggerEntry[] = [];
+  isOverTriggerNested = false;
   isDragging: any = false;
   indexDrag: number;
 
@@ -54,6 +62,8 @@ export class CdsPanelActionsComponent implements OnInit {
     private readonly controllerService: ControllerService,
     private readonly projectPlanUtils: ProjectPlanUtils,
     private readonly translate: TranslateService,
+    private readonly triggerOrchestrator: ConnectorTriggerOrchestrator,
+    private readonly intentService: IntentService,
     // public dragDropService: DragDropService
   ) { }
 
@@ -132,10 +142,18 @@ export class CdsPanelActionsComponent implements OnInit {
       items: (group.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true }))
     }));
 
+    this.triggerRows = (this.triggerGroups || []).map(group => ({
+      group,
+      items: group.entries || []
+    }));
+
     if (this.menuType !== TYPE_OF_MENU.ACTION) {
       this.activeGroup = null;
       this.activeItems = [];
       this.isOverNested = false;
+      this.activeTriggerGroup = null;
+      this.activeTriggerItems = [];
+      this.isOverTriggerNested = false;
     }
 
   }
@@ -213,6 +231,38 @@ export class CdsPanelActionsComponent implements OnInit {
   onOverNested() { this.isOverNested = true; }
 
   onLeaveNested() { this.isOverNested = false; this.closeGroup(); }
+
+  openTriggerGroup(rowEl: HTMLElement, row: { group: ConnectorTriggerGroup; items: ConnectorTriggerEntry[] }) {
+    this.activeTriggerGroup = row;
+    this.activeTriggerItems = row.items;
+    const margin = 8;
+    const maxFlyoutH = Math.min(window.innerHeight * 0.7, 560);
+    const panelTop = this.panelDiv ? this.panelDiv.nativeElement.getBoundingClientRect().top : 0;
+    let screenTop = rowEl.getBoundingClientRect().top;
+    if (screenTop + maxFlyoutH > window.innerHeight - margin) {
+      screenTop = Math.max(margin, window.innerHeight - margin - maxFlyoutH);
+    }
+    this.activeGroupPos = { x: 200, y: Math.max(0, Math.round(screenTop - panelTop)) };
+  }
+
+  closeTriggerGroup() {
+    setTimeout(() => { if (!this.isOverTriggerNested) { this.activeTriggerGroup = null; } }, 0);
+  }
+
+  onOverTriggerNested() { this.isOverTriggerNested = true; }
+
+  onLeaveTriggerNested() { this.isOverTriggerNested = false; this.closeTriggerGroup(); }
+
+  async onAddTrigger(group: ConnectorTriggerGroup, entry: ConnectorTriggerEntry) {
+    try {
+      const intent = await this.triggerOrchestrator.addTrigger(group, entry);
+      if (intent?.intent_id) {
+        this.intentService.setIntentSelectedById(intent.intent_id);
+      }
+    } catch (err) {
+      this.logger.error('[CDS-PANEL-ACTIONS] onAddTrigger error', err);
+    }
+  }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);

@@ -37,6 +37,39 @@
         </cds-action-drag-list>
     </div>
 
+    <!-- TRIGGER GROUP ROWS (click to add; converge on the single entrypoint) -->
+    <div *ngIf="menuType === TYPE_OF_MENU.ACTION && triggerRows?.length > 0"
+        [style.display]="isDragging?'none':'block'" class="connector-groups">
+        <div class="connector-group-header truncate">{{ 'CDSCanvas.Triggers' | translate }}</div>
+        <div class="connector-group-row" *ngFor="let row of triggerRows" #tRowEl
+            (mouseover)="openTriggerGroup(tRowEl, row)"
+            (mouseleave)="closeTriggerGroup()">
+            <span class="action-btn-icon">
+                <img class="connector-group-icon" [src]="row.group.icon" alt="" aria-hidden="true">
+            </span>
+            <span class="action-btn-text truncate">{{ row.group.name }}</span>
+            <span class="group-chevron">&rsaquo;</span>
+        </div>
+    </div>
+
+    <!-- TRIGGER FLYOUT (click-to-add, no drag) -->
+    <div id="trigger_flyout" class="connector-flyout"
+        [style.display]="activeTriggerGroup ? 'block' : 'none'"
+        [style.top.px]="activeGroupPos.y"
+        [style.left.px]="activeGroupPos.x"
+        (mouseover)="onOverTriggerNested()"
+        (mouseleave)="onLeaveTriggerNested()">
+        <div class="action-list">
+            <div class="actions-btns-wpr" *ngFor="let entry of activeTriggerItems"
+                (click)="onAddTrigger(activeTriggerGroup.group, entry)">
+                <span class="action-btn-icon">
+                    <img class="connector-action-icon" [src]="activeTriggerGroup.group.icon" alt="" aria-hidden="true">
+                </span>
+                <span class="action-btn-text truncate">{{ entry.name }}</span>
+            </div>
+        </div>
+    </div>
+
     <!-- EVENT: unchanged -->
     <div *ngIf="menuType === TYPE_OF_MENU.EVENT" class="action-list" id="action_list_drop_connect"
         cdkDropList [cdkDropListData]="menuItemsList">
