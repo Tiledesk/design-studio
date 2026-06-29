@@ -55,6 +55,7 @@ export class CdsTriggerEntrypointComponent implements OnInit {
   private addGroup(g: ConnectorTriggerGroup) {
     if (g.entries && g.entries.length > 0) {
       this.availableGroups = [...this.availableGroups.filter(x => x.id !== g.id), g];
+      this.recomputeSelectItems();
       this.checkAuth(g);
     }
   }
@@ -99,9 +100,13 @@ export class CdsTriggerEntrypointComponent implements OnInit {
     return this.availableGroups.find(g => (g.entries || []).some(e => e.id === ref));
   }
 
-  /** Options for the cds-select add-dropdown: label "Connector — Trigger", value = ref. */
-  get availableSelectItems(): Array<{ label: string; value: string }> {
-    return this.availableEntries.map(x => ({ label: `${x.group.name} — ${x.entry.name}`, value: x.entry.id }));
+  /** Stable options array for the cds-select add-dropdown. ng-select (inside cds-select)
+   *  resets if the [items] reference changes on every change-detection pass, so this is
+   *  cached and recomputed only when the loaded groups or the added subs actually change. */
+  availableSelectItems: Array<{ label: string; value: string }> = [];
+
+  private recomputeSelectItems(): void {
+    this.availableSelectItems = this.availableEntries.map(x => ({ label: `${x.group.name} — ${x.entry.name}`, value: x.entry.id }));
   }
 
   async onAddTriggerSelect(event: any): Promise<void> {
@@ -109,6 +114,7 @@ export class CdsTriggerEntrypointComponent implements OnInit {
     const match = this.availableEntries.find(x => x.entry.id === ref);
     if (!match) { return; }
     await this.orchestrator.addTrigger(this.intent, this.webhookUrl, match.group, match.entry);
+    this.recomputeSelectItems();
   }
 
   onFilterChange(sub: ConnectorTriggerSub, inputId: string, value: string) { sub.filters[inputId] = value; }
@@ -118,7 +124,7 @@ export class CdsTriggerEntrypointComponent implements OnInit {
     catch (e) { console.error('[triggers] save filters failed', e); }
   }
   async onRemove(sub: ConnectorTriggerSub): Promise<void> {
-    try { await this.orchestrator.removeTrigger(this.intent, this.webhookUrl, this.groupForRef(sub.ref), sub.ref); }
+    try { await this.orchestrator.removeTrigger(this.intent, this.webhookUrl, this.groupForRef(sub.ref), sub.ref); this.recomputeSelectItems(); }
     catch (e) { console.error('[triggers] remove failed', e); }
   }
 }
