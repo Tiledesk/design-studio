@@ -506,6 +506,20 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-flow-log>
 
+                    <cds-action-sub-agent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-sub-agent>
+
+                    <cds-action-return *ngSwitchCase="TYPE_ACTION.RETURN"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-return>
+
                 </div>
             </span>
             

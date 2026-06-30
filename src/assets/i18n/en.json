@@ -594,6 +594,11 @@
         "Examples": "Examples",
         "FlowLog": "Log",
         "SetFlowLog":"Set the log",
+        "SubAgentMode": "Execution mode",
+        "SubAgentFireAndContinue": "Fire and continue",
+        "SubAgentWaitForResult": "Wait for result",
+        "SubAgentAwaitWebhook": "Wait for webhook response",
+        "SubAgentAssignRunIdTo": "Assign run id to",
         "AvailableToAgents": "Available to agents",
         "InfoAvailableToAgents": "A block with this option is visible to agents for the purpose to be put back in the conversation",
         "Create": "Create",
@@ -822,6 +827,8 @@
             "N8n": "n8n",
             "AddTag": "Add tag",
             "FlowLog":"Flow log",
+            "SubAgent": "Sub Agent",
+            "Return": "Return",
             "DTMFForm": "DTMF form",
             "DTMFMenu": "DTMF menu",
             "BlindTransfer": "Blind transfer",
@@ -1097,6 +1104,20 @@
                 "IMAGE":"assets/images/doc/LOG.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/flow-log"
+            },
+            "SubAgent": {
+                "TITLE": "Invoke a sub-agent",
+                "DESCRIPTION": "This action invokes another AI agent and optionally waits for its result.",
+                "IMAGE": "assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
+            },
+            "Return": {
+                "TITLE": "Return response",
+                "DESCRIPTION": "This action publishes the HTTP status and payload to complete a sub-agent or webhook flow.",
+                "IMAGE": "assets/images/doc/WEB_RESPONSE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
             "Qapla": {
                 "TITLE": "Ask an order status to Qapla'",

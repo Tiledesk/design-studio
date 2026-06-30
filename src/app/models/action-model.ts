@@ -938,3 +938,40 @@ export class ActionMoveToUnassigned extends Action {
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
     }
 }
+
+export class ActionReturn extends Action {
+    payload: string;
+    status: string | number;
+    bodyType: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN;
+        this.payload = JSON.stringify({});
+        this.bodyType = 'json';
+        this.status = '200';
+    }
+}
+
+export class ActionSubAgent extends Action {
+    subagent_id: string;
+    intentName: string;
+    mode: 'fire_and_continue' | 'wait_result';
+    input: { [key: string]: string };
+    awaitWebhookPublish: boolean;
+    assignRunIdTo: string;
+    assignSubRequestIdTo: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    timeoutMs: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.INVOKE_SUB_AGENT;
+        this.mode = 'fire_and_continue';
+        this.input = {};
+        this.awaitWebhookPublish = false;
+        this.assignResultTo = 'subagent_result';
+    }
+}
