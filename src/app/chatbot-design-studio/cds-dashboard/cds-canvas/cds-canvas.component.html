@@ -7,15 +7,37 @@
 </div>
 
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
-    <cds-panel-intent-list 
+
+    <!-- Tab: alterna Blocks / Subagents nello stesso slot (mutua esclusione via activeLeftPanel) -->
+    <div class="cds-left-panel-tabs" *ngIf="IS_OPEN_INTENTS_LIST">
+        <button type="button" class="cds-left-panel-tab"
+            [class.active]="activeLeftPanel === 'blocks'"
+            (click)="onSelectLeftPanel('blocks')">
+            {{ 'Blocks' | translate }}
+        </button>
+        <button type="button" class="cds-left-panel-tab"
+            [class.active]="activeLeftPanel === 'subagents'"
+            (click)="onSelectLeftPanel('subagents')">
+            {{ 'CDSCanvas.Subagents' | translate }}
+        </button>
+    </div>
+
+    <cds-panel-intent-list *ngIf="activeLeftPanel === 'blocks'"
         id="cdsPanelIntentList"
         class="panel-intent-list"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST"
-        (selectIntent)=onSelectIntent($event) 
+        [hideTitle]="true"
+        (selectIntent)=onSelectIntent($event)
         (deleteIntent)="onDeleteIntent($event)">
     </cds-panel-intent-list>
-    
-    <div class="cds-toggle-setting-sidebar-icon-left-wpr" 
+
+    <cds-panel-subagents *ngIf="activeLeftPanel === 'subagents'"
+        id="cdsPanelSubagents"
+        class="panel-subagents"
+        [IS_OPEN]="IS_OPEN_INTENTS_LIST">
+    </cds-panel-subagents>
+
+    <div class="cds-toggle-setting-sidebar-icon-left-wpr"
         [class.is_opened]="IS_OPEN_INTENTS_LIST"
         (click)="onToogleSidebarIntentsList()">
         <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->

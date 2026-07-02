@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 
+- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
+- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
+- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
+- **changed**: Sub Agent detail panel now fills the panel height like the other actions
+- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
+- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
+
 
 # 1.39.44
 - **changed**: set custom attribute in JSON sources in URL preview in action reply

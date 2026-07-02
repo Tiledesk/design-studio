@@ -93,8 +93,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   mapOfIntents = [];
   labelInfoLoading:string = 'Loading';
 
-  /** panel list of intent */ 
+  /** panel list of intent */
   IS_OPEN_INTENTS_LIST: boolean = true;
+
+  /** pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab) */
+  activeLeftPanel: 'blocks' | 'subagents' = 'blocks';
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -1140,6 +1143,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.removeConnectorDraftAndCloseFloatMenu();
     this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, this.IS_OPEN_INTENTS_LIST);
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
+  }
+
+  /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
+  onSelectLeftPanel(panel: 'blocks' | 'subagents') {
+    this.activeLeftPanel = panel;
+    if (!this.IS_OPEN_INTENTS_LIST) {
+      this.onToogleSidebarIntentsList();
+    }
   }
 
   /** onDroppedElementToStage **

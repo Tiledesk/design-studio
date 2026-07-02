@@ -72,8 +72,27 @@ export class FaqKbService {
       );
   }
 
+  /**
+   * READ — elenco dei SUBAGENT collegati a un chatbot.
+   * API: GET {SERVER_BASE_PATH}{project_id}/faq_kb/{faq_kb_id}/subagents
+   */
+  public getSubagentsByFaqKbId(faq_kb_id: string): Observable<Chatbot[]> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const url = this.FAQKB_URL + faq_kb_id + '/subagents';
+    this.logger.log('[FAQ-KB.SERV] - GET SUBAGENTS - URL', url);
+    return this._httpClient.get<Chatbot[]>(url, httpOptions).pipe(map((res) => {
+      this.logger.log('[FAQ-KB.SERV] - GET SUBAGENTS - RES', res);
+      return res;
+    }));
+  }
+
   // ------------------------------------------------------------
-  // with all=true the response return also the identity bot 
+  // with all=true the response return also the identity bot
   // ------------------------------------------------------------
   public getAllBotByProjectId(): Observable<FaqKb[]> {
 
@@ -122,6 +141,27 @@ export class FaqKbService {
 
 
  
+  /**
+   * CREATE (POST) — crea un nuovo faq_kb (es. subagent).
+   * API: POST {SERVER_BASE_PATH}{project_id}/faq_kb/
+   * payload es.: { id_project, language, name, subtype:'subagent', template:'blank', type:'tilebot', parent_id }
+   */
+  public createFaqKb(payload: any): Observable<Chatbot> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const url = this.FAQKB_URL;
+    this.logger.log('[FAQ-KB.SERV] - CREATE FAQ-KB - URL', url, payload);
+    return this._httpClient.post<Chatbot>(url, JSON.stringify(payload), httpOptions).pipe(map((res) => {
+      this.logger.log('[FAQ-KB.SERV] - CREATE FAQ-KB - RES', res);
+      return res;
+    }));
+  }
+
   /**
    * UPDATE (PUT)
    * @param id
