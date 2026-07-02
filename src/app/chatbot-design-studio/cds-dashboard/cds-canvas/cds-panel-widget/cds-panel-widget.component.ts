@@ -34,6 +34,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   WIDGET_BASE_URL: string = '';
   widgetTestSiteUrl: SafeResourceUrl = null;
   private messageListener: (event: Event) => void;
+  private keepAliveAudio?: HTMLAudioElement;
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor( 
@@ -70,6 +71,7 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
     this.defaultDepartmentId = this.dashboardService.defaultDepartment._id;
     this.logger.log('[CDS-PANEL-WIDGET] ngOnInit  ');
     this.setIframeUrl()
+    this.startKeepAlive()
   }
 
 
@@ -170,10 +172,50 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     window.removeEventListener('message', this.messageListener);
+    this.stopKeepAlive();
   }
 
   resetLogService(){
     this.logService.resetLogService();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Keep-alive audio (impercettibile) — evita che Chrome congeli/scarti la tab in
+  // background ricaricando l'iframe del widget e azzerando i log. Attivo SOLO mentre
+  // questo pannello (l'iframe) è aperto: start in ngOnInit, stop in ngOnDestroy.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /** Traccia WAV muta leggerissima (8-bit mono 8kHz, 0.2s di silenzio reale = ~1.6KB). */
+  private buildSilentWavDataUrl(): string {
+    const sampleRate = 8000, seconds = 0.2;
+    const n = Math.floor(sampleRate * seconds);
+    const buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+    const s = (o: number, str: string) => { for (let i = 0; i < str.length; i++) v.setUint8(o + i, str.charCodeAt(i)); };
+    s(0, 'RIFF'); v.setUint32(4, 36 + n, true); s(8, 'WAVE'); s(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate, true);
+    v.setUint16(32, 1, true); v.setUint16(34, 8, true); s(36, 'data'); v.setUint32(40, n, true);
+    for (let i = 0; i < n; i++) v.setUint8(44 + i, 128); // silenzio 8-bit = 128 (midpoint)
+    let bin = ''; const b = new Uint8Array(buf);
+    for (let i = 0; i < b.length; i++) bin += String.fromCharCode(b[i]);
+    return 'data:audio/wav;base64,' + btoa(bin);
+  }
+
+  private startKeepAlive(): void {
+    if (this.keepAliveAudio) return;
+    try {
+      const a = new Audio(this.buildSilentWavDataUrl());
+      a.loop = true;
+      a.volume = 0.5; // contenuto muto: nessun suono percepibile
+      a.play().catch(() => { /* niente user-activation: ignora, nessun crash */ });
+      this.keepAliveAudio = a;
+    } catch { /* ambienti senza Audio: ignora */ }
+  }
+
+  private stopKeepAlive(): void {
+    if (!this.keepAliveAudio) return;
+    try { this.keepAliveAudio.pause(); this.keepAliveAudio.src = ''; } catch {}
+    this.keepAliveAudio = undefined;
   }
 
 }
