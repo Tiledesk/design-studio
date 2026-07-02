@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 # this branch 
+- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
+- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
+- **changed**: the Sub Agent action is not available inside a subagent
 - **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
 - **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
 - **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot

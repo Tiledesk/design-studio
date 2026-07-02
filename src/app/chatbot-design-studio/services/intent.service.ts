@@ -7,7 +7,7 @@ import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMM
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
-import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
+import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
 
 // SERVICES //
@@ -866,7 +866,7 @@ export class IntentService {
   public async setStartIntent(){
     this.intentSelectedID = null;
     this.intentActive = false;
-    const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    const subtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
     let startingName = STARTING_NAMES[subtype];
     this.logger.log('[CDS-INTENT] startingName: ', startingName);
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === startingName);

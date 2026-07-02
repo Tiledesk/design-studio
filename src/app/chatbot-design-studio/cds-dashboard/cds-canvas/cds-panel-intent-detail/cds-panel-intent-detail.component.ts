@@ -6,7 +6,7 @@ import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-s
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { RESERVED_INTENT_NAMES, STAGE_SETTINGS } from 'src/app/chatbot-design-studio/utils';
-import { TYPE_CHATBOT, TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, TYPE_ACTION, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 import { Intent } from 'src/app/models/intent-model';
 import { Project } from 'src/app/models/project-model';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -110,7 +110,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.isWebhook = true;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
-    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
     this.getWebhook();
   }
 

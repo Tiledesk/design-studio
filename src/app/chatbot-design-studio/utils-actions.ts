@@ -99,6 +99,18 @@ export enum TYPE_CHATBOT {
     COPILOT       = 'copilot',
 }
 
+/**
+ * Nel Design Studio i subagent (subtype 'subagent') vanno gestiti come chatbot standard:
+ * normalizza il subtype a CHATBOT quando è 'subagent' (o assente), altrimenti lo lascia invariato.
+ * Abilita così per i subagent tutte le feature/azioni/variabili del subtype 'chatbot'.
+ */
+export function resolveChatbotSubtype(subtype: string | undefined | null): TYPE_CHATBOT {
+  if (!subtype || subtype === 'subagent') {
+    return TYPE_CHATBOT.CHATBOT;
+  }
+  return subtype as TYPE_CHATBOT;
+}
+
 
 export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY),    name: 'CDSActionCategory.MostUsed',     src: 'assets/images/actions_category/most_used.svg'},

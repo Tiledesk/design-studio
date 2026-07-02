@@ -27,7 +27,7 @@ import { LOGOS_ITEMS } from './../../utils-resources';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
@@ -637,7 +637,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // ---------------------------------------
     // set subtype chatbot
     // ---------------------------------------
-    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
 
 
     // ---------------------------------------
