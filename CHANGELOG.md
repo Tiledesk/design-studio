@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc12
+- **added**: ability to select a department after agent Handoff
+
 # 1.40.3-rc11
 - **bug fix**: restore customHeaders
 
