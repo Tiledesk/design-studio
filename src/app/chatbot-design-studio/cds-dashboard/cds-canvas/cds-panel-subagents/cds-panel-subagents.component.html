@@ -8,6 +8,14 @@
             [placeholder]="'CDSCanvas.SearchASubagent' | translate">
     </div>
 
+    <!-- New subagent -->
+    <div class="subagents-new" *ngIf="IS_OPEN">
+        <button type="button" class="new-subagent-btn" (click)="onNewSubagent()">
+            <span class="material-icons">add</span>
+            {{ 'CDSCanvas.NewSubagent' | translate }}
+        </button>
+    </div>
+
     <!-- Lista subagent -->
     <div class="subagents-list" *ngIf="IS_OPEN">
         <div *ngIf="!isLoading && filteredSubagents.length === 0" class="subagents-empty">
@@ -22,14 +30,6 @@
             <span class="subagent-name">{{ sa.name }}</span>
             <span class="material-icons open-icon">open_in_new</span>
         </a>
-    </div>
-
-    <!-- New subagent -->
-    <div class="subagents-footer" *ngIf="IS_OPEN">
-        <button type="button" class="new-subagent-btn" (click)="onNewSubagent()">
-            <span class="material-icons">add</span>
-            {{ 'CDSCanvas.NewSubagent' | translate }}
-        </button>
     </div>
 
 </div>

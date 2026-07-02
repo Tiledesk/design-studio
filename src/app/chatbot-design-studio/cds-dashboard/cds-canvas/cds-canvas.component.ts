@@ -124,6 +124,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   IS_OPEN_INTENTS_LIST: boolean = true;
   /** pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab) */
   activeLeftPanel: 'blocks' | 'subagents' = 'blocks';
+  /** true se il chatbot aperto è esso stesso un subagent: nasconde tab/pannello Subagents e action Sub Agent */
+  isSubagent: boolean = false;
   IS_OPEN_ADD_ACTIONS_MENU: boolean = false;
   IS_OPEN_PANEL_ACTION_DETAIL: boolean = false;
   IS_OPEN_PANEL_BUTTON_CONFIG: boolean = false;
@@ -294,6 +296,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     }
 
     this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
+    this.isSubagent = this.dashboardService.selectedChatbot.subtype === 'subagent';
+    if (this.isSubagent && this.activeLeftPanel === 'subagents') {
+      this.activeLeftPanel = 'blocks';
+    }
 
     const rawNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     this.listOfNotes = rawNotes.map((n: any) => {
