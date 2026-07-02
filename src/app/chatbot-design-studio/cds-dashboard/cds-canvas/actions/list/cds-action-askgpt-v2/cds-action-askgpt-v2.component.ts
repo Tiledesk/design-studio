@@ -255,6 +255,12 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     this.action.llm = result?.llm ? result.llm : '';
     this.action.model = result?.model ? result.model : '';
     this.action.modelName = result?.modelName ? result.modelName : '';
+    // vLLM: persist the endpoint url on the action; clear it for any other provider.
+    if (result?.llm === 'vllm' && result?.vllmServer) {
+      this.action.vllmServer = result.vllmServer;
+    } else {
+      delete this.action.vllmServer;
+    }
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
     if (result) {
       this.ai_setting['max_tokens'].max = result.max_output_tokens;
@@ -626,7 +632,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   async getResponse(question, namespace) {
     this.logger.log("getResponse called...")
 
-    let data = {
+    let data: any = {
       question: question,
       system_context: this.action.context,
       llm: this.action.llm,
@@ -642,6 +648,13 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     // if(this.action?.chunks_only && this.action?.chunks_only === true){
     //   data['search_type'] = 'chunks';
     // }
+
+    // vLLM: the preview API needs the target server to route the request.
+    // Without it the backend responds: "vllmServer attribute is undefined".
+    if (this.action.llm === 'vllm' && this.action.vllmServer) {
+      data.vllmServer = this.action.vllmServer;
+    }
+
     if(this.action.namespaceAsName){
       data.namespace = await this.nameToId(namespace)
     }

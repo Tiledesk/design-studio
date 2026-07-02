@@ -27,7 +27,7 @@
             class="content draggable-list"
             cdkDropList 
             (cdkDropListDropped)="drop($event)">
-            
+
             <div *ngFor="let command of arrayResponses; let i = index; let odd = odd; let length = count">
 
                 <div *ngIf="odd" cdkDrag
@@ -236,6 +236,41 @@
                                 (updateAndSaveAction) = onUpdateAndSaveAction($event)
                                 (deleteActionReply) = onDeleteActionReply($event)>
                             </cds-action-reply-gallery>
+                        </div>
+                    </div>
+
+                    <!-- TTS RESPONSE -->
+                    <div *ngIf="command.message?.type === typeMessage.TTS" >
+
+                        <div class="response">
+
+                            <!-- *ngIf="typeAction === typeActions.REPLY" -->
+                            <div class="response-drop" 
+                                [ngClass]="{'grabbing':textGrabbing}"
+                                (mousedown)="mouseDown()" 
+                                (mouseup)="mouseUp()" 
+                                cdkDragHandle>
+                            </div>
+
+                            <cds-action-reply-tts 
+                                [class.no-controls]="typeAction === typeActions.RANDOM_REPLY"
+                                [index] = i
+                                [idAction] = "idAction"
+                                [response] = "command.message"
+                                [wait] = "arrayResponses[i-1]"
+                                [previewMode] = "previewMode"
+                                [limitCharsText]="4000"
+                                (moveUpResponse) = onMoveUpResponse($event)
+                                (moveDownResponse) = onMoveDownResponse($event)
+                                (openButtonPanel) = onOpenButtonPanel($event)
+                                (createNewButton) = onCreateNewButton($event)
+                                (deleteButton) = onDeleteButton($event)
+                                (deleteActionReply) = onDeleteActionReply($event)
+                                (updateAndSaveAction) = onUpdateAndSaveAction($event)
+                                (changeActionReply) = onChangeActionReply($event)
+                                (changeJsonButtons) = "onChangeJsonButtons($event, i)">
+                            </cds-action-reply-tts>
+
                         </div>
                     </div>
 

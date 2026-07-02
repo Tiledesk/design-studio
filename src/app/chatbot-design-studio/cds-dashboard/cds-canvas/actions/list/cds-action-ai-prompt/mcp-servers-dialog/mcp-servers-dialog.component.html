@@ -55,6 +55,9 @@
                     <div class="server-info">
                         <div class="server-name">
                             {{ server.name }}
+                            <span *ngIf="server.native" class="mcp-server__status-badge mcp-server__status-badge--native">
+                                {{'CDSCanvas.Native' | translate}}
+                            </span>
                             <span *ngIf="isServerSelected(server)" class="mcp-server__status-badge mcp-server__status-badge--active">
                                 {{'CDSCanvas.Active' | translate}}
                             </span>
@@ -79,10 +82,15 @@
     </div>
 
     <div class="tpl-modal-buttons">
-        <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button" 
+        <button id="cds-add-tiledesk-tools-btn" class="btn btn-primary cds-blue-button" type="button"
+            (click)="onAddTiledeskTools()">
+            <span class="material-icons mcp-dialog__add-icon">add</span>
+            {{'CDSCanvas.TiledeskTools' | translate}}
+        </button>
+        <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button"
             (click)="onAddMcpServer()">
             <span class="material-icons mcp-dialog__add-icon">add</span>
-            {{'CDSCanvas.AddMCPServer' | translate}}
+            {{'CDSCanvas.MCPServer' | translate}}
         </button>
         <button id="cds-ok-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
             OK

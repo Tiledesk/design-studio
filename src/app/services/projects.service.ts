@@ -47,12 +47,23 @@ export class ProjectService {
    *
    * API:
    * POST /api/{id_project}/mcp/tools
-   * Body: { url: "<server_url>" }
+   * Body: { url: "<server_url>", customHeaders?: [{key,value}], oauth?: {clientId,clientSecret,redirectUrl,scope} }
+   *
+   * The optional `customHeaders` and `oauth` are forwarded so the backend can authenticate
+   * against the MCP server during discovery exactly as it does at runtime. They mirror the
+   * shape persisted on the server object; only enabled/non-empty values should be passed in.
    *
    * NOTE: we build the URL following the same pattern used by other project-scoped endpoints:
    * SERVER_BASE_URL + project_id + '/mcp/tools'
    */
-  public getMcpTools(project_id: string, server_url: string): Observable<any> {
+  public getMcpTools(
+    project_id: string,
+    server_url: string,
+    options?: {
+      customHeaders?: Array<{ key: string; value: string }>;
+      oauth?: { clientId: string; clientSecret: string; redirectUrl: string; scope: string };
+    }
+  ): Observable<any> {
     const url = this.SERVER_BASE_URL + project_id + '/mcp/tools';
     this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - URL', url);
 
@@ -63,9 +74,66 @@ export class ProjectService {
       })
     };
 
-    const body = { url: server_url };
+    const body: any = { url: server_url };
+    if (options?.customHeaders && options.customHeaders.length > 0) {
+      body.customHeaders = options.customHeaders;
+    }
+    if (options?.oauth) {
+      body.oauth = options.oauth;
+    }
     return this.http.post(url, body, httpOptions).pipe(map((res: any) => {
       this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - RES ', res);
+      return res;
+    }));
+  }
+
+  /** httpOptions condivisi per gli endpoint MCP (Authorization col token Tiledesk). */
+  private mcpHttpOptions() {
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: this.tiledeskToken
+      })
+    };
+  }
+
+  /**
+   * Catalogo dei server MCP NATIVI di Tiledesk.
+   * API: GET /{id_project}/mcp/native
+   * Ritorna la lista (id, name, url, native, transport, description). I tool si scaricano on-demand via getNativeMcpServerTools.
+   */
+  public getNativeMcpServers(project_id: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/native';
+    this.logger.log('[TILEDESK-SERVICE] - GET NATIVE MCP SERVERS - URL', url);
+    return this.http.get(url, this.mcpHttpOptions()).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - GET NATIVE MCP SERVERS - RES ', res);
+      return res;
+    }));
+  }
+
+  /**
+   * Connessione + recupero tool di un server MCP nativo (on "Connect").
+   * API: POST /{id_project}/mcp/native/{nativeId}/connect  (endpoint già esistente, usato per connettere i server MCP)
+   */
+  public getNativeMcpServerTools(project_id: string, nativeId: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/native/' + nativeId + '/connect';
+    this.logger.log('[TILEDESK-SERVICE] - CONNECT NATIVE MCP SERVER - URL', url);
+    return this.http.post(url, {}, this.mcpHttpOptions()).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - CONNECT NATIVE MCP SERVER - RES ', res);
+      return res;
+    }));
+  }
+
+  /**
+   * Salvataggio dei server MCP nativi selezionati.
+   * API: POST /{id_project}/mcp/servers
+   * Payload nello stesso formato dell'integration ({ id_project, name:"mcp", value:{ servers:[...] } }).
+   */
+  public saveMcpServers(project_id: string, payload: any): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/servers';
+    this.logger.log('[TILEDESK-SERVICE] - SAVE MCP SERVERS - URL', url);
+    return this.http.post(url, payload, this.mcpHttpOptions()).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - SAVE MCP SERVERS - RES ', res);
       return res;
     }));
   }
