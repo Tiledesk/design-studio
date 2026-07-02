@@ -369,6 +369,7 @@ export class ActionSendWhatsapp extends Action {
 }
 
 export class ActionAgent extends Action{
+    depName?: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AGENT;
