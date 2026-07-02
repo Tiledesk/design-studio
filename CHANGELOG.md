@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+# 1.40.3-rc13 
 - **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
 - **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
 - **changed**: the Sub Agent action is not available inside a subagent
