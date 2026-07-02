@@ -7,9 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+# 1.40.3-rc14
 - **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
 - **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+
+# 1.40.3-rc13 
 - **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
 - **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
 - **changed**: the Sub Agent action is not available inside a subagent
