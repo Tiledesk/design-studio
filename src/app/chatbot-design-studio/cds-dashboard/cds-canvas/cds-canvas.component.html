@@ -9,8 +9,8 @@
 <div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
 
     <!-- Tab: alterna Blocks / Subagents nello stesso slot (mutua esclusione via activeLeftPanel).
-         Nascosti se il chatbot è un subagent: resta solo il pannello Blocks. -->
-    <div class="cds-left-panel-tabs" *ngIf="IS_OPEN_INTENTS_LIST && !isSubagent">
+         Visibili anche dentro un subagent (la lista mostra parent + subagent fratelli). -->
+    <div class="cds-left-panel-tabs" *ngIf="IS_OPEN_INTENTS_LIST">
         <button type="button" class="cds-left-panel-tab"
             [class.active]="activeLeftPanel === 'blocks'"
             (click)="onSelectLeftPanel('blocks')">
@@ -32,7 +32,7 @@
         (deleteIntent)="onDeleteIntent($event)">
     </cds-panel-intent-list>
 
-    <cds-panel-subagents *ngIf="!isSubagent && activeLeftPanel === 'subagents'"
+    <cds-panel-subagents *ngIf="activeLeftPanel === 'subagents'"
         id="cdsPanelSubagents"
         class="panel-subagents"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST">

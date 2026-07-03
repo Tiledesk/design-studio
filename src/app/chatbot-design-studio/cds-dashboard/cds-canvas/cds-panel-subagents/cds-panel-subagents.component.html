@@ -8,28 +8,41 @@
             [placeholder]="'CDSCanvas.SearchASubagent' | translate">
     </div>
 
-    <!-- New subagent -->
-    <div class="subagents-new" *ngIf="IS_OPEN">
+    <!-- New subagent (nascosto dentro un subagent) -->
+    <div class="subagents-new" *ngIf="IS_OPEN && !isSubagent">
         <button type="button" class="new-subagent-btn" (click)="onNewSubagent()">
             <span class="material-icons">add</span>
             {{ 'CDSCanvas.NewSubagent' | translate }}
         </button>
     </div>
 
-    <!-- Lista subagent -->
+    <!-- Lista: parent (sempre primo) + subagent -->
     <div class="subagents-list" *ngIf="IS_OPEN">
+
+        <!-- Parent chatbot -->
+        <div *ngIf="parentItem" class="subagent-item parent-item"
+            [class.active]="parentItem._id === currentId"
+            (click)="openAgent(parentItem._id)"
+            [attr.title]="parentItem.name">
+            <span class="material-icons subagent-icon">hub</span>
+            <span class="subagent-name">{{ parentItem.name }}</span>
+            <span class="parent-badge">parent</span>
+        </div>
+
+        <!-- Subagent -->
+        <div *ngFor="let sa of filteredSubagents" class="subagent-item"
+            [class.active]="sa._id === currentId"
+            (click)="openAgent(sa._id)"
+            [attr.title]="sa.name">
+            <span class="material-icons subagent-icon">smart_toy</span>
+            <span class="subagent-name">{{ sa.name }}</span>
+        </div>
+
+        <!-- Empty state (nessun subagent) -->
         <div *ngIf="!isLoading && filteredSubagents.length === 0" class="subagents-empty">
             <span class="material-icons empty-icon">smart_toy</span>
             <p class="empty-text">{{ 'CDSCanvas.NoSubagentsYet' | translate }}</p>
         </div>
-
-        <a *ngFor="let sa of filteredSubagents" class="subagent-item"
-            [href]="getSubagentUrl(sa._id)" target="_blank" rel="noopener noreferrer"
-            [attr.title]="sa.name">
-            <span class="material-icons subagent-icon">smart_toy</span>
-            <span class="subagent-name">{{ sa.name }}</span>
-            <span class="material-icons open-icon">open_in_new</span>
-        </a>
     </div>
 
 </div>
