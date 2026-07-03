@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# 1.40.3-rc15
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+
 # 1.40.3-rc14
 - **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
 - **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
