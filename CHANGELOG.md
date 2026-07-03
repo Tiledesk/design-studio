@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# 1.40.7
+- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
+
 # 1.40.6
 - **bug fix**: change env
 

@@ -411,11 +411,10 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   }
   
   onBlur(event, property){
-    if(property === 'namespace'){
-      this.action[property] = event;
-    } else {
-      this.action[property] = event.target.value;
-    }
+    // `cds-text`/`cds-textarea` ri-emettono il DOM FocusEvent grezzo sul loro output `blur`:
+    // estraiamo il valore stringa dell'input, evitando di salvare "[object FocusEvent]".
+    const value = (typeof event === 'string') ? event : (event?.target?.value ?? event);
+    this.action[property] = value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
