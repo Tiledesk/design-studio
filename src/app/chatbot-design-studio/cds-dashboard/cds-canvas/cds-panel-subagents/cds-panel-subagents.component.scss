@@ -68,8 +68,14 @@
 
     &:hover {
         background: #f0f4f7;
+    }
 
-        .open-icon { opacity: 1; }
+    // elemento correntemente aperto (parent o subagent)
+    &.active {
+        background: #e7effe;
+
+        .subagent-icon { color: var(--blu, #1f64ef); }
+        .subagent-name { color: var(--blu, #1f64ef); font-weight: 600; }
     }
 
     .subagent-icon {
@@ -86,13 +92,29 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
 
-    .open-icon {
-        font-size: 16px;
-        color: #9ba6b3;
+// riga del chatbot parent: sempre in cima, con badge e separatore
+.parent-item {
+    margin-bottom: 4px;
+    border-bottom: 1px solid #eef2f6;
+    border-radius: 6px 6px 0 0;
+
+    .parent-badge {
         flex-shrink: 0;
-        opacity: 0;
-        transition: opacity .2s;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: #7d8a97;
+        background: #eef2f6;
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+
+    &.active .parent-badge {
+        color: var(--blu, #1f64ef);
+        background: #dbe7fe;
     }
 }
 
