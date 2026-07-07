@@ -13,15 +13,32 @@ interface McpTool {
 }
 
 interface McpServer {
+  /** nativeId: presente solo sui server MCP nativi Tiledesk (usato per Connect/Save dei nativi). */
+  id?: string;
   name: string;
   url: string;
   transport: string;
+  /** true = server MCP nativo di Tiledesk (badge "native", name readonly, url nascosto, Connect via nativeId). */
+  native?: boolean;
+  /** descrizione (fornita dal catalogo nativo). */
+  description?: string;
   customHeaders?: Array<{
     enabled: boolean;
     key: string;
     value: string;
     revealValue?: boolean;
   }>;
+  /**
+   * OAuth 2.0 Authorization Code flow config.
+   * Persisted as plain config; the actual flow (browser login / token exchange)
+   * is executed by the backend/runtime, not here. Persisted only when at least one field is filled.
+   */
+  oauth?: {
+    clientId: string;
+    clientSecret: string;
+    redirectUrl: string;
+    scope: string;
+  };
   /** Available tools (from Connect / integrations). Persisted on Save. */
   tools?: McpTool[];
   /** Selected tools for this server. Persisted in integration so selection is kept even when server is not selected. */
@@ -86,6 +103,9 @@ export class McpServerEditDialogComponent implements OnInit {
   isHeadersJsonMode: boolean = false;
   headersJsonText: string = '';
   private originalHeadersSnapshot: string = '';
+  /** Show/hide the OAuth Client Secret value (UI only, not persisted). */
+  revealClientSecret: boolean = false;
+  private originalOAuthSnapshot: string = '';
   
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -138,6 +158,16 @@ export class McpServerEditDialogComponent implements OnInit {
     // Snapshot initial headers for dirty check (normalize fields)
     this.originalHeadersSnapshot = this.serializeHeaders(this.editedServer.customHeaders);
     this.headersJsonText = this.buildHeadersJsonText();
+
+    // Ensure OAuth object exists (kept in-memory for binding; persisted only if at least one field is filled).
+    // A fresh object avoids mutating the original server reference while editing.
+    this.editedServer.oauth = {
+      clientId: this.editedServer.oauth?.clientId || '',
+      clientSecret: this.editedServer.oauth?.clientSecret || '',
+      redirectUrl: this.editedServer.oauth?.redirectUrl || '',
+      scope: this.editedServer.oauth?.scope || ''
+    };
+    this.originalOAuthSnapshot = this.serializeOAuth(this.editedServer.oauth);
     
     // Store all servers
     this.allMcpServers = [...this.data.allServers];
@@ -278,7 +308,8 @@ export class McpServerEditDialogComponent implements OnInit {
     const transportChanged = (this.editedServer?.transport || '') !== snap.transport;
     const toolsSelectionChanged = !this.areSetsEqual(this.selectedToolNames, this.originalSelectedToolsSnapshot);
     const headersChanged = this.serializeHeaders(this.editedServer.customHeaders || []) !== this.originalHeadersSnapshot;
-    return nameChanged || transportChanged || toolsSelectionChanged || headersChanged || this.availableToolsChangedAfterRefresh;
+    const oauthChanged = this.serializeOAuth(this.editedServer.oauth) !== this.originalOAuthSnapshot;
+    return nameChanged || transportChanged || toolsSelectionChanged || headersChanged || oauthChanged || this.availableToolsChangedAfterRefresh;
   }
 
   // -----------------------
@@ -381,6 +412,61 @@ export class McpServerEditDialogComponent implements OnInit {
     }
   }
 
+  // -----------------------
+  // OAuth 2.0 flow config
+  // -----------------------
+  onOAuthFieldChange(field: 'clientId' | 'clientSecret' | 'redirectUrl' | 'scope', value: string): void {
+    if (!this.editedServer.oauth) {
+      this.editedServer.oauth = { clientId: '', clientSecret: '', redirectUrl: '', scope: '' };
+    }
+    this.editedServer.oauth[field] = value ?? '';
+  }
+
+  toggleOAuthSecretReveal(): void {
+    this.revealClientSecret = !this.revealClientSecret;
+  }
+
+  /** Stable serialize used only for the dirty check. */
+  private serializeOAuth(oauth?: McpServer['oauth']): string {
+    try {
+      const o = oauth || { clientId: '', clientSecret: '', redirectUrl: '', scope: '' };
+      return JSON.stringify({
+        clientId: (o.clientId ?? '').toString(),
+        clientSecret: (o.clientSecret ?? '').toString(),
+        redirectUrl: (o.redirectUrl ?? '').toString(),
+        scope: (o.scope ?? '').toString()
+      });
+    } catch {
+      return '';
+    }
+  }
+
+  /**
+   * Returns the OAuth config trimmed, but only when at least one field is filled.
+   * Returns undefined otherwise, so empty OAuth is never persisted (keeps existing servers clean).
+   */
+  private buildOAuthPayload(): McpServer['oauth'] | undefined {
+    const o = this.editedServer.oauth;
+    if (!o) return undefined;
+    const clientId = (o.clientId || '').trim();
+    const clientSecret = (o.clientSecret || '').trim();
+    const redirectUrl = (o.redirectUrl || '').trim();
+    const scope = (o.scope || '').trim();
+    if (!clientId && !clientSecret && !redirectUrl && !scope) return undefined;
+    return { clientId, clientSecret, redirectUrl, scope };
+  }
+
+  /**
+   * Enabled custom headers with both key and value filled, as forwarded to the tools
+   * discovery call. Mirrors the UI note "Only enabled headers with both name and value
+   * will be sent". Returns [] when none apply.
+   */
+  private buildEnabledHeadersPayload(): Array<{ key: string; value: string }> {
+    return (this.editedServer.customHeaders || [])
+      .filter(h => h && h.enabled && (h.key || '').trim() && (h.value || '').trim())
+      .map(h => ({ key: h.key.trim(), value: h.value.trim() }));
+  }
+
 
   get showConnectButton(): boolean {
     // Connect / Refresh button always visible (Connect when no tools, Refresh tools when loaded).
@@ -421,6 +507,11 @@ export class McpServerEditDialogComponent implements OnInit {
       this.errorMessage = "Please fill Name and URL before connecting.";
       return;
     }
+    if (this.isNative && !this.editedServer.id) {
+      this.showError = true;
+      this.errorMessage = "Missing native server id.";
+      return;
+    }
     if (this.isLoadingTools) return;
 
     this.showError = false;
@@ -430,7 +521,16 @@ export class McpServerEditDialogComponent implements OnInit {
     this.isToolsModalOpen = false;
 
     try {
-      const res = await firstValueFrom(this.projectService.getMcpTools(this.project_id, this.editedServer.url));
+      // Server nativo: Connect via nativeId (POST {proj}/mcp/native/{id}/connect). Custom: discovery via url
+      // inoltrando customHeaders + oauth (necessari al backend per autenticarsi verso il server MCP).
+      const res = await firstValueFrom(
+        this.isNative
+          ? this.projectService.getNativeMcpServerTools(this.project_id, this.editedServer.id)
+          : this.projectService.getMcpTools(this.project_id, this.editedServer.url, {
+              customHeaders: this.buildEnabledHeadersPayload(),
+              oauth: this.buildOAuthPayload()
+            })
+      );
       const rawTools = Array.isArray(res) ? res : (Array.isArray(res?.tools) ? res.tools : []);
 
       const tools: McpTool[] = (rawTools || [])
@@ -485,9 +585,18 @@ export class McpServerEditDialogComponent implements OnInit {
       .map(name => ({ name }));
   }
 
+  /** Server MCP nativo Tiledesk: name readonly, url nascosto, Connect via nativeId, Save su /mcp/servers. */
+  get isNative(): boolean {
+    return !!this.editedServer?.native;
+  }
+
   isFormValid(): boolean {
-    return !!(this.editedServer.name && 
-              this.editedServer.url && 
+    if (this.isNative) {
+      // I server nativi non hanno url editabile: bastano name + transport.
+      return !!(this.editedServer.name && this.editedServer.transport);
+    }
+    return !!(this.editedServer.name &&
+              this.editedServer.url &&
               this.editedServer.transport);
   }
 
@@ -519,8 +628,11 @@ export class McpServerEditDialogComponent implements OnInit {
       const selectedTools = this.buildSelectedToolsPayload();
       // Persist total available tools count from last Connect/Refresh so list dialog can show correct "X available".
       const availableToolsCount = this.availableTools?.length ?? 0;
+      // OAuth: trimmed config, undefined when empty (so it is not persisted as noise).
+      const oauthPayload = this.buildOAuthPayload();
       const serverToSave = {
         ...this.editedServer,
+        oauth: oauthPayload,
         tools: selectedTools,
         availableToolsCount
       };
@@ -539,22 +651,27 @@ export class McpServerEditDialogComponent implements OnInit {
         // Add new server to the array (include tools + selectedTools for persistence)
         this.allMcpServers.push({
           ...this.editedServer,
+          oauth: oauthPayload,
           tools: this.editedServer.tools,
           selectedTools: this.buildSelectedToolsPayload()
         });
       } else {
         // Find and update the server in the array (include tools + selectedTools for persistence)
         const serverIndex = this.allMcpServers.findIndex(s => s.name === this.originalServer.name);
+        const updatedServer = {
+          ...this.editedServer,
+          tools: this.editedServer.tools,
+          selectedTools: this.buildSelectedToolsPayload()
+        };
         if (serverIndex > -1) {
-          this.allMcpServers[serverIndex] = {
-            ...this.editedServer,
-            tools: this.editedServer.tools,
-            selectedTools: this.buildSelectedToolsPayload()
-          };
+          this.allMcpServers[serverIndex] = updatedServer;
+        } else {
+          // Server non ancora presente (es. server nativo configurato per la prima volta): aggiungilo alla lista.
+          this.allMcpServers.push(updatedServer);
         }
       }
 
-      // Prepare the integration object
+      // Persistenza: custom e nativi (una volta configurati) salvati insieme nell'integration "mcp".
       const mcpIntegration: McpIntegration = {
         id_project: this.project_id,
         name: "mcp",
@@ -562,15 +679,12 @@ export class McpServerEditDialogComponent implements OnInit {
           servers: this.allMcpServers
         }
       };
-
       this.logger.log("[McpServerEditDialog] Saving integration:", mcpIntegration);
-
-      // Call service to save the entire MCP integration
       const response = await firstValueFrom(
         this.projectService.saveIntegration(this.project_id, mcpIntegration)
       );
-      
-      this.logger.log("[McpServerEditDialog] Integration saved successfully:", response);
+
+      this.logger.log("[McpServerEditDialog] MCP servers saved successfully:", response);
       
       // Clear the loader timer and hide states
       clearTimeout(loaderTimer);
@@ -582,6 +696,7 @@ export class McpServerEditDialogComponent implements OnInit {
       this.dialogRef.close({
         server: {
           ...this.editedServer,
+          oauth: oauthPayload,
           tools: this.editedServer.tools,
           selectedTools: selectedToolsPayload
         },

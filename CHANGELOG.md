@@ -18,11 +18,99 @@
 - **bug fix**: keep the operand2 value when editing legacy conditions (string operand2) and hide the Value field for legacy unary operators
 - **bug fix**: added the missing trackBy in the base filter (fixes JSON Condition build/template error)
 - **changed**: JSON Condition normalizes legacy ignore-case operators across the whole condition on open (explicit case-sensitive migration) and warns instead of silently dropping unknown operators from the serialized `when`
+# 1.40.3-rc15
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+
+# 1.40.3-rc14
+- **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
+- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+
+# 1.40.3-rc13 
+- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
+- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
+- **changed**: the Sub Agent action is not available inside a subagent
+- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
+- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
+- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
+- **changed**: Sub Agent detail panel now fills the panel height like the other actions
+- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
+- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
+
+# 1.40.3-rc12
+- **added**: ability to select a department after agent Handoff
+
+# 1.40.3-rc11
+- **bug fix**: restore customHeaders
+
+# 1.40.3-rc10
+- **added**: added server mcp native tiledesk
+
+# 1.40.3-rc9
+- **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
+
+# 1.40.3-rc8
 - **changed**: no operator preset when opening a Custom Attribute condition; "Apply Condition" stays disabled until an operator is selected
 - **added**: info icon next to "Attribute name" with a tooltip explaining the attribute syntax (array indexes, nested properties)
 - **added**: "Learn more" link to the JSON Condition guide in the Condition and Condition w/ else action info popups
 - **added**: JSON Condition action documentation page
 
+# 1.40.3-rc7
+- **added**: json condition "when" grammar reference doc (for chatbot prompt)
+- **bug fix**: json condition crash with legacy/new action format (safe operator & operand render)
+- **bug fix**: avoid page-reload dialog while the widget test simulator is open
+- **bug fix**: keep the widget iframe alive on tab inactivity (prevent Chrome freeze/discard reload)
+
+# 1.40.3-rc6
+- **changed**: refatoring action conditions
+
+# 1.40.3-rc5
+- **bug fix**: bug fix env
+
+# 1.40.3-rc4
+- **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
+
+# 1.40.3-rc3
+- **bug fix**: integrate customHeaders and auth in "tools" paylosd
+
+# 1.40.3-rc2
+- **bug fix**: vllmServer
+
+# 1.40.3-rc1
+- **bug fix**: added vllm url in vllm models
+
+# 1.40.1-rc9
+- **changed**: filter voice provider list based on chatbot subtype (chatbot: elevenlabs only, voice twilio: twilio and openai only)
+- **bug fix**: voice settings initialization - removed duplicated logic
+
+# 1.40.1-rc8
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
+- **bug fix**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.1-rc7
+- **added**: OAuth 2.0 Flow in MCP server authentication (Client ID, Client Secret, Redirect URL, Scope)
+
+# 1.40.1-rc6
+- **bug fix**: retrocompatibility jsonCondition
+
+# 1.40.1-rc5
+- **changed**: refactoring jsonCondition. added "when"
+
+# 1.40.1-rc4
+- **changed**: display Custom Headers in MCP server
+
+# 1.40.1-rc3
+- **changed**: added tag "BETA"
+
+# 1.40.1-rc2
+- **bug fix**: bug fix css panel detail action data table
+
+# 1.40.1-rc1
+- **added**: added action "data-table"
 
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
@@ -50,38 +138,93 @@
 - **bug-fix**: set minimum tokens when unchecking "Get contents sources"
 - **changed**: updated ai_models
 
+# 1.39.39-rc2
+- **added**: added PINECONE_RERANKING in environment to set reranking
+
+# 1.39.39-rc1
+- **bug-fix**: set minimum tokens when unchecking "Get contents sources"
+- **changed**: updated ai_models
+
 # 1.39.38 
 - **bug fix**: change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
 
+# 1.39.38-rc1 
+- **bug-fix**: changed setModel in the ai-condition and ai-prompt actions to retain the maxtoken value
+
 # 1.39.37  
+
+# 1.39.37-rc1 
 - **changed**: In the "Flow log" action, sort error types with icons and colors in the select box.
 - **changed**: Removed the "Chatgpt task" action from the list of actions. If already used, add the "deprecated" tag.
 - **bug-fix**: Modified the ability to drag an action outside the intent block.
 - **bug-fix**: Modified CSS for actions with AI Settings.
 
 # 1.39.36 
+
+# 1.39.36-rc1
+- **added**: added parameter to enable/disable rules management 
+
+# 1.39.35-rc1 
 - **changed**: hide the "rules" button if there are no "rules" set
 - **changed**: updated AI models
 
 # 1.39.35
+
+# 1.39.34-rc2 
 - **bug-fix**: Removed "manage kb" from webhook detail panel
 - **bug-fix**: in action Ask KB shows the selected template's default value and max-token
 - **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
 
-# 1.39.34
+# 1.39.34-rc1
 - **bug-fix**: action blind trasfer not display voice commands
 
-# 1.39.33
-- **Added**: Added the ability to insert tags into the KB ask action and the KB create action
+# 1.39.33-rc4
+- **bug-fix**: renamed onClickControl to onActionControl in intent.component
 
-# 1.39.32 
+# 1.39.33-rc3
+- **bug-fix**: The action detail panel closes when an action is modified
+
+# 1.39.33-rc2
+- **changed**: replaced "Tag" with "Label"
+
+# 1.39.33-rc1
+- **changed**: update and refactoring cds-action-json-condition
+
+# 1.39.33
+
+# 1.39.32-rc1
 - **bug-fix**: GptTask Preview broken
 - **bug-fix**: Condition blocks not saved when changing Boolean operators
 - **bug-fix**: OpenAI models present in the select even if they are missing from the environment variable
 
-# 1.39.31
-- **bug-fix**: bug fixed in selecting and refreshing MCP server tools.
+# 1.39.32
+
+# 1.39.29-rc9
+- **bug-fix**: Bug fixed in selecting and refreshing MCP server tools.
 - **bug-fix**: Css changes to the preview of selected tools.
+
+# 1.39.29-rc8
+- **changed**: Updated and refactored the cds-intent and cds-connector-in components to improve performance
+
+# 1.39.29-rc7
+- **bug-fix**: Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
+
+# 1.39.29-rc6
+- **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
+
+# 1.39.29-rc5
+- - **added**: added tag to action ask kb and action create kb
+
+# 1.39.29-rc4
+- **bug-fix**: eliminated AAAAAA
+
+# 1.39.29-rc3
+- **changed**: changed the position of the cds-note-controls panel
+
+
+# 1.39.29-rc2
+- **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
+
 
 # 1.39.30
 - **Modified**: Changed the position of the cds-note-controls panel
@@ -96,64 +239,251 @@
 - **changed**: change the color of the badges in the list models
 - **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
 
-# 1.39.29
+# 1.39.29-rc1
 - **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
 
-# 1.39.28
-- **added**: added tools MCP server
+# 1.39.28-rc4
+- **bug-fixed**: Fixed image loading bug with new API
+
+# 1.39.28-rc3
+- **added**: Added a note title to the note rectangle
+- **changed**: Removed the note border in rectangle notes
+- **changed**: Disabled the maximum height on rectangles and set a minimum size
+- **bug-fixed**: Fixed the issue with resizing rectangle notes. The corner opposite the one being dragged now remains locked.
+- **bug-fixed**: Fixed the horizontal resizing of text notes; eliminated flickering.
+
+
+# 1.39.28-rc2 
+- **bug-fix**: filtered LLM templates based on those present in the environment file
+- **bug-fix**: fixed bug on GptTask action in prompt preview
+- **bug-fix**: enabled saving when changing the "OR / AND" operator filter
+
+# 1.39.28-rc1
+- **changed**: refactoring of cds-canvas and cds-intent components
 
 # 1.39.27
 - **changed**: API for upload a file/images
 
+
+# 1.39.27-rc1
+- **added**: added reasoning in AI Prompt action
+
 # 1.39.26
 - **added**: added iteration action
 
-# 1.39.25
+# 1.39.26-rc1
+- **bug-fix**: sort attribute list in Variable List Component
+- **bug-fix**: change the "use kb name" field to 2 lines
+- **bug-fix**: the selected model is red even when the api is set
+- **changed**: change the AI ​​settings preview
+
+# 1.39.25-rc2
 - **bug-fix**: Fixed a filter error when selecting a KB.
 - **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
 - **changed**: Set the "Max chunks for re-ranking" to 100.
 
-# 1.39.24
-- **bug-fixed**: note - video note resizing is not smooth
-- **bug-fixed**: note - fixed max_output_tokens error
-- **changed**: note - handles have been added to the rectangle note vertices
-- **bug-fixed**: note - disabled the 100x100px non-clickable stage area (tds-drag-drawer).
-- **bug-fixed**: note - disabled the note-controls menu when it is transparent
-- **changed**: note - restored the note detail panel opening when clicking on the note, except for the video note
-- **bug-fixed**: note - when change the color, the note detail panel closes
-- **changed**: note - change default colors
-- **changed**: note - store the last colors in the LS
-- **added**: note - add the same intent menu to notebooks
-- **changed**: note - limit uploads to images and GIFs only
-- **added**: note - allow uploading videos from links
-- **added**: Add the text: Total retrieved chunks for re-ranking: 
-- **changed**: Combine chunk limit, re-ranking, and multiplier into a single block, so pay attention to the spacing.
-- **changed**: In the settings, I replace the token icon and add badges in place of the pipe.
-- **changed**: Add the type (H/S) hybrid or semantic, next to the name.
+# 1.39.25-rc1
+- **changed**: updated MCP server, added "tools" selection for each server
+
+# 1.39.25
+
+# 1.39.24-rc11
+- **changed**: minor updates on API for upload a file/chatbot avatar
+
+# 1.39.24-rc10
+- **added**: added tools MCP server
+
+# 1.39.24-rc9
+- **changed**: API for upload a file/chatbot avatar
+
+# 1.39.24-rc8
+- **added**: Add text: Total retrieved chunks for re-ranking: x
+- **changed**: Merge chunk limit, re-ranking, and multiplier into a single block
+- **changed**: In the settings, replace the token icon and add badges in place of the pipe
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name
+
+# 1.39.24-rc7
+- **bug-fixed**: fix regression in action menu that doesn't allow deleting an action
+
+# 1.39.24-rc6
+- **bug-fixed**: Fixed max_output_tokens error
+- **bug-fixed**: Handles have been added to the vertices of the rectangle note
+- **changed**: Disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: Disabled the note-controls menu when it is transparent
+- **bug-fixed**: Restored the ability to open the note detail when clicking on the note, except for the video note
+- **changed**: When I try to change the color, the note detail panel closes
+- **bug-fixed**: The video note resize is not smooth
+
+# 1.39.24-rc5
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
+
+# 1.39.24-rc4
 - **changed**: Set the default max-token value to 10000
 - **added**: Added reranking multiplier
+
+# 1.39.24-rc3
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
+
+# 1.39.24-rc2
+- **changed**: note: change default colors
+- **changed**: note: store the last colors in the LS
+- **added**: note: add the same intent menu to notebooks
+- **changed**: note: limit uploads to images and GIFs only
+- **added**: note: allow uploading videos from links
+
+# 1.39.24-rc1
+
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
 - **changed**: added text and links in reranking: Improve the accuracy of your answers
 - **changed**: web Request does not show output attributes in the stage preview
 - **changed**: change attribute preview in the AI ​​settings panel
 - **bug-fix**: show and save system context textarea in askgpt-v2
 - **changed**: 10K token minimo (dipende dai modelli)
+
+# 1.39.23
+
+# 1.39.23-rc7
+- **changed**: Refactored state management for expansion panels in cds-action-askgpt-v2 component. Introduced separate states for chunks and AI settings panels to improve UI responsiveness and maintainability
+- **changed**: Updated ACTIONS_LIST in utils-actions.ts to ensure consistent formatting and include additional chatbot types for FLOW_LOG action
+
+# 1.39.23-rc6
+- **added**: Support rectangle
+- **bug-fix**: Support border thickness
+- **bug-fix**: Fix the bug that prevents text color from being saved
+- **added**: Add submenus with various note types
+- **added**: Drag-and-drop insertion
+- **added**: Support image type
+- **added**: Support video type
+- **bug-fix**: As soon as the text note is inserted, it should immediately allow you to write with focus on the text
+- **bug-fix**: Centering doesn't work in the block
+
+# 1.39.23-rc5
 - **added**: added sortedItems in selection intent
+
+# 1.39.23-rc4
+- **added**: showed connectors-in only if they are contract connectors
+
+# 1.39.23-rc3
+- **changed**: changed connector-in to only display the list of contracted connector-in to the input
 - **added**: added go to block in panel intent detail;
 - **added**: added multi rows in url iframe;
-- **added**: showed connectors-in only if they are contract connectors
+
+# 1.39.23-rc1
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
+
+# 1.39.23
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
+
+# 1.39.22
+- **changed**: sorted the list of Intents in alphabetical order
+- **added**: added the LLM model gpt-5.2
+- **bug-fix**: Fixed bug when changing the height of iframe
+
+# 1.39.21
+- **added**: added the LLM model gpt-5.2
+
+# 1.39.20
+- **bug-fix**: sorted the list of intents in the intent selection select
+
+# 1.39.19
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc12 
+- **added**: added tag-replyto in mode preview ai condition and ask kb
+- **bug-fix**: change link "learn more" ai condition
+
+
+# 1.39.19-rc10 
 - **changed**: Intent block title hidden if "untitled"
 - **changed**: Form button and question button hidden if empty
 - **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
 - **changed**: If the chatbot is new, only one action per intent
 
+# 1.39.19-rc9
+- **bug-fix**: sorted the listOfIntents in the intent selection select
+
+# 1.39.19-rc8
+- **bug-fix**: do not automatically set TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+- **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings
+
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
+# 1.39.19-rc5
+- **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
+
+# 1.39.19-rc4
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc3
+- **added**: added settings summary in AI action templates and all actions with AISEttings
+- **added**: added tag-replyto in mode preview
+- **added**: added badge on publish button
+
+# 1.39.19-rc2
+- **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
+
+# 1.39.19-rc1
+- **added**: description on elevenlabs voices 
+
+# 1.39.18
+- **bug-fix**: Fixed display of iframe URL in action playback
+
+# 1.39.18-rc2
+- **bug-fix**: css bug fix content-frame
+
+# 1.39.18-rc1
+- **bug-fix**: fixed handling of iframe URL in action replay
+
+# 1.39.17
+- **added**: added the ability to put notes on the stage
+
+# 1.39.16
+- **added**: pipe find to show namespace name in action ask-kb-v2
+- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
+
+# 1.39.15
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.15-rc3
+- **bug-fix**: update resizing note
+
+# 1.39.15-rc2
+- **bug-fix**: cannot update the key or delete an item in action lead_update
+
+# 1.39.15-rc1
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.14
+
+# 1.39.14-rc5
+- **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
+
+# 1.39.14-rc4
+- **changed**: added rotation and horizontal scaling to the notes component
+
+# 1.39.14-rc3
+- **added**: added notes component
+
+# 1.39.14-rc2
+- **bug-fix**: added the "globals" variables created in the DS to the variable list
+- **changed**: open the Intent panel details by clicking on "start intent"
+- **bug-fix**: drag intent "start action"
+- **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
+- **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
+- **bug-fix**: changed knwoledge to knowledge 
+
+# 1.39.14-rc1
+- **bug-fix**: Text correction on replace AI agent
+- **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
 - **added**: Supportare rettangolo
 - **bug-fixed**: Supportare spessore bordo
 - **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
@@ -177,6 +507,78 @@
 # 1.39.11
 
 # 1.39.10
+- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
+- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+
+# 1.39.9-rc16:
+- **bug-fix**: Updated MCP tools in the ai-prompt action when another ai-prompt action is selected
+
+# 1.39.9-rc15:
+- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the AI-prompt, ai-condition, askgpt-v2 action.
+- **bug-fix**: Dragging issue with the "start" intent.
+- **bug-fix**: The namespace or action ID is now displayed correctly based on the namespaceAsName flag (true/false).
+- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+
+# 1.39.9-rc14:
+- **bug-fix**: contract connector undefined and connector empty hidden on action ai prompt
+- **bug-fix**: drag on start intent
+- **bug-fix**: show namespace or id action if namespaceAsName is true or false
+- **bug-fix**: set focus on textarea when create new server MCP
+
+# 1.39.9-rc13:
+- **bug-fix**: bug-fix css in mcp-servers-grid 
+
+# 1.39.9-rc12:
+- **bug-fix**: renamed "selected Mcp Servers"
+
+# 1.39.9-rc11:
+- **changed** updated css mcp servers
+
+# 1.39.9-rc10:
+- **changed** updated mcp servers in action ai-prompt
+
+# 1.39.9-rc9:
+- **added**: added mcp servers in action ai-prompt
+- **added**: added Save/Update MCP Server in integration
+- **added**: retry system for rendering connectors with slow connections
+
+
+# 1.39.9-rc8:
+- **bug-fix**: renamed function onUpdateAndSaveAction in onActionUpdate
+- **bug-fix**: added check on intent undefined
+
+# 1.39.9-rc7:
+- **added**: added action iteration in webhook
+
+# 1.39.9-rc6:
+- **bug-fix**: bug fix changed name attributes assignOutputTo
+- **bug-fix**: bug fix css on block-connector and start-content
+
+# 1.39.9-rc5:
+- **changed**: added "item" attribute
+- **bug-fix**: css bug fixed
+
+# 1.39.9-rc4:
+- **added**: added interation action
+
+# 1.39.9-rc3:
+- **bug-fix**: set result.hybrid on undefined
+- **bug-fix**: bug fix overflow preview-container-extended
+- **bug-fix**: set generate with llm_model_selected.modelName
+- **bug-fix**: undefined.url
+- **bug-fix**: on preview ask kb
+- **bug-fix**: max-height text area
+- **changed**: changed max_tokens_context in max_output_tokens and update openai values
+
+# 1.39.9-rc2:
+- **added**: set default model
+- **changed**: replaced the textarea with a select in the model selection
+- **changed**: changed token display by adding k for thousands
+- **changed**: editable max token field
+- **added**: added max_token and min_token parameters for each model
+
+# 1.39.9-rc1:
+- **added**: added vLLM model integration
 - **bug-fixed**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
 - **bug-fixed**: Ctr-z is enabled in the text area when creating a new MCP server.
 
@@ -184,10 +586,19 @@
 
 # 1.39.8
 
+# 1.39.8-rc1:
+- **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
+- **added**: added css for temperature disabled when gpt-5 is the selected model 
+- **added**: set max_token when change model
+
 # 1.39.7
 - **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
 - **added**: added css for temperature disabled when gpt-5 is the selected model 
 - **added**: set max_token when change model
+
+
+# 1.39.6
+- **changed**: set max_tokens from 8192 to 100000
 
 # 1.39.6
 - **changed**: set max_tokens from 8192 to 100000
@@ -200,6 +611,17 @@
 
 # 1.39.3
 - **bug-fixed**: added filter status "active" in generateLlmModels
+
+# 1.39.3-rc1
+- **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.2-rc3
+- **changed**: changed select llm model in askgpt-v2
+- **changed**: moved common functions between ai-prompt, ai-condition and askgpt-v2 actions in utils-llm-model
+- **added**: skip_unanswered and reranking in AskKbv2 
+
+# 1.39.2-rc2
+- **bug-fix**: bug fix ai-condition and ai-prompt
 
 # 1.39.2
 
@@ -289,7 +711,6 @@
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
 
-
 # 1.38.5
 - **changed**: update ai models
 
@@ -303,13 +724,20 @@
 # 1.38.2
 - **changed**: ai models upgraded
 
+# 1.38.2
+- **changed**: ai models upgraded
+
 # 1.38.1
 - **changed**: Changed connector-width in 2px
 
 # 1.38.0
 
+
 # 1.38.0-rc20
 - **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
 
 # 1.38.0-rc19
 - **bug-fixed**: Voice menu compatibility patch if there is no subtype
@@ -328,6 +756,7 @@
 # 1.38.0-rc15
 - **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
 - **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
 
 # 1.38.0-rc14
 - **added**: Open KNB link in new tab in intent detail panel
@@ -377,12 +806,6 @@
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
 
-# 1.37.6
-- **added**: ability to manage Share_Items from BrandSrc
-
-# 1.37.5
-- **bug-fixed**: Voice menu compatibility patch if there is no subtype
-
 # 1.37.4
 - **bug-fixed**: added models in json-gallery
 
@@ -394,6 +817,9 @@
 
 # 1.37.1
 
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.0-rc2
 - **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
 
@@ -402,6 +828,30 @@
 
 # 1.36.1
 - **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc6
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
+# 1.36.0-rc4
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.36.0-rc2
+- **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
+
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
 
 # 1.36.0
 - **bug-fixed**: added width and height to previewModel images in action reply gallery
@@ -1841,4 +2291,3 @@ delete an action (delete all outgoing connectors)
 
 # 0.0.1
  first deploy<br>
-

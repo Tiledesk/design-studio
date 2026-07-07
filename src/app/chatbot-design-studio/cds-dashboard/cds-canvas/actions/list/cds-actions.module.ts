@@ -78,6 +78,7 @@ import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionDataTableComponent } from './cds-action-data-table/cds-action-data-table.component';
 import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
 import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
 import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
@@ -88,10 +89,13 @@ import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai
 import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
 import { McpServersDialogComponent } from './cds-action-ai-prompt/mcp-servers-dialog/mcp-servers-dialog.component';
 import { McpServerEditDialogComponent } from './cds-action-ai-prompt/mcp-server-edit-dialog/mcp-server-edit-dialog.component';
+import { McpNativeCatalogDialogComponent } from './cds-action-ai-prompt/mcp-native-catalog-dialog/mcp-native-catalog-dialog.component';
 import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
+import { CdsActionSubAgentComponent } from './cds-action-sub-agent/cds-action-sub-agent.component';
+import { CdsActionReturnComponent } from './cds-action-return/cds-action-return.component';
 import { CdsActionAiConditionComponent } from './cds-action-ai-condition/cds-action-ai-condition.component';
 import { AttributesDialogAiConditionComponent } from './cds-action-ai-condition/attributes-dialog/attributes-dialog.component';
 import { AiConditionComponent } from './cds-action-ai-condition/ai-condition/ai-condition.component';
@@ -149,6 +153,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -194,6 +199,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     AttributesDialogAiPromptComponent,
     McpServersDialogComponent,
     McpServerEditDialogComponent,
+    McpNativeCatalogDialogComponent,
     CdsActionAiConditionComponent,
     AttributesDialogAiConditionComponent,
     AiConditionComponent,
@@ -205,7 +211,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,
     CdsActionAddKbContentComponent,
-    CdsActionFlowLogComponent
+    CdsActionFlowLogComponent,
+    CdsActionSubAgentComponent,
+    CdsActionReturnComponent
     
   ],
   imports: [
@@ -266,6 +274,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -309,6 +318,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     AttributesDialogAiPromptComponent,
     McpServersDialogComponent,
     McpServerEditDialogComponent,
+    McpNativeCatalogDialogComponent,
     CdsActionAiConditionComponent,
     AttributesDialogAiConditionComponent,
     AiConditionComponent,
@@ -319,7 +329,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionAddKbContentComponent,
-    CdsActionFlowLogComponent
+    CdsActionFlowLogComponent,
+    CdsActionSubAgentComponent,
+    CdsActionReturnComponent
   ]
 })
 export class CdsActionsModule { }

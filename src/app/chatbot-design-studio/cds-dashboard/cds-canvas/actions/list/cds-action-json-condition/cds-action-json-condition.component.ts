@@ -1,37 +1,38 @@
-import { TYPE_UPDATE_ACTION, OPERATORS_LIST, OperatorValidator } from '../../../../../utils';
-import { Intent } from 'src/app/models/intent-model';
-import { ActionJsonCondition, Expression, Operator } from 'src/app/models/action-model';
-import { Component, EventEmitter, Host, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Subscription } from 'rxjs/internal/Subscription';
 import { SatPopover } from '@ncstate/sat-popover';
 import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
+import { Intent } from 'src/app/models/intent-model';
+import { ActionJsonCondition, Expression, Operator } from 'src/app/models/action-model';
+import { TYPE_UPDATE_ACTION, OPERATORS_LIST, OperatorValidator } from '../../../../../utils';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
+import { serializeConditionToWhen, normalizeLegacyOperator, operatorLabelKey, operandRightDisplay } from 'src/app/chatbot-design-studio/utils-condition';
 
+/** Componente per l’azione condizione JSON: gruppi di condizioni, connector true/false, intent. */
 @Component({
   selector: 'cds-action-json-condition',
   templateUrl: './cds-action-json-condition.component.html',
   styleUrls: ['./cds-action-json-condition.component.scss']
 })
-export class CdsActionJsonConditionComponent implements OnInit {
+export class CdsActionJsonConditionComponent implements OnInit, OnDestroy {
 
-  @ViewChild("addFilter", {static: false}) myPopover : SatPopover;
-  
+  @ViewChild('addFilter', { static: false }) myPopover: SatPopover;
+
   @Input() intentSelected: Intent;
   @Input() action: ActionJsonCondition;
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
-  @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
-  
-  actionJsonConditionFormGroup: FormGroup
-  trueIntentAttributes: string = "";
-  falseIntentAttributes: string = "";
-  booleanOperators=[ { type: 'AND', operator: 'AND'},{ type: 'OR', operator: 'OR'},]
+  @Output() onConnectorChange = new EventEmitter<{ type: 'create' | 'delete'; fromId: string; toId: string }>();
+
+  actionJsonConditionFormGroup: FormGroup;
+  trueIntentAttributes: string = '';
+  falseIntentAttributes: string = '';
+  booleanOperators = [{ type: 'AND', operator: 'AND' }, { type: 'OR', operator: 'OR' }];
   OPERATORS_LIST = OPERATORS_LIST;
-  
+
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
@@ -40,56 +41,51 @@ export class CdsActionJsonConditionComponent implements OnInit {
   isConnectedTrue: boolean = false;
   isConnectedFalse: boolean = false;
   connector: any;
+  listOfIntents: Array<{ name: string; value: string; icon?: string }>;
+
   private subscriptionChangedConnector: Subscription;
-
-  listOfIntents: Array<{name: string, value: string, icon?:string}>;
-
+  private subscriptionFormChanges: Subscription;
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private formBuilder: FormBuilder,
-    private intentService: IntentService,
-    private connectorService: ConnectorService
-    ) { }
+    private intentService: IntentService
+  ) { }
 
-    ngOnInit(): void {
-      this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-        this.logger.log('CdsActionJsonConditionComponent isChangedConnector-->', connector);
-        let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-        if(connector.fromId.startsWith(connectorId)){
-          this.connector = connector;
-          this.updateConnector();
-        }
-      });
-      this.initialize();
-    }
-  
-    /** */
-    ngOnDestroy() {
-      if (this.subscriptionChangedConnector) {
-        this.subscriptionChangedConnector.unsubscribe();
+  /** Inizializza subscription e form alla creazione del componente. */
+  ngOnInit(): void {
+    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
+      this.logger.log('CdsActionJsonConditionComponent isChangedConnector-->', connector);
+      const connectorId = this.idIntentSelected + '/' + this.action._tdActionId;
+      if (connector.fromId.startsWith(connectorId)) {
+        this.connector = connector;
+        this.updateConnector();
       }
+    });
+    this.initialize();
+  }
+
+  /** Disattiva le subscription per evitare memory leak. */
+  ngOnDestroy(): void {
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
     }
-  
-    // ngOnChanges() {
-    //   this.initialize();
-    //   if(this.intentSelected){
-    //     this.initializeConnector();
-    //   }
-    //   this.logger.log('[ACTION-JSON-CONDITION] actionnn-->', this.action)
-    //   if (this.action) {
-    //     this.setFormValue()
-    //   }
-    // }
-  
-    
-    private initializeConnector() {
-      this.idIntentSelected = this.intentSelected.intent_id;
-      this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
-      this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
-      this.listOfIntents = this.intentService.getListOfIntents();
-      this.checkConnectionStatus();
+    if (this.subscriptionFormChanges) {
+      this.subscriptionFormChanges.unsubscribe();
     }
+  }
+
+  /** Imposta id connector, lista intent ordinata e stato connessioni. */
+  private initializeConnector(): void {
+    this.idIntentSelected = this.intentSelected.intent_id;
+    this.idConnectorTrue = this.idIntentSelected + '/' + this.action._tdActionId + '/true';
+    this.idConnectorFalse = this.idIntentSelected + '/' + this.action._tdActionId + '/false';
+    this.listOfIntents = this.intentService.getListOfIntents();
+    if (this.listOfIntents?.length) {
+      this.listOfIntents = [...this.listOfIntents].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    this.checkConnectionStatus();
+  }
 
     private checkConnectionStatus(){
       const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
@@ -134,10 +130,47 @@ export class CdsActionJsonConditionComponent implements OnInit {
       }
       this.logger.log('[ACTION-JSON-CONDITION] actionnn-->', this.action)
       if (this.action) {
+        this.migrateLegacyOperators(); // retrocompat: normalizza gli operatori legacy sull'AST in apertura
         this.setFormValue()
+        this.updateWhen(); // popola `when` anche per le action già salvate (vecchio formato senza `when`)
       }
       // ordina listOfIntents per name
       this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    /** Rigenera l'unica stringa `when` (campo derivato, root azione) da tutto l'AST `groups`. Retrocompatibile: non tocca `groups`. */
+    private updateWhen(){
+      if(this.action){
+        this.action.when = serializeConditionToWhen(this.action.groups);
+      }
+    }
+
+    /**
+     * Retrocompat: normalizza gli operatori legacy (es. *IgnoreCase) su tutto l'AST `groups`,
+     * così UI/preview e `when` sono coerenti e la conversione case-sensitive è esplicita
+     * (non silenziosa al primo salvataggio). Solo in memoria: viene persistito al primo save.
+     */
+    private migrateLegacyOperators(){
+      if(!this.action || !Array.isArray(this.action.groups)) return;
+      this.action.groups.forEach((node: any) => {
+        if(node && node.type === 'expression' && Array.isArray(node.conditions)){
+          node.conditions.forEach((c: any) => {
+            if(c && c.type === 'condition' && c.operator){
+              c.operator = normalizeLegacyOperator(c.operator);
+            }
+          });
+        }
+      });
+    }
+
+    /** Etichetta operatore robusta a formati legacy/sconosciuti (no crash). Usata nel template preview. */
+    operatorLabel(operator: string): string {
+      return operatorLabelKey(operator);
+    }
+
+    /** Lato destro (operand2) robusto a formati vecchi/nuovi (no crash). Usata nel template preview. */
+    operandRightDisplay(condition: any): string {
+      return operandRightDisplay(condition);
     }
   
     private setFormValue(){
@@ -194,9 +227,10 @@ export class CdsActionJsonConditionComponent implements OnInit {
       // let groups = this.actionJsonConditionFormGroup.get('groups') as FormArray
       // groups.push(this.createOperatorGroup(), {emitEvent: false})
       // groups.push(this.createExpressionGroup(), {emitEvent: false})
+      this.updateWhen();
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
-  
+
     onDeleteGroup(index: number, last: boolean){
       this.logger.log('onDeleteGroup', index, last, this.action.groups)
       if(!last){
@@ -209,12 +243,14 @@ export class CdsActionJsonConditionComponent implements OnInit {
         // let groups = this.actionJsonConditionFormGroup.get('groups') as FormArray
         // groups.push(this.createExpressionGroup(), {emitEvent: false})
       }
+      this.updateWhen();
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
-  
+
     onChangeOperator(event, index: number){
       (this.action.groups[index] as Operator).operator = event['type']
       this.logger.log('onChangeOperator actionsss', this.action, this.actionJsonConditionFormGroup)
+      this.updateWhen();
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   
@@ -237,19 +273,19 @@ export class CdsActionJsonConditionComponent implements OnInit {
     onResetBlockSelect(event:{name: string, value: string}, type: 'trueIntent' | 'falseIntent') {
       switch(type){
         case 'trueIntent':
-          this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorTrue, toId: this.action.trueIntent})
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorTrue, toId: this.action.trueIntent });
           break;
         case 'falseIntent':
-          this.onConnectorChange.emit({ type: 'delete', fromId: this.idConnectorFalse, toId: this.action.falseIntent})
+          this.onConnectorChange.emit({ type: 'create', fromId: this.idConnectorFalse, toId: this.action.falseIntent });
           break;
       }
-      this.action[type]=null
-      this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.ACTION, element: this.action });
     }
   
     onChangeExpression(event){
       // this.connectorService.updateConnector(this.intentSelected.intent_id);
       this.logger.log('onChangeExpression actionsss', this.action, event)
+      this.updateWhen();
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     }
   

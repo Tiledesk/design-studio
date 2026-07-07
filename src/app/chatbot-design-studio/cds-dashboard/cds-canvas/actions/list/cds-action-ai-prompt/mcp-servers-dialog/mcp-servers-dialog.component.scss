@@ -357,6 +357,15 @@
   color: #334155;
 }
 
+/* Badge per i server MCP nativi di Tiledesk */
+::ng-deep .custom-mcp-dialog-container .mcp-server__status-badge--native {
+  background: #ede9fe;
+  color: #6d28d9;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
 ::ng-deep .custom-mcp-dialog-container .mcp-server__tools-meta {
   font-size: 12px;
   color: #6b7280;

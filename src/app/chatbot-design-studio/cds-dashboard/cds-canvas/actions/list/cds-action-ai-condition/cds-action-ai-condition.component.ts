@@ -205,6 +205,12 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.llm = result?.llm ? result.llm : '';
     this.action.model = result?.model ? result.model : '';
     this.action.modelName = result?.modelName ? result.modelName : '';
+    // vLLM: persist the endpoint url on the action; clear it for any other provider.
+    if (result?.llm === 'vllm' && result?.vllmServer) {
+      this.action.vllmServer = result.vllmServer;
+    } else {
+      delete this.action.vllmServer;
+    }
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
     if (result) {
       this.ai_setting['max_tokens'].max = result.max_output_tokens;
@@ -307,7 +313,7 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(found){
           found.conditionIntentId = null;
         }
-      } else {
+      } else if (this.connector.created) {
         if(this.listOfConnectors[idCondition]){
           this.listOfConnectors[idCondition].idConnection =  this.connector.id;
           this.listOfConnectors[idCondition].isConnected  =  true;
@@ -316,6 +322,7 @@ export class CdsActionAiConditionComponent implements OnInit {
           found.conditionIntentId = '#'+this.connector.toId;
         }
       }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
       this.logger.log('error: ', error);
@@ -372,13 +379,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       return;
     }
     if(property === 'model'){
-      this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
       this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;
@@ -567,13 +567,20 @@ export class CdsActionAiConditionComponent implements OnInit {
 
   getResponse(question) {
     this.logger.log("getResponse called...")
-    let data = {
+    let data: any = {
       question: question,
       llm: this.action.llm,
       model: this.action.model,
       max_tokens: this.action.max_tokens,
       temperature: this.action.temperature,
     }
+
+    // vLLM: the preview API needs the target server to route the request.
+    // Without it the backend responds: "vllmServer attribute is undefined".
+    if (this.action.llm === 'vllm' && this.action.vllmServer) {
+      data.vllmServer = this.action.vllmServer;
+    }
+
     this.showAiError = false;
     this.searching = true;
     this.showPreview = true;
