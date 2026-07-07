@@ -244,19 +244,221 @@ export function serializeConditionToWhen(groups: Array<Expression | Operator>): 
 }
 
 /* ============================================================================
+ * Parser INVERSO: stringa `when` -> AST `groups`. Inverso di serializeConditionToWhen.
+ * Serve a ricostruire i `groups`/`conditions` per la ri-editabilità quando l'azione
+ * V2 persiste SOLO `when` (SAVE_ONLY_WHEN). Round-trip when-preserving: il re-serialize
+ * dei groups ricostruiti produce lo stesso `when`. NB: `equalAsStrings`/`equalAsNumbers`
+ * (e le not-equal) sono indistinguibili nel `when`: si sceglie in base al tipo del RHS
+ * (numero -> *Numbers, altrimenti *Strings) — semanticamente equivalente per l'engine.
+ * ==========================================================================*/
+
+/** Split di primo livello su `&&`/`||`, rispettando parentesi e stringhe. */
+function splitTopLevel(input: string): { parts: string[]; ops: Array<'AND' | 'OR'> } {
+  const parts: string[] = [];
+  const ops: Array<'AND' | 'OR'> = [];
+  let depth = 0, inStr = false, esc = false, buf = '';
+  for (let i = 0; i < input.length; i++) {
+    const c = input[i];
+    if (inStr) {
+      buf += c;
+      if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') { inStr = true; buf += c; continue; }
+    if (c === '(') { depth++; buf += c; continue; }
+    if (c === ')') { depth--; buf += c; continue; }
+    if (depth === 0 && (c === '&' || c === '|') && input[i + 1] === c) {
+      parts.push(buf); ops.push(c === '&' ? 'AND' : 'OR'); buf = ''; i++; continue;
+    }
+    buf += c;
+  }
+  parts.push(buf);
+  return { parts: parts.map(p => p.trim()), ops };
+}
+
+/** true se `s` è interamente racchiusa in una coppia di parentesi bilanciate. */
+function isWrappedInParens(s: string): boolean {
+  s = s.trim();
+  if (!s.startsWith('(') || !s.endsWith(')')) return false;
+  let depth = 0, inStr = false, esc = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue; }
+    if (c === '"') { inStr = true; continue; }
+    if (c === '(') depth++;
+    else if (c === ')') { depth--; if (depth === 0 && i < s.length - 1) return false; }
+  }
+  return depth === 0;
+}
+
+function stripOuterParens(s: string): string {
+  s = s.trim();
+  return isWrappedInParens(s) ? s.slice(1, -1).trim() : s;
+}
+
+/** Unescape di un letterale stringa (inverso di escapeString). */
+function unescapeString(s: string): string {
+  return s.replace(/\\(["\\])/g, '$1');
+}
+
+/** Split degli argomenti di una funzione su virgole di primo livello. */
+function splitArgs(inner: string): string[] {
+  const args: string[] = [];
+  let depth = 0, inStr = false, esc = false, buf = '';
+  for (let i = 0; i < inner.length; i++) {
+    const c = inner[i];
+    if (inStr) { buf += c; if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue; }
+    if (c === '"') { inStr = true; buf += c; continue; }
+    if (c === '(') { depth++; buf += c; continue; }
+    if (c === ')') { depth--; buf += c; continue; }
+    if (c === ',' && depth === 0) { args.push(buf.trim()); buf = ''; continue; }
+    buf += c;
+  }
+  args.push(buf.trim());
+  return args;
+}
+
+/** Interpreta il RHS: `"..."` -> const stringa, numero -> const, altrimenti -> var. */
+function parseOperandRight(raw: string): { type: 'const' | 'var'; value?: string; name?: string } {
+  const r = (raw || '').trim();
+  if (r.length >= 2 && r.startsWith('"') && r.endsWith('"')) {
+    return { type: 'const', value: unescapeString(r.slice(1, -1)) };
+  }
+  if (/^-?\d+(\.\d+)?$/.test(r)) return { type: 'const', value: r };
+  return { type: 'var', name: r };
+}
+
+function makeCondition(operand1: string, operator: string, operand2: any): Condition {
+  return { type: 'condition', operand1: (operand1 || '').trim(), operator, operand2 } as any;
+}
+
+/** Funzione (+ negazione) -> operatore V2. */
+const FUNC_MAP: { [k: string]: { op: string; neg?: string; unary?: boolean } } = {
+  startsWith:      { op: TYPE_OPERATOR_V2.startsWith,     neg: TYPE_OPERATOR_V2.notStartsWith },
+  contains:        { op: TYPE_OPERATOR_V2.contains,       neg: TYPE_OPERATOR_V2.notContains },
+  endsWith:        { op: TYPE_OPERATOR_V2.endsWith,       neg: TYPE_OPERATOR_V2.notEndsWith },
+  matches:         { op: TYPE_OPERATOR_V2.matches,        neg: TYPE_OPERATOR_V2.notMatches },
+  dateEqual:       { op: TYPE_OPERATOR_V2.equalAsDate,    neg: TYPE_OPERATOR_V2.notEqualAsDate },
+  isAfter:         { op: TYPE_OPERATOR_V2.isAfter },
+  isBefore:        { op: TYPE_OPERATOR_V2.isBefore },
+  isAfterOrEqual:  { op: TYPE_OPERATOR_V2.isAfterOrEqual },
+  isBeforeOrEqual: { op: TYPE_OPERATOR_V2.isBeforeOrEqual },
+  arrayContains:   { op: TYPE_OPERATOR_V2.arrayContains,  neg: TYPE_OPERATOR_V2.arrayNotContains },
+  isEmpty:         { op: TYPE_OPERATOR_V2.isEmpty,        neg: TYPE_OPERATOR_V2.isNotEmpty, unary: true },
+  isNull:          { op: TYPE_OPERATOR_V2.isNull, unary: true },
+  isUndefined:     { op: TYPE_OPERATOR_V2.isUndefined,    neg: TYPE_OPERATOR_V2.exists,     unary: true },
+};
+
+const LENGTH_MAP: { [sym: string]: string } = {
+  '==': TYPE_OPERATOR_V2.lengthEqualTo, '!=': TYPE_OPERATOR_V2.lengthNotEqualTo,
+  '>':  TYPE_OPERATOR_V2.lengthGreaterThan, '<': TYPE_OPERATOR_V2.lengthLessThan,
+  '>=': TYPE_OPERATOR_V2.lengthGreaterThanOrEqual, '<=': TYPE_OPERATOR_V2.lengthLessThanOrEqual,
+};
+
+/** Parser di una singola condizione (senza `&&`/`||` di primo livello). null se non riconosciuta. */
+export function parseCondition(text: string): Condition | null {
+  let s = stripOuterParens((text || '').trim());
+  if (!s) return null;
+
+  let negated = false;
+  if (s.startsWith('!')) { negated = true; s = s.slice(1).trim(); }
+
+  // length(path) OP number
+  const lenMatch = !negated && s.match(/^length\s*\(([\s\S]+)\)\s*(==|!=|>=|<=|>|<)\s*([\s\S]+)$/);
+  if (lenMatch) {
+    return makeCondition(lenMatch[1], LENGTH_MAP[lenMatch[2]], { type: 'const', value: lenMatch[3].trim() });
+  }
+
+  // forma funzione: name(args)
+  const funcMatch = s.match(/^([A-Za-z_]\w*)\s*\(([\s\S]*)\)$/);
+  if (funcMatch && FUNC_MAP[funcMatch[1]]) {
+    const spec = FUNC_MAP[funcMatch[1]];
+    const args = splitArgs(funcMatch[2]);
+    const op = negated && spec.neg ? spec.neg : spec.op;
+    if (spec.unary) return makeCondition(args[0], op, { type: 'const', value: '' });
+    return makeCondition(args[0], op, parseOperandRight(args[1] != null ? args[1] : ''));
+  }
+
+  if (negated) return null; // `!` solo su forme funzione note
+
+  // confronto: left OP right
+  const cmp = s.match(/^([\s\S]+?)\s*(==|!=|>=|<=|>|<)\s*([\s\S]+)$/);
+  if (cmp) {
+    const left = cmp[1].trim(); const sym = cmp[2]; const rhsRaw = cmp[3].trim();
+    if (sym === '==' && rhsRaw === 'true')  return makeCondition(left, TYPE_OPERATOR_V2.isTrue,  { type: 'const', value: '' });
+    if (sym === '==' && rhsRaw === 'false') return makeCondition(left, TYPE_OPERATOR_V2.isFalse, { type: 'const', value: '' });
+    const rhs = parseOperandRight(rhsRaw);
+    const isNum = rhs.type === 'const' && /^-?\d+(\.\d+)?$/.test(String(rhs.value));
+    let op: string | null = null;
+    switch (sym) {
+      case '==': op = isNum ? TYPE_OPERATOR_V2.equalAsNumbers    : TYPE_OPERATOR_V2.equalAsStrings; break;
+      case '!=': op = isNum ? TYPE_OPERATOR_V2.notEqualAsNumbers : TYPE_OPERATOR_V2.notEqualAsStrings; break;
+      case '>':  op = TYPE_OPERATOR_V2.greaterThan; break;
+      case '>=': op = TYPE_OPERATOR_V2.greaterThanOrEqual; break;
+      case '<':  op = TYPE_OPERATOR_V2.lessThan; break;
+      case '<=': op = TYPE_OPERATOR_V2.lessThanOrEqual; break;
+    }
+    return op ? makeCondition(left, op, rhs) : null;
+  }
+  return null;
+}
+
+/** Lista di condizioni interlacciate con operatori, da una stringa `when` di una singola Expression. */
+export function parseConditionsList(text: string): Array<Condition | Operator> {
+  const { parts, ops } = splitTopLevel(text || '');
+  const out: Array<Condition | Operator> = [];
+  for (let i = 0; i < parts.length; i++) {
+    const cond = parseCondition(parts[i]);
+    if (!cond) continue;
+    if (out.length > 0) out.push({ type: 'operator', operator: ops[i - 1] || 'AND' } as any);
+    out.push(cond);
+  }
+  return out;
+}
+
+/**
+ * Inverso di `serializeConditionToWhen`: ricostruisce l'AST `groups` dalla stringa `when`.
+ * Non lancia mai: in caso di errore ritorna [] (il componente crea poi un gruppo vuoto).
+ */
+export function parseWhenToGroups(when: string): Array<Expression | Operator> {
+  try {
+    const s = (when || '').trim();
+    if (!s) return [];
+    const top = splitTopLevel(s);
+    const isMulti = top.parts.length > 1 && top.parts.every(p => isWrappedInParens(p));
+    if (isMulti) {
+      const groups: Array<Expression | Operator> = [];
+      top.parts.forEach((part, i) => {
+        if (i > 0) groups.push({ type: 'operator', operator: top.ops[i - 1] } as any);
+        groups.push({ type: 'expression', conditions: parseConditionsList(stripOuterParens(part)), version: 2 } as any);
+      });
+      return groups;
+    }
+    return [{ type: 'expression', conditions: parseConditionsList(s), version: 2 } as any];
+  } catch (_e) {
+    console.warn('[JSON-Condition] parseWhenToGroups: parsing fallito per when:', when);
+    return [];
+  }
+}
+
+/* ============================================================================
  * Modalità di salvataggio delle condizioni
  * ==========================================================================*/
 
 /**
- * Modalità di salvataggio (TEST).
- * - true  (TEST attuale): le condizioni sono salvate SOLO in `when`; l'AST
- *   (`groups` / `_tdJSONCondition.conditions`) viene svuotato nel payload persistito.
- * - false (retrocompatibilità): salva ENTRAMBI (AST + `when`).
+ * Modalità di salvataggio dell'AZIONE JSON Condition V2 (`jsoncondition2`).
+ * - true (attuale): l'azione V2 persiste SOLO `when` (i `groups` sono svuotati nel payload).
+ *   In apertura l'editor V2 ricostruisce i `groups` via parseWhenToGroups().
+ * - false: salva ENTRAMBI (AST `groups` + `when`).
  *
- * NB: la trasformazione agisce solo sul payload inviato al backend (un clone),
- * MAI sul modello in memoria → l'interfaccia del Design Studio resta invariata.
+ * NB1: agisce SOLO sull'azione `jsoncondition2`. La V1 (`jsoncondition`) salva sempre e solo
+ *      `groups` ed è del tutto estranea a questo flag.
+ * NB2: i filtri reply V2 (`version:2`) salvano SEMPRE anche le `conditions` (round-trip
+ *      diretto, nessuna ricostruzione): il flag non li svuota mai.
+ * NB3: la trasformazione agisce solo sul payload inviato al backend (un clone),
+ *      MAI sul modello in memoria → l'interfaccia del Design Studio resta invariata.
  */
-export const SAVE_ONLY_WHEN = false;
+export const SAVE_ONLY_WHEN = true;
 
 /** type-id dell'azione JSON Condition V2 (hardcoded per evitare import circolari da utils-actions). */
 const JSON_CONDITION_TYPE = 'jsoncondition2';
@@ -272,15 +474,15 @@ export function isLegacyFilter(expression: any): boolean {
 }
 
 /**
- * Genera `when` su un'Expression e, in modalità TEST, ne svuota `conditions`.
- * SOLO per i filtri V2 (`version === 2`): i filtri legacy devono passare nel
- * payload byte-identici (niente `when`, niente marker) per retrocompatibilità.
+ * Genera `when` su un'Expression (filtro reply V2). SOLO per i filtri `version === 2`:
+ * i filtri legacy devono passare nel payload byte-identici (niente `when`, niente marker)
+ * per retrocompatibilità. Le `conditions` NON vengono mai svuotate: i filtri reply V2
+ * fanno round-trip diretto sull'AST (a differenza dell'azione, non c'è ricostruzione).
  */
 function applyExpressionSaveMode(expr: any): void {
   if (!expr || typeof expr !== 'object' || !Array.isArray(expr.conditions)) return;
   if (expr.version !== 2) return; // filtro legacy: non toccare
   expr.when = serializeExpression(expr as Expression);
-  if (SAVE_ONLY_WHEN) expr.conditions = [];
 }
 
 /** Cerca ricorsivamente `_tdJSONCondition` (Expression) dentro un nodo e vi applica la modalità di salvataggio. */

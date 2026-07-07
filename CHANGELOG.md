@@ -9,9 +9,11 @@
 
 
 # this branch 
+- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
+- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
 - **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
 - **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
-- **added**: serialization of the condition `groups` AST into a single `when` expression string (utils-condition), saved next to the AST
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
 - **added**: multi-line tooltip for the "Attribute name" syntax help
 - **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
 

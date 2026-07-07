@@ -10,7 +10,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { Subscription } from 'rxjs/internal/Subscription';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { serializeConditionToWhen, normalizeLegacyOperator, operatorLabelKey, operandRightDisplay } from 'src/app/chatbot-design-studio/utils-condition';
+import { serializeConditionToWhen, normalizeLegacyOperator, operatorLabelKey, operandRightDisplay, parseWhenToGroups } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-json-condition2',
@@ -135,6 +135,7 @@ export class CdsActionJsonCondition2Component implements OnInit {
       }
       this.logger.log('[ACTION-JSON-CONDITION2] actionnn-->', this.action)
       if (this.action) {
+        this.reconstructGroupsFromWhen(); // se salvata solo con `when` (SAVE_ONLY_WHEN), ricostruisce l'AST per l'editor
         this.migrateLegacyOperators(); // retrocompat: normalizza gli operatori legacy sull'AST in apertura
         this.setFormValue()
         this.updateWhen(); // popola `when` anche per le action già salvate (vecchio formato senza `when`)
@@ -147,6 +148,21 @@ export class CdsActionJsonCondition2Component implements OnInit {
     private updateWhen(){
       if(this.action){
         this.action.when = serializeConditionToWhen(this.action.groups);
+      }
+    }
+
+    /**
+     * Ricostruisce i `groups` dalla stringa `when` quando l'azione V2 è stata salvata in
+     * modalità solo-when (SAVE_ONLY_WHEN): senza questo l'editor non avrebbe l'AST da mostrare.
+     * Agisce SOLO se `groups` è vuoto/mancante e `when` è valorizzato → nessun impatto sui casi
+     * che hanno già l'AST (nuove azioni, o salvataggi con groups+when).
+     */
+    private reconstructGroupsFromWhen(){
+      const hasGroups = Array.isArray(this.action.groups) && this.action.groups.length > 0;
+      const when = (this.action.when || '').trim();
+      if (!hasGroups && when !== '') {
+        const rebuilt = parseWhenToGroups(when);
+        if (rebuilt.length) this.action.groups = rebuilt;
       }
     }
 
