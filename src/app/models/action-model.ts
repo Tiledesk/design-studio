@@ -387,6 +387,7 @@ export class ActionSendWhatsapp extends Action {
 }
 
 export class ActionAgent extends Action{
+    depName?: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AGENT;
@@ -510,11 +511,16 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+/** Livello di reasoning: low | medium | high */
+export type ReasoningLevel = 'low' | 'medium' | 'high';
+
 export class ActionAiPrompt extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
     history: boolean;
+    reasoning?: boolean;
+    reasoningLevel?: ReasoningLevel;
     max_tokens: number;
     temperature: number;
     labelModel: string;
@@ -963,5 +969,67 @@ export class ActionMoveToUnassigned extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
+    }
+}
+
+export class ActionReturn extends Action {
+    payload: string;
+    status: string | number;
+    bodyType: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN;
+        this.payload = JSON.stringify({});
+        this.bodyType = 'json';
+        this.status = '200';
+    }
+}
+
+export class ActionSubAgent extends Action {
+    subagent_id: string;
+    intentName: string;
+    mode: 'fire_and_continue' | 'wait_result';
+    input: { [key: string]: string };
+    awaitWebhookPublish: boolean;
+    assignRunIdTo: string;
+    assignSubRequestIdTo: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    timeoutMs: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.INVOKE_SUB_AGENT;
+        this.mode = 'fire_and_continue';
+        this.input = {};
+        this.awaitWebhookPublish = false;
+        this.assignResultTo = 'subagent_result';
+    }
+}
+
+export class ActionDataTable extends Action {
+    tableId: string;
+    tableName: string;
+    operation: string;          // 'get' | 'insert' | 'update' | 'upsert' | 'delete'
+    must_match: string;         // 'all' | 'any'
+    conditions: Array<{ column: string; operator: string; value?: string }>;
+    data: { [key: string]: string };   // { [columnName]: value }
+    assignResultTo: string;
+    assignErrorTo: string;
+    trueIntent: string;     // success branch connector
+    falseIntent: string;    // error/else branch connector
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.DATA_TABLE;
+        this.tableId = '';
+        this.tableName = '';
+        this.operation = 'get';
+        this.must_match = 'all';
+        this.conditions = [];
+        this.data = {};
+        this.assignResultTo = 'data_table_result';
+        this.assignErrorTo = 'error';
     }
 }
