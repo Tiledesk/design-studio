@@ -7,6 +7,8 @@ import {
   escapeString,
   applyConditionSaveModeToPayload,
   SAVE_ONLY_WHEN,
+  parseWhenToGroups,
+  parseCondition,
 } from './utils-condition';
 
 /** Helpers di costruzione AST */
@@ -201,6 +203,92 @@ describe('utils-condition · serializeConditionToWhen', () => {
       cond('', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'y' }),
     );
     expect(serializeExpression(e)).toBe('a == "x"');
+  });
+
+});
+
+describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', () => {
+
+  // Per ogni `when` canonico: serialize(parse(when)) deve riprodurre lo stesso `when`.
+  const CANONICAL_WHENS = [
+    'user_city == "Roma"',
+    'score == 10',
+    'x != "y"',
+    'x != myvar',
+    'n > 5', 'n >= 5', 'n < 5', 'n <= 5',
+    'x == myvar',
+    'flag == true', 'flag == false',
+    'startsWith(name, "dar")', '!startsWith(name, "dar")',
+    'contains(text, "abc")', '!contains(text, "abc")',
+    'endsWith(text, "z")', '!endsWith(text, "z")',
+    'matches(text, "^a.*")', '!matches(text, "^a.*")',
+    'isEmpty(a)', '!isEmpty(a)',
+    'isNull(a)',
+    'isUndefined(a)', '!isUndefined(a)',
+    'dateEqual(d, "2024-01-01")', '!dateEqual(d, "2024-01-01")',
+    'isAfter(d, "2024-01-01")', 'isBefore(d, "2024-01-01")',
+    'isAfterOrEqual(d, "2024-01-01")', 'isBeforeOrEqual(d, "2024-01-01")',
+    'arrayContains(list, "x")', '!arrayContains(list, "x")',
+    'length(list) == 3', 'length(list) != 3',
+    'length(list) > 2', 'length(list) < 2', 'length(list) >= 2', 'length(list) <= 2',
+    'a == 1 && b == "x"',
+    'a == 1 || b == "x"',
+    'user_city == "Roma" && startsWith(name, "dar") || score >= 1',
+    '(a == 1) || (b == "x" && c > 2)',
+    'user.city == "Roma"',
+    'people[0].name == "Anna"',
+  ];
+
+  CANONICAL_WHENS.forEach((when) => {
+    it(`round-trip: ${when}`, () => {
+      expect(serializeConditionToWhen(parseWhenToGroups(when))).toBe(when);
+    });
+  });
+
+  it('escape stringhe (apici e backslash) preservati nel round-trip', () => {
+    const when = 'msg == "he said \\"hi\\" \\\\ done"';
+    expect(serializeConditionToWhen(parseWhenToGroups(when))).toBe(when);
+  });
+
+  it('input vuoto/nullo -> []', () => {
+    expect(parseWhenToGroups('')).toEqual([]);
+    expect(parseWhenToGroups(null as any)).toEqual([]);
+  });
+
+  it('normalizza le parentesi ridondanti di un singolo gruppo (caso degenere multi-gruppo con gruppo vuoto)', () => {
+    // `(kb_chunks == u)` deriva da un AST a 2 gruppi con uno vuoto; il parse lo interpreta come
+    // singolo gruppo e il re-serialize toglie le parentesi ridondanti: semanticamente identico, idempotente.
+    expect(serializeConditionToWhen(parseWhenToGroups('(kb_chunks == u)'))).toBe('kb_chunks == u');
+    // idempotenza: dal secondo giro in poi è stabile
+    const once = serializeConditionToWhen(parseWhenToGroups('(kb_chunks == u)'));
+    expect(serializeConditionToWhen(parseWhenToGroups(once))).toBe(once);
+  });
+
+  it('multi-gruppo: struttura Expression | Operator(OR) | Expression, con marker version=2', () => {
+    const groups: any[] = parseWhenToGroups('(a == 1) || (b == "x")');
+    expect(groups.length).toBe(3);
+    expect(groups[0].type).toBe('expression');
+    expect(groups[0].version).toBe(2);
+    expect(groups[1].type).toBe('operator');
+    expect(groups[1].operator).toBe('OR');
+    expect(groups[2].type).toBe('expression');
+  });
+
+  it('parseCondition: numero->equalAsNumbers, stringa->equalAsStrings, var->equalAsStrings+var', () => {
+    expect(parseCondition('n == 10')?.operator as any).toBe(TYPE_OPERATOR_V2.equalAsNumbers);
+    expect(parseCondition('s == "x"')?.operator as any).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+    const v: any = parseCondition('s == myvar');
+    expect(v.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+    expect(v.operand2.type).toBe('var');
+    expect(v.operand2.name).toBe('myvar');
+  });
+
+  it('parseCondition: unari e negazioni mappano agli operatori giusti', () => {
+    expect(parseCondition('isEmpty(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.isEmpty);
+    expect(parseCondition('!isEmpty(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.isNotEmpty);
+    expect(parseCondition('!isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(parseCondition('a == true')?.operator as any).toBe(TYPE_OPERATOR_V2.isTrue);
+    expect(parseCondition('a == false')?.operator as any).toBe(TYPE_OPERATOR_V2.isFalse);
   });
 
 });
