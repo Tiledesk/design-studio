@@ -1,4 +1,4 @@
-import { TYPE_OPERATOR, OPERATORS_LIST } from './utils';
+import { TYPE_OPERATOR_V2, OPERATORS_LIST_V2 } from './utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
 
 /**
@@ -21,31 +21,31 @@ const BOOLEAN_TOKENS = new Set<string>(['&&', '||']);
 
 /** Operatori il cui RHS è un letterale numerico (niente apici). */
 const NUMERIC_OPERATORS = new Set<string>([
-  TYPE_OPERATOR.equalAsNumbers,
-  TYPE_OPERATOR.notEqualAsNumbers,
-  TYPE_OPERATOR.greaterThan,
-  TYPE_OPERATOR.greaterThanOrEqual,
-  TYPE_OPERATOR.lessThan,
-  TYPE_OPERATOR.lessThanOrEqual,
+  TYPE_OPERATOR_V2.equalAsNumbers,
+  TYPE_OPERATOR_V2.notEqualAsNumbers,
+  TYPE_OPERATOR_V2.greaterThan,
+  TYPE_OPERATOR_V2.greaterThanOrEqual,
+  TYPE_OPERATOR_V2.lessThan,
+  TYPE_OPERATOR_V2.lessThanOrEqual,
   // Array length: il RHS è la lunghezza (numero, senza apici)
-  TYPE_OPERATOR.lengthEqualTo,
-  TYPE_OPERATOR.lengthNotEqualTo,
-  TYPE_OPERATOR.lengthGreaterThan,
-  TYPE_OPERATOR.lengthLessThan,
-  TYPE_OPERATOR.lengthGreaterThanOrEqual,
-  TYPE_OPERATOR.lengthLessThanOrEqual,
+  TYPE_OPERATOR_V2.lengthEqualTo,
+  TYPE_OPERATOR_V2.lengthNotEqualTo,
+  TYPE_OPERATOR_V2.lengthGreaterThan,
+  TYPE_OPERATOR_V2.lengthLessThan,
+  TYPE_OPERATOR_V2.lengthGreaterThanOrEqual,
+  TYPE_OPERATOR_V2.lengthLessThanOrEqual,
 ]);
 
 /** Operatori unari (nessun RHS). Esportato per riuso lato UI (mostra/nascondi Value). */
 export const UNARY_OPERATORS = new Set<string>([
-  TYPE_OPERATOR.isEmpty,
-  TYPE_OPERATOR.isNotEmpty,
-  TYPE_OPERATOR.isNull,
-  TYPE_OPERATOR.isUndefined,
-  TYPE_OPERATOR.exists,
-  TYPE_OPERATOR.doesNotExist,
-  TYPE_OPERATOR.isTrue,
-  TYPE_OPERATOR.isFalse,
+  TYPE_OPERATOR_V2.isEmpty,
+  TYPE_OPERATOR_V2.isNotEmpty,
+  TYPE_OPERATOR_V2.isNull,
+  TYPE_OPERATOR_V2.isUndefined,
+  TYPE_OPERATOR_V2.exists,
+  TYPE_OPERATOR_V2.doesNotExist,
+  TYPE_OPERATOR_V2.isTrue,
+  TYPE_OPERATOR_V2.isFalse,
 ]);
 
 /** Escape per un letterale racchiuso tra doppi apici. */
@@ -71,8 +71,8 @@ export function stripLiquidWrapper(value: string): string {
  * `containsIgnoreCase`/`startsWithIgnoreCase` continuano a funzionare come `contains`/`startsWith`.
  */
 export function normalizeLegacyOperator(op: string): string {
-  if (op === 'containsIgnoreCase') return TYPE_OPERATOR.contains;
-  if (op === 'startsWithIgnoreCase') return TYPE_OPERATOR.startsWith;
+  if (op === 'containsIgnoreCase') return TYPE_OPERATOR_V2.contains;
+  if (op === 'startsWithIgnoreCase') return TYPE_OPERATOR_V2.startsWith;
   return op;
 }
 
@@ -80,12 +80,12 @@ export function normalizeLegacyOperator(op: string): string {
  * Etichetta i18n dell'operatore, robusta ai formati legacy/sconosciuti (mai crash).
  * Normalizza prima gli operatori legacy (es. *IgnoreCase) e, se la chiave non è nel
  * catalogo, ritorna la chiave grezza (il translate pipe la mostra invariata).
- * Usata dai renderer al posto di `OPERATORS_LIST[op].name` (che lancia su op sconosciuto).
+ * Usata dai renderer al posto di `OPERATORS_LIST_V2[op].name` (che lancia su op sconosciuto).
  */
 export function operatorLabelKey(operator: string): string {
   if (!operator) return '';
   const key = normalizeLegacyOperator(operator);
-  return OPERATORS_LIST[key]?.name || key;
+  return OPERATORS_LIST_V2[key]?.name || key;
 }
 
 /**
@@ -131,14 +131,14 @@ export function conditionToWhen(condition: Condition): string {
 
   // --- Unari (nessun RHS) ---
   switch (op) {
-    case TYPE_OPERATOR.isEmpty:      return `isEmpty(${left})`;
-    case TYPE_OPERATOR.isNotEmpty:   return `!isEmpty(${left})`;
-    case TYPE_OPERATOR.isNull:       return `isNull(${left})`;
-    case TYPE_OPERATOR.isUndefined:  return `isUndefined(${left})`;
-    case TYPE_OPERATOR.exists:       return `!isUndefined(${left})`;
-    case TYPE_OPERATOR.doesNotExist: return `isUndefined(${left})`;
-    case TYPE_OPERATOR.isTrue:       return `${left} == true`;
-    case TYPE_OPERATOR.isFalse:      return `${left} == false`;
+    case TYPE_OPERATOR_V2.isEmpty:      return `isEmpty(${left})`;
+    case TYPE_OPERATOR_V2.isNotEmpty:   return `!isEmpty(${left})`;
+    case TYPE_OPERATOR_V2.isNull:       return `isNull(${left})`;
+    case TYPE_OPERATOR_V2.isUndefined:  return `isUndefined(${left})`;
+    case TYPE_OPERATOR_V2.exists:       return `!isUndefined(${left})`;
+    case TYPE_OPERATOR_V2.doesNotExist: return `isUndefined(${left})`;
+    case TYPE_OPERATOR_V2.isTrue:       return `${left} == true`;
+    case TYPE_OPERATOR_V2.isFalse:      return `${left} == false`;
   }
 
   const right = renderOperand2(condition);
@@ -146,38 +146,38 @@ export function conditionToWhen(condition: Condition): string {
   if (right === '' && !UNARY_OPERATORS.has(op)) return '';
 
   switch (op) {
-    case TYPE_OPERATOR.equalAsNumbers:
-    case TYPE_OPERATOR.equalAsStrings:        return `${left} == ${right}`;
-    case TYPE_OPERATOR.notEqualAsNumbers:
-    case TYPE_OPERATOR.notEqualAsStrings:     return `${left} != ${right}`;
-    case TYPE_OPERATOR.greaterThan:           return `${left} > ${right}`;
-    case TYPE_OPERATOR.greaterThanOrEqual:    return `${left} >= ${right}`;
-    case TYPE_OPERATOR.lessThan:              return `${left} < ${right}`;
-    case TYPE_OPERATOR.lessThanOrEqual:       return `${left} <= ${right}`;
-    case TYPE_OPERATOR.startsWith:            return `startsWith(${left}, ${right})`;
-    case TYPE_OPERATOR.notStartsWith:         return `!startsWith(${left}, ${right})`;
-    case TYPE_OPERATOR.contains:              return `contains(${left}, ${right})`;
-    case TYPE_OPERATOR.notContains:           return `!contains(${left}, ${right})`;
-    case TYPE_OPERATOR.endsWith:              return `endsWith(${left}, ${right})`;
-    case TYPE_OPERATOR.notEndsWith:           return `!endsWith(${left}, ${right})`;
-    case TYPE_OPERATOR.matches:               return `matches(${left}, ${right})`;
-    case TYPE_OPERATOR.notMatches:            return `!matches(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.equalAsNumbers:
+    case TYPE_OPERATOR_V2.equalAsStrings:        return `${left} == ${right}`;
+    case TYPE_OPERATOR_V2.notEqualAsNumbers:
+    case TYPE_OPERATOR_V2.notEqualAsStrings:     return `${left} != ${right}`;
+    case TYPE_OPERATOR_V2.greaterThan:           return `${left} > ${right}`;
+    case TYPE_OPERATOR_V2.greaterThanOrEqual:    return `${left} >= ${right}`;
+    case TYPE_OPERATOR_V2.lessThan:              return `${left} < ${right}`;
+    case TYPE_OPERATOR_V2.lessThanOrEqual:       return `${left} <= ${right}`;
+    case TYPE_OPERATOR_V2.startsWith:            return `startsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notStartsWith:         return `!startsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.contains:              return `contains(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notContains:           return `!contains(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.endsWith:              return `endsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notEndsWith:           return `!endsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.matches:               return `matches(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notMatches:            return `!matches(${left}, ${right})`;
     // --- Date & Time (RHS stringa ISO quotata) ---
-    case TYPE_OPERATOR.equalAsDate:           return `dateEqual(${left}, ${right})`;
-    case TYPE_OPERATOR.notEqualAsDate:        return `!dateEqual(${left}, ${right})`;
-    case TYPE_OPERATOR.isAfter:               return `isAfter(${left}, ${right})`;
-    case TYPE_OPERATOR.isBefore:              return `isBefore(${left}, ${right})`;
-    case TYPE_OPERATOR.isAfterOrEqual:        return `isAfterOrEqual(${left}, ${right})`;
-    case TYPE_OPERATOR.isBeforeOrEqual:       return `isBeforeOrEqual(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.equalAsDate:           return `dateEqual(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notEqualAsDate:        return `!dateEqual(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.isAfter:               return `isAfter(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.isBefore:              return `isBefore(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.isAfterOrEqual:        return `isAfterOrEqual(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.isBeforeOrEqual:       return `isBeforeOrEqual(${left}, ${right})`;
     // --- Array ---
-    case TYPE_OPERATOR.arrayContains:         return `arrayContains(${left}, ${right})`;
-    case TYPE_OPERATOR.arrayNotContains:      return `!arrayContains(${left}, ${right})`;
-    case TYPE_OPERATOR.lengthEqualTo:         return `length(${left}) == ${right}`;
-    case TYPE_OPERATOR.lengthNotEqualTo:      return `length(${left}) != ${right}`;
-    case TYPE_OPERATOR.lengthGreaterThan:     return `length(${left}) > ${right}`;
-    case TYPE_OPERATOR.lengthLessThan:        return `length(${left}) < ${right}`;
-    case TYPE_OPERATOR.lengthGreaterThanOrEqual: return `length(${left}) >= ${right}`;
-    case TYPE_OPERATOR.lengthLessThanOrEqual: return `length(${left}) <= ${right}`;
+    case TYPE_OPERATOR_V2.arrayContains:         return `arrayContains(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.arrayNotContains:      return `!arrayContains(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.lengthEqualTo:         return `length(${left}) == ${right}`;
+    case TYPE_OPERATOR_V2.lengthNotEqualTo:      return `length(${left}) != ${right}`;
+    case TYPE_OPERATOR_V2.lengthGreaterThan:     return `length(${left}) > ${right}`;
+    case TYPE_OPERATOR_V2.lengthLessThan:        return `length(${left}) < ${right}`;
+    case TYPE_OPERATOR_V2.lengthGreaterThanOrEqual: return `length(${left}) >= ${right}`;
+    case TYPE_OPERATOR_V2.lengthLessThanOrEqual: return `length(${left}) <= ${right}`;
     default:
       // Operatore non riconosciuto: la condizione verrebbe esclusa dal `when`.
       // Segnaliamo invece di scartarla silenziosamente (l'AST `groups` resta integro).
@@ -258,12 +258,27 @@ export function serializeConditionToWhen(groups: Array<Expression | Operator>): 
  */
 export const SAVE_ONLY_WHEN = false;
 
-/** type-id dell'azione JSON Condition (hardcoded per evitare import circolari da utils-actions). */
-const JSON_CONDITION_TYPE = 'jsoncondition';
+/** type-id dell'azione JSON Condition V2 (hardcoded per evitare import circolari da utils-actions). */
+const JSON_CONDITION_TYPE = 'jsoncondition2';
 
-/** Genera `when` su un'Expression (filtri reply, ecc.) e, in modalità TEST, ne svuota `conditions`. */
+/**
+ * Filtro reply LEGACY = ha condizioni MA non è marcato `version: 2`.
+ * Regola UI: i filtri legacy si aprono col vecchio editor (appdashboard-filter, congelato a master);
+ * filtri vuoti o marcati V2 usano il nuovo editor (appdashboard-filter2).
+ */
+export function isLegacyFilter(expression: any): boolean {
+  return !!(expression && Array.isArray(expression.conditions) && expression.conditions.length > 0)
+    && expression.version !== 2;
+}
+
+/**
+ * Genera `when` su un'Expression e, in modalità TEST, ne svuota `conditions`.
+ * SOLO per i filtri V2 (`version === 2`): i filtri legacy devono passare nel
+ * payload byte-identici (niente `when`, niente marker) per retrocompatibilità.
+ */
 function applyExpressionSaveMode(expr: any): void {
   if (!expr || typeof expr !== 'object' || !Array.isArray(expr.conditions)) return;
+  if (expr.version !== 2) return; // filtro legacy: non toccare
   expr.when = serializeExpression(expr as Expression);
   if (SAVE_ONLY_WHEN) expr.conditions = [];
 }

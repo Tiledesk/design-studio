@@ -1,0 +1,293 @@
+:host{
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-04)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
+    --border-radius-base: 8px;
+    --button-border-radius: #{var(--button-border-radius-base)};
+    --button-height: #{var(--button-height-base)};
+}
+
+.previewMode{
+    .filter-row{
+        grid-column-gap: 5px;
+        grid-row-gap: 0px;
+    }
+    .filter-condition{
+        font-size: 0.6em;
+        line-height: 12px;
+        padding: 8px 8px;
+    }
+    .filter-icon span {
+        font-size: 18px;
+    }
+
+    
+}
+
+.base-filter{
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}
+
+.filter-row{
+    display: grid;
+    width: 100%;
+    // grid-template-columns: minmax(0px, 1fr) 100px;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        
+        opacity: 0;
+
+        height: 28px;
+        width: 28px;
+
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: var(--textColor);
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+
+        span.material-icons{
+            font-size: 20px;
+            color: var(--backGroundColor);
+        }
+
+        &:hover{
+            background-color: var(--textColor);
+            span.material-icons{
+                color: var(--backGroundColor);
+            }
+        }
+    }
+}
+
+
+.add-filter-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 26px;
+    // padding: 0px 9px;
+    // font-size: .9em;
+    // font-weight: 400;
+    // border-radius: 13px;
+    transition: all 0.3s ease 0s;
+    // background: $background-color;
+    // color: $text-color;
+
+    user-select: none;
+    box-sizing: border-box;
+    outline: none;
+    border: 1px dashed var(--blu-light-02);
+    border-radius: var(--button-border-radius);
+    color: var(--blu-light-02);
+    cursor: pointer;
+    font-size: 0.7em;
+    font-weight: 400;
+    line-height: var(--button-height);
+    // margin: 0px 5px 0;
+    order: 1;
+    padding: 0 10px;
+    transition: all .3s;
+    min-width: 100px;
+    text-align: center;
+    width: fit-content;
+
+    span.material-icons-outlined{
+        font-size: 20px;
+    }
+
+    &:hover{
+        border-color: var(--textColor);
+        color: var(--textColor);
+        cursor: pointer;
+    }
+}
+
+.basic-filter-wrp{
+    // background: #fff;
+    // margin: 0 30px;
+    // padding: 20px 0px;
+    // grid-row-gap: 15px;
+    // border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .add-filter-button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+
+        user-select: none;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px dashed var(--blu-light-02);
+        border-radius: var(--button-border-radius);
+        color: var(--blu-light-02);
+        cursor: pointer;
+        font-size: 0.7em;
+        font-weight: 400;
+        line-height: var(--button-height);
+        // margin: 0px 5px 0;
+        order: 1;
+        padding: 0 10px;
+        transition: all .3s;
+        min-width: 100px;
+        text-align: center;
+        width: fit-content;
+
+        
+        &:hover{
+            border-color: var(--textColor);
+            color: var(--textColor);
+        }
+    }
+    
+}
+
+
+::ng-deep .base-filter--add-filter-panel {
+    // position: relative;
+    box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
+    background: rgb(255,255,255);
+    border-radius: 4px;
+    margin: auto;
+    width: 500px;
+    max-height: 80%;
+    min-height: 385px;
+    overflow: auto;
+    max-width: 500px;
+    display: inline-block;
+    top: 50%!important;
+    margin-top: -20%;
+    .category-row-name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden !important;
+    }
+}
+
+.filter-operator {
+    min-width: 100px;
+    width: fit-content;
+    margin: 10px auto;
+}
+
+.filter-operator-preview{
+    display: block;
+    text-align: center;
+}
+
+::ng-deep .filter-operator {
+    .select-bot-box {
+        width: max-content;
+        min-width: 70px;
+        text-align: center;
+        margin: 10px auto;
+    }
+}
+
+.filter-condition{
+    -webkit-box-align: center;
+    align-items: center;
+    display: flex;
+    position: relative;
+    border-radius: var(--border-radius-base);
+    padding: 6px 15px;
+    transition: background-color 0.3s ease 0s, border 0.3s ease 0s, opacity 0.3s ease 0s;
+    cursor: pointer;
+    background: var(--backGroundColor);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--backGroundColor);
+    border-image: initial;
+    font-size: 12px;
+    &:hover{
+        background: var(--hoverBackgroundColor);
+        border-color: var(--textColor);
+        div.remove{
+            opacity: 1;
+        }
+    }
+
+    div.remove {
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        transition: opacity 0.3s ease 0s;
+        opacity: 0;
+        height: 28px;
+        width: 28px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: white;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+        span.material-icons,
+        span.material-icons-outlined {
+            font-size: 20px;
+            color: var(--textColor);
+        }
+        &:hover {
+            background-color: var(--hoverBackgroundColor);
+        }
+    }
+
+    div.filter-icon {
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        color: var(--textColor);
+        display: flex;
+        // font-size: 12px;
+        justify-content: center;
+        margin-right: 10px;
+        width: 15px;
+        transition: color 0.3s ease 0s;
+    }
+}
+
+.ellips{
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s ease 0s;
+    overflow: hidden !important;
+}
+
+cds-select::ng-deep{
+    .select-bot-box {
+        margin: 0px auto;
+    }
+}

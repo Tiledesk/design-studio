@@ -1,4 +1,4 @@
-import { TYPE_OPERATOR } from './utils';
+import { TYPE_OPERATOR_V2 } from './utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
 import {
   serializeConditionToWhen,
@@ -10,10 +10,10 @@ import {
 } from './utils-condition';
 
 /** Helpers di costruzione AST */
-function cond(operand1: string, operator: TYPE_OPERATOR, operand2?: { type: 'const' | 'var', value?: string, name?: string }): Condition {
+function cond(operand1: string, operator: TYPE_OPERATOR_V2, operand2?: { type: 'const' | 'var', value?: string, name?: string }): Condition {
   const c = new Condition();
   c.operand1 = operand1;
-  c.operator = operator;
+  c.operator = operator as any; // Condition.operator resta tipato col TYPE_OPERATOR legacy
   c.operand2 = (operand2 || { type: 'const', value: '', name: '' }) as any;
   return c;
 }
@@ -33,9 +33,9 @@ describe('utils-condition · serializeConditionToWhen', () => {
   it('filtro reply (_tdJSONCondition: Expression) -> popola `when` dentro l\'expression', () => {
     // Caso delle action con filtri (reply, ecc.): l'expression è il _tdJSONCondition stesso
     const tdJSONCondition = expr(
-      cond('lastUserText', TYPE_OPERATOR.equalAsNumbers, { type: 'const', value: '1', name: '' }),
+      cond('lastUserText', TYPE_OPERATOR_V2.equalAsNumbers, { type: 'const', value: '1', name: '' }),
       op('AND'),
-      cond('user_city', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Roma', name: '' }),
+      cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma', name: '' }),
     );
     tdJSONCondition.when = serializeExpression(tdJSONCondition);
     expect(tdJSONCondition.when).toBe('lastUserText == 1 && user_city == "Roma"');
@@ -43,7 +43,7 @@ describe('utils-condition · serializeConditionToWhen', () => {
 
   it('riproduce l\'esempio utente: 2 gruppi (uno vuoto) + RHS variabile => "(kb_chunks == u)"', () => {
     const groups = [
-      expr(cond('kb_chunks', TYPE_OPERATOR.equalAsStrings, { type: 'var', name: 'u', value: 'u' })),
+      expr(cond('kb_chunks', TYPE_OPERATOR_V2.equalAsStrings, { type: 'var', name: 'u', value: 'u' })),
       op('AND'),
       expr(), // secondo gruppo vuoto -> scartato, l'AND pendente viene rimosso
     ];
@@ -53,11 +53,11 @@ describe('utils-condition · serializeConditionToWhen', () => {
   it('riproduce esattamente l\'esempio del brief (singolo gruppo, AND/OR misti)', () => {
     const groups = [
       expr(
-        cond('ai_reply', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Ciao', name: '' }),
+        cond('ai_reply', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Ciao', name: '' }),
         op('AND'),
-        cond('user_city', TYPE_OPERATOR.notEqualAsStrings, { type: 'const', value: 'Roma', name: '' }),
+        cond('user_city', TYPE_OPERATOR_V2.notEqualAsStrings, { type: 'const', value: 'Roma', name: '' }),
         op('OR'),
-        cond('user_language', TYPE_OPERATOR.startsWith, { type: 'const', value: 'it', name: '' }),
+        cond('user_language', TYPE_OPERATOR_V2.startsWith, { type: 'const', value: 'it', name: '' }),
       ),
     ];
     expect(serializeConditionToWhen(groups))
@@ -65,56 +65,56 @@ describe('utils-condition · serializeConditionToWhen', () => {
   });
 
   it('numeri non quotati per gli operatori numerici', () => {
-    expect(conditionToWhen(cond('age', TYPE_OPERATOR.equalAsNumbers, { type: 'const', value: '1' }))).toBe('age == 1');
-    expect(conditionToWhen(cond('age', TYPE_OPERATOR.notEqualAsNumbers, { type: 'const', value: '0' }))).toBe('age != 0');
-    expect(conditionToWhen(cond('age', TYPE_OPERATOR.greaterThan, { type: 'const', value: '18' }))).toBe('age > 18');
-    expect(conditionToWhen(cond('age', TYPE_OPERATOR.greaterThanOrEqual, { type: 'const', value: '18' }))).toBe('age >= 18');
-    expect(conditionToWhen(cond('age', TYPE_OPERATOR.lessThan, { type: 'const', value: '65' }))).toBe('age < 65');
-    expect(conditionToWhen(cond('age', TYPE_OPERATOR.lessThanOrEqual, { type: 'const', value: '65' }))).toBe('age <= 65');
+    expect(conditionToWhen(cond('age', TYPE_OPERATOR_V2.equalAsNumbers, { type: 'const', value: '1' }))).toBe('age == 1');
+    expect(conditionToWhen(cond('age', TYPE_OPERATOR_V2.notEqualAsNumbers, { type: 'const', value: '0' }))).toBe('age != 0');
+    expect(conditionToWhen(cond('age', TYPE_OPERATOR_V2.greaterThan, { type: 'const', value: '18' }))).toBe('age > 18');
+    expect(conditionToWhen(cond('age', TYPE_OPERATOR_V2.greaterThanOrEqual, { type: 'const', value: '18' }))).toBe('age >= 18');
+    expect(conditionToWhen(cond('age', TYPE_OPERATOR_V2.lessThan, { type: 'const', value: '65' }))).toBe('age < 65');
+    expect(conditionToWhen(cond('age', TYPE_OPERATOR_V2.lessThanOrEqual, { type: 'const', value: '65' }))).toBe('age <= 65');
   });
 
   it('stringhe quotate per gli operatori stringa', () => {
-    expect(conditionToWhen(cond('city', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Roma' }))).toBe('city == "Roma"');
-    expect(conditionToWhen(cond('city', TYPE_OPERATOR.notEqualAsStrings, { type: 'const', value: 'Roma' }))).toBe('city != "Roma"');
+    expect(conditionToWhen(cond('city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }))).toBe('city == "Roma"');
+    expect(conditionToWhen(cond('city', TYPE_OPERATOR_V2.notEqualAsStrings, { type: 'const', value: 'Roma' }))).toBe('city != "Roma"');
   });
 
   it('operatori-funzione su stringa', () => {
-    expect(conditionToWhen(cond('lang', TYPE_OPERATOR.startsWith, { type: 'const', value: 'it' }))).toBe('startsWith(lang, "it")');
-    expect(conditionToWhen(cond('lang', TYPE_OPERATOR.notStartsWith, { type: 'const', value: 'it' }))).toBe('!startsWith(lang, "it")');
-    expect(conditionToWhen(cond('msg', TYPE_OPERATOR.contains, { type: 'const', value: 'hi' }))).toBe('contains(msg, "hi")');
-    expect(conditionToWhen(cond('file', TYPE_OPERATOR.endsWith, { type: 'const', value: '.pdf' }))).toBe('endsWith(file, ".pdf")');
+    expect(conditionToWhen(cond('lang', TYPE_OPERATOR_V2.startsWith, { type: 'const', value: 'it' }))).toBe('startsWith(lang, "it")');
+    expect(conditionToWhen(cond('lang', TYPE_OPERATOR_V2.notStartsWith, { type: 'const', value: 'it' }))).toBe('!startsWith(lang, "it")');
+    expect(conditionToWhen(cond('msg', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'hi' }))).toBe('contains(msg, "hi")');
+    expect(conditionToWhen(cond('file', TYPE_OPERATOR_V2.endsWith, { type: 'const', value: '.pdf' }))).toBe('endsWith(file, ".pdf")');
     // Legacy ignore-case operators (removed) are normalized to case-sensitive.
     expect(conditionToWhen(cond('lang', 'startsWithIgnoreCase' as any, { type: 'const', value: 'IT' }))).toBe('startsWith(lang, "IT")');
     expect(conditionToWhen(cond('msg', 'containsIgnoreCase' as any, { type: 'const', value: 'HI' }))).toBe('contains(msg, "HI")');
-    expect(conditionToWhen(cond('email', TYPE_OPERATOR.matches, { type: 'const', value: '^.+@.+$' }))).toBe('matches(email, "^.+@.+$")');
+    expect(conditionToWhen(cond('email', TYPE_OPERATOR_V2.matches, { type: 'const', value: '^.+@.+$' }))).toBe('matches(email, "^.+@.+$")');
   });
 
   it('operatori unari senza RHS', () => {
-    expect(conditionToWhen(cond('x', TYPE_OPERATOR.isEmpty))).toBe('isEmpty(x)');
-    expect(conditionToWhen(cond('x', TYPE_OPERATOR.isNull))).toBe('isNull(x)');
-    expect(conditionToWhen(cond('x', TYPE_OPERATOR.isUndefined))).toBe('isUndefined(x)');
+    expect(conditionToWhen(cond('x', TYPE_OPERATOR_V2.isEmpty))).toBe('isEmpty(x)');
+    expect(conditionToWhen(cond('x', TYPE_OPERATOR_V2.isNull))).toBe('isNull(x)');
+    expect(conditionToWhen(cond('x', TYPE_OPERATOR_V2.isUndefined))).toBe('isUndefined(x)');
   });
 
   it('RHS variabile = identificatore nudo (niente apici)', () => {
-    expect(conditionToWhen(cond('city', TYPE_OPERATOR.equalAsStrings, { type: 'var', name: 'user_city', value: 'user_city' }))).toBe('city == user_city');
-    expect(conditionToWhen(cond('lang', TYPE_OPERATOR.startsWith, { type: 'var', name: 'pref_lang', value: 'pref_lang' }))).toBe('startsWith(lang, pref_lang)');
+    expect(conditionToWhen(cond('city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'var', name: 'user_city', value: 'user_city' }))).toBe('city == user_city');
+    expect(conditionToWhen(cond('lang', TYPE_OPERATOR_V2.startsWith, { type: 'var', name: 'pref_lang', value: 'pref_lang' }))).toBe('startsWith(lang, pref_lang)');
   });
 
   it('escape dei caratteri speciali nelle stringhe', () => {
     expect(escapeString('say "hi"')).toBe('say \\"hi\\"');
-    expect(conditionToWhen(cond('q', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'a"b' }))).toBe('q == "a\\"b"');
+    expect(conditionToWhen(cond('q', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'a"b' }))).toBe('q == "a\\"b"');
   });
 
   it('più gruppi: ogni gruppo tra parentesi, uniti dall\'operatore di gruppo', () => {
     const groups = [
       expr(
-        cond('a', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'x' }),
+        cond('a', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'x' }),
         op('AND'),
-        cond('b', TYPE_OPERATOR.notEqualAsStrings, { type: 'const', value: 'y' }),
+        cond('b', TYPE_OPERATOR_V2.notEqualAsStrings, { type: 'const', value: 'y' }),
       ),
       op('OR'),
       expr(
-        cond('c', TYPE_OPERATOR.startsWith, { type: 'const', value: 'z' }),
+        cond('c', TYPE_OPERATOR_V2.startsWith, { type: 'const', value: 'z' }),
       ),
     ];
     expect(serializeConditionToWhen(groups))
@@ -122,14 +122,14 @@ describe('utils-condition · serializeConditionToWhen', () => {
   });
 
   it('singola condizione, singolo gruppo: nessuna parentesi', () => {
-    const groups = [expr(cond('ai_reply', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Ciao' }))];
+    const groups = [expr(cond('ai_reply', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Ciao' }))];
     expect(serializeConditionToWhen(groups)).toBe('ai_reply == "Ciao"');
   });
 
-  it('save mode: azione jsoncondition -> `when` valorizzato; in TEST `groups` svuotato', () => {
+  it('save mode: azione jsoncondition2 -> `when` valorizzato; in TEST `groups` svuotato', () => {
     const action: any = {
-      _tdActionType: 'jsoncondition',
-      groups: [ expr(cond('ai_reply', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Ciao' })) ],
+      _tdActionType: 'jsoncondition2',
+      groups: [ expr(cond('ai_reply', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Ciao' })) ],
       when: ''
     };
     const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
@@ -142,8 +142,20 @@ describe('utils-condition · serializeConditionToWhen', () => {
     }
   });
 
-  it('save mode: filtro reply (_tdJSONCondition annidato) -> `when` valorizzato; in TEST `conditions` svuotate', () => {
-    const tdJSONCondition: any = expr(cond('user_city', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'Roma' }));
+  it('save mode: azione LEGACY jsoncondition -> payload NON modificato (retrocompatibilità)', () => {
+    const action: any = {
+      _tdActionType: 'jsoncondition',
+      groups: [ expr(cond('ai_reply', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Ciao' })) ]
+    };
+    const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
+    applyConditionSaveModeToPayload(payload);
+    expect(action.when).toBeUndefined(); // nessun `when` scritto sulla vecchia azione
+    expect(action.groups.length).toBe(1);
+  });
+
+  it('save mode: filtro reply V2 (version=2) -> `when` valorizzato; in TEST `conditions` svuotate', () => {
+    const tdJSONCondition: any = expr(cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }));
+    tdJSONCondition.version = 2; // marker V2 (scritto dall'editor appdashboard-filter2)
     const action: any = {
       _tdActionType: 'reply',
       attributes: { message: { _tdJSONCondition: tdJSONCondition } }
@@ -158,6 +170,20 @@ describe('utils-condition · serializeConditionToWhen', () => {
     }
   });
 
+  it('save mode: filtro reply LEGACY (senza version) -> NON modificato (retrocompatibilità)', () => {
+    const tdJSONCondition: any = expr(cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }));
+    delete tdJSONCondition.when; // il filtro legacy non ha `when`
+    const action: any = {
+      _tdActionType: 'reply',
+      attributes: { message: { _tdJSONCondition: tdJSONCondition } }
+    };
+    const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
+    applyConditionSaveModeToPayload(payload);
+    expect(tdJSONCondition.when).toBeUndefined();
+    expect(tdJSONCondition.version).toBeUndefined();
+    expect(tdJSONCondition.conditions.length).toBe(1);
+  });
+
   it('save mode: payload nullo/malformato non lancia', () => {
     expect(() => applyConditionSaveModeToPayload(null)).not.toThrow();
     expect(() => applyConditionSaveModeToPayload({})).not.toThrow();
@@ -170,9 +196,9 @@ describe('utils-condition · serializeConditionToWhen', () => {
     expect(serializeConditionToWhen([expr()])).toBe('');
     // operatore pendente perché una condizione è incompleta (manca operand1)
     const e = expr(
-      cond('a', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'x' }),
+      cond('a', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'x' }),
       op('AND'),
-      cond('', TYPE_OPERATOR.equalAsStrings, { type: 'const', value: 'y' }),
+      cond('', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'y' }),
     );
     expect(serializeExpression(e)).toBe('a == "x"');
   });

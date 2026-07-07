@@ -1,7 +1,17 @@
-<div class="content">
+<div class="content element" [class.previewMode]="previewMode" style="width: 100%;">
+    
+    <div class="filter-row" *ngIf="expression?.conditions.length === 0">
+        <div class="add-filter-btn" 
+            [satPopoverAnchor]="addConditionFilter" 
+            (click)="addConditionFilter.toggle()">
+            <span class="material-icons-outlined">filter_alt</span>
+            {{ 'CDSCanvas.Filter' | translate }}
+        </div>
+    </div>
 
-    <div class="filter-row" *ngFor="let group of expression?.conditions; let i = index; let last = last">
-        <div class="text-editor-wrapper">
+    <div class="filter-row" *ngIf="expression?.conditions.length > 0">
+        <div *ngFor="let group of expression?.conditions; let i = index; let last = last"
+            class="text-editor-wrapper">
             <!-- CONDITION [i]-->
             <div *ngIf="i%2 === 0" 
                 class="filter-condition" 
@@ -15,14 +25,14 @@
                 </div>
                 <div class="filter-text no-ellips">
                     <b>{{group?.operand1}}</b>
-                    {{ (OPERATORS_LIST[group?.operator]?.name || group?.operator) | translate }}
-                    <b *ngIf="group?.operand2?.type === 'const'">{{group?.operand2?.value}}</b>
-                    <b *ngIf="group?.operand2?.type === 'var'">{{group?.operand2?.name}}</b>
+                    {{ operatorLabel(group?.operator) | translate }}
+                    <b>{{ operandRightDisplay(group) }}</b>
                 </div>
             </div>
+
             <!-- OPERATOR [i]-->
             <div *ngIf="i%2 === 1">
-                <cds-select
+                <cds-select *ngIf="!previewMode"
                     class="filter-operator"
                     [items]="booleanOperators"
                     [bindLabelSelect]="'operator'"
@@ -30,19 +40,27 @@
                     [itemSelected]="group?.operator"
                     (onSelected)="onChangeOperator($event, i)">
                 </cds-select>
+
+                <span class="filter-operator-preview" *ngIf="previewMode">
+                    <b>{{group?.operator}}</b>
+                </span>
+            </div>
+
+        </div>
+
+        <div class="basic-filter-wrp" *ngIf="!previewMode">
+            <div class="add-filter-button" 
+                [satPopoverAnchor]="addConditionFilter" 
+                (click)="addConditionFilter.toggle()">
+                <span class="material-icons">add</span>
+                {{ 'CDSCanvas.AddFilter' | translate }}
             </div>
         </div>
+
     </div>
 
-    <div class="basic-filter-wrp" *ngIf="true"> 
-        <div class="add-filter-button" 
-            [satPopoverAnchor]="addConditionFilter" 
-            (click)="addConditionFilter.toggle()">
-            <span class="material-icons">add</span>
-            {{'CDSCanvas.AddNewCondition' | translate }}
-        </div>
-    </div>
-    
+
+
 </div>
 
 <!-- verticalAlign="below" -->
@@ -51,13 +69,11 @@
     horizontalAlign="center" 
     verticalAlign="center" 
     hasBackdrop 
-    (backdropClicked)="addConditionFilter.close();onDismiss($event)"
+    (backdropClicked)="addConditionFilter.close()"
     panelClass="base-filter--add-filter-panel"
     interactiveClose="false">
-    <base-condition-row
+    <base-condition-row2
         [condition]="selectedCondition"
         (close)="onDismiss($event)">
-    </base-condition-row>
+    </base-condition-row2>
 </sat-popover>
-
-

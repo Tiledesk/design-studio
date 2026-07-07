@@ -743,6 +743,26 @@
         "VoiceTwilio": "Voice Twilio"
     },
     "CDSOperatorList": {
+        "equalAsNumbers": "equal As Numbers",
+        "equalAsStrings": "equal As Text",
+        "notEqualAsNumbers": "not Equal As Numbers",
+        "notEqualAsStrings": "not Equal As Text",
+        "greaterThan": "greater Than",
+        "greaterThanOrEqual": "greater Than Or Equal",
+        "lessThan": "less Than",
+        "lessThanOrEqual": "less Than Or Equal",
+        "startsWith": "starts With",
+        "notStartsWith": "not starts With",
+        "startsWithIgnoreCase": "starts With Ignore Case",
+        "endsWith": "ends With",
+        "contains": "contains",
+        "containsIgnoreCase": "contains Ignore Case",
+        "isEmpty": "is Empty",
+        "isNull": "is Null",
+        "isUndefined": "is Undefined",
+        "matches": "matches"
+    },
+    "CDSOperatorListV2": {
         "exists": "exists",
         "doesNotExist": "does not exist",
         "isEmpty": "is empty",
@@ -812,6 +832,7 @@
             "IfOnlineAgent": "If online agents",
             "Condition": "Condition",
             "ConditionElse": "Condition w/ else",
+            "ConditionElseV2": "Condition w/ else V2",
             "ConnectBlock": "Connect block",
             "SetAttribute": "Set attribute",
             "DeleteAttribute": "Delete attribute",
@@ -915,6 +936,13 @@
             },
             "ConditionElse": {
                 "TITLE": "Condition with else branch",
+                "DESCRIPTION": "This action allows branching based on the specified condition with true/false branches",
+                "IMAGE": "assets/images/doc/JSON_CONDITION.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/json-condition"
+            },
+            "ConditionElseV2": {
+                "TITLE": "Condition with else branch (V2)",
                 "DESCRIPTION": "This action allows branching based on the specified condition with true/false branches",
                 "IMAGE": "assets/images/doc/JSON_CONDITION.png",
                 "VIDEO_URL": "",

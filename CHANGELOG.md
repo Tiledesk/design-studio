@@ -9,6 +9,11 @@
 
 
 # this branch
+- **added**: new JSON Condition **V2** as a distinct action (`jsoncondition2`, badge NEW) with its own editor (cds-action-json-condition2, base-filter2/base-condition-row2); the legacy action is flagged DEP and left unchanged for full backward compatibility
+- **added**: new V2 filter editor (filter2) wired into the reply actions; legacy filters keep opening the old editor (isLegacyFilter routing via the `version: 2` marker)
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string, saved next to the AST at save time (utils-condition)
+- **added**: new V2 operator catalog (TYPE_OPERATOR_V2 / OPERATORS_LIST_V2) grouped by type (existence/text/number/boolean/date/array)
+- **changed**: action model with `ActionJsonCondition2` and `Expression` `when`/`version` markers to route legacy vs V2 editors without touching legacy payloads
 - **bug fix**: JSON Condition no longer crashes when opening a chatbot whose condition was created with a different/legacy version (safe operator label & operand rendering on unknown operators or missing operand2)
 - **bug fix**: keep the operand2 value when editing legacy conditions (string operand2) and hide the Value field for legacy unary operators
 - **bug fix**: added the missing trackBy in the base filter (fixes JSON Condition build/template error)
