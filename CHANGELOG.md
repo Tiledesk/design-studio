@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch 
+# 1.40.8-rc1
 - **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
 - **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
 - **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
