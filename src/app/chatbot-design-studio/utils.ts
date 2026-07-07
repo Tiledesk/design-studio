@@ -227,6 +227,58 @@ export enum TYPE_OPERATOR {
     matches                 = "matches"
 }
 
+/**
+ * Operatori della JSON Condition V2 ('jsoncondition2') e dei filtri reply V2.
+ * Set separato dal legacy TYPE_OPERATOR (usato dalla vecchia 'jsoncondition' e dai filtri esistenti)
+ * per garantire retrocompatibilità totale: i due mondi non condividono il catalogo operatori.
+ */
+export enum TYPE_OPERATOR_V2 {
+    // Existence / generic (unary, type-agnostic)
+    exists                  = "exists",
+    doesNotExist            = "doesNotExist",
+    isEmpty                 = "isEmpty",
+    isNotEmpty              = "isNotEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    // Text (string coercion)
+    equalAsStrings          = "equalAsStrings",
+    notEqualAsStrings       = "notEqualAsStrings",
+    contains                = "contains",
+    notContains             = "notContains",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    endsWith                = "endsWith",
+    notEndsWith             = "notEndsWith",
+    matches                 = "matches",
+    notMatches              = "notMatches",
+    // Number (number coercion)
+    equalAsNumbers          = "equalAsNumbers",
+    notEqualAsNumbers       = "notEqualAsNumbers",
+    greaterThan             = "greaterThan",
+    greaterThanOrEqual      = "greaterThanOrEqual",
+    lessThan                = "lessThan",
+    lessThanOrEqual         = "lessThanOrEqual",
+    // Boolean (unary)
+    isTrue                  = "isTrue",
+    isFalse                 = "isFalse",
+    // Date & Time (date coercion)
+    equalAsDate             = "equalAsDate",
+    notEqualAsDate          = "notEqualAsDate",
+    isAfter                 = "isAfter",
+    isBefore                = "isBefore",
+    isAfterOrEqual          = "isAfterOrEqual",
+    isBeforeOrEqual         = "isBeforeOrEqual",
+    // Array (length -> number; contains -> string)
+    arrayContains           = "arrayContains",
+    arrayNotContains        = "arrayNotContains",
+    lengthEqualTo           = "lengthEqualTo",
+    lengthNotEqualTo        = "lengthNotEqualTo",
+    lengthGreaterThan       = "lengthGreaterThan",
+    lengthLessThan          = "lengthLessThan",
+    lengthGreaterThanOrEqual = "lengthGreaterThanOrEqual",
+    lengthLessThanOrEqual   = "lengthLessThanOrEqual"
+}
+
 export enum TYPE_ATTACHMENT {
     TEMPLATE = "template"
 }
@@ -335,6 +387,54 @@ export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATO
     "matches":                  { name: "CDSOperatorList.matches",                          type: TYPE_OPERATOR.matches                                                                         }
 }
 
+/** Catalogo operatori della JSON Condition V2 e dei filtri reply V2 (chiavi i18n dedicate CDSOperatorListV2.*). */
+export const OPERATORS_LIST_V2: { [key: string]: { name: string, type: TYPE_OPERATOR_V2, src?: string, group?: string } } = {
+    // --- Existence / generic (unary) ---
+    "exists":                   { name: "CDSOperatorListV2.exists",                        type: TYPE_OPERATOR_V2.exists,                         group: "Existence"   },
+    "doesNotExist":             { name: "CDSOperatorListV2.doesNotExist",                  type: TYPE_OPERATOR_V2.doesNotExist,                   group: "Existence"   },
+    "isEmpty":                  { name: "CDSOperatorListV2.isEmpty",                       type: TYPE_OPERATOR_V2.isEmpty,                        group: "Existence"   },
+    "isNotEmpty":               { name: "CDSOperatorListV2.isNotEmpty",                    type: TYPE_OPERATOR_V2.isNotEmpty,                     group: "Existence"   },
+    "isNull":                   { name: "CDSOperatorListV2.isNull",                        type: TYPE_OPERATOR_V2.isNull,                         group: "Existence"   },
+    "isUndefined":              { name: "CDSOperatorListV2.isUndefined",                   type: TYPE_OPERATOR_V2.isUndefined,                    group: "Existence"   },
+    // --- Text (string coercion) ---
+    "equalAsStrings":           { name: "CDSOperatorListV2.equalAsStrings",                type: TYPE_OPERATOR_V2.equalAsStrings,                 src: "assets/images/operators/equal.svg",     group: "Text" },
+    "notEqualAsStrings":        { name: "CDSOperatorListV2.notEqualAsStrings",             type: TYPE_OPERATOR_V2.notEqualAsStrings,              src: "assets/images/operators/not-equal.svg", group: "Text" },
+    "contains":                 { name: "CDSOperatorListV2.contains",                      type: TYPE_OPERATOR_V2.contains,                       group: "Text" },
+    "notContains":              { name: "CDSOperatorListV2.notContains",                   type: TYPE_OPERATOR_V2.notContains,                    group: "Text" },
+    "startsWith":               { name: "CDSOperatorListV2.startsWith",                    type: TYPE_OPERATOR_V2.startsWith,                     group: "Text" },
+    "notStartsWith":            { name: "CDSOperatorListV2.notStartsWith",                 type: TYPE_OPERATOR_V2.notStartsWith,                  group: "Text" },
+    "endsWith":                 { name: "CDSOperatorListV2.endsWith",                      type: TYPE_OPERATOR_V2.endsWith,                       group: "Text" },
+    "notEndsWith":              { name: "CDSOperatorListV2.notEndsWith",                   type: TYPE_OPERATOR_V2.notEndsWith,                    group: "Text" },
+    "matches":                  { name: "CDSOperatorListV2.matches",                       type: TYPE_OPERATOR_V2.matches,                        group: "Text" },
+    "notMatches":               { name: "CDSOperatorListV2.notMatches",                    type: TYPE_OPERATOR_V2.notMatches,                     group: "Text" },
+    // --- Number (number coercion) ---
+    "equalAsNumbers":           { name: "CDSOperatorListV2.equalAsNumbers",                type: TYPE_OPERATOR_V2.equalAsNumbers,                 src: "assets/images/operators/equal.svg",     group: "Number" },
+    "notEqualAsNumbers":        { name: "CDSOperatorListV2.notEqualAsNumbers",             type: TYPE_OPERATOR_V2.notEqualAsNumbers,              src: "assets/images/operators/not-equal.svg", group: "Number" },
+    "greaterThan":              { name: "CDSOperatorListV2.greaterThan",                   type: TYPE_OPERATOR_V2.greaterThan,                    src: "assets/images/operators/grather.svg",   group: "Number" },
+    "greaterThanOrEqual":       { name: "CDSOperatorListV2.greaterThanOrEqual",            type: TYPE_OPERATOR_V2.greaterThanOrEqual,             src: "assets/images/operators/gratherEqual.svg", group: "Number" },
+    "lessThan":                 { name: "CDSOperatorListV2.lessThan",                      type: TYPE_OPERATOR_V2.lessThan,                       src: "assets/images/operators/less.svg",      group: "Number" },
+    "lessThanOrEqual":          { name: "CDSOperatorListV2.lessThanOrEqual",               type: TYPE_OPERATOR_V2.lessThanOrEqual,                src: "assets/images/operators/lessEqual.svg", group: "Number" },
+    // --- Boolean (unary) ---
+    "isTrue":                   { name: "CDSOperatorListV2.isTrue",                        type: TYPE_OPERATOR_V2.isTrue,                         group: "Boolean" },
+    "isFalse":                  { name: "CDSOperatorListV2.isFalse",                       type: TYPE_OPERATOR_V2.isFalse,                        group: "Boolean" },
+    // --- Date & Time (date coercion) ---
+    "equalAsDate":              { name: "CDSOperatorListV2.equalAsDate",                   type: TYPE_OPERATOR_V2.equalAsDate,                    group: "Date & Time" },
+    "notEqualAsDate":           { name: "CDSOperatorListV2.notEqualAsDate",                type: TYPE_OPERATOR_V2.notEqualAsDate,                 group: "Date & Time" },
+    "isAfter":                  { name: "CDSOperatorListV2.isAfter",                       type: TYPE_OPERATOR_V2.isAfter,                        group: "Date & Time" },
+    "isBefore":                 { name: "CDSOperatorListV2.isBefore",                      type: TYPE_OPERATOR_V2.isBefore,                       group: "Date & Time" },
+    "isAfterOrEqual":           { name: "CDSOperatorListV2.isAfterOrEqual",                type: TYPE_OPERATOR_V2.isAfterOrEqual,                 group: "Date & Time" },
+    "isBeforeOrEqual":          { name: "CDSOperatorListV2.isBeforeOrEqual",               type: TYPE_OPERATOR_V2.isBeforeOrEqual,                group: "Date & Time" },
+    // --- Array (length -> number; contains -> string) ---
+    "arrayContains":            { name: "CDSOperatorListV2.arrayContains",                 type: TYPE_OPERATOR_V2.arrayContains,                  group: "Array" },
+    "arrayNotContains":         { name: "CDSOperatorListV2.arrayNotContains",              type: TYPE_OPERATOR_V2.arrayNotContains,               group: "Array" },
+    "lengthEqualTo":            { name: "CDSOperatorListV2.lengthEqualTo",                 type: TYPE_OPERATOR_V2.lengthEqualTo,                  group: "Array" },
+    "lengthNotEqualTo":         { name: "CDSOperatorListV2.lengthNotEqualTo",              type: TYPE_OPERATOR_V2.lengthNotEqualTo,               group: "Array" },
+    "lengthGreaterThan":        { name: "CDSOperatorListV2.lengthGreaterThan",             type: TYPE_OPERATOR_V2.lengthGreaterThan,              group: "Array" },
+    "lengthLessThan":           { name: "CDSOperatorListV2.lengthLessThan",                type: TYPE_OPERATOR_V2.lengthLessThan,                 group: "Array" },
+    "lengthGreaterThanOrEqual": { name: "CDSOperatorListV2.lengthGreaterThanOrEqual",      type: TYPE_OPERATOR_V2.lengthGreaterThanOrEqual,       group: "Array" },
+    "lengthLessThanOrEqual":    { name: "CDSOperatorListV2.lengthLessThanOrEqual",         type: TYPE_OPERATOR_V2.lengthLessThanOrEqual,          group: "Array" }
+}
+
 export const TYPE_MATH_OPERATOR_LIST: { [key: string]: { name: string, type: TYPE_MATH_OPERATOR, src?: string } } = {
     "addAsNumbers":             { name: "CDSMathOperatorList.addAsNumbers",                 type: TYPE_MATH_OPERATOR.addAsNumber,               src: "assets/images/operators/add.svg"          },
     "addAsStrings":             { name: "CDSMathOperatorList.addAsStrings",                 type: TYPE_MATH_OPERATOR.addAsString,               src: "assets/images/operators/add.svg"          },
@@ -383,6 +483,14 @@ export const URL_TYPES: Array<{ label: string, value: TYPE_URL }> = [
 
 export function OperatorValidator(control: AbstractControl): { [key: string]: boolean } | null {
     if (control.value in TYPE_OPERATOR) {
+        return null;
+    }
+    return { invalidType: true };
+}
+
+/** Validator per gli operatori V2 (JSON Condition V2 / filtri reply V2). */
+export function OperatorValidatorV2(control: AbstractControl): { [key: string]: boolean } | null {
+    if (control.value in TYPE_OPERATOR_V2) {
         return null;
     }
     return { invalidType: true };
