@@ -9,6 +9,7 @@
 
 
 # this branch 
+- **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
 - **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
 - **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
 - **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
