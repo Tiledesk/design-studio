@@ -575,8 +575,8 @@ export class ConnectorService {
           }
         }
 
-        /**  JSON-CONDITION */
-        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION){
+        /**  JSON-CONDITION (legacy) + JSON-CONDITION2 (V2): stessi connettori true/false */
+        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION || action._tdActionType === TYPE_ACTION.JSON_CONDITION2){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo =  action.trueIntent.replace("#", "");

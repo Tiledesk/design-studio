@@ -1,7 +1,7 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
@@ -12,6 +12,7 @@ import { LLM_MODEL } from '../utils-ai_models';
 import { buildConnectorAction } from '../connector/connector-action.factory';
 import { ConnectorActionEntry } from '../connector/connector-manifest.model';
 import { patchActionIds } from './patch-action-id.util';
+import { applyConditionSaveModeToPayload } from '../utils-condition';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -1056,6 +1057,10 @@ export class IntentService {
       action = new ActionJsonCondition();
       action.groups.push( new Expression());
     }
+    if(typeAction === TYPE_ACTION.JSON_CONDITION2){
+      action = new ActionJsonCondition2();
+      action.groups.push( new Expression());
+    }
     if(typeAction === TYPE_ACTION.CONDITION) {
       action = new ActionCondition();
       action.groups.push( new Expression());
@@ -1761,6 +1766,9 @@ export class IntentService {
     private async opsUpdate(payload: any, UndoRedo=true): Promise<boolean> { 
       // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', payload);
       payload = removeNodesStartingWith(payload, '__');
+      // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`
+      // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
+      payload = applyConditionSaveModeToPayload(payload);
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {

@@ -244,12 +244,19 @@
                         [action]="action">
                     </cds-action-close>
     
-                    <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION" 
+                    <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION"
                         class="panel-response"
-                        [intentSelected]="intent" 
-                        [action]="action" 
+                        [intentSelected]="intent"
+                        [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-json-condition>
+
+                    <cds-action-json-condition2 *ngSwitchCase="TYPE_ACTION.JSON_CONDITION2"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-json-condition2>
     
                     <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT" 
                         class="panel-response"
