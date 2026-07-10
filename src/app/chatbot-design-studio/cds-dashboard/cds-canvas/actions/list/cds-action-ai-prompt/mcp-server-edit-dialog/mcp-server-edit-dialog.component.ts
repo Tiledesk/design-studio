@@ -42,7 +42,7 @@ interface McpServer {
   /** Available tools (from Connect / integrations). Persisted on Save. */
   tools?: McpTool[];
   /** Selected tools for this server. Persisted in integration so selection is kept even when server is not selected. */
-  selectedTools?: Array<{ name: string }>;
+  selectedTools?: string[];
 }
 
 interface McpIntegration {
@@ -574,11 +574,9 @@ export class McpServerEditDialogComponent implements OnInit {
     }
   }
 
-  private buildSelectedToolsPayload(): Array<{ name: string }> {
+  private buildSelectedToolsPayload(): string[] {
     // Save ONLY {name}. No duplicates thanks to Set.
-    return Array.from(this.selectedToolNames)
-      .filter(Boolean)
-      .map(name => ({ name }));
+    return Array.from(this.selectedToolNames).filter(Boolean)
   }
 
   /** Server MCP nativo Tiledesk: name readonly, url nascosto, Connect via nativeId, Save su /mcp/servers. */
