@@ -103,8 +103,8 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   browserLang: string = 'it';
 
-  mcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }>, selectedTools?: Array<{ name: string }> }> = [];
-  selectedMcpServers: Array<{ name: string, url: string, transport: string, tools?: Array<{ name: string }> }> = [];
+  mcpServers: Array<{ name: string, url: string, transport: string, tools?: string[], selectedTools?: string[] }> = [];
+  selectedMcpServers: Array<{ name: string, url: string, transport: string, tools?: string[] }> = [];
 
   constructor(
     private readonly dialog: MatDialog,
@@ -151,6 +151,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
       this.selectedMcpServers = this.action['servers'];
     }
     await this.initialize();
+    this.syncSelectedMcpServersWithIntegration();
     
     // Fine dell'inizializzazione - reset di tutti i flag
     this.isInitializing = {
@@ -167,6 +168,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
       const currentAction = changes['action'].currentValue as ActionAiPrompt;
       if (currentAction['servers']) {
         this.selectedMcpServers = currentAction['servers'];
+        this.syncSelectedMcpServersWithIntegration();
         this.logger.log("[ACTION AI_PROMPT] ngOnChanges - Updated selectedMcpServers from action: ", this.selectedMcpServers);
       } else {
         this.selectedMcpServers = [];
@@ -684,6 +686,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
   }
 
   openMcpServersDialog() {
+    this.syncSelectedMcpServersWithIntegration();
     this.logger.log("[ACTION AI_PROMPT] mcpServers: ", this.mcpServers);
     this.logger.log("[ACTION AI_PROMPT] selectedMcpServers: ", this.selectedMcpServers);
     
@@ -708,6 +711,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     
     // Update the list of selected servers
     this.selectedMcpServers = updateData.selectedServers.length > 0 ? [...updateData.selectedServers] : [];
+    this.syncSelectedMcpServersWithIntegration();
     
     // Update the main server list with any modifications
     if (updateData.allServers) {
@@ -718,7 +722,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     this.action['servers'] = this.selectedMcpServers;
     this.logger.log("[ACTION AI_PROMPT] Real-time updated selected MCP servers: ", this.selectedMcpServers);
     this.logger.log("[ACTION AI_PROMPT] Real-time updated all MCP servers: ", this.mcpServers);
-    
+    console.log("this.action['servers']", this.action['servers']);
     this.updateAndSaveAction.emit();
   }
 
@@ -761,6 +765,38 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
    */
   formatSliderLabel = (value: number): string => {
     return this.formatNumberPipe.transform(value);
+  }
+
+  /** Normalizes tool names from string[] or legacy { name }[] to string[]. */
+  private normalizeMcpToolNames(tools: unknown): string[] {
+    if (!Array.isArray(tools)) {
+      return [];
+    }
+    return [...new Set(
+      tools
+        .map(t => (typeof t === 'string' ? t : (t as { name?: string })?.name))
+        .filter((name): name is string => !!name)
+    )];
+  }
+
+  /**
+   * action.servers stores selected tools in `tools`, while integration stores them in `selectedTools`.
+   * Normalize legacy formats and hydrate empty action tools from integration defaults.
+   */
+  private syncSelectedMcpServersWithIntegration(): void {
+    if (!this.selectedMcpServers?.length) {
+      return;
+    }
+    this.selectedMcpServers = this.selectedMcpServers.map(server => {
+      const integrationServer = this.mcpServers.find(s => s.name === server.name);
+      const actionTools = this.normalizeMcpToolNames(server.tools);
+      const integrationTools = this.normalizeMcpToolNames(integrationServer?.selectedTools);
+      return {
+        ...server,
+        tools: actionTools.length ? actionTools : integrationTools
+      };
+    });
+    this.action['servers'] = this.selectedMcpServers;
   }
 
 }

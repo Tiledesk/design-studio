@@ -14,8 +14,8 @@ interface McpServerLite {
   native?: boolean;
   description?: string;
   customHeaders?: Array<{ enabled: boolean, key: string, value: string }>;
-  tools?: Array<{ name: string }>;
-  selectedTools?: Array<{ name: string }>;
+  tools?: string[];
+  selectedTools?: string[];
 }
 
 
@@ -48,7 +48,15 @@ export class McpServersDialogComponent implements OnInit {
     this.logger.debug("[McpServersDialog] data: ", this.data);
     // Pre-select servers that were already selected
     if (this.data.selectedServers && this.data.selectedServers.length > 0) {
-      this.selectedServers = [...this.data.selectedServers];
+      this.selectedServers = this.data.selectedServers.map(server => {
+        const stored = this.data.mcpServers?.find(s => s.name === server.name);
+        const actionTools = this.normalizeToolNames(server.tools);
+        const integrationTools = this.normalizeToolNames(stored?.selectedTools);
+        return {
+          ...server,
+          tools: actionTools.length ? actionTools : integrationTools
+        };
+      });
       this.logger.debug("[McpServersDialog] Pre-selected servers: ", this.selectedServers);
     }
     // Store the update callback if provided
@@ -74,7 +82,7 @@ export class McpServersDialogComponent implements OnInit {
     } else {
       // Use stored selectedTools from integration when adding, so previous selection is restored
       const stored = this.data.mcpServers?.find(s => s.name === server.name);
-      const tools = Array.isArray(stored?.selectedTools) ? [...stored.selectedTools] : [];
+      const tools = this.normalizeToolNames(stored?.selectedTools);
       this.selectedServers.push({
         id: server.id,
         name: server.name,
@@ -169,7 +177,7 @@ export class McpServersDialogComponent implements OnInit {
       this.data.mcpServers.push(server);
     }
     // attiva il server (selezione) con i tool scelti
-    const tools = Array.isArray(server.selectedTools) ? [...server.selectedTools] : [];
+    const tools = this.normalizeToolNames(server.selectedTools);
     const selected: McpServerLite = {
       id: server.id,
       name: server.name,
@@ -215,7 +223,7 @@ export class McpServersDialogComponent implements OnInit {
           transport: createdServer.transport,
           native: createdServer.native,
           customHeaders: createdServer.customHeaders,
-          tools: result?.selectedTools || []
+          tools: this.normalizeToolNames(result?.selectedTools)
         });
         this.logger.log("[McpServersDialog] New server added:", createdServer);
 
@@ -235,15 +243,15 @@ export class McpServersDialogComponent implements OnInit {
     this.logger.log("[McpServersDialog] - openEditServerDialog for:", server);
     // Use action selection if server is selected, else use stored selectedTools from integration
     const selectedServer = this.selectedServers.find(s => s.name === server.name);
-    const initialSelectedTools = selectedServer?.tools?.length
-      ? selectedServer.tools
-      : (Array.isArray(server.selectedTools) ? server.selectedTools : []);
+    const actionTools = this.normalizeToolNames(selectedServer?.tools);
+    const integrationTools = this.normalizeToolNames(server.selectedTools);
+    const initialSelectedToolNames = actionTools.length ? actionTools : integrationTools;
     const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
       panelClass: 'custom-mcp-edit-dialog-container',
       data: {
         server: server,
         allServers: this.data.mcpServers,
-        selectedTools: initialSelectedTools
+        selectedTools: initialSelectedToolNames.map(name => ({ name }))
       }
     });
 
@@ -251,7 +259,7 @@ export class McpServersDialogComponent implements OnInit {
       this.logger.log("[McpServerEditDialog] result:", result);
       if (result !== false && result) {
         const updatedServer = result?.server ? result.server : result;
-        const selectedTools: Array<{ name: string }> | undefined = result?.selectedTools;
+        const selectedTools: string[] = Array.isArray(result?.selectedTools) ? result.selectedTools : [];
         // Update the server in the list (tools + selectedTools so they are shown and persisted)
         const index = this.data.mcpServers.findIndex(s => s.name === server.name);
         if (index > -1) {
@@ -259,10 +267,6 @@ export class McpServersDialogComponent implements OnInit {
           // Update in selectedServers if it was selected
           const selectedIndex = this.selectedServers.findIndex(s => s.name === server.name);
           if (selectedIndex > -1) {
-            const unique = new Map<string, { name: string }>();
-            (selectedTools || this.selectedServers[selectedIndex].tools || []).forEach(t => {
-              if (t?.name) unique.set(t.name, { name: t.name });
-            });
             this.selectedServers[selectedIndex] = {
               id: updatedServer.id,
               name: updatedServer.name,
@@ -270,7 +274,7 @@ export class McpServersDialogComponent implements OnInit {
               transport: updatedServer.transport,
               native: updatedServer.native,
               customHeaders: updatedServer.customHeaders,
-              tools: Array.from(unique.values())
+              tools: [...new Set(selectedTools)]
             };
           }
           this.logger.log("[McpServersDialog] Server updated:", updatedServer);
@@ -283,6 +287,17 @@ export class McpServersDialogComponent implements OnInit {
         }
       }
     });
+  }
+
+  private normalizeToolNames(tools: unknown): string[] {
+    if (!Array.isArray(tools)) {
+      return [];
+    }
+    return [...new Set(
+      tools
+        .map(t => (typeof t === 'string' ? t : (t as { name?: string })?.name))
+        .filter((name): name is string => !!name)
+    )];
   }
 
 }
