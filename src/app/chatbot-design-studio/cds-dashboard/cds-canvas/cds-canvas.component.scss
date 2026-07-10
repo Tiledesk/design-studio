@@ -193,11 +193,114 @@ $toogle-sidebar-width: 22px;
   cursor: pointer;
   font-size: 18px;
   display: block;
+}
 
-  &:hover {
-    background: #f5f8fa;
-    color: var(--blu);
-  }
+.toggle-setting-sidebar-icon:hover {
+  background: #f5f8fa;
+  color: var(--blu);
+}
+
+
+
+  .box-left {
+    width: $box-left-width;
+    max-width: $box-left-width;
+    min-width: $box-left-width;
+    background-color: var(--blu-light-01);
+    border-right: 1px solid var(--gray-light-02);
+    z-index: 10;
+    position: relative;
+    // Altezza vincolata al canvas (come .box-right): riempie l'area disponibile senza sforare.
+    height: 100vh;
+    max-height: 100%;
+    // Layout a colonna: i tab occupano l'altezza necessaria, il pannello riempie
+    // lo spazio restante e scrolla internamente (niente altezze fisse -> ultimo elemento sempre visibile).
+    display: flex;
+    flex-direction: column;
+    // NB: niente overflow:hidden qui, altrimenti taglia il toggle handle che sporge a destra
+    // (right: -11px). Il contenimento verticale è già gestito dal pannello (overflow-y:auto + min-height:0).
+
+    // Tab Blocks / Subagents (header condiviso dello slot sinistro)
+    .cds-left-panel-tabs {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 4px;
+      padding: 10px 12px 4px;
+    }
+    .cds-left-panel-tab {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      padding: 6px 8px;
+      font-family: var(--font-family-poppins);
+      font-size: 13px;
+      font-weight: 600;
+      color: #7d8a97;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color .2s, color .2s;
+      &:hover { background: #eef2f6; }
+      &.active { background: #fff; color: var(--blu); }
+    }
+    .panel-subagents {
+      position: relative;
+      display: block;
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      overflow-y: auto;
+      margin: 0;
+      padding: 0 2px 10px 2px;
+
+      &::-webkit-scrollbar { width: 6px; height: 6px; }
+      &::-webkit-scrollbar-track { background: transparent; }
+      &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
+      &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
+      &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+      &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
+    }
+    .panel-intent-list {
+      position: relative;
+      display: inline-flex;
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      border-radius: 0em;
+      overflow: hidden;
+      margin: 0px;
+      padding: 0px 2px 10px 2px;
+      align-items: flex-start;
+      overflow-y: auto;
+
+      
+
+      // Scrollbar minimalista: nessuno sfondo (track trasparente), thumb sottile
+      // visibile solo su hover (e la scrollbar compare solo quando serve grazie a overflow:auto).
+      &::-webkit-scrollbar { width: 6px; height: 6px; }
+      &::-webkit-scrollbar-track { background: transparent; }
+      &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
+      &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
+      &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+      &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
+    }
+
+    &.is_closed{
+      width: $box-left-width-closed;
+      max-width: $box-left-width-closed;
+      min-width: $box-left-width-closed;
+    }
+
+
+    &:hover{
+      .cds-toggle-setting-sidebar-icon-left-wpr{
+        display: block;
+      }
+    }
 }
 
 // ============================================================

@@ -34,6 +34,7 @@ export enum TYPE_ACTION {
     OPEN_HOURS          = 'ifopenhours',
     HIDE_MESSAGE        = 'hmessage',
     JSON_CONDITION      = 'jsoncondition',
+    JSON_CONDITION2     = 'jsoncondition2',
     CONDITION           = 'condition',
     CAPTURE_USER_REPLY  = 'capture_user_reply',
     ITERATION           = 'iteration',
@@ -52,6 +53,8 @@ export enum TYPE_ACTION {
     AI_PROMPT           = 'ai_prompt',
     AI_CONDITION        = 'ai_condition',
     WEB_RESPONSE        = 'web_response',
+    INVOKE_SUB_AGENT    = 'invoke_subagent',
+    RETURN              = 'return',
     DATA_TABLE          = 'data_table'
 }
 
@@ -98,6 +101,18 @@ export enum TYPE_CHATBOT {
     COPILOT       = 'copilot',
 }
 
+/**
+ * Nel Design Studio i subagent (subtype 'subagent') vanno gestiti come chatbot standard:
+ * normalizza il subtype a CHATBOT quando è 'subagent' (o assente), altrimenti lo lascia invariato.
+ * Abilita così per i subagent tutte le feature/azioni/variabili del subtype 'chatbot'.
+ */
+export function resolveChatbotSubtype(subtype: string | undefined | null): TYPE_CHATBOT {
+  if (!subtype || subtype === 'subagent') {
+    return TYPE_CHATBOT.CHATBOT;
+  }
+  return subtype as TYPE_CHATBOT;
+}
+
 
 export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY),    name: 'CDSActionCategory.MostUsed',     src: 'assets/images/actions_category/most_used.svg'},
@@ -142,6 +157,7 @@ export const ACTIONS_LIST: {
     MOVE_TO_UNASSIGNED:     { name: 'CDSActionList.NAME.MoveToUnassigned',      chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.MOVE_TO_UNASSIGNED,   src: "assets/images/actions/move_to_unassigned.svg",    status: "active",                       doc: "CDSActionList.DOC.MoveToUnassigned"                               },
     CONDITION:              { name: 'CDSActionList.NAME.Condition',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.Condition"                                      },
     JSON_CONDITION:         { name: 'CDSActionList.NAME.ConditionElse',         chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION,       src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.ConditionElse"                                  },
+    JSON_CONDITION2:        { name: 'CDSActionList.NAME.ConditionElseV2',       chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION2,      src: "assets/images/actions/condition.svg",             status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.ConditionElseV2"                                },
     INTENT :                { name: 'CDSActionList.NAME.ConnectBlock',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.INTENT,               src:"assets/images/actions/connect_intent.svg",         status: "inactive",                     doc: ""                                                                 },
     CONNECT_BLOCK :         { name: 'CDSActionList.NAME.ConnectBlock',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONNECT_BLOCK,        src:"assets/images/actions/connect_intent.svg",         status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
     ASSIGN_VARIABLE:        { name: 'CDSActionList.NAME.SetAttribute',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.ASSIGN_VARIABLE,      src: "assets/images/actions/assign_var.svg",            status: "inactive",                     doc: "CDSActionList.DOC.SetAttribute"                                   },
@@ -171,7 +187,9 @@ export const ACTIONS_LIST: {
     CHANGE_DEPARTMENT:      { name: 'CDSActionList.NAME.ChangeDept',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CHANGE_DEPARTMENT,    src: "assets/images/actions/change_department.svg",     status: "active",                       doc: "CDSActionList.DOC.ChangeDept",                                    },
     CODE :                  { name: 'CDSActionList.NAME.Code',                  chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.CODE,                 src: "assets/images/actions/code.svg",                  status: "active", plan: PLAN_NAME.G,    doc: "CDSActionList.DOC.Code",                      disabled: false     },
     ADD_TAG:                { name: 'CDSActionList.NAME.AddTag',                chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.ADD_TAG,              src: "assets/images/actions/add_tag.svg",               status: "active",                       doc: "CDSActionList.DOC.AddTag",                                        },
-    FLOW_LOG:               { name: 'CDSActionList.NAME.FlowLog',               chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.FLOW_LOG,             src: "assets/images/actions/flow_log.svg",              status: "active",        badge: '',     doc: "",                                                                },
+    FLOW_LOG:               { name: 'CDSActionList.NAME.FlowLog',               chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.FLOW_LOG,             src: "assets/images/actions/flow_log.svg",              status: "active",   badge: '',          doc: "",                                                                },
+    SUB_AGENT:              { name: 'CDSActionList.NAME.SubAgent',              chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT],                                                   category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.INVOKE_SUB_AGENT,     src: "assets/images/actions/replace_bot.svg",           status: "active",                       doc: "CDSActionList.DOC.SubAgent",                                      },
+    RETURN_ACTION:          { name: 'CDSActionList.NAME.Return',                chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT],                                                   category: TYPE_ACTION_CATEGORY.SPECIAL,             type: TYPE_ACTION.RETURN,               src: "assets/images/actions/web_response.svg",          status: "active",                       doc: "CDSActionList.DOC.Return",                                        },
     // ASSIGN_FUNCTION: { name: 'CDSActionList.NAME.SetFunction', category: TYPE_ACTION_CATEGORY.NEW, type: TYPE_ACTION.ASSIGN_FUNCTION, src: "assets/images/actions/assign_var.svg" },
     CAPTURE_USER_REPLY:     { name: 'CDSActionList.NAME.CaptureUserReply',      chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CAPTURE_USER_REPLY,   src: "assets/images/actions/capture_user_reply.svg",    status: "active",                       doc: "CDSActionList.DOC.CaptureUserReply"                               },
     ITERATION:              { name: 'CDSActionList.NAME.Iteration',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.ITERATION,            src: "assets/images/actions/repeat.svg",                status: "active",                       doc: ""                                                                 },

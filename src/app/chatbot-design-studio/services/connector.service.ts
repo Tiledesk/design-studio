@@ -576,8 +576,8 @@ export class ConnectorService {
           }
         }
 
-        /**  JSON-CONDITION */
-        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION){
+        /**  JSON-CONDITION (legacy) + JSON-CONDITION2 (V2): stessi connettori true/false */
+        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION || action._tdActionType === TYPE_ACTION.JSON_CONDITION2){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo =  action.trueIntent.replace("#", "");
@@ -600,6 +600,32 @@ export class ConnectorService {
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
+        /**  SUB-AGENT (INVOKE_SUB_AGENT) — connettori Success/Else, stessa logica di JSON_CONDITION */
+        if(action._tdActionType === TYPE_ACTION.INVOKE_SUB_AGENT){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorTo', idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
         }

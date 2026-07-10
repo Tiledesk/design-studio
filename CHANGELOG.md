@@ -8,6 +8,52 @@
 *Tiledesk SRL*
 
 
+# 1.40.8-rc1
+- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
+- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
+- **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
+- **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
+- **added**: multi-line tooltip for the "Attribute name" syntax help
+- **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
+
+
+# 1.40.7
+- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
+
+# 1.40.6
+- **bug fix**: change env
+
+# 1.40.3-rc15
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+
+# 1.40.3-rc14
+- **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
+- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+
+# 1.40.3-rc13 
+- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
+- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
+- **changed**: the Sub Agent action is not available inside a subagent
+- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
+- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
+- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
+- **changed**: Sub Agent detail panel now fills the panel height like the other actions
+- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
+- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
+
+# 1.40.3-rc12
+- **added**: ability to select a department after agent Handoff
+
+# 1.40.3-rc11
+- **bug fix**: restore customHeaders
+
+# 1.40.3-rc10
+- **added**: added server mcp native tiledesk
+
 # 1.40.3-rc9
 - **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
 

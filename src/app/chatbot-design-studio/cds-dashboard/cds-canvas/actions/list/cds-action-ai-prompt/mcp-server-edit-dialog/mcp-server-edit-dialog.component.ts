@@ -521,11 +521,15 @@ export class McpServerEditDialogComponent implements OnInit {
     this.isToolsModalOpen = false;
 
     try {
-      // Server nativo: Connect via nativeId (GET {proj}/mcp/native/{id}/connect). Custom: discovery via url.
+      // Server nativo: Connect via nativeId (POST {proj}/mcp/native/{id}/connect). Custom: discovery via url
+      // inoltrando customHeaders + oauth (necessari al backend per autenticarsi verso il server MCP).
       const res = await firstValueFrom(
         this.isNative
           ? this.projectService.getNativeMcpServerTools(this.project_id, this.editedServer.id)
-          : this.projectService.getMcpTools(this.project_id, this.editedServer.url)
+          : this.projectService.getMcpTools(this.project_id, this.editedServer.url, {
+              customHeaders: this.buildEnabledHeadersPayload(),
+              oauth: this.buildOAuthPayload()
+            })
       );
       const rawTools = Array.isArray(res) ? res : (Array.isArray(res?.tools) ? res.tools : []);
 

@@ -227,12 +227,19 @@
                             [action]="action">
                         </cds-action-close>
     
-                        <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION" 
-                            class="panel-response"
-                            [intentSelected]="intent" 
-                            [action]="action" 
-                            (updateAndSaveAction)="onActionUpdate($event)">
-                        </cds-action-json-condition>
+                    <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-json-condition>
+
+                    <cds-action-json-condition2 *ngSwitchCase="TYPE_ACTION.JSON_CONDITION2"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-json-condition2>
     
                         <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT" 
                             class="panel-response"
@@ -369,19 +376,19 @@
                             (updateAndSaveAction)="onActionUpdate($event)">
                         </cds-action-qapla>
 
-                    <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
-                        class="panel-response"
-                        [intentSelected]="intent"
-                        [action]="action"
-                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-data-table>
+                        <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-data-table>
 
-                    <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
-                        class="panel-response"
-                        [intentSelected]="intent"
-                        [action]="action"
-                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-make>
+                        <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-make>
 
                         <cds-action-hubspot *ngSwitchCase="TYPE_ACTION.HUBSPOT"    
                             class="panel-response"
@@ -490,6 +497,20 @@
                             [action]="action"
                             (updateAndSaveAction)="onActionUpdate($event)">
                         </cds-action-record>
+
+                        <cds-action-sub-agent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-sub-agent>
+
+                        <cds-action-return *ngSwitchCase="TYPE_ACTION.RETURN"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-return>
 
                         <cds-action-flow-log *ngSwitchCase="TYPE_ACTION.FLOW_LOG"
                             class="panel-response"

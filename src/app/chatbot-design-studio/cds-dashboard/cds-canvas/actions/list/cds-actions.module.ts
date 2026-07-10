@@ -37,6 +37,9 @@ import { CdsActionIntentComponent } from './cds-action-intent/cds-action-intent.
 import { BaseConditionRowComponent } from './cds-action-json-condition/base-condition-row/base-condition-row.component';
 import { BaseFilterComponent } from './cds-action-json-condition/base-filter/base-filter.component';
 import { CdsActionJsonConditionComponent } from './cds-action-json-condition/cds-action-json-condition.component';
+import { BaseConditionRow2Component } from './cds-action-json-condition2/base-condition-row2/base-condition-row2.component';
+import { BaseFilter2Component } from './cds-action-json-condition2/base-filter2/base-filter2.component';
+import { CdsActionJsonCondition2Component } from './cds-action-json-condition2/cds-action-json-condition2.component';
 import { CdsActionMakeComponent } from './cds-action-make/cds-action-make.component';
 import { CdsActionOnlineAgentsComponent } from './cds-action-online-agents/cds-action-online-agents.component';
 import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-open-hours.component';
@@ -91,6 +94,8 @@ import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-act
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
+import { CdsActionSubAgentComponent } from './cds-action-sub-agent/cds-action-sub-agent.component';
+import { CdsActionReturnComponent } from './cds-action-return/cds-action-return.component';
 import { CdsActionAiConditionComponent } from './cds-action-ai-condition/cds-action-ai-condition.component';
 import { AttributesDialogAiConditionComponent } from './cds-action-ai-condition/attributes-dialog/attributes-dialog.component';
 import { AiConditionComponent } from './cds-action-ai-condition/ai-condition/ai-condition.component';
@@ -119,6 +124,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionCloseComponent,
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
+    CdsActionJsonCondition2Component,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
@@ -175,6 +181,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     BaseFilterComponent,
     // VariableListComponent,
     // action JSON-CONDITION elements: end //
+    // action JSON-CONDITION2 (V2) elements: start //
+    BaseFilter2Component,
+    // action JSON-CONDITION2 (V2) elements: end //
     // action ASKGPT elements: start //
     AddkbDialogComponent,
     // action ASKGPT elements: end //
@@ -202,7 +211,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,
     CdsActionAddKbContentComponent,
-    CdsActionFlowLogComponent
+    CdsActionFlowLogComponent,
+    CdsActionSubAgentComponent,
+    CdsActionReturnComponent
     
   ],
   imports: [
@@ -235,6 +246,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionCloseComponent,
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
+    CdsActionJsonCondition2Component,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
@@ -288,6 +300,10 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     BaseFilterComponent,
     // VariableListComponent,
     // action JSON-CONDITION elements: end //
+    // action JSON-CONDITION2 (V2) elements: start //
+    BaseConditionRow2Component,
+    BaseFilter2Component,
+    // action JSON-CONDITION2 (V2) elements: end //
     // action ASKGPT elements: start //
     AddkbDialogComponent,
     // action ASKGPT elements: end //
@@ -313,7 +329,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionAddKbContentComponent,
-    CdsActionFlowLogComponent
+    CdsActionFlowLogComponent,
+    CdsActionSubAgentComponent,
+    CdsActionReturnComponent
   ]
 })
 export class CdsActionsModule { }
