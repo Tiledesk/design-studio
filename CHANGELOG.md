@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.8-rc2
+- **added**: native Tiledesk MCP servers (catalog `/mcp/native`) + OAuth 2.0 config for MCP servers in the AI Prompt action
+- **changed**: MCP tools handled as `string[]` with name normalization (legacy `{ name }[]` still supported)
+- **changed**: hidden the legacy **Condition** and **Condition w/ else** actions from the menu (`status: 'inactive'`) — not addable to new flows, existing agents keep working
 
 # 1.40.8-rc1
 - **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
