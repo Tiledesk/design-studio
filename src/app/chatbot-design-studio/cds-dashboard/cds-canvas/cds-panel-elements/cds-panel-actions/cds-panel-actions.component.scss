@@ -247,6 +247,21 @@ $base-padding: 6px;
     .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; }
 }
 
+// Multi-service connectors render one cds-action-drag-list per subgroup, each with its own
+// internal .action-list scroll region — so the combined flyout had no single scrollbar and could
+// grow past the viewport. Cap and scroll the whole group here instead (matches the flat-list
+// .action-list budget: min(70vh, 560px)), and let per-subgroup lists grow naturally inside it.
+.connector-subgroups-scroll {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  ::ng-deep .action-list {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
 .connector-subgroup + .connector-subgroup { border-top: 1px solid var(--gray-02, #eceef1); }
 
 .connector-subgroup-header {
