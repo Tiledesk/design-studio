@@ -9,7 +9,7 @@
 
 
 
-# this branch
+# 1.40.8-rc3
 - **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
 - **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
 - **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header
