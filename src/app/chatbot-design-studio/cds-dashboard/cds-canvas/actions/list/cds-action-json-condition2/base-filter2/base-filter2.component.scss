@@ -1,0 +1,223 @@
+:host{
+    --icon-color: #{var(--blu)};
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-04)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
+
+    --content-background: rgb(244, 246, 251, 0.4);
+    --border-radius-base: 8px
+
+}
+.base-filter{
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}
+.content{
+    background-color: var(--content-background);
+    border: 1px solid var(--gray-light-02);
+    padding: 20px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        
+        opacity: 0;
+
+        height: 28px;
+        width: 28px;
+
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: white;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+
+        span.material-icons,
+        span.material-icons-outlined{
+            font-size: 20px;
+            color: var(--backGroundColor);
+        }
+
+        &:hover{
+            background-color: var(--textColor);
+            span.material-icons,
+            span.material-icons-outlined{
+                color: var(--backGroundColor);
+            }
+        }
+    }
+}
+
+.basic-filter-wrp{
+    // background: #fff;
+    // margin: 0 30px;
+    // padding: 20px 0px 0px;
+    grid-row-gap: 15px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+
+    .add-filter-button{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        
+        user-select: none;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px dashed var(--blu-light-02);
+        border-radius: var(--button-border-radius-base);
+        color: var(--blu-light-02);
+        cursor: pointer;
+        font-size: 0.7em;
+        font-weight: 400;
+        line-height: var(--button-height-base);
+        // margin: 0px 5px 0;
+        order: 1;
+        padding: 0 10px;
+        transition: all .3s;
+        min-width: 100px;
+        text-align: center;
+        width: fit-content;
+
+        
+        &:hover{
+            border-color: var(--textColor);
+            color: var(--textColor);
+        }
+    }
+    
+}
+
+
+::ng-deep .base-filter--add-filter-panel {
+    // position: relative;
+    box-shadow: 0 0 20px 4px #9aa1b126, 0 4px 80px -8px #24282f40, 0 4px 4px -2px #5b5e6926;
+    background: rgb(255,255,255);
+    border-radius: 4px;
+    margin: auto;
+    width: 500px;
+    max-height: 80%;
+    min-height: 385px;
+    overflow: auto;
+    max-width: 500px;
+    display: inline-block;
+    top: 50%!important;
+    margin-top: -20%;
+    .category-row-name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden !important;
+    }
+}
+
+.filter-operator {
+    min-width: 100px;
+    width: fit-content;
+    margin: 10px auto;
+}
+
+::ng-deep .filter-operator {
+    .select-bot-box {
+        width: max-content;
+        min-width: 70px;
+        text-align: center;
+        margin: 10px auto;
+    }
+}
+
+.filter-condition{
+    -webkit-box-align: center;
+    align-items: center;
+    display: flex;
+    position: relative;
+    border-radius: var(--border-radius-base);
+    padding: 4px 15px;
+    transition: background-color 0.3s ease 0s, border 0.3s ease 0s, opacity 0.3s ease 0s;
+    cursor: pointer;
+    background: var(--backGroundColor);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--backGroundColor);
+    border-image: initial;
+    &:hover{
+        background: var(--hoverBackgroundColor);
+        border-color: var(--textColor);
+        div.remove{
+            opacity: 1;
+        }
+    }
+
+    div.remove {
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        transition: opacity 0.3s ease 0s;
+        opacity: 0;
+        height: 28px;
+        width: 28px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background:white;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+        span.material-icons {
+            font-size: 20px;
+            color: var(--textColor);
+        }
+        &:hover {
+            background-color: var(--hoverBackgroundColor);
+        }
+    }
+
+    div.filter-icon {
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        color: var(--textColor);
+        display: flex;
+        font-size: 15px;
+        justify-content: center;
+        margin-right: 10px;
+        width: 15px;
+        transition: color 0.3s ease 0s;
+    }
+}
+
+.ellips{
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s ease 0s;
+    overflow: hidden !important;
+}

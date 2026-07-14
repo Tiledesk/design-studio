@@ -59,8 +59,8 @@
                 <span class="field-hint">{{'CDSCanvas.OnlySupported' | translate}}</span>
             </div>
 
-            <!-- Authentication accordion (Custom Headers). OAuth 2.0 is intentionally not present here. -->
-            <div class="form-field">
+            <!-- Authentication accordion (nascosto per i server nativi: url nascosto, Connect via nativeId) -->
+            <div class="form-field" *ngIf="!isNative">
                 <mat-accordion class="auth-accordion">
                     <mat-expansion-panel [expanded]="isAuthenticationOpen" (opened)="isAuthenticationOpen = true" (closed)="isAuthenticationOpen = false">
                         <mat-expansion-panel-header class="auth-header">

@@ -47,7 +47,11 @@ export class ProjectService {
    *
    * API:
    * POST /api/{id_project}/mcp/tools
-   * Body: { url: "<server_url>" }
+   * Body: { url: "<server_url>", customHeaders?: [{key,value}] }
+   *
+   * The optional `customHeaders` are forwarded so the backend can authenticate
+   * against the MCP server during discovery exactly as it does at runtime. They mirror the
+   * shape persisted on the server object; only enabled/non-empty values should be passed in.
    *
    * NOTE: we build the URL following the same pattern used by other project-scoped endpoints:
    * SERVER_BASE_URL + project_id + '/mcp/tools'

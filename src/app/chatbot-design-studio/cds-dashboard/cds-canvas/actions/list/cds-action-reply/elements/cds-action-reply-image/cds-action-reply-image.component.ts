@@ -7,6 +7,7 @@ import { IntentService } from '../../../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-image',
@@ -14,6 +15,9 @@ import { Subscription } from 'rxjs/internal/Subscription';
   styleUrls: ['./cds-action-reply-image.component.scss']
 })
 export class CdsActionReplyImageComponent implements OnInit {
+
+  /** true se il filtro esistente è legacy (pre-V2): il template usa il vecchio editor appdashboard-filter */
+  isLegacyFilter = isLegacyFilter;
   
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() changeActionReply = new EventEmitter();
