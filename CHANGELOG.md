@@ -7,6 +7,17 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# this branch
+- **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
+- **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
+- **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header
+- **changed**: MCP tool selection is saved ONLY on the action (`action.servers[]`) and never modifies the MCP integration; adding a server pre-selects no tools
+- **changed**: persisted `action.servers[]` normalized — `native` always present, `id` only for native servers, `tools` as an array of names
+- **bug fix**: custom headers are now forwarded to the `/mcp/tools` discovery call, so the backend can authenticate during the tool scan
+- **bug fix**: reactivated the Custom Headers section in the Add/Edit MCP Server dialog (was hidden)
+
 # 1.40.6
 - **bug fix**: change env
 

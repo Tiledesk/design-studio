@@ -52,7 +52,11 @@ export class ProjectService {
    * NOTE: we build the URL following the same pattern used by other project-scoped endpoints:
    * SERVER_BASE_URL + project_id + '/mcp/tools'
    */
-  public getMcpTools(project_id: string, server_url: string): Observable<any> {
+  public getMcpTools(
+    project_id: string,
+    server_url: string,
+    options?: { customHeaders?: Array<{ key: string; value: string }> }
+  ): Observable<any> {
     const url = this.SERVER_BASE_URL + project_id + '/mcp/tools';
     this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - URL', url);
 
@@ -63,7 +67,11 @@ export class ProjectService {
       })
     };
 
-    const body = { url: server_url };
+    // Forward the enabled custom headers so the backend can authenticate to the MCP server during discovery.
+    const body: any = { url: server_url };
+    if (options?.customHeaders && options.customHeaders.length > 0) {
+      body.customHeaders = options.customHeaders;
+    }
     return this.http.post(url, body, httpOptions).pipe(map((res: any) => {
       this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - RES ', res);
       return res;

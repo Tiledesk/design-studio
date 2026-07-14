@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 
 //MODELS
@@ -15,7 +15,7 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogAiPromptComponent } from './attributes-dialog/attributes-dialog.component';
-import { McpServersDialogComponent } from './mcp-servers-dialog/mcp-servers-dialog.component';
+import { McpSelectedServer } from 'src/app/models/mcp.model';
 import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
@@ -35,7 +35,7 @@ import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
   templateUrl: './cds-action-ai-prompt.component.html',
   styleUrls: ['./cds-action-ai-prompt.component.scss']
 })
-export class CdsActionAiPromptComponent implements OnInit, OnChanges {
+export class CdsActionAiPromptComponent implements OnInit {
   private readonly DEFAULT_MAX_TOKENS = 10000;
   
   @ViewChild('scrollMe', { static: false }) scrollContainer: ElementRef;
@@ -103,9 +103,6 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   browserLang: string = 'it';
 
-  mcpServers: Array<{ name: string, url: string, transport: string, tools?: string[], selectedTools?: string[] }> = [];
-  selectedMcpServers: Array<{ name: string, url: string, transport: string, tools?: string[] }> = [];
-
   constructor(
     private readonly dialog: MatDialog,
     private readonly openaiService: OpenaiService,
@@ -146,12 +143,7 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     if (!this.action.preview) {
       this.action.preview = [];
     }
-    // Initialize selected MCP servers from action
-    if (this.action['servers']) {
-      this.selectedMcpServers = this.action['servers'];
-    }
     await this.initialize();
-    this.syncSelectedMcpServersWithIntegration();
     
     // Fine dell'inizializzazione - reset di tutti i flag
     this.isInitializing = {
@@ -161,21 +153,6 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     };
   }
 
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // Aggiorna selectedMcpServers quando cambia l'action (selezione di un blocco diverso)
-    if (changes['action'] && changes['action'].currentValue) {
-      const currentAction = changes['action'].currentValue as ActionAiPrompt;
-      if (currentAction['servers']) {
-        this.selectedMcpServers = currentAction['servers'];
-        this.syncSelectedMcpServersWithIntegration();
-        this.logger.log("[ACTION AI_PROMPT] ngOnChanges - Updated selectedMcpServers from action: ", this.selectedMcpServers);
-      } else {
-        this.selectedMcpServers = [];
-        this.logger.log("[ACTION AI_PROMPT] ngOnChanges - Reset selectedMcpServers (no servers in action)");
-      }
-    }
-  }
 
   ngOnDestroy() {
     if (this.subscriptionChangedConnector) {
@@ -207,16 +184,6 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
 
 
 
-  async getIntegrations(){
-    const projectID = this.dashboardService.projectID;
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrations(projectID));
-        this.logger.log('[ACTION AI_PROMPT] - integrations response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrations ERROR:', error);
-    }
-  }
 
   async initLLMModels(){
     const result = await initLLMModels({
@@ -226,17 +193,6 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
       logger: this.logger,
       componentName: 'ACTION AI_PROMPT'
     });
-
-    const INTEGRATIONS = await this.getIntegrations();
-    this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
-    if(INTEGRATIONS){
-      INTEGRATIONS.forEach((el: any) => {
-        this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
-        if(el.name && el.name === 'mcp'){
-          this.mcpServers = el.value.servers;
-        }
-      });
-    }
 
     this.llm_models_flat = result;
   }
@@ -685,58 +641,11 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     });
   }
 
-  openMcpServersDialog() {
-    this.syncSelectedMcpServersWithIntegration();
-    this.logger.log("[ACTION AI_PROMPT] mcpServers: ", this.mcpServers);
-    this.logger.log("[ACTION AI_PROMPT] selectedMcpServers: ", this.selectedMcpServers);
-    
-    const dialogRef = this.dialog.open(McpServersDialogComponent, {
-      panelClass: 'custom-mcp-dialog-container',
-      data: { 
-        mcpServers: this.mcpServers,
-        selectedServers: this.selectedMcpServers,
-        onUpdate: (updateData: any) => {
-          this.handleMcpServersUpdate(updateData);
-        }
-      }
-    });
-    // No need to handle afterClosed since updates are real-time via callback
-    dialogRef.afterClosed().subscribe(() => {
-      this.logger.log("[ACTION AI_PROMPT] McpServersDialogComponent closed");
-    });
-  }
-
-  handleMcpServersUpdate(updateData: any): void {
-    this.logger.log("[ACTION AI_PROMPT] Real-time update from dialog:", updateData);
-    
-    // Update the list of selected servers
-    this.selectedMcpServers = updateData.selectedServers.length > 0 ? [...updateData.selectedServers] : [];
-    this.syncSelectedMcpServersWithIntegration();
-    
-    // Update the main server list with any modifications
-    if (updateData.allServers) {
-      this.mcpServers = [...updateData.allServers];
-    }
-    
-    // Save selected servers to action
-    this.action['servers'] = this.selectedMcpServers;
-    this.logger.log("[ACTION AI_PROMPT] Real-time updated selected MCP servers: ", this.selectedMcpServers);
-    this.logger.log("[ACTION AI_PROMPT] Real-time updated all MCP servers: ", this.mcpServers);
-    console.log("this.action['servers']", this.action['servers']);
+  /** Selection changed in the shared cds-mcp-tools component: persist to the action and save. */
+  onMcpServersChange(servers: McpSelectedServer[]): void {
+    this.action.servers = servers;
+    this.logger.log("[ACTION AI_PROMPT] MCP servers changed: ", servers);
     this.updateAndSaveAction.emit();
-  }
-
-  removeSelectedServer(server: { name: string, url: string, transport: string }, event: Event) {
-    event.stopPropagation();
-    const index = this.selectedMcpServers.findIndex(s => s.name === server.name);
-    if (index > -1) {
-      this.selectedMcpServers.splice(index, 1);
-      // Update action
-      this.action['servers'] = this.selectedMcpServers;
-      this.logger.log("[ACTION AI_PROMPT] Removed server, updated list: ", this.selectedMcpServers);
-      
-      this.updateAndSaveAction.emit();
-    }
   }
 
   saveAttributes(attributes) {
@@ -767,36 +676,5 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     return this.formatNumberPipe.transform(value);
   }
 
-  /** Normalizes tool names from string[] or legacy { name }[] to string[]. */
-  private normalizeMcpToolNames(tools: unknown): string[] {
-    if (!Array.isArray(tools)) {
-      return [];
-    }
-    return [...new Set(
-      tools
-        .map(t => (typeof t === 'string' ? t : (t as { name?: string })?.name))
-        .filter((name): name is string => !!name)
-    )];
-  }
-
-  /**
-   * action.servers stores selected tools in `tools`, while integration stores them in `selectedTools`.
-   * Normalize legacy formats and hydrate empty action tools from integration defaults.
-   */
-  private syncSelectedMcpServersWithIntegration(): void {
-    if (!this.selectedMcpServers?.length) {
-      return;
-    }
-    this.selectedMcpServers = this.selectedMcpServers.map(server => {
-      const integrationServer = this.mcpServers.find(s => s.name === server.name);
-      const actionTools = this.normalizeMcpToolNames(server.tools);
-      const integrationTools = this.normalizeMcpToolNames(integrationServer?.selectedTools);
-      return {
-        ...server,
-        tools: actionTools.length ? actionTools : integrationTools
-      };
-    });
-    this.action['servers'] = this.selectedMcpServers;
-  }
 
 }

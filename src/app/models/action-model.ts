@@ -3,6 +3,7 @@ import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_OPERATOR } from
 import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../chatbot-design-studio/utils-actions';
 import { TYPE_METHOD_REQUEST } from '../chatbot-design-studio/utils-request';
+import { McpSelectedServer } from './mcp.model';
 
 export class Action {
     _tdActionType: string;
@@ -508,6 +509,8 @@ export class ActionAiPrompt extends Action {
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
+    /** Selected MCP servers/tools for this action (managed by the shared cds-mcp-tools component). */
+    servers?: McpSelectedServer[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AI_PROMPT

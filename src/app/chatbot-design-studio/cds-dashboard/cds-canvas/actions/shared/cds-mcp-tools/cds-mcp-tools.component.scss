@@ -1,0 +1,115 @@
+// MCP TOOLS PREVIEW --- start **************** //
+.mcp-tools-preview-container {
+    padding: 8px 0px;
+    margin-top: 8px;
+}
+
+.mcp-tools-header {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray);
+    text-transform: uppercase;
+}
+
+.mcp-tools-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mcp-tool-tag {
+    background-color: #e8f4ff;
+    color: var(--blu-02);
+    padding: 0px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-family-poppins);
+    white-space: nowrap;
+    display: inline-block;
+}
+// MCP TOOLS PREVIEW --- end **************** //
+
+// MCP SERVERS SECTION --- start **************** //
+.mcp-servers-section {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+// Header row: label on the left, "Manage MCP tools" button on the right.
+.mcp-servers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    .title-label {
+        margin: 0;
+    }
+}
+
+// "Manage MCP tools" — classic button (cds-blue-button), compact for the header row.
+.mcp-manage-btn {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.mcp-servers-grid {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.mcp-server-button {
+    background-color: #ffffff;
+    border: 0px solid var(--blu-02);
+    border-radius: 4px;
+    padding: 0px 10px;
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    color: var(--blu-02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    position: relative;
+
+    &:hover {
+        background-color: #e8f4ff;
+        border-color: var(--blu);
+        color: var(--blu);
+    }
+
+    &.selected {
+        background-color: #e8f4ff;
+        border-color: var(--blu-02);
+        padding-right: 30px;
+        justify-content: flex-start;
+        cursor: default;
+        .remove-icon {
+            position: absolute;
+            right: 4px;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+            padding: 2px;
+            &:hover {
+                background-color: rgba(255, 0, 0, 0.1);
+                color: #ff0000;
+            }
+        }
+    }
+
+}
+// MCP SERVERS SECTION --- end **************** //
