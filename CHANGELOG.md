@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# 1.40.1-rc2 
+# 1.40.8-rc4 
 - **added**: added documentation image and guide link to the Data Table action tooltip
 - **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
 - **changed**: cds-config-*.json assets are now published under /environments/real_data
