@@ -1165,9 +1165,9 @@
             "DataTable": {
                 "TITLE": "Data Table",
                 "DESCRIPTION": "Read or modify the rows of a project data table: select the table, the operation, set filters and data.",
-                "IMAGE": "",
+                "IMAGE": "assets/images/doc/DATA_TABLE.png",
                 "VIDEO_URL": "",
-                "DOC_URL": ""
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/data-tables"
             },
             "DTMFForm": {
                 "TITLE": "",
