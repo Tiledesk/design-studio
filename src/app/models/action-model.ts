@@ -3,6 +3,7 @@ import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_OPERATOR } from
 import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../chatbot-design-studio/utils-actions';
 import { TYPE_METHOD_REQUEST } from '../chatbot-design-studio/utils-request';
+import { McpSelectedServer } from './mcp.model';
 
 export class Action {
     _tdActionType: string;
@@ -310,6 +311,24 @@ export class ActionCondition extends Action {
     }
 }
 
+/** JSON Condition V2 ('jsoncondition2'): azione distinta dalla legacy 'jsoncondition' per retrocompatibilità totale. */
+export class ActionJsonCondition2 extends Action {
+    trueIntent: string;
+    falseIntent: string;
+    stopOnConditionMet: boolean;
+    groups: Array<Expression | Operator>;
+    when?: string; // tutte le condizioni in un'unica stringa, derivata da `groups` (vedi utils-condition.ts)
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.JSON_CONDITION2;
+        this.groups = [];
+        this.stopOnConditionMet = true;
+        this.when = '';
+    }
+}
+
 export class ActionIntentConnected extends Action {
     intentName?: string;
     json_payload?: Object;
@@ -369,6 +388,7 @@ export class ActionSendWhatsapp extends Action {
 }
 
 export class ActionAgent extends Action{
+    depName?: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AGENT;
@@ -427,6 +447,8 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     llm: string;
     modelName: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignJsonSourcesTo: string;
@@ -506,9 +528,13 @@ export class ActionAiPrompt extends Action {
     llm: string;
     modelName: string;
     model: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
+    /** Selected MCP servers/tools for this action (managed by the shared cds-mcp-tools component). */
+    servers?: McpSelectedServer[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AI_PROMPT
@@ -522,6 +548,8 @@ export class ActionAiCondition extends Action {
     llm: string;
     modelName: string;
     model: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     max_tokens: number;
     temperature: number;
     labelModel: string;
@@ -747,9 +775,12 @@ export interface GalleryElement{
 export class Expression {
     type: string = 'expression';
     conditions: Array<Condition | Operator>
+    when?: string; // condizioni in un'unica stringa, derivata da `conditions` (vedi utils-condition.ts). Scritta SOLO dall'editor V2.
+    version?: number; // marker V2 dei filtri: scritto SOLO dall'editor V2 (appdashboard-filter2). I filtri legacy non hanno il campo.
     constructor(){
         // this.conditions = [ new Condition()]
         this.conditions = []
+        // NB: `when`/`version` NON vengono inizializzati: i filtri/azioni legacy devono restare senza questi campi.
     }
 }
 
@@ -941,6 +972,43 @@ export class ActionMoveToUnassigned extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
+    }
+}
+
+export class ActionReturn extends Action {
+    payload: string;
+    status: string | number;
+    bodyType: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN;
+        this.payload = JSON.stringify({});
+        this.bodyType = 'json';
+        this.status = '200';
+    }
+}
+
+export class ActionSubAgent extends Action {
+    subagent_id: string;
+    intentName: string;
+    mode: 'fire_and_continue' | 'wait_result';
+    input: { [key: string]: string };
+    awaitWebhookPublish: boolean;
+    assignRunIdTo: string;
+    assignSubRequestIdTo: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    timeoutMs: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.INVOKE_SUB_AGENT;
+        this.mode = 'fire_and_continue';
+        this.input = {};
+        this.awaitWebhookPublish = false;
+        this.assignResultTo = 'subagent_result';
     }
 }
 

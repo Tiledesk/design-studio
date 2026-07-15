@@ -1,12 +1,15 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from '../../../../../../cds-base-element/dialog/dialog.component';
+
+//SERVICES
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
-import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+//UTILS
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { variableList, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-variables';
-import { DialogComponent } from '../../../../../../cds-base-element/dialog/dialog.component';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 @Component({
   selector: 'variable-list',
@@ -14,41 +17,43 @@ import { DialogComponent } from '../../../../../../cds-base-element/dialog/dialo
   styleUrls: ['./variable-list.component.scss']
 })
 export class VariableListComponent implements OnInit {
+  
+  @Output() onSelected = new EventEmitter()
 
-  @Output() onSelected = new EventEmitter();
+  type_chatbot:TYPE_CHATBOT;
 
-  type_chatbot: TYPE_CHATBOT;
+  variableListUserDefined: { key: string, elements: Array<{name: string, chatbot_types: string, value: string}>} // = variableList.userDefined 
+  variableListGlobals: { key: string, elements: Array<{name: string, chatbot_types: string, value: string}>}
+  variableListSystemDefined: Array<{ key: string, elements: Array<{name: string, chatbot_types: string, value: string, description: string, src?: string}>}> //= variableList.systemDefined
 
-  variableListUserDefined: { key: string; elements: Array<{ name: string; chatbot_types: string; value: string }> };
-  variableListGlobals: { key: string; elements: Array<{ name: string; chatbot_types: string; value: string }> };
-  variableListSystemDefined: Array<{ key: string; elements: Array<{ name: string; chatbot_types: string; value: string; description: string; src?: string }> }>;
-
-  filteredVariableList: Array<{ key: string; elements: Array<{ name: string; value: string }> }>;
-  filteredGlobalsList: Array<{ key: string; elements: Array<{ name: string; value: string }> }>;
-  filteredIntentVariableList: Array<{ key: string; elements: Array<{ name: string; value: string; description: string; src?: string }> }>;
+  filteredVariableList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
+  filteredGlobalsList: Array<{ key: string, elements: Array<{name: string, value: string}>}> //= []
+  filteredIntentVariableList: Array<{ key: string, elements: Array<{name: string, value: string, description: string, src?: string}>}>
   textVariable: string = '';
   idBot: string;
-  isEmpty: boolean = false;
-  isSearching: boolean = false;
-  BRAND_BASE_INFO = BRAND_BASE_INFO;
+
+  isEmpty: boolean = false
+  isSearching: boolean = false
+
+  BRAND_BASE_INFO = BRAND_BASE_INFO
 
   private logger: LoggerService = LoggerInstance.getInstance();
-
   constructor(
     public dialog: MatDialog,
     private faqkbService: FaqKbService,
     private dashboardService: DashboardService
   ) { }
 
-  /** Carica liste variabili (user-defined, globals, system) e filtri iniziali. */
   ngOnInit(): void {
     this.initialize();
   }
 
-  ngOnChanges(): void { }
+  ngOnChanges(){
+    //this.initialize();
+  }
 
-  /** Inizializza liste variabili filtrate per subtype chatbot e costruisce le liste per la vista. */
-  private initialize(): void {
+  private initialize() {
+    // Ensure subtype is a valid TYPE_CHATBOT value, otherwise fallback to TYPE_CHATBOT.CHATBOT
     if (
       this.dashboardService.selectedChatbot &&
       Object.values(TYPE_CHATBOT).includes(this.dashboardService.selectedChatbot.subtype as TYPE_CHATBOT)
@@ -57,6 +62,9 @@ export class VariableListComponent implements OnInit {
     } else {
       this.type_chatbot = TYPE_CHATBOT.CHATBOT;
     }
+    
+
+
     this.idBot = this.dashboardService.id_faq_kb;
     this.variableListUserDefined = variableList.find(el => el.key === 'userDefined');
     // Sort userDefined elements alphabetically by name
@@ -68,6 +76,7 @@ export class VariableListComponent implements OnInit {
       });
     }
     this.logger.log('[VARIABLE-LIST] initialize--> 1', this.type_chatbot, variableList);
+
     this.variableListGlobals = variableList.find(el => el.key === 'globals');
     // Sort globals elements alphabetically by name
     if (this.variableListGlobals && this.variableListGlobals.elements) {
@@ -79,8 +88,8 @@ export class VariableListComponent implements OnInit {
     }
 
     this.variableListSystemDefined = variableList
-      .filter(el => (el.key !== 'userDefined' && el.key !== 'globals'))
-      .map(el => ({
+    .filter(el => (el.key !== 'userDefined' && el.key !== 'globals'))
+    .map(el => ({
       ...el,
       elements: el.elements
         .filter(elem => elem.chatbot_types?.includes(this.type_chatbot))
@@ -91,14 +100,16 @@ export class VariableListComponent implements OnInit {
         })
     }));
 
-    this.filteredVariableList = [];
-    this.filteredGlobalsList = [];
+    // this.logger.log('[VARIABLE-LIST] initialize--> 2', this.variableListSystemDefined);
+
+    this.filteredVariableList = []
+    this.filteredGlobalsList = []
     this.filteredIntentVariableList = [];
-    if (this.variableListUserDefined) {
-      this.filteredVariableList.push({ key: this.variableListUserDefined.key, elements: this.sortElementsByName(this.variableListUserDefined.elements || []) });
+    if(this.variableListUserDefined){
+      this.filteredVariableList.push(this.variableListUserDefined)
     }
-    if (this.variableListGlobals) {
-      this.filteredGlobalsList.push({ key: this.variableListGlobals.key, elements: this.sortElementsByName(this.variableListGlobals.elements || []) });
+    if(this.variableListGlobals){
+      this.filteredGlobalsList.push(this.variableListGlobals)
     }
     variableList.filter(el => (el.key !== 'userDefined' && el.key !== 'globals')).map(el => {
       // Sort elements alphabetically before adding to filteredIntentVariableList
@@ -116,16 +127,16 @@ export class VariableListComponent implements OnInit {
     // }
   }
 
-  /** Apre dialog per aggiungere attributo custom; al salvataggio aggiunge alla lista e persiste. */
-  openDialog(): void {
-    const that = this;
+  openDialog() {
+    var that = this;
     const dialogRef = this.dialog.open(DialogComponent, {
       panelClass: 'custom-dialog-container',
       data: {text: ''}
     });
     dialogRef.afterClosed().subscribe(result => {
-      if (result && result !== undefined && result !== false) {
-        const variable = { name: result, chatbot_types: this.type_chatbot, value: result };
+      // this.logger.log(`Dialog result: ${result}`);
+      if(result && result !== undefined && result !== false){
+        let variable = {name: result, chatbot_types:this.type_chatbot, value: result};
         that.variableListUserDefined.elements.push(variable);
         // Sort elements alphabetically after adding new variable
         that.variableListUserDefined.elements.sort((a, b) => {
@@ -138,72 +149,72 @@ export class VariableListComponent implements OnInit {
     });
   }
 
-  /** Rimuove una variabile user-defined dalla lista e persiste. */
-  onVariableDelete(variableSelected: { name: string; value: string }): void {
-    const index = this.variableListUserDefined.elements.findIndex(el => el.name === variableSelected.name);
-    if (index > -1) {
-      this.variableListUserDefined.elements.splice(index, 1);
-      this.saveVariables(this.variableListUserDefined.elements);
+  onVariableDelete(variableSelected: {name: string, value: string}){
+    let index = this.variableListUserDefined.elements.findIndex(el => el.name === variableSelected.name)
+    if(index > -1){
+      this.variableListUserDefined.elements.splice(index, 1)
+      this.saveVariables(this.variableListUserDefined.elements)
     }
   }
 
-  /** Persiste le variabili user-defined sul backend. */
-  private saveVariables(variables: Array<{ name: string }>): void {
-    const jsonVar: Record<string, string> = {};
+  private saveVariables(variables){
+    let jsonVar = {};
     variables.forEach(element => {
       jsonVar[element.name] = element.name;
     });
-    this.faqkbService.addNodeToChatbotAttributes(this.idBot, 'variables', jsonVar).subscribe(
-      () => { },
-      () => { }
-    );
+    this.faqkbService.addNodeToChatbotAttributes(this.idBot, 'variables', jsonVar).subscribe((data)=> {
+      if(data){
+        //SUCCESS STATE
+      }
+    }, (error)=> {
+      //FAIL STATE
+    }, ()=>{
+      // this.logger.debug('[RULES-ADD] faqkbService addRuleToChatbot - COMPLETE')
+    })
   }
 
-  /** Notifica al parent la variabile selezionata. */
-  onVariableSelected(variableSelected: { name: string; value: string }): void {
+  onVariableSelected(variableSelected: {name: string, value: string}){
     this.onSelected.emit(variableSelected);
   }
 
-  /** Filtra le liste variabili in base al testo di ricerca e aggiorna isEmpty/isSearching. */
-  onChangeSearch(event: string | { target?: { value?: string } }): void {
-    const value = typeof event === 'string' ? event : (event?.target?.value ?? '');
-    this.textVariable = value;
-    this.filteredVariableList = this._filter2(value, this.variableListUserDefined ? [this.variableListUserDefined] : []);
-    this.filteredGlobalsList = this._filter2(value, this.variableListGlobals ? [this.variableListGlobals] : []);
-    this.filteredIntentVariableList = this._filter2(value, this.variableListSystemDefined || []);
-    const hasUserDefined = this.filteredVariableList?.length > 0 && this.filteredVariableList[0]?.elements?.length > 0;
-    this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && !hasUserDefined);
-    this.isSearching = (value !== '');
+  onChangeSearch(event){
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch-->', event, this.textVariable);
+    if(event && event.target){
+      this.textVariable = event.target.value
+    }else {
+      this.textVariable = event
+    }
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 1', this.textVariable, this.variableListUserDefined, this.variableListGlobals, this.variableListSystemDefined);
+    this.filteredVariableList = this._filter2(this.textVariable, [this.variableListUserDefined])
+    this.filteredGlobalsList = this._filter2(this.textVariable, [this.variableListGlobals])
+    this.filteredIntentVariableList = this._filter2(this.textVariable, this.variableListSystemDefined)
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 2', this.filteredVariableList, this.filteredGlobalsList, this.filteredIntentVariableList);
+    this.isEmpty = (this.filteredIntentVariableList.every(el => el.elements.length === 0) && this.filteredVariableList[0].elements.length === 0 ) 
+    this.isSearching = (this.textVariable !== '')
+    // this.logger.log('[VARIABLE-LIST] onChangeSearch--> 3', this.isEmpty, this.isSearching);
   }
 
-  /** Filtra e ordina per nome gli elementi di ogni gruppo della lista. */
-  private _filter2(value: string, array: Array<{ key: string; elements: Array<any> }>): Array<any> {
+  private _filter(value: string, array: Array<any>): Array<any> {
     const filterValue = value.toLowerCase();
-    return array.map(el => {
-      const filtered = el.elements.filter(option => option.name.toLowerCase().includes(filterValue));
-      const sorted = [...filtered].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-      return { key: el.key, elements: sorted };
+    return array.filter(option => option.name.toLowerCase().includes(filterValue));
+  }
+
+  private _filter2(value: string, array: Array<{key: string, elements: Array<any>}>): Array<any> {
+    const filterValue = value.toLowerCase();
+    return array.map(el => { 
+      const filteredElements = el.elements.filter(option => option.name.toLowerCase().includes(filterValue));
+      // Sort filtered elements alphabetically
+      filteredElements.sort((a, b) => {
+        const nameA = a.name?.toLowerCase() || '';
+        const nameB = b.name?.toLowerCase() || '';
+        return nameA.localeCompare(nameB);
+      });
+      return { key: el.key, elements: filteredElements };
     });
   }
 
-  /** Ordina gli elementi per nome (usato per liste variabili). */
-  private sortElementsByName<T extends { name?: string }>(elements: T[]): T[] {
-    return elements.length ? [...elements].sort((a, b) => (a.name || '').localeCompare(b.name || '')) : elements;
-  }
-
-  /** Apre il dialog per aggiungere un attributo custom. */
-  onAddCustomAttribute(): void {
+  onAddCustomAttribute(){
     this.openDialog();
-  }
-
-  /** trackBy per *ngFor sulle variabili (stabilizza il render). */
-  trackByVariableName(index: number, variable: { name?: string; value?: string }): string | number {
-    return variable?.name ?? variable?.value ?? index;
-  }
-
-  /** trackBy per *ngFor sugli item intent (stabilizza il render). */
-  trackByIntentItemKey(index: number, item: { key?: string }): string | number {
-    return item?.key ?? index;
   }
 
 }

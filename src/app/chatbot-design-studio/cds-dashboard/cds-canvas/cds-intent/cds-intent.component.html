@@ -91,17 +91,32 @@
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
             [cdkDragDisabled]="isNewChatbot"
-            (cdkDragStarted)="onDragStart($event, intent.intent_id, i)" 
-            (cdkDragReleased)="onDragEnd($event, i)"
-            (cdkDragMoved)="onDragPreviewMove($event)"
-            [id]="action._tdActionId" 
-            class="box-action" 
-            tabindex="-1"
-            [class.cds-no-featured-action]="action._isNoFeatured"
-            [class.cds-last-action]="last" 
-            [style.outline]="action._outline"
-            (keydown)="onKeydown($event)"
+            (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
+            (cdkDragReleased)="onDragEnded($event, i)"
+            (cdkDragMoved)="onDragMove($event)"
+            [id]="action._tdActionId"
+            class="box-action tds_draggable"
+            tabindex=-1
+            [ngClass]="{
+                'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
+                'cds-last-action': last
+            }" 
+            [ngStyle]="{
+                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
+            }"
+            (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
+            <!-- [class.isFirst]="first" -->
+            <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
+            <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
+            <!-- <span *ngIf="!first" class="action-element"> -->
+
+            <!-- handle di riordino: SOLO questo (il drag_indicator) trascina/riordina l'azione;
+                 trascinando qualsiasi altro punto si sposta il blocco intent (tds_draggable) -->
+            <div class="action-reorder-handle" cdkDragHandle [title]="'CDSCanvas.Drag' | translate">
+                <img class="active-icon" src="assets/images/icons/drag_indicator.svg" alt="">
+            </div>
+
             <span class="action-element">
                 <div *cdkDragPreview id="customDragPreview">
                     <cds-action-description 
@@ -113,13 +128,12 @@
             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
-                    class="header-action" 
-                    cdkDragHandle
+                <cds-action-description
+                    class="header-action"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
-                <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
+                <div cdkDragDisabled class="body-action tds_draggable" [ngSwitch]="action._tdActionType">
 
                     <cds-action-controls *ngIf="!isNewChatbot"
                         (onClickControl)="onActionControl($event, action, i)">
@@ -213,12 +227,19 @@
                             [action]="action">
                         </cds-action-close>
     
-                        <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION" 
-                            class="panel-response"
-                            [intentSelected]="intent" 
-                            [action]="action" 
-                            (updateAndSaveAction)="onActionUpdate($event)">
-                        </cds-action-json-condition>
+                    <cds-action-json-condition *ngSwitchCase="TYPE_ACTION.JSON_CONDITION"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-json-condition>
+
+                    <cds-action-json-condition2 *ngSwitchCase="TYPE_ACTION.JSON_CONDITION2"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-json-condition2>
     
                         <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT" 
                             class="panel-response"
@@ -355,19 +376,19 @@
                             (updateAndSaveAction)="onActionUpdate($event)">
                         </cds-action-qapla>
 
-                    <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
-                        class="panel-response"
-                        [intentSelected]="intent"
-                        [action]="action"
-                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-data-table>
+                        <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-data-table>
 
-                    <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
-                        class="panel-response"
-                        [intentSelected]="intent"
-                        [action]="action"
-                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
-                    </cds-action-make>
+                        <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-make>
 
                         <cds-action-hubspot *ngSwitchCase="TYPE_ACTION.HUBSPOT"    
                             class="panel-response"
@@ -476,6 +497,20 @@
                             [action]="action"
                             (updateAndSaveAction)="onActionUpdate($event)">
                         </cds-action-record>
+
+                        <cds-action-sub-agent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-sub-agent>
+
+                        <cds-action-return *ngSwitchCase="TYPE_ACTION.RETURN"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                        </cds-action-return>
 
                         <cds-action-flow-log *ngSwitchCase="TYPE_ACTION.FLOW_LOG"
                             class="panel-response"

@@ -13,6 +13,127 @@
 - **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
 - **changed**: cds-config-*.json assets are now published under /environments/real_data
 
+# 1.40.8-rc3
+- **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
+- **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
+- **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header
+- **changed**: MCP tool selection is saved ONLY on the action (`action.servers[]`) and never modifies the MCP integration; adding a server pre-selects no tools
+- **changed**: persisted `action.servers[]` normalized — `native` always present, `id` only for native servers, `tools` as an array of names
+- **bug fix**: custom headers are now forwarded to the `/mcp/tools` discovery call, so the backend can authenticate during the tool scan
+- **bug fix**: reactivated the Custom Headers section in the Add/Edit MCP Server dialog (was hidden)
+
+# 1.40.8-rc2
+- **added**: native Tiledesk MCP servers (catalog `/mcp/native`) + OAuth 2.0 config for MCP servers in the AI Prompt action
+- **changed**: MCP tools handled as `string[]` with name normalization (legacy `{ name }[]` still supported)
+- **changed**: hidden the legacy **Condition** and **Condition w/ else** actions from the menu (`status: 'inactive'`) — not addable to new flows, existing agents keep working
+
+# 1.40.8-rc1
+- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
+- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
+- **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
+- **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
+- **added**: multi-line tooltip for the "Attribute name" syntax help
+- **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
+
+
+# 1.40.7
+- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
+
+# 1.40.6
+- **bug fix**: change env
+
+# 1.40.3-rc15
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+
+# 1.40.3-rc14
+- **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
+- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+
+# 1.40.3-rc13 
+- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
+- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
+- **changed**: the Sub Agent action is not available inside a subagent
+- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
+- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
+- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
+- **changed**: Sub Agent detail panel now fills the panel height like the other actions
+- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
+- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
+
+# 1.40.3-rc12
+- **added**: ability to select a department after agent Handoff
+
+# 1.40.3-rc11
+- **bug fix**: restore customHeaders
+
+# 1.40.3-rc10
+- **added**: added server mcp native tiledesk
+
+# 1.40.3-rc9
+- **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
+
+# 1.40.3-rc8
+- **changed**: no operator preset when opening a Custom Attribute condition; "Apply Condition" stays disabled until an operator is selected
+- **added**: info icon next to "Attribute name" with a tooltip explaining the attribute syntax (array indexes, nested properties)
+- **added**: "Learn more" link to the JSON Condition guide in the Condition and Condition w/ else action info popups
+- **added**: JSON Condition action documentation page
+
+# 1.40.3-rc7
+- **added**: json condition "when" grammar reference doc (for chatbot prompt)
+- **bug fix**: json condition crash with legacy/new action format (safe operator & operand render)
+- **bug fix**: avoid page-reload dialog while the widget test simulator is open
+- **bug fix**: keep the widget iframe alive on tab inactivity (prevent Chrome freeze/discard reload)
+
+# 1.40.3-rc6
+- **changed**: refatoring action conditions
+
+# 1.40.3-rc5
+- **bug fix**: bug fix env
+
+# 1.40.3-rc4
+- **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
+
+# 1.40.3-rc3
+- **bug fix**: integrate customHeaders and auth in "tools" paylosd
+
+# 1.40.3-rc2
+- **bug fix**: vllmServer
+
+# 1.40.3-rc1
+- **bug fix**: added vllm url in vllm models
+
+# 1.40.1-rc9
+- **changed**: filter voice provider list based on chatbot subtype (chatbot: elevenlabs only, voice twilio: twilio and openai only)
+- **bug fix**: voice settings initialization - removed duplicated logic
+
+# 1.40.1-rc8
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
+- **bug fix**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.1-rc7
+- **added**: OAuth 2.0 Flow in MCP server authentication (Client ID, Client Secret, Redirect URL, Scope)
+
+# 1.40.1-rc6
+- **bug fix**: retrocompatibility jsonCondition
+
+# 1.40.1-rc5
+- **changed**: refactoring jsonCondition. added "when"
+
+# 1.40.1-rc4
+- **changed**: display Custom Headers in MCP server
+
+# 1.40.1-rc3
+- **changed**: added tag "BETA"
+
+# 1.40.1-rc2
+- **bug fix**: bug fix css panel detail action data table
+
 # 1.40.1-rc1
 - **added**: added action "data-table"
 

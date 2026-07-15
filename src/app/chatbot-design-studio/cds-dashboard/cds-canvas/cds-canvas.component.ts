@@ -24,7 +24,7 @@ import { Chatbot } from 'src/app/models/faq_kb-model';
 // UTILS //
 import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
-import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
@@ -122,6 +122,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   // UI PANEL STATES
   // ============================================================
   IS_OPEN_INTENTS_LIST: boolean = true;
+  /** pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab) */
+  activeLeftPanel: 'blocks' | 'subagents' = 'blocks';
+  /** true se il chatbot aperto è esso stesso un subagent: nasconde tab/pannello Subagents e action Sub Agent */
+  isSubagent: boolean = false;
   IS_OPEN_ADD_ACTIONS_MENU: boolean = false;
   IS_OPEN_PANEL_ACTION_DETAIL: boolean = false;
   IS_OPEN_PANEL_BUTTON_CONFIG: boolean = false;
@@ -291,7 +295,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       this.intentService.arrayCOPYPAST = copyPasteTEMP['copy'];
     }
 
-    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype ? this.dashboardService.selectedChatbot.subtype : TYPE_CHATBOT.CHATBOT;
+    this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
+    this.isSubagent = this.dashboardService.selectedChatbot.subtype === 'subagent';
+    if (this.isSubagent && this.activeLeftPanel === 'subagents') {
+      this.activeLeftPanel = 'blocks';
+    }
 
     const rawNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     this.listOfNotes = rawNotes.map((n: any) => {
@@ -832,6 +840,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.removeConnectorDraftAndCloseFloatMenu();
     this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, this.IS_OPEN_INTENTS_LIST);
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ', this.IS_OPEN_INTENTS_LIST);
+  }
+
+  /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
+  onSelectLeftPanel(panel: 'blocks' | 'subagents') {
+    this.activeLeftPanel = panel;
+    if (!this.IS_OPEN_INTENTS_LIST) {
+      this.onToogleSidebarIntentsList();
+    }
   }
 
   onSelectIntent(intent: Intent) {

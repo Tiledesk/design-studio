@@ -1,0 +1,34 @@
+<!-- MCP Tools Preview (optional, read-only) -->
+<div class="mcp-tools-preview-container" *ngIf="previewMode && servers && servers.length > 0">
+    <div class="mcp-tools-header">{{'CDSCanvas.ToolsUsed' | translate}}</div>
+    <div class="mcp-tools-preview">
+        <span class="mcp-tool-tag" *ngFor="let server of servers">
+            {{ server.name }}
+        </span>
+    </div>
+</div>
+
+<!-- MCP SERVERS SECTION -->
+<div class="field-box mcp-servers-section">
+    <div class="mcp-servers-header">
+        <label class="title-label">{{'CDSCanvas.UseToolsToCompleteOperation' | translate}}</label>
+        <!-- Manage MCP tools button (classic button, top-right) -->
+        <button
+            class="btn btn-primary cds-blue-button mcp-manage-btn"
+            type="button"
+            (click)="openMcpServersDialog()">
+            {{'CDSCanvas.AddMoreTools' | translate}}
+        </button>
+    </div>
+
+    <!-- Selected MCP Servers -->
+    <div class="mcp-servers-grid" *ngIf="servers?.length">
+        <button
+            *ngFor="let server of servers"
+            class="mcp-server-button selected"
+            type="button">
+            {{ server.name }}
+            <span class="material-icons remove-icon" (click)="removeSelectedServer(server, $event)">close</span>
+        </button>
+    </div>
+</div>

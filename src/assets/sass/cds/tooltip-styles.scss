@@ -54,10 +54,18 @@
     // border: 1px solid #e5effe !important;
 }
 
+// Variante multiriga: preserva i ritorni a capo (\n) e allinea a sinistra l'elenco di esempi.
+::ng-deep .cds-mat-tooltip-multiline {
+    white-space: pre-line !important;
+    text-align: left !important;
+    max-width: 320px !important;
+}
 
-.cds-custom-tooltip {
-    background-color: #fff;
-    color: #555555;
+
+.cds-custom-tooltip,
+.mat-tooltip.cds-custom-tooltip {
+    background-color: #fff !important;
+    color: #555555 !important;
     font-size: 12px;
     border-radius: 2px;
     font-family: var(--font-family-poppins);
