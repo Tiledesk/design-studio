@@ -52,8 +52,9 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
   jsonSourcesValue: string = '{{kb_json_sources | json}}';
 
   // Fields config: which URL fields are rendered in the preview cards (link is always shown)
+  // `source` = the last row with the favicon + domain.
   showFieldsConfig: boolean = false;
-  displayFields: { title: boolean; description: boolean; image: boolean } = { title: true, description: true, image: true };
+  displayFields: { title: boolean; description: boolean; image: boolean; source: boolean } = { title: true, description: true, image: true, source: true };
 
   // Sample data for the config example preview card
   readonly exampleTitle: string = 'Lorem ipsum dolor sit amet';
@@ -192,11 +193,21 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
     return ((this.response as any)?.activeMode as UrlPreviewTab) || this.activeTab;
   }
 
+  /** i18n key for the type tag shown in the node preview (Form / Text / JSON Sources). */
+  get previewTypeLabelKey(): string {
+    switch (this.previewActiveMode) {
+      case 'form': return 'UrlPreviewTabForm';
+      case 'text': return 'UrlPreviewTabJsonSources';
+      case 'list':
+      default: return 'UrlPreviewTabText';
+    }
+  }
+
   toggleFieldsConfig(): void {
     this.showFieldsConfig = !this.showFieldsConfig;
   }
 
-  onToggleField(field: 'title' | 'description' | 'image'): void {
+  onToggleField(field: 'title' | 'description' | 'image' | 'source'): void {
     this.displayFields[field] = !this.displayFields[field];
     this.saveAll();
     this.changeActionReply.emit();

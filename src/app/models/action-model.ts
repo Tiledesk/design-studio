@@ -310,6 +310,24 @@ export class ActionCondition extends Action {
     }
 }
 
+/** JSON Condition V2 ('jsoncondition2'): azione distinta dalla legacy 'jsoncondition' per retrocompatibilità totale. */
+export class ActionJsonCondition2 extends Action {
+    trueIntent: string;
+    falseIntent: string;
+    stopOnConditionMet: boolean;
+    groups: Array<Expression | Operator>;
+    when?: string; // tutte le condizioni in un'unica stringa, derivata da `groups` (vedi utils-condition.ts)
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.JSON_CONDITION2;
+        this.groups = [];
+        this.stopOnConditionMet = true;
+        this.when = '';
+    }
+}
+
 export class ActionIntentConnected extends Action {
     intentName?: string;
     json_payload?: Object;
@@ -427,6 +445,8 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     llm: string;
     modelName: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignJsonSourcesTo: string;
@@ -501,6 +521,8 @@ export class ActionAiPrompt extends Action {
     llm: string;
     modelName: string;
     model: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
@@ -517,6 +539,8 @@ export class ActionAiCondition extends Action {
     llm: string;
     modelName: string;
     model: string;
+    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    vllmServer?: string;
     max_tokens: number;
     temperature: number;
     labelModel: string;
@@ -742,9 +766,12 @@ export interface GalleryElement{
 export class Expression {
     type: string = 'expression';
     conditions: Array<Condition | Operator>
+    when?: string; // condizioni in un'unica stringa, derivata da `conditions` (vedi utils-condition.ts). Scritta SOLO dall'editor V2.
+    version?: number; // marker V2 dei filtri: scritto SOLO dall'editor V2 (appdashboard-filter2). I filtri legacy non hanno il campo.
     constructor(){
         // this.conditions = [ new Condition()]
         this.conditions = []
+        // NB: `when`/`version` NON vengono inizializzati: i filtri/azioni legacy devono restare senza questi campi.
     }
 }
 

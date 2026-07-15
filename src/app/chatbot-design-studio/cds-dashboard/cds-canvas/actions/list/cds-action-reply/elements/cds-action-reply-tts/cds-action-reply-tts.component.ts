@@ -10,6 +10,7 @@ import { ConnectorService } from '../../../../../../../services/connector.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-tts',
@@ -17,6 +18,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   styleUrls: ['./cds-action-reply-tts.component.scss']
 })
 export class CdsActionReplyTTSComponent implements OnInit {
+
+  /** true se il filtro esistente è legacy (pre-V2): il template usa il vecchio editor appdashboard-filter */
+  isLegacyFilter = isLegacyFilter;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   
   @Output() updateAndSaveAction = new EventEmitter();

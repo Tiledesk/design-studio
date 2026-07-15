@@ -12,6 +12,39 @@
 - **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
 - **changed**: cds-config-*.json assets are now published under /environments/real_data
 
+# 1.40.9 
+- **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
+
+# 1.40.8 
+- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
+- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
+- **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
+- **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
+- **added**: multi-line tooltip for the "Attribute name" syntax help
+- **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
+
+
+# 1.40.7
+- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
+
+# 1.40.6
+- **bug fix**: change env
+
+# 1.40.4
+- **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
+
+# 1.40.3
+- **changed**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.2
+- **changed**: refactor(voice-settings): streamline voice and model retrieval from ElevenLabs API; update angular.json for environment asset handling
+
+# 1.40.1
+- **changed**: set parameters to hide favicon and site URL in  action reply URL preview
+- **changed**: action preview in reply url preview
+
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
 
