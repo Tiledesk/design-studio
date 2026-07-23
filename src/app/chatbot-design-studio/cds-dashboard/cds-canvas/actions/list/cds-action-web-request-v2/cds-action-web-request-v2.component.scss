@@ -39,6 +39,17 @@
     gap: 10px;
 }
 
+.cds-web-request-body-selectors{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    .cds-body-mode-select,
+    .cds-raw-type-select{
+        flex: 1;
+        min-width: 0;
+    }
+}
+
 
 .input-group .input-group-addon {
     border: 0;

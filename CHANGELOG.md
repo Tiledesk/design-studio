@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+
+# this branch
+- **added**: Web Request action — Postman-like body editor: first selector (none / form-data / raw) and, when raw, a second selector for the sub-type (text / JavaScript / JSON / HTML / XML)
+- **added**: live body validator per raw sub-type (JSON, XML, JavaScript) with a discreet, non-blocking inline alert that ignores `{{...}}` placeholders
+- **bug-fix**: the body validation alert now shows for invalid raw bodies (previously hidden by a wrong template guard)
+- **changed**: additive & backward-compatible model — new optional `rawType` field and `raw` value for `bodyType`; existing web request actions (none/json/form-data) are read and saved unchanged. New `raw` actions require matching engine support in DirWebRequestV2
+
 # 1.40.10 
 - **added**: added documentation image and guide link to the Data Table action tooltip
 - **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action

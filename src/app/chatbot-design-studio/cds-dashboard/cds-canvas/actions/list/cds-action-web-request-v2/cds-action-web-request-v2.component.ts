@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { TranslateService } from '@ngx-translate/core';
 
 //SERVICES
 import { IntentService } from '../../../../../services/intent.service';
@@ -14,7 +15,7 @@ import { ActionWebRequestV2 } from 'src/app/models/action-model';
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
-import { HEADER_TYPE, TYPE_METHOD_REQUEST } from 'src/app/chatbot-design-studio/utils-request';
+import { HEADER_TYPE, TYPE_METHOD_REQUEST, WEB_REQUEST_BODY_MODES, WEB_REQUEST_RAW_TYPES, RAW_TYPE_CONTENT_TYPE } from 'src/app/chatbot-design-studio/utils-request';
 // import { CDSTextareaComponent } from '../../../base-elements/textarea/textarea.component';
 
 @Component({
@@ -65,16 +66,17 @@ export class CdsActionWebRequestV2Component implements OnInit {
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
   assignments: {} = {}
 
-  bodyOptions: Array<{name: string, value: string, disabled: boolean, checked: boolean}>= [ 
-      {name: 'none',       value: 'none',      disabled: false, checked: true  }, 
-      {name: 'Json',       value: 'json',      disabled: false, checked: false },
-      {name: 'form-data',  value: 'form-data', disabled: false, checked: false }
-  ]
-  bodyType: 'none' | 'json' | 'form-data' = 'none';
+  // Postman-like body selectors
+  bodyModes = WEB_REQUEST_BODY_MODES;
+  rawTypes = WEB_REQUEST_RAW_TYPES;
+  bodyMode: 'none' | 'form-data' | 'raw' = 'none';
+  rawType: 'text' | 'javascript' | 'json' | 'html' | 'xml' = 'json';
+  private validateTimer: any;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
-    private readonly intentService: IntentService
+    private readonly intentService: IntentService,
+    private readonly translate: TranslateService
   ) { }
 
   // SYSTEM FUNCTIONS //
@@ -96,6 +98,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
     if (this.subscriptionChangedConnector) {
       this.subscriptionChangedConnector.unsubscribe();
     }
+    clearTimeout(this.validateTimer);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -150,14 +153,15 @@ export class CdsActionWebRequestV2Component implements OnInit {
       return { label: key, value: key }
     })
     this.jsonHeader = this.action.headersString
-    this.bodyOptions.forEach(el => { el.value ===this.action.bodyType? el.checked= true: el.checked = false })
-    // this.jsonIsValid = this.isValidJson(this.action.jsonBody);
+    // derive UI state (read-only) from the persisted model — no writes to action (G3)
+    this.deriveBodyState();
 
-    if(this.action.jsonBody){ 
+    if(this.action.jsonBody){
       //this.body = this.checkAndSetJsonBody(this.action.jsonBody);
       this.body = this.action.jsonBody;
       this.body = this.formatJSON(this.body, "\t");
     }
+    this.validateBody();
     this.jsonSettings = { timeout: 20000}
     if(this.action.settings){
       this.jsonSettings = this.action.settings
@@ -210,9 +214,88 @@ export class CdsActionWebRequestV2Component implements OnInit {
       this.errorMessage = null;
       return true;
     } catch (e) {
-      this.errorMessage = e;
+      this.errorMessage = this.translate.instant('CDSCanvas.WebRequestInvalidJson');
       return false;
     }
+  }
+
+  private isValidXml(xml: string): boolean {
+    try {
+      const doc = new DOMParser().parseFromString(xml, 'application/xml');
+      const valid = doc.getElementsByTagName('parsererror').length === 0;
+      this.errorMessage = valid ? null : this.translate.instant('CDSCanvas.WebRequestInvalidXml');
+      return valid;
+    } catch (e) {
+      this.errorMessage = this.translate.instant('CDSCanvas.WebRequestInvalidXml');
+      return false;
+    }
+  }
+
+  private isValidJs(js: string): boolean {
+    try {
+      // syntax-only check; does NOT execute the code
+      // eslint-disable-next-line no-new-func
+      new Function(js);
+      this.errorMessage = null;
+      return true;
+    } catch (e) {
+      this.errorMessage = this.translate.instant('CDSCanvas.WebRequestInvalidJs');
+      return false;
+    }
+  }
+
+  /** Replace Tiledesk placeholders ({{ ... }}, incl. filters like {{ x | json }}) with a neutral
+   *  token so a body carrying runtime variables is not flagged as syntactically invalid. */
+  private stripPlaceholders(txt: string): string {
+    return (txt || '').replace(/{{[^}]*}}/g, '0');
+  }
+
+  /** Validate the current raw body against the selected rawType. Non-blocking: only sets jsonIsValid + errorMessage. */
+  private validateBody(): void {
+    if (this.bodyMode !== 'raw') {
+      this.jsonIsValid = true;
+      this.errorMessage = null;
+      return;
+    }
+    const content = this.stripPlaceholders(this.body);
+    if (!content || content.trim().length === 0) {
+      this.jsonIsValid = true;
+      this.errorMessage = null;
+      return;
+    }
+    switch (this.rawType) {
+      case 'json':       this.jsonIsValid = this.isValidJson(content); break;
+      case 'xml':        this.jsonIsValid = this.isValidXml(content);  break;
+      case 'javascript': this.jsonIsValid = this.isValidJs(content);   break;
+      case 'text':
+      case 'html':
+      default:           this.jsonIsValid = true; this.errorMessage = null; break;
+    }
+  }
+
+  /** Derive UI selectors (bodyMode/rawType) from the persisted model. READ-ONLY: never writes to action (G3). */
+  private deriveBodyState(): void {
+    const bt = this.action.bodyType;
+    if (bt === 'form-data') {
+      this.bodyMode = 'form-data';
+    } else if (bt === 'none') {
+      this.bodyMode = 'none';
+    } else {
+      // 'raw' (new actions) or legacy 'json' (or any other value carrying a body) -> raw mode
+      this.bodyMode = 'raw';
+      this.rawType = (this.action.rawType as any) || this.inferRawTypeFromHeaders() || 'json';
+    }
+  }
+
+  private inferRawTypeFromHeaders(): 'text' | 'javascript' | 'json' | 'html' | 'xml' | null {
+    const ct = ((this.jsonHeader && this.jsonHeader['Content-Type']) || '').toString().toLowerCase();
+    if (!ct) { return null; }
+    if (ct.includes('json'))       { return 'json'; }
+    if (ct.includes('xml'))        { return 'xml'; }
+    if (ct.includes('html'))       { return 'html'; }
+    if (ct.includes('javascript')) { return 'javascript'; }
+    if (ct.includes('text/plain')) { return 'text'; }
+    return null;
   }
 
 
@@ -222,30 +305,38 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
-  onChangeButtonSelect(event: {name: string, value: string, disabled: boolean, checked: boolean}){
-    this.bodyOptions.forEach(el => { el.value ===event.value? el.checked = true: el.checked = false })
-    this.bodyOptions.forEach(el => { el.value ===event.value? el.checked = true: el.checked = false })
-    this.action.bodyType= event.value
+  onChangeBodyMode(event: {name: string, value: string}){
+    this.bodyMode = event.value as 'none' | 'form-data' | 'raw';
     switch (event.value){
       case 'none':
-        this.bodyType = 'none';
-        this.bodyType = 'none';
-        this.body = JSON.stringify({})
-        delete this.jsonHeader['Content-Type']
-        break;
-      case 'json':
-        this.bodyType = 'json';
-        this.body = this.action.jsonBody;
-        this.jsonHeader['Content-Type'] = 'application/json';
-        // this.body = this.checkAndSetJsonBody(this.action.jsonBody);
+        this.action.bodyType = 'none';
+        delete this.action.rawType;
+        delete this.jsonHeader['Content-Type'];
         break;
       case 'form-data':
-        this.bodyType = 'form-data';
-        this.bodyType = 'form-data';
-        this.jsonHeader['Content-Type'] = 'multipart/form-data'
+        this.action.bodyType = 'form-data';
+        delete this.action.rawType;
+        this.jsonHeader['Content-Type'] = 'multipart/form-data';
+        break;
+      case 'raw':
+        this.action.bodyType = 'raw';
+        this.rawType = this.rawType || 'json';
+        this.action.rawType = this.rawType;
+        this.jsonHeader['Content-Type'] = RAW_TYPE_CONTENT_TYPE[this.rawType];
         break;
     }
-    this.action.headersString = this.jsonHeader
+    this.action.headersString = this.jsonHeader;
+    this.validateBody();
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  onChangeRawType(event: {name: string, value: string}){
+    this.rawType = event.value as 'text' | 'javascript' | 'json' | 'html' | 'xml';
+    this.action.bodyType = 'raw';
+    this.action.rawType = this.rawType;
+    this.jsonHeader['Content-Type'] = RAW_TYPE_CONTENT_TYPE[this.rawType];
+    this.action.headersString = this.jsonHeader;
+    this.validateBody();
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
@@ -253,10 +344,8 @@ export class CdsActionWebRequestV2Component implements OnInit {
     switch(type){
       case 'body': {
         this.body = e;
-        // // setTimeout(() => {
-          // this.jsonIsValid = this.isValidJson(this.body);
-          // this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
-        // }, 0);
+        clearTimeout(this.validateTimer);
+        this.validateTimer = setTimeout(() => { this.validateBody(); }, 500);
         break;
       }
       case 'url' : {
@@ -297,6 +386,7 @@ export class CdsActionWebRequestV2Component implements OnInit {
   onChangeAttributes(attributes:any){
     this.logger.log('onChangeAttributes');
     this.action.headersString = attributes;
+    this.jsonHeader = attributes;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 
