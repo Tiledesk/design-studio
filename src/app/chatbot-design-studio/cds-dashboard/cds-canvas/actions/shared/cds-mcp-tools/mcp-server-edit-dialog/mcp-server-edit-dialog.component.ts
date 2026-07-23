@@ -2,39 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { ProjectService } from 'src/app/services/projects.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { firstValueFrom } from 'rxjs';
-
-interface McpTool {
-  name: string;
-  title?: string;
-  description?: string;
-}
-
-interface McpServer {
-  name: string;
-  url: string;
-  transport: string;
-  customHeaders?: Array<{
-    enabled: boolean;
-    key: string;
-    value: string;
-    revealValue?: boolean;
-  }>;
-  /** Available tools (from Connect / integrations). Persisted on Save. */
-  tools?: McpTool[];
-  /** Selected tools for this server. Persisted in integration so selection is kept even when server is not selected. */
-  selectedTools?: Array<{ name: string }>;
-}
-
-interface McpIntegration {
-  id_project: string;
-  name: string;
-  value: {
-    servers: McpServer[];
-  };
-}
+import { McpService } from 'src/app/services/mcp.service';
+import { McpServer, McpTool, normalizeMcpToolNames } from 'src/app/models/mcp.model';
 
 
 @Component({
@@ -56,6 +26,8 @@ export class McpServerEditDialogComponent implements OnInit {
 
   // --- Tools selection (per-server, per-action) ---
   availableTools: McpTool[] = [];
+  /** availableTools sorted descending for the "Select tools" popup (built on open). */
+  sortedAvailableTools: McpTool[] = [];
   private selectedToolNames: Set<string> = new Set();
   isToolsModalOpen: boolean = false;
 
@@ -91,17 +63,18 @@ export class McpServerEditDialogComponent implements OnInit {
   
   constructor(
     public dialogRef: MatDialogRef<McpServerEditDialogComponent>,
-    private projectService: ProjectService,
+    private mcpService: McpService,
     private dashboardService: DashboardService,
-    @Inject(MAT_DIALOG_DATA) public data: { 
+    @Inject(MAT_DIALOG_DATA) public data: {
       server?: McpServer;
       allServers: McpServer[];
       isNew?: boolean;
       /**
-       * Selected tools for THIS server in the action config (only {name} is allowed).
-       * Used to keep state when reopening the dialog.
+       * Selected tools for THIS server in the action config. Accepts either the canonical
+       * `{name}[]` (from the servers picker) or a plain `string[]` (from the native catalog);
+       * both are normalized via normalizeMcpToolNames.
        */
-      selectedTools?: Array<{ name: string }>;
+      selectedTools?: Array<{ name: string }> | string[];
     }
   ) { }
 
@@ -145,7 +118,7 @@ export class McpServerEditDialogComponent implements OnInit {
     this.project_id = this.dashboardService.projectID;
 
     // Tools: initialize selection and load available tools for the selected server
-    this.selectedToolNames = new Set((this.data.selectedTools || []).map(t => t?.name).filter(Boolean) as string[]);
+    this.selectedToolNames = new Set(normalizeMcpToolNames(this.data.selectedTools));
     this.originalSelectedToolsSnapshot = new Set(Array.from(this.selectedToolNames));
     this.refreshAvailableTools();
     this.toolsLoaded = Array.isArray(this.availableTools) && this.availableTools.length > 0;
@@ -250,6 +223,29 @@ export class McpServerEditDialogComponent implements OnInit {
       this.selectedToolNames.add(name);
     } else {
       this.selectedToolNames.delete(name);
+    }
+  }
+
+  /** Toggle a single tool from a clickable row (Select tools popup). */
+  toggleTool(name: string): void {
+    this.onToggleTool(name, !this.isToolSelected(name));
+  }
+
+  get areAllToolsSelected(): boolean {
+    return this.availableTools.length > 0
+      && this.availableTools.every(t => this.selectedToolNames.has(t.name));
+  }
+
+  get someToolsSelected(): boolean {
+    return this.selectedToolNames.size > 0 && !this.areAllToolsSelected;
+  }
+
+  /** Select all / deselect all the tools in the popup. */
+  toggleAllTools(): void {
+    if (this.areAllToolsSelected) {
+      this.selectedToolNames.clear();
+    } else {
+      this.selectedToolNames = new Set(this.availableTools.map(t => t.name));
     }
   }
 
@@ -404,6 +400,8 @@ export class McpServerEditDialogComponent implements OnInit {
   }
 
   openToolsModal(): void {
+    // Show all tools in descending alphabetical order (like the picker "more.." popup).
+    this.sortedAvailableTools = [...this.availableTools].sort((a, b) => b.name.localeCompare(a.name));
     this.isToolsModalOpen = true;
   }
 
@@ -421,6 +419,11 @@ export class McpServerEditDialogComponent implements OnInit {
       this.errorMessage = "Please fill Name and URL before connecting.";
       return;
     }
+    if (this.isNative && !this.editedServer.id) {
+      this.showError = true;
+      this.errorMessage = "Missing native server id.";
+      return;
+    }
     if (this.isLoadingTools) return;
 
     this.showError = false;
@@ -430,16 +433,11 @@ export class McpServerEditDialogComponent implements OnInit {
     this.isToolsModalOpen = false;
 
     try {
-      const res = await firstValueFrom(this.projectService.getMcpTools(this.project_id, this.editedServer.url));
-      const rawTools = Array.isArray(res) ? res : (Array.isArray(res?.tools) ? res.tools : []);
-
-      const tools: McpTool[] = (rawTools || [])
-        .filter((t: any) => t && typeof t.name === 'string' && t.name.trim().length > 0)
-        .map((t: any) => ({
-          name: String(t.name),
-          title: t.title ? String(t.title) : undefined,
-          description: t.description ? String(t.description) : undefined
-        }));
+      // Server nativo: Connect via nativeId (POST {proj}/mcp/native/{id}/connect). Custom: discovery via url,
+      // forwarding the enabled custom headers so the backend can authenticate to the MCP server.
+      const tools: McpTool[] = this.isNative
+        ? await this.mcpService.connectNativeServer(this.editedServer.id, this.project_id)
+        : await this.mcpService.discoverTools(this.editedServer.url, this.project_id, this.buildEnabledHeadersPayload());
 
       if (!tools || tools.length === 0) {
         this.showError = true;
@@ -478,16 +476,43 @@ export class McpServerEditDialogComponent implements OnInit {
     }
   }
 
-  private buildSelectedToolsPayload(): Array<{ name: string }> {
+  private buildSelectedToolsPayload(): string[] {
     // Save ONLY {name}. No duplicates thanks to Set.
-    return Array.from(this.selectedToolNames)
-      .filter(Boolean)
-      .map(name => ({ name }));
+    return Array.from(this.selectedToolNames).filter(Boolean)
+  }
+
+  /**
+   * Server CONFIG for the "mcp" integration: url/transport/native/id/customHeaders + the discovered
+   * available tools. The tool SELECTION is intentionally NOT persisted here — it lives on the action.
+   */
+  private buildServerConfigForIntegration(): McpServer {
+    const server: McpServer = { ...this.editedServer, tools: this.editedServer.tools };
+    delete server.selectedTools;
+    return server;
+  }
+
+  /**
+   * Enabled custom headers with both key and value filled, forwarded to the tools-discovery call
+   * so the backend can authenticate to the MCP server. Disabled/empty headers are dropped.
+   */
+  private buildEnabledHeadersPayload(): Array<{ key: string; value: string }> {
+    return (this.editedServer.customHeaders || [])
+      .filter(h => h && h.enabled && (h.key || '').trim() && (h.value || '').trim())
+      .map(h => ({ key: h.key.trim(), value: h.value.trim() }));
+  }
+
+  /** Server MCP nativo Tiledesk: name readonly, url nascosto, Connect via nativeId, Save su /mcp/servers. */
+  get isNative(): boolean {
+    return !!this.editedServer?.native;
   }
 
   isFormValid(): boolean {
-    return !!(this.editedServer.name && 
-              this.editedServer.url && 
+    if (this.isNative) {
+      // I server nativi non hanno url editabile: bastano name + transport.
+      return !!(this.editedServer.name && this.editedServer.transport);
+    }
+    return !!(this.editedServer.name &&
+              this.editedServer.url &&
               this.editedServer.transport);
   }
 
@@ -516,15 +541,6 @@ export class McpServerEditDialogComponent implements OnInit {
     }, 500);
 
     try {
-      const selectedTools = this.buildSelectedToolsPayload();
-      // Persist total available tools count from last Connect/Refresh so list dialog can show correct "X available".
-      const availableToolsCount = this.availableTools?.length ?? 0;
-      const serverToSave = {
-        ...this.editedServer,
-        tools: selectedTools,
-        availableToolsCount
-      };
-
       if (this.isNewServer) {
         // Check if server name already exists
         const nameExists = this.allMcpServers.some(s => s.name === this.editedServer.name);
@@ -536,41 +552,25 @@ export class McpServerEditDialogComponent implements OnInit {
           clearTimeout(loaderTimer);
           return;
         }
-        // Add new server to the array (include tools + selectedTools for persistence)
-        this.allMcpServers.push({
-          ...this.editedServer,
-          tools: this.editedServer.tools,
-          selectedTools: this.buildSelectedToolsPayload()
-        });
+        // Add the new server CONFIG only (tool selection lives on the action, not the integration).
+        this.allMcpServers.push(this.buildServerConfigForIntegration());
       } else {
-        // Find and update the server in the array (include tools + selectedTools for persistence)
+        // Update the server CONFIG only (tool selection lives on the action, not the integration).
         const serverIndex = this.allMcpServers.findIndex(s => s.name === this.originalServer.name);
+        const updatedServer = this.buildServerConfigForIntegration();
         if (serverIndex > -1) {
-          this.allMcpServers[serverIndex] = {
-            ...this.editedServer,
-            tools: this.editedServer.tools,
-            selectedTools: this.buildSelectedToolsPayload()
-          };
+          this.allMcpServers[serverIndex] = updatedServer;
+        } else {
+          // Server non ancora presente (es. server nativo configurato per la prima volta): aggiungilo alla lista.
+          this.allMcpServers.push(updatedServer);
         }
       }
 
-      // Prepare the integration object
-      const mcpIntegration: McpIntegration = {
-        id_project: this.project_id,
-        name: "mcp",
-        value: {
-          servers: this.allMcpServers
-        }
-      };
+      // Persistenza: custom e nativi (una volta configurati) salvati insieme nell'integration "mcp".
+      this.logger.log("[McpServerEditDialog] Saving MCP servers:", this.allMcpServers);
+      const response = await this.mcpService.saveMcpIntegration(this.allMcpServers, this.project_id);
 
-      this.logger.log("[McpServerEditDialog] Saving integration:", mcpIntegration);
-
-      // Call service to save the entire MCP integration
-      const response = await firstValueFrom(
-        this.projectService.saveIntegration(this.project_id, mcpIntegration)
-      );
-      
-      this.logger.log("[McpServerEditDialog] Integration saved successfully:", response);
+      this.logger.log("[McpServerEditDialog] MCP servers saved successfully:", response);
       
       // Clear the loader timer and hide states
       clearTimeout(loaderTimer);

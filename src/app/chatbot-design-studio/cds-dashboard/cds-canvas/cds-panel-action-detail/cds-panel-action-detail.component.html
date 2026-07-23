@@ -102,7 +102,8 @@
                     <cds-action-agent *ngSwitchCase="TYPE_ACTION.AGENT"
                         class="panel-response"    
                         [action]="elementSelected"
-                        [previewMode]="false">
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-agent>
 
                     <cds-action-wait *ngSwitchCase="TYPE_ACTION.WAIT"
@@ -485,6 +486,23 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-flow-log>
+
+                    <cds-action-sub-agent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-sub-agent>
+
+                    <cds-action-return *ngSwitchCase="TYPE_ACTION.RETURN"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-return>
 
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">

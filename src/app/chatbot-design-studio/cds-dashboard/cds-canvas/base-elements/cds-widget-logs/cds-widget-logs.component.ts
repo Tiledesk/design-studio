@@ -8,7 +8,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
-import { TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 
 @Component({
   selector: 'cds-widget-logs',
@@ -145,7 +145,7 @@ export class CdsWidgetLogsComponent implements OnInit {
     if(localStorage.getItem("log_animation_type") != null){
       this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
     };
-    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+    const chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot?.subtype);
     if(chatbotSubtype === TYPE_CHATBOT.WEBHOOK || chatbotSubtype === TYPE_CHATBOT.COPILOT){
       const webhook_id = await this.getWebhook();
       this.logger.log("[CDS-WIDGET-LOG] initializeChatbot webhook_id : ", webhook_id);
@@ -370,7 +370,7 @@ export class CdsWidgetLogsComponent implements OnInit {
       this.animationLog = JSON.parse(localStorage.getItem("log_animation_type"));
     };
     let scale = null;
-    const chatbotSubtype = this.dashboardService.selectedChatbot?.subtype;
+    const chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot?.subtype);
     if(chatbotSubtype === TYPE_CHATBOT.CHATBOT){
       scale = 1;
     }
