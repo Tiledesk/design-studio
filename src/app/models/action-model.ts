@@ -190,6 +190,8 @@ export class ActionWebRequestV2 extends Action {
     jsonBody: string;
     formData: Array<FormData>;
     bodyType: string;
+    /** Raw body sub-type when bodyType === 'raw'. Optional/additive: absent on actions created before this feature. */
+    rawType?: 'text' | 'javascript' | 'json' | 'html' | 'xml';
     assignResultTo: string;
     assignStatusTo: string;
     assignErrorTo: string;
