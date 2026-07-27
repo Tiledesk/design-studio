@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.11
+- **added**: added new google models
+
+# 1.40.10 
+- **added**: added documentation image and guide link to the Data Table action tooltip
+- **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
+- **changed**: cds-config-*.json assets are now published under /environments/real_data
 
 # 1.40.9 
 - **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
