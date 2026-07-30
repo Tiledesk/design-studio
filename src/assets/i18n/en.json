@@ -997,7 +997,7 @@
             "ReturnStack":{
                 "TITLE":"Return to the parent agent",
                 "DESCRIPTION":"Pops the subagent stack and resumes the parent agent flow from where it was paused.",
-                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
+                "IMAGE":"",
                 "VIDEO_URL":"",
                 "DOC_URL":""
             },

@@ -720,6 +720,10 @@ export class IntentService {
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
 
+    // updateIntent in coda fa refreshIntent solo sull'intent di destinazione:
+    // notifico esplicitamente anche il blocco sorgente, che deve ri-renderizzarsi
+    // (es. se resta con la sola azione "Return to parent agent" diventa una pastiglia)
+    this.behaviorIntent.next(previousIntent);
     this.updateIntent(currentIntent, previousIntent);
     return;
     // this.connectorService.updateConnector(currentIntent.intent_id);

@@ -5,7 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 import { Setting } from 'src/app/models/action-model';
-import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
+import { TYPE_ACTION, TYPE_ACTION_VXML, isReturnStackIntent } from '../utils-actions';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { filter, map, shareReplay } from 'rxjs/operators';
 
@@ -356,7 +356,9 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public async createConnectorsOfIntent(intent:any){
-    if(intent.attributes?.nextBlockAction){
+    // i nodi "Return to parent agent" sono terminali: nessun connettore in uscita,
+    // anche se su blocchi legacy è rimasto salvato un nextBlockAction.intentName stantio
+    if(intent.attributes?.nextBlockAction && !isReturnStackIntent(intent)){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;

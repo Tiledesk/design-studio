@@ -154,7 +154,7 @@ export const ACTIONS_LIST: {
     REPLACE_BOTV2:          { name: 'CDSActionList.NAME.ReplaceAIAgent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV2,        src: "assets/images/actions/replace_bot.svg",           status: "inactive",                     doc: "CDSActionList.DOC.ReplaceAIAgent"                                 },
     REPLACE_BOTV3:          { name: 'CDSActionList.NAME.ReplaceAIAgent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV3,        src: "assets/images/actions/replace_bot.svg",           status: "inactive",                     doc: "CDSActionList.DOC.ReplaceAIAgent"                                 },
     REPLACE_BOTV4:          { name: 'CDSActionList.NAME.InvokeSubagent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV4,        src: "assets/images/actions/replace_bot.svg",           status: "active",   badge: 'NEW',         doc: "CDSActionList.DOC.InvokeSubagent"                                 },
-    RETURN_STACK:           { name: 'CDSActionList.NAME.ReturnStack',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.RETURN_STACK,         src: "assets/images/actions/connect_intent.svg",          status: "active",   badge: 'NEW',         doc: "CDSActionList.DOC.ReturnStack"                                    },
+    RETURN_STACK:           { name: 'CDSActionList.NAME.ReturnStack',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.RETURN_STACK,         src: "assets/images/icons/stacks.svg",                  status: "active",   badge: 'NEW',         doc: "CDSActionList.DOC.ReturnStack"                                    },
     WAIT :                  { name: 'CDSActionList.NAME.Wait',                  chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.WAIT,                 src:"assets/images/actions/wait.svg",                   status: "active",                       doc: "CDSActionList.DOC.Wait"                                           },
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
     WEB_REQUESTV2 :         { name: 'CDSActionList.NAME.WebRequest',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_REQUESTV2,        src:"assets/images/actions/web_request.svg",            status: "active",                       doc: "CDSActionList.DOC.WebRequest"                                     },
@@ -199,4 +199,19 @@ export const ACTIONS_LIST: {
     BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
+}
+
+
+/**
+ * isReturnStackIntent
+ * true quando il blocco contiene SOLO l'azione "Return to parent agent":
+ * in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita.
+ * NB: il parametro è tipizzato `any` di proposito: importare `Intent` qui creerebbe
+ * il ciclo utils-actions -> intent-model -> action-model -> utils-actions.
+ */
+export function isReturnStackIntent(intent: any): boolean {
+    const actions = intent?.actions;
+    return Array.isArray(actions)
+        && actions.length === 1
+        && actions[0]?._tdActionType === TYPE_ACTION.RETURN_STACK;
 }
