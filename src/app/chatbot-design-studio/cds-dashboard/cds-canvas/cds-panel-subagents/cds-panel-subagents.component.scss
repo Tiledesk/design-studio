@@ -1,0 +1,171 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.subagents-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    margin: 6px 0 10px;
+
+    .search-icon {
+        position: absolute;
+        left: 22px;
+        font-size: 18px;
+        color: #9ba6b3;
+        pointer-events: none;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 34px;
+        padding: 0 10px 0 34px;
+        border: 1px solid #e2e8ee;
+        border-radius: 6px;
+        background: #fff;
+        font-family: var(--font-family-poppins);
+        font-size: 13px;
+        color: #22272d;
+        outline: none;
+        transition: border-color .2s;
+
+        &:focus {
+            border-color: var(--blu, #1f64ef);
+        }
+    }
+}
+
+.subagents-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px;
+
+    // Scrollbar minimalista: track trasparente, thumb sottile visibile solo su hover
+    &::-webkit-scrollbar { width: 6px; height: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
+    &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
+    &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
+}
+
+.subagent-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color .2s;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        background: #f0f4f7;
+    }
+
+    // elemento correntemente aperto (parent o subagent)
+    &.active {
+        background: #e7effe;
+
+        .subagent-icon { color: var(--blu, #1f64ef); }
+        .subagent-name { color: var(--blu, #1f64ef); font-weight: 600; }
+    }
+
+    .subagent-icon {
+        font-size: 18px;
+        color: #7d8a97;
+        flex-shrink: 0;
+    }
+
+    .subagent-name {
+        flex: 1;
+        font-size: 14px;
+        color: #444a51;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+// riga del chatbot parent: sempre in cima, con badge e separatore
+.parent-item {
+    margin-bottom: 4px;
+    border-bottom: 1px solid #eef2f6;
+    border-radius: 6px 6px 0 0;
+
+    .parent-badge {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: #7d8a97;
+        background: #eef2f6;
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+
+    &.active .parent-badge {
+        color: var(--blu, #1f64ef);
+        background: #dbe7fe;
+    }
+}
+
+.subagents-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    text-align: center;
+    color: #9ba6b3;
+
+    .empty-icon {
+        font-size: 40px;
+        opacity: 0.5;
+        margin-bottom: 10px;
+    }
+
+    .empty-text {
+        font-size: 13px;
+        margin: 0;
+    }
+}
+
+.subagents-new {
+    padding: 4px 12px 10px;
+
+    .new-subagent-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        height: 36px;
+        border: 1px solid #c6cdd4;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--blu, #1f64ef);
+        font-family: var(--font-family-poppins);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color .2s, border-color .2s;
+
+        .material-icons {
+            font-size: 18px;
+        }
+
+        &:hover {
+            background: #f0f4f7;
+            border-color: var(--blu, #1f64ef);
+        }
+    }
+}

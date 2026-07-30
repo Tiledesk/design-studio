@@ -26,6 +26,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   
   @Input() IS_OPEN: boolean;
   @Input() intent_id: string;
+  /** nasconde il titolo interno "Blocks" quando il pannello è sotto i tab Blocks/Subagents */
+  @Input() hideTitle: boolean = false;
   @Output() selectIntent = new EventEmitter();
   @Output() deleteIntent = new EventEmitter();
  

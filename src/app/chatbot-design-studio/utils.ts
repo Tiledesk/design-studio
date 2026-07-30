@@ -34,18 +34,18 @@ export const DOCS_LINK = {
         more_json_uttons: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        twilio: {
+        'twilio': {
             voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
         },
-        openai: {
+        'openai': {
             tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
             voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
         },
-        elevenlabs: {
+        'elevenlabs': {
             tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
-            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},
-            voice_elevenlabs: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
         },
     },
     LIQUIDJS: {
@@ -207,24 +207,50 @@ export enum TYPE_EVENT_CATEGORY {
 }
 
 export enum TYPE_OPERATOR {
-    equalAsNumbers          = "equalAsNumbers",
+    // Existence / generic (unary, type-agnostic)
+    exists                  = "exists",
+    doesNotExist            = "doesNotExist",
+    isEmpty                 = "isEmpty",
+    isNotEmpty              = "isNotEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    // Text (string coercion)
     equalAsStrings          = "equalAsStrings",
-    notEqualAsNumbers       = "notEqualAsNumbers",
     notEqualAsStrings       = "notEqualAsStrings",
+    contains                = "contains",
+    notContains             = "notContains",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    endsWith                = "endsWith",
+    notEndsWith             = "notEndsWith",
+    matches                 = "matches",
+    notMatches              = "notMatches",
+    // Number (number coercion)
+    equalAsNumbers          = "equalAsNumbers",
+    notEqualAsNumbers       = "notEqualAsNumbers",
     greaterThan             = "greaterThan",
     greaterThanOrEqual      = "greaterThanOrEqual",
     lessThan                = "lessThan",
     lessThanOrEqual         = "lessThanOrEqual",
-    startsWith              = "startsWith",
-    notStartsWith           = 'notStartsWith',
-    startsWithIgnoreCase    = "startsWithIgnoreCase",
-    contains                = "contains",
-    containsIgnoreCase      = "containsIgnoreCase",
-    endsWith                = "endsWith",
-    isEmpty                 = "isEmpty",
-    isNull                  = "isNull",
-    isUndefined             = "isUndefined",
-    matches                 = "matches"
+    // Boolean (unary)
+    isTrue                  = "isTrue",
+    isFalse                 = "isFalse",
+    // Date & Time (date coercion)
+    equalAsDate             = "equalAsDate",
+    notEqualAsDate          = "notEqualAsDate",
+    isAfter                 = "isAfter",
+    isBefore                = "isBefore",
+    isAfterOrEqual          = "isAfterOrEqual",
+    isBeforeOrEqual         = "isBeforeOrEqual",
+    // Array (length -> number; contains -> string)
+    arrayContains           = "arrayContains",
+    arrayNotContains        = "arrayNotContains",
+    lengthEqualTo           = "lengthEqualTo",
+    lengthNotEqualTo        = "lengthNotEqualTo",
+    lengthGreaterThan       = "lengthGreaterThan",
+    lengthLessThan          = "lengthLessThan",
+    lengthGreaterThanOrEqual = "lengthGreaterThanOrEqual",
+    lengthLessThanOrEqual   = "lengthLessThanOrEqual"
 }
 
 /**
@@ -314,21 +340,6 @@ export enum OPTIONS {
     ALPHA       = 'alpha'
 }
 
-export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
-    { name: "GPT-4.1",                          value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 mini",                     value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 nano",                     value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
-    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
-    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
-    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
-    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
-    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "inactive"    },
-    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "inactive"    }
-]
-
-
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
 export const MESSAGE_METADTA_HEIGHT = 230;
@@ -366,25 +377,51 @@ export const EVENTS_LIST = {
     RULE:       { name: 'Rule',     type: TYPE_EVENT_CATEGORY.RULE,     src: "assets/images/events/rule.svg"    },
 }
 
-export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATOR, src?: string } } = {
-    "equalAsNumbers":           { name: "CDSOperatorList.equalAsNumbers",                   type: TYPE_OPERATOR.equalAsNumbers,                 src: "assets/images/operators/equal.svg"        },
-    "equalAsStrings":           { name: "CDSOperatorList.equalAsStrings",                   type: TYPE_OPERATOR.equalAsStrings,                 src: "assets/images/operators/equal.svg"        },
-    "notEqualAsNumbers":        { name: "CDSOperatorList.notEqualAsNumbers",                type: TYPE_OPERATOR.notEqualAsNumbers,              src: "assets/images/operators/not-equal.svg"    },
-    "notEqualAsStrings":        { name: "CDSOperatorList.notEqualAsStrings",                type: TYPE_OPERATOR.notEqualAsStrings,              src: "assets/images/operators/not-equal.svg"    },
-    "greaterThan":              { name: "CDSOperatorList.greaterThan",                      type: TYPE_OPERATOR.greaterThan,                    src: "assets/images/operators/grather.svg"      },
-    "greaterThanOrEqual":       { name: "CDSOperatorList.greaterThanOrEqual",               type: TYPE_OPERATOR.greaterThanOrEqual,             src: "assets/images/operators/gratherEqual.svg" },
-    "lessThan":                 { name: "CDSOperatorList.lessThan",                         type: TYPE_OPERATOR.lessThan,                       src: "assets/images/operators/less.svg"         },
-    "lessThanOrEqual":          { name: "CDSOperatorList.lessThanOrEqual",                  type: TYPE_OPERATOR.lessThanOrEqual,                src: "assets/images/operators/lessEqual.svg"    },
-    "startsWith":               { name: "CDSOperatorList.startsWith",                       type: TYPE_OPERATOR.startsWith                                                                      },
-    "notStartsWith":            { name: "CDSOperatorList.notStartsWith",                    type: TYPE_OPERATOR.notStartsWith                                                                   },
-    "startsWithIgnoreCase":     { name: "CDSOperatorList.startsWithIgnoreCase",             type: TYPE_OPERATOR.startsWithIgnoreCase                                                            },
-    "endsWith":                 { name: "CDSOperatorList.endsWith",                         type: TYPE_OPERATOR.endsWith                                                                        },
-    "contains":                 { name: "CDSOperatorList.contains",                         type: TYPE_OPERATOR.contains                                                                        },
-    "containsIgnoreCase":       { name: "CDSOperatorList.containsIgnoreCase",               type: TYPE_OPERATOR.containsIgnoreCase                                                              },
-    "isEmpty":                  { name: "CDSOperatorList.isEmpty",                          type: TYPE_OPERATOR.isEmpty                                                                         },
-    "isNull":                   { name: "CDSOperatorList.isNull",                           type: TYPE_OPERATOR.isNull                                                                          },
-    "isUndefined":              { name: "CDSOperatorList.isUndefined",                      type: TYPE_OPERATOR.isUndefined                                                                     },
-    "matches":                  { name: "CDSOperatorList.matches",                          type: TYPE_OPERATOR.matches                                                                         }
+export const OPERATORS_LIST: { [key: string]: { name: string, type: TYPE_OPERATOR, src?: string, group?: string } } = {
+    // --- Existence / generic (unary) ---
+    "exists":                   { name: "CDSOperatorList.exists",                          type: TYPE_OPERATOR.exists,                         group: "Existence"   },
+    "doesNotExist":             { name: "CDSOperatorList.doesNotExist",                    type: TYPE_OPERATOR.doesNotExist,                   group: "Existence"   },
+    "isEmpty":                  { name: "CDSOperatorList.isEmpty",                         type: TYPE_OPERATOR.isEmpty,                        group: "Existence"   },
+    "isNotEmpty":               { name: "CDSOperatorList.isNotEmpty",                      type: TYPE_OPERATOR.isNotEmpty,                     group: "Existence"   },
+    "isNull":                   { name: "CDSOperatorList.isNull",                          type: TYPE_OPERATOR.isNull,                         group: "Existence"   },
+    "isUndefined":              { name: "CDSOperatorList.isUndefined",                     type: TYPE_OPERATOR.isUndefined,                    group: "Existence"   },
+    // --- Text (string coercion) ---
+    "equalAsStrings":           { name: "CDSOperatorList.equalAsStrings",                  type: TYPE_OPERATOR.equalAsStrings,                 src: "assets/images/operators/equal.svg",     group: "Text" },
+    "notEqualAsStrings":        { name: "CDSOperatorList.notEqualAsStrings",               type: TYPE_OPERATOR.notEqualAsStrings,              src: "assets/images/operators/not-equal.svg", group: "Text" },
+    "contains":                 { name: "CDSOperatorList.contains",                        type: TYPE_OPERATOR.contains,                       group: "Text" },
+    "notContains":              { name: "CDSOperatorList.notContains",                     type: TYPE_OPERATOR.notContains,                    group: "Text" },
+    "startsWith":               { name: "CDSOperatorList.startsWith",                      type: TYPE_OPERATOR.startsWith,                     group: "Text" },
+    "notStartsWith":            { name: "CDSOperatorList.notStartsWith",                   type: TYPE_OPERATOR.notStartsWith,                  group: "Text" },
+    "endsWith":                 { name: "CDSOperatorList.endsWith",                        type: TYPE_OPERATOR.endsWith,                       group: "Text" },
+    "notEndsWith":              { name: "CDSOperatorList.notEndsWith",                     type: TYPE_OPERATOR.notEndsWith,                    group: "Text" },
+    "matches":                  { name: "CDSOperatorList.matches",                         type: TYPE_OPERATOR.matches,                        group: "Text" },
+    "notMatches":               { name: "CDSOperatorList.notMatches",                      type: TYPE_OPERATOR.notMatches,                     group: "Text" },
+    // --- Number (number coercion) ---
+    "equalAsNumbers":           { name: "CDSOperatorList.equalAsNumbers",                  type: TYPE_OPERATOR.equalAsNumbers,                 src: "assets/images/operators/equal.svg",     group: "Number" },
+    "notEqualAsNumbers":        { name: "CDSOperatorList.notEqualAsNumbers",               type: TYPE_OPERATOR.notEqualAsNumbers,              src: "assets/images/operators/not-equal.svg", group: "Number" },
+    "greaterThan":              { name: "CDSOperatorList.greaterThan",                     type: TYPE_OPERATOR.greaterThan,                    src: "assets/images/operators/grather.svg",   group: "Number" },
+    "greaterThanOrEqual":       { name: "CDSOperatorList.greaterThanOrEqual",              type: TYPE_OPERATOR.greaterThanOrEqual,             src: "assets/images/operators/gratherEqual.svg", group: "Number" },
+    "lessThan":                 { name: "CDSOperatorList.lessThan",                        type: TYPE_OPERATOR.lessThan,                       src: "assets/images/operators/less.svg",      group: "Number" },
+    "lessThanOrEqual":          { name: "CDSOperatorList.lessThanOrEqual",                 type: TYPE_OPERATOR.lessThanOrEqual,                src: "assets/images/operators/lessEqual.svg", group: "Number" },
+    // --- Boolean (unary) ---
+    "isTrue":                   { name: "CDSOperatorList.isTrue",                          type: TYPE_OPERATOR.isTrue,                         group: "Boolean" },
+    "isFalse":                  { name: "CDSOperatorList.isFalse",                         type: TYPE_OPERATOR.isFalse,                        group: "Boolean" },
+    // --- Date & Time (date coercion) ---
+    "equalAsDate":              { name: "CDSOperatorList.equalAsDate",                     type: TYPE_OPERATOR.equalAsDate,                    group: "Date & Time" },
+    "notEqualAsDate":           { name: "CDSOperatorList.notEqualAsDate",                  type: TYPE_OPERATOR.notEqualAsDate,                 group: "Date & Time" },
+    "isAfter":                  { name: "CDSOperatorList.isAfter",                         type: TYPE_OPERATOR.isAfter,                        group: "Date & Time" },
+    "isBefore":                 { name: "CDSOperatorList.isBefore",                        type: TYPE_OPERATOR.isBefore,                       group: "Date & Time" },
+    "isAfterOrEqual":           { name: "CDSOperatorList.isAfterOrEqual",                  type: TYPE_OPERATOR.isAfterOrEqual,                 group: "Date & Time" },
+    "isBeforeOrEqual":          { name: "CDSOperatorList.isBeforeOrEqual",                 type: TYPE_OPERATOR.isBeforeOrEqual,                group: "Date & Time" },
+    // --- Array (length -> number; contains -> string) ---
+    "arrayContains":            { name: "CDSOperatorList.arrayContains",                   type: TYPE_OPERATOR.arrayContains,                  group: "Array" },
+    "arrayNotContains":         { name: "CDSOperatorList.arrayNotContains",                type: TYPE_OPERATOR.arrayNotContains,               group: "Array" },
+    "lengthEqualTo":            { name: "CDSOperatorList.lengthEqualTo",                   type: TYPE_OPERATOR.lengthEqualTo,                  group: "Array" },
+    "lengthNotEqualTo":         { name: "CDSOperatorList.lengthNotEqualTo",                type: TYPE_OPERATOR.lengthNotEqualTo,               group: "Array" },
+    "lengthGreaterThan":        { name: "CDSOperatorList.lengthGreaterThan",               type: TYPE_OPERATOR.lengthGreaterThan,              group: "Array" },
+    "lengthLessThan":           { name: "CDSOperatorList.lengthLessThan",                  type: TYPE_OPERATOR.lengthLessThan,                 group: "Array" },
+    "lengthGreaterThanOrEqual": { name: "CDSOperatorList.lengthGreaterThanOrEqual",        type: TYPE_OPERATOR.lengthGreaterThanOrEqual,       group: "Array" },
+    "lengthLessThanOrEqual":    { name: "CDSOperatorList.lengthLessThanOrEqual",           type: TYPE_OPERATOR.lengthLessThanOrEqual,          group: "Array" }
 }
 
 /** Catalogo operatori della JSON Condition V2 e dei filtri reply V2 (chiavi i18n dedicate CDSOperatorListV2.*). */
@@ -893,4 +930,158 @@ export class ColorUtils {
     // fallback sul colore di default (già con alpha desiderato)
     return defaultColor;
   }
+}
+// =============================
+// INTENT UTILITY FUNCTIONS
+// =============================
+
+/**
+ * Verifica se il colore fornito è valido.
+ * 
+ * @param color - Colore da validare
+ * @returns true se il colore è valido, false altrimenti
+ */
+export function isValidColor(color: any): boolean {
+  return color && color !== undefined && color !== null && color !== '';
+}
+
+/**
+ * Verifica se gli ID sono validi per la creazione di un connettore.
+ * 
+ * @param fromId - ID di origine
+ * @param toId - ID di destinazione
+ * @returns true se gli ID sono validi, false altrimenti
+ */
+export function areValidIds(fromId: string | null, toId: string | null): boolean {
+  return fromId !== null && toId !== null && fromId !== '' && toId !== '';
+}
+
+/**
+ * Trova la chiave dell'enum corrispondente al tipo di azione.
+ * 
+ * @param actionType - Il tipo di azione da cercare
+ * @param TYPE_ACTION - L'enum dei tipi di azione
+ * @returns La chiave dell'enum o null se non trovata
+ */
+export function findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+  const enumKeys = Object.keys(TYPE_ACTION);
+  
+  for (const key of enumKeys) {
+    if (TYPE_ACTION[key] === actionType) {
+      return key;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Aggiunge una classe CSS a un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da aggiungere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function addCssClassToElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log("[UTILS] Aggiunta classe CSS:", className, "a elemento:", componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element) {
+      element.classList.add(className);
+      if (logger) {
+        logger.log("[UTILS] Classe aggiunta con successo");
+      }
+    } else {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nell'aggiunta della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Rimuove una classe CSS da un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da rimuovere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function removeCssClassFromElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log('[UTILS] Rimozione classe CSS:', className, 'da elemento:', componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+      if (logger) {
+        logger.log("[UTILS] Classe rimossa con successo");
+      }
+    } else if (!element) {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    } else {
+      if (logger) {
+        logger.debug("[UTILS] Classe non presente sull'elemento:", className);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nella rimozione della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Calcola il numero di domande da una stringa di testo.
+ * 
+ * @param questionText - Testo contenente le domande
+ * @returns Numero di domande calcolato
+ */
+export function calculateQuestionCount(questionText: string): number {
+  if (!questionText) {
+    return 0;
+  }
+  
+  const questionSegments = questionText
+    .split(/\r?\n/)
+    .filter(segment => segment.trim() !== '');
+  
+  return questionSegments.length;
+}
+
+/**
+ * Calcola la dimensione di un form.
+ * 
+ * @param form - Oggetto form da analizzare
+ * @returns Dimensione del form (numero di campi)
+ */
+export function calculateFormSize(form: any): number {
+  if (form && form !== null) {
+    return Object.keys(form).length;
+  }
+  return 0;
 }

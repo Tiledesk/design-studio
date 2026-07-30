@@ -77,6 +77,71 @@ export const COHERE_MODEL: Array<{ name: string, value: string, description:stri
 
 export const GOOGLE_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number, reasoning: boolean}> = [
   {
+    name: "Gemini 3.1 pro",
+    value: "gemini-3-pro-preview",
+    description: "TYPE_GPT_MODEL.gemini-3-pro-preview.description",
+    status: "inactive",
+    min_tokens: 1,
+    max_output_tokens: 65536,
+    reasoning: true
+  },
+  {
+    name: "Gemini Omni Flash",
+    value: "gemini-2.5-flash",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 1000000,
+    reasoning: true
+  },
+  {
+    name: "Gemini 3.6 Flash",
+    value: "gemini-2.5-flash",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 1000000,
+    reasoning: true
+  },
+  {
+    name: "Gemini 3.5 Flash",
+    value: "gemini-2.5-flash",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 1000000,
+    reasoning: true
+  },
+  {
+    name: "Gemini 3.5 Flash-Lite",
+    value: "gemini-2.5-flash",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 1000000,
+    reasoning: true
+  },
+  {
+    name: "Gemini 3.1 Flash Image",
+    value: "gemini-2.5-flash",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 1000000,
+    reasoning: true
+  },
+  {
+    name: "Gemini 3.1 Flash-Lite Image",
+    value: "gemini-2.5-flash",
+    description: "TYPE_GPT_MODEL.gemini-2.5-flash.description",
+    status: "active",
+    min_tokens: 1,
+    max_output_tokens: 1000000,
+    reasoning: true
+  },
+  
+  
+  {
     name: "Gemini 3 pro preview",
     value: "gemini-3-pro-preview",
     description: "TYPE_GPT_MODEL.gemini-3-pro-preview.description",

@@ -10,6 +10,8 @@ import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
 import { CdsCanvasComponent } from './cds-canvas.component';
 import { CdsPanelIntentListComponent } from './cds-panel-intent-list/cds-panel-intent-list.component';
+import { CdsPanelSubagentsComponent } from './cds-panel-subagents/cds-panel-subagents.component';
+import { CdsNewSubagentDialogComponent } from './cds-panel-subagents/cds-new-subagent-dialog/cds-new-subagent-dialog.component';
 import { CdsPanelWidgetComponent } from './cds-panel-widget/cds-panel-widget.component';
 import { ContextMenuComponent } from './base-elements/context-menu/context-menu.component';
 import { CdsActionArrowComponent } from './actions/shared/cds-action-controls/cds-action-arrow/cds-action-arrow.component';
@@ -69,6 +71,8 @@ const routes: Routes = [
 
     //CDS PANEL INTENT LIST
     CdsPanelIntentListComponent,
+    CdsPanelSubagentsComponent,
+    CdsNewSubagentDialogComponent,
 
     //CDS PANEL ACTION DETAIL
     CdsActionDetailPanelComponent,
