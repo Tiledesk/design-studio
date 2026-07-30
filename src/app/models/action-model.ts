@@ -272,6 +272,24 @@ export class ActionReplaceBotV3 extends Action {
     }
 }
 
+export class ActionReplaceBotV4 extends Action {
+    botId: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV4;
+    }
+}
+
+export class ActionReturnStack extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN_STACK;
+    }
+}
+
 export class ActionChangeDepartment extends Action {
     depName: string;
     constructor(){
