@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TYPE_ACTION, TYPE_ACTION_CATEGORY } from '../utils-actions';
-import { ConnectorActionEntry, ConnectorManifest, ConnectorManifestGroup } from './connector-manifest.model';
+import { ConnectorActionEntry, ConnectorAuthConfig, ConnectorManifest, ConnectorManifestGroup } from './connector-manifest.model';
 import { ConnectorTriggerGroup } from './connector-trigger.model';
 
 export interface ConnectorPaletteEntry {
@@ -14,6 +14,8 @@ export interface ConnectorPaletteEntry {
   src: string;
   status: 'active';
   connectorRef: string;             // entry.id
+  baseUrl: string;                  // connector base URL — for the OAuth auth row
+  auth: ConnectorAuthConfig;        // connector-level OAuth config
   connectorEntry: ConnectorActionEntry;
 }
 
@@ -51,7 +53,11 @@ export class ConnectorCatalogService {
       src: manifest.connector?.icon || 'assets/images/actions/web_request.svg',
       status: 'active' as const,
       connectorRef: a.id,
-      connectorEntry: { ...a, icon: manifest.connector?.icon }
+      baseUrl: manifest.connector?.baseUrl,
+      auth: manifest.connector?.auth,
+      // Thread connector-level baseUrl/auth onto the entry so the action factory
+      // (which only receives connectorEntry) can stamp `_tdConnector`.
+      connectorEntry: { ...a, icon: manifest.connector?.icon, baseUrl: manifest.connector?.baseUrl, auth: manifest.connector?.auth }
     }));
   }
 
@@ -103,6 +109,7 @@ export class ConnectorCatalogService {
       icon: manifest.connector?.icon || 'assets/images/actions/web_request.svg',
       baseUrl,
       apiKey,
+      auth: manifest.connector?.auth,
       entries: (manifest.triggers || []).map(t => ({ ...t, icon: manifest.connector?.icon })),
       groups: manifest.groups || [],
     };

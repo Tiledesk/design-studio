@@ -30,6 +30,12 @@ export class CdsActionConnectorComponent implements OnInit, OnDestroy, OnChanges
   meta: ConnectorMeta = { name: '', inputs: [] };
   values: { [id: string]: string } = {};
 
+  // OAuth auth row (edit mode). Sourced from action._tdConnector stamped at build time,
+  // with a fallback to the action.url origin for older saved actions.
+  connectorBaseUrl: string = '';
+  connectorRef: string = '';
+  requiresAuth: boolean = false;
+
   listOfIntents: Array<{ name: string, value: string, icon?: string }>;
 
   // Connectors
@@ -72,6 +78,7 @@ export class CdsActionConnectorComponent implements OnInit, OnDestroy, OnChanges
 
   private initialize(): void {
     this.meta = (this.action as any)._tdConnectorMeta || { name: '', inputs: [] };
+    this.initializeAuthRow();
     this.values = readConnectorInputs(this.action);
     // Ensure every declared input has a key so ngModel binds
     this.meta.inputs.forEach(i => {
@@ -79,6 +86,28 @@ export class CdsActionConnectorComponent implements OnInit, OnDestroy, OnChanges
     });
     if (this.intentSelected) {
       this.initializeConnector();
+    }
+  }
+
+  /** Resolve the connector identity for the OAuth auth row. Reads `_tdConnector`
+   *  (stamped at build time); falls back to the action.url origin for older actions,
+   *  with requiresAuth defaulting false so the row stays hidden when auth is unknown. */
+  private initializeAuthRow(): void {
+    const conn = (this.action as any)?._tdConnector;
+    if (conn && conn.baseUrl) {
+      this.connectorBaseUrl = conn.baseUrl;
+      this.connectorRef = conn.ref || '';
+      const auth = conn.auth;
+      this.requiresAuth = !!(auth && auth.type) && auth.type !== 'none';
+      return;
+    }
+    // Fallback for pre-existing actions without _tdConnector.
+    this.connectorRef = (this.action as any)?._tdConnectorRef || '';
+    this.requiresAuth = false;
+    try {
+      this.connectorBaseUrl = this.action?.url ? new URL(this.action.url).origin : '';
+    } catch {
+      this.connectorBaseUrl = '';
     }
   }
 

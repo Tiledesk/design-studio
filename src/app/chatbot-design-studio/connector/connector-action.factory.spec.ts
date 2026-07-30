@@ -9,7 +9,9 @@ const entry: ConnectorActionEntry = {
     method: 'POST', url: 'https://conn.example.com/api/actions',
     headers: { 'Content-Type': 'application/json' },
     bodyTemplate: { id: 'gmail.send-email', external_id: '{projectId}', inputs: { to: '{{to}}' } }
-  }
+  },
+  baseUrl: 'https://conn.example.com',
+  auth: { type: 'oauth2', installPath: '/auth/google', scopes: [] }
 };
 
 describe('buildConnectorAction', () => {
@@ -49,6 +51,12 @@ describe('buildConnectorAction', () => {
     const body = JSON.parse(a.jsonBody);
     expect(body.inputs.pageSize).toBe('10');
     expect(body.inputs.query).toBe('');
+  });
+  it('stamps _tdConnector with ref / baseUrl / auth from the entry', () => {
+    const a: any = buildConnectorAction(entry);
+    expect(a._tdConnector.ref).toBe('gmail.send-email');
+    expect(a._tdConnector.baseUrl).toBe('https://conn.example.com');
+    expect(a._tdConnector.auth.type).toBe('oauth2');
   });
   it('seeds falsy-but-valid defaults (0, false) rather than dropping them to empty', () => {
     const withFalsyDefaults: any = {

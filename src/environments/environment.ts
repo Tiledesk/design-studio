@@ -1,15 +1,21 @@
 export const environment = {
-    production: true,
+    production: false,
     t2y12PruGU9wUtEGzBJfolMIgK: 'CHANGEIT',
     VERSION: require('../../package.json').version,
-    remoteConfig: true, 
-    remoteConfigUrl: './design-studio-config.json',
-    //remoteConfigUrl: './environments/real_data/cds-config-aws-stage.json',
-    apiUrl: 'CHANGEIT',
-    widgetBaseUrl: 'CHANGEIT',
-    dashboardBaseUrl: 'CHANGEIT',
+    // Local dev: the remote config JSON is a Docker/envsubst template full of
+    // unsubstituted ${VAR} placeholders (same issue as tiledesk-dashboard's
+    // dashboard-config.json) - fetching it overwrites every good default below.
+    remoteConfig: false,
+    remoteConfigUrl: '/environments/real_data/cds-config-native-collaudo.json',
+    // remoteConfigUrl: './real_data/cds-config-native-prod.json',
+    // remoteConfigUrl: './real_data/cds-config-aws-stage.json',
+    // remoteConfigUrl: './environments/real_data/cds-config-aws-stage.json',
+    // remoteConfigUrl: './design-studio-config.json',
+    apiUrl: 'http://localhost:3001/',
+    widgetBaseUrl: 'http://localhost:4200/launch.js',
+    dashboardBaseUrl: 'http://localhost:4200/',
     whatsappTemplatesBaseUrl: 'CHANGEIT',
-    wsUrl: 'ws://localhost:3000/',
+    wsUrl: 'ws://localhost:3001/',
     uploadEngine: 'native',
     baseImageUrl: 'CHANGEIT',
     fileUploadAccept: "*/*",
@@ -31,5 +37,8 @@ export const environment = {
       appId: 'tilechat',
       MQTTendpoint: 'mqtt://localhost:15675/ws', // MQTT endpoint
       APIendpoint: 'http://localhost:8004/api'
-    }
+    },
+    // TEMP: connectors surfaced directly from their /api/manifest until the per-project
+    // install/integration-record flow exists. Empty in prod/pre.
+    connectorBaseUrls: ['http://localhost:3000']
 };

@@ -1,4 +1,4 @@
-import { ConnectorActionEntry, ConnectorManifestGroup } from './connector-manifest.model';
+import { ConnectorActionEntry, ConnectorAuthConfig, ConnectorManifestGroup } from './connector-manifest.model';
 import { ConnectorFormInput, connectorMetaFromEntry } from './connector-action-form.util';
 
 // A trigger descriptor has the same manifest shape as an action entry.
@@ -10,6 +10,7 @@ export interface ConnectorTriggerGroup {
   icon: string;
   baseUrl: string;     // connector base URL — needed to call /api/triggers
   apiKey?: string;     // Bearer key from the integration record (absent on the dev env path)
+  auth?: ConnectorAuthConfig;   // connector-level OAuth config — for the shared auth row
   entries: ConnectorTriggerEntry[];
   groups?: ConnectorManifestGroup[];   // manifest group table — for label resolution in the dropdown
 }

@@ -15,6 +15,8 @@ export function buildConnectorAction(entry: ConnectorActionEntry): ActionWebRequ
   a.assignErrorTo = 'error';
   (a as any)._tdConnectorRef = entry.id;
   (a as any)._tdConnectorMeta = connectorMetaFromEntry(entry);
+  // Connector identity for the OAuth auth row on the action panel (Approach A).
+  (a as any)._tdConnector = { ref: entry.id, baseUrl: entry.baseUrl, auth: entry.auth };
   const seededValues: { [id: string]: string } = {};
   (entry.inputs || []).forEach(i => {
     seededValues[i.id] = (i.default !== undefined && i.default !== null) ? String(i.default) : '';
