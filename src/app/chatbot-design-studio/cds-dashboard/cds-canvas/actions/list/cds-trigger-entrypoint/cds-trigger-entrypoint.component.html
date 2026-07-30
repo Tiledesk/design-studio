@@ -1,16 +1,13 @@
 <div class="trigger-entrypoint">
   <div class="te-title">{{ 'CDSCanvas.Triggers' | translate }}</div>
 
-  <div class="te-auth" *ngFor="let g of availableGroups">
-    <img class="te-icon" *ngIf="g.icon" [src]="g.icon" alt="">
-    <div class="te-auth-info">
-      <span class="te-auth-name ellips">{{ g.name }}</span>
-      <span class="te-auth-email ellips" *ngIf="authByGroup[g.id] && emailByGroup[g.id]">{{ emailByGroup[g.id] }}</span>
-    </div>
-    <span class="te-auth-ok" *ngIf="authByGroup[g.id]">{{ 'CDSCanvas.Connected' | translate }}</span>
-    <button class="te-auth-btn ghost" *ngIf="authByGroup[g.id]" (click)="onConnect(g, true)">{{ 'CDSCanvas.ChangeAccount' | translate }}</button>
-    <button class="te-auth-btn" *ngIf="!authByGroup[g.id]" (click)="onConnect(g)">{{ 'CDSCanvas.Connect' | translate }}</button>
-  </div>
+  <cds-connector-auth-row *ngFor="let g of availableGroups"
+      [baseUrl]="g.baseUrl"
+      [requiresAuth]="requiresAuth(g)"
+      [connectorId]="g.id"
+      [name]="g.name"
+      [icon]="g.icon">
+  </cds-connector-auth-row>
 
   <div class="te-add" *ngIf="availableSelectItems.length">
     <cds-select class="te-add-select"

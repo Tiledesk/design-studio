@@ -38,6 +38,19 @@ describe('ConnectorCatalogService', () => {
     expect(entries[0].connectorEntry.id).toBe('gmail.send-email');
   });
 
+  it('carries the connector baseUrl and auth onto palette entries (and the connectorEntry)', () => {
+    const entries = svc.toPaletteEntries(manifest);
+    expect(entries[0].baseUrl).toBe('https://c');
+    expect(entries[0].auth.type).toBe('oauth2');
+    expect((entries[0].connectorEntry as any).baseUrl).toBe('https://c');
+    expect((entries[0].connectorEntry as any).auth.type).toBe('oauth2');
+  });
+
+  it('carries the connector auth onto the trigger group', () => {
+    const tg = svc.toTriggerGroup(manifest, 'https://c');
+    expect(tg.auth!.type).toBe('oauth2');
+  });
+
   it('injects the connector icon into palette entries and src', () => {
     const withIcon = { ...manifest, connector: { ...manifest.connector, icon: 'https://c/assets/connector-icon.svg' } };
     const entries = svc.toPaletteEntries(withIcon);

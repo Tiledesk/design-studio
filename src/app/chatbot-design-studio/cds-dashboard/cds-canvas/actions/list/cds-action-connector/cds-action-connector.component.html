@@ -47,6 +47,15 @@
 
     <div class="connector-action-title" *ngIf="meta.name">{{ meta.name }}</div>
 
+    <!-- OAuth auth row — only for connectors that declare OAuth -->
+    <cds-connector-auth-row
+        [baseUrl]="connectorBaseUrl"
+        [requiresAuth]="requiresAuth"
+        [connectorId]="connectorRef"
+        [name]="meta.name"
+        [icon]="meta.icon">
+    </cds-connector-auth-row>
+
     <!-- One control per declared input, chosen by type -->
     <div class="field-box connector-field" *ngFor="let input of meta.inputs" [ngSwitch]="controlType(input)">
         <label class="title-label">

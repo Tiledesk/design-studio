@@ -20,6 +20,12 @@ export interface ConnectorWebRequestHint {
   bodyTemplate: { [k: string]: unknown };
 }
 
+export interface ConnectorAuthConfig {
+  type: string;
+  installPath?: string;
+  scopes?: string[];
+}
+
 export interface ConnectorActionEntry {
   id: string;            // "pluginId.actionId"
   name: string;
@@ -29,6 +35,10 @@ export interface ConnectorActionEntry {
   outputs: ConnectorProperty[];
   webrequest: ConnectorWebRequestHint;
   icon?: string;
+  // Connector-level identity threaded through from the manifest at palette-build
+  // time, so the action factory can stamp `_tdConnector` (baseUrl + OAuth config).
+  baseUrl?: string;
+  auth?: ConnectorAuthConfig;
 }
 
 export interface ConnectorManifestGroup {
@@ -45,7 +55,7 @@ export interface ConnectorManifest {
     version: string;
     description: string;
     baseUrl: string;
-    auth: { type: string; installPath: string; scopes: string[] };
+    auth: ConnectorAuthConfig;
     icon?: string;
   };
   actions: ConnectorActionEntry[];

@@ -10,7 +10,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 4201",
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
