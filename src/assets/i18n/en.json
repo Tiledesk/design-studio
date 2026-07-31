@@ -522,6 +522,9 @@
         "ChooseBlockDescription": "Automatically execute this block when the Agent joins the conversation",
         "ExecuteBlock": "Execute block",
         "ThisRequestNoBody": "This request does not have a body",
+        "WebRequestInvalidJson": "Invalid JSON",
+        "WebRequestInvalidXml": "Invalid XML",
+        "WebRequestInvalidJs": "Invalid JavaScript",
         "Location": "Location",
         "PhoneNumber": "Phone number",
         "HeaderParameters": "Header parameters",
@@ -907,6 +910,8 @@
             "DeleteAttribute": "Delete attribute",
             "ReplaceBot": "Replace bot",
             "ReplaceAIAgent":"Replace AI Agent",
+            "InvokeSubagent":"Invoke subagent",
+            "ReturnStack":"Return to parent agent",
             "Wait": "Wait",
             "WebRequest": "Web request",
             "WebResponse": "Web response",
@@ -1054,6 +1059,21 @@
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
+            },
+            "InvokeSubagent":{
+                "TITLE":"Invoke a subagent and resume the parent flow on return",
+                "DESCRIPTION":"Switches to another AI agent and saves the current position on the stack. When the subagent executes a Return action, the parent flow resumes from the block configured in Go to block.",
+                "RESUME_HINT":"After the subagent returns, the parent flow continues from the block selected in Go to block (intent panel).",
+                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
+            },
+            "ReturnStack":{
+                "TITLE":"Return to the parent agent",
+                "DESCRIPTION":"Pops the subagent stack and resumes the parent agent flow from where it was paused.",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             },
             "Wait": {
                 "TITLE": "Wait before next action",

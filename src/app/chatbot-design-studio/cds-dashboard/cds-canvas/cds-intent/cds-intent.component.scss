@@ -15,6 +15,7 @@
   --add-action-btn-hover-color: #{var(--add-action-btn-hover-color-preview)};
   --base-color: #{var(--blu)};
   --startIntentMaxWidth: 160px;
+  --returnStackMaxWidth: 264px;
   --base-border-radius-base: #{var(--button-border-radius-base)};
   --drag-preview-max-width: 244;
   --intent-title-color: rgb(108, 104, 89);
@@ -98,6 +99,88 @@
       position: absolute;
       margin: 0;
       padding: 0;
+    }
+  }
+
+  /* RETURN TO PARENT AGENT: nodo terminale a pastiglia
+     (speculare di .isStart, ma ancorato a sinistra e senza connettore in uscita) */
+  &.isReturnStack {
+    width: fit-content;
+    min-width: 180px;
+    max-width: var(--returnStackMaxWidth);
+    height: 44px;
+    padding: 0 16px 0 14px;
+    border-radius: 22px;
+    background-color: #4b5052 !important; // batte il background-color inline di [ngStyle]
+    box-shadow: #00000052 0 -1px inset;
+    cursor: pointer;
+    outline: unset !important; // niente anello colorato di selezione, come per .isStart
+
+    // l'overlay eredita border-radius 8px + background bianco: gli angoli spunterebbero dalla pastiglia
+    .intent-background-overlay {
+      display: none !important;
+    }
+    // il layer di drag è width:calc(100% - 20px)/height:40px: lascerebbe zone non trascinabili
+    .header-draggable {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    &.outline-border,
+    &.ripple-effect,
+    &.live-start-intent,
+    &.live-active-intent-pulse {
+      border-radius: 22px;
+    }
+
+    // il footer resta nel DOM ma vuoto: non deve aggiungere altezza sotto la pastiglia
+    .footer-intent {
+      min-height: 0;
+      margin: 0;
+    }
+  }
+
+  .cds-return-stack-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+
+    .cds-return-stack-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 20px;
+      width: 20px;
+      height: 20px;
+      pointer-events: none; // il drag dello stage controlla event.target: l'svg non ha tds_draggable
+
+      mat-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+        line-height: 20px;
+        // MatIconRegistry inietta l'<svg> a runtime senza _ngcontent-*: serve ::ng-deep
+        ::ng-deep svg {
+          width: 20px;
+          height: 20px;
+          fill: var(--color-white-hex);
+        }
+      }
+    }
+
+    .cds-return-stack-label {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.5; // con 1.2 l'overflow:hidden tagliava i discendenti (la "p" di "parent")
+      color: var(--color-white-hex);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
     }
   }
 

@@ -16,6 +16,24 @@
 - **added**: added new google models
 
 # 1.40.11
+
+# 1.40.11-rc3
+- **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
+- **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
+- **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
+- **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
+- **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
+- **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
+
+
+# 1.40.11-rc2
+- **added**: Web Request action — Postman-like body editor: first selector (none / form-data / raw) and, when raw, a second selector for the sub-type (text / JavaScript / JSON / HTML / XML)
+- **added**: live body validator per raw sub-type (JSON, XML, JavaScript) with a discreet, non-blocking inline alert that ignores `{{...}}` placeholders
+- **bug-fix**: the body validation alert now shows for invalid raw bodies (previously hidden by a wrong template guard)
+- **changed**: additive & backward-compatible model — new optional `rawType` field and `raw` value for `bodyType`; existing web request actions (none/json/form-data) are read and saved unchanged. New `raw` actions require matching engine support in DirWebRequestV2
+
+# 1.40.10 
+# 1.40.11-rc1 
 - **added**: added new google models
 
 # 1.40.8-rc4 
