@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 // Logger
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from '../models/project-user';
+import { HttpMemoCache } from '../utils/http-memo-cache';
 
 
 @Injectable({
@@ -27,6 +28,14 @@ export class ProjectService {
   private URL_TILEDESK_PROJECTS: string;
   private tiledeskToken: string;
 
+  /**
+   * Cache delle GET /integration: senza, ogni azione AI sul canvas rifà le stesse chiamate
+   * in ngOnInit (N azioni -> N richieste identiche).
+   * TTL 60s: le integration cambiano di rado e l'unico write in-app (saveIntegration) invalida esplicitamente.
+   */
+  private static readonly INTEGRATIONS_CACHE_TTL_MS = 60_000;
+  private readonly integrationsCache = new HttpMemoCache(ProjectService.INTEGRATIONS_CACHE_TTL_MS);
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -40,6 +49,8 @@ export class ProjectService {
     this.SERVER_BASE_URL = serverBaseUrl;
     this.URL_TILEDESK_PROJECTS = this.SERVER_BASE_URL + 'projects/';
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
+    // cambiano base url e token: quanto è in cache è stato preso con credenziali/host potenzialmente diversi
+    this.integrationsCache.clear();
   }
 
   /**
@@ -259,30 +270,34 @@ export class ProjectService {
   // Get integration by projectId and integration name
   // ----------------------------------------------------------
   getIntegrationByName(project_id: string, name: string): Observable<any> {
-    const url = this.SERVER_BASE_URL + project_id + '/integration/name/' + name;
-    this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: this.tiledeskToken
-      })
-    };
-    return this.http.get(url, httpOptions);
+    return this.integrationsCache.get(`integration-by-name|${project_id}|${name}`, () => {
+      const url = this.SERVER_BASE_URL + project_id + '/integration/name/' + name;
+      this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: this.tiledeskToken
+        })
+      };
+      return this.http.get(url, httpOptions);
+    });
   }
 
 
    getIntegrations(project_id: string): Observable<any> {
-    const url = this.SERVER_BASE_URL + project_id + '/integration';
-    this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: this.tiledeskToken
-      })
-    };
-    return this.http.get(url, httpOptions);
+    return this.integrationsCache.get(`integrations|${project_id}`, () => {
+      const url = this.SERVER_BASE_URL + project_id + '/integration';
+      this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: this.tiledeskToken
+        })
+      };
+      return this.http.get(url, httpOptions);
+    });
    }
 
    // ----------------------------------------------------------
@@ -299,7 +314,11 @@ export class ProjectService {
     }
     const url = this.SERVER_BASE_URL + project_id + "/integration/";
     this.logger.debug('[TILEDESK-SERVICE] - save integration URL: ', url);
-    return this.http.post(url, integration, httpOptions);
+    return this.http.post(url, integration, httpOptions).pipe(
+      // la POST riscrive l'intera integration: invalido lista e entry by-name.
+      // tap emette solo sul next, quindi non invalida se il salvataggio fallisce.
+      tap(() => this.integrationsCache.clear())
+    );
   }
 
   //  updateMcpServer(project_id: string, mcpServer: { name: string, url: string, transport: string }): Observable<any> {

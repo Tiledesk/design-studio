@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { firstValueFrom, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 //MODELS
 import { ActionAiPrompt } from 'src/app/models/action-model';
@@ -191,31 +191,6 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
     this.logger.log("[ACTION AI_PROMPT] initialize llm_options_models: ", this.action);
   }
 
-  async getIntegrationByName(){
-    const projectID = this.dashboardService.projectID;
-    const integrationName = 'ollama';
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
-        this.logger.log('[ACTION AI_PROMPT] - integration response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
-    }
-  }
-
-
-
-  async getIntegrations(){
-    const projectID = this.dashboardService.projectID;
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrations(projectID));
-        this.logger.log('[ACTION AI_PROMPT] - integrations response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrations ERROR:', error);
-    }
-  }
-
   async initLLMModels(){
     const result = await initLLMModels({
       projectService: this.projectService,
@@ -225,13 +200,14 @@ export class CdsActionAiPromptComponent implements OnInit, OnChanges {
       componentName: 'ACTION AI_PROMPT'
     });
 
-    const INTEGRATIONS = await this.getIntegrations();
+    const INTEGRATIONS = await getIntegrations(this.projectService, this.dashboardService, this.logger);
     this.logger.log('[ACTION AI_PROMPT] 1 - integrations:', INTEGRATIONS);
     if(INTEGRATIONS){
       INTEGRATIONS.forEach((el: any) => {
         this.logger.log('[ACTION AI_PROMPT] 1 - integration:', el.name, el.value.apikey);
         if(el.name && el.name === 'mcp'){
-          this.mcpServers = el.value.servers;
+          // copia: l'array viene mutato in-place dalle dialog MCP (push/assegnazione per indice)
+          this.mcpServers = [...(el.value?.servers ?? [])];
         }
       });
     }

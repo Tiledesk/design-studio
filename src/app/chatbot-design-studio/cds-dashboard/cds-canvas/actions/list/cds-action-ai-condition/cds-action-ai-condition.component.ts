@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { firstValueFrom, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 //MODELS
 import { ActionAiCondition } from 'src/app/models/action-model';
@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
@@ -239,18 +239,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       } else {
         this.ai_setting['temperature'].disabled = false;
       }
-    }
-  }
-
-  async getIntegrationByName(){
-    const projectID = this.dashboardService.projectID;
-    const integrationName = 'ollama';
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
-        this.logger.log('[ACTION AI_CONDITION] - integration response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_CONDITION] getIntegrationByName ERROR:', error);
     }
   }
 
