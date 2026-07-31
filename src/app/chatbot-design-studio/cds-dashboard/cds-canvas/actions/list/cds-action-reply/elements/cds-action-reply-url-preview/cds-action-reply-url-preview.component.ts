@@ -3,6 +3,7 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 import { Message, Wait, Expression } from 'src/app/models/action-model';
 import { DOCS_LINK, TEXT_CHARS_LIMIT } from '../../../../../../../utils';
+import { hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -95,9 +96,7 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
     } else {
       this.delayTime = 500 / 1000;
     }
-    if (this.response?._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0) {
-      this.filterConditionExist = true;
-    }
+    this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
     this.detectAndRestore();
   }
 
@@ -285,7 +284,7 @@ export class CdsActionReplyUrlPreviewComponent implements OnInit, OnDestroy, OnC
 
   onChangeExpression(expression: Expression) {
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = !!(expression && expression?.conditions.length > 0);
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
 

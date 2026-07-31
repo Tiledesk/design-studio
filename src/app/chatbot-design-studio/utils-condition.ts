@@ -446,15 +446,20 @@ export function parseWhenToGroups(when: string): Array<Expression | Operator> {
  * ==========================================================================*/
 
 /**
- * Modalità di salvataggio dell'AZIONE JSON Condition V2 (`jsoncondition2`).
- * - true (attuale): l'azione V2 persiste SOLO `when` (i `groups` sono svuotati nel payload).
- *   In apertura l'editor V2 ricostruisce i `groups` via parseWhenToGroups().
- * - false: salva ENTRAMBI (AST `groups` + `when`).
+ * Modalità di salvataggio delle condizioni V2 verso il backend.
+ * - true (attuale): si persiste SOLO la stringa `when`; l'AST viene svuotato nel payload.
+ *   In apertura gli editor ricostruiscono l'AST da `when` (parseWhenToGroups per l'azione,
+ *   ensureConditionsFromWhen per i filtri reply).
+ * - false: salva ENTRAMBI (AST + `when`).
  *
- * NB1: agisce SOLO sull'azione `jsoncondition2`. La V1 (`jsoncondition`) salva sempre e solo
+ * NB1: sull'AZIONE agisce solo su `jsoncondition2`. La V1 (`jsoncondition`) salva sempre e solo
  *      `groups` ed è del tutto estranea a questo flag.
- * NB2: i filtri reply V2 (`version:2`) salvano SEMPRE anche le `conditions` (round-trip
- *      diretto, nessuna ricostruzione): il flag non li svuota mai.
+ * NB2: NON vale per i FILTRI reply. Il server li valuta sull'AST `conditions` con semantica
+ *      V1: omettere quel nodo (o svuotarlo) blocca il flusso. Sui filtri `version: 2` si
+ *      scrive `when` ACCANTO alle `conditions` — innocuo oggi, pronto se in futuro il server
+ *      leggerà anche lì la stringa. La compatibilità degli operatori è garantita a monte dal
+ *      picker ristretto a OPERATORS_LIST_REPLY_FILTER (utils.ts).
+ *      I filtri legacy (senza `version`) restano byte-identici, con il solo nodo `conditions`.
  * NB3: la trasformazione agisce solo sul payload inviato al backend (un clone),
  *      MAI sul modello in memoria → l'interfaccia del Design Studio resta invariata.
  */
@@ -474,15 +479,78 @@ export function isLegacyFilter(expression: any): boolean {
 }
 
 /**
- * Genera `when` su un'Expression (filtro reply V2). SOLO per i filtri `version === 2`:
- * i filtri legacy devono passare nel payload byte-identici (niente `when`, niente marker)
- * per retrocompatibilità. Le `conditions` NON vengono mai svuotate: i filtri reply V2
- * fanno round-trip diretto sull'AST (a differenza dell'azione, non c'è ricostruzione).
+ * true se l'expression rappresenta un filtro ATTIVO, in una qualsiasi delle due forme:
+ *  - AST `conditions` popolato (filtri legacy; filtri V2 aperti nell'editor);
+ *  - stringa `when` valorizzata (filtri V2 già salvati: le `conditions` sono svuotate nel payload).
+ * Null-safe. Usata dal badge "Filter" dei reply element, che viene calcolato PRIMA che
+ * l'editor abbia ricostruito l'AST (e anche dove l'editor non esiste affatto, es. url-preview).
+ */
+export function hasFilter(expression: any): boolean {
+  if (!expression || typeof expression !== 'object') return false;
+  if (Array.isArray(expression.conditions) && expression.conditions.length > 0) return true;
+  return typeof expression.when === 'string' && expression.when.trim() !== '';
+}
+
+/**
+ * Auto-riparazione in apertura editor: i filtri reply V2 persistono SOLO `when`, quindi
+ * al reload l'AST non c'è. Qui lo ricostruiamo da `when` per renderlo ri-editabile.
+ * Idempotente. No-op (e nessuna mutazione) su:
+ *  - filtri legacy (`version !== 2`): mai toccati;
+ *  - filtri che hanno già l'AST;
+ *  - `when` vuoto o non parsabile → `conditions` restano [] e applyExpressionSaveMode
+ *    non rigenera `when` (rigenera solo con conditions non vuote): il dato sopravvive.
+ */
+export function ensureConditionsFromWhen(expression: any): void {
+  if (!expression || typeof expression !== 'object') return;
+  if (expression.version !== 2) return;
+  if (Array.isArray(expression.conditions) && expression.conditions.length > 0) return;
+  const when = typeof expression.when === 'string' ? expression.when.trim() : '';
+  if (!when) return;
+  let rebuilt: Array<Condition | Operator> = [];
+  try {
+    rebuilt = parseConditionsList(when);
+  } catch (_e) {
+    rebuilt = [];
+  }
+  if (!rebuilt.length) {
+    console.warn('[JSON-Condition] filtro V2: `when` non ricostruibile, AST lasciato vuoto:', when);
+    return;
+  }
+  // Diagnostica: una ricostruzione parziale perderebbe i frammenti non riconosciuti al prossimo save.
+  if (serializeExpression({ type: 'expression', conditions: rebuilt } as any) !== when) {
+    console.warn('[JSON-Condition] filtro V2: ricostruzione PARZIALE del `when`:', when);
+  }
+  expression.conditions = rebuilt;
+}
+
+/**
+ * Modalità di salvataggio di un'Expression (filtro reply). Agisce SOLO sui filtri
+ * marcati `version === 2`:
+ *  - rigenera `when` dall'AST, ma SOLO se l'AST c'è (conditions non vuote). Se le
+ *    conditions sono vuote il filtro non è stato aperto in questa sessione (arriva dal
+ *    server già in forma solo-`when`): rigenerare produrrebbe '' e cancellerebbe il filtro;
+ *  - MANTIENE `conditions`: è il nodo che il server valuta per i filtri dei messaggi.
+ *    Il contratto "solo `when`" vale unicamente per l'AZIONE `jsoncondition2`, che è
+ *    valutata da un percorso diverso; per i filtri reply omettere `conditions` blocca
+ *    il flusso. Che gli operatori nell'AST siano interpretabili è garantito a monte,
+ *    dal picker ristretto a OPERATORS_LIST_REPLY_FILTER.
+ *
+ * I filtri LEGACY (senza `version`) escono subito: devono passare nel payload
+ * byte-identici (niente `when`, niente marker) per retrocompatibilità totale.
  */
 function applyExpressionSaveMode(expr: any): void {
   if (!expr || typeof expr !== 'object' || !Array.isArray(expr.conditions)) return;
   if (expr.version !== 2) return; // filtro legacy: non toccare
-  expr.when = serializeExpression(expr as Expression);
+  if (expr.conditions.length > 0) {
+    const when = serializeExpression(expr as Expression);
+    if (when) {
+      expr.when = when;
+    } else {
+      // Nessuna condizione serializzabile (es. RHS vuoto su operatore non unario):
+      // non sovrascriviamo `when` con '' — l'AST resta la fonte per il server.
+      console.warn('[JSON-Condition] filtro V2 non serializzabile in `when`: AST conservato', expr);
+    }
+  }
 }
 
 /** Cerca ricorsivamente `_tdJSONCondition` (Expression) dentro un nodo e vi applica la modalità di salvataggio. */

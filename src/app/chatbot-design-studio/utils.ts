@@ -435,6 +435,30 @@ export const OPERATORS_LIST_V2: { [key: string]: { name: string, type: TYPE_OPER
     "lengthLessThanOrEqual":    { name: "CDSOperatorListV2.lengthLessThanOrEqual",         type: TYPE_OPERATOR_V2.lengthLessThanOrEqual,          group: "Array" }
 }
 
+/**
+ * Operatori disponibili nei FILTRI delle Reply (`_tdJSONCondition`).
+ *
+ * I filtri reply sono valutati dal server sull'AST `conditions` con semantica V1: il
+ * contratto `when` vale solo per l'AZIONE JSON Condition V2, non per i filtri dei messaggi.
+ * Offrire nel picker un operatore che il server non conosce produce un filtro non
+ * interpretabile e il flusso si blocca sul blocco che lo contiene.
+ *
+ * L'insieme è quindi l'intersezione con il catalogo V1, DERIVATA a runtime da
+ * TYPE_OPERATOR: aggiungendo un operatore a V1 compare qui da solo, senza doppia manutenzione.
+ * I 22 operatori solo-V2 (exists, doesNotExist, date, array, lunghezze, ...) non sono
+ * rappresentabili nell'AST V1 — `exists` sarebbe `!isUndefined(x)` e l'AST non ha
+ * un nodo di negazione — quindi non sono traducibili, solo esclusi.
+ */
+export const OPERATORS_LIST_REPLY_FILTER: { [key: string]: { name: string, type: TYPE_OPERATOR_V2, src?: string, group?: string } } =
+    Object.keys(OPERATORS_LIST_V2)
+        .filter(key => (Object.values(TYPE_OPERATOR) as string[]).includes(key))
+        .reduce((acc, key) => { acc[key] = OPERATORS_LIST_V2[key]; return acc; }, {});
+
+/** true se l'operatore è valutabile dal server nei filtri reply (vedi OPERATORS_LIST_REPLY_FILTER). */
+export function isReplyFilterOperatorSupported(operator: string): boolean {
+    return !!operator && Object.prototype.hasOwnProperty.call(OPERATORS_LIST_REPLY_FILTER, operator);
+}
+
 export const TYPE_MATH_OPERATOR_LIST: { [key: string]: { name: string, type: TYPE_MATH_OPERATOR, src?: string } } = {
     "addAsNumbers":             { name: "CDSMathOperatorList.addAsNumbers",                 type: TYPE_MATH_OPERATOR.addAsNumber,               src: "assets/images/operators/add.svg"          },
     "addAsStrings":             { name: "CDSMathOperatorList.addAsStrings",                 type: TYPE_MATH_OPERATOR.addAsString,               src: "assets/images/operators/add.svg"          },
