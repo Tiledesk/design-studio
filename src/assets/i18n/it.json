@@ -216,6 +216,7 @@
       "DataTableAddCondition": "Aggiungi condizione",
       "DataTableData": "Dati",
       "DataTableAddData": "Aggiungi campo",
+      "UnsupportedFilterOperator": "Questo operatore non è supportato nei filtri delle reply e blocca il flusso su questo blocco. Apri il filtro e scegli un altro operatore.",
       "DeprecationMessage": "Deprecato. Usa la nuova action <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a>.",
       "KBJsonSources": "Assegna le sorgenti KB JSON a",
       "EnterIntentName": "Inserisci il nome del blocco",

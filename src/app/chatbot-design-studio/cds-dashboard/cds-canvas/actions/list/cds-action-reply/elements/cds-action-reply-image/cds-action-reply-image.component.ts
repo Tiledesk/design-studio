@@ -7,7 +7,7 @@ import { IntentService } from '../../../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-image',
@@ -93,9 +93,7 @@ export class CdsActionReplyImageComponent implements OnInit {
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
 
-    if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-      this.filterConditionExist = true
-    }
+    this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
   }
 
 
@@ -175,7 +173,7 @@ export class CdsActionReplyImageComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
   
