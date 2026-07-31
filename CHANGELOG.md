@@ -7,15 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
  
-# this branch
+# 1.40.11-rc4
 - **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
 - **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
 - **changed**: the AI actions no longer re-fetch the same data per instance — the `integration`, `integration/name/ollama`, `integration/name/vllm` and `kb/namespace/all` GETs are now cached in `ProjectService`/`OpenaiService` through a new `HttpMemoCache` (in-flight dedup + short TTL, invalidated on `saveIntegration` and on project change). A canvas with N Ask KB / AI Prompt / AI Condition actions now issues 1 request per endpoint instead of N
 - **changed**: removed the duplicated `/integration` GET in the AI Prompt action and the dead `getIntegrationByName`/`getIntegrations` copies in AI Prompt and AI Condition, now using the shared util
 - **bug fix**: the MCP servers array is copied instead of referenced, so the MCP dialogs can no longer mutate the shared integration payload
-- **added**: added new google models
 
-# 1.40.11
 
 # 1.40.11-rc3
 - **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
