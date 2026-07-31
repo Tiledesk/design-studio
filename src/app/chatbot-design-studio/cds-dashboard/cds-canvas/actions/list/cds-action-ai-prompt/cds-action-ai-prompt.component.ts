@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { firstValueFrom, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 //MODELS
 import { ActionAiPrompt, ReasoningLevel } from 'src/app/models/action-model';
@@ -169,21 +169,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     });
     this.logger.log("[ACTION AI_PROMPT] initialize llm_options_models: ", this.action);
   }
-
-  async getIntegrationByName(){
-    const projectID = this.dashboardService.projectID;
-    const integrationName = 'ollama';
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
-        this.logger.log('[ACTION AI_PROMPT] - integration response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_PROMPT] getIntegrationByName ERROR:', error);
-    }
-  }
-
-
-
 
   async initLLMModels(){
     const result = await initLLMModels({

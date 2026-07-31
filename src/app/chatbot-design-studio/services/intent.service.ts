@@ -19,6 +19,7 @@ import { ControllerService } from '../services/controller.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { SavingStateService } from 'src/app/services/saving-state.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -90,9 +91,10 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private savingStateService: SavingStateService
   ) { }
-    
+
   private emitIntentSelection(): void {
     this.behaviorIntentSelection.next({ intentSelectedID: this.intentSelectedID, intentActive: this.intentActive });
   }
@@ -1840,7 +1842,10 @@ export class IntentService {
       payload = applyConditionSaveModeToPayload(payload);
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
-        this.faqService.opsUpdate(payload).subscribe((resp: any) => {
+        // track(): incrementa alla subscribe, decrementa via finalize su next+complete /
+        // error / unsubscribe. Copre tutti e 5 i chiamanti (updateIntent, saveNewIntent,
+        // deleteIntentNew, restoreLastUNDO, restoreLastREDO), che NON fanno await qui.
+        this.savingStateService.track(this.faqService.opsUpdate(payload)).subscribe((resp: any) => {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);

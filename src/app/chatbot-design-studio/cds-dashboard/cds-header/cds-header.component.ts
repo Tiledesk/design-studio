@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs';
@@ -9,6 +9,7 @@ import { FaqKbService } from 'src/app/services/faq-kb.service';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { SavingStateService } from 'src/app/services/saving-state.service';
 import { IntentService } from '../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -36,7 +37,7 @@ const swal = require('sweetalert');
   templateUrl: './cds-header.component.html',
   styleUrls: ['./cds-header.component.scss']
 })
-export class CdsHeaderComponent implements OnInit {
+export class CdsHeaderComponent implements OnInit, OnDestroy {
   
   @Input() IS_OPEN_SIDEBAR: boolean;
   // @Input() defaultDepartmentId: string;
@@ -46,6 +47,8 @@ export class CdsHeaderComponent implements OnInit {
   @Output() goToBck = new EventEmitter();
 
    private subscriptionTestItOutPlayed: Subscription;
+   private subscriptionIsSaving: Subscription;
+   private subscriptionIsSavingVisible: Subscription;
 
   id_faq_kb: string;
   projectID: string;
@@ -65,6 +68,10 @@ export class CdsHeaderComponent implements OnInit {
   PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
   isPlaying:boolean = false;
+  /** true appena parte un salvataggio: disabilita il pulsante Publish */
+  isSaving: boolean = false;
+  /** true solo se il salvataggio supera i 300ms: mostra spinner + "Saving..." */
+  isSavingVisible: boolean = false;
 
   // webhook //
   isWebhook: boolean = false;
@@ -93,7 +100,8 @@ export class CdsHeaderComponent implements OnInit {
     private readonly webhookService: WebhookService,
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
-  ) { 
+    private readonly savingStateService: SavingStateService,
+  ) {
     this.manageRouteChanges();
     this.setSubscriptions();
   }
@@ -142,6 +150,8 @@ export class CdsHeaderComponent implements OnInit {
     if (this.subscriptionTestItOutPlayed) {
       this.subscriptionTestItOutPlayed.unsubscribe();
     }
+    this.subscriptionIsSaving?.unsubscribe();
+    this.subscriptionIsSavingVisible?.unsubscribe();
   }
 
 
@@ -153,6 +163,14 @@ export class CdsHeaderComponent implements OnInit {
         if(!state){
           this.onCloseTestItOut()
         }
+      });
+
+      /** SUBSCRIBE TO THE GLOBAL SAVING STATE */
+      this.subscriptionIsSaving = this.savingStateService.isSaving$.subscribe((saving) => {
+        this.isSaving = saving;
+      });
+      this.subscriptionIsSavingVisible = this.savingStateService.isSavingVisible$.subscribe((visible) => {
+        this.isSavingVisible = visible;
       });
   }
 
@@ -225,6 +243,9 @@ export class CdsHeaderComponent implements OnInit {
   }
 
   onClickPublish(){
+    // Non aprire il pannello se c'e' un salvataggio in volo: si pubblicherebbe uno stato
+    // non ancora persistito. Ridondante col [disabled], ma protegge da click programmatici.
+    if (this.isSaving) { return; }
     // this.publishPaneltoggleState = !this.publishPaneltoggleState
     this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState);
     this.selectedChatbot.modified = false;
