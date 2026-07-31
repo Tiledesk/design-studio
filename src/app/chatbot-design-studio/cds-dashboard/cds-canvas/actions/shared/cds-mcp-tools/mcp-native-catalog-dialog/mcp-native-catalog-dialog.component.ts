@@ -2,23 +2,9 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { ProjectService } from 'src/app/services/projects.service';
-import { DashboardService } from 'src/app/services/dashboard.service';
-import { firstValueFrom } from 'rxjs';
+import { McpService } from 'src/app/services/mcp.service';
+import { McpServer } from 'src/app/models/mcp.model';
 import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-server-edit-dialog.component';
-
-/** Server MCP nativo Tiledesk nel catalogo. */
-interface NativeServer {
-  id?: string;
-  name: string;
-  url: string;
-  transport: string;
-  native?: boolean;
-  description?: string;
-  customHeaders?: Array<{ enabled: boolean, key: string, value: string }>;
-  tools?: Array<{ name: string }>;
-  selectedTools?: Array<{ name: string }>;
-}
 
 @Component({
   selector: 'mcp-native-catalog-dialog',
@@ -27,8 +13,8 @@ interface NativeServer {
 })
 export class McpNativeCatalogDialogComponent implements OnInit {
 
-  nativeServers: NativeServer[] = [];
-  filteredServers: NativeServer[] = [];
+  nativeServers: McpServer[] = [];
+  filteredServers: McpServer[] = [];
   searchFilter: string = '';
   isLoading: boolean = false;
   showError: boolean = false;
@@ -39,13 +25,12 @@ export class McpNativeCatalogDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<McpNativeCatalogDialogComponent>,
     private dialog: MatDialog,
-    private projectService: ProjectService,
-    private dashboardService: DashboardService,
+    private mcpService: McpService,
     @Inject(MAT_DIALOG_DATA) public data: {
       // lista dei server MCP già configurati (per ripristinare la config e marcare i "configured")
-      configuredServers: NativeServer[];
+      configuredServers: McpServer[];
       // callback invocata quando un nativo viene configurato e salvato (per aggiungerlo alla lista principale)
-      onConfigured?: (server: any) => void;
+      onConfigured?: (server: McpServer) => void;
     }
   ) { }
 
@@ -53,28 +38,12 @@ export class McpNativeCatalogDialogComponent implements OnInit {
     this.loadNativeServers();
   }
 
-  /** Carica il catalogo dei server nativi (POST {proj}/mcp/native). */
+  /** Carica il catalogo dei server nativi (GET {proj}/mcp/native). */
   async loadNativeServers(): Promise<void> {
     this.isLoading = true;
     this.showError = false;
     try {
-      const projectId = this.dashboardService.projectID;
-      const res = await firstValueFrom(this.projectService.getNativeMcpServers(projectId));
-      const rawList = Array.isArray(res)
-        ? res
-        : (Array.isArray(res?.servers) ? res.servers : (Array.isArray(res?.value?.servers) ? res.value.servers : []));
-      this.nativeServers = (rawList || [])
-        .filter((s: any) => s && (s.id || s.name))
-        .map((s: any) => ({
-          id: s.id ? String(s.id) : undefined,
-          name: String(s.name ?? s.id ?? ''),
-          url: s.url ? String(s.url) : '',
-          transport: String(s.transport ?? 'streamable_http'),
-          native: true,
-          description: s.description ? String(s.description) : undefined,
-          tools: [],
-          selectedTools: []
-        }));
+      this.nativeServers = await this.mcpService.loadNativeServers();
       this.applyFilter();
     } catch (error) {
       this.logger.error('[McpNativeCatalogDialog] error loading native servers:', error);
@@ -101,17 +70,17 @@ export class McpNativeCatalogDialogComponent implements OnInit {
   }
 
   /** true se il nativo è già presente nella lista dei server configurati. */
-  isConfigured(server: NativeServer): boolean {
+  isConfigured(server: McpServer): boolean {
     return (this.data.configuredServers || []).some(c =>
       (server.id && c.id === server.id) || c.name === server.name);
   }
 
   /** Click su un server del catalogo: apre il dettaglio (edit-dialog readonly per i nativi). */
-  onSelectNative(server: NativeServer): void {
+  onSelectNative(server: McpServer): void {
     // Se già configurato, ripristina la configurazione esistente (tool selezionati ecc.).
     const existing = (this.data.configuredServers || []).find(c =>
       (server.id && c.id === server.id) || c.name === server.name);
-    const detail: NativeServer = existing
+    const detail: McpServer = existing
       ? { ...existing, native: true, id: existing.id || server.id, description: existing.description || server.description }
       : { ...server };
     const selectedTools = Array.isArray(existing?.selectedTools)

@@ -61,10 +61,11 @@
         </cds-select>
     </div>
 
-    <hr class="custom-divider">
+    
 
     <!-- Conditions / filters (get / update / upsert / delete) -->
     <ng-container *ngIf="showConditions">
+        <hr class="custom-divider">
         <div class="field-box">
             <label class="title-label">{{ 'CDSCanvas.DataTableMatchMode' | translate }}</label>
             <cds-select

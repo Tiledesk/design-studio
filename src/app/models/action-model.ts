@@ -3,6 +3,7 @@ import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_OPERATOR } from
 import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../chatbot-design-studio/utils-actions';
 import { TYPE_METHOD_REQUEST } from '../chatbot-design-studio/utils-request';
+import { McpSelectedServer } from './mcp.model';
 
 export class Action {
     _tdActionType: string;
@@ -190,6 +191,8 @@ export class ActionWebRequestV2 extends Action {
     jsonBody: string;
     formData: Array<FormData>;
     bodyType: string;
+    /** Raw body sub-type when bodyType === 'raw'. Optional/additive: absent on actions created before this feature. */
+    rawType?: 'text' | 'javascript' | 'json' | 'html' | 'xml';
     assignResultTo: string;
     assignStatusTo: string;
     assignErrorTo: string;
@@ -269,6 +272,24 @@ export class ActionReplaceBotV3 extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.REPLACE_BOTV3;
+    }
+}
+
+export class ActionReplaceBotV4 extends Action {
+    botId: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV4;
+    }
+}
+
+export class ActionReturnStack extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN_STACK;
     }
 }
 
@@ -532,6 +553,8 @@ export class ActionAiPrompt extends Action {
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
+    /** Selected MCP servers/tools for this action (managed by the shared cds-mcp-tools component). */
+    servers?: McpSelectedServer[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AI_PROMPT

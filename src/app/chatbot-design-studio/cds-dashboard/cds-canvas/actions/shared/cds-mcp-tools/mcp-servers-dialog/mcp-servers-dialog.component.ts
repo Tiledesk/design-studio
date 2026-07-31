@@ -4,25 +4,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 import { McpNativeCatalogDialogComponent } from '../mcp-native-catalog-dialog/mcp-native-catalog-dialog.component';
-
-/**
- * Server MCP nel dialog. Unifica le due feature aggiunte in parallelo:
- *  - server NATIVI Tiledesk (catalogo /mcp/native): `id` = nativeId, `native`, `description`
- *  - autenticazione OAuth (da master-pre): `oauth` (clientId/clientSecret/redirectUrl/scope)
- * `customHeaders`/`oauth` viaggiano con la selezione; `tools` = disponibili, `selectedTools` = selezionati.
- */
-interface McpServerLite {
-  id?: string;
-  name: string;
-  url: string;
-  transport: string;
-  native?: boolean;
-  description?: string;
-  customHeaders?: Array<{ enabled: boolean, key: string, value: string }>;
-  oauth?: { clientId: string, clientSecret: string, redirectUrl: string, scope: string };
-  tools?: Array<{ name: string }>;
-  selectedTools?: Array<{ name: string }>;
-}
+import { McpServer, McpSelectedServer, McpTool, normalizeMcpToolNames } from 'src/app/models/mcp.model';
 
 
 @Component({
@@ -32,10 +14,18 @@ interface McpServerLite {
 })
 export class McpServersDialogComponent implements OnInit {
 
-  selectedServers: Array<McpServerLite> = [];
-  filteredServers: Array<McpServerLite> = [];
+  selectedServers: Array<McpSelectedServer> = [];
+  filteredServers: Array<McpServer> = [];
   searchFilter: string = '';
   onUpdateCallback: (data: any) => void;
+
+  // "Tools" popup (opened from the "more.." link on a card): ALL the server's tools sorted
+  // descending, editable. Toggling tools (and select/deselect all) updates the server's ACTIVE
+  // tools for this action in real time (like the card toggle).
+  isActiveToolsModalOpen: boolean = false;
+  activeToolsModalServer: McpServer | null = null;
+  activeToolsModalTools: McpTool[] = [];
+  activeToolsModalSelected: Set<string> = new Set();
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -44,8 +34,8 @@ export class McpServersDialogComponent implements OnInit {
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: {
       // mcpServers from integrations: tools = available, selectedTools = last selection (kept even when server not selected).
-      mcpServers: Array<McpServerLite>,
-      selectedServers?: Array<McpServerLite>,
+      mcpServers: Array<McpServer>,
+      selectedServers?: Array<McpSelectedServer>,
       onUpdate?: (data: any) => void
     }
   ) { }
@@ -54,7 +44,11 @@ export class McpServersDialogComponent implements OnInit {
     this.logger.debug("[McpServersDialog] data: ", this.data);
     // Pre-select servers that were already selected
     if (this.data.selectedServers && this.data.selectedServers.length > 0) {
-      this.selectedServers = [...this.data.selectedServers];
+      this.selectedServers = this.data.selectedServers.map(server => ({
+        // Tool selection is per-action: use ONLY the action's own tools (no integration fallback).
+        ...server,
+        tools: normalizeMcpToolNames(server.tools)
+      }));
       this.logger.debug("[McpServersDialog] Pre-selected servers: ", this.selectedServers);
     }
     // Store the update callback if provided
@@ -70,7 +64,7 @@ export class McpServersDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  toggleServerSelection(server: McpServerLite, event?: Event): void {
+  toggleServerSelection(server: McpServer, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent triggering the button click
     }
@@ -78,9 +72,8 @@ export class McpServersDialogComponent implements OnInit {
     if (index > -1) {
       this.selectedServers.splice(index, 1);
     } else {
-      // Use stored selectedTools from integration when adding, so previous selection is restored
+      // Add with NO tools selected: the selection is per-action, the user picks via the tools popup.
       const stored = this.data.mcpServers?.find(s => s.name === server.name);
-      const tools = Array.isArray(stored?.selectedTools) ? [...stored.selectedTools] : [];
       this.selectedServers.push({
         id: server.id,
         name: server.name,
@@ -88,8 +81,7 @@ export class McpServersDialogComponent implements OnInit {
         transport: server.transport,
         native: server.native,
         customHeaders: stored?.customHeaders,
-        oauth: stored?.oauth,
-        tools
+        tools: []
       });
     }
     this.logger.log("[McpServersDialog] selectedServers: ", this.selectedServers);
@@ -130,23 +122,104 @@ export class McpServersDialogComponent implements OnInit {
   }
 
   /**
-   * Count of available tools for a server (from integrations -> data.mcpServers[].tools).
+   * Active tool NAMES for a server = the ACTION's selection only. A server that is not selected in
+   * the action has no active tools (no fallback to the integration — selection is per-action).
    */
-  getAvailableToolsCount(server: { name: string }): number {
+  getActiveToolNames(server: { name: string }): string[] {
+    const selected = this.selectedServers.find(s => s.name === server.name);
+    if (selected && Array.isArray(selected.tools)) {
+      return selected.tools;
+    }
+    return [];
+  }
+
+  /** All available (discovered) tools of a server, from the integration's data.mcpServers[].tools. */
+  getAvailableTools(server: { name: string }): McpTool[] {
     const found = this.data?.mcpServers?.find(s => s.name === server.name);
-    return Array.isArray(found?.tools) ? found.tools.length : 0;
+    return Array.isArray(found?.tools) ? found.tools : [];
+  }
+
+  /** True when the given tool name is currently checked in the popup. */
+  isActiveTool(name: string): boolean {
+    return this.activeToolsModalSelected.has(name);
+  }
+
+  get areAllActiveToolsSelected(): boolean {
+    return this.activeToolsModalTools.length > 0
+      && this.activeToolsModalTools.every(t => this.activeToolsModalSelected.has(t.name));
+  }
+
+  get someActiveToolsSelected(): boolean {
+    return this.activeToolsModalSelected.size > 0 && !this.areAllActiveToolsSelected;
   }
 
   /**
-   * Count of active/selected tools: from selectedServers when server is selected, else from stored selectedTools (integration).
+   * Opens the popup with ALL the server's tools (descending alphabetical order), the active ones
+   * checked. Triggered by the "more.." link. Editing persists to the action (see applySelection).
    */
-  getActiveToolsCount(server: { name: string }): number {
-    const selected = this.selectedServers.find(s => s.name === server.name);
-    if (selected && Array.isArray(selected.tools)) {
-      return selected.tools.length;
+  openActiveToolsModal(server: McpServer, event?: Event): void {
+    event?.stopPropagation();
+    this.activeToolsModalServer = server;
+    this.activeToolsModalTools = [...this.getAvailableTools(server)]
+      .sort((a, b) => b.name.localeCompare(a.name));
+    this.activeToolsModalSelected = new Set(this.getActiveToolNames(server));
+    this.isActiveToolsModalOpen = true;
+  }
+
+  /** Toggle a single tool, then persist the selection to the action. */
+  toggleActiveTool(name: string): void {
+    if (this.activeToolsModalSelected.has(name)) {
+      this.activeToolsModalSelected.delete(name);
+    } else {
+      this.activeToolsModalSelected.add(name);
     }
-    const found = this.data?.mcpServers?.find(s => s.name === server.name);
-    return Array.isArray(found?.selectedTools) ? found.selectedTools.length : 0;
+    this.applyActiveToolsSelection();
+  }
+
+  /** Select all / deselect all the visible tools, then persist. */
+  toggleAllActiveTools(): void {
+    if (this.areAllActiveToolsSelected) {
+      this.activeToolsModalSelected.clear();
+    } else {
+      this.activeToolsModalSelected = new Set(this.activeToolsModalTools.map(t => t.name));
+    }
+    this.applyActiveToolsSelection();
+  }
+
+  /**
+   * Persist the popup selection to the action's server list (real-time, like the card toggle):
+   * - >=1 tool selected → the server is (or becomes) selected with exactly those active tools;
+   * - 0 tools selected  → the server is removed from the action selection.
+   */
+  private applyActiveToolsSelection(): void {
+    const srv = this.activeToolsModalServer;
+    if (!srv) {
+      return;
+    }
+    const names = Array.from(this.activeToolsModalSelected);
+    const idx = this.selectedServers.findIndex(s => s.name === srv.name);
+    if (names.length === 0) {
+      if (idx > -1) {
+        this.selectedServers.splice(idx, 1);
+      }
+    } else if (idx > -1) {
+      this.selectedServers[idx] = { ...this.selectedServers[idx], tools: names };
+    } else {
+      this.selectedServers.push({
+        id: srv.id,
+        name: srv.name,
+        url: srv.url,
+        transport: srv.transport,
+        native: srv.native,
+        customHeaders: srv.customHeaders,
+        tools: names
+      });
+    }
+    this.notifyUpdate();
+  }
+
+  closeActiveToolsModal(): void {
+    this.isActiveToolsModalOpen = false;
   }
 
   /**
@@ -160,13 +233,13 @@ export class McpServersDialogComponent implements OnInit {
       panelClass: 'custom-mcp-dialog-container',
       data: {
         configuredServers: this.data.mcpServers,
-        onConfigured: (server: McpServerLite) => this.onNativeConfigured(server)
+        onConfigured: (server: McpServer) => this.onNativeConfigured(server)
       }
     });
   }
 
   /** Aggiunge/aggiorna nella lista configurata un server nativo appena configurato e lo attiva. */
-  private onNativeConfigured(server: McpServerLite): void {
+  private onNativeConfigured(server: McpServer): void {
     if (!server) return;
     // add/update nella lista dei server configurati (già salvati in integration dall'edit-dialog)
     const idx = this.data.mcpServers.findIndex(s => (server.id && s.id === server.id) || s.name === server.name);
@@ -176,8 +249,8 @@ export class McpServersDialogComponent implements OnInit {
       this.data.mcpServers.push(server);
     }
     // attiva il server (selezione) con i tool scelti
-    const tools = Array.isArray(server.selectedTools) ? [...server.selectedTools] : [];
-    const selected: McpServerLite = {
+    const tools = normalizeMcpToolNames(server.selectedTools);
+    const selected: McpSelectedServer = {
       id: server.id,
       name: server.name,
       url: server.url,
@@ -222,8 +295,7 @@ export class McpServersDialogComponent implements OnInit {
           transport: createdServer.transport,
           native: createdServer.native,
           customHeaders: createdServer.customHeaders,
-          oauth: createdServer.oauth,
-          tools: result?.selectedTools || []
+          tools: normalizeMcpToolNames(result?.selectedTools)
         });
         this.logger.log("[McpServersDialog] New server added:", createdServer);
 
@@ -236,22 +308,21 @@ export class McpServersDialogComponent implements OnInit {
     });
   }
 
-  openEditServerDialog(server: McpServerLite, event?: Event): void {
+  openEditServerDialog(server: McpServer, event?: Event): void {
     if (event) {
       event.stopPropagation(); // Prevent any unwanted propagation
     }
     this.logger.log("[McpServersDialog] - openEditServerDialog for:", server);
     // Use action selection if server is selected, else use stored selectedTools from integration
     const selectedServer = this.selectedServers.find(s => s.name === server.name);
-    const initialSelectedTools = selectedServer?.tools?.length
-      ? selectedServer.tools
-      : (Array.isArray(server.selectedTools) ? server.selectedTools : []);
+    // Pre-check ONLY the action's current selection for this server (no integration fallback).
+    const initialSelectedToolNames = normalizeMcpToolNames(selectedServer?.tools);
     const dialogRef = this.dialog.open(McpServerEditDialogComponent, {
       panelClass: 'custom-mcp-edit-dialog-container',
       data: {
         server: server,
         allServers: this.data.mcpServers,
-        selectedTools: initialSelectedTools
+        selectedTools: initialSelectedToolNames.map(name => ({ name }))
       }
     });
 
@@ -259,7 +330,7 @@ export class McpServersDialogComponent implements OnInit {
       this.logger.log("[McpServerEditDialog] result:", result);
       if (result !== false && result) {
         const updatedServer = result?.server ? result.server : result;
-        const selectedTools: Array<{ name: string }> | undefined = result?.selectedTools;
+        const selectedTools: string[] = Array.isArray(result?.selectedTools) ? result.selectedTools : [];
         // Update the server in the list (tools + selectedTools so they are shown and persisted)
         const index = this.data.mcpServers.findIndex(s => s.name === server.name);
         if (index > -1) {
@@ -267,10 +338,6 @@ export class McpServersDialogComponent implements OnInit {
           // Update in selectedServers if it was selected
           const selectedIndex = this.selectedServers.findIndex(s => s.name === server.name);
           if (selectedIndex > -1) {
-            const unique = new Map<string, { name: string }>();
-            (selectedTools || this.selectedServers[selectedIndex].tools || []).forEach(t => {
-              if (t?.name) unique.set(t.name, { name: t.name });
-            });
             this.selectedServers[selectedIndex] = {
               id: updatedServer.id,
               name: updatedServer.name,
@@ -278,8 +345,7 @@ export class McpServersDialogComponent implements OnInit {
               transport: updatedServer.transport,
               native: updatedServer.native,
               customHeaders: updatedServer.customHeaders,
-              oauth: updatedServer.oauth,
-              tools: Array.from(unique.values())
+              tools: [...new Set(selectedTools)]
             };
           }
           this.logger.log("[McpServersDialog] Server updated:", updatedServer);

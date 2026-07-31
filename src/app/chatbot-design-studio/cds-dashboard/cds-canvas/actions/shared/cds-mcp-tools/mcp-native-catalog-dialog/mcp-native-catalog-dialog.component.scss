@@ -1,6 +1,7 @@
-/* Il frame del dialog (.tpl-modal-*) e i badge (.mcp-server__status-badge*) sono definiti
-   globalmente via ::ng-deep sul panelClass .custom-mcp-dialog-container nel list-dialog.
-   Qui definiamo solo il layout della lista/item (scoped a questo componente). */
+/* Il frame del dialog (.tpl-modal-*) e le icone di stato (.mcp-server__native-icon /
+   .mcp-server__status-icon*) sono definiti globalmente via ::ng-deep sul panelClass
+   .custom-mcp-dialog-container nel list-dialog. Qui definiamo solo il layout della lista/item
+   (scoped) e gli override di colore delle icone che devono battere .mcp-server-item .material-icons. */
 
 :host { display: block; }
 
@@ -66,6 +67,18 @@
         color: var(--blu);
         flex-shrink: 0;
     }
+}
+
+/* Status/native icons must beat the generic `.mcp-server-item .material-icons { color: var(--blu) }`
+   above via higher specificity (the chevron_right stays blue). */
+.mcp-server-item .server-name .mcp-server__native-icon {
+    color: #6d28d9;
+    font-size: 16px;
+}
+
+.mcp-server-item .server-name .mcp-server__status-icon--active {
+    color: var(--blu-02);
+    font-size: 18px;
 }
 
 .server-info {

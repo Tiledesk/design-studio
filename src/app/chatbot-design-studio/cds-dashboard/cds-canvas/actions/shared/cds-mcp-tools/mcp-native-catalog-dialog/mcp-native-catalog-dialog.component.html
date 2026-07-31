@@ -1,7 +1,8 @@
 <div class="tpl-modal-box">
     <div class="tpl-modal-header">
         <div class="tpl-modal-header-text">
-            <span>{{'CDSCanvas.TiledeskTools' | translate}}</span>
+            <span class="mcp-dialog__title">{{'CDSCanvas.NativeTools' | translate}}</span>
+            <span class="mcp-dialog__subtitle">{{'CDSCanvas.NativeToolsSubtitle' | translate}}</span>
         </div>
         <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
     </div>
@@ -45,12 +46,10 @@
                     <div class="server-info">
                         <div class="server-name">
                             {{ server.name }}
-                            <span class="mcp-server__status-badge mcp-server__status-badge--native">
-                                {{'CDSCanvas.Native' | translate}}
-                            </span>
-                            <span *ngIf="isConfigured(server)" class="mcp-server__status-badge mcp-server__status-badge--active">
-                                {{'CDSCanvas.Active' | translate}}
-                            </span>
+                            <span class="material-icons mcp-server__native-icon"
+                                [matTooltip]="'CDSCanvas.Native' | translate" matTooltipClass="cds-mat-tooltip">verified</span>
+                            <span *ngIf="isConfigured(server)" class="material-icons mcp-server__status-icon mcp-server__status-icon--active"
+                                [matTooltip]="'CDSCanvas.Active' | translate" matTooltipClass="cds-mat-tooltip">check_circle</span>
                         </div>
                         <div *ngIf="server.description" class="server-url">{{ server.description }}</div>
                         <div class="server-type">{{ server.transport }}</div>
@@ -59,11 +58,5 @@
                 </button>
             </div>
         </div>
-    </div>
-
-    <div class="tpl-modal-buttons">
-        <button id="cds-ok-btn" class="btn btn-primary cds-blue-button" type="button" [mat-dialog-close]="false">
-            {{'CDSCanvas.Close' | translate}}
-        </button>
     </div>
 </div>
