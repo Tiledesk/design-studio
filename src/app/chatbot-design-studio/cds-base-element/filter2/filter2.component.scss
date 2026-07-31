@@ -278,6 +278,16 @@
     }
 }
 
+/* Operatore non valutabile dal server nei filtri reply: il flusso si fermerebbe
+   su questo blocco finché l'utente non lo sostituisce. */
+.filter-unsupported-icon {
+    color: #dc362e;
+}
+
+.filter-text.unsupported {
+    color: #dc362e;
+}
+
 .ellips{
     line-height: 20px;
     text-overflow: ellipsis;
