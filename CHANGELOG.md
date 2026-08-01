@@ -7,10 +7,21 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.11
+- **added**: added new google models
 
 # this branch 
 - **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
+
+# 1.40.10 
+- **added**: added documentation image and guide link to the Data Table action tooltip
+- **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
+- **changed**: cds-config-*.json assets are now published under /environments/real_data
+
+# 1.40.9 
 - **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
+
+# 1.40.8 
 - **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
 - **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
 - **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
