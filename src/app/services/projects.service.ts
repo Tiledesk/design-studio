@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 // Logger
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from '../models/project-user';
+import { HttpMemoCache } from '../utils/http-memo-cache';
 
 
 @Injectable({
@@ -27,6 +28,14 @@ export class ProjectService {
   private URL_TILEDESK_PROJECTS: string;
   private tiledeskToken: string;
 
+  /**
+   * Cache delle GET /integration: senza, ogni azione AI sul canvas rifà le stesse chiamate
+   * in ngOnInit (N azioni -> N richieste identiche).
+   * TTL 60s: le integration cambiano di rado e l'unico write in-app (saveIntegration) invalida esplicitamente.
+   */
+  private static readonly INTEGRATIONS_CACHE_TTL_MS = 60_000;
+  private readonly integrationsCache = new HttpMemoCache(ProjectService.INTEGRATIONS_CACHE_TTL_MS);
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -40,6 +49,8 @@ export class ProjectService {
     this.SERVER_BASE_URL = serverBaseUrl;
     this.URL_TILEDESK_PROJECTS = this.SERVER_BASE_URL + 'projects/';
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
+    // cambiano base url e token: quanto è in cache è stato preso con credenziali/host potenzialmente diversi
+    this.integrationsCache.clear();
   }
 
   /**
@@ -47,12 +58,20 @@ export class ProjectService {
    *
    * API:
    * POST /api/{id_project}/mcp/tools
-   * Body: { url: "<server_url>" }
+   * Body: { url: "<server_url>", customHeaders?: [{key,value}] }
+   *
+   * The optional `customHeaders` are forwarded so the backend can authenticate
+   * against the MCP server during discovery exactly as it does at runtime. They mirror the
+   * shape persisted on the server object; only enabled/non-empty values should be passed in.
    *
    * NOTE: we build the URL following the same pattern used by other project-scoped endpoints:
    * SERVER_BASE_URL + project_id + '/mcp/tools'
    */
-  public getMcpTools(project_id: string, server_url: string): Observable<any> {
+  public getMcpTools(
+    project_id: string,
+    server_url: string,
+    options?: { customHeaders?: Array<{ key: string; value: string }> }
+  ): Observable<any> {
     const url = this.SERVER_BASE_URL + project_id + '/mcp/tools';
     this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - URL', url);
 
@@ -63,9 +82,64 @@ export class ProjectService {
       })
     };
 
-    const body = { url: server_url };
+    // Forward the enabled custom headers so the backend can authenticate to the MCP server during discovery.
+    const body: any = { url: server_url };
+    if (options?.customHeaders && options.customHeaders.length > 0) {
+      body.customHeaders = options.customHeaders;
+    }
     return this.http.post(url, body, httpOptions).pipe(map((res: any) => {
       this.logger.log('[TILEDESK-SERVICE] - GET MCP TOOLS (DISCOVERY) - RES ', res);
+      return res;
+    }));
+  }
+
+  /** httpOptions condivisi per gli endpoint MCP (Authorization col token Tiledesk). */
+  private mcpHttpOptions() {
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: this.tiledeskToken
+      })
+    };
+  }
+
+  /**
+   * Catalogo dei server MCP NATIVI di Tiledesk.
+   * API: GET /{id_project}/mcp/native
+   * Ritorna la lista (id, name, url, native, transport, description). I tool si scaricano on-demand via getNativeMcpServerTools.
+   */
+  public getNativeMcpServers(project_id: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/native';
+    this.logger.log('[TILEDESK-SERVICE] - GET NATIVE MCP SERVERS - URL', url);
+    return this.http.get(url, this.mcpHttpOptions()).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - GET NATIVE MCP SERVERS - RES ', res);
+      return res;
+    }));
+  }
+
+  /**
+   * Connessione + recupero tool di un server MCP nativo (on "Connect").
+   * API: POST /{id_project}/mcp/native/{nativeId}/connect  (endpoint già esistente, usato per connettere i server MCP)
+   */
+  public getNativeMcpServerTools(project_id: string, nativeId: string): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/native/' + nativeId + '/connect';
+    this.logger.log('[TILEDESK-SERVICE] - CONNECT NATIVE MCP SERVER - URL', url);
+    return this.http.post(url, {}, this.mcpHttpOptions()).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - CONNECT NATIVE MCP SERVER - RES ', res);
+      return res;
+    }));
+  }
+
+  /**
+   * Salvataggio dei server MCP nativi selezionati.
+   * API: POST /{id_project}/mcp/servers
+   * Payload nello stesso formato dell'integration ({ id_project, name:"mcp", value:{ servers:[...] } }).
+   */
+  public saveMcpServers(project_id: string, payload: any): Observable<any> {
+    const url = this.SERVER_BASE_URL + project_id + '/mcp/servers';
+    this.logger.log('[TILEDESK-SERVICE] - SAVE MCP SERVERS - URL', url);
+    return this.http.post(url, payload, this.mcpHttpOptions()).pipe(map((res: any) => {
+      this.logger.log('[TILEDESK-SERVICE] - SAVE MCP SERVERS - RES ', res);
       return res;
     }));
   }
@@ -259,30 +333,34 @@ export class ProjectService {
   // Get integration by projectId and integration name
   // ----------------------------------------------------------
   getIntegrationByName(project_id: string, name: string): Observable<any> {
-    const url = this.SERVER_BASE_URL + project_id + '/integration/name/' + name;
-    this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: this.tiledeskToken
-      })
-    };
-    return this.http.get(url, httpOptions);
+    return this.integrationsCache.get(`integration-by-name|${project_id}|${name}`, () => {
+      const url = this.SERVER_BASE_URL + project_id + '/integration/name/' + name;
+      this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: this.tiledeskToken
+        })
+      };
+      return this.http.get(url, httpOptions);
+    });
   }
 
 
    getIntegrations(project_id: string): Observable<any> {
-    const url = this.SERVER_BASE_URL + project_id + '/integration';
-    this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: this.tiledeskToken
-      })
-    };
-    return this.http.get(url, httpOptions);
+    return this.integrationsCache.get(`integrations|${project_id}`, () => {
+      const url = this.SERVER_BASE_URL + project_id + '/integration';
+      this.logger.log('[TILEDESK-SERVICE] - GET INTEGRATION - URL', url);
+      const httpOptions = {
+        headers: new HttpHeaders({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: this.tiledeskToken
+        })
+      };
+      return this.http.get(url, httpOptions);
+    });
    }
 
    // ----------------------------------------------------------
@@ -299,7 +377,11 @@ export class ProjectService {
     }
     const url = this.SERVER_BASE_URL + project_id + "/integration/";
     this.logger.debug('[TILEDESK-SERVICE] - save integration URL: ', url);
-    return this.http.post(url, integration, httpOptions);
+    return this.http.post(url, integration, httpOptions).pipe(
+      // la POST riscrive l'intera integration: invalido lista e entry by-name.
+      // tap emette solo sul next, quindi non invalida se il salvataggio fallisce.
+      tap(() => this.integrationsCache.clear())
+    );
   }
 
   //  updateMcpServer(project_id: string, mcpServer: { name: string, url: string, transport: string }): Observable<any> {

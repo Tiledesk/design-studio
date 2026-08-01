@@ -115,9 +115,20 @@ button.close {
     right: 0;
     left: 0;
     bottom: var(--footer-panel-action-detail-height);
-    overflow: scroll;
-    // overflow: auto; // nk
-    // max-height: calc(100vh - 200px); // nk
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    // Scrollbar minimalista, coerente con le sidebar Blocks/Subagents: nessuno sfondo (track
+    // trasparente), thumb sottile visibile solo su hover, e presente solo quando serve (overflow auto).
+    // Punto UNICO: vale per il pannello di dettaglio di TUTTE le action.
+    &::-webkit-scrollbar { width: 6px; height: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
+    &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
+    &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
 }
 
 .no-footer {
@@ -313,6 +324,62 @@ emoji-mart {
 .btn.btn-primary.cds-blue-button.xl {
     padding: 12px 24px;
     border-radius: 9999px;
+}
+
+/* Stato DISABILITATO del bottone blu CDS.
+   Bootstrap (.btn:disabled, 0-2-0) applica solo opacity:.65 + pointer-events:none;
+   background e color di .btn.btn-primary.cds-blue-button (0-3-0) restano attivi.
+   Rimettiamo pointer-events:auto per avere il cursore not-allowed e non uccidere
+   il matTooltip del .publish-badge; di conseguenza va neutralizzato l'&:hover{opacity:.8}. */
+.btn.btn-primary.cds-blue-button:disabled,
+.btn.btn-primary.cds-blue-button.disabled,
+.btn.btn-primary.cds-blue-button[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: auto;
+    box-shadow: none;
+}
+
+.btn.btn-primary.cds-blue-button:disabled:hover,
+.btn.btn-primary.cds-blue-button.disabled:hover,
+.btn.btn-primary.cds-blue-button[disabled]:hover {
+    opacity: 0.55;
+}
+
+/* Spinner inline nei bottoni CDS.
+   I nomi DEVONO essere namespaced cds-*: questo file e' iniettato come bundle GLOBALE
+   (angular.json -> styles: cds-style) e non e' scopato dalla view encapsulation.
+   Un `.spinner` generico romperebbe l'indicatore "sta scrivendo" di
+   src/chat21-core/utils/user-typing, che usa gia' class="spinner".
+   Stesso motivo per @keyframes cds-spin invece di spin (gia' definito 3 volte altrove). */
+.cds-btn-inline-spinner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cds-btn-spinner {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: cds-spin 0.8s linear infinite;
+}
+
+@keyframes cds-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cds-btn-spinner {
+        animation-duration: 2.4s;
+    }
 }
 
 appdashboard-cds-dashboard a {

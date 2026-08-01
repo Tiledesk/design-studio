@@ -16,17 +16,36 @@ export class TiledeskStage {
     isDragging = false;
     position = {x: 0, y: 0};
 
+    /** rAF throttle: at most one moved-and-scaled dispatch per animation frame */
+    _movedAndScaledRafId = null;
+    _movedAndScaledPending = null;
+
     constructor(containerId, drawerId, classDraggable) {
         this.containerId = containerId;
         this.drawerId = drawerId;
         this.classDraggable = classDraggable;
         this.moveAndZoom = this.moveAndZoom.bind(this);
+        this._scheduleMovedAndScaled = this._scheduleMovedAndScaled.bind(this);
+    }
+
+    _scheduleMovedAndScaled() {
+        this._movedAndScaledPending = { scale: this.scale, x: this.tx, y: this.ty };
+        if (this._movedAndScaledRafId != null) return;
+        this._movedAndScaledRafId = requestAnimationFrame(() => {
+            this._movedAndScaledRafId = null;
+            const p = this._movedAndScaledPending;
+            this._movedAndScaledPending = null;
+            if (p == null) return;
+            const customEvent = new CustomEvent("moved-and-scaled", { detail: p });
+            document.dispatchEvent(customEvent);
+        });
     }
     
     setDrawer() {
         this.container = document.getElementById(this.containerId);
         this.drawer = document.getElementById(this.drawerId);
         this.drawer.style.transformOrigin = this.torigin;
+        this.getPositionNow();
         this.container.addEventListener("wheel", this.moveAndZoom);
         this.setupMouseDrag();
     }
@@ -57,10 +76,7 @@ export class TiledeskStage {
                         this.tx = startX + (event.clientX - clientX) * direction;
                         this.ty = startY + (event.clientY - clientY) * direction;
                         this.transform();
-                        setTimeout(() => {
-                            const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });
-                            document.dispatchEvent(customEvent);
-                        }, 0)
+                        this._scheduleMovedAndScaled();
                     }
                 }).bind(this);
 
@@ -77,12 +93,7 @@ export class TiledeskStage {
 
 
     moveAndZoom(event) {
-        // // console.log("[TILEDESK-STAGE-JS]  •••• moveAndZoom ••••");
         event.preventDefault();
-        const dx = event.deltaX;
-        const dy = event.deltaY;
-        this.getPositionNow();
-
         if (event.ctrlKey === false) {
             let direction = -1;
             this.tx += event.deltaX * direction;
@@ -97,7 +108,7 @@ export class TiledeskStage {
             zoom_point.y = event.pageY - this.drawer.offsetTop-originRec.y;
             zoom_target.x = (zoom_point.x - this.tx)/this.scale;
             zoom_target.y = (zoom_point.y - this.ty)/this.scale;
-            this.scale += dy * -0.01;
+            this.scale += event.deltaY * -0.01;
             // Restrict scale
             this.scale = Math.min(Math.max(0.125, this.scale), 4);
             this.tx = -zoom_target.x * this.scale + zoom_point.x
@@ -105,11 +116,7 @@ export class TiledeskStage {
             // Apply scale transform
             this.transform();
         }
-        setTimeout(() => {
-            const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });
-            document.dispatchEvent(customEvent);
-        }, 0)
-        
+        this._scheduleMovedAndScaled();
     }
 
     // richiamato solo quando premo sul plsante più e meno
@@ -133,25 +140,28 @@ export class TiledeskStage {
     }
     
     transform() {
-        let tcmd = `translate(${this.tx}px, ${this.ty}px)`;
-        let scmd = `scale(${this.scale})`;
-        const cmd = tcmd + " " + scmd;
-        this.drawer.style.transform = cmd;
+        const tcmd = `translate3d(${this.tx}px, ${this.ty}px, 0)`;
+        const scmd = `scale(${this.scale})`;
+        this.drawer.style.transform = tcmd + " " + scmd;
     }
 
 
     getPositionNow(){
         if(window.getComputedStyle(this.drawer)){
-            let computedStyle = window.getComputedStyle(this.drawer);
-            let transformValue = computedStyle.getPropertyValue('transform');
-            if(transformValue !== "none") {
-                let transformMatrix = transformValue.match(/matrix.*\((.+)\)/)[1].split(', ');
-                let translateX = parseFloat(transformMatrix[4]);
-                let translateY = parseFloat(transformMatrix[5]);
-                let scaleX = parseFloat(transformMatrix[0]);
-                this.tx = translateX;
-                this.ty = translateY;
-                this.scale = scaleX;
+            const computedStyle = window.getComputedStyle(this.drawer);
+            const transformValue = computedStyle.getPropertyValue('transform');
+            if(transformValue === "none") return;
+            const m = transformValue.match(/matrix3?d?\((.+)\)/);
+            if (!m) return;
+            const parts = m[1].split(', ').map(s => parseFloat(s.trim()));
+            if (transformValue.startsWith("matrix3d") && parts.length >= 16) {
+                this.tx = parts[12];
+                this.ty = parts[13];
+                this.scale = parts[0];
+            } else if (parts.length >= 6) {
+                this.tx = parts[4];
+                this.ty = parts[5];
+                this.scale = parts[0];
             }
         }
     }

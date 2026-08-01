@@ -1,195 +1,167 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
-import { IntentService } from '../../../../services/intent.service';
-import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX } from '../../../../utils';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { IntentService } from '../../../../services/intent.service';
+import {
+  INTENT_COLORS,
+  RESERVED_INTENT_NAMES,
+  UNTITLED_BLOCK_PREFIX,
+} from '../../../../utils';
 
 @Component({
   selector: 'cds-panel-intent-header',
   templateUrl: './panel-intent-header.component.html',
-  styleUrls: ['./panel-intent-header.component.scss']
+  styleUrls: ['./panel-intent-header.component.scss'],
 })
 export class PanelIntentHeaderComponent implements OnInit, OnChanges {
-  @ViewChild('inputIntentName', { static: true }) inputIntentName!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputIntentName', { static: true })
+  inputIntentName!: ElementRef<HTMLInputElement>;
 
   @Input() intent: Intent;
   @Input() intentColor: string;
-  @Output() saveIntent = new EventEmitter();
 
   RESERVED_INTENT_NAMES = RESERVED_INTENT_NAMES;
-  listOfIntents: Intent[];
   intentName: string;
- 
-  
-  id_faq_kb: string;
-  isFocused: boolean = false;
+  isStart = false;
+  isDefaultFallback = false;
+  isWebhook = false;
+  isNotErrorName = true;
+  intentNameAlreadyExist = false;
+  intentNameNOTHasSpecialCharacters = true;
 
-  isStart: boolean = false;
-  isDefaultFallback: boolean = false;
-  isWebhook: boolean = false;
-  isNotErrorName: boolean = true;
+  private readonly logger: LoggerService =
+    LoggerInstance.getInstance();
+  private listOfIntents: Intent[] = [];
+  private isFocused = false;
 
-  intentNameAlreadyExist: boolean = false
-  intentNameNOTHasSpecialCharacters: boolean = true;
-  
-
-  private readonly logger: LoggerService = LoggerInstance.getInstance()
-  constructor(
-    public intentService: IntentService
-  ) { 
-    this.intentService.getIntents().subscribe(intents => {
-      if(intents){
+  constructor(public intentService: IntentService) {
+    this.intentService.getIntents().subscribe((intents) => {
+      if (intents) {
         this.listOfIntents = intents;
-        if(this.intent){
+        if (this.intent) {
           this.intentName = this.intent.intent_display_name;
         }
       }
-    })
+    });
   }
 
-  // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.initialize();
   }
 
-  ngOnChanges() {
-    // this.logger.log("[PANEL-INTENT-HEADER] header OnChanges intentSelected intent_display_name: ", this.intent.intent_display_name)
+  /**
+   * Angular lifecycle hook: risponde ai cambi delle input properties.
+   * @param changes - mappa delle proprietà modificate
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    // Riservato a eventuali reazioni future ai cambi di intent
   }
 
-  /******************* CUSTOM FUNCTIONS *******************/ 
-
-  /** initialize */
-  private initialize(){
-    this.listOfIntents = this.intentService.listOfIntents;
-    this.intentNameAlreadyExist = false;
-    this.intentNameNOTHasSpecialCharacters = true;
-    if (this.intent.intent_display_name === undefined || this.intent.intent_display_name.trim().length === 0) {
-      this.intentService.setDisplayName();
-    } else {
-      this.intentName = this.intent.intent_display_name;
-    }
-    if(this.intentName === RESERVED_INTENT_NAMES.START) {
-      this.isStart = true;
-      // this.intentNameAlreadyExist = true;
-    } else if(this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
-      this.isDefaultFallback = true;
-      // this.intentNameAlreadyExist = true;
-    } else if(this.intentName === RESERVED_INTENT_NAMES.WEBHOOK) {
-      this.isWebhook = true;
-      // this.intentNameAlreadyExist = true;
-    }
-    if(!this.intentColor){
-      this.intentColor = INTENT_COLORS.COLOR1;
-    }
-    this.logger.log("[PANEL-INTENT-HEADER] initialize name:", this.intent);
-    //this.inputIntentName.nativeElement.focus();
+  /**
+   * Gestisce il click sulla zona header dell'intent (log e possibile estensione).
+   * @param event - evento di click
+   */
+  onSelectIntent(event: Event): void {
+    this.logger.log(
+      '[PANEL-INTENT-HEADER] onSelectIntent',
+      event,
+      this.intent
+    );
   }
 
-
-  /** checkIntentNameMachRegex */
-  private checkIntentNameMachRegex(intentname) {
-    const regex = /^[ _0-9a-zA-Z]+$/
-    return regex.test(intentname);
-  }
-
-  /** checkIntentName */
-  private checkIntentName(name: string) {
-    this.intentNameAlreadyExist = false;
-    if(!this.intentName || this.intentName.trim().length == 0 || this.intentName === UNTITLED_BLOCK_PREFIX) {
-      return false;
-    }
-    for (const element of this.listOfIntents) {
-      if (element.intent_display_name === name && element.intent_id !== this.intent.intent_id) { 
-        this.intentNameAlreadyExist = true;
-        return false;
-      }
-    }
-    this.intentNameNOTHasSpecialCharacters = this.checkIntentNameMachRegex(name);
-    if(!this.intentNameNOTHasSpecialCharacters){
-      return false;
-    }
-    return true;
-  }
-  /******************* END CUSTOM FUNCTIONS *******************/ 
-
-
-  /******************* EVENT FUNCTIONS *******************/ 
-  onSelectIntent(event){
-    this.logger.log("[PANEL-INTENT-HEADER] onSelectIntent",event, this.intent);
-    // // this.intentService.setIntentSelected(this.intent.intent_id);
-  }
-
-  /** onMouseUpInput */
-  onMouseUpInput(event){
-    this.logger.log("[PANEL-INTENT-HEADER] onMouseUpInput");
+  /**
+   * Imposta il focus sull'input del nome intent al mouseup.
+   * @param event - evento mouseup
+   */
+  onMouseUpInput(event: Event): void {
+    this.logger.log('[PANEL-INTENT-HEADER] onMouseUpInput');
     this.isFocused = true;
     this.inputIntentName.nativeElement.focus();
   }
 
-  /** onChangeIntentName */
-  onChangeIntentName(event) {
-    this.logger.log("[PANEL-INTENT-HEADER] onChangeIntentName", event, this.intent);
-    // Se il campo è vuoto, non mostrare errori ma aggiorna comunque l'UI in tempo reale
-    if(!event || event.trim().length === 0) {
+  /**
+   * Aggiorna il nome intent in tempo reale in base all'input; gestisce vuoti e nomi riservati.
+   * @param event - valore corrente dell'input (nome intent)
+   */
+  onChangeIntentName(event: string): void {
+    this.logger.log(
+      '[PANEL-INTENT-HEADER] onChangeIntentName',
+      event,
+      this.intent
+    );
+    if (!event || event.trim().length === 0) {
       this.intentNameAlreadyExist = false;
       this.isNotErrorName = true;
       this.intentNameNOTHasSpecialCharacters = true;
       this.intentName = event || '';
-      // Aggiorna l'intent localmente anche con stringa vuota per aggiornare la preview in tempo reale
       this.intent.intent_display_name = event || '';
-      // Aggiorna l'UI in tempo reale (preview e lista) senza salvare sul server
-      // Il salvataggio sul server avviene solo su onBlur e imposterà sempre un nome di default
       this.intentService.updateIntentDisplayNameInRealTime(this.intent);
       return;
     }
-    
-    if(this.intentService.isReservedIntent(event) && !this.intent.attributes.readonly){
-      this.logger.log("[PANEL-INTENT-HEADER] isReservedIntent TRUE", this.intent.attributes.readonly);
+    if (
+      this.intentService.isReservedIntent(event) &&
+      !this.intent.attributes.readonly
+    ) {
+      this.logger.log(
+        '[PANEL-INTENT-HEADER] isReservedIntent TRUE',
+        this.intent.attributes.readonly
+      );
       this.intentNameAlreadyExist = true;
       this.isNotErrorName = false;
     } else {
-      this.logger.log("[PANEL-INTENT-HEADER] isReservedIntent FALSE");
+      this.logger.log('[PANEL-INTENT-HEADER] isReservedIntent FALSE');
       this.intentNameAlreadyExist = false;
       this.isNotErrorName = this.checkIntentName(event);
-      if(this.isNotErrorName){
+      if (this.isNotErrorName) {
         this.intentName = event;
-        // Aggiorna l'intent localmente per aggiornare la preview in tempo reale
         this.intent.intent_display_name = event;
-        // Aggiorna l'UI in tempo reale (preview e lista) senza salvare sul server
-        // Il salvataggio sul server avviene solo su onBlur
         this.intentService.updateIntentDisplayNameInRealTime(this.intent);
       }
     }
   }
 
-
-  onBlur(event){
-    this.logger.log("[PANEL-INTENT-HEADER]  onBlur!!!", this.intent);
-    // Se il campo è vuoto, genera automaticamente un nome univoco con prefisso preDisplayName
-    if(!this.intentName || this.intentName.trim().length === 0) {
-      this.logger.log("[PANEL-INTENT-HEADER] Campo vuoto, genero nome automatico");
+  /**
+   * Al blur: valida il nome, genera un nome di default se vuoto, e salva se valido.
+   * @param event - evento blur
+   */
+  onBlur(event: Event): void {
+    this.logger.log('[PANEL-INTENT-HEADER]  onBlur!!!', this.intent);
+    if (!this.intentName || this.intentName.trim().length === 0) {
+      this.logger.log(
+        '[PANEL-INTENT-HEADER] Campo vuoto, genero nome automatico'
+      );
       const generatedName = this.intentService.setDisplayName();
       this.intentName = generatedName;
       this.intent.intent_display_name = generatedName;
       this.isNotErrorName = true;
       this.intentNameAlreadyExist = false;
       this.intentNameNOTHasSpecialCharacters = true;
-      // Aggiorna l'UI in tempo reale con il nome generato prima di salvare
       this.intentService.updateIntentDisplayNameInRealTime(this.intent);
       this.inputIntentName.nativeElement.blur();
       this.onSaveIntent();
       return;
     }
-    if(this.intentService.isReservedIntent(this.intentName) && this.intent.attributes.readonly === false){
+    if (
+      this.intentService.isReservedIntent(this.intentName) &&
+      this.intent.attributes.readonly === false
+    ) {
       this.intentNameAlreadyExist = true;
       this.intentName = this.intent.intent_display_name;
-      this.logger.log("[PANEL-INTENT-HEADER]  isReservedIntent true");
+      this.logger.log('[PANEL-INTENT-HEADER]  isReservedIntent true');
     } else {
       this.intentNameAlreadyExist = false;
-      this.logger.log("[PANEL-INTENT-HEADER]  isReservedIntent true");
+      this.logger.log('[PANEL-INTENT-HEADER]  isReservedIntent true');
       this.isNotErrorName = this.checkIntentName(this.intentName);
-      if(this.isNotErrorName){
+      if (this.isNotErrorName) {
         this.intent.intent_display_name = this.intentName;
         this.inputIntentName.nativeElement.blur();
         this.onSaveIntent();
@@ -197,19 +169,25 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     }
   }
 
-  /** ENTER KEYBOARD EVENT*/
-  onEnterButtonPressed(event) {
-    this.logger.log('[PANEL-INTENT-HEADER] onEnterButtonPressed Intent name: onEnterButtonPressed event', event)
-    // Se il campo è vuoto, genera automaticamente un nome univoco con prefisso preDisplayName
-    if(!this.intentName || this.intentName.trim().length === 0) {
-      this.logger.log("[PANEL-INTENT-HEADER] Campo vuoto su Enter, genero nome automatico");
+  /**
+   * Alla pressione di Enter: se il campo è vuoto genera nome e salva, altrimenti fa blur.
+   * @param event - evento keydown Enter
+   */
+  onEnterButtonPressed(event: Event): void {
+    this.logger.log(
+      '[PANEL-INTENT-HEADER] onEnterButtonPressed Intent name: onEnterButtonPressed event',
+      event
+    );
+    if (!this.intentName || this.intentName.trim().length === 0) {
+      this.logger.log(
+        '[PANEL-INTENT-HEADER] Campo vuoto su Enter, genero nome automatico'
+      );
       const generatedName = this.intentService.setDisplayName();
       this.intentName = generatedName;
       this.intent.intent_display_name = generatedName;
       this.isNotErrorName = true;
       this.intentNameAlreadyExist = false;
       this.intentNameNOTHasSpecialCharacters = true;
-      // Aggiorna l'UI in tempo reale con il nome generato prima di salvare
       this.intentService.updateIntentDisplayNameInRealTime(this.intent);
       this.inputIntentName.nativeElement.blur();
       this.onSaveIntent();
@@ -218,27 +196,100 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     this.inputIntentName.nativeElement.blur();
   }
 
-  /** doubleClickFunction */
-  doubleClickFunction(event){
-    this.logger.log("[PANEL-INTENT-HEADER] doubleClickFunction");
+  /**
+   * Seleziona tutto il testo nell'input al doppio click.
+   * @param event - evento dblclick
+   */
+  doubleClickFunction(event: Event): void {
+    this.logger.log('[PANEL-INTENT-HEADER] doubleClickFunction');
     this.inputIntentName.nativeElement.select();
   }
 
-  /** onSaveIntent */
-  onSaveIntent() {
-    this.logger.log("[PANEL-INTENT-HEADER] SALVO!!!");
+  /**
+   * Propaga il salvataggio del nome intent al servizio.
+   */
+  onSaveIntent(): void {
+    this.logger.log('[PANEL-INTENT-HEADER] SALVO!!!');
     this.intentService.changeIntentName(this.intent);
   }
 
-  /** focusInput
-   * Metodo pubblico per mettere il focus sull'input del nome intent
+  /**
+   * Metodo pubblico per mettere il focus sull'input del nome intent (usabile dal parent).
    */
   public focusInput(): void {
-    if (this.inputIntentName && this.inputIntentName.nativeElement) {
+    if (this.inputIntentName?.nativeElement) {
       setTimeout(() => {
         this.inputIntentName.nativeElement.focus({ preventScroll: true });
-        // this.inputIntentName.nativeElement.select();
       }, 300);
     }
+  }
+
+  /**
+   * Inizializza stato e nome intent; imposta colore e flag per intent riservati.
+   */
+  private initialize(): void {
+    this.listOfIntents = this.intentService.listOfIntents;
+    this.intentNameAlreadyExist = false;
+    this.intentNameNOTHasSpecialCharacters = true;
+    if (
+      this.intent.intent_display_name === undefined ||
+      this.intent.intent_display_name.trim().length === 0
+    ) {
+      this.intentService.setDisplayName();
+    } else {
+      this.intentName = this.intent.intent_display_name;
+    }
+    if (this.intentName === RESERVED_INTENT_NAMES.START) {
+      this.isStart = true;
+    } else if (this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
+      this.isDefaultFallback = true;
+    } else if (this.intentName === RESERVED_INTENT_NAMES.WEBHOOK) {
+      this.isWebhook = true;
+    }
+    if (!this.intentColor) {
+      this.intentColor = INTENT_COLORS.COLOR1;
+    }
+    this.logger.log('[PANEL-INTENT-HEADER] initialize name:', this.intent);
+  }
+
+  /**
+   * Verifica se il nome intent rispetta il regex (solo lettere, numeri, spazi, underscore).
+   * @param intentname - nome da validare
+   * @returns true se valido
+   */
+  private checkIntentNameMatchRegex(intentname: string): boolean {
+    const regex = /^[ _0-9a-zA-Z]+$/;
+    return regex.test(intentname);
+  }
+
+  /**
+   * Controlla unicità e caratteri consentiti del nome; aggiorna flag di errore.
+   * @param name - nome da controllare
+   * @returns true se il nome è valido
+   */
+  private checkIntentName(name: string): boolean {
+    this.intentNameAlreadyExist = false;
+    if (
+      !this.intentName ||
+      this.intentName.trim().length === 0 ||
+      this.intentName === UNTITLED_BLOCK_PREFIX
+    ) {
+      return false;
+    }
+    for (const element of this.listOfIntents) {
+      if (
+        element.intent_display_name === name &&
+        element.intent_id !== this.intent.intent_id
+      ) {
+        this.intentNameAlreadyExist = true;
+        return false;
+      }
+    }
+    this.intentNameNOTHasSpecialCharacters =
+      this.checkIntentNameMatchRegex(name);
+    if (!this.intentNameNOTHasSpecialCharacters) {
+      return false;
+    }
+    return true;
   }
 }

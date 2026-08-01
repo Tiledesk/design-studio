@@ -67,7 +67,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     const appconfig = this.appConfigService.getConfig();
     this.persistence = appconfig.authPersistence;
-    this.appStorageService.initialize(environment.storage_prefix, this.persistence, '')
+    this.appStorageService.initialize(appconfig.storage_prefix, this.persistence, '')
 
     this.logger.setLoggerConfig(true, appconfig.logLevel)
     this.logger.info('[APP-COMP] logLevel: ', appconfig.logLevel);
@@ -158,6 +158,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // Skip while a test simulator session is active: a reload would restart the conversation
+    // and wipe the logs the user is analyzing (see isTestSimulatorActive).
+    if (this.isTestSimulatorActive()) {
+      return;
+    }
+
     this.resumeDialogOpen = true;
     const ref = this.dialog.open(AppInterruptionComponent, {
       data: {
@@ -172,6 +178,16 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
     ref.afterClosed().subscribe(() => {
       this.resumeDialogOpen = false;
     });
+  }
+
+  /**
+   * Una sessione di test del simulatore è attiva quando il Design Studio renderizza
+   * l'iframe del widget (#widgetIframe, dentro cds-panel-widget *ngIf) e/o il pannello
+   * log (<cds-widget-logs> *ngIf). In quel caso un reload riavvierebbe la conversazione
+   * e azzererebbe i log: meglio non mostrare il dialog di resume.
+   */
+  private isTestSimulatorActive(): boolean {
+    return !!document.querySelector('#widgetIframe, cds-widget-logs');
   }
 
 

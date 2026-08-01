@@ -5,6 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { FaqKbService } from './faq-kb.service';
 import { DashboardService } from './dashboard.service';
+import { SavingStateService } from './saving-state.service';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -27,7 +28,8 @@ export class NoteService {
 
   constructor(
     private faqKbService: FaqKbService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private savingStateService: SavingStateService
   ) { }
 
   /**
@@ -279,9 +281,7 @@ export class NoteService {
       }
       
       // Recupera tutte le note dal dashboardService (o array vuoto se non esiste)
-      const notes = this.dashboardService.selectedChatbot.attributes.notes || [];
-      // Garantisce default anche per note già presenti (retro-compatibilità)
-      notes.forEach(n => this.ensureNoteDefaults(n));
+      const notes = this.dashboardService.selectedChatbot.attributes?.notes || [];
       
       // Cerca se la nota esiste già nell'array
       const existingIndex = notes.findIndex(n => n.note_id === note.note_id);
@@ -311,7 +311,7 @@ export class NoteService {
       };
       
       // Chiama patchAttributes per salvare le note in remoto
-      return this.faqKbService.patchAttributes(id_faq_kb, attributes);
+      return this.savingStateService.track(this.faqKbService.patchAttributes(id_faq_kb, attributes));
     } catch (error) {
       this.logger.error('[NOTE-SERVICE] Error saving notes remotely:', error);
       throw error;
@@ -357,7 +357,7 @@ export class NoteService {
       };
       
       // Chiama patchAttributes per salvare l'array aggiornato in remoto
-      return this.faqKbService.patchAttributes(id_faq_kb, attributes);
+      return this.savingStateService.track(this.faqKbService.patchAttributes(id_faq_kb, attributes));
     } catch (error) {
       this.logger.error('[NOTE-SERVICE] Error deleting note:', error);
       throw error;
@@ -436,9 +436,12 @@ export class NoteService {
         notes: notes
       };
       
-      // Salva la nota duplicata in remoto e restituisce la nota duplicata
-      return this.faqKbService.patchAttributes(id_faq_kb, attributes).pipe(
-        map(() => duplicatedNote)
+      // Salva la nota duplicata in remoto e restituisce la nota duplicata.
+      // track() avvolge l'intera catena: finalize scatta dopo il map, non prima.
+      return this.savingStateService.track(
+        this.faqKbService.patchAttributes(id_faq_kb, attributes).pipe(
+          map(() => duplicatedNote)
+        )
       );
     } catch (error) {
       this.logger.error('[NOTE-SERVICE] Error duplicating note:', error);

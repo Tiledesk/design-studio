@@ -6,7 +6,7 @@ import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-s
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { ConnectorService } from 'src/app/chatbot-design-studio/services/connector.service';
 import { RESERVED_INTENT_NAMES, STAGE_SETTINGS } from 'src/app/chatbot-design-studio/utils';
-import { TYPE_CHATBOT, TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, TYPE_ACTION, resolveChatbotSubtype, isReturnStackIntent } from 'src/app/chatbot-design-studio/utils-actions';
 import { Intent } from 'src/app/models/intent-model';
 import { Project } from 'src/app/models/project-model';
 import { AppConfigService } from 'src/app/services/app-config';
@@ -34,6 +34,8 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
 
   isStart: boolean = false;
   isWebhook: boolean = false;
+  /** nodo terminale "Return to parent agent": non deve avere connettore in uscita */
+  isReturnStack: boolean = false;
 
   // Connector management
   listOfIntents: Array<{name: string, value: string, icon?:string}> = [];
@@ -71,8 +73,10 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       this.initializeWebhook();
     }
     
+    this.isReturnStack = isReturnStackIntent(this.intent);
+
     // Inizializza la lista degli intent per la select del connettore
-    if (!this.isStart && !this.isWebhook) {
+    if (!this.isStart && !this.isWebhook && !this.isReturnStack) {
       this.initializeConnectorSelect();
     }
   }
@@ -110,7 +114,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.isWebhook = true;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
-    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
     this.getWebhook();
   }
 
@@ -265,7 +269,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
 
   /**
    * Inizializza la select per gestire il connettore dell'intent.
-   * Carica la lista degli intent escludendo quello corrente, START e WEBHOOK.
+   * Carica la lista degli intent escludendo quello corrente.
    */
   private initializeConnectorSelect(): void {
     // Ottiene la lista di tutti gli intent

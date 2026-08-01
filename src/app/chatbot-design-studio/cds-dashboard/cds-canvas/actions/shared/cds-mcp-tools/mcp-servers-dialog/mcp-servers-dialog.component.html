@@ -1,0 +1,137 @@
+<div class="tpl-modal-box">
+    <div class="tpl-modal-header">
+        <div class="tpl-modal-header-text">
+            <span class="mcp-dialog__title">{{'CDSCanvas.ServerMCP' | translate}}</span>
+            <span class="mcp-dialog__subtitle">{{'CDSCanvas.ChooseToolOrAddMCPServer' | translate}}</span>
+        </div>
+        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+    </div>
+    
+    <hr class="custom-hr mcp-dialog__hr">
+    
+    <!-- Search and Counter Section - Always visible -->
+    <div class="search-section">
+        <div class="server-count">
+            {{'CDSCanvas.TotalMCPServers' | translate}}: <span class="count-number">{{ filteredServers.length }}</span>
+        </div>
+        <div class="search-input-wrapper">
+            <input 
+                type="text" 
+                class="search-input"
+                [(ngModel)]="searchFilter"
+                (input)="onSearchChange()"
+                [placeholder]="'CDSCanvas.SearchByNameURLOrType' | translate">
+            <span class="material-icons search-icon">search</span>
+        </div>
+    </div>
+    
+    <div class="tpl-modal-content">
+        <div class="mcp-servers-list">
+            <div *ngIf="!data.mcpServers || data.mcpServers.length === 0" class="empty-state">
+                <span class="material-icons empty-icon">cloud_off</span>
+                <p class="empty-message">{{'CDSCanvas.NoMCPServerConfigured' | translate}}</p>
+            </div>
+            
+            <div *ngIf="filteredServers.length === 0 && data.mcpServers && data.mcpServers.length > 0" class="empty-state">
+                <span class="material-icons empty-icon">search_off</span>
+                <p class="empty-message">{{'CDSCanvas.NoServersMatchSearch' | translate}}</p>
+            </div>
+            
+            <div class="mcp-server-item-wrapper" *ngFor="let server of filteredServers">
+                <button 
+                    class="mcp-server-item"
+                    [class.selected]="isServerSelected(server)"
+                    type="button"
+                    (click)="toggleServerSelection(server, $event)">
+                    <!-- Edit badge (must NOT trigger server selection) -->
+                    <span
+                        class="edit-button mcp-server__edit-badge"
+                        role="button"
+                        tabindex="0"
+                        (click)="openEditServerDialog(server, $event)"
+                        (keydown.enter)="openEditServerDialog(server, $event)"
+                        (keydown.space)="openEditServerDialog(server, $event)">
+                        <span class="material-icons mcp-server__edit-icon">edit</span>
+                    </span>
+                    <div class="server-info">
+                        <div class="server-name">
+                            {{ server.name }}
+                            <span *ngIf="server.native" class="material-icons mcp-server__native-icon"
+                                [matTooltip]="'CDSCanvas.Native' | translate" matTooltipClass="cds-mat-tooltip">verified</span>
+                            <span *ngIf="isServerSelected(server)" class="material-icons mcp-server__status-icon mcp-server__status-icon--active"
+                                [matTooltip]="'CDSCanvas.Active' | translate" matTooltipClass="cds-mat-tooltip">check_circle</span>
+                            <span *ngIf="!isServerSelected(server)" class="material-icons mcp-server__status-icon mcp-server__status-icon--available"
+                                [matTooltip]="'CDSCanvas.Available' | translate" matTooltipClass="cds-mat-tooltip">check_circle_outline</span>
+                        </div>
+                        <div class="server-url">{{ server.url }}</div>
+                        <div class="server-type">{{ server.transport }}</div>
+                        <div class="server-type mcp-server__tools-active-row">
+                            <span class="mcp-server__tools-active-label">{{'CDSCanvas.ToolsActiveLabel' | translate}}:</span>
+                            <mcp-active-tools-inline
+                                [names]="getActiveToolNames(server)"
+                                (more)="openActiveToolsModal(server, $event)">
+                            </mcp-active-tools-inline>
+                        </div>
+                    </div>
+                    <!-- <span class="material-icons checkmark-icon" *ngIf="isServerSelected(server)">check_circle</span> -->
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button"
+            (click)="onAddMcpServer()">
+            <span class="material-icons mcp-dialog__add-icon">add</span>
+            {{'CDSCanvas.MCPServer' | translate}}
+        </button>
+        <button id="cds-add-tiledesk-tools-btn" class="btn btn-primary cds-blue-button" type="button"
+            (click)="onAddTiledeskTools()">
+            <span class="material-icons mcp-dialog__add-icon">add</span>
+            {{'CDSCanvas.NativeTools' | translate}}
+        </button>
+    </div>
+
+    <!-- Read-only overlay: ALL the server's tools (descending), active ones checked.
+         Sized to the dialog box, header mirrors .tpl-modal-header. -->
+    <div *ngIf="isActiveToolsModalOpen" class="tools-modal">
+        <div class="tpl-modal-header">
+            <div class="tpl-modal-header-text">
+                <span class="mcp-dialog__title">{{'CDSCanvas.AvailableTools' | translate}} ({{ activeToolsModalTools.length }})</span>
+                <span class="mcp-dialog__subtitle">{{'CDSCanvas.ToolsActiveLabel' | translate}}: {{ activeToolsModalSelected.size }} / {{ activeToolsModalTools.length }}</span>
+            </div>
+            <i class="material-icons cds-close-btn-icon" (click)="closeActiveToolsModal()">close</i>
+        </div>
+        <hr class="custom-hr mcp-dialog__hr">
+        <div class="tools-modal__list">
+            <div *ngIf="activeToolsModalTools.length === 0" class="tools-modal__empty">
+                {{'CDSCanvas.NoToolsAvailable' | translate}}
+            </div>
+            <div *ngIf="activeToolsModalTools.length > 0" class="tools-modal__item tools-modal__selectall"
+                (click)="toggleAllActiveTools()">
+                <span class="material-icons tools-modal__item-check"
+                    [class.tools-modal__item-check--on]="areAllActiveToolsSelected || someActiveToolsSelected">
+                    {{ areAllActiveToolsSelected ? 'check_box' : (someActiveToolsSelected ? 'indeterminate_check_box' : 'check_box_outline_blank') }}
+                </span>
+                <div class="tools-modal__item-content">
+                    <span class="tools-modal__item-name">
+                        {{ (areAllActiveToolsSelected ? 'CDSCanvas.DeselectAll' : 'CDSCanvas.SelectAll') | translate }}
+                    </span>
+                </div>
+            </div>
+            <div *ngFor="let tool of activeToolsModalTools" class="tools-modal__item tools-modal__item--clickable"
+                (click)="toggleActiveTool(tool.name)">
+                <span class="material-icons tools-modal__item-check"
+                    [class.tools-modal__item-check--on]="isActiveTool(tool.name)">
+                    {{ isActiveTool(tool.name) ? 'check_box' : 'check_box_outline_blank' }}
+                </span>
+                <div class="tools-modal__item-content">
+                    <span class="tools-modal__item-name">{{ tool.name }}</span>
+                    <span *ngIf="tool.description" class="tools-modal__item-desc">{{ tool.description }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

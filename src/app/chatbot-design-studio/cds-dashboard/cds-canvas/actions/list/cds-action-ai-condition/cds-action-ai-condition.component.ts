@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { firstValueFrom, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 //MODELS
 import { ActionAiCondition } from 'src/app/models/action-model';
@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
@@ -242,18 +242,6 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
   }
 
-  async getIntegrationByName(){
-    const projectID = this.dashboardService.projectID;
-    const integrationName = 'ollama';
-    try {
-        const response = await firstValueFrom(this.projectService.getIntegrationByName(projectID, integrationName));
-        this.logger.log('[ACTION AI_CONDITION] - integration response:', response.value);
-        return response;
-    } catch (error) {
-      this.logger.log('[ACTION AI_CONDITION] getIntegrationByName ERROR:', error);
-    }
-  }
-
   refreshConnector(idConnector, idCondition) {
      this.listOfConnectors[idCondition] = {
       idConnector: idConnector,
@@ -313,7 +301,7 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(found){
           found.conditionIntentId = null;
         }
-      } else {
+      } else if (this.connector.created) {
         if(this.listOfConnectors[idCondition]){
           this.listOfConnectors[idCondition].idConnection =  this.connector.id;
           this.listOfConnectors[idCondition].isConnected  =  true;
@@ -322,6 +310,7 @@ export class CdsActionAiConditionComponent implements OnInit {
           found.conditionIntentId = '#'+this.connector.toId;
         }
       }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
       this.logger.log('error: ', error);
@@ -378,13 +367,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       return;
     }
     if(property === 'model'){
-      this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
       this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;

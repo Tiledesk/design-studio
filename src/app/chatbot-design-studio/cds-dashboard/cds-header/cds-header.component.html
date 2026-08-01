@@ -36,12 +36,17 @@
     <div class="right-opts">
 
         <div *ngIf="isBlockSectionActive" class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
-            <button *ngIf="(!isPlaying && isWebhook) || !isWebhook" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button" (click)="onClickPublish()">
+            <button *ngIf="(!isPlaying && isWebhook) || !isWebhook" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button"
+                [disabled]="isSaving"
+                (click)="onClickPublish()">
                 <!-- <span class="material-icons">
                     cached
                 </span> -->
-                {{ 'Publish' | translate}}
-                <span *ngIf="selectedChatbot?.modified" 
+                <span *ngIf="!isSavingVisible">{{ 'Publish' | translate}}</span>
+                <span *ngIf="isSavingVisible" class="cds-btn-inline-spinner">
+                    <span class="cds-btn-spinner"></span>{{ 'CDSCanvas.Saving' | translate}}...
+                </span>
+                <span *ngIf="selectedChatbot?.modified"
                   class="publish-badge"
                   [matTooltip]="'CDSHeader.ThereAreUnpublishedChanges' | translate"
                   matTooltipClass="cds-mat-tooltip"
