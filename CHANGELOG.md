@@ -18,6 +18,9 @@
 # 1.40.11
 - **added**: added new google models
 
+# this branch 
+- **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
+
 # 1.40.10 
 - **added**: added documentation image and guide link to the Data Table action tooltip
 - **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
