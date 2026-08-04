@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
  
+# 1.40.11-rc6
+- **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
+- **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
 
 # 1.40.11-rc5 
 - **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
