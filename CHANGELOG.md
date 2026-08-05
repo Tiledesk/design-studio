@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+
+# 1.40.13
+- **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
+- **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
+
 # 1.40.12
 - **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
 - **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
