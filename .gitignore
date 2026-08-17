@@ -59,6 +59,8 @@ Thumbs.db
 settings.json
 docs
 .claude
+.superpowers/
+.connector-sdd-*.md
 json-condition-when-grammar.md
 .superpowers/
 .connector-sdd-*.md

@@ -9,6 +9,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
+import { buildConnectorAction } from '../connector/connector-action.factory';
+import { ConnectorActionEntry } from '../connector/connector-manifest.model';
+import { patchActionIds } from './patch-action-id.util';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
 import { buildConnectorAction } from '../connector/connector-action.factory';
 import { ConnectorActionEntry } from '../connector/connector-manifest.model';
