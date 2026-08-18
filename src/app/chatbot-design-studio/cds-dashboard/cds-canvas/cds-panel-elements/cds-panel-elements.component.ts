@@ -156,10 +156,7 @@ export class CdsPanelElementsComponent implements OnInit {
     this.projectService.getIntegrations(projectId).pipe(
       catchError(() => of(null))
     ).subscribe((integrations: any) => {
-      if (!Array.isArray(integrations)) { return; }
-      integrations.forEach((integration: any) => {
-        const baseUrl = integration?.value?.baseUrl;
-        if (!baseUrl || integration?.value?.installed !== true) { return; }
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl }) => {
         this.connectorCatalogService.fetchManifest(baseUrl).pipe(
           catchError(() => of(null))
         ).subscribe(manifest => {

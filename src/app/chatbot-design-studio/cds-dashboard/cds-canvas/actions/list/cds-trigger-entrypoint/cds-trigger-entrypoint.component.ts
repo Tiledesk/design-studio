@@ -27,15 +27,11 @@ export class CdsTriggerEntrypointComponent implements OnInit {
     const projectId = this.dashboardService.projectID;
     if (projectId && (this.projectService as any).getIntegrations) {
       (this.projectService as any).getIntegrations(projectId).pipe(catchError(() => of(null))).subscribe((integrations: any) => {
-        if (Array.isArray(integrations)) {
-          integrations.forEach((integration: any) => {
-            const baseUrl = integration?.value?.baseUrl;
-            if (!baseUrl || integration?.value?.installed !== true) { return; }
-            this.connectorCatalogService.fetchManifest(baseUrl).pipe(catchError(() => of(null))).subscribe(m => {
-              if (m) { this.addGroup(this.connectorCatalogService.toTriggerGroup(m, baseUrl, integration?.value?.apiKey)); }
-            });
+        this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl, apiKey }) => {
+          this.connectorCatalogService.fetchManifest(baseUrl).pipe(catchError(() => of(null))).subscribe(m => {
+            if (m) { this.addGroup(this.connectorCatalogService.toTriggerGroup(m, baseUrl, apiKey)); }
           });
-        }
+        });
       });
     }
     // static dev path

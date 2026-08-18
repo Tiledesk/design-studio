@@ -30,6 +30,7 @@ import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
 import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
+import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 
 const swal = require('sweetalert');
@@ -104,6 +105,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
     private readonly triggerService: ConnectorTriggerService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
   ) {
     this.manageRouteChanges();
@@ -403,14 +405,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     ((environment as any).connectorBaseUrls || []).forEach((b: string) => { if (b) { conns.push({ baseUrl: b }); } });
     try {
       const integrations: any = await firstValueFrom((this.projectService as any).getIntegrations(this.projectID));
-      if (Array.isArray(integrations)) {
-        integrations.forEach((i: any) => {
-          const b = i?.value?.baseUrl;
-          if (b && i?.value?.installed === true && !conns.find(c => c.baseUrl === b)) {
-            conns.push({ baseUrl: b, apiKey: i?.value?.apiKey });
-          }
-        });
-      }
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl, apiKey }) => {
+        if (!conns.find(c => c.baseUrl === baseUrl)) {
+          conns.push({ baseUrl, apiKey });
+        }
+      });
     } catch { /* ignore — dev path still arms via connectorBaseUrls */ }
     conns.forEach(c => {
       const call$ = arm

@@ -13,9 +13,6 @@ import { buildConnectorAction } from '../connector/connector-action.factory';
 import { ConnectorActionEntry } from '../connector/connector-manifest.model';
 import { patchActionIds } from './patch-action-id.util';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
-import { buildConnectorAction } from '../connector/connector-action.factory';
-import { ConnectorActionEntry } from '../connector/connector-manifest.model';
-import { patchActionIds } from './patch-action-id.util';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -959,7 +956,7 @@ export class IntentService {
 
     if (typeAction === TYPE_ACTION.CONNECTOR) {
       if (options?.connectorEntry) {
-        return buildConnectorAction(options.connectorEntry);
+        return buildConnectorAction(options.connectorEntry, this.dashboardService.projectID);
       }
       // No connector descriptor reached us: never return undefined (it would be
       // inserted as a null action and crash the canvas). Skip instead.

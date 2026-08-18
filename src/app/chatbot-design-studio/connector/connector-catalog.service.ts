@@ -44,6 +44,24 @@ export class ConnectorCatalogService {
     );
   }
 
+  /**
+   * Extracts the per-project connector list from the raw response of
+   * GET /:projectid/integration (every integration doc for the project).
+   * Connectors are stored under a single doc named 'connectors' whose
+   * value.items[] holds one entry per added connector — see
+   * tiledesk-dashboard's connector-integration.component.ts#addConnector.
+   * There is no per-connector doc with value.baseUrl/value.installed.
+   */
+  getInstalledConnectorEntries(integrations: any): Array<{ baseUrl: string; apiKey?: string }> {
+    if (!Array.isArray(integrations)) { return []; }
+    const connectorsDoc = integrations.find((integration: any) => integration?.name === 'connectors');
+    const items = connectorsDoc?.value?.items;
+    if (!Array.isArray(items)) { return []; }
+    return items
+      .filter((item: any) => !!item?.baseUrl)
+      .map((item: any) => ({ baseUrl: item.baseUrl, apiKey: item.apiKey }));
+  }
+
   toPaletteEntries(manifest: ConnectorManifest): ConnectorPaletteEntry[] {
     return manifest.actions.map(a => ({
       name: a.name,

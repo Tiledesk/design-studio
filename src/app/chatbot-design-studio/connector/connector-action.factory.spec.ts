@@ -58,6 +58,16 @@ describe('buildConnectorAction', () => {
     expect(a._tdConnector.baseUrl).toBe('https://conn.example.com');
     expect(a._tdConnector.auth.type).toBe('oauth2');
   });
+  it('bakes the real project id into external_id when provided (the runtime never resolves the {projectId} placeholder)', () => {
+    const a: any = buildConnectorAction(entry, '64f0a1b2c3d4e5f678901234');
+    const body = JSON.parse(a.jsonBody);
+    expect(body.external_id).toBe('64f0a1b2c3d4e5f678901234');
+  });
+  it('leaves external_id as the unresolved placeholder when no project id is given (back-compat)', () => {
+    const a: any = buildConnectorAction(entry);
+    const body = JSON.parse(a.jsonBody);
+    expect(body.external_id).toBe('{projectId}');
+  });
   it('seeds falsy-but-valid defaults (0, false) rather than dropping them to empty', () => {
     const withFalsyDefaults: any = {
       ...entry,

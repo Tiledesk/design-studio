@@ -12,7 +12,13 @@ export const environment = {
     // remoteConfigUrl: './environments/real_data/cds-config-aws-stage.json',
     // remoteConfigUrl: './design-studio-config.json',
     apiUrl: 'http://localhost:3001/',
-    widgetBaseUrl: 'http://localhost:4200/launch.js',
+    // Callers append their own filename (launch.js, assets/twp/chatbot-panel.html)
+    // onto this base — it must be a bare base URL ending in '/', and it must point
+    // at chat21-web-widget (the widget app), not tiledesk-dashboard. The previous
+    // 'http://localhost:4200/launch.js' was both malformed (no trailing-slash base)
+    // and pointed at the wrong app, so cds-panel-widget's "Test It" iframe resolved
+    // to a garbage URL that fell through to tiledesk-dashboard's SPA shell.
+    widgetBaseUrl: 'http://localhost:4202/',
     dashboardBaseUrl: 'http://localhost:4200/',
     whatsappTemplatesBaseUrl: 'CHANGEIT',
     wsUrl: 'ws://localhost:3001/',
@@ -35,7 +41,7 @@ export const environment = {
     },
     chat21Config: {
       appId: 'tilechat',
-      MQTTendpoint: 'mqtt://localhost:15675/ws', // MQTT endpoint
+      MQTTendpoint: 'ws://localhost:15675/ws', // MQTT endpoint (mqtt.js in a browser needs ws://, not mqtt://)
       APIendpoint: 'http://localhost:8004/api'
     },
     // TEMP: connectors surfaced directly from their /api/manifest until the per-project
