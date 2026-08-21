@@ -72,7 +72,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     } else if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.initializeWebhook();
     }
-    
+
     this.isReturnStack = isReturnStackIntent(this.intent);
 
     // Inizializza la lista degli intent per la select del connettore

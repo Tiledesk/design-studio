@@ -1041,7 +1041,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
       this.closeAllPanels();
       this.closeActionDetailPanel();
-      this.createNewIntentFromPanelElement(pos, action.value.type);
+      this.createNewIntentFromPanelElement(pos, action.value.type, action.value.connectorEntry);
     } else if (action) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
       let prevIntentOfaction = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
@@ -1054,9 +1054,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async createNewIntentFromConnectorDraft(typeAction, connectorDraft) {
+  async createNewIntentFromConnectorDraft(typeAction, connectorDraft, connectorEntry?) {
     const toPoint = connectorDraft.toPoint;
-    const newAction = this.intentService.createNewAction(typeAction);
+    const newAction = this.intentService.createNewAction(typeAction, { connectorEntry });
     let intent = this.intentService.createNewIntent(this.id_faq_kb, newAction, toPoint, connectorDraft.color);
     this.logger.log('[CDS-CANVAS] ho creato intent: ', intent);
     this.intentService.addNewIntentToListOfIntents(intent);
@@ -1076,8 +1076,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async createNewIntentFromPanelElement(pos, typeAction) {
-    const newAction = this.intentService.createNewAction(typeAction);
+  async createNewIntentFromPanelElement(pos, typeAction, connectorEntry?) {
+    const newAction = this.intentService.createNewAction(typeAction, { connectorEntry });
     let intent = this.intentService.createNewIntent(this.id_faq_kb, newAction, pos);
     this.intentService.addNewIntentToListOfIntents(intent);
     const newIntent = await this.settingAndSaveNewIntent(pos, intent, null, null);
@@ -1111,10 +1111,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
 
     if (connectorDraft?.toPoint && !this.hasClickedAddAction) {
       this.logger.log("[CDS-CANVAS] ho trascinato il connettore e sto per creare un intent", connectorDraft);
-      this.createNewIntentFromConnectorDraft(event.type, connectorDraft);
+      this.createNewIntentFromConnectorDraft(event.type, connectorDraft, event.connectorEntry);
     } else if (this.hasClickedAddAction) {
       this.logger.log("[CDS-CANVAS] ho premuto + quindi creo una nuova action e la aggiungo all'intent");
-      const newAction = this.intentService.createNewAction(event.type);
+      const newAction = this.intentService.createNewAction(event.type, { connectorEntry: event.connectorEntry });
       this.intentService.addActionToIntentSelected(newAction);
       this.controllerService.closeAddActionMenu();
     }

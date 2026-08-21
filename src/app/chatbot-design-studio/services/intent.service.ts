@@ -10,6 +10,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL, OPENAI_MODEL } from '../utils-ai_models';
+import { buildConnectorAction } from '../connector/connector-action.factory';
+import { ConnectorActionEntry } from '../connector/connector-manifest.model';
+import { patchActionIds } from './patch-action-id.util';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
 
 // SERVICES //
@@ -273,7 +276,7 @@ export class IntentService {
   }
 
   public addActionToIntentSelected(action){
-    if(this.intentSelected){
+    if(action && this.intentSelected){
       this.intentSelected.actions.push(action);
       this.updateIntent(this.intentSelected);
     }
@@ -416,13 +419,7 @@ export class IntentService {
    * perchè generati dal server. In questo caso è necessario assegnarne uno.
    */
   public patchActionId(faqs){
-    faqs.forEach(element => {
-      element.actions.forEach(action => {
-        if(!action._tdActionId || action._tdActionId === "UUIDV4"){
-          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
-        }
-      });
-    });
+    patchActionIds(faqs);
   }
  
 
@@ -436,7 +433,9 @@ export class IntentService {
     if(color){
       intent.attributes.color = color;
     }
-    intent.actions.push(action);
+    if (action) {
+      intent.actions.push(action);
+    }
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }
@@ -754,7 +753,10 @@ export class IntentService {
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
-    let newAction = this.createNewAction(action.value.type);
+    let newAction = this.createNewAction(action.value.type, { connectorEntry: action.value.connectorEntry });
+    if (!newAction) {
+      return;
+    }
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
@@ -1017,9 +1019,19 @@ export class IntentService {
    * @param typeAction 
    * @returns 
    */
-  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
+  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML, options?: { connectorEntry?: ConnectorActionEntry }) {
     this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
+
+    if (typeAction === TYPE_ACTION.CONNECTOR) {
+      if (options?.connectorEntry) {
+        return buildConnectorAction(options.connectorEntry, this.dashboardService.projectID);
+      }
+      // No connector descriptor reached us: never return undefined (it would be
+      // inserted as a null action and crash the canvas). Skip instead.
+      this.logger.error('[INTENT-SERV] connector action requested without a connectorEntry; skipping');
+      return null;
+    }
 
     if(typeAction === TYPE_ACTION.REPLY){
       action = new ActionReply();

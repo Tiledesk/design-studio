@@ -6,46 +6,47 @@
 *Giovanni Troisi* <br>
 ### **Copyrigth**: 
 *Tiledesk SRL*
- 
-# 1.40.11-rc6
+
+# 1.40.14
+- **added**: connector plugin pattern — an installed connector microservice's catalog (`GET /api/manifest`) now drives the flow-builder action palette. A connector action is authored as a normal block but **persists as an ordinary `webrequestv2` action plus a `_tdConnectorRef` marker**, so the chatbot runtime executes it with zero core changes; adding a new connector needs no further design-studio work — it only has to be installed (an integration record with a `baseUrl`) and serve a valid manifest
+- **added**: per-connector palette grouping — each installed connector gets an expandable palette row opening a flyout, split into per-service sections driven by the manifest `groups[]` table (display name, icon and sort order resolved from the manifest; unknown group ids fall back to a title-cased label and the connector icon). A failed manifest fetch is skipped and never breaks the palette
+- **added**: connector triggers configured from the webhook detail sidebar — explicit select + "Add" button, per-service option groups, the connected account shown with a "Change account" action, and a dedicated OAuth authentication row (`cds-connector-auth-row`)
+- **added**: connector `/dev` mirroring for triggers, armed and disarmed when Test It Out is opened and closed
+- **added**: isolated Karma test setup for the connector folder and for unit specs (`ng test --configuration connector`), with `src/test.connector.ts`, `src/test.units.ts` and dedicated tsconfigs, so these specs run independently of the pre-existing broken ones
+- **changed**: `cds-action-description` now receives the whole action (`[actionSelected]`), so a connector block renders the connector's own name and icon instead of the generic web-request label
+- **changed**: a `webrequestv2` block carrying a `_tdConnectorRef` renders the connector's required-input summary (`cds-action-connector`) instead of the generic web-request preview
+
+# 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
 - **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
 
-# 1.40.11-rc5 
+# 1.40.12
 - **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
-
-# 1.40.11-rc4
 - **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
 - **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
 - **changed**: the AI actions no longer re-fetch the same data per instance — the `integration`, `integration/name/ollama`, `integration/name/vllm` and `kb/namespace/all` GETs are now cached in `ProjectService`/`OpenaiService` through a new `HttpMemoCache` (in-flight dedup + short TTL, invalidated on `saveIntegration` and on project change). A canvas with N Ask KB / AI Prompt / AI Condition actions now issues 1 request per endpoint instead of N
 - **changed**: removed the duplicated `/integration` GET in the AI Prompt action and the dead `getIntegrationByName`/`getIntegrations` copies in AI Prompt and AI Condition, now using the shared util
 - **bug fix**: the MCP servers array is copied instead of referenced, so the MCP dialogs can no longer mutate the shared integration payload
-
-# 1.40.11-rc3
 - **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
 - **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
 - **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
 - **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
 - **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
 - **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
-
-
-# 1.40.11-rc2
 - **added**: Web Request action — Postman-like body editor: first selector (none / form-data / raw) and, when raw, a second selector for the sub-type (text / JavaScript / JSON / HTML / XML)
 - **added**: live body validator per raw sub-type (JSON, XML, JavaScript) with a discreet, non-blocking inline alert that ignores `{{...}}` placeholders
 - **bug-fix**: the body validation alert now shows for invalid raw bodies (previously hidden by a wrong template guard)
 - **changed**: additive & backward-compatible model — new optional `rawType` field and `raw` value for `bodyType`; existing web request actions (none/json/form-data) are read and saved unchanged. New `raw` actions require matching engine support in DirWebRequestV2
 
-# 1.40.10 
-# 1.40.11-rc1 
+# 1.40.11
 - **added**: added new google models
 
-# 1.40.8-rc4 
+# 1.40.10
 - **added**: added documentation image and guide link to the Data Table action tooltip
 - **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
 - **changed**: cds-config-*.json assets are now published under /environments/real_data
 
-# 1.40.8-rc3
+# 1.40.9
 - **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
 - **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
 - **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header
@@ -53,13 +54,11 @@
 - **changed**: persisted `action.servers[]` normalized — `native` always present, `id` only for native servers, `tools` as an array of names
 - **bug fix**: custom headers are now forwarded to the `/mcp/tools` discovery call, so the backend can authenticate during the tool scan
 - **bug fix**: reactivated the Custom Headers section in the Add/Edit MCP Server dialog (was hidden)
-
-# 1.40.8-rc2
 - **added**: native Tiledesk MCP servers (catalog `/mcp/native`) + OAuth 2.0 config for MCP servers in the AI Prompt action
 - **changed**: MCP tools handled as `string[]` with name normalization (legacy `{ name }[]` still supported)
 - **changed**: hidden the legacy **Condition** and **Condition w/ else** actions from the menu (`status: 'inactive'`) — not addable to new flows, existing agents keep working
 
-# 1.40.8-rc1
+# 1.40.8
 - **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
 - **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
 - **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
@@ -67,7 +66,6 @@
 - **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
 - **added**: multi-line tooltip for the "Attribute name" syntax help
 - **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
-
 
 # 1.40.7
 - **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"

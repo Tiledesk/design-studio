@@ -76,6 +76,8 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
 import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-action-gpt-assistant.component';
 import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
+import { CdsActionConnectorComponent } from './cds-action-connector/cds-action-connector.component';
+import { CdsConnectorAuthRowComponent } from './cds-connector-auth-row/cds-connector-auth-row.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
@@ -141,6 +143,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
       FormDataComponent,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
@@ -266,6 +270,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionHideMessageComponent,
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,

@@ -6,6 +6,7 @@ export enum TYPE_ACTION {
     RANDOM_REPLY        = 'randomreply',
     WEB_REQUEST         = 'webrequest',
     WEB_REQUESTV2       = 'webrequestv2',
+    CONNECTOR           = 'connector',
     MAKE                = 'make',
     AGENT               = 'agent',
     CLOSE               = 'close',

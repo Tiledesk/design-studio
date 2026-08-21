@@ -18,7 +18,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist",
-            "baseHref":"/",
+            "baseHref": "/",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -50,20 +50,64 @@
               "node_modules/@ctrl/ngx-emoji-mart/picker.css",
               "node_modules/quill/dist/quill.snow.css",
               "src/styles.scss",
-              { "input" : "src/assets/sass/cds/tooltip-styles.scss", "inject": true, "bundleName": "cds-tooltip-style"},
-              { "input" : "src/assets/sass/material-dashboard.scss", "inject": true, "bundleName": "material-dashboard"},
-              { "input" : "src/assets/sass/cds/styles.scss", "inject": true, "bundleName": "cds-style"},
-              { "input" : "src/assets/sass/cds/action-styles.scss", "inject": true, "bundleName": "action-style"},
-              { "input" : "src/assets/sass/cds/settings-section.scss", "inject": false, "bundleName": "settings-section"},
-              { "input" : "src/assets/sass/cds/connector-styles.scss", "inject": true, "bundleName": "connector-style"},
+              {
+                "input": "src/assets/sass/cds/tooltip-styles.scss",
+                "inject": true,
+                "bundleName": "cds-tooltip-style"
+              },
+              {
+                "input": "src/assets/sass/material-dashboard.scss",
+                "inject": true,
+                "bundleName": "material-dashboard"
+              },
+              {
+                "input": "src/assets/sass/cds/styles.scss",
+                "inject": true,
+                "bundleName": "cds-style"
+              },
+              {
+                "input": "src/assets/sass/cds/action-styles.scss",
+                "inject": true,
+                "bundleName": "action-style"
+              },
+              {
+                "input": "src/assets/sass/cds/settings-section.scss",
+                "inject": false,
+                "bundleName": "settings-section"
+              },
+              {
+                "input": "src/assets/sass/cds/connector-styles.scss",
+                "inject": true,
+                "bundleName": "connector-style"
+              },
               { "input" : "src/assets/sass/cds/slider-styles.scss", "inject": true, "bundleName": "slider-styles"}
             ],
             "scripts": [
-              { "input": "node_modules/jquery/dist/jquery.js", "inject": true, "bundleName": "jquery" },
-              { "input": "node_modules/bootstrap/dist/js/bootstrap.js", "inject": true, "bundleName": "bootstrap" },
-              { "input": "node_modules/bootstrap-notify/bootstrap-notify.js", "inject": true, "bundleName": "bootstrap-notify" },
-              { "input": "node_modules/moment/moment.js", "inject": true, "bundleName": "moment" },
-              { "input": "src/assets/js/mqtt/4.1.0/mqtt.min.js", "inject": true, "bundleName": "mqtt.min" }
+              {
+                "input": "node_modules/jquery/dist/jquery.js",
+                "inject": true,
+                "bundleName": "jquery"
+              },
+              {
+                "input": "node_modules/bootstrap/dist/js/bootstrap.js",
+                "inject": true,
+                "bundleName": "bootstrap"
+              },
+              {
+                "input": "node_modules/bootstrap-notify/bootstrap-notify.js",
+                "inject": true,
+                "bundleName": "bootstrap-notify"
+              },
+              {
+                "input": "node_modules/moment/moment.js",
+                "inject": true,
+                "bundleName": "moment"
+              },
+              {
+                "input": "src/assets/js/mqtt/4.1.0/mqtt.min.js",
+                "inject": true,
+                "bundleName": "mqtt.min"
+              }
             ]
           },
           "configurations": {
@@ -95,7 +139,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "baseHref":"./",
+              "baseHref": "./",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -119,7 +163,7 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "baseHref":"./",
+              "baseHref": "./",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -172,6 +216,18 @@
               "src/styles.scss"
             ],
             "scripts": []
+          },
+          "configurations": {
+            "connector": {
+              "main": "src/test.connector.ts",
+              "tsConfig": "tsconfig.spec.connector.json",
+              "karmaConfig": "karma.connector.conf.js"
+            },
+            "units": {
+              "main": "src/test.units.ts",
+              "tsConfig": "tsconfig.spec.units.json",
+              "karmaConfig": "karma.connector.conf.js"
+            }
           }
         }
       }
