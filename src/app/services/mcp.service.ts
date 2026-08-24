@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ProjectService } from './projects.service';
 import { DashboardService } from './dashboard.service';
+import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import {
   McpServer,
   McpSelectedServer,
@@ -25,7 +26,8 @@ export class McpService {
 
   constructor(
     private readonly projectService: ProjectService,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly appStorageService: AppStorageService
   ) { }
 
   private resolveProjectId(projectId?: string): string {
@@ -136,5 +138,73 @@ export class McpService {
       ...server,
       tools: normalizeMcpToolNames(server.tools)
     }));
+  }
+
+  /* ==========================================================================
+   * Memoria della selezione dei tool
+   *
+   * `action.servers[]` contiene SOLO i server attivi: deselezionandone uno la sua selezione
+   * di tool sparirebbe, e riselezionandolo si ripartirebbe da zero. Qui la conserviamo a parte,
+   * per AZIONE + SERVER (scope corretto: due azioni che usano lo stesso server non si
+   * sovrascrivono a vicenda), fuori sia dall'integrazione MCP sia dal payload dell'azione.
+   * ========================================================================*/
+
+  /** Chiave di storage (AppStorageService aggiunge gia' il prefisso applicativo). */
+  private static readonly TOOLS_MEMORY_KEY = 'cds_mcp_tools_memory';
+  /** Voci non toccate da piu' di questo periodo vengono scartate alla prima scrittura. */
+  private static readonly TOOLS_MEMORY_TTL_MS = 90 * 24 * 60 * 60 * 1000;
+  /** Tetto di azioni memorizzate: oltre, si scartano le meno recenti (l'azione puo' essere stata cancellata). */
+  private static readonly TOOLS_MEMORY_MAX_ACTIONS = 200;
+
+  /** Legge l'intera memoria. Tollerante a storage assente o contenuto corrotto. */
+  private readToolsMemory(): { [actionId: string]: { updatedAt: number, servers: { [name: string]: string[] } } } {
+    try {
+      const raw = this.appStorageService.getItem(McpService.TOOLS_MEMORY_KEY);
+      if (!raw) {
+        return {};
+      }
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      return (parsed && typeof parsed === 'object') ? parsed : {};
+    } catch (_e) {
+      return {};
+    }
+  }
+
+  /** Scrive la memoria applicando TTL e tetto massimo. Non lancia mai. */
+  private writeToolsMemory(memory: { [actionId: string]: { updatedAt: number, servers: { [name: string]: string[] } } }): void {
+    try {
+      const now = Date.now();
+      let entries = Object.keys(memory)
+        .filter(id => (now - (memory[id]?.updatedAt ?? 0)) < McpService.TOOLS_MEMORY_TTL_MS)
+        .sort((a, b) => (memory[b]?.updatedAt ?? 0) - (memory[a]?.updatedAt ?? 0))
+        .slice(0, McpService.TOOLS_MEMORY_MAX_ACTIONS);
+      const pruned = entries.reduce((acc, id) => { acc[id] = memory[id]; return acc; }, {});
+      this.appStorageService.setItem(McpService.TOOLS_MEMORY_KEY, JSON.stringify(pruned));
+    } catch (_e) {
+      // la memoria e' un comfort, non deve mai rompere il flusso
+    }
+  }
+
+  /** Selezione di tool memorizzata per un'azione (mappa nomeServer -> tool). */
+  getRememberedToolsForAction(actionId: string): { [serverName: string]: string[] } {
+    if (!actionId) {
+      return {};
+    }
+    const entry = this.readToolsMemory()[actionId];
+    return (entry && entry.servers && typeof entry.servers === 'object') ? entry.servers : {};
+  }
+
+  /** Memorizza (o azzera) la selezione di tool di un server per una specifica azione. */
+  setRememberedTools(actionId: string, serverName: string, tools: string[]): void {
+    if (!actionId || !serverName) {
+      return;
+    }
+    const memory = this.readToolsMemory();
+    const entry = memory[actionId] ?? { updatedAt: 0, servers: {} };
+    entry.servers = entry.servers ?? {};
+    entry.servers[serverName] = normalizeMcpToolNames(tools);
+    entry.updatedAt = Date.now();
+    memory[actionId] = entry;
+    this.writeToolsMemory(memory);
   }
 }

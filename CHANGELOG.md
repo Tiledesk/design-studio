@@ -10,6 +10,9 @@
 
 
 # this branch
+- **changed**: in the MCP servers dialog the edit (pencil) icon is now shown ONLY on selected servers: an unselected server can just be toggled, so managing a server always goes through selecting it first
+- **added**: the tool selection of a server survives its deselection — it is remembered per ACTION + SERVER (`McpService` memory on `AppStorageService`, with 90-day expiry and a 200-action cap), so deselecting and re-selecting a server, closing the dialog or reloading the page no longer resets the chosen tools. Nothing is written to the MCP integration nor to the action payload; on recall the tools are filtered against the ones still exposed by the server
+- **added**: the Edit MCP Server dialog now lists the selected tool names under "Tools selected", with the same single-line + "more.." rendering used in the servers list; "more.." opens the existing Select tools modal
 - **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
 - **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
 - **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header

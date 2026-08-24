@@ -43,8 +43,9 @@
                     [class.selected]="isServerSelected(server)"
                     type="button"
                     (click)="toggleServerSelection(server, $event)">
-                    <!-- Edit badge (must NOT trigger server selection) -->
+                    <!-- Edit badge: solo sui server SELEZIONATI (must NOT trigger server selection) -->
                     <span
+                        *ngIf="isServerSelected(server)"
                         class="edit-button mcp-server__edit-badge"
                         role="button"
                         tabindex="0"

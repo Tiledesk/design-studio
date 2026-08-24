@@ -5,6 +5,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 import { McpNativeCatalogDialogComponent } from '../mcp-native-catalog-dialog/mcp-native-catalog-dialog.component';
 import { McpServer, McpSelectedServer, McpTool, normalizeMcpToolNames } from 'src/app/models/mcp.model';
+import { McpService } from 'src/app/services/mcp.service';
 
 
 @Component({
@@ -27,21 +28,35 @@ export class McpServersDialogComponent implements OnInit {
   activeToolsModalTools: McpTool[] = [];
   activeToolsModalSelected: Set<string> = new Set();
 
+  /**
+   * Ultima selezione di tool per server (chiave = nome server). Copia di lavoro: e' idratata
+   * all'apertura dalla memoria persistente e riscritta a ogni modifica, cosi' la selezione
+   * sopravvive sia alla deselezione del server sia alla chiusura del dialog e al reload.
+   * Se l'azione non passa un `actionId` resta solo in memoria, per la sessione del dialog.
+   */
+  private lastToolsByServer: Map<string, string[]> = new Map();
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     public dialogRef: MatDialogRef<McpServersDialogComponent>,
     private dialog: MatDialog,
+    private mcpService: McpService,
     @Inject(MAT_DIALOG_DATA) public data: {
       // mcpServers from integrations: tools = available, selectedTools = last selection (kept even when server not selected).
       mcpServers: Array<McpServer>,
       selectedServers?: Array<McpSelectedServer>,
+      /** Id dell'azione: chiave della memoria persistente della selezione dei tool. */
+      actionId?: string,
       onUpdate?: (data: any) => void
     }
   ) { }
 
   ngOnInit(): void {
     this.logger.debug("[McpServersDialog] data: ", this.data);
+    // idrata la memoria dei tool dei server NON selezionati (persistita per azione)
+    const remembered = this.mcpService.getRememberedToolsForAction(this.data.actionId);
+    Object.keys(remembered).forEach(name => this.lastToolsByServer.set(name, remembered[name]));
     // Pre-select servers that were already selected
     if (this.data.selectedServers && this.data.selectedServers.length > 0) {
       this.selectedServers = this.data.selectedServers.map(server => ({
@@ -49,6 +64,8 @@ export class McpServersDialogComponent implements OnInit {
         ...server,
         tools: normalizeMcpToolNames(server.tools)
       }));
+      // seed della memoria: i tool gia' selezionati sopravvivono a un deseleziona/riseleziona
+      this.selectedServers.forEach(s => this.rememberTools(s.name, s.tools));
       this.logger.debug("[McpServersDialog] Pre-selected servers: ", this.selectedServers);
     }
     // Store the update callback if provided
@@ -70,9 +87,11 @@ export class McpServersDialogComponent implements OnInit {
     }
     const index = this.selectedServers.findIndex(s => s.name === server.name);
     if (index > -1) {
+      // memorizza la selezione PRIMA di rimuovere il server, cosi' riselezionandolo la ritrova
+      this.rememberTools(server.name, this.selectedServers[index].tools);
       this.selectedServers.splice(index, 1);
     } else {
-      // Add with NO tools selected: the selection is per-action, the user picks via the tools popup.
+      // Riprende i tool memorizzati per questo server (vuoto alla prima selezione).
       const stored = this.data.mcpServers?.find(s => s.name === server.name);
       this.selectedServers.push({
         id: server.id,
@@ -81,7 +100,7 @@ export class McpServersDialogComponent implements OnInit {
         transport: server.transport,
         native: server.native,
         customHeaders: stored?.customHeaders,
-        tools: []
+        tools: this.recallTools(server)
       });
     }
     this.logger.log("[McpServersDialog] selectedServers: ", this.selectedServers);
@@ -119,6 +138,30 @@ export class McpServersDialogComponent implements OnInit {
 
   isServerSelected(server: { name: string }): boolean {
     return this.selectedServers.some(s => s.name === server.name);
+  }
+
+  /**
+   * Memorizza l'ultima selezione di tool di un server: in memoria e, se l'azione e' identificata,
+   * anche in storage, cosi' sopravvive alla deselezione, alla chiusura del dialog e al reload.
+   */
+  private rememberTools(name: string, tools?: string[]): void {
+    const names = normalizeMcpToolNames(tools);
+    this.lastToolsByServer.set(name, names);
+    this.mcpService.setRememberedTools(this.data.actionId, name, names);
+  }
+
+  /**
+   * Recupera l'ultima selezione di tool memorizzata per il server, filtrata sui tool ancora
+   * disponibili: se dopo un refresh il server non espone piu' un tool, non lo resuscitiamo.
+   * Se il server non ha un catalogo tool non filtriamo (non sapremmo su cosa).
+   */
+  private recallTools(server: { name: string }): string[] {
+    const remembered = this.lastToolsByServer.get(server.name) ?? [];
+    const available = this.getAvailableTools(server).map(t => t.name);
+    if (available.length === 0) {
+      return [...remembered];
+    }
+    return remembered.filter(name => available.includes(name));
   }
 
   /**
@@ -197,6 +240,8 @@ export class McpServersDialogComponent implements OnInit {
       return;
     }
     const names = Array.from(this.activeToolsModalSelected);
+    // memorizza anche quando names e' vuoto (il server viene deselezionato qui sotto)
+    this.rememberTools(srv.name, names);
     const idx = this.selectedServers.findIndex(s => s.name === srv.name);
     if (names.length === 0) {
       if (idx > -1) {
@@ -250,6 +295,7 @@ export class McpServersDialogComponent implements OnInit {
     }
     // attiva il server (selezione) con i tool scelti
     const tools = normalizeMcpToolNames(server.selectedTools);
+    this.rememberTools(server.name, tools);
     const selected: McpSelectedServer = {
       id: server.id,
       name: server.name,
@@ -288,6 +334,7 @@ export class McpServersDialogComponent implements OnInit {
         // Add the new server to the list
         this.data.mcpServers.push(createdServer);
         // Automatically select the new server
+        this.rememberTools(createdServer.name, normalizeMcpToolNames(result?.selectedTools));
         this.selectedServers.push({
           id: createdServer.id,
           name: createdServer.name,
@@ -331,6 +378,7 @@ export class McpServersDialogComponent implements OnInit {
       if (result !== false && result) {
         const updatedServer = result?.server ? result.server : result;
         const selectedTools: string[] = Array.isArray(result?.selectedTools) ? result.selectedTools : [];
+        this.rememberTools(updatedServer?.name ?? server.name, selectedTools);
         // Update the server in the list (tools + selectedTools so they are shown and persisted)
         const index = this.data.mcpServers.findIndex(s => s.name === server.name);
         if (index > -1) {

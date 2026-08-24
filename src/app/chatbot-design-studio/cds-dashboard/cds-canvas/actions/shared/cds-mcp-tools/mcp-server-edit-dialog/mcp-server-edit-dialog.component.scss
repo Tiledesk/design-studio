@@ -155,6 +155,17 @@
     margin-top: 4px;
 }
 
+/* Anteprima inline dei tool selezionati: stessi colore/dimensione della lista server MCP.
+   min-width:0 e' necessario perche' il figlio possa troncare con ellissi. */
+.tools-selected-preview {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
 .tools-select-btn {
     padding: 6px 10px;
     font-size: 12px;
