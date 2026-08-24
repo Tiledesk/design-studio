@@ -176,6 +176,15 @@
                     </button>
                 </div>
 
+                <!-- Elenco dei tool selezionati, stessa resa dell'anteprima nella lista server:
+                     riga singola con ellissi e "more.." quando i nomi non entrano. -->
+                <div *ngIf="selectedToolsCount > 0" class="tools-selected-preview">
+                    <mcp-active-tools-inline
+                        [names]="selectedToolNamesList"
+                        (more)="openToolsModal()">
+                    </mcp-active-tools-inline>
+                </div>
+
                 <!-- <div *ngIf="totalToolsCount === 0" class="readonly-field">
                     {{'CDSCanvas.NoToolsAvailable' | translate}}
                 </div> -->
