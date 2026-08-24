@@ -191,6 +191,8 @@ export class ActionWebRequestV2 extends Action {
     jsonBody: string;
     formData: Array<FormData>;
     bodyType: string;
+    /** Raw body sub-type when bodyType === 'raw'. Optional/additive: absent on actions created before this feature. */
+    rawType?: 'text' | 'javascript' | 'json' | 'html' | 'xml';
     assignResultTo: string;
     assignStatusTo: string;
     assignErrorTo: string;
@@ -270,6 +272,24 @@ export class ActionReplaceBotV3 extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.REPLACE_BOTV3;
+    }
+}
+
+export class ActionReplaceBotV4 extends Action {
+    botId: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV4;
+    }
+}
+
+export class ActionReturnStack extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN_STACK;
     }
 }
 

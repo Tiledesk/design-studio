@@ -2,7 +2,7 @@ import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionReplaceBotV4, ActionReturnStack, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey } from '../utils';
 import { environment } from 'src/environments/environment';
@@ -10,6 +10,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL, OPENAI_MODEL } from '../utils-ai_models';
+import { buildConnectorAction } from '../connector/connector-action.factory';
+import { ConnectorActionEntry } from '../connector/connector-manifest.model';
+import { patchActionIds } from './patch-action-id.util';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
 
 // SERVICES //
@@ -19,6 +22,7 @@ import { ControllerService } from '../services/controller.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { SavingStateService } from 'src/app/services/saving-state.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -90,9 +94,10 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private savingStateService: SavingStateService
   ) { }
-    
+
   private emitIntentSelection(): void {
     this.behaviorIntentSelection.next({ intentSelectedID: this.intentSelectedID, intentActive: this.intentActive });
   }
@@ -271,7 +276,7 @@ export class IntentService {
   }
 
   public addActionToIntentSelected(action){
-    if(this.intentSelected){
+    if(action && this.intentSelected){
       this.intentSelected.actions.push(action);
       this.updateIntent(this.intentSelected);
     }
@@ -414,13 +419,7 @@ export class IntentService {
    * perchè generati dal server. In questo caso è necessario assegnarne uno.
    */
   public patchActionId(faqs){
-    faqs.forEach(element => {
-      element.actions.forEach(action => {
-        if(!action._tdActionId || action._tdActionId === "UUIDV4"){
-          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
-        }
-      });
-    });
+    patchActionIds(faqs);
   }
  
 
@@ -434,7 +433,9 @@ export class IntentService {
     if(color){
       intent.attributes.color = color;
     }
-    intent.actions.push(action);
+    if (action) {
+      intent.actions.push(action);
+    }
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }
@@ -752,7 +753,10 @@ export class IntentService {
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
-    let newAction = this.createNewAction(action.value.type);
+    let newAction = this.createNewAction(action.value.type, { connectorEntry: action.value.connectorEntry });
+    if (!newAction) {
+      return;
+    }
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
@@ -788,6 +792,10 @@ export class IntentService {
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
 
+    // updateIntent in coda fa refreshIntent solo sull'intent di destinazione:
+    // notifico esplicitamente anche il blocco sorgente, che deve ri-renderizzarsi
+    // (es. se resta con la sola azione "Return to parent agent" diventa una pastiglia)
+    this.behaviorIntent.next(previousIntent);
     this.updateIntent(currentIntent, previousIntent);
     return;
     // this.connectorService.updateConnector(currentIntent.intent_id);
@@ -1011,9 +1019,19 @@ export class IntentService {
    * @param typeAction 
    * @returns 
    */
-  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
+  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML, options?: { connectorEntry?: ConnectorActionEntry }) {
     this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
+
+    if (typeAction === TYPE_ACTION.CONNECTOR) {
+      if (options?.connectorEntry) {
+        return buildConnectorAction(options.connectorEntry, this.dashboardService.projectID);
+      }
+      // No connector descriptor reached us: never return undefined (it would be
+      // inserted as a null action and crash the canvas). Skip instead.
+      this.logger.error('[INTENT-SERV] connector action requested without a connectorEntry; skipping');
+      return null;
+    }
 
     if(typeAction === TYPE_ACTION.REPLY){
       action = new ActionReply();
@@ -1101,6 +1119,13 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.REPLACE_BOTV3){
       action = new  ActionReplaceBotV3();
       action.useSlug = false;
+    }
+    if(typeAction === TYPE_ACTION.REPLACE_BOTV4){
+      action = new  ActionReplaceBotV4();
+      action.useSlug = false;
+    }
+    if(typeAction === TYPE_ACTION.RETURN_STACK){
+      action = new ActionReturnStack();
     }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();
@@ -1840,7 +1865,10 @@ export class IntentService {
       payload = applyConditionSaveModeToPayload(payload);
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
-        this.faqService.opsUpdate(payload).subscribe((resp: any) => {
+        // track(): incrementa alla subscribe, decrementa via finalize su next+complete /
+        // error / unsubscribe. Copre tutti e 5 i chiamanti (updateIntent, saveNewIntent,
+        // deleteIntentNew, restoreLastUNDO, restoreLastREDO), che NON fanno await qui.
+        this.savingStateService.track(this.faqService.opsUpdate(payload)).subscribe((resp: any) => {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);

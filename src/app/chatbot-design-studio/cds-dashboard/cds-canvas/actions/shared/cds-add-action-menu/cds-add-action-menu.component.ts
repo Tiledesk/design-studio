@@ -1,7 +1,8 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { TYPE_OF_MENU } from '../../../../../utils';
 import { TranslateService } from '@ngx-translate/core';
-import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
+import { ACTIONS_LIST, isSubagentSubtype, isActionAvailableInSubagentContext } from 'src/app/chatbot-design-studio/utils-actions';
+import { DashboardService } from 'src/app/services/dashboard.service';
 
 @Component({
   selector: 'cds-add-action-menu',
@@ -23,17 +24,29 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
   contentHeight : any;
   actionToSearch: string;
   // @Output() clickedOutOfAddActionMenu= new EventEmitter();
-  constructor(public translate: TranslateService) { }
+  constructor(
+    public translate: TranslateService,
+    private readonly dashboardService: DashboardService
+  ) { }
+
+  /**
+   * Voci del menu azioni disponibili nel contesto corrente: esclude le azioni
+   * disattivate e quelle riservate a (o vietate in) un subagent.
+   */
+  private getAvailableActions(): Array<{type: string, value: any}> {
+    const isSubagent = isSubagentSubtype(this.dashboardService.selectedChatbot?.subtype);
+    return Object.keys(ACTIONS_LIST).map(key => {
+      return {
+        type: key,
+        value: ACTIONS_LIST[key]
+      };
+    }).filter(el => el.value.status !== 'inactive' && isActionAvailableInSubagentContext(el.value, isSubagent));
+  }
 
   ngOnInit(): void {
     switch (this.menuType) {
       case TYPE_OF_MENU.ACTION:
-        this.menuItemsList = Object.keys(ACTIONS_LIST).map(key => {
-          return {
-            type: key,
-            value: ACTIONS_LIST[key]
-          };
-        }).filter(el => el.value.status !== 'inactive');
+        this.menuItemsList = this.getAvailableActions();
         break;
       case TYPE_OF_MENU.EVENT:
         this.menuItemsList = [];
@@ -53,23 +66,13 @@ export class CdsAddActionMenuComponent implements OnInit, OnChanges {
         this.menuItemsList = [];
         break;
       default:
-        this.menuItemsList = Object.keys(ACTIONS_LIST).map(key => {
-          return {
-            type: key,
-            value: ACTIONS_LIST[key]
-          };
-        }).filter(el => el.value.status !== 'inactive');
+        this.menuItemsList = this.getAvailableActions();
         break;
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.menuItemsList = Object.keys(ACTIONS_LIST).map(key => {
-      return {
-        type: key,
-        value: ACTIONS_LIST[key]
-      };
-    }).filter(el => el.value.status !== 'inactive')
+    this.menuItemsList = this.getAvailableActions();
 
     if(this.menuItemsList){
       this.filterMenuItemsList = this.menuItemsList.sort((el1, el2)=> this.translate.instant(el1.value.name).localeCompare(this.translate.instant(el2.value.name)));

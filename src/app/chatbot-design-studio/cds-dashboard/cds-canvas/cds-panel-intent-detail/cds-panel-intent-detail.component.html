@@ -110,12 +110,14 @@
             <!-- <div class="link-container">
                 <a class="link" (click)="goToKNB()">{{'CDSCanvas.ManageKnowledgeBases' | translate}}</a>
             </div> -->
+
+            <cds-trigger-entrypoint [intent]="intent" [webhookUrl]="webhookUrl"></cds-trigger-entrypoint>
         </div>
 
         <!-- ---------------------------------------------------------- -->
         <!-- Next Block Connector -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook && !isStart" class="row">
+        <div *ngIf="!isWebhook && !isStart && !isReturnStack" class="row">
             <div class="field-box">
                 <label class="title-label">{{'CDSCanvas.GoToBlock' | translate}}</label>
                 <cds-select id="next-intent-select"

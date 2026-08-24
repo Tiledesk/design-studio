@@ -2,7 +2,8 @@
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
-    [class.isStart]="isStart" 
+    [class.isStart]="isStart"
+    [class.isReturnStack]="isReturnStack"
     [class.tds-slim-intent]="isNewChatbot"
     [id]="'intent-content-'+ intent?.intent_id"
     [style.background-color]="vm.backgroundColor"
@@ -20,11 +21,13 @@
         [display_name]="intent.intent_display_name"
         [deleteOptionEnabled]="listOfActions?.length > 0"
         [webhookEnabled]="intent.webhook_enabled"
+        [isReturnStack]="isReturnStack"
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
 
     <div [id]="'block-header-'+ intent?.intent_id"
+        *ngIf="!isReturnStack"
         class="pic-header"
         [ngClass]="{'cds-start': isStart}">
         <cds-panel-intent-header *ngIf="!isUntitledBlock" 
@@ -51,7 +54,21 @@
         </div>
 
     </div>
-    <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
+
+    <!-- ------------------------------------------------------------------------- -->
+    <!-- RETURN TO PARENT AGENT: nodo terminale a pastiglia                         -->
+    <!-- (speculare dello start: connettore in ingresso, nessuno in uscita)         -->
+    <!-- ------------------------------------------------------------------------- -->
+    <div *ngIf="isReturnStack" class="cds-return-stack-content tds_draggable">
+        <div class="cds-return-stack-icon">
+            <mat-icon svgIcon="stacks" aria-hidden="true"></mat-icon>
+        </div>
+        <span class="cds-return-stack-label">
+            {{ 'CDSActionList.NAME.ReturnStack' | translate }}
+        </span>
+    </div>
+
+    <div *ngIf="isAgentsAvailable && !isReturnStack" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
 
     <div *ngIf="isStart" class="cds-start-content tds_draggable">
         <cds-action-intent class="panel-response" 
@@ -62,7 +79,7 @@
         </cds-action-intent>
     </div>
 
-    <div *ngIf="!isStart" class="actions-list-wpr"
+    <div *ngIf="!isStart && !isReturnStack" class="actions-list-wpr"
         cdkDropList
         [cdkDropListData]="listOfActions"
         [cdkDropListDisabled]="isNewChatbot"
@@ -122,6 +139,7 @@
                     <cds-action-description 
                         class="header-action" 
                         [previewMode]="false"
+                        [actionSelected]="action"
                         [elementType]="action._tdActionType">
                     </cds-action-description>
                 </div>
@@ -130,6 +148,7 @@
 
                 <cds-action-description
                     class="header-action"
+                    [actionSelected]="action"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
@@ -256,7 +275,17 @@
                             [action]="action">
                         </cds-action-replace-bot-v3>
 
-                        <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
+                        <cds-action-replace-bot-v4 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV4"
+                            class="panel-response"
+                            [action]="action">
+                        </cds-action-replace-bot-v4>
+
+                        <cds-action-return-stack *ngSwitchCase="TYPE_ACTION.RETURN_STACK"
+                            class="panel-response"
+                            [action]="action">
+                        </cds-action-return-stack>
+
+                        <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE"
                             class="panel-response"
                             [action]="action">
                         </cds-action-assign-variable>
@@ -282,12 +311,24 @@
                             [action]="action">
                         </cds-action-web-request>
     
-                        <cds-action-web-request-v2 *ngSwitchCase="TYPE_ACTION.WEB_REQUESTV2"    
-                            class="panel-response"
-                            [intentSelected]="intent" 
-                            [action]="action"
-                            (updateAndSaveAction)="onActionUpdate($event)">
-                        </cds-action-web-request-v2>
+                        <ng-container *ngSwitchCase="TYPE_ACTION.WEB_REQUESTV2">
+                            <!-- Connector actions persist as webrequestv2: show the connector's
+                                 required-input summary instead of the generic web-request preview -->
+                            <cds-action-connector *ngIf="action._tdConnectorRef"
+                                class="panel-response"
+                                [intentSelected]="intent"
+                                [action]="action"
+                                [previewMode]="true"
+                                (updateAndSaveAction)="onActionUpdate($event)">
+                            </cds-action-connector>
+
+                            <cds-action-web-request-v2 *ngIf="!action._tdConnectorRef"
+                                class="panel-response"
+                                [intentSelected]="intent"
+                                [action]="action"
+                                (updateAndSaveAction)="onActionUpdate($event)">
+                            </cds-action-web-request-v2>
+                        </ng-container>
 
                         <cds-action-web-response *ngSwitchCase="TYPE_ACTION.WEB_RESPONSE"    
                             class="panel-response"
@@ -527,8 +568,8 @@
             </cds-action-arrow>
         </div>
     </div>
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
-        class="panel-response last-action-intent" 
+    <cds-action-intent *ngIf="!isStart && !isReturnStack && intent && actionIntent && !isActionIntent"
+        class="panel-response last-action-intent"
         [intentSelected]="intent"
         [action]="actionIntent"
         [isLast]="true"
@@ -536,7 +577,7 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && !isReturnStack && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">
                 + {{ labelAddAction }}

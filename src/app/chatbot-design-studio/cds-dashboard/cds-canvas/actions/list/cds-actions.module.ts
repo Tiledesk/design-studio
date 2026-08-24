@@ -46,6 +46,8 @@ import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-
 import { CdsActionQaplaComponent } from './cds-action-qapla/cds-action-qapla.component';
 import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot/cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
 import { CdsActionReplaceBotV3Component } from './cds-action-replace-bot/cds-action-replace-bot-v3/cds-action-replace-bot-v3.component';
+import { CdsActionReplaceBotV4Component } from './cds-action-replace-bot/cds-action-replace-bot-v4/cds-action-replace-bot-v4.component';
+import { CdsActionReturnStackComponent } from './cds-action-return-stack/cds-action-return-stack.component';
 import { CdsActionReplaceBotComponent } from './cds-action-replace-bot/cds-action-replace-bot-v1/cds-action-replace-bot.component';
 import { CdsActionReplyComponent } from './cds-action-reply/cds-action-reply-v1/cds-action-reply.component';
 import { CdsActionReplyButtonComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
@@ -74,6 +76,8 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
 import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-action-gpt-assistant.component';
 import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
+import { CdsActionConnectorComponent } from './cds-action-connector/cds-action-connector.component';
+import { CdsConnectorAuthRowComponent } from './cds-connector-auth-row/cds-connector-auth-row.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
@@ -131,12 +135,16 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
     CdsActionReplaceBotV3Component,
+    CdsActionReplaceBotV4Component,
+    CdsActionReturnStackComponent,
     CdsActionAssignVariableComponent,
     CdsActionAssignVariableV2Component,
     CdsActionHideMessageComponent,
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
       FormDataComponent,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
@@ -255,11 +263,15 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
     CdsActionReplaceBotV3Component,
+    CdsActionReplaceBotV4Component,
+    CdsActionReturnStackComponent,
     CdsActionAssignVariableComponent,
     CdsActionAssignVariableV2Component,
     CdsActionHideMessageComponent,
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
