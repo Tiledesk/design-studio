@@ -32,6 +32,8 @@ export class StageService {
   settings: Settings;
   loaded: boolean = false;
 
+  private readonly LEFT_PANEL_KEY_PREFIX = 'cds_left_panel_';
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -335,6 +337,26 @@ export class StageService {
   }
 
 
+
+
+  /**
+   * Tab attiva del pannello sinistro (Blocks/Subagents).
+   *
+   * NB: a differenza delle altre impostazioni di stage NON e' salvata per singolo chatbot
+   * ma per "famiglia" (parent + i suoi subagent). Navigando fra parent e subagent cambia
+   * l'id_faq_kb: con una chiave per-bot ogni navigazione ripartirebbe da 'blocks', che e'
+   * esattamente il problema da risolvere.
+   */
+  public getActiveLeftPanel(familyId: string): 'blocks' | 'subagents' {
+    if (!familyId) { return 'blocks'; }
+    const value = this.appStorageService.getItem(this.LEFT_PANEL_KEY_PREFIX + familyId);
+    return value === 'subagents' ? 'subagents' : 'blocks';
+  }
+
+  public saveActiveLeftPanel(familyId: string, panel: 'blocks' | 'subagents'){
+    if (!familyId) { return; }
+    this.appStorageService.setItem(this.LEFT_PANEL_KEY_PREFIX + familyId, panel);
+  }
 
 
   /** saveSettings 

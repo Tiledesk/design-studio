@@ -7,9 +7,27 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.3-rc15
+- **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
+- **added**: new "Invoke Subagent" action (Flow), clone of Invoke Agent restricted to the subagents connected to the agent
+- **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
+- **changed**: the Sub Agent action is hidden from the Special actions
+- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent)
+- **bug fix**: inside a subagent the invocable agents are now the siblings (parent's subagents), excluding itself, instead of an empty list
+- **added**: selecting a subagent preselects its start block
+- **bug fix**: clearing the selected subagent left the previously selected block
+- **changed**: the "Return" action is renamed "Return to agent"
+- **added**: the Blocks/Subagents tab is kept across reloads and parent/subagent navigation
+- **added**: delete a subagent from the Subagents panel (hover menu + confirmation modal)
+- **changed**: after creating a subagent the Design Studio reloads on the new subagent; after deleting one it reloads on the parent
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+
 # 1.40.3-rc14
 - **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
-- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
 
 # 1.40.3-rc13 
 - **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)

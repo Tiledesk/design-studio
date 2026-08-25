@@ -272,6 +272,22 @@ export class ActionReplaceBotV3 extends Action {
     }
 }
 
+/**
+ * Invoke Subagent: clone di ActionReplaceBotV3 ristretto ai subagent.
+ * I nomi dei campi sono volutamente IDENTICI a quelli di ActionReplaceBotV3 cosi' che
+ * l'engine possa riusare lo stesso handler, registrando solo il nuovo _tdActionType.
+ */
+export class ActionInvokeSubagent extends Action {
+    botId: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.INVOKE_SUB_AGENT_V2;
+    }
+}
+
 export class ActionChangeDepartment extends Action {
     depName: string;
     constructor(){
