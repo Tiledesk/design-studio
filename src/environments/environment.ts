@@ -1,5 +1,5 @@
 export const environment = {
-    production: true,
+    production: false,
     t2y12PruGU9wUtEGzBJfolMIgK: 'CHANGEIT',
     VERSION: require('../../package.json').version,
     remoteConfig: true, 
@@ -9,7 +9,7 @@ export const environment = {
     widgetBaseUrl: 'CHANGEIT',
     dashboardBaseUrl: 'CHANGEIT',
     whatsappTemplatesBaseUrl: 'CHANGEIT',
-    wsUrl: 'ws://localhost:3000/',
+    wsUrl: 'ws://localhost:3001/',
     uploadEngine: 'native',
     baseImageUrl: 'CHANGEIT',
     fileUploadAccept: "*/*",
@@ -29,7 +29,10 @@ export const environment = {
     },
     chat21Config: {
       appId: 'tilechat',
-      MQTTendpoint: 'mqtt://localhost:15675/ws', // MQTT endpoint
+      MQTTendpoint: 'ws://localhost:15675/ws', // MQTT endpoint (mqtt.js in a browser needs ws://, not mqtt://)
       APIendpoint: 'http://localhost:8004/api'
-    }
+    },
+    // TEMP: connectors surfaced directly from their /api/manifest until the per-project
+    // install/integration-record flow exists. Empty in prod/pre.
+    connectorBaseUrls: ['http://localhost:3000']
 };

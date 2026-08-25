@@ -12,6 +12,7 @@
     }
 
     .tpl-modal-box {
+        position: relative;
         border-radius: 6px;
         display: flex;
         flex-direction: column;
@@ -49,15 +50,22 @@
         text-align: center;
         width: 0;
 
-        span {
+        .mcp-dialog__title {
+            display: block;
             word-wrap: break-word;
-            display: -webkit-box;
-            line-height: 23px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 69px;
+            line-height: 22px;
             font-weight: 600;
             font-size: 16px;
+        }
+
+        .mcp-dialog__subtitle {
+            display: block;
+            word-wrap: break-word;
+            line-height: 16px;
+            font-weight: 400;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
         }
     }
     
@@ -66,6 +74,53 @@
         // border-bottom: 1px solid #e5e5e5;
         // background-color: #fafafa;
         flex-shrink: 0;
+    }
+
+    // Search styling shared with the native catalog dialog (same panelClass).
+    .server-count {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 10px;
+
+        .count-number {
+            color: var(--blu-02);
+            font-weight: 600;
+        }
+    }
+
+    .search-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 40px 10px 12px;
+        border: 1px solid #d0d0d0;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: var(--font-family-poppins);
+        outline: none;
+        transition: all 0.2s ease;
+
+        &:focus {
+            border-color: var(--blu-02);
+            box-shadow: 0 0 0 3px rgba(0, 108, 255, 0.1);
+        }
+
+        &::placeholder {
+            color: #999;
+        }
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 12px;
+        color: #999;
+        font-size: 20px;
+        pointer-events: none;
     }
 
     .tpl-modal-content {
@@ -105,52 +160,6 @@
         gap: 10px;
         border-top: 1px solid #e5e5e5;
     }
-}
-
-.server-count {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 10px;
-    
-    .count-number {
-        color: var(--blu-02);
-        font-weight: 600;
-    }
-}
-
-.search-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px 40px 10px 12px;
-    border: 1px solid #d0d0d0;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: var(--font-family-poppins);
-    outline: none;
-    transition: all 0.2s ease;
-    
-    &:focus {
-        border-color: var(--blu-02);
-        box-shadow: 0 0 0 3px rgba(0, 108, 255, 0.1);
-    }
-    
-    &::placeholder {
-        color: #999;
-    }
-}
-
-.search-icon {
-    position: absolute;
-    right: 12px;
-    color: #999;
-    font-size: 20px;
-    pointer-events: none;
 }
 
 .mcp-servers-list {
@@ -266,7 +275,7 @@
     flex-shrink: 0;
     width: 30px;
     height: 30px;
-    background-color: #ffffff;
+    background-color: transparent;
     border: 0px solid #d0d0d0;
     border-radius: 8px;
     cursor: pointer;
@@ -279,9 +288,9 @@
     }
 
     &:hover {
-        background-color: var(--white-hex);
+        background-color: #ffffff;
         border-color: #b0b0b0;
-        
+
         .material-icons {
             color: #333;
         }
@@ -301,16 +310,6 @@
         opacity: .8 !important;
     }
 }
-
-#cds-ok-btn {
-    background: #e5e5e5;
-    color: #4b5052;
-
-    &:hover {
-        opacity: 0.8;
-    }
-}
-
 
 /* ---- MCP servers dialog: moved from inline styles (appended) ---- */
 ::ng-deep .custom-mcp-dialog-container .mcp-dialog__hr {
@@ -340,24 +339,144 @@
   font-size: 16px;
 }
 
-::ng-deep .custom-mcp-dialog-container .mcp-server__status-badge {
-  margin-left: 8px;
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 10px;
+/* Status/native icons (replace the old text badges). Shared with the native catalog via panelClass. */
+::ng-deep .custom-mcp-dialog-container .mcp-server__native-icon {
+  margin-left: 6px;
+  font-size: 16px;
+  color: #6d28d9;
+  vertical-align: middle;
 }
 
-::ng-deep .custom-mcp-dialog-container .mcp-server__status-badge--active {
-  background: #dbeafe;
-  color: #1d4ed8;
+::ng-deep .custom-mcp-dialog-container .mcp-server__status-icon {
+  margin-left: 6px;
+  font-size: 18px;
+  vertical-align: middle;
 }
 
-::ng-deep .custom-mcp-dialog-container .mcp-server__status-badge--available {
-  background: #f1f5f9;
-  color: #334155;
+::ng-deep .custom-mcp-dialog-container .mcp-server__status-icon--active {
+  color: var(--blu-02);
 }
 
-::ng-deep .custom-mcp-dialog-container .mcp-server__tools-meta {
+::ng-deep .custom-mcp-dialog-container .mcp-server__status-icon--available {
+  color: #22c55e;
+}
+
+/* Active tools inline row: label + clipped names + "more.." */
+::ng-deep .custom-mcp-dialog-container .mcp-server__tools-active-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
   font-size: 12px;
   color: #6b7280;
+}
+
+::ng-deep .custom-mcp-dialog-container .mcp-server__tools-active-label {
+  flex-shrink: 0;
+}
+
+/* ---- Read-only "active tools" overlay: fills the dialog box exactly (same size/position) ---- */
+::ng-deep .custom-mcp-dialog-container .tools-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 6px;
+  /* header + hr styling is inherited from .tpl-modal-header / .mcp-dialog__hr */
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 20px 16px 20px;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--blu-02);
+    border-radius: 4px;
+    &:hover {
+      background: var(--blu);
+    }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--blu-02) transparent;
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__empty {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 12px 2px;
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 2px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background-color: #f8fafc;
+  }
+}
+
+/* "Select all / Deselect all" row: emphasized, sticky-like separator */
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__selectall {
+  border-bottom: 2px solid #e5e7eb;
+
+  .tools-modal__item-name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #374151;
+  }
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__item-check {
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 18px;
+  color: #cbd5e1;
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__item-check--on {
+  color: var(--blu-02);
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__item-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  word-break: break-word;
+}
+
+::ng-deep .custom-mcp-dialog-container .tools-modal .tools-modal__item-desc {
+  font-size: 12px;
+  line-height: 16px;
+  color: #6b7280;
+  margin-top: 2px;
+  word-break: break-word;
 }

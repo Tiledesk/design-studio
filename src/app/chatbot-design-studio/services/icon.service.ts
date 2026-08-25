@@ -127,6 +127,10 @@ export class IconService {
 
     // actions //
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/data_table.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/data_table.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions/add_tag.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/add_tag.svg')
     );

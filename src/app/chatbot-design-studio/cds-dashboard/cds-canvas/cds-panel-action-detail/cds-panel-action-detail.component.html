@@ -20,7 +20,17 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
+                <cds-action-connector *ngIf="elementSelected._tdConnectorRef"
+                    class="panel-response"
+                    [intentSelected]="intentSelected"
+                    [action]="elementSelected"
+                    [previewMode]="false"
+                    (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                    (updateAndSaveAction)="onSaveIntent($event)">
+                </cds-action-connector>
+
+                <div [ngSwitch]="elementSelected._tdActionType"
+                     *ngIf="!elementSelected._tdConnectorRef && canShowActionByPlan.enabled">
 
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY"
                         class="panel-response"
@@ -102,7 +112,8 @@
                     <cds-action-agent *ngSwitchCase="TYPE_ACTION.AGENT"
                         class="panel-response"    
                         [action]="elementSelected"
-                        [previewMode]="false">
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-agent>
 
                     <cds-action-wait *ngSwitchCase="TYPE_ACTION.WAIT"
@@ -338,6 +349,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-qapla>
+
+                    <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-data-table>
 
                     <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
                         class="panel-response"

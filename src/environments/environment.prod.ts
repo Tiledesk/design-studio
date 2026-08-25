@@ -30,5 +30,6 @@ export const environment = {
       appId: 'tilechat',
       MQTTendpoint: 'mqtt://localhost:15675/ws', // MQTT endpoint
       APIendpoint: 'http://localhost:8004/api'
-    }
+    },
+    connectorBaseUrls: []
 };

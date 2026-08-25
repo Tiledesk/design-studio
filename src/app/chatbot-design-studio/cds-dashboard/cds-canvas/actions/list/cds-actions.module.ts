@@ -76,10 +76,13 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
 import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-action-gpt-assistant.component';
 import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
+import { CdsActionConnectorComponent } from './cds-action-connector/cds-action-connector.component';
+import { CdsConnectorAuthRowComponent } from './cds-connector-auth-row/cds-connector-auth-row.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
+import { CdsActionDataTableComponent } from './cds-action-data-table/cds-action-data-table.component';
 import { CdsActionClearTranscriptComponent } from './cds-action-clear-transcript/cds-action-clear-transcript.component';
 import { CdsActionMoveUnassignedComponent } from './cds-action-move-unassigned/cds-action-move-unassigned.component';
 import { CdsActionConnectBlockComponent } from './cds-action-connect-block/cds-action-connect-block.component';
@@ -88,8 +91,11 @@ import { VariableCssClassPipe } from 'src/app/pipe/variablecssClass.pipe';
 import { GetVariableNamePipe } from 'src/app/pipe/get-variable-name.pipe';
 import { CdsActionAiPromptComponent } from './cds-action-ai-prompt/cds-action-ai-prompt.component';
 import { AttributesDialogAiPromptComponent } from './cds-action-ai-prompt/attributes-dialog/attributes-dialog.component';
-import { McpServersDialogComponent } from './cds-action-ai-prompt/mcp-servers-dialog/mcp-servers-dialog.component';
-import { McpServerEditDialogComponent } from './cds-action-ai-prompt/mcp-server-edit-dialog/mcp-server-edit-dialog.component';
+import { CdsMcpToolsComponent } from '../shared/cds-mcp-tools/cds-mcp-tools.component';
+import { McpActiveToolsInlineComponent } from '../shared/cds-mcp-tools/mcp-active-tools-inline/mcp-active-tools-inline.component';
+import { McpServersDialogComponent } from '../shared/cds-mcp-tools/mcp-servers-dialog/mcp-servers-dialog.component';
+import { McpServerEditDialogComponent } from '../shared/cds-mcp-tools/mcp-server-edit-dialog/mcp-server-edit-dialog.component';
+import { McpNativeCatalogDialogComponent } from '../shared/cds-mcp-tools/mcp-native-catalog-dialog/mcp-native-catalog-dialog.component';
 import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-action-web-response.component';
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
@@ -137,6 +143,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
       FormDataComponent,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
@@ -155,6 +163,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -198,8 +207,11 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
     AttributesDialogAiPromptComponent,
+    CdsMcpToolsComponent,
+    McpActiveToolsInlineComponent,
     McpServersDialogComponent,
     McpServerEditDialogComponent,
+    McpNativeCatalogDialogComponent,
     CdsActionAiConditionComponent,
     AttributesDialogAiConditionComponent,
     AiConditionComponent,
@@ -258,6 +270,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionHideMessageComponent,
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
@@ -276,6 +290,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionN8nComponent,
     CdsActionAddTagComponent,
     CdsActionLeadUpdateComponent,
+    CdsActionDataTableComponent,
     // action REPLY elements: start //
     CdsActionReplyToolsComponent,
     CdsActionReplyTextComponent,
@@ -317,14 +332,17 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionSendWhatsappComponent,
     CdsActionAiPromptComponent,
     AttributesDialogAiPromptComponent,
+    CdsMcpToolsComponent,
+    McpActiveToolsInlineComponent,
     McpServersDialogComponent,
     McpServerEditDialogComponent,
+    McpNativeCatalogDialogComponent,
     CdsActionAiConditionComponent,
     AttributesDialogAiConditionComponent,
     AiConditionComponent,
     // action Ai Prompt elements: end //
     CdsActionWebResponseComponent,
-    
+
     //PIPES
     GetVariableNamePipe,
     VariableCssClassPipe,

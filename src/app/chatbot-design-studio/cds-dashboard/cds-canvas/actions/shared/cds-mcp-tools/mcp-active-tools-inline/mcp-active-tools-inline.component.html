@@ -1,0 +1,4 @@
+<span #namesEl class="mcp-active-tools-inline__names">{{ displayText || '—' }}</span>
+<a *ngIf="isOverflowing" class="mcp-active-tools-inline__more" (click)="onMoreClick($event)">
+    {{ 'CDSCanvas.MoreTools' | translate }}
+</a>
