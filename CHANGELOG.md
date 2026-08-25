@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+# 1.40.14-rc3 
 - **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
 - **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
 - **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
