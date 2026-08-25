@@ -95,7 +95,6 @@ import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
 import { CdsActionSubAgentComponent } from './cds-action-sub-agent/cds-action-sub-agent.component';
-import { CdsActionInvokeSubagentComponent } from './cds-action-invoke-subagent/cds-action-invoke-subagent.component';
 import { CdsActionReturnComponent } from './cds-action-return/cds-action-return.component';
 import { CdsActionAiConditionComponent } from './cds-action-ai-condition/cds-action-ai-condition.component';
 import { AttributesDialogAiConditionComponent } from './cds-action-ai-condition/attributes-dialog/attributes-dialog.component';
@@ -214,7 +213,6 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAddKbContentComponent,
     CdsActionFlowLogComponent,
     CdsActionSubAgentComponent,
-    CdsActionInvokeSubagentComponent,
     CdsActionReturnComponent
     
   ],
@@ -333,7 +331,6 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAddKbContentComponent,
     CdsActionFlowLogComponent,
     CdsActionSubAgentComponent,
-    CdsActionInvokeSubagentComponent,
     CdsActionReturnComponent
   ]
 })

@@ -9,10 +9,10 @@
 
 # this branch 
 - **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
-- **added**: new "Invoke Subagent" action (Flow), clone of Invoke Agent restricted to the subagents connected to the agent
+- **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
 - **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
 - **changed**: the Sub Agent action is hidden from the Special actions
-- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent)
+- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent), superseding the `subagent_visibility: never` rule on **Invoke subagent**
 - **bug fix**: inside a subagent the invocable agents are now the siblings (parent's subagents), excluding itself, instead of an empty list
 - **added**: selecting a subagent preselects its start block
 - **bug fix**: clearing the selected subagent left the previously selected block
