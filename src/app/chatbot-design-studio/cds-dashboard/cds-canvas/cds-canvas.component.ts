@@ -278,6 +278,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if(this.stageService.settings?.open_intent_list_state != null){
       this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
     }
+    this.activeLeftPanel = this.stageService.getActiveLeftPanel(this.getLeftPanelFamilyId());
     
     
     // this.stageService.initStageSettings(this.id_faq_kb);
@@ -1145,9 +1146,22 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
   }
 
+  /**
+   * Id della "famiglia" a cui appartiene la tab del pannello sinistro: il parent quando siamo
+   * dentro un subagent, il chatbot corrente altrimenti. Cosi' la scelta Blocks/Subagents
+   * sopravvive alla navigazione parent <-> subagent, che cambia id_faq_kb.
+   */
+  private getLeftPanelFamilyId(): string {
+    const current: any = this.dashboardService.selectedChatbot;
+    return current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+  }
+
   /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
   onSelectLeftPanel(panel: 'blocks' | 'subagents') {
     this.activeLeftPanel = panel;
+    this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), panel);
     if (!this.IS_OPEN_INTENTS_LIST) {
       this.onToogleSidebarIntentsList();
     }

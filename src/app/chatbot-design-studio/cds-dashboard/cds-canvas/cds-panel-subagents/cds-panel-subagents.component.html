@@ -36,6 +36,32 @@
             [attr.title]="sa.name">
             <span class="material-icons subagent-icon">smart_toy</span>
             <span class="subagent-name">{{ sa.name }}</span>
+
+            <!-- Azioni del subagent. Si apre in hover e si chiude 1s dopo l'uscita del mouse
+                 (il timer e' annullato rientrando sul bottone o sul pannello).
+                 stopPropagation: il click non deve navigare sulla riga.
+                 Presente solo sui subagent: il parent non e' eliminabile da qui. -->
+            <button type="button" class="subagent-menu-btn"
+                #subagentTrigger="matMenuTrigger"
+                [matMenuTriggerFor]="subagentMenu"
+                (click)="$event.stopPropagation()"
+                (mouseenter)="onSubagentMenuEnter(subagentTrigger)"
+                (mouseleave)="onSubagentMenuLeave(subagentTrigger)">
+                <span class="material-icons">more_vert</span>
+            </button>
+            <mat-menu #subagentMenu="matMenu" class="subagent-menu-panel"
+                xPosition="before" [hasBackdrop]="false">
+                <div class="subagent-menu-content"
+                    (mouseenter)="onSubagentMenuEnter(subagentTrigger)"
+                    (mouseleave)="onSubagentMenuLeave(subagentTrigger)">
+                    <div class="subagent-menu-item" (click)="onDeleteSubagent(sa, $event)">
+                        <div class="subagent-menu-item-icon">
+                            <span class="material-icons-outlined">delete</span>
+                        </div>
+                        <div class="subagent-menu-item-text truncate">{{ 'CDSCanvas.DeleteSubagent' | translate }}</div>
+                    </div>
+                </div>
+            </mat-menu>
         </div>
 
         <!-- Empty state (nessun subagent) -->

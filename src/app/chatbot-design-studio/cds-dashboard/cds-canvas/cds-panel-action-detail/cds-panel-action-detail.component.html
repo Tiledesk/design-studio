@@ -155,6 +155,13 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-replace-bot-v3>
 
+                    <cds-action-invoke-subagent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT_V2"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-invoke-subagent>
+
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE"
                         class="panel-response"
                         [action]="elementSelected"

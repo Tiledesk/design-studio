@@ -494,6 +494,7 @@
         "Error": "Error",
         "ChooseBot": "Choose a bot",
         "ChooseAgent": "Choose an Agent",
+        "ChooseSubagent": "Choose a Subagent",
         "UseChatbotSlug": "Use Chatbot slag",
         "ChooseBlock": "Choose a block",
         "ChooseBlockDescription": "Automatically execute this block when the Agent joins the conversation",
@@ -585,6 +586,8 @@
         "ViewList": "View list",
         "UseBotSlug": "Use bot slug",
         "ChooseBotBySlug": "Choose bot by slug",
+        "ChooseSubagentBySlug": "Choose subagent by slug",
+        "UseSubagentSlug": "Use subagent slug",
         "CopilotEnabled": "Copilot enabled",
         "CopilotDisabled": "Copilot disabled",
         "ResponseStatus": "Response status",
@@ -619,6 +622,9 @@
         "Subagents": "Subagents",
         "SearchASubagent": "Search a subagent...",
         "NoSubagentsYet": "No subagents available yet",
+        "DeleteSubagent": "Delete subagent",
+        "DeleteSubagentTitle": "Delete subagent",
+        "DeleteSubagentText": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
         "NewSubagent": "New subagent",
         "EnterSubagentName": "Enter subagent name",
         "CreatingSubagent": "Creating subagent",
@@ -802,8 +808,8 @@
             "ConnectBlock": "Connect block",
             "SetAttribute": "Set attribute",
             "DeleteAttribute": "Delete attribute",
-            "ReplaceBot": "Replace bot",
-            "ReplaceAIAgent":"Replace AI Agent",
+            "InvokeAgent": "Invoke Agent",
+            "InvokeSubagent": "Invoke Subagent",
             "Wait": "Wait",
             "WebRequest": "Web request",
             "WebResponse": "Web response",
@@ -835,7 +841,7 @@
             "AddTag": "Add tag",
             "FlowLog":"Flow log",
             "SubAgent": "Sub Agent",
-            "Return": "Return",
+            "Return": "Return to agent",
             "DTMFForm": "DTMF form",
             "DTMFMenu": "DTMF menu",
             "BlindTransfer": "Blind transfer",
@@ -930,19 +936,19 @@
                 "VIDEO_URL": "",
                 "DOC_URL": ""
             },
-            "ReplaceBot": {
-                "TITLE": "Replace the current bot with another one",
-                "DESCRIPTION": "Replaces the current chatbot with the specied one",
-                "IMAGE": "assets/images/doc/REPLACE_BOT.png",
-                "VIDEO_URL": "",
-                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
-            },
-            "ReplaceAIAgent":{
+            "InvokeAgent":{
                 "TITLE":"Replaces the current Agent with the specied one",
                 "DESCRIPTION":"",
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
+            },
+            "InvokeSubagent":{
+                "TITLE":"Invokes one of the Subagents connected to this Agent",
+                "DESCRIPTION":"",
+                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             },
             "Wait": {
                 "TITLE": "Wait before next action",

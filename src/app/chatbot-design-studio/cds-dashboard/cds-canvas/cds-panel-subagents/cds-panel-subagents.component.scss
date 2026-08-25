@@ -92,6 +92,98 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    // tre puntini: compaiono su hover della riga, restano visibili se il menu e' aperto
+    // (aria-expanded) o se la riga e' quella attiva, cosi' il target non "scappa".
+    .subagent-menu-btn {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: #7d8a97;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity .15s, background-color .15s;
+
+        .material-icons { font-size: 18px; }
+
+        &:hover { background: #dfe6ec; color: #444a51; }
+        &[aria-expanded="true"] { opacity: 1; background: #dfe6ec; }
+    }
+
+    &:hover .subagent-menu-btn,
+    &.active .subagent-menu-btn { opacity: 1; }
+}
+
+// Menu azioni del subagent: stessa grammatica visiva del menu "Options" (cds-menu +
+// context-menu): pannello bianco con bordo gray-02, niente ombra, voci da 30px con
+// icona 16px grigia e testo 11px blu, ombra soffusa in hover.
+::ng-deep .mat-menu-panel.subagent-menu-panel {
+    min-width: 0;
+    max-width: none;
+    // Material impone min-height:64px alle mat-menu-panel: senza azzerarlo il pannello
+    // resta molto piu' alto della voce che contiene.
+    min-height: 0;
+    width: 160px;
+    border-radius: 8px;
+    border: 2px solid var(--gray-02);
+    box-shadow: none;
+    background: #fff;
+    overflow: hidden;
+
+    // il padding del content e' l'UNICO margine: 6px identici sui 4 lati attorno alla voce
+    .mat-menu-content:not(:empty) { padding: 6px; }
+
+    .subagent-menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        height: 30px;
+        margin: 0;
+        padding: 0 2px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+
+            .subagent-menu-item-icon span { color: var(--blu); }
+            .subagent-menu-item-text { color: var(--blu); }
+        }
+    }
+
+    .subagent-menu-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+            width: 16px;
+            font-size: 16px;
+            color: var(--gray-light-01);
+        }
+    }
+
+    .subagent-menu-item-text {
+        color: var(--blu);
+        padding: 0 6px;
+        font-size: 11px;
+        font-weight: 400;
+    }
+
+    .truncate {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
 }
 
 // riga del chatbot parent: sempre in cima, con badge e separatore
