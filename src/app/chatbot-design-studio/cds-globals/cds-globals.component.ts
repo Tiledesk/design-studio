@@ -52,7 +52,7 @@ export class CdsGlobalsComponent implements OnInit {
       this.selectedChatbot.attributes.globals.sort((a, b) => {
         return a.key.toLowerCase().localeCompare(b.key.toLowerCase());;
       })
-      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: false }));
+      this.list = this.selectedChatbot.attributes.globals.map(s => ({ ...s, visible: s.visible ?? true })).filter(s => s.visible);
       this.logger.debug("[CDS-GLOBALS] globals list: ", this.list)
       if(this.list.length > 0){
         this.showWelcome = false
@@ -81,7 +81,7 @@ export class CdsGlobalsComponent implements OnInit {
   }
 
   saveAttributes() {
-    let data = this.list.map(({ visible, ...keepAttrs }) => keepAttrs);
+    let data = this.list.map(({ ...keepAttrs }) => keepAttrs);
 
     this.faqKbService.addNodeToChatbotAttributes(this.selectedChatbot._id, 'globals', data).subscribe((resp) => {
       this.newGlobal = {
@@ -120,10 +120,10 @@ export class CdsGlobalsComponent implements OnInit {
     this.logger.log('[CDS-GLOBALS ] onGlobalChange -->', event, this.updateIndex)
     switch(event.type){
       case 'add':
-        this.list.push(event.element)
+        this.list.push({ ...event.element, visible: true })
         break;
       case 'edit':
-        this.list[this.updateIndex] = event.element
+        this.list[this.updateIndex] = { ...event.element, visible: true };
         break;
       case 'delete':
         this.list.splice(this.updateIndex, 1);

@@ -13,6 +13,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { TranslateService } from '@ngx-translate/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from 'src/app/chatbot-design-studio/utils-actions';
+import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
 const swal = require('sweetalert');
 
 @Component({
@@ -21,6 +22,9 @@ const swal = require('sweetalert');
   styleUrls: ['./cds-action-reply-voice-text.component.scss']
 })
 export class CdsActionReplyVoiceTextComponent implements OnInit {
+
+  /** true se il filtro esistente è legacy (pre-V2): il template usa il vecchio editor appdashboard-filter */
+  isLegacyFilter = isLegacyFilter;
   @ViewChild('autosize') autosize: CdkTextareaAutosize;
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   

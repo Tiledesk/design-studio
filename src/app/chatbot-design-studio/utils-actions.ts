@@ -28,12 +28,15 @@ export enum TYPE_ACTION {
     REPLACE_BOT         = 'replacebot',
     REPLACE_BOTV2       = 'replacebotv2',
     REPLACE_BOTV3       = 'replacebotv3',
+    REPLACE_BOTV4       = 'replacebotv4',
+    RETURN_STACK        = 'returnstack',
     CHANGE_DEPARTMENT   = 'department',
     ONLINE_AGENTS       = 'ifonlineagents',
     ONLINE_AGENTSV2     = 'ifonlineagentsv2',
     OPEN_HOURS          = 'ifopenhours',
     HIDE_MESSAGE        = 'hmessage',
     JSON_CONDITION      = 'jsoncondition',
+    JSON_CONDITION2     = 'jsoncondition2',
     CONDITION           = 'condition',
     CAPTURE_USER_REPLY  = 'capture_user_reply',
     ITERATION           = 'iteration',
@@ -53,7 +56,6 @@ export enum TYPE_ACTION {
     AI_CONDITION        = 'ai_condition',
     WEB_RESPONSE        = 'web_response',
     INVOKE_SUB_AGENT    = 'invoke_subagent',
-    INVOKE_SUB_AGENT_V2 = 'invoke_subagent_v2',
     RETURN              = 'return'
 }
 
@@ -98,18 +100,30 @@ export enum TYPE_CHATBOT {
     VOICE_TWILIO  = 'voice_twilio',
     WEBHOOK       = 'webhook',
     COPILOT       = 'copilot',
+    SUBAGENT      = 'subagent',
 }
 
 /**
- * Nel Design Studio i subagent (subtype 'subagent') vanno gestiti come chatbot standard:
- * normalizza il subtype a CHATBOT quando è 'subagent' (o assente), altrimenti lo lascia invariato.
- * Abilita così per i subagent tutte le feature/azioni/variabili del subtype 'chatbot'.
+ * isSubagentSubtype
+ * true quando il chatbot aperto nel Design Studio è un subagent, cioè un agente
+ * invocato da un altro agente tramite l'azione "Invoke subagent".
+ */
+export function isSubagentSubtype(subtype: string | undefined | null): boolean {
+    return subtype === TYPE_CHATBOT.SUBAGENT;
+}
+
+/**
+ * resolveChatbotSubtype
+ * Nel Design Studio un subagent va trattato come un chatbot standard: normalizza il
+ * subtype a CHATBOT quando è 'subagent' (o assente), altrimenti lo lascia invariato.
+ * Senza questa normalizzazione checkIfActionIsInChatbotType disattiverebbe TUTTE le
+ * azioni dentro un subagent, perché nessuna dichiara 'subagent' fra i chatbot_types.
  */
 export function resolveChatbotSubtype(subtype: string | undefined | null): TYPE_CHATBOT {
-  if (!subtype || subtype === 'subagent') {
-    return TYPE_CHATBOT.CHATBOT;
-  }
-  return subtype as TYPE_CHATBOT;
+    if (!subtype || isSubagentSubtype(subtype)) {
+        return TYPE_CHATBOT.CHATBOT;
+    }
+    return subtype as TYPE_CHATBOT;
 }
 
 
@@ -138,10 +152,15 @@ export const ACTIONS_LIST: {
         type: TYPE_ACTION | TYPE_ACTION_VXML, 
         src: string, 
         status: 'active' | 'inactive' | 'beta', 
-        plan?: PLAN_NAME, 
-        badge?: string, 
-        doc?: string, 
-        disabled?: boolean 
+        plan?: PLAN_NAME,
+        badge?: string,
+        doc?: string,
+        disabled?: boolean,
+        /** visibilità nel menu azioni rispetto al contesto subagent:
+         *  'only'  = offerta SOLO dentro un subagent
+         *  'never' = nascosta dentro un subagent
+         *  (assente) = offerta ovunque */
+        subagent_visibility?: 'only' | 'never'
     }
 } = {
     REPLY :                 { name: 'CDSActionList.NAME.Reply',                 chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REPLY,                src: "assets/images/actions/reply.svg",                 status: "active" ,                      doc: "CDSActionList.DOC.Reply",                                         },
@@ -154,8 +173,9 @@ export const ACTIONS_LIST: {
     ONLINE_AGENTSV2:        { name: 'CDSActionList.NAME.IfOnlineAgent',         chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTSV2,      src: "assets/images/actions/online_agents.svg",         status: "active",                       doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
     CLEAR_TRANSCRIPT:       { name: 'CDSActionList.NAME.ClearTranscript',       chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLEAR_TRANSCRIPT,     src: "assets/images/actions/clear_transcript.svg",      status: "active",                       doc: "CDSActionList.DOC.ClearTranscript"                                },
     MOVE_TO_UNASSIGNED:     { name: 'CDSActionList.NAME.MoveToUnassigned',      chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.MOVE_TO_UNASSIGNED,   src: "assets/images/actions/move_to_unassigned.svg",    status: "active",                       doc: "CDSActionList.DOC.MoveToUnassigned"                               },
-    CONDITION:              { name: 'CDSActionList.NAME.Condition',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.Condition"                                      },
-    JSON_CONDITION:         { name: 'CDSActionList.NAME.ConditionElse',         chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION,       src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.ConditionElse"                                  },
+    CONDITION:              { name: 'CDSActionList.NAME.Condition',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "inactive",                     doc: "CDSActionList.DOC.Condition"                                      },
+    JSON_CONDITION:         { name: 'CDSActionList.NAME.ConditionElse',         chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION,       src: "assets/images/actions/condition.svg",             status: "inactive",                     doc: "CDSActionList.DOC.ConditionElse"                                  },
+    JSON_CONDITION2:        { name: 'CDSActionList.NAME.ConditionElseV2',       chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION2,      src: "assets/images/actions/condition.svg",             status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.ConditionElseV2"                                },
     INTENT :                { name: 'CDSActionList.NAME.ConnectBlock',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.INTENT,               src:"assets/images/actions/connect_intent.svg",         status: "inactive",                     doc: ""                                                                 },
     CONNECT_BLOCK :         { name: 'CDSActionList.NAME.ConnectBlock',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONNECT_BLOCK,        src:"assets/images/actions/connect_intent.svg",         status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
     ASSIGN_VARIABLE:        { name: 'CDSActionList.NAME.SetAttribute',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.ASSIGN_VARIABLE,      src: "assets/images/actions/assign_var.svg",            status: "inactive",                     doc: "CDSActionList.DOC.SetAttribute"                                   },
@@ -164,7 +184,8 @@ export const ACTIONS_LIST: {
     REPLACE_BOT:            { name: 'CDSActionList.NAME.InvokeAgent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOT,          src: "assets/images/actions/replace_bot.svg",           status: "inactive",                     doc: "CDSActionList.DOC.InvokeAgent"                                 },
     REPLACE_BOTV2:          { name: 'CDSActionList.NAME.InvokeAgent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV2,        src: "assets/images/actions/replace_bot.svg",           status: "inactive",                     doc: "CDSActionList.DOC.InvokeAgent"                                 },
     REPLACE_BOTV3:          { name: 'CDSActionList.NAME.InvokeAgent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV3,        src: "assets/images/actions/replace_bot.svg",           status: "active",   badge: 'NEW',          doc: "CDSActionList.DOC.InvokeAgent"                                 },
-    INVOKE_SUBAGENT:        { name: 'CDSActionList.NAME.InvokeSubagent',      chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT],                                                   category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.INVOKE_SUB_AGENT_V2,  src: "assets/images/actions/replace_bot.svg",           status: "active",   badge: 'NEW',          doc: "CDSActionList.DOC.InvokeSubagent"                              },
+    REPLACE_BOTV4:          { name: 'CDSActionList.NAME.InvokeSubagent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV4,        src: "assets/images/actions/replace_bot.svg",           status: "active",   badge: 'NEW',         doc: "CDSActionList.DOC.InvokeSubagent"},
+    RETURN_STACK:           { name: 'CDSActionList.NAME.ReturnStack',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.RETURN_STACK,         src: "assets/images/icons/stacks.svg",                  status: "active",   badge: 'NEW',         doc: "CDSActionList.DOC.ReturnStack",           subagent_visibility: 'only'             },
     WAIT :                  { name: 'CDSActionList.NAME.Wait',                  chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.WAIT,                 src:"assets/images/actions/wait.svg",                   status: "active",                       doc: "CDSActionList.DOC.Wait"                                           },
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
     WEB_REQUESTV2 :         { name: 'CDSActionList.NAME.WebRequest',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_REQUESTV2,        src:"assets/images/actions/web_request.svg",            status: "active",                       doc: "CDSActionList.DOC.WebRequest"                                     },
@@ -211,4 +232,31 @@ export const ACTIONS_LIST: {
     BLIND_TRANSFER_TWILIO:  { name: 'CDSActionList.NAME.BlindTransfer',         chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.BLIND_TRANSFER,  src:"assets/images/actions-voice/blind_transfer.svg",   status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
+}
+
+
+/**
+ * isActionAvailableInSubagentContext
+ * Filtro di visibilità del menu azioni in base al contesto: "Invoke subagent" ha senso
+ * solo fuori da un subagent, "Return to parent agent" solo dentro un subagent.
+ * NB: filtra SOLO il menu; le azioni già presenti nei flussi restano renderizzate.
+ */
+export function isActionAvailableInSubagentContext(action: { subagent_visibility?: 'only' | 'never' }, isSubagent: boolean): boolean {
+    if (action?.subagent_visibility === 'only') { return isSubagent; }
+    if (action?.subagent_visibility === 'never') { return !isSubagent; }
+    return true;
+}
+
+/**
+ * isReturnStackIntent
+ * true quando il blocco contiene SOLO l'azione "Return to parent agent":
+ * in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita.
+ * NB: il parametro è tipizzato `any` di proposito: importare `Intent` qui creerebbe
+ * il ciclo utils-actions -> intent-model -> action-model -> utils-actions.
+ */
+export function isReturnStackIntent(intent: any): boolean {
+    const actions = intent?.actions;
+    return Array.isArray(actions)
+        && actions.length === 1
+        && actions[0]?._tdActionType === TYPE_ACTION.RETURN_STACK;
 }

@@ -1,7 +1,7 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionSubAgent, ActionReturn, ActionInvokeSubagent } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionSubAgent, ActionReturn, ActionJsonCondition2, ActionReplaceBotV4, ActionReturnStack } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
@@ -9,6 +9,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
+import { applyConditionSaveModeToPayload } from '../utils-condition';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -719,6 +720,10 @@ export class IntentService {
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
 
+    // updateIntent in coda fa refreshIntent solo sull'intent di destinazione:
+    // notifico esplicitamente anche il blocco sorgente, che deve ri-renderizzarsi
+    // (es. se resta con la sola azione "Return to parent agent" diventa una pastiglia)
+    this.behaviorIntent.next(previousIntent);
     this.updateIntent(currentIntent, previousIntent);
     return;
     // this.connectorService.updateConnector(currentIntent.intent_id);
@@ -1033,9 +1038,12 @@ export class IntentService {
       action = new  ActionReplaceBotV3();
       action.useSlug = false;
     }
-    if(typeAction === TYPE_ACTION.INVOKE_SUB_AGENT_V2){
-      action = new  ActionInvokeSubagent();
+    if(typeAction === TYPE_ACTION.REPLACE_BOTV4){
+      action = new  ActionReplaceBotV4();
       action.useSlug = false;
+    }
+    if(typeAction === TYPE_ACTION.RETURN_STACK){
+      action = new ActionReturnStack();
     }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();
@@ -1046,6 +1054,10 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.JSON_CONDITION){
       action = new ActionJsonCondition();
+      action.groups.push( new Expression());
+    }
+    if(typeAction === TYPE_ACTION.JSON_CONDITION2){
+      action = new ActionJsonCondition2();
       action.groups.push( new Expression());
     }
     if(typeAction === TYPE_ACTION.CONDITION) {
@@ -1766,6 +1778,9 @@ export class IntentService {
     private async opsUpdate(payload: any, UndoRedo=true): Promise<boolean> { 
       // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', payload);
       payload = removeNodesStartingWith(payload, '__');
+      // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`
+      // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
+      payload = applyConditionSaveModeToPayload(payload);
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         this.faqService.opsUpdate(payload).subscribe((resp: any) => {

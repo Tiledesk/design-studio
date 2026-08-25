@@ -134,6 +134,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-json-condition>
 
+                    <cds-action-json-condition2 *ngSwitchCase="TYPE_ACTION.JSON_CONDITION2"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-json-condition2>
+
                     <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT"
                         class="panel-response"
                         [action]="elementSelected"
@@ -155,12 +164,18 @@
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-replace-bot-v3>
 
-                    <cds-action-invoke-subagent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT_V2"
+                    <cds-action-replace-bot-v4 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV4" 
                         class="panel-response"
                         [action]="elementSelected"
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
-                    </cds-action-invoke-subagent>
+                    </cds-action-replace-bot-v4>
+
+                    <cds-action-return-stack *ngSwitchCase="TYPE_ACTION.RETURN_STACK" 
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-return-stack>
 
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE"
                         class="panel-response"

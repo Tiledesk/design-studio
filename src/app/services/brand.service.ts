@@ -186,7 +186,8 @@ export class BrandService {
     const that = this
     try {
       let url = this.appConfig.getConfig().brandSrc
-      if (url && url !== 'CHANGEIT') {
+      const isUnresolvedPlaceholder = typeof url === 'string' && /^\$\{.+\}$/.test(url.trim());
+      if (url && url !== 'CHANGEIT' && !isUnresolvedPlaceholder) {
         const data = await this.httpClient.get(url).toPromise();
 
         // console.log('[BRAND-SERV] **** GET BRAND FROM URL ****', url);

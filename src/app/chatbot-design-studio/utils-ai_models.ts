@@ -709,7 +709,7 @@ export const OPENAI_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 
-export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens?: number, max_output_tokens?: number, reasoning?: boolean}> = [
+export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, vllmServer?: string}> = [
   {
     name: "ollama_1",
     value: "ollama_1",
@@ -744,8 +744,8 @@ export const DEFAULT_MODEL: { name: string, value: string, description:string, s
 * Changes name format to "Provider - ModelName" and value format to "provider-modelname"
 * Adds description and src for each record
 */
-export function generateLlmModelsFlat(): Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean}> {
-  let llm_models_flat: Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean}> = [];
+export function generateLlmModelsFlat(): Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, vllmServer?: string}> {
+  let llm_models_flat: Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, vllmServer?: string}> = [];
   LLM_MODEL.forEach(provider => {
     provider.models.forEach(model => {
       llm_models_flat.push({
@@ -758,7 +758,8 @@ export function generateLlmModelsFlat(): Array<{modelName: string, llm: string, 
         configured: false,
         min_tokens: (model as any).min_tokens || 1,
         max_output_tokens: (model as any).max_output_tokens || 128000,
-        reasoning: (model as any).reasoning ?? false
+        reasoning: (model as any).reasoning ?? false,
+        vllmServer: (model as any).vllmServer
       });
     });
   });

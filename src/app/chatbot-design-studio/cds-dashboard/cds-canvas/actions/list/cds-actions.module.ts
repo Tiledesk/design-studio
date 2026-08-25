@@ -37,12 +37,17 @@ import { CdsActionIntentComponent } from './cds-action-intent/cds-action-intent.
 import { BaseConditionRowComponent } from './cds-action-json-condition/base-condition-row/base-condition-row.component';
 import { BaseFilterComponent } from './cds-action-json-condition/base-filter/base-filter.component';
 import { CdsActionJsonConditionComponent } from './cds-action-json-condition/cds-action-json-condition.component';
+import { BaseConditionRow2Component } from './cds-action-json-condition2/base-condition-row2/base-condition-row2.component';
+import { BaseFilter2Component } from './cds-action-json-condition2/base-filter2/base-filter2.component';
+import { CdsActionJsonCondition2Component } from './cds-action-json-condition2/cds-action-json-condition2.component';
 import { CdsActionMakeComponent } from './cds-action-make/cds-action-make.component';
 import { CdsActionOnlineAgentsComponent } from './cds-action-online-agents/cds-action-online-agents.component';
 import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-open-hours.component';
 import { CdsActionQaplaComponent } from './cds-action-qapla/cds-action-qapla.component';
 import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot/cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
 import { CdsActionReplaceBotV3Component } from './cds-action-replace-bot/cds-action-replace-bot-v3/cds-action-replace-bot-v3.component';
+import { CdsActionReplaceBotV4Component } from './cds-action-replace-bot/cds-action-replace-bot-v4/cds-action-replace-bot-v4.component';
+import { CdsActionReturnStackComponent } from './cds-action-return-stack/cds-action-return-stack.component';
 import { CdsActionReplaceBotComponent } from './cds-action-replace-bot/cds-action-replace-bot-v1/cds-action-replace-bot.component';
 import { CdsActionReplyComponent } from './cds-action-reply/cds-action-reply-v1/cds-action-reply.component';
 import { CdsActionReplyButtonComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
@@ -52,6 +57,7 @@ import { CdsActionReplyImageComponent } from './cds-action-reply/elements/cds-ac
 import { CdsActionReplyRedirectComponent } from './cds-action-reply/elements/cds-action-reply-redirect/cds-action-reply-redirect.component';
 import { CdsActionReplyTextComponent } from './cds-action-reply/elements/cds-action-reply-text/cds-action-reply-text.component';
 import { CdsActionReplyUrlPreviewComponent } from './cds-action-reply/elements/cds-action-reply-url-preview/cds-action-reply-url-preview.component';
+import { CdsActionReplyTTSComponent } from './cds-action-reply/elements/cds-action-reply-tts/cds-action-reply-tts.component';
 import { CdsActionReplyToolsComponent } from './cds-action-reply/elements/cds-action-reply-tools/cds-action-reply-tools.component';
 import { CdsActionWaitComponent } from './cds-action-wait/cds-action-wait.component';
 import { CdsActionWebRequestComponent } from './cds-action-web-request/cds-action-web-request.component';
@@ -119,10 +125,13 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionCloseComponent,
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
+    CdsActionJsonCondition2Component,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
     CdsActionReplaceBotV3Component,
+    CdsActionReplaceBotV4Component,
+    CdsActionReturnStackComponent,
     CdsActionAssignVariableComponent,
     CdsActionAssignVariableV2Component,
     CdsActionHideMessageComponent,
@@ -155,6 +164,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionReplyFrameComponent,
     CdsActionReplyRedirectComponent,
     CdsActionReplyGalleryComponent,
+    CdsActionReplyTTSComponent,
     CdsActionReplyButtonComponent,
     CdsActionReplySettingsComponent,
     // action REPLY elements: end //
@@ -173,6 +183,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     BaseFilterComponent,
     // VariableListComponent,
     // action JSON-CONDITION elements: end //
+    // action JSON-CONDITION2 (V2) elements: start //
+    BaseFilter2Component,
+    // action JSON-CONDITION2 (V2) elements: end //
     // action ASKGPT elements: start //
     AddkbDialogComponent,
     // action ASKGPT elements: end //
@@ -235,10 +248,13 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionCloseComponent,
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
+    CdsActionJsonCondition2Component,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
     CdsActionReplaceBotV3Component,
+    CdsActionReplaceBotV4Component,
+    CdsActionReturnStackComponent,
     CdsActionAssignVariableComponent,
     CdsActionAssignVariableV2Component,
     CdsActionHideMessageComponent,
@@ -287,6 +303,10 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     BaseFilterComponent,
     // VariableListComponent,
     // action JSON-CONDITION elements: end //
+    // action JSON-CONDITION2 (V2) elements: start //
+    BaseConditionRow2Component,
+    BaseFilter2Component,
+    // action JSON-CONDITION2 (V2) elements: end //
     // action ASKGPT elements: start //
     AddkbDialogComponent,
     // action ASKGPT elements: end //

@@ -5,6 +5,7 @@ import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { Expression, Message, Metadata, Wait } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-voice-audio',
@@ -12,6 +13,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   styleUrls: ['./cds-action-reply-audio.component.scss']
 })
 export class CdsActionReplyAudioComponent implements OnInit {
+
+  /** true se il filtro esistente è legacy (pre-V2): il template usa il vecchio editor appdashboard-filter */
+  isLegacyFilter = isLegacyFilter;
 
   @Output() changeActionReply = new EventEmitter();
   @Output() deleteActionReply = new EventEmitter();
