@@ -155,6 +155,10 @@
           width: 20px;
           height: 20px;
           fill: var(--color-white-hex);
+          // web_response.svg dichiara <style>.cls-1{fill:#000}</style> nei defs e la regola
+          // di classe batte il fill sull'<svg>: senza questo override i path resterebbero
+          // neri, cioe' invisibili sulla pastiglia scura
+          path { fill: var(--color-white-hex) !important; }
         }
       }
     }

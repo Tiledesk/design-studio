@@ -226,7 +226,7 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     this.closeSubagentMenu();
     if (!sa?._id || this.isDeleting) { return; }
     const ref = this.dialog.open(DialogYesNoComponent, {
-      panelClass: 'custom-dialog-container',
+      panelClass: 'custom-confirm-dialog-container',
       disableClose: true,
       data: {
         title: this.translate.instant('CDSCanvas.DeleteSubagentTitle'),
