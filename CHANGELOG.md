@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch gio 27 ago 2026
+- **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
+- **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
+- **changed**: the **Return** action is available again in the menu, with its original name "Return"
+- **added**: **Invoke Agent** preselects the start block when an agent is selected and clears the block when the agent is cleared, like **Invoke subagent**
+- **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
+- **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
+
 # this branch 
 - **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
 - **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project

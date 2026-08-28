@@ -8,6 +8,7 @@ import { FaqService } from 'src/app/services/faq.service';
 import { Faq } from 'src/app/models/faq-model';
 import { Intent } from 'src/app/models/intent-model';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { TYPE_INTENT_NAME } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-action-replace-bot-v3',
@@ -83,7 +84,12 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
   }
 
 
-  getAllFaqById(chatbotId: string){
+  /**
+   * @param autoSelectStart alla SELEZIONE di un agent preseleziona il suo blocco di
+   * partenza ('start'). Non passato in apertura pannello, per non sovrascrivere ne'
+   * risalvare la scelta gia' fatta dall'utente.
+   */
+  getAllFaqById(chatbotId: string, autoSelectStart: boolean = false){
     this.logger.log("[ACTION REPLACE BOT] get AllFaqById: ",chatbotId);
     
     this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks)=> {
@@ -93,6 +99,14 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
         label: faq.intent_display_name,
         value: faq.intent_display_name
       }));
+      if (autoSelectStart && !this.action?.blockName) {
+        const startBlock = this.autocompleteOptionsBlockName.find(o => o.value === TYPE_INTENT_NAME.START);
+        if (startBlock) {
+          this.action.blockName = startBlock.value;
+          this.logger.log("[ACTION REPLACE BOT] start block preselezionato: ", startBlock.value);
+          this.updateAndSaveAction.emit();
+        }
+      }
       this.logger.log("[ACTION REPLACE BOT] get AllFaqById blocks: ", this.autocompleteOptionsBlockName);
     }, error: (error)=> {
       this.logger.error("[ACTION REPLACE BOT] error get AllFaqById: ", error);
@@ -106,7 +120,7 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
     this.action.botId = event.id;
     this.action.botSlug = event.slug;
     this.action.blockName = '' //rest blockName when chatbot is changed
-    this.getAllFaqById(event.id)
+    this.getAllFaqById(event.id, true)
     this.updateAndSaveAction.emit()
     this.logger.log("[ACTION REPLACE BOT] action edited: ", this.action)
   }
@@ -151,6 +165,10 @@ export class CdsActionReplaceBotV3Component implements OnInit, OnChanges {
       case 'botId':
         this.action.botId = null;
         this.action.botSlug = null;
+        // senza agent selezionato il blocco non ha piu' significato: si svuota il valore
+        // e le opzioni, altrimenti resterebbe puntato a un blocco dell'agent precedente
+        this.action.blockName = null;
+        this.autocompleteOptionsBlockName = [];
         break;
       case 'blockName':
         this.action.blockName = null
