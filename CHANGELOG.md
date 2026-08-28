@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch gio 27 ago 2026
+# 1.40.14-rc4
 - **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
 - **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
 - **changed**: the **Return** action is available again in the menu, with its original name "Return"
