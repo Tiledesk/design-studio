@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch
+# 1.40.8-im
 - **added**: Web Request action — Postman-like body editor: first selector (none / form-data / raw) and, when raw, a second selector for the sub-type (text / JavaScript / JSON / HTML / XML)
 - **added**: live body validator per raw sub-type (JSON, XML, JavaScript) with a discreet, non-blocking inline alert that ignores `{{...}}` placeholders
 - **bug-fix**: the body validation alert now shows for invalid raw bodies (previously hidden by a wrong template guard)
