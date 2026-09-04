@@ -128,6 +128,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.project_id = this.dashboardService.projectID;
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'openrouter');
 
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name;
