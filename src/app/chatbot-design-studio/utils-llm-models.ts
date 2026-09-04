@@ -182,10 +182,14 @@ export async function getIntegrationModels(
       if (!value) {
         continue;
       }
-      // Build model entries supporting BOTH integration shapes:
+      // Build model entries supporting ALL integration shapes:
       // - multi-endpoint (refactored vLLM): value.servers[].models
       //   -> modelName label = "<server name> ・ model" and vllmServer = server NAME (the server's name, NOT the url)
-      // - legacy flat (e.g. ollama / old vLLM): value.models -> label = value = model id
+      // - legacy flat (e.g. ollama / old vLLM): value.models is string[] -> label = value = model id
+      // - per-model config (OpenRouter): value.models is object[] carrying the
+      //   provider routing -> label = the catalogue name, value = the routable id.
+      //   The routing itself is NOT sent from here: the server resolves it from
+      //   the integration by model id, so only the id has to survive.
       let entries: Array<{ name: string; value: string; vllmServer?: string }> = [];
       if (Array.isArray(value.servers)) {
         for (const server of value.servers) {
@@ -200,8 +204,19 @@ export async function getIntegrationModels(
         }
       } else if (Array.isArray(value.models)) {
         entries = value.models
-          .filter((m: any) => typeof m === 'string' && m.trim().length > 0)
-          .map((m: string) => ({ name: m, value: m }));
+          .map((m: any) => {
+            if (typeof m === 'string') {
+              const id = m.trim();
+              return id.length > 0 ? { name: id, value: id } : null;
+            }
+            const id = (m?.id ?? '').toString().trim();
+            if (id.length === 0) {
+              return null;
+            }
+            const label = (m?.name ?? '').toString().trim();
+            return { name: label.length > 0 ? label : id, value: id };
+          })
+          .filter((e: any): e is { name: string; value: string } => e !== null);
       }
       // De-duplicate by display label, preserving order.
       const seen = new Set<string>();

@@ -133,6 +133,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     // aggiorno llm_model con i modelli dell'integration
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'openrouter');
     
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
