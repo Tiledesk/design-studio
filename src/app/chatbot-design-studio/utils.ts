@@ -9,8 +9,13 @@ export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
  * created on or after this date -> V3, before -> legacy.
  * ISO string format, compared lexicographically against `createdAt` (also ISO).
  * Resolved once per chatbot in DashboardService.resolveDsVersion().
+ *
+ * Must stay in the FUTURE until release: a chatbot built with the legacy editor
+ * that falls after the cutoff would lose inline action editing, reordering and
+ * "+ Add action". Erring late is safe (the agent stays on the proven editor),
+ * erring early is not. Align this with the actual release date.
  */
-export const DATE_NEW_CHATBOT = '2026-09-01T00:00:00.000Z';
+export const DATE_NEW_CHATBOT = '2026-09-07T00:00:00.000Z';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 

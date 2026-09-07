@@ -143,9 +143,10 @@
             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
-                    class="header-action" 
+                <cds-action-description
+                    class="header-action"
                     cdkDragHandle
+                    [class.tds_draggable_deep]="isV3"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
@@ -543,7 +544,7 @@
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent && !hideBlockConnector"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"

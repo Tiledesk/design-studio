@@ -11,7 +11,7 @@ import { ControllerService } from '../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, ACTIONS_WITH_OWN_OUTPUTS } from 'src/app/chatbot-design-studio/utils-actions';
 import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -96,6 +96,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isUntitledBlock: boolean = false;
   /** true quando il chatbot va editato con il Design Studio V3 (una action per blocco, niente drag). */
   isV3: boolean = false;
+  /** V3: nasconde il pallino di uscita del blocco quando l'action contenuta ha gia' connettori propri. */
+  hideBlockConnector: boolean = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -577,6 +579,39 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** CUSTOM FUNCTIONS  */
 
   /** setActionIntent */
+  /**
+   * V3 — decide se nascondere il pallino di uscita del blocco.
+   * Il pallino e' l'uscita di riserva del blocco: serve solo alle action che non
+   * hanno connettori propri. Dove l'action espone gia' le sue uscite (Success/Else,
+   * bottoni, ecc.) il pallino e' ridondante e va nascosto.
+   *
+   * Due vincoli:
+   * - vale SOLO in V3: sui chatbot legacy il pallino resta sempre visibile;
+   * - non si nasconde mai un pallino GIA' COLLEGATO, altrimenti il collegamento
+   *   diventerebbe invisibile e non piu' rimovibile dall'utente.
+   */
+  private updateHideBlockConnector(fromId: string, toId: string): void {
+    if (!this.isV3) {
+      this.hideBlockConnector = false;
+      return;
+    }
+    const alreadyConnected = !!(fromId && toId);
+    this.hideBlockConnector = !alreadyConnected
+      && !!this.intent?.actions?.some(action => this.actionHasOwnOutputs(action));
+    this.logger.log('[CDS-INTENT] updateHideBlockConnector:', { alreadyConnected, hide: this.hideBlockConnector });
+  }
+
+  /**
+   * True se l'action espone connettori di uscita propri sul canvas.
+   * L'elenco e le esclusioni - fra cui la famiglia Reply, che conserva sempre il
+   * pallino del blocco - sono documentati in docs/V3/design-studio-v3-analysis.md
+   * (Parte 1-bis) e dichiarati in ACTIONS_WITH_OWN_OUTPUTS.
+   */
+  private actionHasOwnOutputs(action: any): boolean {
+    const type = action?._tdActionType;
+    return !!type && ACTIONS_WITH_OWN_OUTPUTS.includes(type);
+  }
+
   private setActionIntent(){
     try {
       let connectorID = '';
@@ -591,6 +626,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.logger.log('[CDS-INTENT] actionIntent :: ', this.actionIntent);
       this.isActionIntent = this.intent.actions.some(obj => obj._tdActionType === TYPE_ACTION.INTENT);
+      this.updateHideBlockConnector(fromId, toId);
       if(this.isActionIntent){
         this.actionIntent = null;
         if(fromId && toId && fromId !== '' && toId !== ''){

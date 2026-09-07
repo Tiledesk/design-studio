@@ -229,3 +229,50 @@ export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
     { name: 'all (AND)', value: 'all' },
     { name: 'any (OR)',  value: 'any' }
 ];
+
+/**
+ * Action che espongono SEMPRE almeno un connettore di uscita proprio sul canvas
+ * (true/false, goto, fallback/error, noInput/noMatch...), indipendentemente dal
+ * loro contenuto. In V3 il pallino del blocco su di esse e' ridondante.
+ *
+ * Elenco derivato dai rami di ConnectorService.createConnectorsOfIntent() e
+ * verificato sui template che montano <cds-connector>: vedi la tabella in
+ * docs/V3/design-studio-v3-analysis.md (Parte 1-bis).
+ *
+ * ESCLUSE di proposito:
+ * - la famiglia REPLY (reply, replyv2, randomreply): i bottoni sono ramificazioni
+ *   su scelta dell'utente e noInput/noMatch sono percorsi d'errore, ma il flusso
+ *   deve poter proseguire di default dopo la risposta. Mostrano quindi SEMPRE il
+ *   pallino del blocco, con o senza bottoni configurati.
+ * - le action voice (TYPE_ACTION_VXML): montano i connettori tramite elementi
+ *   condivisi ma non tutte hanno un ramo nel connector service.
+ *
+ * Nel dubbio si mostra il pallino: uno in piu' e' innocuo, uno in meno lascia il
+ * blocco senza via d'uscita.
+ */
+export const ACTIONS_WITH_OWN_OUTPUTS: Array<TYPE_ACTION> = [
+    TYPE_ACTION.INTENT,
+    TYPE_ACTION.CONNECT_BLOCK,
+    TYPE_ACTION.CAPTURE_USER_REPLY,
+    TYPE_ACTION.ONLINE_AGENTS,
+    TYPE_ACTION.ONLINE_AGENTSV2,
+    TYPE_ACTION.OPEN_HOURS,
+    TYPE_ACTION.JSON_CONDITION,
+    TYPE_ACTION.JSON_CONDITION2,
+    TYPE_ACTION.ASKGPT,
+    TYPE_ACTION.ASKGPTV2,
+    TYPE_ACTION.GPT_TASK,
+    TYPE_ACTION.GPT_ASSISTANT,
+    TYPE_ACTION.AI_PROMPT,
+    TYPE_ACTION.AI_CONDITION,
+    TYPE_ACTION.WEB_REQUESTV2,
+    TYPE_ACTION.DATA_TABLE,
+    TYPE_ACTION.SEND_WHATSAPP,
+    TYPE_ACTION.MAKE,
+    TYPE_ACTION.HUBSPOT,
+    TYPE_ACTION.CUSTOMERIO,
+    TYPE_ACTION.BREVO,
+    TYPE_ACTION.N8N,
+    TYPE_ACTION.QAPLA,
+    TYPE_ACTION.ITERATION,
+];
