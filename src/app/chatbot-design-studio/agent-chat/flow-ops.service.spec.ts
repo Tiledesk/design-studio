@@ -64,6 +64,8 @@ describe('FlowOpsService — intent operations', () => {
       updateIntent: recordingUndo('updateIntent', undoStack),
       deleteIntentNew: recordingUndo('deleteIntentNew', undoStack),
       createNewAction: jasmine.createSpy('createNewAction'),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
         .and.callFake(() => { undoStack.pop(); })
     };
@@ -103,6 +105,18 @@ describe('FlowOpsService — intent operations', () => {
     const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
     expect(savedIntent.intent_display_name).toBe('greeting');
     expect(savedIntent.attributes.position).toEqual({ x: 10, y: 20 });
+  });
+
+  it('registers drag on a newly created block, the way the studio\'s own creation paths do', async () => {
+    // Without this, a block the agent creates renders and saves correctly but
+    // cannot be dragged until the whole page is reloaded --
+    // setDragAndListnerEventToElements() on load is what re-registers drag
+    // for blocks that never got it. settingAndSaveNewIntent() in
+    // cds-canvas.component.ts and pasteIntentOntoStage() in IntentService
+    // both call setDragAndListnerEventToElement right after adding the
+    // intent; add_intent has to do the same.
+    await service.apply([{ op: 'add_intent', intent_display_name: 'greeting' }]);
+    expect(intentService.setDragAndListnerEventToElement).toHaveBeenCalledWith('new-id');
   });
 
   it('renames an intent through updateIntent', async () => {
@@ -249,6 +263,8 @@ describe('FlowOpsService — display names obey the studio\'s own rules', () => 
       updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
       deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
       createNewAction: jasmine.createSpy('createNewAction'),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
     };
 

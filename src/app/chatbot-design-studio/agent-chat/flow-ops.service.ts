@@ -251,7 +251,41 @@ export class FlowOpsService {
     }
     this.intentService.addNewIntentToListOfIntents(intent);
     await this.intentService.saveNewIntent(intent, intent, null);
+    this.registerDrag(intent.intent_id);
     return { op: op.op, ok: true, intent_id: intent.intent_id };
+  }
+
+  /** Register the studio's own drag handler on a newly created block, the way
+   *  both of its own creation paths do it: `settingAndSaveNewIntent` in
+   *  cds-canvas.component.ts and `pasteIntentOntoStage` in IntentService both
+   *  call `setDragAndListnerEventToElement` right after adding the intent to
+   *  the list. Without it the block sits on the canvas un-draggable until a
+   *  full page reload runs `setDragAndListnerEventToElements`, which
+   *  re-registers every block on the stage from scratch.
+   *
+   *  Deliberately not `setIntentSelected`: the studio's own paths select the
+   *  new block because a person just created exactly one and expects it
+   *  focused. An agent batch can create several in a row, and selecting each
+   *  in turn would yank the canvas around and change what a mid-batch
+   *  `get_canvas_selection` reports. Only the drag registration is needed
+   *  here.
+   *
+   *  Not awaited: `setDragAndListnerEventToElement` polls the DOM for the new
+   *  node for up to a second before giving up quietly. Awaiting it serially
+   *  would add up to a second per created block to a multi-block batch's
+   *  result, for a UI convenience the caller never sees. The studio's own
+   *  `settingAndSaveNewIntent` does not await it either. The call cannot
+   *  reject in practice -- the poll always resolves, even to "never
+   *  appeared" -- but it is wrapped the same way `drawConnector` below wraps
+   *  its own best-effort redraw, so a future change there cannot surface here
+   *  as an unhandled promise rejection. */
+  private registerDrag(intentId: string): void {
+    try {
+      Promise.resolve(this.intentService.setDragAndListnerEventToElement(intentId))
+        .catch(() => {});
+    } catch {
+      // Registration is best-effort; the block is already created and saved.
+    }
   }
 
   private async updateIntent(op: Extract<FlowOp, { op: 'update_intent' }>): Promise<FlowOpResult> {
