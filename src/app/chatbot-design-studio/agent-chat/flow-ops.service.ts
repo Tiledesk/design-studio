@@ -1,14 +1,24 @@
 import { Injectable } from '@angular/core';
 import { IntentService } from '../services/intent.service';
+import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION } from '../utils-actions';
+import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX } from '../utils';
 
 const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
   'add_action', 'update_action', 'delete_action', 'connect'
 ];
+
+/** The characters a block name may contain, copied from the studio's own
+ *  rename validator in `panel-intent-header.component.ts`. Anything the UI
+ *  refuses to type must also be refused here, or the agent becomes a way
+ *  around the invariant rather than another user of it. */
+const INTENT_NAME_REGEX = /^[ _0-9a-zA-Z]+$/;
+
+const RESERVED_NAMES: string[] = Object.values(RESERVED_INTENT_NAMES);
 
 /** Applies the agent's operations to the open flow.
  *
@@ -20,8 +30,16 @@ const KNOWN_OPS = [
 @Injectable({ providedIn: 'root' })
 export class FlowOpsService {
 
+  /** How many entries the last applied batch pushed onto the studio's undo
+   *  stack. `restoreLastUNDO()` pops exactly one, so undoing a batch of N
+   *  operations means popping N times -- otherwise a single Undo takes back
+   *  one operation and leaves the other N-1 applied, with the offer withdrawn
+   *  and no way back. */
+  private lastBatchUndoDepth = 0;
+
   constructor(
     private intentService: IntentService,
+    private connectorService: ConnectorService,
     private dashboardService: DashboardService
   ) {}
 
@@ -43,9 +61,18 @@ export class FlowOpsService {
 
     const validation = ops.map(op => this.validate(op));
     if (validation.some(r => !r.ok)) {
+      // Nothing was applied, so nothing from this batch is on the undo stack.
+      // Leaving a previous batch's depth in place would make the next Undo
+      // pop entries this batch never pushed.
+      this.lastBatchUndoDepth = 0;
       return { ok: false, rejected_before_applying: true, results: validation };
     }
 
+    // Measured rather than assumed: each of updateIntent / saveNewIntent /
+    // deleteIntentNew pushes exactly one entry today, but the honest count of
+    // "what this batch put on the stack" is the stack's own growth, which
+    // stays right if an operation ever pushes none or two.
+    const undoDepthBefore = this.undoStackDepth();
     const results: FlowOpResult[] = [];
     let ok = true;
     for (const op of ops) {
@@ -62,12 +89,26 @@ export class FlowOpsService {
         break;
       }
     }
+    this.lastBatchUndoDepth = Math.max(this.undoStackDepth() - undoDepthBefore, 0);
     return { ok, rejected_before_applying: false, results };
   }
 
-  /** Undo the most recent change, whoever made it. */
+  private undoStackDepth(): number {
+    const stack = this.intentService.arrayUNDO;
+    return Array.isArray(stack) ? stack.length : 0;
+  }
+
+  /** Take back the whole of the last applied batch.
+   *
+   *  Not "the most recent change": the panel offers one Undo for a batch of N
+   *  operations, and each of those pushed its own entry. Popping one would
+   *  leave N-1 applied while the button disappears, so the user is told the
+   *  flow was restored when most of it was not. */
   public undoLast(): void {
-    this.intentService.restoreLastUNDO();
+    for (let i = 0; i < this.lastBatchUndoDepth; i++) {
+      this.intentService.restoreLastUNDO();
+    }
+    this.lastBatchUndoDepth = 0;
   }
 
   private validate(op: FlowOp): FlowOpResult {
@@ -85,7 +126,9 @@ export class FlowOpsService {
 
     switch (op.op) {
       case 'add_intent':
-        return { op: op.op, ok: true };
+        return op.intent_display_name === undefined
+          ? { op: op.op, ok: true }
+          : (this.validateDisplayName(op, op.intent_display_name) ?? { op: op.op, ok: true });
       case 'update_intent':
       case 'delete_intent':
       case 'move':
@@ -100,10 +143,62 @@ export class FlowOpsService {
     }
   }
 
+  /** The studio's own rules for a block's display name, applied to whatever
+   *  the agent sends.
+   *
+   *  These are not cosmetic. `setDefaultIntentSelected` and `cds-header`'s
+   *  Test-it-out both find the start block by `intent_display_name.trim() ===
+   *  'start'`, so an agent tidying names could rename the start block and
+   *  break flow selection outright. The UI enforces all of this in
+   *  `panel-intent-header.component.ts`; the agent has to meet the same bar.
+   *
+   *  Returns null when the name is acceptable. */
+  private validateDisplayName(
+    op: FlowOp, name: string, ownIntentId?: string
+  ): FlowOpResult | null {
+    const fail = (error: string): FlowOpResult => ({ op: op.op, ok: false, error });
+    if (typeof name !== 'string' || name.trim().length === 0) {
+      return fail('intent_display_name cannot be empty.');
+    }
+    if (name === UNTITLED_BLOCK_PREFIX) {
+      return fail(`"${UNTITLED_BLOCK_PREFIX}" is the studio's placeholder prefix, not a name.`);
+    }
+    if (!INTENT_NAME_REGEX.test(name)) {
+      return fail(
+        `"${name}" is not a valid block name: only letters, digits, spaces and ` +
+        `underscores are allowed.`);
+    }
+    if (RESERVED_NAMES.indexOf(name.trim()) !== -1) {
+      return fail(
+        `"${name.trim()}" is a reserved block name. The studio creates those blocks ` +
+        `itself and finds them by name, so nothing else may take one.`);
+    }
+    if (ownIntentId) {
+      const current = this.intentService.getIntentFromId(ownIntentId);
+      const currentName = (current?.intent_display_name ?? '').trim();
+      if (RESERVED_NAMES.indexOf(currentName) !== -1) {
+        return fail(
+          `"${currentName}" is a reserved block and cannot be renamed: the studio ` +
+          `finds it by name, and Test it out stops working without it.`);
+      }
+    }
+    const clash = (this.intentService.listOfIntents || []).some((i: Intent) =>
+      i.intent_display_name === name && i.intent_id !== ownIntentId);
+    if (clash) {
+      return fail(`Another block is already called "${name}". Block names must be unique.`);
+    }
+    return null;
+  }
+
   /** Per-operation required fields, beyond the intent existing. */
   private validateShape(op: FlowOp): FlowOpResult {
     const fail = (error: string): FlowOpResult => ({ op: op.op, ok: false, error });
     switch (op.op) {
+      case 'update_intent':
+        return op.intent_display_name === undefined
+          ? { op: op.op, ok: true }
+          : (this.validateDisplayName(op, op.intent_display_name, op.intent_id)
+              ?? { op: op.op, ok: true });
       case 'move':
         return (op.position && typeof op.position.x === 'number' && typeof op.position.y === 'number')
           ? { op: op.op, ok: true }
@@ -243,13 +338,47 @@ export class FlowOpsService {
     // names another block by display name IS the edge, and the connector the
     // user sees is drawn from it.
     const action: any = this.intentService.createNewAction(TYPE_ACTION.CONNECT_BLOCK);
-    action.intentName = to.intent_display_name;
+    // The studio's contract for `intentName` is '#' + intent_id, never the
+    // display name. `IntentService.getListOfIntents()` offers exactly that as
+    // the value the UI assigns, and `ConnectorService` strips the '#' and looks
+    // the id up on every connector refresh -- blanking `intentName` outright
+    // when it does not resolve. A display name here therefore draws no
+    // connector and then silently erases itself, having reported success.
+    action.intentName = '#' + to.intent_id;
+    // An id is not readable, so the action would render unlabelled without
+    // this. The UI sets the same pair together in
+    // `cds-action-connect-block.component.ts`.
+    action._tdActionTitle = to.intent_display_name;
     from.actions = from.actions || [];
     from.actions.push(action);
     await this.intentService.updateIntent(from);
+    this.drawConnector(from.intent_id, action._tdActionId, to.intent_id);
     return {
       op: op.op, ok: true,
       intent_id: op.from_intent_id, action_id: action._tdActionId
     };
+  }
+
+  /** Make the new edge visible now, the way the UI does.
+   *
+   *  Operations apply immediately, and a correct `intentName` alone leaves the
+   *  user looking at an unchanged canvas until something rebuilds connectors.
+   *  `createNewConnector` is the same call the UI makes from
+   *  `cds-panel-action-detail`'s `onConnectorChange`, and it is safe to make
+   *  before Angular has rendered the new action: it polls the stage for both
+   *  elements for up to a second and gives up quietly if either never appears
+   *  -- which is also what happens when the canvas is not on screen at all.
+   *
+   *  Not awaited, and never allowed to fail the operation: the flow is already
+   *  correct and saved by this point, and a repaint is not something the
+   *  agent's tool result should wait on or be refused over. */
+  private drawConnector(fromIntentId: string, actionId: string, toIntentId: string): void {
+    try {
+      const result: any = this.connectorService
+        .createNewConnector(`${fromIntentId}/${actionId}`, toIntentId);
+      Promise.resolve(result).catch(() => {});
+    } catch {
+      // Drawing is best-effort; the model is already right either way.
+    }
   }
 }

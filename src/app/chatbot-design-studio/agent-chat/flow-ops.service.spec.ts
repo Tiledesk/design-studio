@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
+import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 function anIntent(intentId: string, name: string): Intent {
   const intent = new Intent();
@@ -13,14 +15,38 @@ function anIntent(intentId: string, name: string): Intent {
   return intent;
 }
 
+/** A stand-in for ConnectorService that records what it was asked to draw. */
+function aConnectorService(): any {
+  return {
+    createNewConnector: jasmine.createSpy('createNewConnector')
+      .and.returnValue(Promise.resolve())
+  };
+}
+
+/** The real IntentService pushes exactly one entry onto `arrayUNDO` per
+ *  persistence call -- see updateIntent, saveNewIntent and deleteIntentNew. A
+ *  fake that skips that bookkeeping cannot tell a per-batch undo from a
+ *  per-operation one, so these spies keep it. */
+function recordingUndo(name: string, stack: any[]): jasmine.Spy {
+  return jasmine.createSpy(name).and.callFake(() => {
+    stack.push({ undo: [], redo: [] });
+    return Promise.resolve(true);
+  });
+}
+
 describe('FlowOpsService — intent operations', () => {
   let service: FlowOpsService;
   let intentService: any;
   let dashboardService: any;
+  let undoStack: any[];
 
   beforeEach(() => {
+    undoStack = [];
     intentService = {
-      listOfIntents: [anIntent('i1', 'start'), anIntent('i2', 'welcome')],
+      listOfIntents: [
+        anIntent('i1', 'start'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
+      ],
+      arrayUNDO: undoStack,
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
       },
@@ -34,11 +60,12 @@ describe('FlowOpsService — intent operations', () => {
           return intent;
         }),
       addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
-      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
-      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
-      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      saveNewIntent: recordingUndo('saveNewIntent', undoStack),
+      updateIntent: recordingUndo('updateIntent', undoStack),
+      deleteIntentNew: recordingUndo('deleteIntentNew', undoStack),
       createNewAction: jasmine.createSpy('createNewAction'),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+        .and.callFake(() => { undoStack.pop(); })
     };
     dashboardService = { id_faq_kb: 'kb1' };
 
@@ -46,6 +73,7 @@ describe('FlowOpsService — intent operations', () => {
       providers: [
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
         { provide: DashboardService, useValue: dashboardService }
       ]
     });
@@ -55,7 +83,7 @@ describe('FlowOpsService — intent operations', () => {
   it('reads the flow as the list of intents', () => {
     const snapshot = service.readFlow();
     expect(snapshot.id_faq_kb).toBe('kb1');
-    expect(snapshot.intents.length).toBe(2);
+    expect(snapshot.intents.length).toBe(3);
   });
 
   it('adds an intent and reports its id', async () => {
@@ -103,7 +131,7 @@ describe('FlowOpsService — intent operations', () => {
 
   it('refuses an unknown intent_id and applies nothing', async () => {
     const report = await service.apply([
-      { op: 'update_intent', intent_id: 'i1', intent_display_name: 'ok' },
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'ok' },
       { op: 'update_intent', intent_id: 'nope', intent_display_name: 'bad' }
     ]);
     expect(report.ok).toBe(false);
@@ -134,18 +162,64 @@ describe('FlowOpsService — intent operations', () => {
     expect(report.ok).toBe(false);
   });
 
-  it('delegates undo to the studio\'s own undo stack', () => {
+  it('undoes every operation of the applied batch, not just the last one', async () => {
+    // The panel offers one Undo for the whole batch. Popping a single entry
+    // would leave two of these three applied while the button disappears --
+    // the studio's own restoreLastUNDO pops exactly one per call.
+    const report = await service.apply([
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'a' },
+      { op: 'update_intent', intent_id: 'i3', intent_display_name: 'b' },
+      { op: 'move', intent_id: 'i1', position: { x: 1, y: 2 } }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(undoStack.length).toBe(3);
+
     service.undoLast();
-    expect(intentService.restoreLastUNDO).toHaveBeenCalled();
+    expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(3);
+    expect(undoStack.length).toBe(0);
+  });
+
+  it('undoes only what the last batch applied, never a previous batch too', async () => {
+    await service.apply([{ op: 'update_intent', intent_id: 'i2', intent_display_name: 'first' }]);
+    await service.apply([
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'second' },
+      { op: 'update_intent', intent_id: 'i3', intent_display_name: 'third' }
+    ]);
+    service.undoLast();
+    expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(2);
+    // The earlier batch's entry must survive: the user only asked to take
+    // back the change they were just told about.
+    expect(undoStack.length).toBe(1);
+  });
+
+  it('undoes nothing for a batch that was refused before it applied', async () => {
+    await service.apply([{ op: 'update_intent', intent_id: 'i2', intent_display_name: 'ok' }]);
+    await service.apply([{ op: 'move', intent_id: 'nope', position: { x: 0, y: 0 } }]);
+    service.undoLast();
+    expect(intentService.restoreLastUNDO).not.toHaveBeenCalled();
+  });
+
+  it('undoes only what actually applied when a batch failed midway', async () => {
+    intentService.updateIntent.and.callFake((intent: Intent) => {
+      if (intent.intent_id === 'i3') { return Promise.reject(new Error('network down')); }
+      undoStack.push({ undo: [], redo: [] });
+      return Promise.resolve(true);
+    });
+    await service.apply([
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'a' },
+      { op: 'update_intent', intent_id: 'i3', intent_display_name: 'b' }
+    ]);
+    service.undoLast();
+    expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(1);
   });
 
   it('reports honestly when application fails midway', async () => {
     intentService.updateIntent.and.callFake((intent: Intent) =>
-      intent.intent_id === 'i2' ? Promise.reject(new Error('network down'))
+      intent.intent_id === 'i3' ? Promise.reject(new Error('network down'))
                                 : Promise.resolve(true));
     const report = await service.apply([
-      { op: 'update_intent', intent_id: 'i1', intent_display_name: 'a' },
-      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'b' }
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'a' },
+      { op: 'update_intent', intent_id: 'i3', intent_display_name: 'b' }
     ]);
     expect(report.ok).toBe(false);
     expect(report.rejected_before_applying).toBe(false);
@@ -155,9 +229,111 @@ describe('FlowOpsService — intent operations', () => {
   });
 });
 
+describe('FlowOpsService — display names obey the studio\'s own rules', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [
+        anIntent('i1', 'start'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
+      ],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake(() => anIntent('new-id', 'Untitled Block 1')),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction'),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  /** Every one of these is refused by the UI's own rename validator in
+   *  panel-intent-header.component.ts. */
+  const badRenames: Array<{ why: string, name: string, expect: string }> = [
+    { why: 'an empty name', name: '   ', expect: 'empty' },
+    { why: 'punctuation the studio forbids', name: 'say-hello!', expect: 'valid block name' },
+    { why: 'a name another block already has', name: 'checkout', expect: 'already called' },
+    { why: 'a reserved name', name: 'defaultFallback', expect: 'reserved' }
+  ];
+  badRenames.forEach(({ why, name, expect: fragment }) => {
+    it(`refuses a rename to ${why}, before anything is applied`, async () => {
+      const report = await service.apply([
+        { op: 'update_intent', intent_id: 'i2', intent_display_name: name }
+      ]);
+      expect(report.ok).toBe(false);
+      expect(report.rejected_before_applying).toBe(true);
+      expect(report.results[0].error).toContain(fragment);
+      expect(intentService.updateIntent).not.toHaveBeenCalled();
+      expect(intentService.getIntentFromId('i2').intent_display_name).toBe('welcome');
+    });
+  });
+
+  it('refuses to rename the start block, which the studio finds by name', async () => {
+    // setDefaultIntentSelected and cds-header's Test it out both locate the
+    // start block with intent_display_name.trim() === 'start'. An agent
+    // tidying up names could otherwise break flow selection outright.
+    const report = await service.apply([
+      { op: 'update_intent', intent_id: 'i1', intent_display_name: 'entry point' }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain('reserved');
+    expect(intentService.getIntentFromId('i1').intent_display_name).toBe('start');
+  });
+
+  it('applies a rename that meets every rule', async () => {
+    const report = await service.apply([
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'say hello 2' }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(intentService.getIntentFromId('i2').intent_display_name).toBe('say hello 2');
+  });
+
+  it('lets a block keep its own name', async () => {
+    // Uniqueness is checked against the other blocks, exactly as the UI does
+    // -- a no-op rename is not a clash with itself.
+    const report = await service.apply([
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'welcome', question: 'hi' }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('holds add_intent to the same rules as a rename', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'start' }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('reserved');
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+  });
+
+  it('still lets add_intent leave the name to the studio', async () => {
+    const report = await service.apply([{ op: 'add_intent' }]);
+    expect(report.ok).toBe(true);
+  });
+});
+
 describe('FlowOpsService — action operations', () => {
   let service: FlowOpsService;
   let intentService: any;
+  let connectorService: any;
 
   beforeEach(() => {
     const withAction = anIntent('i1', 'start');
@@ -179,12 +355,14 @@ describe('FlowOpsService — action operations', () => {
       deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
     };
+    connectorService = aConnectorService();
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       providers: [
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
         { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
       ]
     });
@@ -247,7 +425,7 @@ describe('FlowOpsService — action operations', () => {
     expect(intentService.getIntentFromId('i1').actions.length).toBe(0);
   });
 
-  it('connects two intents by naming the target on a connect_block action', async () => {
+  it('connects two intents by pointing a connect_block action at the target id', async () => {
     const report = await service.apply([
       { op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }
     ]);
@@ -255,6 +433,126 @@ describe('FlowOpsService — action operations', () => {
     expect(intentService.createNewAction).toHaveBeenCalledWith('connect_block');
     const actions: any[] = intentService.getIntentFromId('i1').actions;
     const connector = actions[actions.length - 1];
-    expect(connector.intentName).toBe('welcome');
+
+    // The studio's contract, from IntentService.getListOfIntents(): the value
+    // the UI assigns to intentName is '#' + intent_id. A display name here
+    // draws nothing and is blanked on the next connector refresh.
+    expect(connector.intentName).toBe('#i2');
+    // And the id has to be readable to a human somewhere, or the action
+    // renders unlabelled.
+    expect(connector._tdActionTitle).toBe('welcome');
+  });
+
+  it('writes an intentName that resolves back to the target intent', async () => {
+    // The point of this assertion is the round trip, not the write. A test
+    // that only checked the string written is what let a display name -- which
+    // resolves to nothing -- sit here reported as a success.
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    const actions: any[] = intentService.getIntentFromId('i1').actions;
+    const connector = actions[actions.length - 1];
+
+    // Exactly what ConnectorService does on every refresh.
+    const resolvedId = connector.intentName.replace('#', '');
+    const resolved = intentService.getIntentFromId(resolvedId);
+    expect(resolved).toBeTruthy();
+    expect(resolved.intent_id).toBe('i2');
+  });
+
+  it('draws the connector immediately, through the studio\'s own path', async () => {
+    // Operations apply immediately (design decision 4). A correct intentName
+    // alone leaves the user staring at an unchanged canvas until something
+    // rebuilds connectors -- so FlowOps makes the same call the UI makes from
+    // cds-panel-action-detail's onConnectorChange.
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    const actions: any[] = intentService.getIntentFromId('i1').actions;
+    const connector = actions[actions.length - 1];
+
+    expect(connectorService.createNewConnector)
+      .toHaveBeenCalledWith(`i1/${connector._tdActionId}`, 'i2');
+  });
+});
+
+describe('FlowOpsService — what connect writes, read back by the studio itself', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+
+  beforeEach(() => {
+    // The real ConnectorService logs through the app-wide logger singleton,
+    // which nothing has set up in a spec run.
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+
+    intentService = {
+      listOfIntents: [anIntent('i1', 'start'), anIntent('i2', 'welcome')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
+        ({ _tdActionId: 'act-1', _tdActionType: type })),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  async function connectAndTakeTheAction(): Promise<any> {
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    const from = intentService.getIntentFromId('i1');
+    return from.actions[from.actions.length - 1];
+  }
+
+  it('survives ConnectorService\'s real connector refresh, and draws an edge', async () => {
+    // The whole feature has been asserted against hand-written fakes, and a
+    // fake cannot notice that the studio reads intentName back differently
+    // from how FlowOps wrote it. This runs the produced intent through the
+    // real ConnectorService: its own id resolution, its own intentExists
+    // check, and its own erasure of an intentName that resolves to nothing.
+    const action = await connectAndTakeTheAction();
+    const from = intentService.getIntentFromId('i1');
+
+    const connectors = new ConnectorService();
+    connectors.listOfIntents = intentService.listOfIntents;
+    // Only the drawing is stubbed out -- it wants a rendered canvas and a
+    // jsPlumb-style stage. Everything under test here (the '#' strip, the
+    // intentExists lookup, the blanking) is the real code above it.
+    const drawn: Array<{ fromId: string, toId: string }> = [];
+    (connectors as any).createConnector = (_intent: any, fromId: string, toId: string) => {
+      drawn.push({ fromId, toId });
+    };
+
+    await connectors.createConnectorsOfIntent(from);
+
+    // A display name would not resolve, so the refresh would blank it here
+    // and the user's connection would vanish with nothing said.
+    expect(action.intentName).toBe('#i2');
+    expect(drawn).toEqual([{ fromId: 'i1/act-1', toId: 'i2' }]);
+  });
+
+  it('writes one of the values IntentService itself offers for a connect_block', async () => {
+    const action = await connectAndTakeTheAction();
+    // getListOfIntents() is where the UI's dropdown gets the value it assigns
+    // to intentName -- the definition of the contract, called for real.
+    const offered = IntentService.prototype.getListOfIntents
+      .call({ listOfIntents: intentService.listOfIntents });
+    expect(offered.map((o: any) => o.value)).toContain(action.intentName);
+    // And the label the agent set is the name offered beside that value.
+    expect(offered.find((o: any) => o.value === action.intentName).name)
+      .toBe(action._tdActionTitle);
   });
 });
