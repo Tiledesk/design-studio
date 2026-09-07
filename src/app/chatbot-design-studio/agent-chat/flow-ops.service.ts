@@ -125,10 +125,12 @@ export class FlowOpsService {
         : { op: op.op, ok: false, error: `No intent with intent_id "${id}" is on the canvas.` };
 
     switch (op.op) {
-      case 'add_intent':
-        return op.intent_display_name === undefined
-          ? { op: op.op, ok: true }
-          : (this.validateDisplayName(op, op.intent_display_name) ?? { op: op.op, ok: true });
+      case 'add_intent': {
+        const nameError = op.intent_display_name === undefined
+          ? null
+          : this.validateDisplayName(op, op.intent_display_name);
+        return nameError ?? this.validateAddIntentActions(op) ?? { op: op.op, ok: true };
+      }
       case 'update_intent':
       case 'delete_intent':
       case 'move':
@@ -186,6 +188,39 @@ export class FlowOpsService {
       i.intent_display_name === name && i.intent_id !== ownIntentId);
     if (clash) {
       return fail(`Another block is already called "${name}". Block names must be unique.`);
+    }
+    return null;
+  }
+
+  /** `add_intent`'s optional `actions` get the same buildability check
+   *  `add_action` gets -- and one more that `add_action` does not need.
+   *  `add_action` fails safely at apply time: `createNewAction` returning
+   *  `undefined` is caught before anything is pushed onto an already-real
+   *  intent, so a bad type there costs nothing but the one operation.
+   *  `add_intent` has no such luxury: creating the block and populating it
+   *  are the same operation, so an unbuildable type discovered mid-`addIntent`
+   *  would leave a block already saved with only the actions built before it.
+   *  That is exactly the half-populated result this feature exists to
+   *  prevent, so every action's type is proven buildable here, before
+   *  `addIntent` creates anything. `createNewAction` only constructs a plain
+   *  object -- no DOM, no network, no list mutation -- so calling it here to
+   *  check and then discarding the result is safe. Returns null when every
+   *  action (or no `actions` at all) is fine. */
+  private validateAddIntentActions(op: Extract<FlowOp, { op: 'add_intent' }>): FlowOpResult | null {
+    if (op.actions === undefined) { return null; }
+    if (!Array.isArray(op.actions)) {
+      return { op: op.op, ok: false, error: 'add_intent actions must be an array.' };
+    }
+    for (const action of op.actions) {
+      if (!action || typeof action.type !== 'string' || !action.type) {
+        return { op: op.op, ok: false, error: 'Every action in add_intent.actions needs a type.' };
+      }
+      if (!this.intentService.createNewAction(action.type as any)) {
+        return {
+          op: op.op, ok: false,
+          error: `"${action.type}" is not an action type this design studio can create.`
+        };
+      }
     }
     return null;
   }
@@ -248,6 +283,16 @@ export class FlowOpsService {
     intent.actions = [];
     if (op.intent_display_name) {
       intent.intent_display_name = op.intent_display_name;
+    }
+    // Built the same way addAction builds one -- createNewAction plus
+    // assignFields -- and pushed onto the clean list above, in the order the
+    // caller gave. validate() already proved every type here is buildable,
+    // so this cannot leave the block half-populated; it either arrives here
+    // fully specified or the whole batch was refused before addIntent ran.
+    for (const actionSpec of op.actions ?? []) {
+      const action = this.intentService.createNewAction(actionSpec.type as any);
+      this.assignFields(action, actionSpec.fields);
+      intent.actions.push(action);
     }
     this.intentService.addNewIntentToListOfIntents(intent);
     await this.intentService.saveNewIntent(intent, intent, null);

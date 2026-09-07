@@ -488,6 +488,145 @@ describe('FlowOpsService — action operations', () => {
   });
 });
 
+describe('FlowOpsService — add_intent with inline actions', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+  let actionIdCounter: number;
+
+  beforeEach(() => {
+    actionIdCounter = 0;
+    intentService = {
+      listOfIntents: [anIntent('i1', 'start')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      // Mirrors the real createNewAction: pure, no side effects, undefined
+      // for a type the studio cannot build.
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => {
+        if (type === 'nonsense') { return undefined; }
+        return { _tdActionId: `act-${type}-${actionIdCounter++}`, _tdActionType: type };
+      }),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('creates the block with both actions, in order, built via createNewAction, with fields applied', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Chiedi Email',
+      position: { x: 350, y: 200 },
+      actions: [
+        { type: 'reply', fields: { text: 'Qual è la tua email?' } },
+        { type: 'capture_user_reply', fields: { assignResultTo: 'user_email' } }
+      ]
+    }]);
+
+    expect(report.ok).toBe(true);
+    expect(report.results[0].intent_id).toBe('new-id');
+
+    // Both actions must be built through createNewAction -- never assembled
+    // from the raw op JSON. validate() calls it once per action too, to prove
+    // buildability before anything is created, so both types appear among the
+    // calls rather than at a fixed index; the order actually applied is
+    // asserted below, on the saved intent's own action array.
+    expect(intentService.createNewAction).toHaveBeenCalledWith('reply');
+    expect(intentService.createNewAction).toHaveBeenCalledWith('capture_user_reply');
+
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    expect(savedIntent.actions.length).toBe(2);
+    expect(savedIntent.actions[0]._tdActionType).toBe('reply');
+    expect(savedIntent.actions[0].text).toBe('Qual è la tua email?');
+    expect(savedIntent.actions[1]._tdActionType).toBe('capture_user_reply');
+    expect(savedIntent.actions[1].assignResultTo).toBe('user_email');
+  });
+
+  it('behaves exactly as before when actions is omitted', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'greeting', position: { x: 1, y: 2 } }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(intentService.createNewAction).not.toHaveBeenCalled();
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    expect(savedIntent.actions).toEqual([]);
+  });
+
+  it('refuses the whole batch when an action has an unbuildable type, before anything is created', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Chiedi Email',
+      actions: [
+        { type: 'reply', fields: { text: 'hi' } },
+        { type: 'nonsense' }
+      ]
+    }]);
+
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('nonsense');
+
+    // Nothing was created: not the intent, not either action.
+    expect(intentService.createNewIntent).not.toHaveBeenCalled();
+    expect(intentService.addNewIntentToListOfIntents).not.toHaveBeenCalled();
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+    expect(intentService.listOfIntents.length).toBe(1);
+    expect(intentService.listOfIntents.some((i: Intent) => i.intent_display_name === 'Chiedi Email'))
+      .toBe(false);
+  });
+
+  it('refuses a batch whose action has no type, before anything is created', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      actions: [{ fields: { text: 'hi' } } as any]
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(intentService.createNewIntent).not.toHaveBeenCalled();
+  });
+
+  it('ignores a forged _tdActionId or _tdActionType in an action\'s fields', async () => {
+    await service.apply([{
+      op: 'add_intent',
+      actions: [{
+        type: 'reply',
+        fields: { _tdActionId: 'forged', _tdActionType: 'agent', text: 'hi' }
+      }]
+    }]);
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    // The id and type on the saved action must be the ones createNewAction
+    // itself produced -- validate() calls it once to prove buildability and
+    // addIntent calls it again to build for real, so the exact counter value
+    // is an artifact of the double call, not something to pin down here.
+    expect(savedIntent.actions[0]._tdActionId).not.toBe('forged');
+    expect(savedIntent.actions[0]._tdActionId).toMatch(/^act-reply-\d+$/);
+    expect(savedIntent.actions[0]._tdActionType).toBe('reply');
+    expect(savedIntent.actions[0].text).toBe('hi');
+  });
+});
+
 describe('FlowOpsService — what connect writes, read back by the studio itself', () => {
   let service: FlowOpsService;
   let intentService: any;

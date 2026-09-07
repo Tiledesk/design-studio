@@ -5,7 +5,15 @@
  *  not something a person can review. Every operation names what it acts on by
  *  `intent_id` -- the uuid, not the Mongo `id`. */
 export type FlowOp =
-  | { op: 'add_intent'; intent_display_name?: string; position?: FlowPosition }
+  | {
+      op: 'add_intent'; intent_display_name?: string; position?: FlowPosition;
+      /** Optional actions to populate the new block with, in the same call
+       *  that creates it. Built the same way `add_action` builds one --
+       *  `IntentService.createNewAction(type)` plus `fields` -- so the agent
+       *  never has to read back the new `intent_id` and send a second
+       *  `apply_flow_patch` just to fill a block it just created. */
+      actions?: Array<{ type: string; fields?: Record<string, any> }>;
+    }
   | { op: 'update_intent'; intent_id: string; intent_display_name?: string; question?: string }
   | { op: 'delete_intent'; intent_id: string }
   | { op: 'move'; intent_id: string; position: FlowPosition }
