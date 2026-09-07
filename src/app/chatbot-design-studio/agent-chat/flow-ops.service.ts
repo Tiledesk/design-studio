@@ -658,31 +658,45 @@ export class FlowOpsService {
     return { op: op.op, ok: true, intent_id: op.intent_id, action_id: op.action_id };
   }
 
+  /** Link two blocks the way the studio's own canvas does: through the source
+   *  block's connector dot, not a visible row in its `actions` list.
+   *
+   *  `attributes.nextBlockAction` -- an action of type `TYPE_ACTION.INTENT`
+   *  -- IS the dot: this is `onChangeNextIntentSelect` in
+   *  `cds-panel-intent-detail.component.ts`, done the same way it is done
+   *  there -- ensure the action exists, point its `intentName` at the
+   *  target, save, then draw the edge. A block has exactly one dot, so
+   *  connecting an already-connected block retargets that one action rather
+   *  than adding a second.
+   *
+   *  This deliberately never touches `from.actions`. A block whose `actions`
+   *  carries its own `TYPE_ACTION.INTENT` entry has its dot suppressed
+   *  outright -- see `isActionIntent` in `cds-intent.component.ts` -- so the
+   *  two mechanisms are mutually exclusive by design; producing both here
+   *  would silently defeat the one this operation is meant to set. */
   private async connect(op: Extract<FlowOp, { op: 'connect' }>): Promise<FlowOpResult> {
     const from = this.intentService.getIntentFromId(op.from_intent_id);
     const to = this.intentService.getIntentFromId(op.to_intent_id);
-    // An edge is not its own object here: an action of type connect_block that
-    // names another block by display name IS the edge, and the connector the
-    // user sees is drawn from it.
-    const action: any = this.intentService.createNewAction(TYPE_ACTION.CONNECT_BLOCK);
+    from.attributes = from.attributes || ({} as any);
+    if (!from.attributes.nextBlockAction) {
+      from.attributes.nextBlockAction = this.intentService.createNewAction(TYPE_ACTION.INTENT);
+    }
+    const nextBlockAction: any = from.attributes.nextBlockAction;
     // The studio's contract for `intentName` is '#' + intent_id, never the
-    // display name. `IntentService.getListOfIntents()` offers exactly that as
-    // the value the UI assigns, and `ConnectorService` strips the '#' and looks
-    // the id up on every connector refresh -- blanking `intentName` outright
-    // when it does not resolve. A display name here therefore draws no
-    // connector and then silently erases itself, having reported success.
-    action.intentName = '#' + to.intent_id;
-    // An id is not readable, so the action would render unlabelled without
-    // this. The UI sets the same pair together in
-    // `cds-action-connect-block.component.ts`.
-    action._tdActionTitle = to.intent_display_name;
-    from.actions = from.actions || [];
-    from.actions.push(action);
+    // display name. `ConnectorService` strips the '#' and looks the id up on
+    // every connector refresh -- blanking `intentName` outright when it does
+    // not resolve. A display name here therefore draws no connector and then
+    // silently erases itself, having reported success.
+    //
+    // Unlike the old connect_block action, the dot is never labelled from
+    // `_tdActionTitle` -- `onChangeNextIntentSelect` never sets it either,
+    // so there is nothing equivalent to set here.
+    nextBlockAction.intentName = '#' + to.intent_id;
     await this.intentService.updateIntent(from);
-    this.drawConnector(from.intent_id, action._tdActionId, to.intent_id);
+    this.drawConnector(from.intent_id, nextBlockAction._tdActionId, to.intent_id);
     return {
       op: op.op, ok: true,
-      intent_id: op.from_intent_id, action_id: action._tdActionId
+      intent_id: op.from_intent_id, action_id: nextBlockAction._tdActionId
     };
   }
 
@@ -690,11 +704,15 @@ export class FlowOpsService {
    *
    *  Operations apply immediately, and a correct `intentName` alone leaves the
    *  user looking at an unchanged canvas until something rebuilds connectors.
-   *  `createNewConnector` is the same call the UI makes from
-   *  `cds-panel-action-detail`'s `onConnectorChange`, and it is safe to make
-   *  before Angular has rendered the new action: it polls the stage for both
-   *  elements for up to a second and gives up quietly if either never appears
-   *  -- which is also what happens when the canvas is not on screen at all.
+   *  `createConnectorFromId(fromId, toId, true)` is the exact call
+   *  `onChangeNextIntentSelect` makes in `cds-panel-intent-detail.component.ts`
+   *  once it has set the dot's `intentName`, and it is safe to make before
+   *  Angular has rendered the new action: like `createNewConnector` before it,
+   *  it polls the stage for both elements for up to a second and gives up
+   *  quietly if either never appears -- which is also what happens when the
+   *  canvas is not on screen at all. It additionally no-ops when a connector
+   *  with this exact id is already on the stage, rather than drawing a
+   *  duplicate.
    *
    *  Not awaited, and never allowed to fail the operation: the flow is already
    *  correct and saved by this point, and a repaint is not something the
@@ -702,7 +720,7 @@ export class FlowOpsService {
   private drawConnector(fromIntentId: string, actionId: string, toIntentId: string): void {
     try {
       const result: any = this.connectorService
-        .createNewConnector(`${fromIntentId}/${actionId}`, toIntentId);
+        .createConnectorFromId(`${fromIntentId}/${actionId}`, toIntentId, true);
       Promise.resolve(result).catch(() => {});
     } catch {
       // Drawing is best-effort; the model is already right either way.

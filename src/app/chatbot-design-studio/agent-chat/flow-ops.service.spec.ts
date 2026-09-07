@@ -19,7 +19,9 @@ function anIntent(intentId: string, name: string): Intent {
 function aConnectorService(): any {
   return {
     createNewConnector: jasmine.createSpy('createNewConnector')
-      .and.returnValue(Promise.resolve())
+      .and.returnValue(Promise.resolve()),
+    createConnectorFromId: jasmine.createSpy('createConnectorFromId')
+      .and.returnValue(Promise.resolve(true))
   };
 }
 
@@ -441,22 +443,53 @@ describe('FlowOpsService — action operations', () => {
     expect(intentService.getIntentFromId('i1').actions.length).toBe(0);
   });
 
-  it('connects two intents by pointing a connect_block action at the target id', async () => {
+  it('connects two intents by pointing the source block\'s connector dot at the target id', async () => {
     const report = await service.apply([
       { op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }
     ]);
     expect(report.ok).toBe(true);
-    expect(intentService.createNewAction).toHaveBeenCalledWith('connect_block');
-    const actions: any[] = intentService.getIntentFromId('i1').actions;
-    const connector = actions[actions.length - 1];
+    const from = intentService.getIntentFromId('i1');
+    const connector = from.attributes.nextBlockAction;
 
     // The studio's contract, from IntentService.getListOfIntents(): the value
     // the UI assigns to intentName is '#' + intent_id. A display name here
     // draws nothing and is blanked on the next connector refresh.
     expect(connector.intentName).toBe('#i2');
-    // And the id has to be readable to a human somewhere, or the action
-    // renders unlabelled.
-    expect(connector._tdActionTitle).toBe('welcome');
+  });
+
+  it('does not append a connect_block, or any intent-type action, to the source block\'s actions', async () => {
+    // The dot and an action-list entry are mutually exclusive by design --
+    // isActionIntent in cds-intent.component.ts suppresses the dot outright
+    // when actions carries a TYPE_ACTION.INTENT entry. connect must never
+    // write to actions at all.
+    const before = intentService.getIntentFromId('i1').actions.length;
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    const actions: any[] = intentService.getIntentFromId('i1').actions;
+    expect(actions.length).toBe(before);
+    expect(actions.some((a: any) => a._tdActionType === 'connect_block')).toBe(false);
+    expect(actions.some((a: any) => a._tdActionType === 'intent')).toBe(false);
+  });
+
+  it('creates the dot\'s action when the block has none yet', async () => {
+    const from = intentService.getIntentFromId('i1');
+    from.attributes = {};
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(intentService.createNewAction).toHaveBeenCalledWith('intent');
+    expect(from.attributes.nextBlockAction.intentName).toBe('#i2');
+  });
+
+  it('retargets an already-connected block instead of accumulating a second dot', async () => {
+    const from = intentService.getIntentFromId('i1');
+    // Points somewhere unresolvable to start with, so the assertion below
+    // proves the value actually changed rather than merely surviving.
+    from.attributes = { nextBlockAction: { _tdActionId: 'existing-dot', _tdActionType: 'intent', intentName: '#bogus' } };
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(report.ok).toBe(true);
+    // createNewAction must not be called again -- the existing dot is reused.
+    expect(intentService.createNewAction).not.toHaveBeenCalled();
+    // Still exactly one dot, retargeted rather than accumulated.
+    expect(from.attributes.nextBlockAction._tdActionId).toBe('existing-dot');
+    expect(from.attributes.nextBlockAction.intentName).toBe('#i2');
   });
 
   it('writes an intentName that resolves back to the target intent', async () => {
@@ -464,8 +497,7 @@ describe('FlowOpsService — action operations', () => {
     // that only checked the string written is what let a display name -- which
     // resolves to nothing -- sit here reported as a success.
     await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
-    const actions: any[] = intentService.getIntentFromId('i1').actions;
-    const connector = actions[actions.length - 1];
+    const connector = intentService.getIntentFromId('i1').attributes.nextBlockAction;
 
     // Exactly what ConnectorService does on every refresh.
     const resolvedId = connector.intentName.replace('#', '');
@@ -478,13 +510,12 @@ describe('FlowOpsService — action operations', () => {
     // Operations apply immediately (design decision 4). A correct intentName
     // alone leaves the user staring at an unchanged canvas until something
     // rebuilds connectors -- so FlowOps makes the same call the UI makes from
-    // cds-panel-action-detail's onConnectorChange.
+    // cds-panel-intent-detail's onChangeNextIntentSelect.
     await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
-    const actions: any[] = intentService.getIntentFromId('i1').actions;
-    const connector = actions[actions.length - 1];
+    const connector = intentService.getIntentFromId('i1').attributes.nextBlockAction;
 
-    expect(connectorService.createNewConnector)
-      .toHaveBeenCalledWith(`i1/${connector._tdActionId}`, 'i2');
+    expect(connectorService.createConnectorFromId)
+      .toHaveBeenCalledWith(`i1/${connector._tdActionId}`, 'i2', true);
   });
 });
 
@@ -653,6 +684,12 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
       deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
     };
+    // A real Intent (anIntent -> new Intent()) is born with its own
+    // nextBlockAction already scaffolded -- clearing it here means connect()
+    // has to build one through createNewAction, the same as it would for any
+    // block that genuinely has no dot yet, so the fixed 'act-1' id below is
+    // deterministic rather than whatever uuid IntentAttributes happened to mint.
+    intentService.listOfIntents[0].attributes.nextBlockAction = undefined;
 
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -666,10 +703,10 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
     service = TestBed.inject(FlowOpsService);
   });
 
-  async function connectAndTakeTheAction(): Promise<any> {
+  async function connectAndTakeTheDot(): Promise<any> {
     await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
     const from = intentService.getIntentFromId('i1');
-    return from.actions[from.actions.length - 1];
+    return from.attributes.nextBlockAction;
   }
 
   it('survives ConnectorService\'s real connector refresh, and draws an edge', async () => {
@@ -678,7 +715,7 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
     // from how FlowOps wrote it. This runs the produced intent through the
     // real ConnectorService: its own id resolution, its own intentExists
     // check, and its own erasure of an intentName that resolves to nothing.
-    const action = await connectAndTakeTheAction();
+    const dot = await connectAndTakeTheDot();
     const from = intentService.getIntentFromId('i1');
 
     const connectors = new ConnectorService();
@@ -695,20 +732,17 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
 
     // A display name would not resolve, so the refresh would blank it here
     // and the user's connection would vanish with nothing said.
-    expect(action.intentName).toBe('#i2');
+    expect(dot.intentName).toBe('#i2');
     expect(drawn).toEqual([{ fromId: 'i1/act-1', toId: 'i2' }]);
   });
 
-  it('writes one of the values IntentService itself offers for a connect_block', async () => {
-    const action = await connectAndTakeTheAction();
+  it('writes one of the values IntentService itself offers for the connector dropdown', async () => {
+    const dot = await connectAndTakeTheDot();
     // getListOfIntents() is where the UI's dropdown gets the value it assigns
     // to intentName -- the definition of the contract, called for real.
     const offered = IntentService.prototype.getListOfIntents
       .call({ listOfIntents: intentService.listOfIntents });
-    expect(offered.map((o: any) => o.value)).toContain(action.intentName);
-    // And the label the agent set is the name offered beside that value.
-    expect(offered.find((o: any) => o.value === action.intentName).name)
-      .toBe(action._tdActionTitle);
+    expect(offered.map((o: any) => o.value)).toContain(dot.intentName);
   });
 });
 
