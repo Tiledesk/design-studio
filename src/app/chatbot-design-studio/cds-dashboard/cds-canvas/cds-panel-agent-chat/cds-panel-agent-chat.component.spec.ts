@@ -144,6 +144,50 @@ describe('CdsPanelAgentChatComponent', () => {
     expect(component.canUndo).toBe(false);
   });
 
+  it('says a refused batch was refused, and why, instead of rendering nothing', async () => {
+    // Deriving only a success count meant a refusal showed no row at all --
+    // indistinguishable, to the user, from the agent having done nothing. The
+    // report carries the reason; the panel must not throw it away.
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: false, rejected_before_applying: true, results: [
+      { op: 'move', ok: false, error: 'No intent with intent_id "x" is on the canvas.' }
+    ]});
+    fixture.detectChanges();
+
+    expect(component.failedCount).toBe(1);
+    const row: HTMLElement = fixture.nativeElement.querySelector('.agent-chat-applied');
+    expect(row).toBeTruthy();
+    expect(row.textContent).toContain('No intent with intent_id "x" is on the canvas.');
+    // Nothing applied, so nothing is offered back.
+    expect(fixture.nativeElement.querySelector('.agent-chat-applied button')).toBeNull();
+  });
+
+  it('mentions the failures of a batch that only partly applied', async () => {
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: false, rejected_before_applying: false, results: [
+      { op: 'update_intent', ok: true },
+      { op: 'update_intent', ok: false, error: 'network down' }
+    ]});
+    fixture.detectChanges();
+
+    expect(component.appliedCount).toBe(1);
+    expect(component.failedCount).toBe(1);
+    const row: HTMLElement = fixture.nativeElement.querySelector('.agent-chat-applied');
+    // Both halves of the truth: what landed, and what did not.
+    expect(row.textContent).toContain('Applied');
+    expect(row.textContent).toContain('network down');
+  });
+
   it('still offers undo when a batch partially applied before failing midway', async () => {
     // Distinguishes canUndo from report.ok: this batch is not ok (it failed
     // partway through), but it is not rejected_before_applying either -- one
@@ -188,5 +232,10 @@ describe('CdsPanelAgentChatComponent', () => {
     // The offer must be withdrawn once it has been taken -- a stale button
     // clicked twice would ask the studio to undo a second, nonexistent change.
     expect(component.canUndo).toBe(false);
+    // And the count goes with it: undo takes back the whole batch, so a row
+    // still claiming "Applied 1 change" is wrong about the flow's state.
+    expect(component.appliedCount).toBe(0);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.agent-chat-applied')).toBeNull();
   });
 });

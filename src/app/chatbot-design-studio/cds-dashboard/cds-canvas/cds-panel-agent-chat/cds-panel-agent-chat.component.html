@@ -12,13 +12,20 @@
   <iframe #agentChatIframe
     class="agent-chat-frame"
     [class.agent-chat-frame--hidden]="error"
-    [class.has-applied-row]="appliedCount > 0"
+    [class.has-applied-row]="appliedCount > 0 || failedCount > 0"
     [src]="safeIframeSrc"
     title="{{ 'CDS.AgentChat.Title' | translate }}">
   </iframe>
 
-  <div class="agent-chat-applied" *ngIf="appliedCount > 0">
-    <span>{{ 'CDS.AgentChat.Applied' | translate:{count: appliedCount} }}</span>
+  <div class="agent-chat-applied" *ngIf="appliedCount > 0 || failedCount > 0">
+    <span *ngIf="appliedCount > 0">{{ 'CDS.AgentChat.Applied' | translate:{count: appliedCount} }}</span>
+    <!-- A refusal that renders nothing is indistinguishable from the agent
+         having done nothing at all, which is the failure this feature exists
+         to avoid. The report carries the reason; say it. -->
+    <span class="agent-chat-failed" *ngIf="failedCount > 0">
+      {{ 'CDS.AgentChat.Failed' | translate:{count: failedCount} }}
+      <span class="agent-chat-failed-reason" *ngIf="firstError">{{ firstError }}</span>
+    </span>
     <button type="button" *ngIf="canUndo" (click)="onUndo()">
       {{ 'CDS.AgentChat.Undo' | translate }}
     </button>

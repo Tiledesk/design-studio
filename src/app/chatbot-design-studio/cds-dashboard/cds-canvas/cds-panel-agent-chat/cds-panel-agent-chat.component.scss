@@ -55,4 +55,21 @@
     cursor: pointer;
     font-weight: 600;
   }
+
+  .agent-chat-failed {
+    color: #b42318;
+    min-width: 0;
+  }
+
+  // The error text is whatever the operation said; it must not push the Undo
+  // button off the row.
+  .agent-chat-failed-reason {
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 220px;
+    vertical-align: bottom;
+  }
 }

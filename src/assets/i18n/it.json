@@ -310,6 +310,7 @@
         "Toggle": "Costruisci questo flusso descrivendolo",
         "LoadFailed": "Non è stato possibile caricare la chat AI.",
         "Applied": "Applicate {{count}} modifiche a questo flusso.",
+        "Failed": "{{count}} modifiche non sono state applicate:",
         "Undo": "Annulla"
       }
     }
