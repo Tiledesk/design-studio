@@ -25,7 +25,14 @@ describe('FlowOpsService — intent operations', () => {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
       },
       createNewIntent: jasmine.createSpy('createNewIntent')
-        .and.callFake(() => anIntent('new-id', 'Untitled Block 1')),
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          // Mirrors the real IntentService.createNewIntent, which stores the
+          // requested position on the new intent -- so tests can tell a
+          // dropped position from one that was threaded through correctly.
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
       addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
       saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
       updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
@@ -56,9 +63,18 @@ describe('FlowOpsService — intent operations', () => {
       { op: 'add_intent', intent_display_name: 'greeting', position: { x: 10, y: 20 } }
     ]);
     expect(report.ok).toBe(true);
-    expect(intentService.addNewIntentToListOfIntents).toHaveBeenCalled();
-    expect(intentService.saveNewIntent).toHaveBeenCalled();
     expect(report.results[0].intent_id).toBe('new-id');
+
+    // Assert on what was actually handed to the persistence calls, not just
+    // that they were called -- a dropped display name or position would
+    // still pass a bare toHaveBeenCalled().
+    const addedIntent = intentService.addNewIntentToListOfIntents.calls.mostRecent().args[0];
+    expect(addedIntent.intent_display_name).toBe('greeting');
+    expect(addedIntent.attributes.position).toEqual({ x: 10, y: 20 });
+
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    expect(savedIntent.intent_display_name).toBe('greeting');
+    expect(savedIntent.attributes.position).toEqual({ x: 10, y: 20 });
   });
 
   it('renames an intent through updateIntent', async () => {
@@ -73,7 +89,11 @@ describe('FlowOpsService — intent operations', () => {
   it('deletes an intent', async () => {
     const report = await service.apply([{ op: 'delete_intent', intent_id: 'i2' }]);
     expect(report.ok).toBe(true);
-    expect(intentService.deleteIntentNew).toHaveBeenCalled();
+    // Assert the deletion targeted i2 specifically -- an implementation that
+    // always deleted listOfIntents[0] would still pass a bare
+    // toHaveBeenCalled().
+    const deletedIntent = intentService.deleteIntentNew.calls.mostRecent().args[0];
+    expect(deletedIntent.intent_id).toBe('i2');
   });
 
   it('moves an intent', async () => {
@@ -90,6 +110,16 @@ describe('FlowOpsService — intent operations', () => {
     expect(report.rejected_before_applying).toBe(true);
     expect(report.results[1].error).toContain('nope');
     // The valid first operation must not have been applied either.
+    expect(intentService.updateIntent).not.toHaveBeenCalled();
+  });
+
+  it('refuses a move with no position and applies nothing', async () => {
+    const report = await service.apply([
+      { op: 'move', intent_id: 'i1' } as any
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('position');
     expect(intentService.updateIntent).not.toHaveBeenCalled();
   });
 
