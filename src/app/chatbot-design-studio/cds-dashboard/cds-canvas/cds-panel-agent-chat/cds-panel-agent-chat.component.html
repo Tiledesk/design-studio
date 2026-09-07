@@ -12,7 +12,15 @@
   <iframe #agentChatIframe
     class="agent-chat-frame"
     [class.agent-chat-frame--hidden]="error"
+    [class.has-applied-row]="appliedCount > 0"
     [src]="safeIframeSrc"
     title="{{ 'CDS.AgentChat.Title' | translate }}">
   </iframe>
+
+  <div class="agent-chat-applied" *ngIf="appliedCount > 0">
+    <span>{{ 'CDS.AgentChat.Applied' | translate:{count: appliedCount} }}</span>
+    <button type="button" *ngIf="canUndo" (click)="onUndo()">
+      {{ 'CDS.AgentChat.Undo' | translate }}
+    </button>
+  </div>
 </div>

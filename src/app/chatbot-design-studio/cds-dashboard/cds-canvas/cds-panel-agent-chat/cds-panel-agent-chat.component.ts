@@ -4,6 +4,7 @@ import {
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
+import { FlowOpsService } from 'src/app/chatbot-design-studio/agent-chat/flow-ops.service';
 import { FlowOpsReport } from 'src/app/chatbot-design-studio/agent-chat/flow-ops.model';
 
 @Component({
@@ -27,13 +28,16 @@ export class CdsPanelAgentChatComponent implements OnChanges, OnDestroy {
   public safeIframeSrc: SafeResourceUrl;
   public error: string | null = null;
   public lastReport: FlowOpsReport | null = null;
+  public appliedCount = 0;
+  public canUndo = false;
 
   private attached = false;
   private appliedSub: Subscription;
 
   constructor(
     public hostService: AgentChatHostService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private flowOps: FlowOpsService
   ) {
     this.safeIframeSrc = this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
   }
@@ -58,11 +62,22 @@ export class CdsPanelAgentChatComponent implements OnChanges, OnDestroy {
       this.iframeSrc = this.hostService.iframeSrc();
       this.safeIframeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(this.iframeSrc);
       this.appliedSub = this.hostService.applied$
-        .subscribe((report: FlowOpsReport) => { this.lastReport = report; });
+        .subscribe((report: FlowOpsReport) => {
+          this.lastReport = report;
+          this.appliedCount = report.results.filter(r => r.ok).length;
+          // A batch refused during validation changed nothing, so there is
+          // nothing to undo and offering it would be a lie.
+          this.canUndo = !report.rejected_before_applying && this.appliedCount > 0;
+        });
     } catch {
       this.attached = false;
       this.error = this.hostService.lastError;
     }
+  }
+
+  onUndo(): void {
+    this.flowOps.undoLast();
+    this.canUndo = false;
   }
 
   ngOnDestroy(): void {

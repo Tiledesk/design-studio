@@ -134,6 +134,11 @@ describe('FlowOpsService — intent operations', () => {
     expect(report.ok).toBe(false);
   });
 
+  it('delegates undo to the studio\'s own undo stack', () => {
+    service.undoLast();
+    expect(intentService.restoreLastUNDO).toHaveBeenCalled();
+  });
+
   it('reports honestly when application fails midway', async () => {
     intentService.updateIntent.and.callFake((intent: Intent) =>
       intent.intent_id === 'i2' ? Promise.reject(new Error('network down'))

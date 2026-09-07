@@ -23,6 +23,8 @@
   display: none;
 }
 
+.agent-chat-frame.has-applied-row { height: calc(100% - 37px); }
+
 .agent-chat-error {
   padding: 24px;
   font-size: 14px;
@@ -31,5 +33,26 @@
     white-space: pre-wrap;
     font-size: 12px;
     opacity: 0.75;
+  }
+}
+
+.agent-chat-applied {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  background: #f4f6f8;
+  border-top: 1px solid #e2e6ea;
+
+  button {
+    border: 0;
+    background: none;
+    color: #1f6feb;
+    cursor: pointer;
+    font-weight: 600;
   }
 }

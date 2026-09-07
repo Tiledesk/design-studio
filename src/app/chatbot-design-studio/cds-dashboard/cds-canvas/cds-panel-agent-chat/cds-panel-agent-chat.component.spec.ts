@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdsPanelAgentChatComponent } from './cds-panel-agent-chat.component';
 import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
+import { FlowOpsService } from 'src/app/chatbot-design-studio/agent-chat/flow-ops.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
 
 describe('CdsPanelAgentChatComponent', () => {
   let fixture: ComponentFixture<CdsPanelAgentChatComponent>;
@@ -20,7 +22,10 @@ describe('CdsPanelAgentChatComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [CdsPanelAgentChatComponent],
       imports: [TranslateModule.forRoot()],
-      providers: [{ provide: AgentChatHostService, useValue: hostService }]
+      providers: [
+        { provide: AgentChatHostService, useValue: hostService },
+        { provide: FlowOpsService, useValue: { undoLast: jasmine.createSpy('undoLast') } }
+      ]
     }).compileComponents();
     fixture = TestBed.createComponent(CdsPanelAgentChatComponent);
     component = fixture.componentInstance;
@@ -110,5 +115,51 @@ describe('CdsPanelAgentChatComponent', () => {
     // never-inserted node.
     expect(hostService.attach.calls.mostRecent().args[0]).toBe(realIframe);
     expect(component.error).toBeNull();
+  });
+
+  it('summarises what was applied and offers undo', async () => {
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: true, rejected_before_applying: false, results: [
+      { op: 'add_intent', ok: true }, { op: 'add_action', ok: true }
+    ]});
+    expect(component.appliedCount).toBe(2);
+    expect(component.canUndo).toBe(true);
+  });
+
+  it('offers no undo for a batch that was refused before it applied', async () => {
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: false, rejected_before_applying: true, results: [
+      { op: 'move', ok: false, error: 'No intent with intent_id "x"' }
+    ]});
+    expect(component.canUndo).toBe(false);
+  });
+
+  it('still offers undo when a batch partially applied before failing midway', async () => {
+    // Distinguishes canUndo from report.ok: this batch is not ok (it failed
+    // partway through), but it is not rejected_before_applying either -- one
+    // operation actually changed the flow, so there is something to undo. An
+    // implementation that read canUndo off report.ok instead of
+    // rejected_before_applying would wrongly withhold Undo here.
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: false, rejected_before_applying: false, results: [
+      { op: 'update_intent', ok: true }, { op: 'update_intent', ok: false, error: 'network down' }
+    ]});
+    expect(component.appliedCount).toBe(1);
+    expect(component.canUndo).toBe(true);
   });
 });
