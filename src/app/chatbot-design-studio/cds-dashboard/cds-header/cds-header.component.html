@@ -120,6 +120,15 @@
             </div>
         </div>
 
+        <button *ngIf="isAgentChatAvailable"
+            id="cds-agent-chat-btn"
+            class="btn btn-primary pull-right cds-blue-button"
+            type="button"
+            [title]="'CDS.AgentChat.Toggle' | translate"
+            (click)="onToggleAgentChat()">
+            <span class="material-icons">auto_awesome</span>
+        </button>
+
         <div *ngIf="isBlockSectionActive" class="btn-group"
                 matTooltipClass="cds-mat-tooltip"
                 matTooltip="{{ 'TestIt' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'

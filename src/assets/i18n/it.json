@@ -303,5 +303,14 @@
         "field_label": "Scrivi un'etichetta chiara che aiuti gli utenti a inserire i dati corretti (es: come ti chiami?)",
         "field_error": "Scrivi un messaggio di errore se i dati inseriti dall'utente non sono corretti"
       }
+    },
+    "CDS": {
+      "AgentChat": {
+        "Title": "Costruisci con l'AI",
+        "Toggle": "Costruisci questo flusso descrivendolo",
+        "LoadFailed": "Non è stato possibile caricare la chat AI.",
+        "Applied": "Applicate {{count}} modifiche a questo flusso.",
+        "Undo": "Annulla"
+      }
     }
   }

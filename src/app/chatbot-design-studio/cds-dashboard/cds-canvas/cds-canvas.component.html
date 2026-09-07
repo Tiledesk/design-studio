@@ -178,6 +178,12 @@
     (newConversation)="onNewConversation($event)">
 </cds-panel-widget>
 
+<cds-panel-agent-chat
+    [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT"
+    [class.isHidden]="!IS_OPEN_PANEL_AGENT_CHAT"
+    [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT">
+</cds-panel-agent-chat>
+
 <cds-context-menu *ngIf="IS_OPEN_CONTEXT_MENU"
     class="context-menu"
     [style.top.px]="positionContextMenu.y" 

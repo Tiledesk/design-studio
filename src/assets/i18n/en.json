@@ -1499,5 +1499,14 @@
     "NoReleaseHistoryAvailable": "No release history available",
     "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here",
     "FollowLog": "Follow log",
-    "DeleteLog": "Delete log"
+    "DeleteLog": "Delete log",
+    "CDS": {
+        "AgentChat": {
+            "Title": "Build with AI",
+            "Toggle": "Build this flow by describing it",
+            "LoadFailed": "The AI chat could not be loaded.",
+            "Applied": "Applied {{count}} change(s) to this flow.",
+            "Undo": "Undo"
+        }
+    }
 }

@@ -11,6 +11,7 @@ import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/chan
 import { CdsCanvasComponent } from './cds-canvas.component';
 import { CdsPanelIntentListComponent } from './cds-panel-intent-list/cds-panel-intent-list.component';
 import { CdsPanelWidgetComponent } from './cds-panel-widget/cds-panel-widget.component';
+import { CdsPanelAgentChatComponent } from './cds-panel-agent-chat/cds-panel-agent-chat.component';
 import { ContextMenuComponent } from './base-elements/context-menu/context-menu.component';
 import { CdsActionArrowComponent } from './actions/shared/cds-action-controls/cds-action-arrow/cds-action-arrow.component';
 import { CdsActionControlsComponent } from './actions/shared/cds-action-controls/cds-action-controls/cds-action-controls.component';
@@ -78,6 +79,9 @@ const routes: Routes = [
 
     //CDS PANEL WIDGET
     CdsPanelWidgetComponent,
+
+    //CDS PANEL AGENT CHAT
+    CdsPanelAgentChatComponent,
 
     //CDS PANEL ELEMENTS
     CdsPanelElementsComponent,

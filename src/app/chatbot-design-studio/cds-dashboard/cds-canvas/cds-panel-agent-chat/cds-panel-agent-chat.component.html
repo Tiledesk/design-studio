@@ -1,0 +1,18 @@
+<div class="agent-chat-panel">
+  <div class="agent-chat-error" *ngIf="error">
+    <span class="material-icons">error_outline</span>
+    <p>{{ 'CDS.AgentChat.LoadFailed' | translate }}</p>
+    <pre>{{ error }}</pre>
+  </div>
+
+  <!-- Kept mounted even during an error (hidden via CSS, not *ngIf): removing
+       it from the DOM would drop the #agentChatIframe ViewChild, so a retry
+       after a failed attach() would wire up a detached placeholder instead of
+       this real element. -->
+  <iframe #agentChatIframe
+    class="agent-chat-frame"
+    [class.agent-chat-frame--hidden]="error"
+    [src]="safeIframeSrc"
+    title="{{ 'CDS.AgentChat.Title' | translate }}">
+  </iframe>
+</div>
