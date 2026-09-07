@@ -13,7 +13,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Department } from 'src/app/models/department-model';
 // UTILS //
-import { convertJsonToArray } from 'src/app/chatbot-design-studio/utils';
+import { convertJsonToArray, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -35,6 +35,15 @@ export class DashboardService {
   /** Reactive stream for components that need to react to chatbot changes. */
   readonly selectedChatbot$ = new BehaviorSubject<Chatbot | null>(null);
   translateparamBotName: any;
+
+  /**
+   * Design Studio version of the selected chatbot: true = V3, false = legacy.
+   * Discriminated by creation date (see DATE_NEW_CHATBOT). Single source of truth:
+   * computed once per chatbot here, never recomputed by the components.
+   */
+  isV3: boolean = false;
+  /** Reactive counterpart of `isV3`, for components that render before the chatbot is loaded. */
+  readonly isV3$ = new BehaviorSubject<boolean>(false);
 
   project: Project;
   /** Reactive stream for components that need to react to project changes. */
@@ -88,6 +97,30 @@ export class DashboardService {
 
 
   // ----------------------------------------------------------
+  // Design Studio version of the selected chatbot
+  // ----------------------------------------------------------
+  /**
+   * Resolves whether the chatbot must be edited with the V3 Design Studio.
+   * A chatbot is V3 when it was created on or after DATE_NEW_CHATBOT; both dates
+   * are ISO strings, so the comparison is lexicographic.
+   * When `createdAt` is missing we fall back to LEGACY on purpose: it is the
+   * long-standing behaviour, so an incomplete payload never silently switches editor.
+   */
+  private resolveDsVersion(chatbot: Chatbot): void {
+    let isV3 = false;
+    try {
+      const createdAt = chatbot?.createdAt;
+      isV3 = !!createdAt && createdAt >= DATE_NEW_CHATBOT;
+    } catch (error) {
+      this.logger.error('[ DSHBRD-SERVICE ] resolveDsVersion ERROR: ', error);
+      isV3 = false;
+    }
+    this.isV3 = isV3;
+    this.isV3$.next(isV3);
+    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { createdAt: chatbot?.createdAt, cutoff: DATE_NEW_CHATBOT, isV3 });
+  }
+
+  // ----------------------------------------------------------
   // Get bot by id
   // ----------------------------------------------------------
   async getBotById(): Promise<boolean> {
@@ -98,6 +131,7 @@ export class DashboardService {
           if (chatbot) {
             this.selectedChatbot = chatbot;
             this.selectedChatbot$.next(chatbot);
+            this.resolveDsVersion(chatbot);
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }
             variableList.find(el => el.key ==='userDefined').elements = [];
             if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {

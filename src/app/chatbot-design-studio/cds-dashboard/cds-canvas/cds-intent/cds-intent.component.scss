@@ -741,8 +741,8 @@ cds-panel-intent-header.isStart ::ng-deep{
   }
 }
 
-/** SLIM INTENT **/
-.tds-slim-intent {
+/** V3 INTENT - blocco a una sola action, senza controlli inline **/
+.tds-v3-intent {
   padding: 2px;
   .pic-header {
     padding: 0px;
@@ -750,9 +750,22 @@ cds-panel-intent-header.isStart ::ng-deep{
   .pic-title-text {
     padding: 4px 8px 10px;
   }
+  /* In V3 il footer resta nel DOM ma non contiene nulla di cliccabile:
+     niente altezza residua, niente margine negativo, niente cursore da bottone. */
   .footer-intent{
     min-height: 0px;
     margin: 0;
+    cursor: default;
+  }
+  /* Il blocco ospita una sola action: il gap pensato per la colonna non serve. */
+  .actions-list-wpr {
+    gap: 0;
+  }
+  /* L'action riempie il blocco: senza bordo bianco si evita la doppia cornice
+     con il padding del blocco. Cambia solo il colore, non lo spessore, cosi'
+     il layout non si sposta. */
+  .box-action {
+    border-color: transparent;
   }
   .tds-drop-element {
     width: calc(100% - 4px);

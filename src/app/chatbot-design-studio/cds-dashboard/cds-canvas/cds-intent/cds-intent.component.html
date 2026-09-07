@@ -4,7 +4,7 @@
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.isStart]="isStart" 
-    [class.tds-slim-intent]="isNewChatbot"
+    [class.tds-v3-intent]="isV3"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
@@ -73,7 +73,7 @@
     <div *ngIf="!isStart" class="actions-list-wpr"
         cdkDropList
         [cdkDropListData]="listOfActions"
-        [cdkDropListDisabled]="isNewChatbot"
+        [cdkDropListDisabled]="isV3"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
@@ -82,7 +82,7 @@
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
             cdkDrag
-            [cdkDragDisabled]="dragDisabled || isNewChatbot">
+            [cdkDragDisabled]="dragDisabled || isV3">
             <!-- add-action-placeholder  -->
             <!-- <div class="add--action-placeholder-add-icon">
                 <span class="material-icons"> add </span>
@@ -110,7 +110,7 @@
 
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
-            [cdkDragDisabled]="isNewChatbot"
+            [cdkDragDisabled]="isV3"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
             (cdkDragMoved)="onDragMove($event)"
@@ -151,7 +151,7 @@
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
-                    <cds-action-controls *ngIf="!isNewChatbot"
+                    <cds-action-controls *ngIf="!isV3"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
     
@@ -552,7 +552,7 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
                 + {{ 'CDSCanvas.AddAction' | translate}}

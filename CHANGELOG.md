@@ -9,6 +9,12 @@
 
 
 
+# this branch 07/09/2026
+- **added**: Design Studio **V3** — i chatbot creati dal 01/09/2026 aprono l'editor semplificato (una sola action per blocco, drag delle action disabilitato, niente menu inline edit/copy/delete, niente "+ Add action" sui blocchi pieni); la versione si ricava da `createdAt` confrontato con `DATE_NEW_CHATBOT`
+- **changed**: la versione è risolta una volta sola per chatbot in `DashboardService` (`isV3`/`isV3$`) invece di essere ricalcolata da ogni blocco; `isNewChatbot` rinominato `isV3`
+- **changed**: un chatbot **senza** `createdAt` è ora trattato come legacy (prima come V3), così un payload incompleto non cambia editor
+- **changed**: restyle del blocco V3 (`.tds-slim-intent` → `.tds-v3-intent`) — rimossi lo spazio morto e il cursore da bottone sul footer vuoto, il gap tra action e la doppia cornice attorno all'unica action
+
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
 - **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)

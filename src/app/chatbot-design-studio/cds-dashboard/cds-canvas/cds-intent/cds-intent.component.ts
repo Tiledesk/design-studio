@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -94,7 +94,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   serverBaseURL: any;
   chatbot_id: string;
   isUntitledBlock: boolean = false;
-  isNewChatbot: boolean = false;
+  /** true quando il chatbot va editato con il Design Studio V3 (una action per blocco, niente drag). */
+  isV3: boolean = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -280,8 +281,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.updateIsUntitledBlock();
       // Aggiorna showIntentOptions dopo l'inizializzazione
       this.updateShowIntentOptions();
-      // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
-      this.checkIfNewChatbot();
+      // Versione del Design Studio da usare per questo chatbot (V3 o legacy)
+      this.setDsVersion();
       this.addEventListener();
       this.setIntentAttributes();
       
@@ -470,39 +471,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /** checkIfNewChatbot
-   * Verifica se il chatbot è stato creato dopo il 01/06/2025
-   * Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
-   * Altrimenti isNewChatbot = true
+  /** setDsVersion
+   * Legge la versione del Design Studio dal DashboardService, che la calcola
+   * una volta sola quando il chatbot viene caricato (resolveDsVersion).
+   * Qui non si ricalcola nulla: il blocco è solo un consumatore del flag.
    */
-  private checkIfNewChatbot(): void {
-    
-    //this.isNewChatbot = false;
-    //return;
-    const cutoffDate = DATE_NEW_CHATBOT;
-    const chatbot = this.dashboardService.selectedChatbot;
-    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
-
-
-    if (!chatbot || !chatbot.createdAt) {
-      // Se non c'è data di creazione, considera come nuovo chatbot
-      this.isNewChatbot = true;
-      this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
-      return;
-    }
-
-    try {
-      // Se la data di creazione è precedente al ... (DATE_NEW_CHATBOT), isNewChatbot = false
-      // Altrimenti (successiva o uguale), isNewChatbot = true
-      this.isNewChatbot = chatbot.createdAt >= cutoffDate;
-      this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
-        isNewChatbot: this.isNewChatbot
-      });
-    } catch (error) {
-      this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
-      // In caso di errore, considera come nuovo chatbot
-      this.isNewChatbot = true;
-    }
+  private setDsVersion(): void {
+    this.isV3 = this.dashboardService.isV3;
+    this.logger.log('[CDS-INTENT] setDsVersion:', { isV3: this.isV3 });
   }
 
   ngAfterViewInit() {
@@ -942,12 +918,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Predicate function that only allows type='intent' to be dropped into a list. */
   canEnterDropList(action: any) {
     return (item: CdkDrag<any>) => {
-      // Se il chatbot è nuovo, disabilita il drop se c'è già un'action nell'intent
-      // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
+      // In V3 il blocco accetta una sola action: se ne ha già una, nega il drop
+      if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
         return false;
       }
-      // Per i chatbot esistenti, permette il drop normalmente
+      // Sui chatbot legacy il drop resta libero
       return true;
     }
   }
@@ -965,14 +940,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
     
-    // Se il chatbot è nuovo, impedisce il drop se c'è già un'action nell'intent
-    // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-    if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
+    // In V3 il blocco accetta una sola action: se ne ha già una, il drop non passa
+    if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot V3 e c\'è già un\'action nell\'intent');
       return;
     }
-    
-    // Per i chatbot esistenti, esegue il drop normalmente
+
+    // Sui chatbot legacy il drop procede normalmente
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
     if (event.previousContainer === event.container) {
