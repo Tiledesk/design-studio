@@ -948,6 +948,55 @@ describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () 
     // Nothing applied: the existing action's operation is untouched.
     expect(intentService.getIntentFromId('i1').actions[0].operation.type).toBe('now');
   });
+
+  // A live run found the loophole this closes: "replacing an array with
+  // another array is fine" let a caller keep every key of a protected
+  // object (ActionReply.attributes: disableInputMessage + commands) while
+  // emptying the one array among them that actually matters. The
+  // missing-keys check above only ever looked at *presence*, never at
+  // whether a kept array had been hollowed out.
+  it('refuses fields.attributes that keeps every key but empties the non-empty commands array -- the reported defect', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { attributes: { disableInputMessage: false, commands: [] } }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('commands');
+    expect(intentService.getIntentFromId('i2').actions.length).toBe(0);
+  });
+
+  it('refuses the same emptied array even with an accompanying text field -- the literal reported payload', async () => {
+    // The exact combination that reached the canvas live: fields carried
+    // both `text` and an `attributes` whose `commands` had been emptied.
+    // With the guard fixed, this is refused before writeReplyText (the
+    // text mapping) ever runs -- the two fixes are complementary, not
+    // redundant: this stops the corruption from being written at all, and
+    // the text mapping's own self-healing (see the "self-heals" tests in
+    // the reply-text describe block) covers whatever this guard cannot see,
+    // such as commands emptied by a route that never touches `fields.attributes`.
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { text: 'Qual è la tua email?', attributes: { disableInputMessage: false, commands: [] } }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(intentService.getIntentFromId('i2').actions.length).toBe(0);
+  });
+
+  it('still lets a scaffolded EMPTY array be freely replaced -- webrequestv2.formData starts empty', async () => {
+    // The refined rule only protects a *non-empty* scaffolded array; an
+    // empty one (a real case from action-model.ts: ActionWebRequestV2's
+    // `formData = []`, never populated by createNewAction) stays exactly as
+    // freely replaceable as before -- the caller filling it in is the
+    // normal case, not damage.
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'webrequestv2',
+      fields: { formData: [{ key: 'file', type: 'file' }] }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.formData).toEqual([{ key: 'file', type: 'file' }]);
+  });
 });
 
 /** The real `createNewAction(REPLY | REPLYV2 | RANDOM_REPLY)` scaffold
@@ -1079,6 +1128,76 @@ describe('FlowOpsService — a reply\'s requested text lands where the studio re
     const added = intentService.getIntentFromId('i2').actions[0];
     expect(added.attributes).toBeUndefined();
     expect(added.text).toBe('not a reply');
+  });
+
+  // A live run surfaced a second-order bug: the scaffold guard's array rule
+  // ("replacing an array with another array is fine") let a caller keep both
+  // of ActionReply.attributes's keys while emptying `commands` to `[]`. The
+  // text mapping above then found no message command to write into and fell
+  // back to the ignored top-level `text` -- the block asked nothing. Fixed
+  // on two fronts: `flow-ops.service.spec.ts`'s "refusing to destroy the
+  // scaffold's structure" block now refuses that exact input at validation
+  // (see the two new tests there), but this text mapping is made
+  // self-sufficient regardless -- it must not depend on the guard, a future
+  // caller, or a future rule change leaving the command in place. These
+  // three tests exercise that directly, each with `commands` already `[]`
+  // by the time writeReplyText runs.
+  it('self-heals a reply\'s message command via add_action when the scaffold\'s commands arrive already empty', async () => {
+    // Simulates commands having been emptied by some means other than
+    // fields.attributes (fields here never mentions attributes at all, so
+    // the guard has nothing to refuse) -- the scenario the guard fix cannot
+    // cover by construction, and exactly what this self-sufficiency is for.
+    intentService.createNewAction.and.callFake((type: string) => ({
+      _tdActionId: 'generated', _tdActionType: type, text: undefined,
+      attributes: { disableInputMessage: false, commands: [] }
+    }));
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { text: 'Qual è la tua email?' }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    const messageCommand = added.attributes.commands.find((c: any) => c && c.message);
+    expect(messageCommand).toBeTruthy();
+    expect(messageCommand.message.text).toBe('Qual è la tua email?');
+  });
+
+  it('self-heals the same way through add_intent\'s inline reply action', async () => {
+    intentService.createNewAction.and.callFake((type: string) => ({
+      _tdActionId: 'generated', _tdActionType: type, text: undefined,
+      attributes: { disableInputMessage: false, commands: [] }
+    }));
+    const report = await service.apply([{
+      op: 'add_intent',
+      actions: [{ type: 'reply', fields: { text: 'Qual è la tua email?' } }]
+    }]);
+    expect(report.ok).toBe(true);
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    const messageCommand = savedIntent.actions[0].attributes.commands.find((c: any) => c && c.message);
+    expect(messageCommand).toBeTruthy();
+    expect(messageCommand.message.text).toBe('Qual è la tua email?');
+  });
+
+  it('self-heals update_action on an existing reply whose commands were already emptied -- the exact shape observed live', async () => {
+    // {"_tdActionType":"reply","attributes":{"disableInputMessage":false,
+    //  "commands":[]},"text":"Qual è la tua email?"} -- the actual corrupted
+    // document from the live run, reconstructed here as the action already
+    // on the canvas before this update_action runs.
+    const intent = intentService.getIntentFromId('i1');
+    intent.actions = [{
+      _tdActionId: 'reply-1', _tdActionType: 'reply',
+      attributes: { disableInputMessage: false, commands: [] },
+      text: 'Qual è la tua email?'
+    }];
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'reply-1',
+      fields: { text: 'Qual è la tua email?' }
+    }]);
+    expect(report.ok).toBe(true);
+    const updated = intentService.getIntentFromId('i1').actions[0];
+    const messageCommand = updated.attributes.commands.find((c: any) => c && c.message);
+    expect(messageCommand).toBeTruthy();
+    expect(messageCommand.message.text).toBe('Qual è la tua email?');
   });
 });
 

@@ -3,9 +3,10 @@ import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
+import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION } from '../utils-actions';
-import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX } from '../utils';
+import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND } from '../utils';
 
 const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
@@ -470,16 +471,46 @@ export class FlowOpsService {
    *  `attributes.commands` (found by shape, not a fixed index, so it keeps
    *  working if a caller's `fields.attributes` or index-affecting edit
    *  changed where the message command sits). A no-op for every other
-   *  action type, and a no-op when `fields.text` was not supplied. */
+   *  action type, and a no-op when `fields.text` was not supplied.
+   *
+   *  Self-sufficient, not merely opportunistic: a live run showed
+   *  `attributes.commands` arriving empty (`findScaffoldViolation`'s array
+   *  rule let a caller keep both of `attributes`'s keys while replacing
+   *  `commands` with `[]`) -- with no message command to find, the text was
+   *  silently dropped back onto the ignored top-level field. That specific
+   *  hole is now refused at validation too (see `findScaffoldViolation`),
+   *  but this method does not depend on that guard, or on `createNewAction`
+   *  always scaffolding correctly, or on nothing further ever emptying the
+   *  array again: when no message command exists, it builds one -- the same
+   *  `Wait` + `Command(MESSAGE)` pair `createNewAction` itself builds -- so
+   *  the text always ends up where the studio reads it, whatever state
+   *  `commands` was actually found in. */
   private writeReplyText(actionType: string, action: any, fields?: Record<string, any>): void {
     if (!fields || typeof fields.text !== 'string') { return; }
     if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(actionType) === -1) { return; }
-    const commands = action?.attributes?.commands;
-    if (!Array.isArray(commands)) { return; }
+    if (!action.attributes || typeof action.attributes !== 'object') {
+      action.attributes = { disableInputMessage: false, commands: [] };
+    }
+    if (!Array.isArray(action.attributes.commands)) {
+      action.attributes.commands = [];
+    }
+    const commands = action.attributes.commands;
     const messageCommand = commands.find((c: any) => c && c.message);
     if (messageCommand) {
-      messageCommand.message.text = fields.text;
+      if (!messageCommand.message) {
+        messageCommand.message = new Message('text', fields.text);
+      } else {
+        messageCommand.message.text = fields.text;
+      }
+      return;
     }
+    // No message command survived, whatever the reason: build the missing
+    // pair from scratch, the same shape createNewAction scaffolds a fresh
+    // reply with.
+    const wait = new Wait();
+    const command = new Command(TYPE_COMMAND.MESSAGE);
+    command.message = new Message('text', fields.text);
+    commands.push(wait, command);
   }
 
   /** `assignFields` overwrites wholesale: `action[key] = fields[key]`. For a
@@ -515,25 +546,46 @@ export class FlowOpsService {
    *  built action (`add_action`, `add_intent`'s inline actions) or the action
    *  as it already exists (`update_action` -- see that call site for why).
    *  For each of the scaffold's *protected* keys, if `fields` supplies that
-   *  key: an array may be replaced by any array, but an object must still
-   *  carry every key the scaffold's object had. A scalar field, an
-   *  unprotected (defaults-only) object, or a key the scaffold never had, is
-   *  untouched by this check -- assignFields is free to do what it already
-   *  does there. Returns the refusal message, or null when `fields` is safe
-   *  to apply. */
+   *  key: an array may be replaced by any array, but not an empty one if the
+   *  scaffold's own array was non-empty (see the array clause below); an
+   *  object must still carry every key the scaffold's object had, and is
+   *  then walked one level further for the same array rule (see `nested`
+   *  below). A scalar field, an unprotected (defaults-only) object, or a key
+   *  the scaffold never had, is untouched by this check -- assignFields is
+   *  free to do what it already does there. Returns the refusal message, or
+   *  null when `fields` is safe to apply.
+   *
+   *  `pathPrefix` is bookkeeping only, for readable messages when this
+   *  recurses one level into a protected object (`"attributes.commands"`
+   *  rather than a bare `"commands"` that doesn't say where it lives) -- it
+   *  is never passed by a call site, only by this method calling itself. */
   private findScaffoldViolation(
-    actionType: string, scaffold: any, fields?: Record<string, any>
+    actionType: string, scaffold: any, fields?: Record<string, any>, pathPrefix: string = ''
   ): string | null {
     if (!fields || !scaffold) { return null; }
     for (const key of Object.keys(scaffold)) {
       if (!(key in fields)) { continue; }
+      const path = pathPrefix ? `${pathPrefix}.${key}` : key;
       const scaffolded = scaffold[key];
       if (scaffolded === null || typeof scaffolded !== 'object') { continue; }
       const supplied = fields[key];
       if (Array.isArray(scaffolded)) {
         if (!Array.isArray(supplied)) {
-          return `"${actionType}" action's "${key}" is an array; fields.${key} must be an ` +
+          return `"${actionType}" action's "${path}" is an array; fields.${path} must be an ` +
             `array too, not ${JSON.stringify(supplied)}.`;
+        }
+        // The live defect this array clause missed: a scaffolded array that
+        // starts non-empty is structure the studio renders from (ActionReply's
+        // attributes.commands, for one) -- replacing it with `[]` removes that
+        // structure just as surely as dropping the key would, even though the
+        // key itself is still present and still an array. A scaffolded array
+        // that starts *empty* (ActionWebRequestV2.formData, for one) is a
+        // default with nothing in it yet, so filling it in -- with anything,
+        // including staying empty -- is the normal, unrestricted case.
+        if (scaffolded.length > 0 && supplied.length === 0) {
+          return `"${actionType}" action's "${path}" is a non-empty array by default; ` +
+            `fields.${path} cannot replace it with an empty array -- that leaves the ` +
+            `action with nothing to render.`;
         }
         continue;
       }
@@ -543,16 +595,24 @@ export class FlowOpsService {
         .some(v => v !== null && typeof v === 'object');
       if (!holdsAContainer) { continue; }
       if (supplied === null || typeof supplied !== 'object' || Array.isArray(supplied)) {
-        return `"${actionType}" action's "${key}" is an object; fields.${key} must be an ` +
+        return `"${actionType}" action's "${path}" is an object; fields.${path} must be an ` +
           `object too, not ${JSON.stringify(supplied)}.`;
       }
       const missing = Object.keys(scaffolded).filter(k => !(k in supplied));
       if (missing.length > 0) {
-        return `"${actionType}" action's "${key}" needs ${Object.keys(scaffolded).join(', ')}; ` +
-          `fields.${key} is missing ${missing.join(', ')}. assignFields replaces "${key}" ` +
+        return `"${actionType}" action's "${path}" needs ${Object.keys(scaffolded).join(', ')}; ` +
+          `fields.${path} is missing ${missing.join(', ')}. assignFields replaces "${path}" ` +
           `wholesale rather than merging into it, so include every existing key alongside ` +
           `whatever you're changing.`;
       }
+      // Every key survived, but a kept key's own array value may still have
+      // been hollowed out -- exactly the reported defect: `attributes` kept
+      // both `disableInputMessage` and `commands`, with `commands` emptied.
+      // The missing-keys check above only ever looked at presence; recurse
+      // the same rule one level in so a kept-but-emptied array isn't a
+      // separate loophole from a dropped key.
+      const nested = this.findScaffoldViolation(actionType, scaffolded, supplied, path);
+      if (nested) { return nested; }
     }
     return null;
   }
