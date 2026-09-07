@@ -5,7 +5,10 @@ export const SUPPORTED_PROTOCOL_VERSION = 1;
 export class AgentChatLoadError extends Error {
   constructor(message: string) {
     super(message);
-    // Required for `instanceof` to survive TypeScript's ES5 class emit.
+    // Defensive, not load-bearing: tsconfig targets es2020, where extending a
+    // built-in works and this is a no-op. It is here so that lowering the
+    // target -- which is what breaks `instanceof` on a subclassed Error --
+    // does not quietly break the loader's error handling with it.
     Object.setPrototypeOf(this, AgentChatLoadError.prototype);
     this.name = 'AgentChatLoadError';
   }

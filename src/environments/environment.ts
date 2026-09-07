@@ -12,6 +12,11 @@ export const environment = {
     // The agent chat's mount point. It reverse proxies to the agent runtime,
     // so this is the only address design-studio needs. Unset or CHANGEIT
     // hides the feature entirely.
+    //
+    // This value is never read at run time: `remoteConfig: true` above means
+    // AppConfigService.loadAppConfig replaces this whole object with
+    // design-studio-config.json, where the key ships as CHANGEIT. Set it
+    // THERE to switch the feature on.
     agentChatUrl: 'http://localhost:5173',
     wsUrl: 'ws://localhost:3000/',
     uploadEngine: 'native',

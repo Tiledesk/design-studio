@@ -120,14 +120,18 @@
             </div>
         </div>
 
-        <button *ngIf="isAgentChatAvailable"
-            id="cds-agent-chat-btn"
-            class="btn btn-primary pull-right cds-blue-button"
-            type="button"
-            [title]="'CDS.AgentChat.Toggle' | translate"
-            (click)="onToggleAgentChat()">
-            <span class="material-icons">auto_awesome</span>
-        </button>
+        <!-- Inside the isBlockSectionActive guard, alongside Test it out: the
+             chat drives the canvas, so it has no meaning on a section where
+             the canvas is not present. -->
+        <div *ngIf="isBlockSectionActive && isAgentChatAvailable" class="btn-group">
+            <button id="cds-agent-chat-btn"
+                class="btn btn-primary pull-right cds-blue-button"
+                type="button"
+                [title]="'CDS.AgentChat.Toggle' | translate"
+                (click)="onToggleAgentChat()">
+                <span class="material-icons">auto_awesome</span>
+            </button>
+        </div>
 
         <div *ngIf="isBlockSectionActive" class="btn-group"
                 matTooltipClass="cds-mat-tooltip"
