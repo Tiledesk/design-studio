@@ -949,3 +949,135 @@ describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () 
     expect(intentService.getIntentFromId('i1').actions[0].operation.type).toBe('now');
   });
 });
+
+/** The real `createNewAction(REPLY | REPLYV2 | RANDOM_REPLY)` scaffold
+ *  (intent.service.ts): a top-level `text` the studio never reads, and the
+ *  actual visible text nested at `attributes.commands[1].message.text` --
+ *  the same place `cds-action-reply`/`-v2` read it
+ *  (`this.arrayResponses = this.action.attributes.commands`, and
+ *  `cds-action-reply-text`'s `@Input() response: Message` bound to that
+ *  command's `.message`). */
+function replyScaffold(type: string): any {
+  return {
+    _tdActionId: 'generated',
+    _tdActionType: type,
+    text: undefined,
+    attributes: {
+      disableInputMessage: false,
+      commands: [
+        { type: 'wait', time: 500 },
+        { type: 'message', message: { type: 'text', text: 'A chat message will be sent to the visitor' } }
+      ]
+    }
+  };
+}
+
+describe('FlowOpsService — a reply\'s requested text lands where the studio reads it', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+
+  beforeEach(() => {
+    const withReply = anIntent('i1', 'start');
+    withReply.actions = [replyScaffold('reply')];
+    withReply.actions[0]._tdActionId = 'reply-1';
+
+    intentService = {
+      listOfIntents: [withReply, anIntent('i2', 'welcome')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      // Mirrors the real createNewAction for the three reply-family types:
+      // every one of them is scaffolded exactly this way in intent.service.ts.
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => {
+        if (['reply', 'replyv2', 'randomreply'].indexOf(type) !== -1) {
+          return replyScaffold(type);
+        }
+        return { _tdActionId: 'generated', _tdActionType: type };
+      }),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('add_action reply with fields.text writes the message command\'s text, not only the ignored top-level field', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { text: 'Benvenuto nel nostro servizio di assistenza clienti!' }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.attributes.commands[1].message.text)
+      .toBe('Benvenuto nel nostro servizio di assistenza clienti!');
+    // Harmless to also carry it top-level -- just not the only place it lands.
+    expect(added.text).toBe('Benvenuto nel nostro servizio di assistenza clienti!');
+  });
+
+  it('add_intent\'s inline reply action writes the message command\'s text the same way', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      actions: [{ type: 'reply', fields: { text: 'Ciao, come posso aiutarti?' } }]
+    }]);
+    expect(report.ok).toBe(true);
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    expect(savedIntent.actions[0].attributes.commands[1].message.text).toBe('Ciao, come posso aiutarti?');
+  });
+
+  it('covers replyv2, the same scaffold shape as reply', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2', fields: { text: 'v2 text' }
+    }]);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.attributes.commands[1].message.text).toBe('v2 text');
+  });
+
+  it('covers randomreply, the same scaffold shape as reply', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'randomreply', fields: { text: 'random text' }
+    }]);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.attributes.commands[1].message.text).toBe('random text');
+  });
+
+  it('update_action on an existing reply updates the message command\'s text too', async () => {
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'reply-1',
+      fields: { text: 'Updated wording' }
+    }]);
+    expect(report.ok).toBe(true);
+    const updated = intentService.getIntentFromId('i1').actions[0];
+    expect(updated.attributes.commands[1].message.text).toBe('Updated wording');
+    expect(updated.text).toBe('Updated wording');
+  });
+
+  it('leaves an action with no message command alone -- text-bearing fields on other types are untouched', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'close', fields: { text: 'not a reply' }
+    }]);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.attributes).toBeUndefined();
+    expect(added.text).toBe('not a reply');
+  });
+});

@@ -322,6 +322,7 @@ export class FlowOpsService {
     for (const actionSpec of op.actions ?? []) {
       const action = this.intentService.createNewAction(actionSpec.type as any);
       this.assignFields(action, actionSpec.fields);
+      this.writeReplyText(action._tdActionType, action, actionSpec.fields);
       intent.actions.push(action);
     }
     this.intentService.addNewIntentToListOfIntents(intent);
@@ -399,6 +400,44 @@ export class FlowOpsService {
     Object.keys(fields)
       .filter(key => FlowOpsService.PROTECTED_FIELDS.indexOf(key) === -1)
       .forEach(key => { action[key] = fields[key]; });
+  }
+
+  /** The three action types `createNewAction` scaffolds with the same
+   *  reply-command shape: `ActionReply`, `ActionReplyV2` and
+   *  `ActionRandomReply` are each built as a top-level `text?: string` that
+   *  nothing reads, plus `attributes.commands = [Wait, Command(MESSAGE)]`
+   *  whose `command.message.text` -- seeded to the placeholder "A chat
+   *  message will be sent to the visitor" -- is what `cds-action-reply` /
+   *  `-v2` actually render and save
+   *  (`this.arrayResponses = this.action.attributes.commands`, and
+   *  `cds-action-reply-text`'s `@Input() response: Message` bound to that
+   *  command's `.message`). Voice actions (`TYPE_ACTION_VXML`) scaffold a
+   *  similar-looking `commands` array, but they render through a separate
+   *  set of components for a separate (voice) flow type this feature does
+   *  not target, so they are deliberately left out of this list rather than
+   *  matched structurally. */
+  private static readonly REPLY_LIKE_ACTION_TYPES: string[] = [
+    TYPE_ACTION.REPLY, TYPE_ACTION.REPLYV2, TYPE_ACTION.RANDOM_REPLY
+  ];
+
+  /** `assignFields` already writes `fields.text` onto the action's top-level
+   *  `text` -- harmless, but for the three reply-like types above that is
+   *  not where the studio reads it, so the agent's requested wording would
+   *  never appear on the canvas. This writes the same `fields.text` into the
+   *  scaffolded message command too, wherever it currently is in
+   *  `attributes.commands` (found by shape, not a fixed index, so it keeps
+   *  working if a caller's `fields.attributes` or index-affecting edit
+   *  changed where the message command sits). A no-op for every other
+   *  action type, and a no-op when `fields.text` was not supplied. */
+  private writeReplyText(actionType: string, action: any, fields?: Record<string, any>): void {
+    if (!fields || typeof fields.text !== 'string') { return; }
+    if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(actionType) === -1) { return; }
+    const commands = action?.attributes?.commands;
+    if (!Array.isArray(commands)) { return; }
+    const messageCommand = commands.find((c: any) => c && c.message);
+    if (messageCommand) {
+      messageCommand.message.text = fields.text;
+    }
   }
 
   /** `assignFields` overwrites wholesale: `action[key] = fields[key]`. For a
@@ -490,6 +529,7 @@ export class FlowOpsService {
       };
     }
     this.assignFields(action, op.fields);
+    this.writeReplyText(action._tdActionType, action, op.fields);
     intent.actions = intent.actions || [];
     if (typeof op.index === 'number' && op.index >= 0 && op.index <= intent.actions.length) {
       intent.actions.splice(op.index, 0, action);
@@ -504,6 +544,7 @@ export class FlowOpsService {
     const intent = this.intentService.getIntentFromId(op.intent_id);
     const action = intent.actions.find((a: any) => a._tdActionId === op.action_id);
     this.assignFields(action, op.fields);
+    this.writeReplyText(action._tdActionType, action, op.fields);
     await this.intentService.updateIntent(intent);
     return { op: op.op, ok: true, intent_id: op.intent_id, action_id: op.action_id };
   }
