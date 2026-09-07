@@ -1608,3 +1608,172 @@ describe('FlowOpsService — connect refuses a block that already routes conditi
     expect(error).toContain('goToIntent');
   });
 });
+
+describe('FlowOpsService — an action\'s own destination fields must resolve on the canvas', () => {
+  // The gap this closes: connect's endpoints (from_intent_id/to_intent_id)
+  // were validated, but the destinations an action carries inside its own
+  // `fields` (trueIntent, goToIntent, ai_condition's conditionIntentId, ...)
+  // were not -- so an agent could fill every branch of a twelve-block flow
+  // with invented slugs and have the whole batch accepted, only for
+  // ConnectorService to blank each one silently on the next refresh.
+  let service: FlowOpsService;
+  let intentService: any;
+  let actionIdCounter: number;
+
+  beforeEach(() => {
+    actionIdCounter = 0;
+    intentService = {
+      listOfIntents: [
+        anIntent('i1', 'start'), anIntent('i2', 'kb_trovata'), anIntent('i3', 'valuta_urgenza')
+      ],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => {
+        if (type === 'nonsense') { return undefined; }
+        return { _tdActionId: `act-${type}-${actionIdCounter++}`, _tdActionType: type };
+      }),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('refuses add_action of type askgpt whose trueIntent is an invented slug, naming the field and value, and writes nothing', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#kb_trovata' } }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('askgpt');
+    expect(error).toContain('trueIntent');
+    expect(error).toContain('#kb_trovata');
+    expect(intentService.updateIntent).not.toHaveBeenCalled();
+    expect(intentService.getIntentFromId('i1').actions.length).toBe(0);
+  });
+
+  it('accepts the same destination given as a real \'#\' + intent_id', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#i2' } }
+    ]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i1').actions[0];
+    expect(added.trueIntent).toBe('#i2');
+  });
+
+  it('accepts a bare intent_id without the leading #', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: 'i2' } }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('accepts an empty destination as a normal intermediate state', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '' } }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('refuses update_action the same way, for a real, already-applied action', async () => {
+    const before = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#i2' } }
+    ]);
+    expect(before.ok).toBe(true);
+    const actionId = before.results[0].action_id;
+
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: actionId, fields: { falseIntent: '#not_real' } }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('falseIntent');
+    expect(error).toContain('#not_real');
+    // The earlier, valid trueIntent must be untouched by the refused call.
+    expect(intentService.getIntentFromId('i1').actions[0].trueIntent).toBe('#i2');
+  });
+
+  it('refuses add_intent whose inline actions carry a bad destination, and creates no block at all', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Raccogli Domanda',
+      actions: [{ type: 'capture_user_reply', fields: { goToIntent: '#kb_consulta' } }]
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('capture_user_reply');
+    expect(error).toContain('goToIntent');
+    expect(error).toContain('#kb_consulta');
+    expect(intentService.createNewIntent).not.toHaveBeenCalled();
+    expect(intentService.addNewIntentToListOfIntents).not.toHaveBeenCalled();
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+    expect(intentService.listOfIntents.length).toBe(3);
+  });
+
+  it('refuses capture_user_reply\'s bad goToIntent -- a different field name than the condition types', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'capture_user_reply', fields: { goToIntent: '#nope' } }
+    ]);
+    expect(report.ok).toBe(false);
+    const error = report.results[0].error;
+    expect(error).toContain('capture_user_reply');
+    expect(error).toContain('goToIntent');
+    expect(error).toContain('#nope');
+  });
+
+  it('refuses ai_condition\'s dynamic intents[].conditionIntentId when it does not resolve', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'ai_condition',
+      fields: { intents: [{ label: 'billing', conditionIntentId: '#agente_disponibile' }] }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('ai_condition');
+    expect(error).toContain('conditionIntentId');
+    expect(error).toContain('#agente_disponibile');
+  });
+
+  it('accepts ai_condition\'s dynamic conditionIntentId once it resolves to a real block', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'ai_condition',
+      fields: { intents: [{ label: 'billing', conditionIntentId: '#i3' }] }
+    }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('says a batch-created block has no id yet, and to route to it in a second call', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#kb_trovata' } }
+    ]);
+    const error = report.results[0].error;
+    expect(error.toLowerCase()).toContain('second call');
+    expect(error).toContain('add_intent');
+    expect(error.toLowerCase()).toContain('intent_id');
+  });
+});

@@ -234,6 +234,92 @@ export class FlowOpsService {
     [TYPE_ACTION.ITERATION]: ['goToIntent', 'fallbackIntent'],
   };
 
+  /** Every destination-carrying field this feature validates, wherever an
+   *  action's `fields` are applied -- `add_action`, `update_action`, and
+   *  `add_intent`'s inline `actions`. Built on top of
+   *  `CONDITIONAL_ROUTER_FIELDS` rather than a second, hand-typed list, so
+   *  the two features that both care about "which fields point at another
+   *  block" read one definition.
+   *
+   *  The one addition `CONDITIONAL_ROUTER_FIELDS` itself doesn't carry:
+   *  `ActionReplyV2`'s `noInputIntent` / `noMatchIntent`. That map
+   *  deliberately leaves `REPLYV2` out -- see its own doc comment -- because
+   *  those two fields, even both configured, don't decide the block's
+   *  outbound routing exhaustively enough to refuse `connect` over (a
+   *  clicked button still routes through its own destination, or the dot).
+   *  That reasoning is about whether `connect` should be blocked; it says
+   *  nothing about whether the field itself is a destination that must
+   *  resolve to a real block -- it still is one, so destination validation
+   *  covers it even though the connect guard doesn't.
+   *
+   *  `ai_condition`'s dynamic `intents[].conditionIntentId` is not listed
+   *  here for the same reason it is not in `CONDITIONAL_ROUTER_FIELDS`: it
+   *  lives at a variable index in an array, not a fixed field name. It is
+   *  validated separately in `validateActionDestinations`. */
+  private static readonly DESTINATION_FIELDS: Record<string, string[]> = {
+    ...FlowOpsService.CONDITIONAL_ROUTER_FIELDS,
+    [TYPE_ACTION.REPLYV2]: ['noInputIntent', 'noMatchIntent'],
+  };
+
+  /** Whether `value` is a destination `validateActionDestinations` accepts:
+   *  unset or empty (a routing field with no branch chosen yet -- a normal
+   *  intermediate state, never a refusal), or a reference this batch can
+   *  actually resolve on the canvas right now -- a `'#'`-prefixed
+   *  `intent_id`, or a bare one, the same two forms `connect`'s own
+   *  endpoints accept. Anything else -- an invented slug, a display name, a
+   *  block that plain doesn't exist -- does not resolve and is refused. */
+  private isAcceptableDestination(value: any): boolean {
+    if (value === undefined || value === null || value === '') { return true; }
+    if (typeof value !== 'string') { return false; }
+    const id = value.startsWith('#') ? value.slice(1) : value;
+    return !!this.intentService.getIntentFromId(id);
+  }
+
+  /** The refusal for one bad destination field -- named so the agent can
+   *  read exactly what to fix, and, critically, so it learns the fix a
+   *  batch can't apply by itself: a block `add_intent` creates in the same
+   *  batch has no `intent_id` yet, so nothing in that same batch can
+   *  legitimately route to it. That has to be a second call, once the
+   *  first one's result hands back the real id -- this message says so, in
+   *  the language the agent already responds to, rather than leaving it to
+   *  guess why a perfectly-formed-looking flow was refused. Returns null
+   *  when `value` is acceptable. */
+  private validateDestinationField(actionType: string, field: string, value: any): string | null {
+    if (this.isAcceptableDestination(value)) { return null; }
+    return `"${actionType}" action's "${field}" points at "${value}", which is not an ` +
+      `intent_id on the canvas. A destination must be an existing block's intent_id, with or ` +
+      `without the leading '#' -- never an invented slug or a display name. If "${value}" was ` +
+      `meant to reach a block this same batch's add_intent is creating, that block has no ` +
+      `intent_id yet: add_intent returns the new intent_id in its result, so set this ` +
+      `destination in a second call, once you have it.`;
+  }
+
+  /** Every destination field `fields` sets on an action of `actionType`,
+   *  checked against `DESTINATION_FIELDS` -- plus, for `ai_condition`, every
+   *  configured entry of the dynamic `intents[].conditionIntentId` array,
+   *  which `DESTINATION_FIELDS` cannot list by fixed field name. Returns the
+   *  first violation found, or null when every destination `fields` sets is
+   *  either empty or resolves. Called wherever an action's `fields` are
+   *  applied, before anything is written -- `add_action`, `update_action`,
+   *  and `add_intent`'s inline `actions` all route through this. */
+  private validateActionDestinations(actionType: string, fields?: Record<string, any>): string | null {
+    if (!fields) { return null; }
+    for (const field of FlowOpsService.DESTINATION_FIELDS[actionType] || []) {
+      if (!(field in fields)) { continue; }
+      const violation = this.validateDestinationField(actionType, field, fields[field]);
+      if (violation) { return violation; }
+    }
+    if (actionType === TYPE_ACTION.AI_CONDITION && Array.isArray(fields.intents)) {
+      for (let i = 0; i < fields.intents.length; i++) {
+        const value = fields.intents[i]?.conditionIntentId;
+        const violation = this.validateDestinationField(
+          actionType, `intents[${i}].conditionIntentId`, value);
+        if (violation) { return violation; }
+      }
+    }
+    return null;
+  }
+
   /** Whether `action` is an `ai_condition` action carrying at least one
    *  configured dynamic branch -- `intents[].conditionIntentId` for some
    *  AI-classified intent the author already pointed somewhere. Split out
@@ -375,6 +461,10 @@ export class FlowOpsService {
       if (violation) {
         return { op: op.op, ok: false, error: violation };
       }
+      const destinationViolation = this.validateActionDestinations(action.type, action.fields);
+      if (destinationViolation) {
+        return { op: op.op, ok: false, error: destinationViolation };
+      }
     }
     return null;
   }
@@ -405,7 +495,9 @@ export class FlowOpsService {
         const violation = scaffold
           ? this.findScaffoldViolation(op.type, scaffold, op.fields)
           : null;
-        return violation ? fail(violation) : { op: op.op, ok: true };
+        if (violation) { return fail(violation); }
+        const destinationViolation = this.validateActionDestinations(op.type, op.fields);
+        return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
       case 'update_action': {
         const intent = this.intentService.getIntentFromId((op as any).intent_id);
@@ -420,7 +512,10 @@ export class FlowOpsService {
         // operation can grow a `type` key once configured in the panel), and
         // those are not damage for update_action to flag.
         const violation = this.findScaffoldViolation(action._tdActionType, action, (op as any).fields);
-        return violation ? fail(violation) : { op: op.op, ok: true };
+        if (violation) { return fail(violation); }
+        const destinationViolation =
+          this.validateActionDestinations(action._tdActionType, (op as any).fields);
+        return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
       case 'delete_action': {
         const intent = this.intentService.getIntentFromId((op as any).intent_id);
