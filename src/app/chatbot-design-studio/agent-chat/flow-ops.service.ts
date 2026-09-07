@@ -157,8 +157,141 @@ export class FlowOpsService {
       case 'connect':
         return needsIntent(op.from_intent_id)
             ?? needsIntent(op.to_intent_id)
+            ?? this.validateConnectRouting(op)
             ?? { op: op.op, ok: true };
     }
+  }
+
+  /** Action types whose own fields already decide where the block they live
+   *  on goes next, and the field(s) on each that hold the destination(s).
+   *
+   *  Sourced from two places, cross-checked against each other: each class's
+   *  own fields in `action-model.ts`, and `connector.service.ts`'s
+   *  `createListOfConnectorsByIntent2` -- the studio's own (and only) list of
+   *  which field names it draws a real canvas connector from
+   *  (`trueIntent`/`falseIntent`, `goToIntent`/`fallbackIntent`, ...). A field
+   *  not in that list is not a destination the canvas renders, whatever it is
+   *  named. Every entry here was also confirmed against its own
+   *  `cds-action-*` component: each sets the field to `'#' + intent_id` from
+   *  an `onConnectorChange`/`onChangeBlockSelect`-style handler, the same
+   *  contract `connectViaDot` and `connectViaActionInList` already use.
+   *
+   *  `ai_condition` carries its branch destinations differently from every
+   *  other entry here -- one static pair (`fallbackIntent`, `errorIntent`)
+   *  plus a variable number of dynamic ones (`intents[].conditionIntentId`,
+   *  one per AI-classified branch the block author added). The static pair is
+   *  covered here like any other entry; the dynamic ones are checked
+   *  separately in `findConfiguredConditionalRouter`, which is why this map's
+   *  own value for it does not mention `conditionIntentId`.
+   *
+   *  Two field-name families that exist in `action-model.ts` under these same
+   *  names are deliberately left out, because they do not carry this
+   *  block-level meaning:
+   *   - `ActionReplyV2.noInputIntent` / `.noMatchIntent`. These are fallback
+   *     branches for a reply that carries quick-reply buttons -- gated on
+   *     `attributes.commands` holding a message with
+   *     `message.attributes.attachment.buttons.length > 0`, see
+   *     `checkButtonsInCommands` in `cds-action-reply-settings.component.ts`
+   *     -- not an exhaustive pair the way a condition's `trueIntent`/
+   *     `falseIntent` is. A clicked button still routes through its own
+   *     destination (or the block's own dot, when nothing else claims it);
+   *     configuring `noInputIntent`/`noMatchIntent` alone does not exhaust the
+   *     block's outbound routing, so it must not block `connect`.
+   *   - The VXML voice actions' `trueIntent`/`falseIntent`/`noInputIntent`
+   *     (`blind_transfer`, the DTMF actions, ...): `intent.service.ts`'s
+   *     `createNewAction` builds these fields nested inside a `Command`'s
+   *     `settings` (`command_form.settings = { trueIntent: null, ... }`),
+   *     never as a field on the action object itself the way every entry
+   *     below is. They also render through the separate voice component set
+   *     this feature does not target -- the same reasoning
+   *     `REPLY_LIKE_ACTION_TYPES` above already excludes voice actions by.
+   *     Reading `action[field]` below never sees a nested `settings` value
+   *     regardless, so no explicit exclusion is needed for these to be
+   *     correctly ignored; they are named here for the record. */
+  private static readonly CONDITIONAL_ROUTER_FIELDS: Record<string, string[]> = {
+    [TYPE_ACTION.JSON_CONDITION]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.JSON_CONDITION2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.CONDITION]: ['trueIntent'],
+    [TYPE_ACTION.AI_CONDITION]: ['fallbackIntent', 'errorIntent'],
+    [TYPE_ACTION.ONLINE_AGENTS]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.ONLINE_AGENTSV2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.OPEN_HOURS]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.WEB_REQUESTV2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.ASKGPT]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.ASKGPTV2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.GPT_TASK]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.GPT_ASSISTANT]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.AI_PROMPT]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.SEND_WHATSAPP]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.QAPLA]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.MAKE]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.HUBSPOT]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.CUSTOMERIO]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.BREVO]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.N8N]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.DATA_TABLE]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.CAPTURE_USER_REPLY]: ['goToIntent'],
+    [TYPE_ACTION.ITERATION]: ['goToIntent', 'fallbackIntent'],
+  };
+
+  /** Whether `action` is an `ai_condition` action carrying at least one
+   *  configured dynamic branch -- `intents[].conditionIntentId` for some
+   *  AI-classified intent the author already pointed somewhere. Split out
+   *  from `CONDITIONAL_ROUTER_FIELDS` because that map holds only fixed field
+   *  names, and this destination lives at a variable index in an array
+   *  instead. `connector.service.ts` draws a connector from exactly this
+   *  shape -- `key === 'conditionIntentId' && obj.label` -- so this checks
+   *  the same condition the canvas itself does. */
+  private hasConfiguredAiConditionBranch(action: any): boolean {
+    if (!action || action._tdActionType !== TYPE_ACTION.AI_CONDITION) { return false; }
+    return Array.isArray(action.intents) && action.intents.some((i: any) => !!i?.conditionIntentId);
+  }
+
+  /** The first action in `actions` that already routes the block by itself --
+   *  present, and carrying at least one non-empty destination among its entry
+   *  in `CONDITIONAL_ROUTER_FIELDS` (or, for `ai_condition`, a configured
+   *  dynamic branch). An action of a routing type with every destination
+   *  still empty is not yet a router -- an unconfigured `askgpt` action, say,
+   *  decides nothing, so it must not block `connect` from also setting the
+   *  dot. Returns null when no action on the block is both a routing type and
+   *  configured. */
+  private findConfiguredConditionalRouter(
+    actions: any[] | undefined
+  ): { action: any; fields: string[] } | null {
+    for (const action of actions || []) {
+      if (!action) { continue; }
+      const fields = FlowOpsService.CONDITIONAL_ROUTER_FIELDS[action._tdActionType];
+      if (!fields) { continue; }
+      const configured = fields.some(f => !!action[f]) || this.hasConfiguredAiConditionBranch(action);
+      if (configured) { return { action, fields }; }
+    }
+    return null;
+  }
+
+  /** Refuses a `connect` whose source block already routes itself through one
+   *  of its own actions -- a condition, or any other action type in
+   *  `CONDITIONAL_ROUTER_FIELDS` -- with at least one destination already set.
+   *  `connect` only ever adds an *unconditional* link (the dot, or the
+   *  actions-list intent action); writing one onto a block whose routing is
+   *  already fully decided by, say, a `jsoncondition2`'s `trueIntent` /
+   *  `falseIntent` would give the block two contradictory outbound semantics
+   *  -- the live defect this guards against. Refusing here, before anything
+   *  is applied, is what lets the agent read the message and fix its own
+   *  call rather than the studio silently drawing a third, spurious
+   *  connector. Returns null when the source block is not currently routed
+   *  this way, in which case `connect` proceeds exactly as before. */
+  private validateConnectRouting(op: Extract<FlowOp, { op: 'connect' }>): FlowOpResult | null {
+    const from = this.intentService.getIntentFromId(op.from_intent_id);
+    const router = this.findConfiguredConditionalRouter(from.actions);
+    if (!router) { return null; }
+    const fieldList = router.fields.join(' / ');
+    return {
+      op: op.op, ok: false,
+      error: `"${from.intent_display_name}" already routes conditionally, through its ` +
+        `"${router.action._tdActionType}" action -- connect would give the block a second, ` +
+        `contradictory destination. Set the branch destinations on that action's ${fieldList} ` +
+        `field(s) instead of connecting the block itself.`
+    };
   }
 
   /** The studio's own rules for a block's display name, applied to whatever

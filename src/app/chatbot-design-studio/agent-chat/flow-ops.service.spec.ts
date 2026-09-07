@@ -1471,3 +1471,140 @@ describe('FlowOpsService — add_intent lays new blocks out left to right', () =
     expect(addedIntent.attributes.position).toEqual({ x: 0, y: 0 });
   });
 });
+
+describe('FlowOpsService — connect refuses a block that already routes conditionally', () => {
+  // The live defect: a block whose routing is already fully decided by a
+  // condition-like action (jsoncondition2's trueIntent/falseIntent, for one)
+  // still let connect add an unconditional dot on top -- three outgoing
+  // connection points on one block, two of them contradictory. connect must
+  // refuse instead, the same way the rest of this service refuses rather
+  // than silently doing something the agent didn't ask for.
+  let service: FlowOpsService;
+  let intentService: any;
+  let connectorService: any;
+
+  function intentWithActions(id: string, name: string, actions: any[]): Intent {
+    const intent = anIntent(id, name);
+    intent.actions = actions;
+    return intent;
+  }
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [
+        intentWithActions('i1', 'Verifica Servizio', [
+          { _tdActionId: 'cond1', _tdActionType: 'jsoncondition2', trueIntent: '#i2', falseIntent: '#i3' }
+        ]),
+        intentWithActions('i2', 'Chiedi Data', []),
+        intentWithActions('i3', 'Chiedi Argomento', []),
+        intentWithActions('i4', 'unconfigured condition', [
+          { _tdActionId: 'cond2', _tdActionType: 'jsoncondition2', trueIntent: '', falseIntent: '' }
+        ]),
+        intentWithActions('i5', 'ordinary block', []),
+        intentWithActions('i6', 'configured askgpt', [
+          { _tdActionId: 'gpt1', _tdActionType: 'askgpt', trueIntent: '#i2', falseIntent: '' }
+        ]),
+        intentWithActions('i7', 'unconfigured askgpt', [
+          { _tdActionId: 'gpt2', _tdActionType: 'askgpt', trueIntent: '', falseIntent: '' }
+        ]),
+        intentWithActions('i8', 'configured capture_user_reply', [
+          { _tdActionId: 'cap1', _tdActionType: 'capture_user_reply', goToIntent: '#i2' }
+        ])
+      ],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
+        ({ _tdActionId: 'generated', _tdActionType: type })),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('refuses connect from a block whose jsoncondition2 already has a trueIntent set', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('Verifica Servizio');
+    expect(error).toContain('jsoncondition2');
+  });
+
+  it('changes nothing when connect is refused for an already-conditionally-routed block', async () => {
+    const from = intentService.getIntentFromId('i1');
+    const actionsBefore = JSON.parse(JSON.stringify(from.actions));
+    const dotBefore = JSON.parse(JSON.stringify(from.attributes.nextBlockAction));
+
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' }]);
+
+    expect(from.actions).toEqual(actionsBefore);
+    expect(from.attributes.nextBlockAction).toEqual(dotBefore);
+    expect(intentService.updateIntent).not.toHaveBeenCalled();
+    expect(connectorService.createConnectorFromId).not.toHaveBeenCalled();
+    expect(connectorService.createNewConnector).not.toHaveBeenCalled();
+  });
+
+  it('still allows connect when the condition action carries no destinations at all', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i4', to_intent_id: 'i2' }
+    ]);
+    expect(report.ok).toBe(true);
+    const from = intentService.getIntentFromId('i4');
+    expect(from.attributes.nextBlockAction.intentName).toBe('#i2');
+  });
+
+  it('leaves an ordinary block\'s connect unaffected', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i5', to_intent_id: 'i2' }
+    ]);
+    expect(report.ok).toBe(true);
+    const from = intentService.getIntentFromId('i5');
+    expect(from.attributes.nextBlockAction.intentName).toBe('#i2');
+  });
+
+  it('refuses connect from a block whose askgpt action already has a trueIntent set, naming the trueIntent / falseIntent fields', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i6', to_intent_id: 'i3' }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('configured askgpt');
+    expect(error).toContain('askgpt');
+    expect(error).toContain('trueIntent');
+    expect(error).toContain('falseIntent');
+  });
+
+  it('still allows connect when the askgpt action carries no destinations at all', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i7', to_intent_id: 'i2' }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('refuses connect from a block whose capture_user_reply already has a goToIntent set, naming that field', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i8', to_intent_id: 'i3' }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    const error = report.results[0].error;
+    expect(error).toContain('configured capture_user_reply');
+    expect(error).toContain('capture_user_reply');
+    expect(error).toContain('goToIntent');
+  });
+});
