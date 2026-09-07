@@ -10,6 +10,17 @@ import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 
+/** `tiledesk_token` in localStorage holds the whole `Authorization` header
+ *  value, scheme and all -- see webhook-service.service.ts, which sends it
+ *  through unchanged. The chat's own runtime client adds a `JWT ` scheme of
+ *  its own, so handing it an already-prefixed value would double it up and
+ *  every call would 401. Strip a leading scheme case-insensitively, tolerate
+ *  extra whitespace, and leave a bare token untouched -- the prefix is not
+ *  guaranteed to be there. */
+function stripTokenScheme(token: string): string {
+  return token.replace(/^\s*jwt\s+/i, '');
+}
+
 /** Owns the chat iframe's host side.
  *
  *  Design-studio knows one address. The iframe's src, the postMessage target
@@ -92,7 +103,7 @@ export class AgentChatHostService {
         // The chat's own mount point: it proxies /v1/ to the runtime, which is
         // why design-studio never learns the runtime's address.
         baseUrl: this.config.chatUrl,
-        token: localStorage.getItem('tiledesk_token') ?? undefined,
+        token: this.storedToken(),
         projectId: this.dashboardService.projectID,
         flowId: this.dashboardService.id_faq_kb
       })
@@ -121,11 +132,18 @@ export class AgentChatHostService {
   }
 
   public setToken(token: string): void {
-    this.host?.setToken(token);
+    this.host?.setToken(stripTokenScheme(token));
   }
 
   public detach(): void {
     this.host?.destroy();
     this.host = null;
+  }
+
+  /** The bare token for the chat's own config, stripped of the scheme
+   *  design-studio's storage already carries (see stripTokenScheme above). */
+  private storedToken(): string | undefined {
+    const stored = localStorage.getItem('tiledesk_token');
+    return stored ? stripTokenScheme(stored) : undefined;
   }
 }

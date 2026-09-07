@@ -94,6 +94,28 @@ describe('AgentChatHostService', () => {
     expect(config.flowId).toBe('kb1');
   });
 
+  it('strips a JWT scheme prefix off the stored token before handing it to the chat', async () => {
+    // tiledesk_token holds the whole Authorization header value (see
+    // webhook-service.service.ts, which sends it through unchanged). The
+    // chat's own client adds `JWT ` itself, so a prefixed value handed over
+    // here would double up and every call would 401.
+    localStorage.setItem('tiledesk_token', 'JWT eyJhbGci.abc.def');
+    await service.attach(document.createElement('iframe'));
+    expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
+  });
+
+  it('is tolerant of case and extra whitespace in the stored scheme prefix', async () => {
+    localStorage.setItem('tiledesk_token', '  jwt   eyJhbGci.abc.def');
+    await service.attach(document.createElement('iframe'));
+    expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
+  });
+
+  it('leaves a bare stored token unchanged', async () => {
+    localStorage.setItem('tiledesk_token', 'eyJhbGci.abc.def');
+    await service.attach(document.createElement('iframe'));
+    expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
+  });
+
   it('registers exactly the three client tools', async () => {
     await service.attach(document.createElement('iframe'));
     expect(Object.keys(registered).sort())
@@ -165,6 +187,27 @@ describe('AgentChatHostService', () => {
     // The conversation lives in that frame; reloading it to refresh a token
     // would throw the conversation away.
     expect(iframe.getAttribute('src')).toBe('https://chat.example.com/');
+  });
+
+  it('strips a JWT scheme prefix off a refreshed token before pushing it in', async () => {
+    // The token-refresh subscription reads from the same storage key as
+    // getConfig(), so it is fed the same already-prefixed value and needs
+    // the same treatment.
+    const iframe = document.createElement('iframe');
+    await service.attach(iframe);
+
+    tokenChanged.next('JWT eyJhbGci.fresh.token');
+
+    expect(createdHosts[0].setToken).toHaveBeenCalledWith('eyJhbGci.fresh.token');
+  });
+
+  it('leaves a bare refreshed token unchanged', async () => {
+    const iframe = document.createElement('iframe');
+    await service.attach(iframe);
+
+    tokenChanged.next('eyJhbGci.fresh.token');
+
+    expect(createdHosts[0].setToken).toHaveBeenCalledWith('eyJhbGci.fresh.token');
   });
 
   it('ignores a token refresh while nothing is attached', () => {
