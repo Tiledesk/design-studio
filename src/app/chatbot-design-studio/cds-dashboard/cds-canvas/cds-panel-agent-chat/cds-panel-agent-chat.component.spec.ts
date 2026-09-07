@@ -162,4 +162,31 @@ describe('CdsPanelAgentChatComponent', () => {
     expect(component.appliedCount).toBe(1);
     expect(component.canUndo).toBe(true);
   });
+
+  it('undoes the last change when the button is clicked, and stops offering it', async () => {
+    // Clicking the rendered button, rather than calling component.onUndo()
+    // directly, also pins the template wiring -- (click)="onUndo()" and the
+    // *ngIf="canUndo" that puts the button there in the first place.
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    const flowOps: any = TestBed.inject(FlowOpsService);
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: true, rejected_before_applying: false, results: [
+      { op: 'add_intent', ok: true }
+    ]});
+    fixture.detectChanges();
+
+    const undoButton: HTMLButtonElement =
+      fixture.nativeElement.querySelector('.agent-chat-applied button');
+    expect(undoButton).toBeTruthy();
+    undoButton.click();
+
+    expect(flowOps.undoLast).toHaveBeenCalled();
+    // The offer must be withdrawn once it has been taken -- a stale button
+    // clicked twice would ask the studio to undo a second, nonexistent change.
+    expect(component.canUndo).toBe(false);
+  });
 });
