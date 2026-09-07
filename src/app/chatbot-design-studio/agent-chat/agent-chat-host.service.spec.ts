@@ -4,7 +4,9 @@ import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { AppConfigService } from 'src/app/services/app-config';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 describe('AgentChatHostService', () => {
   let service: AgentChatHostService;
@@ -13,6 +15,9 @@ describe('AgentChatHostService', () => {
   let created: any;
   let createdHosts: any[];
   let originalImport: any;
+  let tokenChanged: Subject<string>;
+  let selectedChatbot: BehaviorSubject<any>;
+  let dashboardService: any;
 
   beforeEach(() => {
     registered = {};
@@ -40,12 +45,19 @@ describe('AgentChatHostService', () => {
         Promise.resolve({ ok: true, rejected_before_applying: false, results: [] }))
     };
 
+    tokenChanged = new Subject<string>();
+    selectedChatbot = new BehaviorSubject<any>(null);
+    dashboardService = {
+      projectID: 'p1', id_faq_kb: 'kb1', selectedChatbot$: selectedChatbot
+    };
+
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
         { provide: FlowOpsService, useValue: flowOps },
         { provide: IntentService, useValue: { intentSelected: { intent_id: 'i1' } } },
-        { provide: DashboardService, useValue: { projectID: 'p1', id_faq_kb: 'kb1' } },
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: tokenChanged } },
         { provide: AppConfigService, useValue: {
             getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } }
       ]
@@ -139,6 +151,38 @@ describe('AgentChatHostService', () => {
     expect(emitted).toEqual([report]);
   });
 
+  it('pushes a refreshed token into the running chat rather than reloading it', async () => {
+    // The error table promises token expiry is handled by setToken() without
+    // reloading the iframe. Until this was wired up, setToken() had no caller
+    // anywhere but its own spec, and a session outliving its JWT just failed.
+    const iframe = document.createElement('iframe');
+    await service.attach(iframe);
+    iframe.setAttribute('src', 'https://chat.example.com/');
+
+    tokenChanged.next('jwt-fresh');
+
+    expect(createdHosts[0].setToken).toHaveBeenCalledWith('jwt-fresh');
+    // The conversation lives in that frame; reloading it to refresh a token
+    // would throw the conversation away.
+    expect(iframe.getAttribute('src')).toBe('https://chat.example.com/');
+  });
+
+  it('ignores a token refresh while nothing is attached', () => {
+    expect(() => tokenChanged.next('jwt-fresh')).not.toThrow();
+  });
+
+  it('follows the user to another chatbot without reloading the frame', async () => {
+    await service.attach(document.createElement('iframe'));
+    createdHosts[0].setContext.calls.reset();
+
+    dashboardService.projectID = 'p2';
+    dashboardService.id_faq_kb = 'kb2';
+    selectedChatbot.next({ _id: 'kb2' });
+
+    expect(createdHosts[0].setContext)
+      .toHaveBeenCalledWith({ projectId: 'p2', flowId: 'kb2' });
+  });
+
   it('is not configured when the url is missing', () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -146,7 +190,8 @@ describe('AgentChatHostService', () => {
         AgentChatHostService,
         { provide: FlowOpsService, useValue: flowOps },
         { provide: IntentService, useValue: {} },
-        { provide: DashboardService, useValue: {} },
+        { provide: DashboardService, useValue: { selectedChatbot$: new BehaviorSubject(null) } },
+        { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: new Subject<string>() } },
         { provide: AppConfigService, useValue: { getConfig: () => ({}) } }
       ]
     });

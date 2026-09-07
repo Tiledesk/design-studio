@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { IntentService } from '../services/intent.service';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { FlowOpsService } from './flow-ops.service';
 import { FlowOp, FlowOpsReport } from './flow-ops.model';
 import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
@@ -33,9 +34,23 @@ export class AgentChatHostService {
     private appConfigService: AppConfigService,
     private dashboardService: DashboardService,
     private intentService: IntentService,
+    private tiledeskAuthService: TiledeskAuthService,
     private flowOps: FlowOpsService
   ) {
     this.config = readAgentChatConfig(this.appConfigService.getConfig());
+    // The chat is handed the token once, at `hello`, and then talks to the
+    // runtime by itself; a session that outlives its JWT would just start
+    // failing. Pushing a fresh one in beats reloading the frame, which would
+    // take the conversation with it.
+    this.tiledeskAuthService.tiledeskTokenChanged$
+      .subscribe((token: string) => this.setToken(token));
+    // Switching chatbot usually destroys the panel, and the re-attach that
+    // follows reads both values live -- but that is a property of today's
+    // routing, not a guarantee. This makes the context follow the switch
+    // whether or not the panel survives it.
+    this.dashboardService.selectedChatbot$.subscribe(() => this.setContext());
+    // Both are no-ops while nothing is attached. This service is root-scoped
+    // and lives as long as the app, so neither subscription outlives anything.
   }
 
   public isConfigured(): boolean {
@@ -55,6 +70,11 @@ export class AgentChatHostService {
     // panel remounts without a matching ngOnDestroy -- must not leave the
     // previous host's postMessage listener alive to answer alongside the new
     // one.
+    //
+    // Destroying before the new load, rather than after it succeeds, cannot
+    // lose a working host: the panel sets `attached = true` before calling
+    // wire() and clears it only when wire() fails, so the only way back here
+    // is after a failure -- and a failed attach() left no host behind.
     this.host?.destroy();
     this.host = null;
     let adapter;
