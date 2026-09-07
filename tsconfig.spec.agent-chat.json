@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-agent-chat",
+    "types": ["jasmine", "node"]
+  },
+  "files": ["src/test-agent-chat.ts", "src/polyfills.ts"],
+  "include": [
+    "src/app/chatbot-design-studio/agent-chat/**/*.spec.ts",
+    "src/app/chatbot-design-studio/cds-dashboard/cds-canvas/cds-panel-agent-chat/**/*.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

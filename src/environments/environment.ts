@@ -9,6 +9,10 @@ export const environment = {
     widgetBaseUrl: 'CHANGEIT',
     dashboardBaseUrl: 'CHANGEIT',
     whatsappTemplatesBaseUrl: 'CHANGEIT',
+    // The agent chat's mount point. It reverse proxies to the agent runtime,
+    // so this is the only address design-studio needs. Unset or CHANGEIT
+    // hides the feature entirely.
+    agentChatUrl: 'http://localhost:5173',
     wsUrl: 'ws://localhost:3000/',
     uploadEngine: 'native',
     baseImageUrl: 'CHANGEIT',
