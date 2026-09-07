@@ -21,7 +21,8 @@ function aConnectorService(): any {
     createNewConnector: jasmine.createSpy('createNewConnector')
       .and.returnValue(Promise.resolve()),
     createConnectorFromId: jasmine.createSpy('createConnectorFromId')
-      .and.returnValue(Promise.resolve(true))
+      .and.returnValue(Promise.resolve(true)),
+    deleteConnectorWithIDStartingWith: jasmine.createSpy('deleteConnectorWithIDStartingWith')
   };
 }
 
@@ -516,6 +517,142 @@ describe('FlowOpsService — action operations', () => {
 
     expect(connectorService.createConnectorFromId)
       .toHaveBeenCalledWith(`i1/${connector._tdActionId}`, 'i2', true);
+  });
+});
+
+describe('FlowOpsService — connect retargets whichever mechanism is actually live', () => {
+  // Every `start` block ships with a TYPE_ACTION.INTENT entry already in its
+  // `actions` -- that's the live connector for it, and it suppresses the
+  // block's own dot outright (isActionIntent in cds-intent.component.ts).
+  // Writing attributes.nextBlockAction on such a block, as the dot-only
+  // implementation did, changes a field nothing reads: the canvas keeps
+  // showing the old edge from the actions-list action. These tests cover the
+  // branch that retargets that action instead, mirroring
+  // cds-action-intent.component.ts's own onChangeSelect.
+  let service: FlowOpsService;
+  let intentService: any;
+  let connectorService: any;
+
+  function intentWithActionIntent(id: string, name: string): Intent {
+    const intent = anIntent(id, name);
+    intent.actions = [{
+      _tdActionId: 'existing-action-intent',
+      _tdActionType: 'intent',
+      intentName: ''
+    } as any];
+    return intent;
+  }
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [
+        intentWithActionIntent('i1', 'start'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
+      ],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
+        ({ _tdActionId: 'generated', _tdActionType: type })),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('retargets the actions-list intent action and leaves the (suppressed) dot untouched', async () => {
+    const from = intentService.getIntentFromId('i1');
+    // A real Intent is born with attributes.nextBlockAction already
+    // scaffolded -- capture it so the assertion below proves connect left it
+    // exactly alone, not merely that it stayed present.
+    const dotBefore = JSON.parse(JSON.stringify(from.attributes.nextBlockAction));
+
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(report.ok).toBe(true);
+
+    const actionIntent = from.actions.find((a: any) => a._tdActionType === 'intent');
+    expect(actionIntent._tdActionId).toBe('existing-action-intent');
+    expect(actionIntent.intentName).toBe('#i2');
+    expect(from.attributes.nextBlockAction).toEqual(dotBefore);
+    // No second action was created for this -- the existing one was reused.
+    expect(intentService.createNewAction).not.toHaveBeenCalled();
+  });
+
+  it('still sets the dot for a block whose actions carry no intent-type entry', async () => {
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'i2', to_intent_id: 'i3' }]);
+    expect(report.ok).toBe(true);
+    const from = intentService.getIntentFromId('i2');
+    expect(from.attributes.nextBlockAction.intentName).toBe('#i3');
+    expect((from.actions || []).length).toBe(0);
+  });
+
+  it('keeps the "#" contract on the actions-list path, same as the dot', async () => {
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    const actionIntent = intentService.getIntentFromId('i1').actions
+      .find((a: any) => a._tdActionType === 'intent');
+    // The exact same contract as the dot: ConnectorService strips '#' and
+    // blanks intentName outright when the id doesn't resolve -- a bare id or
+    // display name here would vanish on the next refresh.
+    expect(actionIntent.intentName).toBe('#i2');
+  });
+
+  it('draws through createNewConnector with the actions-list action\'s own id as fromId -- not the dot\'s call', async () => {
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    // fromId is intent_id + '/' + THIS action's own _tdActionId -- the same
+    // composition cds-action-intent.component.ts's initialize() uses
+    // (this.idConnector = this.idIntentSelected + '/' + this.action._tdActionId),
+    // not the dot's _tdActionId.
+    expect(connectorService.createNewConnector)
+      .toHaveBeenCalledWith('i1/existing-action-intent', 'i2');
+    // And never through the dot's own draw call.
+    expect(connectorService.createConnectorFromId).not.toHaveBeenCalled();
+  });
+
+  it('clears any previously-drawn edge from this action before drawing the retargeted one', async () => {
+    // cds-panel-action-detail.component.ts's onConnectorChange('create', ...)
+    // does this before createNewConnector -- without it a retarget would
+    // leave the old edge on screen, since createNewConnector has no
+    // "already exists" check and the connector's DOM id changes with toId.
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(connectorService.deleteConnectorWithIDStartingWith)
+      .toHaveBeenCalledWith('i1/existing-action-intent', false, true);
+  });
+
+  it('labels a freshly untitled actions-list action, but never overwrites an existing title on retarget', async () => {
+    const from = intentService.getIntentFromId('i1');
+    delete from.actions[0]._tdActionTitle;
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(from.actions[0]._tdActionTitle).toBe('welcome');
+
+    // A person may have edited the label by hand; retargeting the connector
+    // must not clobber it -- cds-action-intent.component.ts's own guard is
+    // `if (!this.action._tdActionTitle)`.
+    from.actions[0]._tdActionTitle = 'Custom label';
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' }]);
+    expect(from.actions[0]._tdActionTitle).toBe('Custom label');
+  });
+
+  it('retargets in place across repeated connects -- one action, not two', async () => {
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' }]);
+    const from = intentService.getIntentFromId('i1');
+    const intentActions = from.actions.filter((a: any) => a._tdActionType === 'intent');
+    expect(intentActions.length).toBe(1);
+    expect(intentActions[0].intentName).toBe('#i3');
   });
 });
 
