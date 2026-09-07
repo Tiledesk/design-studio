@@ -711,3 +711,166 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
       .toBe(action._tdActionTitle);
   });
 });
+
+describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () => {
+  // assignFields does a shallow Object.assign-style overwrite: a caller's
+  // nested object replaces the scaffolded one wholesale. createNewAction's
+  // ActionAssignVariableV2 builds operation: { operands: [...], operators: [] }
+  // -- structure cds-action-assign-variable-v2.component.html dereferences
+  // with a hard `.operands.length`, past the optional chain on `operation?.`.
+  // A fields.operation that drops `operands` produces an action the renderer
+  // throws on forever. These tests are the regression for that live defect.
+  let service: FlowOpsService;
+  let intentService: any;
+
+  function scaffoldFor(type: string): any {
+    if (type === 'nonsense') { return undefined; }
+    if (type === 'setattribute-v2') {
+      return {
+        _tdActionId: 'generated',
+        _tdActionType: 'setattribute-v2',
+        destination: '',
+        operation: { operands: [{ value: '', isVariable: false }], operators: [] }
+      };
+    }
+    return { _tdActionId: 'generated', _tdActionType: type };
+  }
+
+  beforeEach(() => {
+    const withAction = anIntent('i1', 'start');
+    // The existing action already carries a sub-key (`operation.type`) that a
+    // freshly built setattribute-v2 would not have -- exactly what saving a
+    // valid edit through the studio's own panel would leave behind.
+    withAction.actions = [{
+      _tdActionId: 'existing-1',
+      _tdActionType: 'setattribute-v2',
+      destination: 'incident_id',
+      operation: {
+        operands: [{ value: '', isVariable: false }],
+        operators: [],
+        type: 'now'
+      }
+    } as any];
+
+    intentService = {
+      listOfIntents: [withAction, anIntent('i2', 'welcome')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake(scaffoldFor),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('refuses add_action fields that delete the scaffold\'s nested keys -- the reported defect', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'setattribute-v2',
+      fields: { operation: { type: 'now' }, destination: 'incident_timestamp' }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('setattribute-v2');
+    expect(report.results[0].error).toContain('operands');
+    expect(intentService.getIntentFromId('i2').actions.length).toBe(0);
+  });
+
+  it('refuses the same shape through add_intent\'s inline actions', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      actions: [{ type: 'setattribute-v2', fields: { operation: { type: 'now' } } }]
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('operands');
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+  });
+
+  it('accepts an operation carrying every scaffold key plus an extra one', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'setattribute-v2',
+      fields: {
+        operation: {
+          operands: [{ value: '', isVariable: false }],
+          operators: [],
+          type: 'now'
+        }
+      }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.operation.type).toBe('now');
+  });
+
+  it('accepts an array wholesale replacing the scaffold\'s array', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'setattribute-v2',
+      fields: {
+        operation: {
+          operands: [{ value: 'x', isVariable: true }, { value: 'y', isVariable: false }],
+          operators: ['+']
+        }
+      }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.operation.operands.length).toBe(2);
+  });
+
+  it('leaves a scalar field free to change on its own', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'setattribute-v2',
+      fields: { destination: 'my_var' }
+    }]);
+    expect(report.ok).toBe(true);
+    expect(intentService.getIntentFromId('i2').actions[0].destination).toBe('my_var');
+  });
+
+  it('compares update_action against the existing action, so the user\'s own prior edit is not refused', async () => {
+    // The fixture's existing action already has operation.type = 'now' -- not
+    // something a fresh setattribute-v2 scaffold has. Changing only
+    // destination must not be refused on the grounds that a *freshly built*
+    // action wouldn't have that sub-key.
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'existing-1',
+      fields: { destination: 'new_dest' }
+    }]);
+    expect(report.ok).toBe(true);
+    expect(intentService.getIntentFromId('i1').actions[0].destination).toBe('new_dest');
+  });
+
+  it('still refuses update_action fields that would delete keys the existing action already has', async () => {
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'existing-1',
+      fields: { operation: { type: 'now' } }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('operands');
+    // Nothing applied: the existing action's operation is untouched.
+    expect(intentService.getIntentFromId('i1').actions[0].operation.type).toBe('now');
+  });
+});

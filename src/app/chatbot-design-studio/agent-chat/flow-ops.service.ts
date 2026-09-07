@@ -215,11 +215,16 @@ export class FlowOpsService {
       if (!action || typeof action.type !== 'string' || !action.type) {
         return { op: op.op, ok: false, error: 'Every action in add_intent.actions needs a type.' };
       }
-      if (!this.intentService.createNewAction(action.type as any)) {
+      const scaffold = this.intentService.createNewAction(action.type as any);
+      if (!scaffold) {
         return {
           op: op.op, ok: false,
           error: `"${action.type}" is not an action type this design studio can create.`
         };
+      }
+      const violation = this.findScaffoldViolation(action.type, scaffold, action.fields);
+      if (violation) {
+        return { op: op.op, ok: false, error: violation };
       }
     }
     return null;
@@ -238,11 +243,36 @@ export class FlowOpsService {
         return (op.position && typeof op.position.x === 'number' && typeof op.position.y === 'number')
           ? { op: op.op, ok: true }
           : fail('move needs a position with numeric x and y.');
-      case 'add_action':
-        return typeof op.type === 'string' && op.type
-          ? { op: op.op, ok: true }
-          : fail('add_action needs a type.');
-      case 'update_action':
+      case 'add_action': {
+        if (typeof op.type !== 'string' || !op.type) {
+          return fail('add_action needs a type.');
+        }
+        // Built and discarded here the same way validateAddIntentActions
+        // already does it: createNewAction only constructs a plain object, so
+        // calling it to check shape costs nothing. A type the studio cannot
+        // build comes back undefined -- that failure is reported by addAction
+        // itself at apply time, as it always has been, not here.
+        const scaffold = this.intentService.createNewAction(op.type as any);
+        const violation = scaffold
+          ? this.findScaffoldViolation(op.type, scaffold, op.fields)
+          : null;
+        return violation ? fail(violation) : { op: op.op, ok: true };
+      }
+      case 'update_action': {
+        const intent = this.intentService.getIntentFromId((op as any).intent_id);
+        const action = (intent.actions || [])
+          .find((a: any) => a._tdActionId === (op as any).action_id);
+        if (!action) {
+          return fail(`Intent "${(op as any).intent_id}" has no action with _tdActionId "${(op as any).action_id}".`);
+        }
+        // Compared against the action as it already exists, not a fresh
+        // createNewAction() scaffold: the action may carry sub-keys a user
+        // legitimately added since it was created (ActionAssignVariableV2's
+        // operation can grow a `type` key once configured in the panel), and
+        // those are not damage for update_action to flag.
+        const violation = this.findScaffoldViolation(action._tdActionType, action, (op as any).fields);
+        return violation ? fail(violation) : { op: op.op, ok: true };
+      }
       case 'delete_action': {
         const intent = this.intentService.getIntentFromId((op as any).intent_id);
         const found = (intent.actions || [])
@@ -369,6 +399,57 @@ export class FlowOpsService {
     Object.keys(fields)
       .filter(key => FlowOpsService.PROTECTED_FIELDS.indexOf(key) === -1)
       .forEach(key => { action[key] = fields[key]; });
+  }
+
+  /** `assignFields` overwrites wholesale: `action[key] = fields[key]`. For a
+   *  scalar or an array that is exactly the flexibility the agent needs. But
+   *  `createNewAction` also scaffolds nested objects the renderer depends on
+   *  -- `ActionAssignVariableV2.operation`, for one, built as
+   *  `{ operands: [...], operators: [] }` -- and
+   *  cds-action-assign-variable-v2.component.html reads
+   *  `action?.operation?.operands.length` straight through: the optional
+   *  chain stops at `operation?.`, so a caller's `operation` that lacks
+   *  `operands` renders as a hard `TypeError` forever, with the broken action
+   *  already saved.
+   *
+   *  Checked one level deep against `scaffold`, which is either a freshly
+   *  built action (`add_action`, `add_intent`'s inline actions) or the action
+   *  as it already exists (`update_action` -- see that call site for why).
+   *  For each of the scaffold's keys whose value is a non-null object or
+   *  array, if `fields` supplies that key: an array may be replaced by any
+   *  array, but an object must still carry every key the scaffold's object
+   *  had. A scalar field, or a key the scaffold never had, is untouched by
+   *  this check -- assignFields is free to do what it already does there.
+   *  Returns the refusal message, or null when `fields` is safe to apply. */
+  private findScaffoldViolation(
+    actionType: string, scaffold: any, fields?: Record<string, any>
+  ): string | null {
+    if (!fields || !scaffold) { return null; }
+    for (const key of Object.keys(scaffold)) {
+      if (!(key in fields)) { continue; }
+      const scaffolded = scaffold[key];
+      if (scaffolded === null || typeof scaffolded !== 'object') { continue; }
+      const supplied = fields[key];
+      if (Array.isArray(scaffolded)) {
+        if (!Array.isArray(supplied)) {
+          return `"${actionType}" action's "${key}" is an array; fields.${key} must be an ` +
+            `array too, not ${JSON.stringify(supplied)}.`;
+        }
+        continue;
+      }
+      if (supplied === null || typeof supplied !== 'object' || Array.isArray(supplied)) {
+        return `"${actionType}" action's "${key}" is an object; fields.${key} must be an ` +
+          `object too, not ${JSON.stringify(supplied)}.`;
+      }
+      const missing = Object.keys(scaffolded).filter(k => !(k in supplied));
+      if (missing.length > 0) {
+        return `"${actionType}" action's "${key}" needs ${Object.keys(scaffolded).join(', ')}; ` +
+          `fields.${key} is missing ${missing.join(', ')}. assignFields replaces "${key}" ` +
+          `wholesale rather than merging into it, so include every existing key alongside ` +
+          `whatever you're changing.`;
+      }
+    }
+    return null;
   }
 
   private async addAction(op: Extract<FlowOp, { op: 'add_action' }>): Promise<FlowOpResult> {
