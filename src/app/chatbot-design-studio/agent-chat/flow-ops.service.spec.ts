@@ -1840,3 +1840,174 @@ describe('FlowOpsService — an action\'s own destination fields must resolve on
     expect(error.toLowerCase()).toContain('intent_id');
   });
 });
+
+describe('FlowOpsService — a bare \'#\' destination is an empty one, not an invented slug', () => {
+  // Live defect: the agent writes trueIntent: '#' as its own way of saying
+  // "not set yet" -- the '#' prefix every real destination uses, with
+  // nothing after it. `isAcceptableDestination` stripped a leading '#' and
+  // checked what was left resolved, but never checked whether anything was
+  // left at all, so '#' alone (and '#' padded with whitespace) fell through
+  // to "does not resolve" and refused the whole batch. Empty is empty,
+  // whatever prefix it arrived wearing.
+  let service: FlowOpsService;
+  let intentService: any;
+  let actionIdCounter: number;
+
+  beforeEach(() => {
+    actionIdCounter = 0;
+    intentService = {
+      listOfIntents: [
+        anIntent('i1', 'start'), anIntent('i2', 'kb_trovata'), anIntent('i3', 'valuta_urgenza')
+      ],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => {
+        if (type === 'nonsense') { return undefined; }
+        return { _tdActionId: `act-${type}-${actionIdCounter++}`, _tdActionType: type };
+      }),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('accepts add_action of type askgpt with trueIntent: "#"', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#' } }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('accepts "#" padded with surrounding whitespace', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '  #  ' } }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('accepts a destination that is only whitespace, no \'#\' at all', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: ' ' } }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('still refuses a genuinely invented slug -- "#" is not a wildcard for "anything goes"', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#kb_trovata' } }
+    ]);
+    expect(report.ok).toBe(false);
+    const error = report.results[0].error;
+    expect(error).toContain('#kb_trovata');
+  });
+
+  it('accepts the same "#" form through update_action', async () => {
+    const before = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#i2' } }
+    ]);
+    const actionId = before.results[0].action_id;
+
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: actionId, fields: { falseIntent: '#' } }
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('accepts the same "#" form through add_intent\'s inline actions', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Raccogli Domanda',
+      actions: [{ type: 'askgpt', fields: { trueIntent: '#' } }]
+    }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('still refuses an invented slug through add_intent\'s inline actions', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Raccogli Domanda',
+      actions: [{ type: 'askgpt', fields: { trueIntent: '#kb_trovata' } }]
+    }]);
+    expect(report.ok).toBe(false);
+  });
+
+  it('stores a "#"-only destination as "", not the raw "#" the agent sent', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#' } }
+    ]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i1').actions[0];
+    expect(added.trueIntent).toBe('');
+  });
+
+  it('stores a whitespace-padded "#" destination as "" too', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '  #  ' } }
+    ]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i1').actions[0];
+    expect(added.trueIntent).toBe('');
+  });
+
+  it('stores a "#"-only destination set through update_action as "" too', async () => {
+    const before = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'askgpt', fields: { trueIntent: '#i2' } }
+    ]);
+    const actionId = before.results[0].action_id;
+
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: actionId, fields: { falseIntent: '#' } }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(intentService.getIntentFromId('i1').actions[0].falseIntent).toBe('');
+  });
+
+  it('stores a "#"-only destination set through add_intent\'s inline actions as "" too', async () => {
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Raccogli Domanda',
+      actions: [{ type: 'askgpt', fields: { trueIntent: '#' } }]
+    }]);
+    expect(report.ok).toBe(true);
+    const addedIntent = intentService.addNewIntentToListOfIntents.calls.mostRecent().args[0];
+    expect(addedIntent.actions[0].trueIntent).toBe('');
+  });
+
+  it('still resolves a real destination through ai_condition\'s dynamic conditionIntentId when the others on the block are "#"', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'ai_condition',
+      fields: {
+        fallbackIntent: '#', errorIntent: '#',
+        intents: [{ label: 'billing', conditionIntentId: '#i3' }]
+      }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i1').actions[0];
+    expect(added.fallbackIntent).toBe('');
+    expect(added.errorIntent).toBe('');
+    expect(added.intents[0].conditionIntentId).toBe('#i3');
+  });
+});

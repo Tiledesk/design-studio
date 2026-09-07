@@ -261,17 +261,38 @@ export class FlowOpsService {
     [TYPE_ACTION.REPLYV2]: ['noInputIntent', 'noMatchIntent'],
   };
 
+  /** Strips a leading `'#'` and surrounding whitespace from a destination
+   *  string, the same shape `ConnectorService` strips before it looks a
+   *  destination up (`action.trueIntent.replace("#", "")`, there without the
+   *  trim). Trims first so a `'#'` wrapped in whitespace (`'  #  '`) is
+   *  recognised as the prefix before the prefix check runs, then trims again
+   *  in case whitespace sat between the `'#'` and the rest. The single place
+   *  both `isAcceptableDestination` and `normalizeStoredDestinations` ask
+   *  "what, if anything, does this actually name" -- so a bare `'#'`, `'#'`
+   *  padded with whitespace, and plain whitespace all reduce to the same
+   *  empty string as `''` itself, rather than each caller re-deriving its
+   *  own idea of "nothing here". */
+  private normalizedDestinationId(value: string): string {
+    const trimmed = value.trim();
+    const stripped = trimmed.startsWith('#') ? trimmed.slice(1) : trimmed;
+    return stripped.trim();
+  }
+
   /** Whether `value` is a destination `validateActionDestinations` accepts:
    *  unset or empty (a routing field with no branch chosen yet -- a normal
-   *  intermediate state, never a refusal), or a reference this batch can
-   *  actually resolve on the canvas right now -- a `'#'`-prefixed
-   *  `intent_id`, or a bare one, the same two forms `connect`'s own
-   *  endpoints accept. Anything else -- an invented slug, a display name, a
-   *  block that plain doesn't exist -- does not resolve and is refused. */
+   *  intermediate state, never a refusal) -- which now includes a `'#'` with
+   *  nothing meaningful after it, the form the agent itself writes for "not
+   *  set yet" since every real destination already wears the same `'#'`
+   *  prefix -- or a reference this batch can actually resolve on the canvas
+   *  right now -- a `'#'`-prefixed `intent_id`, or a bare one, the same two
+   *  forms `connect`'s own endpoints accept. Anything else -- an invented
+   *  slug, a display name, a block that plain doesn't exist -- does not
+   *  resolve and is refused. */
   private isAcceptableDestination(value: any): boolean {
     if (value === undefined || value === null || value === '') { return true; }
     if (typeof value !== 'string') { return false; }
-    const id = value.startsWith('#') ? value.slice(1) : value;
+    const id = this.normalizedDestinationId(value);
+    if (id === '') { return true; }
     return !!this.intentService.getIntentFromId(id);
   }
 
@@ -594,6 +615,7 @@ export class FlowOpsService {
       const action = this.intentService.createNewAction(actionSpec.type as any);
       this.assignFields(action, actionSpec.fields);
       this.writeReplyText(action._tdActionType, action, actionSpec.fields);
+      this.normalizeStoredDestinations(action, actionSpec.fields);
       intent.actions.push(action);
     }
     this.intentService.addNewIntentToListOfIntents(intent);
@@ -749,6 +771,51 @@ export class FlowOpsService {
     commands.push(wait, command);
   }
 
+  /** Blanks any destination field `fields` just set on `action` to a plain
+   *  `''` when it normalizes to empty -- a bare `'#'`, with or without
+   *  surrounding whitespace, or plain whitespace. `isAcceptableDestination`
+   *  already lets every one of those forms through as "unset"; without this,
+   *  the raw value the agent sent (`'#'`, `'  #  '`, ...) would land on the
+   *  action verbatim -- harmless to `ConnectorService`, which blanks it the
+   *  same way on its own next refresh (see the doc comment on
+   *  `DESTINATION_FIELDS` for that read path), but truthy in the meantime to
+   *  this file's own `findConfiguredConditionalRouter` /
+   *  `hasConfiguredAiConditionBranch`, both of which decide "already
+   *  configured" by `!!action[field]` and would misread a stored `'#'` as a
+   *  real branch. Storing `''` -- the same value every other unset
+   *  destination already uses -- keeps that check honest and makes what is
+   *  on disk agree with what `isAcceptableDestination` just accepted, rather
+   *  than opening a second, inconsistent notion of "empty" alongside it.
+   *
+   *  Reuses `normalizedDestinationId`, the same resolution
+   *  `isAcceptableDestination` validates against, rather than a second
+   *  normalization path. Only touches fields `fields` actually supplied --
+   *  an untouched destination already on the action (from a prior call) is
+   *  left exactly as it was found. Mutates `action` in place; called once
+   *  `assignFields` has already written `fields` onto it, from every path
+   *  that writes an action's fields: `addAction`, `updateAction`,
+   *  `add_intent`'s inline action loop. */
+  private normalizeStoredDestinations(action: any, fields?: Record<string, any>): void {
+    if (!action || !fields) { return; }
+    const destinationFields = FlowOpsService.DESTINATION_FIELDS[action._tdActionType] || [];
+    for (const field of destinationFields) {
+      if (!(field in fields)) { continue; }
+      if (typeof action[field] === 'string' && this.normalizedDestinationId(action[field]) === '') {
+        action[field] = '';
+      }
+    }
+    if (action._tdActionType === TYPE_ACTION.AI_CONDITION
+        && Array.isArray(fields.intents) && Array.isArray(action.intents)) {
+      for (let i = 0; i < action.intents.length; i++) {
+        const entry = action.intents[i];
+        if (entry && typeof entry.conditionIntentId === 'string'
+            && this.normalizedDestinationId(entry.conditionIntentId) === '') {
+          entry.conditionIntentId = '';
+        }
+      }
+    }
+  }
+
   /** `assignFields` overwrites wholesale: `action[key] = fields[key]`. For a
    *  scalar, or an object that is only ever a bag of scalar defaults, that is
    *  exactly the flexibility the agent needs -- `ActionWebRequestV2`'s
@@ -868,6 +935,7 @@ export class FlowOpsService {
     }
     this.assignFields(action, op.fields);
     this.writeReplyText(action._tdActionType, action, op.fields);
+    this.normalizeStoredDestinations(action, op.fields);
     intent.actions = intent.actions || [];
     if (typeof op.index === 'number' && op.index >= 0 && op.index <= intent.actions.length) {
       intent.actions.splice(op.index, 0, action);
@@ -883,6 +951,7 @@ export class FlowOpsService {
     const action = intent.actions.find((a: any) => a._tdActionId === op.action_id);
     this.assignFields(action, op.fields);
     this.writeReplyText(action._tdActionType, action, op.fields);
+    this.normalizeStoredDestinations(action, op.fields);
     await this.intentService.updateIntent(intent);
     return { op: op.op, ok: true, intent_id: op.intent_id, action_id: op.action_id };
   }
