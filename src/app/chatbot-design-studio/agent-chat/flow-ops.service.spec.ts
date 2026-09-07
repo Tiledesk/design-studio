@@ -675,7 +675,12 @@ describe('FlowOpsService — add_intent with inline actions', () => {
           intent.attributes.position = pos;
           return intent;
         }),
-      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      // Mirrors the real IntentService.addNewIntentToListOfIntents, which
+      // pushes onto listOfIntents -- needed so a follow-up update_action in
+      // the same test can find the block add_intent just created, the way it
+      // would on the real canvas.
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents')
+        .and.callFake((intent: Intent) => { intentService.listOfIntents.push(intent); }),
       saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
       updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
       deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
@@ -730,6 +735,64 @@ describe('FlowOpsService — add_intent with inline actions', () => {
     expect(savedIntent.actions[0].text).toBe('Qual è la tua email?');
     expect(savedIntent.actions[1]._tdActionType).toBe('capture_user_reply');
     expect(savedIntent.actions[1].assignResultTo).toBe('user_email');
+  });
+
+  it('returns the inline actions\' ids, in order, so a follow-up call can address them', async () => {
+    // The gap this closes: an action created inline has no id the agent can
+    // reach any other way until add_intent hands one back. Without this,
+    // wiring routing fields via update_action means guessing an action_id --
+    // exactly the "1" an agent guessed live, per the reported defect.
+    const report = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Chiedi Email',
+      actions: [
+        { type: 'reply', fields: { text: 'Qual è la tua email?' } },
+        { type: 'capture_user_reply', fields: { assignResultTo: 'user_email' } }
+      ]
+    }]);
+
+    expect(report.ok).toBe(true);
+    const savedIntent = intentService.saveNewIntent.calls.mostRecent().args[0];
+    expect(report.results[0].action_ids).toEqual([
+      savedIntent.actions[0]._tdActionId,
+      savedIntent.actions[1]._tdActionId
+    ]);
+  });
+
+  it('does not return a stray action_ids when add_intent created no inline actions', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'greeting' }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(report.results[0].action_ids).toBeUndefined();
+  });
+
+  it('hands back ids that genuinely work: a follow-up update_action succeeds with one', async () => {
+    const addReport = await service.apply([{
+      op: 'add_intent',
+      intent_display_name: 'Chiedi Email',
+      actions: [
+        { type: 'reply', fields: { text: 'Qual è la tua email?' } },
+        { type: 'capture_user_reply', fields: { assignResultTo: 'user_email' } }
+      ]
+    }]);
+    const [firstActionId, secondActionId] = addReport.results[0].action_ids!;
+    const newIntentId = addReport.results[0].intent_id!;
+
+    const wireReport = await service.apply([{
+      op: 'update_action', intent_id: newIntentId, action_id: secondActionId,
+      fields: { goToIntent: '#i1' }
+    }]);
+
+    expect(wireReport.ok).toBe(true);
+    const wired = intentService.getIntentFromId(newIntentId).actions
+      .find((a: any) => a._tdActionId === secondActionId);
+    expect(wired.goToIntent).toBe('#i1');
+    // The other returned id is a distinct, still-present action -- proof the
+    // two ids in action_ids actually address two different actions, not the
+    // same one twice.
+    expect(intentService.getIntentFromId(newIntentId).actions
+      .some((a: any) => a._tdActionId === firstActionId)).toBe(true);
   });
 
   it('behaves exactly as before when actions is omitted', async () => {

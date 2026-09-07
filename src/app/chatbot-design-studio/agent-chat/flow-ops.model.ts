@@ -31,6 +31,15 @@ export interface FlowOpResult {
   intent_id?: string;
   /** Present when an action was created. */
   action_id?: string;
+  /** Present on a successful `add_intent` that created inline `actions`: the
+   *  `_tdActionId` of each, in the same order as `op.actions`. Without this,
+   *  those actions' ids exist only inside the studio's own model -- an agent
+   *  wiring up routing afterwards (`update_action` on `askgpt`, `ai_condition`,
+   *  `webrequestv2`, and the other action types that carry their own
+   *  destinations) would have no `action_id` to address them by, and no way
+   *  to get one except guessing. Omitted, not an empty array, when `add_intent`
+   *  created no inline actions. */
+  action_ids?: string[];
   /** Present when not ok. States what was wrong, so the agent can correct it. */
   error?: string;
 }

@@ -599,7 +599,15 @@ export class FlowOpsService {
     this.intentService.addNewIntentToListOfIntents(intent);
     await this.intentService.saveNewIntent(intent, intent, null);
     this.registerDrag(intent.intent_id);
-    return { op: op.op, ok: true, intent_id: intent.intent_id };
+    const result: FlowOpResult = { op: op.op, ok: true, intent_id: intent.intent_id };
+    // Only when actions were actually created inline -- see FlowOpResult's own
+    // doc comment for why this is the direct path for wiring them up
+    // afterwards, and why it stays absent rather than an empty array when
+    // add_intent built no actions.
+    if (intent.actions.length > 0) {
+      result.action_ids = intent.actions.map((action: any) => action._tdActionId);
+    }
+    return result;
   }
 
   /** Register the studio's own drag handler on a newly created block, the way
