@@ -402,9 +402,13 @@ export class FlowOpsService {
   }
 
   /** `assignFields` overwrites wholesale: `action[key] = fields[key]`. For a
-   *  scalar or an array that is exactly the flexibility the agent needs. But
-   *  `createNewAction` also scaffolds nested objects the renderer depends on
-   *  -- `ActionAssignVariableV2.operation`, for one, built as
+   *  scalar, or an object that is only ever a bag of scalar defaults, that is
+   *  exactly the flexibility the agent needs -- `ActionWebRequestV2`'s
+   *  `headersString` scaffolds four default header strings a person can
+   *  freely delete or replace through the panel, and an agent doing the same
+   *  through `fields.headersString` is not damaging anything. But
+   *  `createNewAction` also scaffolds *structure* the renderer depends on --
+   *  `ActionAssignVariableV2.operation`, for one, built as
    *  `{ operands: [...], operators: [] }` -- and
    *  cds-action-assign-variable-v2.component.html reads
    *  `action?.operation?.operands.length` straight through: the optional
@@ -412,15 +416,30 @@ export class FlowOpsService {
    *  `operands` renders as a hard `TypeError` forever, with the broken action
    *  already saved.
    *
+   *  The distinction: a scaffolded object is protected only when it itself
+   *  holds at least one container value (an array or a nested object) --
+   *  `operation.operands` is an array, so `operation` is protected; so is
+   *  `ActionReply.attributes`, whose `commands` is an array that
+   *  cds-action-reply.component.ts dereferences the same hard way
+   *  (`this.action.attributes.commands`, no `?.` at all). By contrast
+   *  `headersString`'s values are all strings, `settings: { timeout: 20000 }`
+   *  holds only a number, and `ActionHideMessage.attributes: { subtype: "info" }`
+   *  -- an unrelated, differently-shaped field that happens to share the name
+   *  -- holds only a string, so none of those are protected. This is derived
+   *  from what the constructor actually built, not a hand-maintained list of
+   *  which keys matter, so an action type added later is classified
+   *  correctly without touching this method.
+   *
    *  Checked one level deep against `scaffold`, which is either a freshly
    *  built action (`add_action`, `add_intent`'s inline actions) or the action
    *  as it already exists (`update_action` -- see that call site for why).
-   *  For each of the scaffold's keys whose value is a non-null object or
-   *  array, if `fields` supplies that key: an array may be replaced by any
-   *  array, but an object must still carry every key the scaffold's object
-   *  had. A scalar field, or a key the scaffold never had, is untouched by
-   *  this check -- assignFields is free to do what it already does there.
-   *  Returns the refusal message, or null when `fields` is safe to apply. */
+   *  For each of the scaffold's *protected* keys, if `fields` supplies that
+   *  key: an array may be replaced by any array, but an object must still
+   *  carry every key the scaffold's object had. A scalar field, an
+   *  unprotected (defaults-only) object, or a key the scaffold never had, is
+   *  untouched by this check -- assignFields is free to do what it already
+   *  does there. Returns the refusal message, or null when `fields` is safe
+   *  to apply. */
   private findScaffoldViolation(
     actionType: string, scaffold: any, fields?: Record<string, any>
   ): string | null {
@@ -437,6 +456,11 @@ export class FlowOpsService {
         }
         continue;
       }
+      // A plain object: protected only if it holds structure of its own --
+      // otherwise its keys are defaults, not something fields must preserve.
+      const holdsAContainer = Object.values(scaffolded)
+        .some(v => v !== null && typeof v === 'object');
+      if (!holdsAContainer) { continue; }
       if (supplied === null || typeof supplied !== 'object' || Array.isArray(supplied)) {
         return `"${actionType}" action's "${key}" is an object; fields.${key} must be an ` +
           `object too, not ${JSON.stringify(supplied)}.`;

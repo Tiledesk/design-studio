@@ -733,6 +733,49 @@ describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () 
         operation: { operands: [{ value: '', isVariable: false }], operators: [] }
       };
     }
+    if (type === 'webrequestv2') {
+      // The real ActionWebRequestV2 scaffold (action-model.ts) -- headersString,
+      // settings and assignments are objects, but every one of their own
+      // values is a scalar (or, for assignments, there are none at all).
+      // None of that is structure a renderer depends on; it's just starting
+      // defaults a person can freely replace through the panel.
+      return {
+        _tdActionId: 'generated',
+        _tdActionType: 'webrequestv2',
+        method: 'GET',
+        url: '',
+        headersString: {
+          'Content-Type': '*/*', 'Cache-Control': 'no-cache',
+          'User-Agent': 'BotRuntime', 'Accept': '*/*'
+        },
+        settings: { timeout: 20000 },
+        jsonBody: null,
+        formData: [],
+        bodyType: 'none',
+        assignResultTo: 'result',
+        assignStatusTo: 'status',
+        assignErrorTo: 'error',
+        assignments: {}
+      };
+    }
+    if (type === 'reply') {
+      // The real createNewAction(TYPE_ACTION.REPLY) scaffold: attributes is
+      // an object, but unlike headersString/settings it holds a container of
+      // its own (`commands`) -- the same shape cds-action-reply.component.ts
+      // dereferences with a hard `this.action.attributes.commands`, no `?.`
+      // at all. It must stay protected even though it happens to share the
+      // field name "attributes" with ActionHideMessage's unprotected,
+      // scalar-only { subtype: "info" }.
+      return {
+        _tdActionId: 'generated',
+        _tdActionType: 'reply',
+        text: undefined,
+        attributes: {
+          disableInputMessage: false,
+          commands: [{ type: 'wait' }, { type: 'message' }]
+        }
+      };
+    }
     return { _tdActionId: 'generated', _tdActionType: type };
   }
 
@@ -847,6 +890,38 @@ describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () 
     }]);
     expect(report.ok).toBe(true);
     expect(intentService.getIntentFromId('i2').actions[0].destination).toBe('my_var');
+  });
+
+  it('accepts a full headersString replacement, since it holds only defaults and no structure', async () => {
+    // The false positive: headersString scaffolds four default header
+    // strings a person can freely delete or replace through the panel.
+    // Refusing an agent that sends only Authorization -- dropping the
+    // defaults entirely -- would block ordinary header configuration, which
+    // is most of the point of a web request action. Pinned here so the
+    // refined "protected only if it holds a container value" rule can't
+    // regress back to treating every scaffolded object as structure.
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'webrequestv2',
+      fields: { headersString: { Authorization: 'Bearer x' } }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.headersString).toEqual({ Authorization: 'Bearer x' });
+  });
+
+  it('still refuses an attributes object that drops the commands array a reply action renders from', async () => {
+    // Confirms the refined rule does not overcorrect: a scaffolded object
+    // that DOES hold a container (attributes.commands, an array) stays
+    // protected, even though a differently-shaped, unrelated field
+    // (ActionHideMessage.attributes) happens to share its name and is not.
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { attributes: { disableInputMessage: true } }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('commands');
+    expect(intentService.getIntentFromId('i2').actions.length).toBe(0);
   });
 
   it('compares update_action against the existing action, so the user\'s own prior edit is not refused', async () => {
