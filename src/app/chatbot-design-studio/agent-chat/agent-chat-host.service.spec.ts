@@ -11,22 +11,26 @@ describe('AgentChatHostService', () => {
   let flowOps: any;
   let registered: Record<string, Function>;
   let created: any;
+  let createdHosts: any[];
   let originalImport: any;
 
   beforeEach(() => {
     registered = {};
     created = null;
+    createdHosts = [];
     originalImport = moduleImporter.load;
     moduleImporter.load = () => Promise.resolve({
       PROTOCOL_VERSION: 1,
       createAgentChatHost: (opts: any) => {
         created = opts;
-        return {
+        const host = {
           registerTool: (name: string, fn: Function) => { registered[name] = fn; },
           setContext: jasmine.createSpy('setContext'),
           setToken: jasmine.createSpy('setToken'),
           destroy: jasmine.createSpy('destroy')
         };
+        createdHosts.push(host);
+        return host;
       }
     });
 
@@ -108,6 +112,31 @@ describe('AgentChatHostService', () => {
     moduleImporter.load = () => Promise.reject(new TypeError('Failed to fetch'));
     await expectAsync(service.attach(document.createElement('iframe'))).toBeRejected();
     expect(service.lastError).toContain('did not serve a usable adapter');
+  });
+
+  it('destroys the previous host before creating another, so re-attaching does not leak a listener', async () => {
+    await service.attach(document.createElement('iframe'));
+    const firstHost = createdHosts[0];
+    await service.attach(document.createElement('iframe'));
+    expect(createdHosts.length).toBe(2);
+    expect(firstHost.destroy).toHaveBeenCalled();
+  });
+
+  it('never sets the iframe src itself, so the caller controls the ready race', async () => {
+    const iframe = document.createElement('iframe');
+    await service.attach(iframe);
+    expect(iframe.getAttribute('src')).toBeNull();
+    expect(Object.keys(registered).length).toBe(3);
+  });
+
+  it('emits the flow ops report on applied$ after apply_flow_patch', async () => {
+    await service.attach(document.createElement('iframe'));
+    const report = { ok: true, rejected_before_applying: false, results: [{ op: 'move', ok: true }] };
+    flowOps.apply.and.returnValue(Promise.resolve(report));
+    const emitted: any[] = [];
+    service.applied$.subscribe(r => emitted.push(r));
+    await registered['apply_flow_patch']({ operations: [] });
+    expect(emitted).toEqual([report]);
   });
 
   it('is not configured when the url is missing', () => {

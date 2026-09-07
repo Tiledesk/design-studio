@@ -51,6 +51,12 @@ export class AgentChatHostService {
    *  first can beat the listener into existence. */
   public async attach(iframe: HTMLIFrameElement): Promise<void> {
     this.lastError = null;
+    // A second attach() without an intervening detach() -- plausible if a
+    // panel remounts without a matching ngOnDestroy -- must not leave the
+    // previous host's postMessage listener alive to answer alongside the new
+    // one.
+    this.host?.destroy();
+    this.host = null;
     let adapter;
     try {
       adapter = await loadAgentChatAdapter(this.config.chatUrl);
