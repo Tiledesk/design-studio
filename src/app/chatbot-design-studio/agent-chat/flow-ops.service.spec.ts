@@ -149,3 +149,107 @@ describe('FlowOpsService — intent operations', () => {
     expect(report.results[1].error).toContain('network down');
   });
 });
+
+describe('FlowOpsService — action operations', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+
+  beforeEach(() => {
+    const withAction = anIntent('i1', 'start');
+    withAction.actions = [{ _tdActionId: 'a1', _tdActionType: 'reply', text: 'hi' } as any];
+
+    intentService = {
+      listOfIntents: [withAction, anIntent('i2', 'welcome')],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => {
+        if (type === 'nonsense') { return undefined; }
+        return { _tdActionId: 'generated', _tdActionType: type };
+      }),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('builds an action with createNewAction rather than from raw json', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i2', type: 'reply', fields: { text: 'hello' } }
+    ]);
+    expect(intentService.createNewAction).toHaveBeenCalledWith('reply');
+    expect(report.results[0].action_id).toBe('generated');
+    const added: any = intentService.getIntentFromId('i2').actions[0];
+    expect(added._tdActionType).toBe('reply');
+    expect(added.text).toBe('hello');
+  });
+
+  it('inserts at an index when one is given', async () => {
+    await service.apply([{ op: 'add_action', intent_id: 'i1', type: 'reply', index: 0 }]);
+    expect(intentService.getIntentFromId('i1').actions[0]._tdActionId).toBe('generated');
+  });
+
+  it('refuses an action type the studio cannot build', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'nonsense' }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain('nonsense');
+  });
+
+  it('never lets fields overwrite an action identity', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { _tdActionId: 'forged', _tdActionType: 'agent', text: 'x' }
+    }]);
+    const added: any = intentService.getIntentFromId('i2').actions[0];
+    expect(added._tdActionId).toBe('generated');
+    expect(added._tdActionType).toBe('reply');
+  });
+
+  it('updates an existing action', async () => {
+    await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: 'a1', fields: { text: 'bye' } }
+    ]);
+    expect(intentService.getIntentFromId('i1').actions[0].text).toBe('bye');
+    expect(intentService.updateIntent).toHaveBeenCalled();
+  });
+
+  it('refuses to update an action that is not there', async () => {
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: 'ghost', fields: { text: 'x' } }
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('ghost');
+  });
+
+  it('deletes an action', async () => {
+    await service.apply([{ op: 'delete_action', intent_id: 'i1', action_id: 'a1' }]);
+    expect(intentService.getIntentFromId('i1').actions.length).toBe(0);
+  });
+
+  it('connects two intents by naming the target on a connect_block action', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(intentService.createNewAction).toHaveBeenCalledWith('connect_block');
+    const actions: any[] = intentService.getIntentFromId('i1').actions;
+    const connector = actions[actions.length - 1];
+    expect(connector.intentName).toBe('welcome');
+  });
+});

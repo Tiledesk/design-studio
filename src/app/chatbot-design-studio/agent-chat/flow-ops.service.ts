@@ -3,6 +3,7 @@ import { IntentService } from '../services/intent.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowSnapshot } from './flow-ops.model';
+import { TYPE_ACTION } from '../utils-actions';
 
 const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
@@ -131,9 +132,15 @@ export class FlowOpsService {
       case 'update_intent': return this.updateIntent(op);
       case 'delete_intent': return this.deleteIntent(op);
       case 'move': return this.moveIntent(op);
+      case 'add_action': return this.addAction(op);
+      case 'update_action': return this.updateAction(op);
+      case 'delete_action': return this.deleteAction(op);
+      case 'connect': return this.connect(op);
       default:
-        // Action operations arrive in Task 6.
-        throw new Error(`Operation "${op.op}" is recognised but not yet implemented.`);
+        // Unreachable: `validate` already restricts `op.op` to KNOWN_OPS, and
+        // every known op is handled above. Kept so TypeScript can see that
+        // every code path returns.
+        throw new Error(`Operation "${(op as any).op}" is recognised but not yet implemented.`);
     }
   }
 
@@ -176,5 +183,73 @@ export class FlowOpsService {
     intent.attributes.position = { x: op.position.x, y: op.position.y };
     await this.intentService.updateIntent(intent);
     return { op: op.op, ok: true, intent_id: op.intent_id };
+  }
+
+  /** Fields the agent may never set: they are the action's identity, and the
+   *  studio owns them. Letting `fields` carry them would let a forged id
+   *  collide with a real one, or make an action lie about its own type. */
+  private static readonly PROTECTED_FIELDS = ['_tdActionId', '_tdActionType'];
+
+  private assignFields(action: any, fields?: Record<string, any>): void {
+    if (!fields) { return; }
+    Object.keys(fields)
+      .filter(key => FlowOpsService.PROTECTED_FIELDS.indexOf(key) === -1)
+      .forEach(key => { action[key] = fields[key]; });
+  }
+
+  private async addAction(op: Extract<FlowOp, { op: 'add_action' }>): Promise<FlowOpResult> {
+    const intent = this.intentService.getIntentFromId(op.intent_id);
+    // createNewAction owns every action type the studio can build -- including
+    // the nested scaffolding an agent would never guess, like the Wait command
+    // an ActionReply is born with. An unbuildable type comes back undefined,
+    // which is the same refusal the UI would give.
+    const action = this.intentService.createNewAction(op.type as any);
+    if (!action) {
+      return {
+        op: op.op, ok: false,
+        error: `"${op.type}" is not an action type this design studio can create.`
+      };
+    }
+    this.assignFields(action, op.fields);
+    intent.actions = intent.actions || [];
+    if (typeof op.index === 'number' && op.index >= 0 && op.index <= intent.actions.length) {
+      intent.actions.splice(op.index, 0, action);
+    } else {
+      intent.actions.push(action);
+    }
+    await this.intentService.updateIntent(intent);
+    return { op: op.op, ok: true, intent_id: op.intent_id, action_id: action._tdActionId };
+  }
+
+  private async updateAction(op: Extract<FlowOp, { op: 'update_action' }>): Promise<FlowOpResult> {
+    const intent = this.intentService.getIntentFromId(op.intent_id);
+    const action = intent.actions.find((a: any) => a._tdActionId === op.action_id);
+    this.assignFields(action, op.fields);
+    await this.intentService.updateIntent(intent);
+    return { op: op.op, ok: true, intent_id: op.intent_id, action_id: op.action_id };
+  }
+
+  private async deleteAction(op: Extract<FlowOp, { op: 'delete_action' }>): Promise<FlowOpResult> {
+    const intent = this.intentService.getIntentFromId(op.intent_id);
+    intent.actions = intent.actions.filter((a: any) => a._tdActionId !== op.action_id);
+    await this.intentService.updateIntent(intent);
+    return { op: op.op, ok: true, intent_id: op.intent_id, action_id: op.action_id };
+  }
+
+  private async connect(op: Extract<FlowOp, { op: 'connect' }>): Promise<FlowOpResult> {
+    const from = this.intentService.getIntentFromId(op.from_intent_id);
+    const to = this.intentService.getIntentFromId(op.to_intent_id);
+    // An edge is not its own object here: an action of type connect_block that
+    // names another block by display name IS the edge, and the connector the
+    // user sees is drawn from it.
+    const action: any = this.intentService.createNewAction(TYPE_ACTION.CONNECT_BLOCK);
+    action.intentName = to.intent_display_name;
+    from.actions = from.actions || [];
+    from.actions.push(action);
+    await this.intentService.updateIntent(from);
+    return {
+      op: op.op, ok: true,
+      intent_id: op.from_intent_id, action_id: action._tdActionId
+    };
   }
 }
