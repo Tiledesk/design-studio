@@ -3,7 +3,7 @@ import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
-import { FlowOp, FlowOpResult, FlowOpsReport, FlowSnapshot } from './flow-ops.model';
+import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION } from '../utils-actions';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX } from '../utils';
 
@@ -17,6 +17,21 @@ const KNOWN_OPS = [
  *  refuses to type must also be refused here, or the agent becomes a way
  *  around the invariant rather than another user of it. */
 const INTENT_NAME_REGEX = /^[ _0-9a-zA-Z]+$/;
+
+/** The block card's own on-canvas width -- the only place this size is
+ *  defined is `.panel-intent-content { width: 264px; }` in
+ *  `cds-intent.component.scss`. There is no shared TS constant for it, so
+ *  this names that CSS value rather than picking a fresh magic number. */
+const CANVAS_BLOCK_WIDTH_PX = 264;
+
+/** Clear air between two blocks placed left to right, on top of the block's
+ *  own width, so a new block never sits edge to edge with the one before
+ *  it. */
+const CANVAS_BLOCK_GAP_PX = 60;
+
+/** How far right of one block the next one lands when `add_intent` has to
+ *  invent a position. */
+const NEW_BLOCK_HORIZONTAL_STEP_PX = CANVAS_BLOCK_WIDTH_PX + CANVAS_BLOCK_GAP_PX;
 
 const RESERVED_NAMES: string[] = Object.values(RESERVED_INTENT_NAMES);
 
@@ -304,8 +319,35 @@ export class FlowOpsService {
     }
   }
 
+  /** Where a new block lands when `add_intent` doesn't say where.
+   *
+   *  `op.position ?? { x: 0, y: 0 }` put every position-less block at the
+   *  same point -- stacking them -- and the agent omits `position` often.
+   *  This instead looks at every block already on the canvas and places the
+   *  new one to the right of the rightmost one, on that block's own y: a
+   *  left-to-right layout instead of a pile at the origin.
+   *
+   *  Reads `listOfIntents` fresh rather than caching the rightmost block for
+   *  the whole batch: `addIntent` pushes the new intent onto `listOfIntents`
+   *  (via `addNewIntentToListOfIntents`) before this method could be called
+   *  again, so the next position-less `add_intent` in the same batch sees
+   *  the block just placed and lands further right still, instead of
+   *  landing on top of it. */
+  private computeNewBlockPosition(): FlowPosition {
+    const intents: Intent[] = this.intentService.listOfIntents || [];
+    let rightmost: FlowPosition | null = null;
+    for (const intent of intents) {
+      const pos = intent?.attributes?.position;
+      if (!pos || typeof pos.x !== 'number' || typeof pos.y !== 'number') { continue; }
+      if (!rightmost || pos.x > rightmost.x) { rightmost = pos; }
+    }
+    return rightmost
+      ? { x: rightmost.x + NEW_BLOCK_HORIZONTAL_STEP_PX, y: rightmost.y }
+      : { x: 0, y: 0 };
+  }
+
   private async addIntent(op: Extract<FlowOp, { op: 'add_intent' }>): Promise<FlowOpResult> {
-    const position = op.position ?? { x: 0, y: 0 };
+    const position = op.position ?? this.computeNewBlockPosition();
     const intent: Intent = this.intentService.createNewIntent(
       this.dashboardService.id_faq_kb, null, position);
     // createNewIntent pushes the action it is handed; a null one leaves an

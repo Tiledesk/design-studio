@@ -1081,3 +1081,103 @@ describe('FlowOpsService — a reply\'s requested text lands where the studio re
     expect(added.text).toBe('not a reply');
   });
 });
+
+describe('FlowOpsService — add_intent lays new blocks out left to right', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+
+  function intentAt(id: string, name: string, x: number, y: number): Intent {
+    const intent = anIntent(id, name);
+    intent.attributes.position = { x, y };
+    return intent;
+  }
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [
+        intentAt('i1', 'start', 0, 0),
+        intentAt('i2', 'welcome', 300, 40),
+        intentAt('i3', 'checkout', 150, 500)
+      ],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-' + (intentService.listOfIntents.length + 1), 'Untitled Block');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      // The real addNewIntentToListOfIntents pushes onto listOfIntents --
+      // reproduced here because a batch of add_intent operations must see
+      // each other's blocks to lay out left to right rather than stacking.
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents')
+        .and.callFake((intent: Intent) => { intentService.listOfIntents.push(intent); }),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction'),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('places a position-less block to the right of the rightmost existing block, not stacked at the origin', async () => {
+    const report = await service.apply([{ op: 'add_intent', intent_display_name: 'next step' }]);
+    expect(report.ok).toBe(true);
+    const addedIntent = intentService.addNewIntentToListOfIntents.calls.mostRecent().args[0];
+    // Rightmost existing block is i2 at x:300 -- the new one must land
+    // further right than that, not at (0,0) where the old default put it.
+    expect(addedIntent.attributes.position.x).toBeGreaterThan(300);
+    // On that same block's baseline (y), not a downward march.
+    expect(addedIntent.attributes.position.y).toBe(40);
+  });
+
+  it('gives three position-less blocks in one batch three distinct, non-overlapping x positions', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'step one' },
+      { op: 'add_intent', intent_display_name: 'step two' },
+      { op: 'add_intent', intent_display_name: 'step three' }
+    ]);
+    expect(report.ok).toBe(true);
+    const placed = intentService.addNewIntentToListOfIntents.calls.allArgs().map((args: any[]) => args[0]);
+    expect(placed.length).toBe(3);
+    const xs = placed.map((i: Intent) => i.attributes.position.x);
+    // Strictly increasing, and each gap at least a block-width wide so two
+    // blocks can never overlap.
+    expect(xs[1]).toBeGreaterThan(xs[0]);
+    expect(xs[2]).toBeGreaterThan(xs[1]);
+    expect(xs[1] - xs[0]).toBeGreaterThanOrEqual(264);
+    expect(xs[2] - xs[1]).toBeGreaterThanOrEqual(264);
+  });
+
+  it('still honours an explicit position from the caller, unchanged', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'exact spot', position: { x: 42, y: 99 } }
+    ]);
+    expect(report.ok).toBe(true);
+    const addedIntent = intentService.addNewIntentToListOfIntents.calls.mostRecent().args[0];
+    expect(addedIntent.attributes.position).toEqual({ x: 42, y: 99 });
+  });
+
+  it('places the very first block at the origin when the canvas has no positioned blocks at all', async () => {
+    intentService.listOfIntents = [];
+    const report = await service.apply([{ op: 'add_intent', intent_display_name: 'first' }]);
+    expect(report.ok).toBe(true);
+    const addedIntent = intentService.addNewIntentToListOfIntents.calls.mostRecent().args[0];
+    expect(addedIntent.attributes.position).toEqual({ x: 0, y: 0 });
+  });
+});
