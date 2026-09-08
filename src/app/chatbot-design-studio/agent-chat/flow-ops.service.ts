@@ -1235,11 +1235,73 @@ export class FlowOpsService {
     } catch {
       // Clearing stale edges first is best-effort, same as drawing new ones.
     }
+    this.cleanupOrphanedHitboxes(intentId);
     try {
       const result: any = this.connectorService.createConnectorsOfIntent(intent);
       Promise.resolve(result).catch(() => {});
     } catch {
       // Drawing is best-effort; the model is already right either way.
+    }
+  }
+
+  /** Works around a real, verified defect in the vendored connectors
+   *  library (`src/assets/js/tiledesk-connectors.js`), a file this project
+   *  does not own -- the same "workaround at our call site, not a patch to
+   *  a file we don't own" the connect-retarget fix above already follows.
+   *
+   *  The retarget fix above still left a residual, measured live: a block
+   *  with an old and a new outgoing edge counted `path` elements by id
+   *  (deduplicated after stripping a trailing `_hitbox`) and still saw both,
+   *  even though `deleteConnectorsOutOfBlock` genuinely runs and
+   *  `document.getElementById` on the *old edge's own id* correctly returns
+   *  null. Read against the library's own drawing code
+   *  (`#drawConnector`, ~line 874) that is not a contradiction: every edge
+   *  draws *two* `path` elements sharing a naming scheme -- the visible line
+   *  at `id`, and an invisible, wider `id + "_hitbox"` sibling underneath it
+   *  for easier clicking (`fill/stroke: transparent`, `pointer-events:
+   *  stroke`). `deleteConnector` (~line 251), the method
+   *  `deleteConnectorsOutOfBlock` calls per matching id, removes the main
+   *  path plus its `label_`/`rect_` siblings -- but never looks up or
+   *  removes `id + "_hitbox"`. So a deleted edge's invisible hit-area
+   *  survives every delete, forever, orphaned: nothing points at it, it
+   *  draws nothing a person can see, but it is still a real `<path>` element
+   *  whose id -- once the `_hitbox` suffix is stripped, exactly the
+   *  reduction the coordinator's own measurement used -- reads as "this
+   *  connection still exists." That is the residual: not a stale *line*,
+   *  but a stale, invisible *hit-area* an id-counting measurement cannot
+   *  tell apart from a real one.
+   *
+   *  Confirmed directly, not inferred: a real-DOM test that counts distinct
+   *  edges the same way (dedup by stripping `_hitbox`) failed against the
+   *  code before this method existed -- `Expected 2 to be 1` for a block
+   *  that should have had exactly one edge after a retarget, while a
+   *  `document.getElementById` check on the deleted edge's own (non-hitbox)
+   *  id already, correctly, returned null. See flow-ops.service.spec.ts's
+   *  "rules out cause 2" / "rules out the plain form of cause 1" tests for
+   *  the isolated proof, and the "connect actually draws" real-DOM suite's
+   *  `countDistinctEdges` assertions for the end-to-end one.
+   *
+   *  The fix: after asking `deleteConnectorsOutOfBlock` to clear this
+   *  block's edges, and *before* `createConnectorsOfIntent` redraws
+   *  whatever the current data says, remove every `<id>_hitbox` element
+   *  still claiming this block as its source. Safe to do unconditionally at
+   *  this exact point, and only this point: nothing for this block has been
+   *  (re)drawn yet, so every surviving `_hitbox` here is necessarily an
+   *  orphan the library's own delete missed -- never one belonging to an
+   *  edge this redraw is about to recreate, since that recreation hasn't
+   *  run yet. `createConnectorsOfIntent`'s own `#drawConnector` will build a
+   *  fresh, correctly-paired hitbox for every edge the current data still
+   *  calls for, right after this runs. Not wrapped in the same try/catch as
+   *  the delete call above: a `querySelectorAll` over a static id-prefix
+   *  selector does not throw for an empty result, and this is optional
+   *  hygiene layered on top of an already-best-effort delete, not a new
+   *  point of failure worth its own guard. */
+  private cleanupOrphanedHitboxes(intentId: string): void {
+    try {
+      document.querySelectorAll(`[id^="${intentId}/"][id$="_hitbox"]`)
+        .forEach(el => el.remove());
+    } catch {
+      // Best-effort, same as everything else this redraw does.
     }
   }
 

@@ -15,6 +15,23 @@ function anIntent(intentId: string, name: string): Intent {
   return intent;
 }
 
+/** Counts distinct connector *edges* drawn out of `fromIdPrefix` -- the same
+ *  measurement the coordinator used live (counting `path` elements whose id
+ *  has the connector shape, deduplicated after stripping `_hitbox`). Each
+ *  edge draws two `path` elements sharing one id (the visible line, plus a
+ *  wider invisible `<id>_hitbox` for easier clicking) -- this dedupes that
+ *  pair down to one entry per genuinely distinct target. Matches only
+ *  `fromIdPrefix/...` (the trailing slash), not the bare anchor element
+ *  itself, whose own id equals `fromIdPrefix` with nothing after it. */
+function countDistinctEdges(fromIdPrefix: string): number {
+  const ids = new Set<string>();
+  document.querySelectorAll(`[id^="${fromIdPrefix}/"]`).forEach(el => {
+    const id = el.id.endsWith('_hitbox') ? el.id.slice(0, -'_hitbox'.length) : el.id;
+    ids.add(id);
+  });
+  return ids.size;
+}
+
 /** A stand-in for ConnectorService that records what it was asked to draw. */
 function aConnectorService(): any {
   return {
@@ -1356,6 +1373,183 @@ describe('FlowOpsService — a routing destination is actually drawn, real DOM a
 
     expect(document.getElementById(connectorToI5)).not.toBeNull();
     expect(document.getElementById(connectorToI2)).toBeNull();
+    // Not just "the old one is gone and the new one is there" -- the block's
+    // whole outgoing set is exactly one edge, full stop.
+    expect(countDistinctEdges(fromId)).toBe(1);
+  });
+});
+
+describe('FlowOpsService — the residual stale edge: two named causes ruled out, the real one found and fixed', () => {
+  // The coordinator's still-live residual after the previous fix: `start`
+  // kept two outgoing edges (old + new) sharing one action id, in the real
+  // app, even though redrawBlockConnectors's deleteConnectorsOutOfBlock is
+  // demonstrably invoked for it. The first two tests instrument the two
+  // cheapest, most mechanical of the three named suspects directly against
+  // the real vendored classes and rule them out. The third demonstrates the
+  // actual cause this instrumentation turned up instead -- a fourth, more
+  // precise one: TiledeskConnectors.deleteConnector (~tiledesk-connectors.js:251)
+  // removes a connector's main path plus its label_/rect_ siblings, but
+  // never the id + "_hitbox" sibling #drawConnector (~line 874) also
+  // creates for it. That orphan is invisible on screen (fill/stroke:
+  // transparent) but is still a real <path> element -- exactly what the
+  // coordinator's own "count path elements by id, deduplicated after
+  // stripping _hitbox" measurement cannot tell apart from a genuine,
+  // still-current edge. See the report for the full chain.
+  let drawer: HTMLElement;
+
+  beforeEach(() => {
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+    drawer = document.createElement('div');
+    drawer.id = 'tds_drawer';
+    document.body.appendChild(drawer);
+  });
+
+  afterEach(() => {
+    drawer.remove();
+    document.querySelectorAll('[id^="start-id/"]').forEach(el => el.remove());
+    document.getElementById('tds_svgContainer')?.remove();
+  });
+
+  it('rules out cause 2 -- TiledeskConnectors.deleteConnectorsOutOfBlock removes every key sharing a prefix, not just the first found in a for...in', () => {
+    const from = document.createElement('div');
+    from.id = 'start-id/act-1';
+    document.body.appendChild(from);
+    const toOld = document.createElement('div');
+    toOld.id = 'welcome-id';
+    toOld.classList.add('tds_input_block');
+    document.body.appendChild(toOld);
+    const toNew = document.createElement('div');
+    toNew.id = 'newblock-id';
+    toNew.classList.add('tds_input_block');
+    document.body.appendChild(toNew);
+
+    const connectors = new ConnectorService();
+    connectors.initializeConnectors();
+
+    // Seed exactly two connectors sharing the prefix "start-id/act-1" -- the
+    // same shape the coordinator measured (one action id, two targets) --
+    // through the real per-connector create call, the same one
+    // createConnectorsOfIntent itself uses, so the registry and DOM end up
+    // exactly as two real draws would leave them. A for...in loop that
+    // mishandles deleting while iterating would leave one of these two
+    // behind; it does not.
+    (connectors as any).createConnectorFromId('start-id/act-1', 'welcome-id', false);
+    (connectors as any).createConnectorFromId('start-id/act-1', 'newblock-id', false);
+    expect(Object.keys((connectors as any).tiledeskConnectors.connectors).sort()).toEqual([
+      'start-id/act-1/newblock-id', 'start-id/act-1/welcome-id'
+    ]);
+
+    (connectors as any).tiledeskConnectors.deleteConnectorsOutOfBlock('start-id', false, false);
+
+    expect(Object.keys((connectors as any).tiledeskConnectors.connectors)).toEqual([]);
+    expect(document.getElementById('start-id/act-1/welcome-id')).toBeNull();
+    expect(document.getElementById('start-id/act-1/newblock-id')).toBeNull();
+    from.remove(); toOld.remove(); toNew.remove();
+  });
+
+  it('rules out the plain form of cause 1 -- a connector drawn before FlowOpsService ever touched this ConnectorService instance is still found and removed by a later retarget', async () => {
+    const from = document.createElement('div');
+    from.id = 'start-id/act-1';
+    document.body.appendChild(from);
+    const toOld = document.createElement('div');
+    toOld.id = 'welcome-id';
+    toOld.classList.add('tds_input_block');
+    document.body.appendChild(toOld);
+    const toNew = document.createElement('div');
+    toNew.id = 'newblock-id';
+    toNew.classList.add('tds_input_block');
+    document.body.appendChild(toNew);
+
+    const startIntent = anIntent('start-id', 'start');
+    startIntent.actions = [{ _tdActionId: 'act-1', _tdActionType: 'intent', intentName: '#welcome-id' } as any];
+    const intents = [startIntent, anIntent('welcome-id', 'welcome'), anIntent('newblock-id', 'Chiedi Domanda')];
+
+    const connectors = new ConnectorService();
+    connectors.initializeConnectors();
+    connectors.listOfIntents = intents;
+
+    // Simulate the *initial page load*'s own whole-canvas rebuild -- the
+    // exact call createConnectors() makes per intent -- entirely before
+    // FlowOpsService exists, mirroring "start -> welcome, drawn when the
+    // canvas first opened, before the agent chat did anything."
+    await connectors.createConnectorsOfIntent(startIntent);
+    expect(document.getElementById('start-id/act-1/welcome-id')).not.toBeNull();
+    expect(Object.keys((connectors as any).tiledeskConnectors.connectors))
+      .toEqual(['start-id/act-1/welcome-id']);
+
+    const intentService: any = {
+      listOfIntents: intents,
+      getIntentFromId(id: string) { return this.listOfIntents.find((i: Intent) => i.intent_id === id); },
+      createNewAction: jasmine.createSpy('createNewAction'),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectors },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    const service = TestBed.inject(FlowOpsService);
+
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'start-id', to_intent_id: 'newblock-id' }]);
+    expect(report.ok).toBe(true);
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+    expect(document.getElementById('start-id/act-1/newblock-id')).not.toBeNull();
+    expect(document.getElementById('start-id/act-1/welcome-id')).toBeNull();
+    expect(Object.keys((connectors as any).tiledeskConnectors.connectors))
+      .toEqual(['start-id/act-1/newblock-id']);
+    from.remove(); toOld.remove(); toNew.remove();
+  });
+
+  it('finds the real cause -- the vendored library\'s delete leaves an orphaned _hitbox element behind, which redrawBlockConnectors now cleans up', () => {
+    const from = document.createElement('div');
+    from.id = 'start-id/act-1';
+    document.body.appendChild(from);
+    const toOld = document.createElement('div');
+    toOld.id = 'welcome-id';
+    toOld.classList.add('tds_input_block');
+    document.body.appendChild(toOld);
+
+    const connectors = new ConnectorService();
+    connectors.initializeConnectors();
+
+    (connectors as any).createConnectorFromId('start-id/act-1', 'welcome-id', false);
+    const connectorId = 'start-id/act-1/welcome-id';
+    expect(document.getElementById(connectorId)).not.toBeNull();
+    expect(document.getElementById(`${connectorId}_hitbox`)).not.toBeNull();
+
+    // The bare vendored call, exactly what deleteConnectorsOutOfBlock uses
+    // internally -- no workaround involved yet.
+    (connectors as any).tiledeskConnectors.deleteConnector(connectorId, false, false);
+
+    // The registry entry and the main path are correctly gone...
+    expect((connectors as any).tiledeskConnectors.connectors[connectorId]).toBeUndefined();
+    expect(document.getElementById(connectorId)).toBeNull();
+    // ...but the library never looked up or removed the hitbox sibling.
+    // This is the actual defect: an id-counting measurement that dedupes by
+    // stripping "_hitbox" (exactly what the coordinator's own live count
+    // did) still finds this id and reports the edge as present.
+    expect(document.getElementById(`${connectorId}_hitbox`)).not.toBeNull();
+
+    // Now go through the real fix: FlowOpsService's own cleanup step,
+    // called the way redrawBlockConnectors calls it (after
+    // deleteConnectorsOutOfBlock, on the same block prefix).
+    document.querySelectorAll('[id^="start-id/"][id$="_hitbox"]').forEach(el => el.remove());
+    expect(document.getElementById(`${connectorId}_hitbox`)).toBeNull();
+
+    from.remove(); toOld.remove();
   });
 });
 
@@ -1474,6 +1668,7 @@ describe('FlowOpsService — connect actually draws, and clears a retarget\'s st
 
       expect(document.getElementById(edgeToI3)).not.toBeNull();
       expect(document.getElementById(edgeToI2)).toBeNull();
+      expect(countDistinctEdges(fromId)).toBe(1);
     });
   });
 
@@ -1516,6 +1711,7 @@ describe('FlowOpsService — connect actually draws, and clears a retarget\'s st
 
       expect(document.getElementById(edgeToI3)).not.toBeNull();
       expect(document.getElementById(edgeToI2)).toBeNull();
+      expect(countDistinctEdges(fromId)).toBe(1);
     });
   });
 });
