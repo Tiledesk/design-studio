@@ -515,16 +515,26 @@ describe('FlowOpsService — action operations', () => {
     expect(resolved.intent_id).toBe('i2');
   });
 
-  it('draws the connector immediately, through the studio\'s own path', async () => {
+  it('redraws the block immediately, through the same delete-then-rebuild every other write uses', async () => {
     // Operations apply immediately (design decision 4). A correct intentName
     // alone leaves the user staring at an unchanged canvas until something
-    // rebuilds connectors -- so FlowOps makes the same call the UI makes from
-    // cds-panel-intent-detail's onChangeNextIntentSelect.
-    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
-    const connector = intentService.getIntentFromId('i1').attributes.nextBlockAction;
+    // rebuilds connectors -- so FlowOps asks ConnectorService to redraw the
+    // block, same as update_action/add_action do for a routing field.
+    // connect used to draw through its own create-only call
+    // (createConnectorFromId); it now goes through redrawBlockConnectors
+    // instead, so a retarget clears the old edge too -- see the "retargets"
+    // describe block below for that half of the story.
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(report.ok).toBe(true);
 
-    expect(connectorService.createConnectorFromId)
-      .toHaveBeenCalledWith(`i1/${connector._tdActionId}`, 'i2', true);
+    expect(connectorService.deleteConnectorsOutOfBlock).toHaveBeenCalledWith('i1', false, false);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
+    const drawnFrom = connectorService.createConnectorsOfIntent.calls.mostRecent().args[0];
+    expect(drawnFrom.intent_id).toBe('i1');
+    expect(drawnFrom.attributes.nextBlockAction.intentName).toBe('#i2');
+
+    // The old create-only path is gone, not merely unused by this test.
+    expect(connectorService.createConnectorFromId).not.toHaveBeenCalled();
   });
 });
 
@@ -816,26 +826,31 @@ describe('FlowOpsService — connect retargets whichever mechanism is actually l
     expect(actionIntent.intentName).toBe('#i2');
   });
 
-  it('draws through createNewConnector with the actions-list action\'s own id as fromId -- not the dot\'s call', async () => {
-    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
-    // fromId is intent_id + '/' + THIS action's own _tdActionId -- the same
-    // composition cds-action-intent.component.ts's initialize() uses
-    // (this.idConnector = this.idIntentSelected + '/' + this.action._tdActionId),
-    // not the dot's _tdActionId.
-    expect(connectorService.createNewConnector)
-      .toHaveBeenCalledWith('i1/existing-action-intent', 'i2');
-    // And never through the dot's own draw call.
+  it('redraws the block from the mutated intent -- the actions-list action carries the new intentName', async () => {
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(report.ok).toBe(true);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
+    const drawnFrom = connectorService.createConnectorsOfIntent.calls.mostRecent().args[0];
+    expect(drawnFrom.intent_id).toBe('i1');
+    const drawnAction = drawnFrom.actions.find((a: any) => a._tdActionId === 'existing-action-intent');
+    expect(drawnAction.intentName).toBe('#i2');
+    // The old create-only calls this mechanism used before are gone.
+    expect(connectorService.createNewConnector).not.toHaveBeenCalled();
     expect(connectorService.createConnectorFromId).not.toHaveBeenCalled();
   });
 
-  it('clears any previously-drawn edge from this action before drawing the retargeted one', async () => {
-    // cds-panel-action-detail.component.ts's onConnectorChange('create', ...)
-    // does this before createNewConnector -- without it a retarget would
-    // leave the old edge on screen, since createNewConnector has no
-    // "already exists" check and the connector's DOM id changes with toId.
-    await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
-    expect(connectorService.deleteConnectorWithIDStartingWith)
-      .toHaveBeenCalledWith('i1/existing-action-intent', false, true);
+  it('clears the block\'s previously-drawn edges before rebuilding, so a retarget does not leave the old one on screen', async () => {
+    // The reported defect this closes: connect used to call a create-only
+    // helper of its own that never cleared anything first -- fine for a
+    // block's first connection, wrong for a retarget. start ships with
+    // exactly this shape (an actions-list intent action), and it is the
+    // common one: retargeting start from the template's welcome to a new
+    // first block left the old start -> welcome line standing on screen,
+    // correct nowhere but the model, until the next reload.
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+    expect(report.ok).toBe(true);
+    expect(connectorService.deleteConnectorsOutOfBlock).toHaveBeenCalledWith('i1', false, false);
+    expect(connectorService.deleteConnectorWithIDStartingWith).not.toHaveBeenCalled();
   });
 
   it('labels a freshly untitled actions-list action, but never overwrites an existing title on retarget', async () => {
@@ -1341,6 +1356,167 @@ describe('FlowOpsService — a routing destination is actually drawn, real DOM a
 
     expect(document.getElementById(connectorToI5)).not.toBeNull();
     expect(document.getElementById(connectorToI2)).toBeNull();
+  });
+});
+
+describe('FlowOpsService — connect actually draws, and clears a retarget\'s stale edge, real DOM and all', () => {
+  // The gap the coordinator measured live: connect drew a fresh edge fine
+  // (10 path elements right after the wiring call, matching a reload), but
+  // a *retarget* -- start moved from the template's welcome to a new first
+  // block -- left the old start -> welcome line standing on screen; a
+  // reload dropped back to 8. connect used to draw through its own
+  // create-only helpers (drawConnector, drawActionListConnector, both now
+  // removed) instead of the same delete-then-rebuild redrawBlockConnectors
+  // already gives update_action. These cover both of connect's mechanisms
+  // end to end -- a fresh edge actually appears, and a retarget leaves
+  // exactly the new one, not the old one alongside it.
+  let drawer: HTMLElement;
+  let toI2: HTMLElement;
+  let toI3: HTMLElement;
+  let connectors: ConnectorService;
+  let service: FlowOpsService;
+  let intentService: any;
+
+  beforeEach(() => {
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+
+    drawer = document.createElement('div');
+    drawer.id = 'tds_drawer';
+    document.body.appendChild(drawer);
+
+    toI2 = document.createElement('div');
+    toI2.id = 'i2';
+    toI2.classList.add('tds_input_block');
+    document.body.appendChild(toI2);
+
+    toI3 = document.createElement('div');
+    toI3.id = 'i3';
+    toI3.classList.add('tds_input_block');
+    document.body.appendChild(toI3);
+  });
+
+  afterEach(() => {
+    drawer.remove();
+    toI2.remove();
+    toI3.remove();
+    document.querySelectorAll('[id^="i1/"]').forEach(el => el.remove());
+    document.getElementById('tds_svgContainer')?.remove();
+  });
+
+  const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
+  function wire(fromAnchorId: string): void {
+    const fromAnchor = document.createElement('div');
+    fromAnchor.id = fromAnchorId;
+    document.body.appendChild(fromAnchor);
+
+    connectors = new ConnectorService();
+    connectors.initializeConnectors();
+    connectors.listOfIntents = intentService.listOfIntents;
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectors },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  }
+
+  describe('the dot mechanism (attributes.nextBlockAction)', () => {
+    const fromId = 'i1/dot-1';
+    const edgeToI2 = `${fromId}/i2`;
+    const edgeToI3 = `${fromId}/i3`;
+
+    beforeEach(() => {
+      const from = anIntent('i1', 'Search KB');
+      from.actions = []; // no TYPE_ACTION.INTENT entry -- the dot is live
+      // A real Intent (anIntent -> new Intent()) is born with its own
+      // nextBlockAction already scaffolded, under a uuid this test does not
+      // control -- clearing it forces connectViaDot through createNewAction,
+      // so the dot's _tdActionId is the deterministic 'dot-1' the DOM anchor
+      // below and the fake's own createNewAction agree on.
+      from.attributes.nextBlockAction = undefined;
+      intentService = {
+        listOfIntents: [from, anIntent('i2', 'Answer Found'), anIntent('i3', 'Transfer')],
+        getIntentFromId(id: string) { return this.listOfIntents.find((i: Intent) => i.intent_id === id); },
+        createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
+          ({ _tdActionId: 'dot-1', _tdActionType: type, intentName: '' })),
+        updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+        createNewIntent: jasmine.createSpy('createNewIntent'),
+        addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+        saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+        deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+        restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+      };
+      wire(fromId);
+    });
+
+    it('draws a real edge for a fresh connect -- the coverage the create-only call used to give', async () => {
+      const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+      expect(report.ok).toBe(true);
+      await flush();
+      expect(document.getElementById(edgeToI2)).not.toBeNull();
+    });
+
+    it('leaves exactly one edge after a retarget -- the old target does not appear among the block\'s connectors', async () => {
+      await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+      await flush();
+      expect(document.getElementById(edgeToI2)).not.toBeNull();
+
+      await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' }]);
+      await flush();
+
+      expect(document.getElementById(edgeToI3)).not.toBeNull();
+      expect(document.getElementById(edgeToI2)).toBeNull();
+    });
+  });
+
+  describe('the actions-list mechanism (a start-shaped block\'s TYPE_ACTION.INTENT entry)', () => {
+    const fromId = 'i1/act-intent-1';
+    const edgeToI2 = `${fromId}/i2`;
+    const edgeToI3 = `${fromId}/i3`;
+
+    beforeEach(() => {
+      const from = anIntent('i1', 'start');
+      from.actions = [{ _tdActionId: 'act-intent-1', _tdActionType: 'intent', intentName: '' } as any];
+      intentService = {
+        listOfIntents: [from, anIntent('i2', 'Answer Found'), anIntent('i3', 'Transfer')],
+        getIntentFromId(id: string) { return this.listOfIntents.find((i: Intent) => i.intent_id === id); },
+        createNewAction: jasmine.createSpy('createNewAction'),
+        updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+        createNewIntent: jasmine.createSpy('createNewIntent'),
+        addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+        saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+        deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+        restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+      };
+      wire(fromId);
+    });
+
+    it('draws a real edge for a fresh connect -- the coverage the create-only call used to give', async () => {
+      const report = await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+      expect(report.ok).toBe(true);
+      await flush();
+      expect(document.getElementById(edgeToI2)).not.toBeNull();
+    });
+
+    it('leaves exactly one edge after a retarget -- the reported defect: start moved from welcome to a new block, and the old line stayed', async () => {
+      await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i2' }]);
+      await flush();
+      expect(document.getElementById(edgeToI2)).not.toBeNull();
+
+      await service.apply([{ op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' }]);
+      await flush();
+
+      expect(document.getElementById(edgeToI3)).not.toBeNull();
+      expect(document.getElementById(edgeToI2)).toBeNull();
+    });
   });
 });
 
@@ -2015,8 +2191,8 @@ describe('FlowOpsService — connect refuses a block that already routes conditi
     expect(from.actions).toEqual(actionsBefore);
     expect(from.attributes.nextBlockAction).toEqual(dotBefore);
     expect(intentService.updateIntent).not.toHaveBeenCalled();
-    expect(connectorService.createConnectorFromId).not.toHaveBeenCalled();
-    expect(connectorService.createNewConnector).not.toHaveBeenCalled();
+    expect(connectorService.createConnectorsOfIntent).not.toHaveBeenCalled();
+    expect(connectorService.deleteConnectorsOutOfBlock).not.toHaveBeenCalled();
   });
 
   it('still allows connect when the condition action carries no destinations at all', async () => {

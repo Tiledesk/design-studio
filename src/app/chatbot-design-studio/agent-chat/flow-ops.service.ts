@@ -599,7 +599,7 @@ export class FlowOpsService {
       case 'add_action': return this.addAction(op, blocksToRedraw);
       case 'update_action': return this.updateAction(op, blocksToRedraw);
       case 'delete_action': return this.deleteAction(op);
-      case 'connect': return this.connect(op);
+      case 'connect': return this.connect(op, blocksToRedraw);
       default:
         // Unreachable: `validate` already restricts `op.op` to KNOWN_OPS, and
         // every known op is handled above. Kept so TypeScript can see that
@@ -704,9 +704,9 @@ export class FlowOpsService {
    *  result, for a UI convenience the caller never sees. The studio's own
    *  `settingAndSaveNewIntent` does not await it either. The call cannot
    *  reject in practice -- the poll always resolves, even to "never
-   *  appeared" -- but it is wrapped the same way `drawConnector` below wraps
-   *  its own best-effort redraw, so a future change there cannot surface here
-   *  as an unhandled promise rejection. */
+   *  appeared" -- but it is wrapped the same way `redrawBlockConnectors`
+   *  below wraps its own best-effort redraw, so a future change there cannot
+   *  surface here as an unhandled promise rejection. */
   private registerDrag(intentId: string): void {
     try {
       Promise.resolve(this.intentService.setDragAndListnerEventToElement(intentId))
@@ -1047,16 +1047,18 @@ export class FlowOpsService {
    *  That keeps the choice deterministic and independent of anything about
    *  the operation itself (its target, when it runs), rather than picking
    *  "last" and having the result depend on append order a caller cannot see. */
-  private async connect(op: Extract<FlowOp, { op: 'connect' }>): Promise<FlowOpResult> {
+  private async connect(
+    op: Extract<FlowOp, { op: 'connect' }>, blocksToRedraw: Set<string>
+  ): Promise<FlowOpResult> {
     const from = this.intentService.getIntentFromId(op.from_intent_id);
     const to = this.intentService.getIntentFromId(op.to_intent_id);
 
     const actionIntent: any = (from.actions || [])
       .find((a: any) => a._tdActionType === TYPE_ACTION.INTENT);
     if (actionIntent) {
-      return this.connectViaActionInList(op, from, to, actionIntent);
+      return this.connectViaActionInList(op, from, to, actionIntent, blocksToRedraw);
     }
-    return this.connectViaDot(op, from, to);
+    return this.connectViaDot(op, from, to, blocksToRedraw);
   }
 
   /** The dot path: `attributes.nextBlockAction`. Live only for a block whose
@@ -1066,11 +1068,11 @@ export class FlowOpsService {
    *  `attributes.nextBlockAction` IS the dot: this is
    *  `onChangeNextIntentSelect` in `cds-panel-intent-detail.component.ts`,
    *  done the same way it is done there -- ensure the action exists, point
-   *  its `intentName` at the target, save, then draw the edge. A block has
-   *  exactly one dot, so connecting an already-connected block retargets
-   *  that one action rather than adding a second. */
+   *  its `intentName` at the target, save. A block has exactly one dot, so
+   *  connecting an already-connected block retargets that one action rather
+   *  than adding a second. */
   private async connectViaDot(
-    op: Extract<FlowOp, { op: 'connect' }>, from: Intent, to: Intent
+    op: Extract<FlowOp, { op: 'connect' }>, from: Intent, to: Intent, blocksToRedraw: Set<string>
   ): Promise<FlowOpResult> {
     from.attributes = from.attributes || ({} as any);
     if (!from.attributes.nextBlockAction) {
@@ -1088,7 +1090,11 @@ export class FlowOpsService {
     // so there is nothing equivalent to set here.
     nextBlockAction.intentName = '#' + to.intent_id;
     await this.intentService.updateIntent(from);
-    this.drawConnector(from.intent_id, nextBlockAction._tdActionId, to.intent_id);
+    // Making the edge visible is `redrawBlockConnectors`'s job now, not a
+    // create-only call of its own -- see that method's doc comment for why
+    // retargeting an already-connected block needs the delete-then-rebuild
+    // it does, not merely another create.
+    blocksToRedraw.add(from.intent_id);
     return {
       op: op.op, ok: true,
       intent_id: op.from_intent_id, action_id: nextBlockAction._tdActionId
@@ -1102,48 +1108,26 @@ export class FlowOpsService {
    *  Mirrors `cds-action-intent.component.ts`'s own `onChangeSelect`: set
    *  `intentName`, set `_tdActionTitle` when the action does not already
    *  have one (that component's own guard -- `if (!this.action._tdActionTitle)`
-   *  -- so an existing custom title survives a retarget), save, then draw
-   *  the edge the same way `cds-panel-action-detail.component.ts`'s
-   *  `onConnectorChange` does for this action type. */
+   *  -- so an existing custom title survives a retarget), save. */
   private async connectViaActionInList(
-    op: Extract<FlowOp, { op: 'connect' }>, from: Intent, to: Intent, actionIntent: any
+    op: Extract<FlowOp, { op: 'connect' }>, from: Intent, to: Intent, actionIntent: any,
+    blocksToRedraw: Set<string>
   ): Promise<FlowOpResult> {
     actionIntent.intentName = '#' + to.intent_id;
     if (!actionIntent._tdActionTitle) {
       actionIntent._tdActionTitle = to.intent_display_name;
     }
     await this.intentService.updateIntent(from);
-    this.drawActionListConnector(from.intent_id, actionIntent._tdActionId, to.intent_id);
+    // Same reasoning as connectViaDot above: redrawBlockConnectors covers
+    // this mechanism too (createConnectorsOfIntent draws a TYPE_ACTION.INTENT
+    // actions-list entry exactly the same way it draws the dot), and its
+    // delete-then-rebuild is what actually clears the block's previous edge
+    // on a retarget -- a create-only call here never did.
+    blocksToRedraw.add(from.intent_id);
     return {
       op: op.op, ok: true,
       intent_id: op.from_intent_id, action_id: actionIntent._tdActionId
     };
-  }
-
-  /** Make the dot's new edge visible now, the way the UI does.
-   *
-   *  Operations apply immediately, and a correct `intentName` alone leaves the
-   *  user looking at an unchanged canvas until something rebuilds connectors.
-   *  `createConnectorFromId(fromId, toId, true)` is the exact call
-   *  `onChangeNextIntentSelect` makes in `cds-panel-intent-detail.component.ts`
-   *  once it has set the dot's `intentName`, and it is safe to make before
-   *  Angular has rendered the new action: it polls the stage for both
-   *  elements for up to a second and gives up quietly if either never appears
-   *  -- which is also what happens when the canvas is not on screen at all.
-   *  It additionally no-ops when a connector with this exact id is already
-   *  on the stage, rather than drawing a duplicate.
-   *
-   *  Not awaited, and never allowed to fail the operation: the flow is already
-   *  correct and saved by this point, and a repaint is not something the
-   *  agent's tool result should wait on or be refused over. */
-  private drawConnector(fromIntentId: string, actionId: string, toIntentId: string): void {
-    try {
-      const result: any = this.connectorService
-        .createConnectorFromId(`${fromIntentId}/${actionId}`, toIntentId, true);
-      Promise.resolve(result).catch(() => {});
-    } catch {
-      // Drawing is best-effort; the model is already right either way.
-    }
   }
 
   /** Redraw every connector on `intentId`'s block from what its actions'
@@ -1216,18 +1200,33 @@ export class FlowOpsService {
    *  therefore idempotent -- covered by a test below that calls it twice and
    *  asserts the DOM still holds exactly one `path`, not two.
    *
-   *  Not awaited, and never allowed to fail the operation, for the same
-   *  reason as `drawConnector`: both `deleteConnectorsOutOfBlock` and
-   *  `createConnectorsOfIntent` are wrapped independently, so one failing
-   *  never stops the other from being tried, and `createConnectorFromId`
-   *  itself polls the DOM (`isElementOnTheStage`) for up to a second and
-   *  resolves quietly either way, including when the canvas is not on
-   *  screen at all -- a repaint failing must never turn a write that already
-   *  succeeded and saved into a reported failure. Called once per affected
-   *  block after a whole batch applies (see `blocksToRedraw` in `apply()`),
-   *  not once per operation -- a batch of a dozen `update_action` calls
-   *  across a few blocks would otherwise ask the DOM to redraw the same
-   *  block a dozen times for a repaint the user only ever sees once. */
+   *  Not awaited, and never allowed to fail the operation: both
+   *  `deleteConnectorsOutOfBlock` and `createConnectorsOfIntent` are wrapped
+   *  independently, so one failing never stops the other from being tried,
+   *  and `createConnectorFromId` itself polls the DOM (`isElementOnTheStage`)
+   *  for up to a second and resolves quietly either way, including when the
+   *  canvas is not on screen at all -- a repaint failing must never turn a
+   *  write that already succeeded and saved into a reported failure. Called
+   *  once per affected block after a whole batch applies (see
+   *  `blocksToRedraw` in `apply()`), not once per operation -- a batch of a
+   *  dozen `update_action` calls across a few blocks would otherwise ask the
+   *  DOM to redraw the same block a dozen times for a repaint the user only
+   *  ever sees once.
+   *
+   *  This is also `connect`'s own redraw now, for both of its mechanisms
+   *  (`connectViaDot`'s `attributes.nextBlockAction` and
+   *  `connectViaActionInList`'s actions-list `TYPE_ACTION.INTENT` entry --
+   *  `createConnectorsOfIntent` draws both straight from `intent`, see its
+   *  own handling of each just above). `connect` used to call two
+   *  create-only helpers of its own (`drawConnector`, `drawActionListConnector`,
+   *  both since removed) that never cleared a block's previous edge first --
+   *  fine for a block being connected for the first time, wrong for a
+   *  retarget: `start`'s actions-list entry moved from the template's
+   *  `welcome` to a new first block left the old `start -> welcome` line
+   *  standing on screen, correct nowhere but the model, until the next
+   *  reload. Folding `connect` into this same delete-then-rebuild closes
+   *  that the same way a retargeted `update_action` destination already
+   *  closes it. */
   private redrawBlockConnectors(intentId: string): void {
     const intent = this.intentService.getIntentFromId(intentId);
     if (!intent) { return; }
@@ -1251,40 +1250,5 @@ export class FlowOpsService {
    *  gives for a single block. */
   private redrawBlocks(intentIds: Set<string>): void {
     intentIds.forEach(intentId => this.redrawBlockConnectors(intentId));
-  }
-
-  /** Make the actions-list action's new edge visible now, the way the UI
-   *  does for that mechanism specifically.
-   *
-   *  `cds-panel-action-detail.component.ts`'s `onConnectorChange('create', ...)`
-   *  -- the handler `cds-action-intent`'s own `onConnectorChange` output
-   *  feeds -- first clears any connector already drawn from this action
-   *  (`deleteConnectorWithIDStartingWith`, itself a no-op when none is on the
-   *  stage) and only then calls `createNewConnector`. Without that clear,
-   *  retargeting this action would leave the old edge on screen alongside the
-   *  new one: unlike the dot's `createConnectorFromId`, `createNewConnector`
-   *  has no built-in "already exists" check of its own, and the connector's
-   *  DOM id changes with the target (`fromId/toId`), so the old one is never
-   *  found and overwritten -- it has to be deleted explicitly, the same as
-   *  the UI does. Both calls are safe before Angular has rendered anything:
-   *  `deleteConnectorWithIDStartingWith` no-ops when its element is not on
-   *  the stage, and `createNewConnector` polls for up to a second and gives
-   *  up quietly, exactly like `createConnectorFromId` above.
-   *
-   *  Not awaited, and never allowed to fail the operation, for the same
-   *  reason as `drawConnector`. */
-  private drawActionListConnector(fromIntentId: string, actionId: string, toIntentId: string): void {
-    const fromId = `${fromIntentId}/${actionId}`;
-    try {
-      this.connectorService.deleteConnectorWithIDStartingWith(fromId, false, true);
-    } catch {
-      // Clearing the old edge is best-effort, same as drawing the new one.
-    }
-    try {
-      const result: any = this.connectorService.createNewConnector(fromId, toIntentId);
-      Promise.resolve(result).catch(() => {});
-    } catch {
-      // Drawing is best-effort; the model is already right either way.
-    }
   }
 }
