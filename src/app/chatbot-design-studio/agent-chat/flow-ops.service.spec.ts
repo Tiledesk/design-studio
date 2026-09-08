@@ -23,8 +23,14 @@ function aConnectorService(): any {
     createConnectorFromId: jasmine.createSpy('createConnectorFromId')
       .and.returnValue(Promise.resolve(true)),
     deleteConnectorWithIDStartingWith: jasmine.createSpy('deleteConnectorWithIDStartingWith'),
-    updateConnectorsOfBlock: jasmine.createSpy('updateConnectorsOfBlock')
-      .and.returnValue(Promise.resolve(true))
+    // The data-driven, whole-intent builder redrawBlockConnectors actually
+    // uses -- not updateConnectorsOfBlock, which reads DOM attributes Angular
+    // has not re-rendered yet by the time FlowOps calls it, and whose delete
+    // path hits a pre-existing, unrelated master bug. See redrawBlockConnectors's
+    // own doc comment in flow-ops.service.ts for the full story.
+    createConnectorsOfIntent: jasmine.createSpy('createConnectorsOfIntent')
+      .and.returnValue(Promise.resolve()),
+    deleteConnectorsOutOfBlock: jasmine.createSpy('deleteConnectorsOutOfBlock')
   };
 }
 
@@ -526,11 +532,20 @@ describe('FlowOpsService — redrawing a block\'s connectors after a routing fie
   // The reported defect: an agent-set trueIntent/falseIntent (or goToIntent,
   // or any other routing field) lands correctly in the model and is
   // persisted, but the canvas draws nothing until a full reload rebuilds
-  // every connector from the saved data. These cover that FlowOps now asks
-  // ConnectorService to redraw the affected block the way the UI itself does
-  // -- updateConnectorsOfBlock, the same call cds-intent.component.ts's
-  // onDropAction and IntentService.restoreIntent's undo/redo 'put' path make
-  // for an already-rendered block whose routing just changed.
+  // every connector from the saved data.
+  //
+  // These assert on createConnectorsOfIntent specifically -- the method that
+  // actually reads the model and draws -- and, where it matters, on the
+  // *intent object* it was handed, so a regression back to
+  // updateConnectorsOfBlock (which reads stale DOM attributes instead of the
+  // model, and was the first, wrong version of this fix) fails these for the
+  // same reason it fails in the app: never called with anything, because it
+  // never receives the data it would need to draw from. A bare
+  // "was the connector service called" assertion would not have caught that
+  // -- updateConnectorsOfBlock direction was "called" too, it just drew
+  // nothing and, on the delete branch, threw. See the next describe block
+  // for a real-DOM test that counts actual drawn elements, the way the
+  // defect was actually confirmed.
   let service: FlowOpsService;
   let intentService: any;
   let connectorService: any;
@@ -587,24 +602,34 @@ describe('FlowOpsService — redrawing a block\'s connectors after a routing fie
     service = TestBed.inject(FlowOpsService);
   });
 
-  it('redraws the block after update_action sets an askgptv2\'s trueIntent and falseIntent', async () => {
+  it('redraws the block after update_action sets an askgptv2\'s trueIntent and falseIntent, handing the mutated intent to createConnectorsOfIntent', async () => {
     const report = await service.apply([{
       op: 'update_action', intent_id: 'i1', action_id: 'a-cond',
       fields: { trueIntent: '#i2', falseIntent: '#i2' }
     }]);
     expect(report.ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('i1');
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledTimes(1);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
+
+    // Not just "called" -- called with the actual intent object carrying the
+    // destination this operation just wrote. This is the read-back that
+    // catches a fix that redraws from stale data (or from nothing).
+    const drawnFrom = connectorService.createConnectorsOfIntent.calls.mostRecent().args[0];
+    expect(drawnFrom.intent_id).toBe('i1');
+    const drawnAction = drawnFrom.actions.find((a: any) => a._tdActionId === 'a-cond');
+    expect(drawnAction.trueIntent).toBe('#i2');
+    expect(drawnAction.falseIntent).toBe('#i2');
   });
 
-  it('redraws the block after update_action sets capture_user_reply\'s goToIntent', async () => {
+  it('redraws the block after update_action sets capture_user_reply\'s goToIntent, handing the mutated intent to createConnectorsOfIntent', async () => {
     const report = await service.apply([{
       op: 'update_action', intent_id: 'i3', action_id: 'a-cap',
       fields: { goToIntent: '#i2' }
     }]);
     expect(report.ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('i3');
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledTimes(1);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
+    const drawnFrom = connectorService.createConnectorsOfIntent.calls.mostRecent().args[0];
+    expect(drawnFrom.intent_id).toBe('i3');
+    expect(drawnFrom.actions.find((a: any) => a._tdActionId === 'a-cap').goToIntent).toBe('#i2');
   });
 
   it('does not redraw when update_action sets no destination field', async () => {
@@ -612,7 +637,30 @@ describe('FlowOpsService — redrawing a block\'s connectors after a routing fie
       { op: 'update_action', intent_id: 'i1', action_id: 'a-text', fields: { text: 'bye' } }
     ]);
     expect(report.ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).not.toHaveBeenCalled();
+    expect(connectorService.createConnectorsOfIntent).not.toHaveBeenCalled();
+    expect(connectorService.deleteConnectorsOutOfBlock).not.toHaveBeenCalled();
+  });
+
+  it('clears the block\'s previously-drawn outgoing connectors before rebuilding, so a retargeted destination does not leave the old edge on screen', async () => {
+    // Jasmine's CallInfo carries no invocation-order timestamp, so ordering
+    // is observed the direct way: each spy's default behaviour is kept, but
+    // wrapped to also record its name into a shared, order-preserving array.
+    const order: string[] = [];
+    connectorService.deleteConnectorsOutOfBlock.and.callFake(() => { order.push('delete'); });
+    connectorService.createConnectorsOfIntent.and.callFake(() => {
+      order.push('create');
+      return Promise.resolve();
+    });
+
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i2' }
+    }]);
+    expect(report.ok).toBe(true);
+    expect(connectorService.deleteConnectorsOutOfBlock).toHaveBeenCalledWith('i1', false, false);
+    // Cleared before the rebuild, not after -- rebuilding onto a still-dirty
+    // block would either draw nothing (blocked by an id collision with the
+    // stale edge) or leave the stale one standing next to the new one.
+    expect(order).toEqual(['delete', 'create']);
   });
 
   it('redraws every affected block once each in a batch that touches three blocks, not once per operation', async () => {
@@ -627,14 +675,21 @@ describe('FlowOpsService — redrawing a block\'s connectors after a routing fie
     ]);
 
     expect(report.ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledTimes(3);
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('i1');
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('i3');
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('i4');
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(3);
+    const drawnIds = connectorService.createConnectorsOfIntent.calls.allArgs()
+      .map((args: any[]) => args[0].intent_id).sort();
+    expect(drawnIds).toEqual(['i1', 'i3', 'i4']);
+    // i1's redraw happened after both of its operations applied, so it
+    // carries the *second* write (falseIntent), not a stale mid-batch copy.
+    const i1Drawn = connectorService.createConnectorsOfIntent.calls.allArgs()
+      .find((args: any[]) => args[0].intent_id === 'i1')[0];
+    const i1Action = i1Drawn.actions.find((a: any) => a._tdActionId === 'a-cond');
+    expect(i1Action.trueIntent).toBe('#i2');
+    expect(i1Action.falseIntent).toBe('#i2');
   });
 
   it('still reports ok:true when the redraw itself throws', async () => {
-    connectorService.updateConnectorsOfBlock.and.callFake(() => {
+    connectorService.createConnectorsOfIntent.and.callFake(() => {
       throw new Error('canvas not ready');
     });
     const report = await service.apply([{
@@ -643,11 +698,25 @@ describe('FlowOpsService — redrawing a block\'s connectors after a routing fie
     }]);
     expect(report.ok).toBe(true);
     expect(report.results[0].ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('i1');
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
+  });
+
+  it('still redraws when clearing the block\'s old connectors first throws', async () => {
+    // deleteConnectorsOutOfBlock and createConnectorsOfIntent are each
+    // independently best-effort -- one failing must not stop the other from
+    // being tried.
+    connectorService.deleteConnectorsOutOfBlock.and.callFake(() => {
+      throw new Error('nothing to clear yet');
+    });
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i2' }
+    }]);
+    expect(report.ok).toBe(true);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
   });
 
   it('still reports ok:true when the redraw\'s own promise rejects', async () => {
-    connectorService.updateConnectorsOfBlock.and.returnValue(Promise.reject(new Error('stage gone')));
+    connectorService.createConnectorsOfIntent.and.returnValue(Promise.reject(new Error('stage gone')));
     const report = await service.apply([{
       op: 'update_action', intent_id: 'i1', action_id: 'a-cond',
       fields: { trueIntent: '#i2' }
@@ -1012,8 +1081,10 @@ describe('FlowOpsService — add_intent with inline actions', () => {
     }]);
 
     expect(report.ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledWith('new-id');
-    expect(connectorService.updateConnectorsOfBlock).toHaveBeenCalledTimes(1);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalledTimes(1);
+    const drawnFrom = connectorService.createConnectorsOfIntent.calls.mostRecent().args[0];
+    expect(drawnFrom.intent_id).toBe('new-id');
+    expect(drawnFrom.actions[0].goToIntent).toBe('#i2');
   });
 
   it('does not redraw a new block whose inline actions set no destination', async () => {
@@ -1024,7 +1095,7 @@ describe('FlowOpsService — add_intent with inline actions', () => {
       actions: [{ type: 'reply', fields: { text: 'hi' } }]
     }]);
     expect(report.ok).toBe(true);
-    expect(connectorService.updateConnectorsOfBlock).not.toHaveBeenCalled();
+    expect(connectorService.createConnectorsOfIntent).not.toHaveBeenCalled();
   });
 });
 
@@ -1113,6 +1184,163 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
     const offered = IntentService.prototype.getListOfIntents
       .call({ listOfIntents: intentService.listOfIntents });
     expect(offered.map((o: any) => o.value)).toContain(dot.intentName);
+  });
+});
+
+describe('FlowOpsService — a routing destination is actually drawn, real DOM and all', () => {
+  // Every other test in this file asserts through a fake ConnectorService --
+  // useful for isolating FlowOps's own logic, but exactly the kind of test
+  // that let the original ("updateConnectorsOfBlock") version of this fix
+  // through: the fake recorded a call that, against the real service, drew
+  // nothing. This runs the real ConnectorService, wired to a real
+  // TiledeskConnectors instance, against real DOM elements standing in for
+  // the block's rendered action anchor and its target block -- the same
+  // instrument the defect was actually confirmed with: counting the real
+  // `path` elements a connector draws, not just whether a method was called.
+  let drawer: HTMLElement;
+  let fromAnchor: HTMLElement;
+  let toBlock: HTMLElement;
+  let retargetBlock: HTMLElement;
+  let connectors: ConnectorService;
+  let service: FlowOpsService;
+  let intentService: any;
+
+  const fromId = 'i1/a-cond/true';
+  const connectorToI2 = `${fromId}/i2`;
+  const connectorToI5 = `${fromId}/i5`;
+
+  beforeEach(() => {
+    // The real ConnectorService logs through the app-wide logger singleton,
+    // which nothing has set up in a spec run.
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+
+    // #tds_drawer is the element TiledeskConnectors mounts its SVG stage
+    // into (ConnectorService.initializeConnectors() hard-codes that id).
+    // Without it on the page, the library still creates path elements but
+    // never appends them to the document -- which would make every lookup
+    // below silently see "nothing drawn" for a reason that has nothing to do
+    // with FlowOps. fromAnchor/toBlock/retargetBlock stand in for the real
+    // canvas nodes an action's connector anchor and a block card render with
+    // -- their ids are exactly what the studio's own contract already uses
+    // ('<intent_id>/<action_id>/<port>' and '<intent_id>'), and toBlock /
+    // retargetBlock carry 'tds_input_block', the class
+    // elementLogicTopLeft() searches for to find a block's own logical
+    // position.
+    drawer = document.createElement('div');
+    drawer.id = 'tds_drawer';
+    document.body.appendChild(drawer);
+
+    fromAnchor = document.createElement('div');
+    fromAnchor.id = fromId;
+    document.body.appendChild(fromAnchor);
+
+    toBlock = document.createElement('div');
+    toBlock.id = 'i2';
+    toBlock.classList.add('tds_input_block');
+    document.body.appendChild(toBlock);
+
+    retargetBlock = document.createElement('div');
+    retargetBlock.id = 'i5';
+    retargetBlock.classList.add('tds_input_block');
+    document.body.appendChild(retargetBlock);
+
+    const withCondition = anIntent('i1', 'Search KB');
+    withCondition.actions = [
+      { _tdActionId: 'a-cond', _tdActionType: 'askgptv2', trueIntent: '', falseIntent: '' } as any
+    ];
+
+    intentService = {
+      listOfIntents: [withCondition, anIntent('i2', 'Answer Found'), anIntent('i5', 'Transfer')],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    connectors = new ConnectorService();
+    connectors.initializeConnectors();
+    connectors.listOfIntents = intentService.listOfIntents;
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectors },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  afterEach(() => {
+    drawer.remove();
+    fromAnchor.remove();
+    toBlock.remove();
+    retargetBlock.remove();
+    document.querySelectorAll(`[id^="${fromId}"]`).forEach(el => el.remove());
+    document.getElementById('tds_svgContainer')?.remove();
+  });
+
+  // redrawBlockConnectors is deliberately not awaited by apply(), and even
+  // though every element it needs already exists (so createConnectorFromId
+  // never falls into isElementOnTheStage's polling), the call chain is still
+  // async end to end (createConnectorsOfIntent -> createConnector ->
+  // createConnectorFromId, each declared async). A macrotask turn is enough
+  // to drain every microtask those leave pending.
+  const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
+  it('draws a real <path> connector for a destination update_action just wrote -- not merely a call the service received', async () => {
+    expect(document.getElementById(connectorToI2)).toBeNull();
+
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i2' }
+    }]);
+    expect(report.ok).toBe(true);
+    await flush();
+
+    const drawn = document.getElementById(connectorToI2);
+    expect(drawn).not.toBeNull();
+    expect(drawn!.tagName.toLowerCase()).toBe('path');
+  });
+
+  it('does not stack a duplicate line when the same destination is redrawn a second time', async () => {
+    await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i2' }
+    }]);
+    await flush();
+    const countAfterFirst = document.querySelectorAll(`[id^="${fromId}"]`).length;
+    expect(countAfterFirst).toBeGreaterThan(0);
+
+    await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i2' }
+    }]);
+    await flush();
+
+    expect(document.querySelectorAll(`[id^="${fromId}"]`).length).toBe(countAfterFirst);
+  });
+
+  it('leaves exactly one edge after a retarget -- no stale line left pointing at the old destination', async () => {
+    await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i2' }
+    }]);
+    await flush();
+    expect(document.getElementById(connectorToI2)).not.toBeNull();
+
+    await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'a-cond', fields: { trueIntent: '#i5' }
+    }]);
+    await flush();
+
+    expect(document.getElementById(connectorToI5)).not.toBeNull();
+    expect(document.getElementById(connectorToI2)).toBeNull();
   });
 });
 

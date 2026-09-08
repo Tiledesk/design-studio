@@ -1156,39 +1156,88 @@ export class FlowOpsService {
    *  connector from scratch -- exactly the report: two branches "not
    *  associated with any block" that were actually just never drawn.
    *
-   *  `updateConnectorsOfBlock`, not `createConnectorsOfIntent`: the studio's
-   *  own code already had to make this exact choice, for the exact same
-   *  situation -- an existing, already-rendered block whose routing changed
-   *  after the initial load -- and picked `updateConnectorsOfBlock` both
-   *  times. `cds-intent.component.ts`'s `onDropAction` calls it after moving
-   *  an action into a different block changes that block's outbound edges;
-   *  `IntentService.restoreIntent`'s undo/redo `put` path calls it after a
-   *  restored intent's fields (routing fields included) land back on the
-   *  model. `createConnectorsOfIntent` is the other shape entirely: the
-   *  whole-canvas rebuild `createConnectors` runs once per intent on initial
-   *  load, and `IntentService.pasteIntentOntoStage` tried calling it for a
-   *  single freshly-pasted block and left it commented out in favour of
-   *  `updateConnectorsOfBlock` -- the same block-scoped tool this method
-   *  uses. `updateConnectorsOfBlock` walks the block's own rendered
-   *  `[connector]` elements, deletes whatever was drawn from each one, and
-   *  redraws from that element's current `idConnection` -- which is why it is
-   *  only correct for a block Angular has already rendered with the new
-   *  field values bound in, never for one being built from a bare data
-   *  object the way `createConnectorsOfIntent` reads.
+   *  `createConnectorsOfIntent(intent)`, not `updateConnectorsOfBlock` --
+   *  reversed from this method's first version, which measured wrong. Both
+   *  were tried against the real thing (an `askgptv2` given `trueIntent` /
+   *  `falseIntent` through `update_action`) by counting the actual `path`
+   *  elements a connector draws, not the block's own always-present endpoint
+   *  dots: `updateConnectorsOfBlock` drew zero lines. It reads the DOM, not
+   *  the model -- `elem.querySelectorAll('[connector]')`, then each found
+   *  element's own `idConnection` *attribute* -- and that attribute is bound
+   *  by Angular from the action's field, so it only carries the new
+   *  destination once change detection has re-rendered the block from the
+   *  mutated action. FlowOps calls this synchronously, right after mutating
+   *  that same action in memory: nothing has re-rendered yet, so every
+   *  anchor's `idConnection` is still whatever it was before this operation
+   *  ran, and `updateConnectorsOfBlock` redraws exactly nothing new. Worse,
+   *  when it does find a stale connector to clear first, it calls
+   *  `deleteConnectorById`, which calls `ConnectorService.deleteConnector`
+   *  with the arguments transposed against that method's own signature
+   *  (`deleteConnector(intent, idConnection, save, notify)` vs. the two
+   *  positional arguments `deleteConnectorById` actually passes) -- a
+   *  pre-existing bug on `master`, unrelated to this feature, that throws
+   *  `TypeError: idConnection.lastIndexOf is not a function` and aborts the
+   *  loop before anything downstream of it runs. `createConnectorsOfIntent`
+   *  has neither problem: it is the same builder `createConnectors` already
+   *  calls once per intent on initial load, reading `intent.attributes.nextBlockAction`
+   *  and walking `intent.actions` directly -- the model FlowOps just mutated,
+   *  not a DOM attribute waiting on a render pass -- and it never calls the
+   *  broken delete path at all.
+   *
+   *  Paired with `deleteConnectorsOutOfBlock(intentId, false, false)` first,
+   *  the same pairing `IntentService.restoreIntent`'s undo/redo `put` path
+   *  already uses around `updateConnectorsOfBlock`. `createConnectorsOfIntent`
+   *  only ever adds: it has no delete step of its own, so redrawing a block
+   *  whose destination was *retargeted* (an already-configured `trueIntent`
+   *  pointed at a different block, not merely set from empty) would leave
+   *  the old edge on screen alongside the new one -- correct in the model,
+   *  wrong on the canvas, again, until a reload. `deleteConnectorsOutOfBlock`
+   *  clears every connector already drawn *out of* this block first (it
+   *  matches on `connectorId.startsWith(intentId)`, so an inbound connector
+   *  from some other block is untouched); `createConnectorsOfIntent` then
+   *  rebuilds all of them fresh from the current data, so nothing already
+   *  correct is lost. This delete path is a different method entirely from
+   *  the broken one above: `ConnectorService.deleteConnectorsOutOfBlock`
+   *  forwards straight to `TiledeskConnectors.deleteConnectorsOutOfBlock`,
+   *  which calls the connectors library's own three-argument
+   *  `deleteConnector(connectorId, save, notify)` -- never the broken
+   *  `ConnectorService.deleteConnector(intent, idConnection, save, notify)`
+   *  wrapper `deleteConnectorById` misuses.
+   *
+   *  `createConnectorFromId` -- what `createConnectorsOfIntent` calls per
+   *  edge, through the private `createConnector(intent, fromId, toId)` --
+   *  opens with `document.getElementById(fromId + '/' + toId)` and, when
+   *  that id is already on the stage, updates it in place and returns
+   *  rather than adding a second line. Confirmed by reading the call chain,
+   *  not assumed: `createConnectorsOfIntent` -> `createConnector` ->
+   *  `createConnectorFromId` is a straight, unconditional call at each step,
+   *  so this guard is always reached on the path this method uses. Calling
+   *  this method twice in a row for the same, unchanged destination is
+   *  therefore idempotent -- covered by a test below that calls it twice and
+   *  asserts the DOM still holds exactly one `path`, not two.
    *
    *  Not awaited, and never allowed to fail the operation, for the same
-   *  reason as `drawConnector`: `updateConnectorsOfBlock` itself polls the
-   *  DOM (`isElementOnTheStage`) for up to a second and resolves quietly
-   *  either way, including when the canvas is not on screen at all -- and a
-   *  repaint failing must never turn a write that already succeeded and
-   *  saved into a reported failure. Called once per affected block after a
-   *  whole batch applies (see `blocksToRedraw` in `apply()`), not once per
-   *  operation -- a batch of a dozen `update_action` calls across a few
-   *  blocks would otherwise ask the DOM to redraw the same block a dozen
-   *  times for a repaint the user only ever sees once. */
+   *  reason as `drawConnector`: both `deleteConnectorsOutOfBlock` and
+   *  `createConnectorsOfIntent` are wrapped independently, so one failing
+   *  never stops the other from being tried, and `createConnectorFromId`
+   *  itself polls the DOM (`isElementOnTheStage`) for up to a second and
+   *  resolves quietly either way, including when the canvas is not on
+   *  screen at all -- a repaint failing must never turn a write that already
+   *  succeeded and saved into a reported failure. Called once per affected
+   *  block after a whole batch applies (see `blocksToRedraw` in `apply()`),
+   *  not once per operation -- a batch of a dozen `update_action` calls
+   *  across a few blocks would otherwise ask the DOM to redraw the same
+   *  block a dozen times for a repaint the user only ever sees once. */
   private redrawBlockConnectors(intentId: string): void {
+    const intent = this.intentService.getIntentFromId(intentId);
+    if (!intent) { return; }
     try {
-      const result: any = this.connectorService.updateConnectorsOfBlock(intentId);
+      this.connectorService.deleteConnectorsOutOfBlock(intentId, false, false);
+    } catch {
+      // Clearing stale edges first is best-effort, same as drawing new ones.
+    }
+    try {
+      const result: any = this.connectorService.createConnectorsOfIntent(intent);
       Promise.resolve(result).catch(() => {});
     } catch {
       // Drawing is best-effort; the model is already right either way.
