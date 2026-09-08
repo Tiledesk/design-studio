@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.40.14-rc5
+# 1.40.14-rc7
 - **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
 - **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
 - **changed**: nel pannello Subagents la **casella di ricerca** "Search a subagent" e il **badge `parent`** sono nascosti: rimosso il markup, conservati stili e logica di filtro (`onSearch`/`applyFilter`), cosi' ripristinarli e' questione di poche righe
