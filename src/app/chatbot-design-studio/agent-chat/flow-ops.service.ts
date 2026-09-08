@@ -6,7 +6,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION } from '../utils-actions';
-import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND } from '../utils';
+import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID } from '../utils';
 
 const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
@@ -351,6 +351,21 @@ export class FlowOpsService {
         if (violation) { return violation; }
       }
     }
+    // A reply's buttons route the flow as much as any named field does; their
+    // destination just sits nested in `attributes` under a per-button
+    // `action`, so it has to be walked rather than looked up by name. Only
+    // 'action' buttons route -- a url or text button's `action` means
+    // something else entirely -- which is the same test the flow engine's
+    // `allReplyButtons` applies before it treats a button as a branch.
+    if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(actionType) !== -1) {
+      const buttons = this.replyButtonsOf({ _tdActionType: actionType, attributes: fields.attributes });
+      for (let i = 0; i < buttons.length; i++) {
+        if (buttons[i].type !== TYPE_BUTTON.ACTION) { continue; }
+        const violation = this.validateDestinationField(
+          actionType, `buttons[${i}].action`, buttons[i].action);
+        if (violation) { return violation; }
+      }
+    }
     return null;
   }
 
@@ -376,6 +391,15 @@ export class FlowOpsService {
     if (destinationFields.some(field => field in fields)) { return true; }
     if (actionType === TYPE_ACTION.AI_CONDITION && Array.isArray(fields.intents)) {
       return fields.intents.some((entry: any) => entry && 'conditionIntentId' in entry);
+    }
+    // A reply's buttons are destinations too -- they route the flow and draw
+    // their own connectors, they just live nested in `attributes` instead of
+    // in a named field, so DESTINATION_FIELDS cannot list them. Any write
+    // that touches the buttons counts, set or cleared, for the same reason
+    // the named fields do.
+    if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(actionType) !== -1
+        && 'attributes' in fields) {
+      return true;
     }
     return false;
   }
@@ -656,6 +680,8 @@ export class FlowOpsService {
       const action = this.intentService.createNewAction(actionSpec.type as any);
       this.assignFields(action, actionSpec.fields);
       this.writeReplyText(action._tdActionType, action, actionSpec.fields);
+      this.normalizeReplyCommands(action._tdActionType, action);
+      this.normalizeReplyButtons(intent.intent_id, action);
       this.normalizeStoredDestinations(action, actionSpec.fields);
       intent.actions.push(action);
       // A destination set inline can only reach a block that already exists
@@ -820,6 +846,115 @@ export class FlowOpsService {
     const command = new Command(TYPE_COMMAND.MESSAGE);
     command.message = new Message('text', fields.text);
     commands.push(wait, command);
+  }
+
+  /** Puts `attributes.commands` back into the order the studio itself builds:
+   *  every message command preceded by its own wait, `[Wait, Message, Wait,
+   *  Message, ...]` -- which is how `createNewAction` scaffolds a reply and
+   *  how `cds-action-reply` saves one back.
+   *
+   *  A caller supplying `fields.attributes` replaces that array wholesale and
+   *  may hand back the same commands in a different order. Nothing on the
+   *  canvas minds -- but the flow the canvas persists is run by
+   *  tiledesk-tybot-connector, whose `DirReplyV2.go` reads
+   *  `attributes.commands[1].message.text` by fixed index. Running a
+   *  generated flow found it: a `replyv2` whose commands arrived as
+   *  `[Message, Wait]` threw `Cannot read properties of undefined (reading
+   *  'text')` there, killing the turn -- the block simply never answered.
+   *  (That line only feeds a debug variable, so it is a bug upstream too; but
+   *  the flow is ours to hand over correct, and the studio never produces
+   *  that order itself.)
+   *
+   *  Nothing is dropped: waits already present are reused in order, a missing
+   *  one is created, and any surplus wait keeps its data at the end of the
+   *  array. An already-canonical array comes back element for element. */
+  private normalizeReplyCommands(actionType: string, action: any): void {
+    if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(actionType) === -1) { return; }
+    const commands = action?.attributes?.commands;
+    if (!Array.isArray(commands)) { return; }
+    if (!commands.some((c: any) => c && c.message)) { return; }
+    const waits = commands.filter((c: any) => c && c.type === TYPE_COMMAND.WAIT);
+    const ordered: any[] = [];
+    let nextWait = 0;
+    for (const command of commands) {
+      if (!command || command.type === TYPE_COMMAND.WAIT) { continue; }
+      if (command.message) { ordered.push(waits[nextWait++] ?? new Wait()); }
+      ordered.push(command);
+    }
+    ordered.push(...waits.slice(nextWait));
+    action.attributes.commands = ordered;
+  }
+
+  /** Gives every reply button the identity and connection bookkeeping the
+   *  studio itself maintains -- `uid`, `__idConnector`, `__idConnection`,
+   *  `__isConnected` -- so a button the agent wrote is indistinguishable from
+   *  one the author created in the panel.
+   *
+   *  The agent supplies the semantics, which are the only part it can know:
+   *  `type: 'action'`, `value` (the label, and what a typed reply is matched
+   *  against), and `action: '#<intent_id>'`. Everything here is derived from
+   *  ids that do not exist until `createNewAction` has minted `_tdActionId`
+   *  -- and, for `add_intent`, until `createNewIntent` has minted
+   *  `intent_id` -- so no caller could produce them even in principle.
+   *  Recomputed rather than trusted, so a value copied from another block
+   *  cannot leave a button claiming to belong to a different action.
+   *
+   *  The one field that has to be right is `uid`: `createConnectorsOfIntent`
+   *  builds the connector id as `<intent_id>/<action_id>/<uid>` and mints a
+   *  uid on the spot when one is missing -- unsaved, so the same button would
+   *  get a different id on the next load. Minting it here instead means the
+   *  uid is persisted with the action, the way the panel's own
+   *  `IntentService.patchButtons` persists it. The `__`-prefixed three are
+   *  view state the panel recomputes on render and the server does not store;
+   *  they are set anyway so the in-memory intent this batch hands to
+   *  `redrawBlockConnectors` is already consistent.
+   *
+   *  Buttons with no destination (`action` empty, or a url/text button) are
+   *  left disconnected -- identified, but pointing nowhere, exactly like a
+   *  button the author has just created and not yet wired up. */
+  private normalizeReplyButtons(intentId: string, action: any): void {
+    if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(action?._tdActionType) === -1) { return; }
+    for (const button of this.replyButtonsOf(action)) {
+      if (typeof button.uid !== 'string' || !button.uid.trim()) {
+        button.uid = generateShortUID();
+      }
+      button.__idConnector = `${intentId}/${action._tdActionId}/${button.uid}`;
+      const target = this.buttonDestination(button);
+      if (target) {
+        button.__isConnected = true;
+        button.__idConnection = `${button.__idConnector}/${target}`;
+      } else {
+        button.__isConnected = false;
+        button.__idConnection = null;
+      }
+    }
+  }
+
+  /** Every button on a reply-like action, across all of its message commands
+   *  -- the same walk `TiledeskChatbotUtil.allReplyButtons` does when the flow
+   *  runs, minus its `type === 'action'` filter, because the bookkeeping is
+   *  owed to url and text buttons too. */
+  private replyButtonsOf(action: any): any[] {
+    const commands = action?.attributes?.commands;
+    if (!Array.isArray(commands)) { return []; }
+    const buttons: any[] = [];
+    for (const command of commands) {
+      const found = command?.message?.attributes?.attachment?.buttons;
+      if (Array.isArray(found)) {
+        buttons.push(...found.filter((b: any) => b && typeof b === 'object'));
+      }
+    }
+    return buttons;
+  }
+
+  /** The intent_id a button points at, or `''` when it points nowhere. Reads
+   *  it the way `cds-panel-button-configuration` writes it: `'#<intent_id>'`,
+   *  optionally followed by a JSON attributes blob. */
+  private buttonDestination(button: any): string {
+    if (typeof button.action !== 'string') { return ''; }
+    const value = button.action.trim();
+    if (value.indexOf('#') === -1) { return ''; }
+    return value.split('#')[1].split('{')[0].trim();
   }
 
   /** Blanks any destination field `fields` just set on `action` to a plain
@@ -988,6 +1123,8 @@ export class FlowOpsService {
     }
     this.assignFields(action, op.fields);
     this.writeReplyText(action._tdActionType, action, op.fields);
+    this.normalizeReplyCommands(action._tdActionType, action);
+    this.normalizeReplyButtons(op.intent_id, action);
     this.normalizeStoredDestinations(action, op.fields);
     intent.actions = intent.actions || [];
     if (typeof op.index === 'number' && op.index >= 0 && op.index <= intent.actions.length) {
@@ -1009,6 +1146,8 @@ export class FlowOpsService {
     const action = intent.actions.find((a: any) => a._tdActionId === op.action_id);
     this.assignFields(action, op.fields);
     this.writeReplyText(action._tdActionType, action, op.fields);
+    this.normalizeReplyCommands(action._tdActionType, action);
+    this.normalizeReplyButtons(op.intent_id, action);
     this.normalizeStoredDestinations(action, op.fields);
     await this.intentService.updateIntent(intent);
     if (this.actionTouchesConnectors(action._tdActionType, op.fields)) {

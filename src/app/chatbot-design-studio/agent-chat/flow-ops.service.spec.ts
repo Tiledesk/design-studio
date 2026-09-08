@@ -2203,6 +2203,303 @@ describe('FlowOpsService — a reply\'s requested text lands where the studio re
     expect(messageCommand).toBeTruthy();
     expect(messageCommand.message.text).toBe('Qual è la tua email?');
   });
+
+  // Found by *running* a generated flow, not by reading it: the agent built a
+  // `replyv2` with three buttons and supplied `fields.attributes` wholesale,
+  // whose `commands` came back as [Message, Wait] instead of the studio's
+  // [Wait, Message]. The canvas rendered it perfectly. The engine that runs
+  // the flow (tiledesk-tybot-connector's DirReplyV2.go) reads
+  // `commands[1].message.text` by fixed index, threw "Cannot read properties
+  // of undefined (reading 'text')", and the block never answered the visitor.
+  it('reorders a caller-supplied commands array so every message command is preceded by its wait', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: {
+        attributes: {
+          disableInputMessage: false,
+          commands: [
+            { type: 'message', message: { type: 'text', text: 'Ciao! Come posso aiutarti?' } },
+            { type: 'wait', time: 500 }
+          ]
+        }
+      }
+    }]);
+    expect(report.ok).toBe(true);
+    const added = intentService.getIntentFromId('i2').actions[0];
+    expect(added.attributes.commands.map((c: any) => c.type)).toEqual(['wait', 'message']);
+    expect(added.attributes.commands[1].message.text).toBe('Ciao! Come posso aiutarti?');
+    // The wait the caller sent is reused, not replaced by a fresh default.
+    expect(added.attributes.commands[0].time).toBe(500);
+  });
+
+  it('pairs every message with a wait when several arrive out of order, dropping nothing', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: {
+        attributes: {
+          disableInputMessage: false,
+          commands: [
+            { type: 'message', message: { type: 'text', text: 'primo' } },
+            { type: 'message', message: { type: 'text', text: 'secondo' } },
+            { type: 'wait', time: 500 },
+            { type: 'wait', time: 900 },
+            { type: 'wait', time: 1200 }
+          ]
+        }
+      }
+    }]);
+    const commands = intentService.getIntentFromId('i2').actions[0].attributes.commands;
+    expect(commands.map((c: any) => c.type)).toEqual(['wait', 'message', 'wait', 'message', 'wait']);
+    expect(commands[0].time).toBe(500);
+    expect(commands[1].message.text).toBe('primo');
+    expect(commands[2].time).toBe(900);
+    expect(commands[3].message.text).toBe('secondo');
+    // The surplus wait keeps its data rather than being discarded.
+    expect(commands[4].time).toBe(1200);
+  });
+
+  it('creates the missing wait when a caller sends a message command with none', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: {
+        attributes: {
+          disableInputMessage: false,
+          commands: [{ type: 'message', message: { type: 'text', text: 'senza wait' } }]
+        }
+      }
+    }]);
+    const commands = intentService.getIntentFromId('i2').actions[0].attributes.commands;
+    expect(commands.map((c: any) => c.type)).toEqual(['wait', 'message']);
+    expect(commands[1].message.text).toBe('senza wait');
+  });
+
+  it('leaves an already-canonical array element for element', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'reply',
+      fields: { text: 'Ciao!' }
+    }]);
+    expect(report.ok).toBe(true);
+    const commands = intentService.getIntentFromId('i2').actions[0].attributes.commands;
+    expect(commands.map((c: any) => c.type)).toEqual(['wait', 'message']);
+    expect(commands.length).toBe(2);
+  });
+
+  it('normalizes on update_action too, not only on the paths that create an action', async () => {
+    const intent = intentService.getIntentFromId('i1');
+    intent.actions = [{
+      _tdActionId: 'reply-1', _tdActionType: 'replyv2',
+      attributes: {
+        disableInputMessage: false,
+        commands: [
+          { type: 'message', message: { type: 'text', text: 'vecchio' } },
+          { type: 'wait', time: 500 }
+        ]
+      }
+    }];
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i1', action_id: 'reply-1',
+      fields: { text: 'nuovo' }
+    }]);
+    expect(report.ok).toBe(true);
+    const commands = intentService.getIntentFromId('i1').actions[0].attributes.commands;
+    expect(commands.map((c: any) => c.type)).toEqual(['wait', 'message']);
+    expect(commands[1].message.text).toBe('nuovo');
+  });
+
+  it('leaves a non-reply action\'s commands untouched -- only the reply family is normalized', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'close',
+      fields: {
+        attributes: {
+          commands: [
+            { type: 'message', message: { type: 'text', text: 'x' } },
+            { type: 'wait', time: 500 }
+          ]
+        }
+      }
+    }]);
+    const commands = intentService.getIntentFromId('i2').actions[0].attributes.commands;
+    expect(commands.map((c: any) => c.type)).toEqual(['message', 'wait']);
+  });
+});
+
+/** A reply message command carrying `buttons`, the shape
+ *  `cds-action-reply` stores them in and `TiledeskChatbotUtil.allReplyButtons`
+ *  walks when the flow runs. */
+function replyWithButtons(buttons: any[]): any {
+  return {
+    _tdActionId: 'generated',
+    _tdActionType: 'replyv2',
+    attributes: {
+      disableInputMessage: false,
+      commands: [
+        { type: 'wait', time: 500 },
+        {
+          type: 'message',
+          message: {
+            type: 'text', text: 'Come posso aiutarti?',
+            attributes: { attachment: { type: 'template', buttons } }
+          }
+        }
+      ]
+    }
+  };
+}
+
+/** Running a generated flow showed the second half of the button story: a
+ *  `replyv2` whose buttons the agent had written Facebook-style
+ *  (`title`/`payload`/`intentName`, no `value`, no `action`) rendered on the
+ *  canvas but routed nowhere -- `allReplyButtons` keeps only `type: 'action'`
+ *  buttons and `buttonByText` matches on `value`, so clicking "Fatture" fell
+ *  through to defaultFallback. The semantics are the agent's to get right
+ *  (the system prompt documents them); the wiring is the studio's, because
+ *  `__idConnector` needs ids that do not exist until the action is built. */
+describe('FlowOpsService — reply buttons get the wiring only the studio can supply', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [anIntent('i1', 'start'), anIntent('i2', 'Menu'), anIntent('i3', 'Fatture')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => ({
+        _tdActionId: 'generated', _tdActionType: type, text: undefined,
+        attributes: {
+          disableInputMessage: false,
+          commands: [
+            { type: 'wait', time: 500 },
+            { type: 'message', message: { type: 'text', text: 'placeholder' } }
+          ]
+        }
+      })),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('builds __idConnector, __idConnection and __isConnected for a button pointing at a block', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([
+        { type: 'action', value: 'Fatture', action: '#i3' }
+      ])
+    }]);
+    expect(report.ok).toBe(true);
+    const button = intentService.getIntentFromId('i2')
+      .actions[0].attributes.commands[1].message.attributes.attachment.buttons[0];
+    expect(typeof button.uid).toBe('string');
+    expect(button.uid.length).toBeGreaterThan(0);
+    expect(button.__idConnector).toBe(`i2/generated/${button.uid}`);
+    expect(button.__idConnection).toBe(`i2/generated/${button.uid}/i3`);
+    expect(button.__isConnected).toBe(true);
+  });
+
+  it('leaves a button pointing nowhere disconnected, but still identified', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([{ type: 'action', value: 'Non collegato', action: '' }])
+    }]);
+    const button = intentService.getIntentFromId('i2')
+      .actions[0].attributes.commands[1].message.attributes.attachment.buttons[0];
+    expect(button.__idConnector).toBe(`i2/generated/${button.uid}`);
+    expect(button.__isConnected).toBe(false);
+    expect(button.__idConnection).toBeNull();
+  });
+
+  it('keeps a uid the caller already chose rather than minting a second one', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([{ uid: 'mine', type: 'action', value: 'Fatture', action: '#i3' }])
+    }]);
+    const button = intentService.getIntentFromId('i2')
+      .actions[0].attributes.commands[1].message.attributes.attachment.buttons[0];
+    expect(button.uid).toBe('mine');
+    expect(button.__idConnector).toBe('i2/generated/mine');
+  });
+
+  it('recomputes a stale __idConnector copied from another block', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([{
+        uid: 'b1', type: 'action', value: 'Fatture', action: '#i3',
+        __idConnector: 'someOtherBlock/someOtherAction/b1',
+        __idConnection: 'someOtherBlock/someOtherAction/b1/nowhere',
+        __isConnected: true
+      }])
+    }]);
+    const button = intentService.getIntentFromId('i2')
+      .actions[0].attributes.commands[1].message.attributes.attachment.buttons[0];
+    expect(button.__idConnector).toBe('i2/generated/b1');
+    expect(button.__idConnection).toBe('i2/generated/b1/i3');
+  });
+
+  it('wires buttons on a block add_intent is creating, using the new block\'s own id', async () => {
+    const report = await service.apply([{
+      op: 'add_intent', intent_display_name: 'Menu2',
+      actions: [{ type: 'replyv2', fields: replyWithButtons([
+        { type: 'action', value: 'Fatture', action: '#i3' }
+      ]) }]
+    }]);
+    expect(report.ok).toBe(true);
+    const saved = intentService.saveNewIntent.calls.mostRecent().args[0];
+    const button = saved.actions[0].attributes.commands[1].message.attributes.attachment.buttons[0];
+    expect(button.__idConnector).toBe(`new-id/generated/${button.uid}`);
+    expect(button.__idConnection).toBe(`new-id/generated/${button.uid}/i3`);
+  });
+
+  it('refuses an action button pointing at a block that is not on the canvas', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([{ type: 'action', value: 'Fatture', action: '#nonexistent' }])
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain('buttons[0].action');
+    expect(intentService.getIntentFromId('i2').actions.length).toBe(0);
+  });
+
+  it('does not read a url button\'s action as a destination', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([
+        { type: 'url', value: 'Sito', link: 'https://example.com', action: 'not-an-intent' }
+      ])
+    }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('redraws the block\'s connectors after writing buttons', async () => {
+    const connectorService = TestBed.inject(ConnectorService) as any;
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: replyWithButtons([{ type: 'action', value: 'Fatture', action: '#i3' }])
+    }]);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalled();
+  });
 });
 
 describe('FlowOpsService — add_intent lays new blocks out left to right', () => {
