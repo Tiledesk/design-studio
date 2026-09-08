@@ -10,7 +10,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { LIST_JSON_MODEL_GALLERY } from 'src/app/chatbot-design-studio/utils-json-gallery';
-import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-gallery',
@@ -120,9 +120,7 @@ export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, On
       });
       this.idIntent = this.idAction.split('/')[0];
 
-      if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-        this.filterConditionExist = true
-      }
+      this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
     } catch (error) {
       this.logger.log('onAddNewResponse ERROR', error);
     }
@@ -316,7 +314,7 @@ export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, On
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
 

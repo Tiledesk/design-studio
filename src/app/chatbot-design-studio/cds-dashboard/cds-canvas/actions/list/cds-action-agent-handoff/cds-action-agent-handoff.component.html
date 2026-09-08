@@ -36,5 +36,20 @@
 
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail">
-    <div class="action-description" [innerHTML]="actions['AGENT']?.doc+'.DESCRIPTION' | translate"></div>
+    
+    <div class="field-box">
+        <div class="action-description" [innerHTML]="actions['AGENT']?.doc+'.DESCRIPTION' | translate"></div>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.ChooseADepartment' | translate }}</label>
+        <cds-select id="select" 
+            [items]="departments" 
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'name'" 
+            [searchable]=true
+            [itemSelected]="action?.depName" 
+            (onSelected)="onChangeSelect($event)">
+        </cds-select>
+    </div>
 </div>

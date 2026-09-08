@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { SatPopover } from '@ncstate/sat-popover';
-import { OPERATORS_LIST_V2 } from '../../utils';
+import { OPERATORS_LIST_V2, OPERATORS_LIST_REPLY_FILTER, isReplyFilterOperatorSupported } from '../../utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
-import { serializeExpression, operatorLabelKey, operandRightDisplay } from 'src/app/chatbot-design-studio/utils-condition';
+import { serializeExpression, operatorLabelKey, operandRightDisplay, ensureConditionsFromWhen } from 'src/app/chatbot-design-studio/utils-condition';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -17,7 +17,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   templateUrl: './filter2.component.html',
   styleUrls: ['./filter2.component.scss']
 })
-export class CDSFilter2Component implements OnInit {
+export class CDSFilter2Component implements OnInit, OnChanges {
 
   @ViewChild("addConditionFilter") addConditionFilter : SatPopover;
 
@@ -29,19 +29,40 @@ export class CDSFilter2Component implements OnInit {
   selectedCondition: Condition;
   selectedIndex: number;
 
+  /** catalogo completo: serve solo per ETICHETTARE anche gli operatori non più selezionabili */
   OPERATORS_LIST = OPERATORS_LIST_V2
+  /** catalogo offerto nel picker: solo gli operatori che il server valuta nei filtri reply */
+  OPERATORS_LIST_PICKER = OPERATORS_LIST_REPLY_FILTER
+  /** true se l'operatore di una condizione già salvata non è valutabile dal server */
+  isReplyFilterOperatorSupported = isReplyFilterOperatorSupported
 
   logger: LoggerService = LoggerInstance.getInstance()
   constructor() { }
 
   ngOnInit(): void {
+    this.ensureEditableExpression()
+  }
+
+  ngOnChanges(changes: SimpleChanges){
+    if(changes['expression']){
+      this.ensureEditableExpression()
+    }
+    this.logger.log('[BASE_FILTER2] expression selected-->', this.expression)
+  }
+
+  /**
+   * Normalizza l'expression per l'editor: garantisce l'oggetto e l'array `conditions`
+   * (il server può restituire un filtro V2 senza AST) e, per i filtri V2 salvati in
+   * forma solo-`when`, ricostruisce l'AST rendendoli ri-editabili.
+   */
+  private ensureEditableExpression(){
     if(!this.expression){
       this.expression = new Expression()
     }
-  }
-
-  ngOnChanges(){
-    this.logger.log('[BASE_FILTER2] expression selected-->', this.expression)
+    if(!Array.isArray(this.expression.conditions)){
+      this.expression.conditions = []
+    }
+    ensureConditionsFromWhen(this.expression)
   }
 
   /**

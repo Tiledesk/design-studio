@@ -5,7 +5,7 @@ import { TYPE_MESSAGE } from '../../../../../../../utils';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
-import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-frame',
@@ -60,9 +60,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
 
   private initialize(){
     this.delayTime = (this.wait?.time && this.wait?.time !== 0)? (this.wait.time/1000) : 500/1000;
-    if(this.response?._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-      this.filterConditionExist = true
-    }
+    this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
     if (typeof this.response?.metadata?.height === 'string') {
       this.heightIframe = parseFloat(this.response.metadata.height);
     } else {
@@ -98,7 +96,7 @@ export class CdsActionReplyFrameComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = hasFilter(expression);
     // this.logger.log("[ActionReplyFrameComponent] onChangeExpression: ", this.response.metadata);
     this.changeActionReply.emit();
   }

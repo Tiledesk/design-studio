@@ -1,0 +1,21 @@
+/* Scoped test config for isolated pure-unit specs (*.unit.spec.ts) anywhere under
+   src/app, compiling only those specs (+ their imports). Keeps these unit tests
+   runnable independently of pre-existing broken specs elsewhere in the repo.
+   Used by the angular.json `test` configuration named "units". */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-units",
+    "types": [
+      "jasmine"
+    ]
+  },
+  "files": [
+    "src/test.units.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/app/**/*.unit.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

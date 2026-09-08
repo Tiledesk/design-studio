@@ -23,9 +23,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
-import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 import { environment } from 'src/environments/environment';
 
@@ -134,6 +133,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     // aggiorno llm_model con i modelli dell'integration
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
     await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
+    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'openrouter');
     
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);

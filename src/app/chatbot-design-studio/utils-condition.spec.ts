@@ -1,4 +1,4 @@
-import { TYPE_OPERATOR_V2 } from './utils';
+import { TYPE_OPERATOR_V2, OPERATORS_LIST_REPLY_FILTER, isReplyFilterOperatorSupported } from './utils';
 import { Condition, Expression, Operator } from 'src/app/models/action-model';
 import {
   serializeConditionToWhen,
@@ -9,6 +9,8 @@ import {
   SAVE_ONLY_WHEN,
   parseWhenToGroups,
   parseCondition,
+  hasFilter,
+  ensureConditionsFromWhen,
 } from './utils-condition';
 
 /** Helpers di costruzione AST */
@@ -155,7 +157,7 @@ describe('utils-condition · serializeConditionToWhen', () => {
     expect(action.groups.length).toBe(1);
   });
 
-  it('save mode: filtro reply V2 (version=2) -> `when` valorizzato; in TEST `conditions` svuotate', () => {
+  it('save mode: filtro reply V2 (version=2) -> `when` valorizzato ACCANTO alle `conditions`', () => {
     const tdJSONCondition: any = expr(cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }));
     tdJSONCondition.version = 2; // marker V2 (scritto dall'editor appdashboard-filter2)
     const action: any = {
@@ -165,11 +167,8 @@ describe('utils-condition · serializeConditionToWhen', () => {
     const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
     applyConditionSaveModeToPayload(payload);
     expect(tdJSONCondition.when).toBe('user_city == "Roma"');
-    if (SAVE_ONLY_WHEN) {
-      expect(tdJSONCondition.conditions).toEqual([]);
-    } else {
-      expect(tdJSONCondition.conditions.length).toBe(1);
-    }
+    // le conditions restano: sono il nodo che il server valuta per i filtri reply
+    expect(tdJSONCondition.conditions.length).toBe(1);
   });
 
   it('save mode: filtro reply LEGACY (senza version) -> NON modificato (retrocompatibilità)', () => {
@@ -289,6 +288,129 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     expect(parseCondition('!isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
     expect(parseCondition('a == true')?.operator as any).toBe(TYPE_OPERATOR_V2.isTrue);
     expect(parseCondition('a == false')?.operator as any).toBe(TYPE_OPERATOR_V2.isFalse);
+  });
+
+});
+
+/* ============================================================================
+ * Filtri reply V2: il server valuta l'AST `conditions` (semantica V1).
+ * Il contratto "solo `when`" vale unicamente per l'AZIONE jsoncondition2.
+ * ==========================================================================*/
+describe('utils-condition · filtri reply V2', () => {
+
+  /** Costruisce il payload di salvataggio attorno a un _tdJSONCondition. */
+  function payloadWith(tdJSONCondition: any) {
+    const action: any = { _tdActionType: 'reply', attributes: { message: { _tdJSONCondition: tdJSONCondition } } };
+    return { operations: [{ type: 'put', intent: { actions: [action] } }] };
+  }
+
+  it('il nodo `conditions` sopravvive al salvataggio: è quello che il server valuta', () => {
+    const td: any = expr(
+      cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }),
+      op('AND'),
+      cond('age', TYPE_OPERATOR_V2.greaterThan, { type: 'const', value: '18' }),
+    );
+    td.version = 2;
+    applyConditionSaveModeToPayload(payloadWith(td));
+    expect(td.conditions.length).toBe(3);
+    expect(td.when).toBe('user_city == "Roma" && age > 18');
+  });
+
+  it('salvataggio idempotente: `when` rigenerato identico, AST invariato', () => {
+    const td: any = expr(cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }));
+    td.version = 2;
+    applyConditionSaveModeToPayload(payloadWith(td));
+    const first = td.when;
+    applyConditionSaveModeToPayload(payloadWith(td));
+    expect(td.when).toBe(first);
+    expect(td.conditions.length).toBe(1);
+  });
+
+  it('filtro V2 senza AST (salvato da una build intermedia): `when` non viene azzerato', () => {
+    const td: any = { type: 'expression', version: 2, conditions: [], when: '!isUndefined(kb_chunks)' };
+    applyConditionSaveModeToPayload(payloadWith(td));
+    expect(td.when).toBe('!isUndefined(kb_chunks)');
+  });
+
+  it('filtro svuotato dall\'utente: hasFilter() è false', () => {
+    const td: any = { type: 'expression', version: 2, conditions: [], when: '' };
+    applyConditionSaveModeToPayload(payloadWith(td));
+    expect(hasFilter(td)).toBe(false);
+  });
+
+  it('filtro LEGACY: il payload resta byte-identico', () => {
+    const td: any = expr(
+      cond('user_city', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: 'Roma' }),
+      op('AND'),
+      cond('age', TYPE_OPERATOR_V2.greaterThan, { type: 'const', value: '18' }),
+    );
+    delete td.when;
+    const payload = payloadWith(td);
+    const before = JSON.stringify(payload);
+    applyConditionSaveModeToPayload(payload);
+    expect(JSON.stringify(payload)).toBe(before);
+  });
+
+  it('condizione non serializzabile (RHS vuoto): AST conservato, `when` non azzerato', () => {
+    const td: any = expr(cond('age', TYPE_OPERATOR_V2.greaterThan, { type: 'const', value: '' }));
+    td.version = 2;
+    applyConditionSaveModeToPayload(payloadWith(td));
+    expect(td.conditions.length).toBe(1);
+    expect(td.when).toBeUndefined();
+  });
+
+  it('il picker dei filtri reply espone SOLO gli operatori che il server valuta', () => {
+    // i 22 solo-V2 non sono rappresentabili nell'AST V1 -> non devono essere selezionabili
+    const soloV2 = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'isTrue', 'isFalse',
+                    'isAfter', 'arrayContains', 'lengthGreaterThan'];
+    soloV2.forEach(o => {
+      expect(isReplyFilterOperatorSupported(o)).toBe(false);
+      expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeUndefined();
+    });
+    const comuni = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
+                    'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
+    comuni.forEach(o => {
+      expect(isReplyFilterOperatorSupported(o)).toBe(true);
+      expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeDefined();
+    });
+    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(16);
+  });
+
+  it('hasFilter: riconosce entrambe le forme ed è null-safe', () => {
+    expect(hasFilter(null)).toBe(false);
+    expect(hasFilter(undefined)).toBe(false);
+    expect(hasFilter({})).toBe(false);
+    expect(hasFilter({ conditions: [] })).toBe(false);
+    expect(hasFilter({ conditions: [cond('a', TYPE_OPERATOR_V2.isEmpty)] })).toBe(true);
+    expect(hasFilter({ conditions: [], when: 'a == "x"' })).toBe(true);
+    expect(hasFilter({ conditions: [], when: '   ' })).toBe(false);
+    expect(hasFilter({ when: 'a == "x"' })).toBe(true);
+  });
+
+  it('ensureConditionsFromWhen: ripara i filtri salvati senza AST, no-op sui legacy', () => {
+    // auto-riparazione di un filtro salvato da una build intermedia (solo `when`)
+    const orphan: any = { type: 'expression', version: 2, conditions: [], when: 'user_city == "Roma"' };
+    ensureConditionsFromWhen(orphan);
+    expect(orphan.conditions.length).toBe(1);
+
+    // legacy: mai toccato
+    const legacy: any = { type: 'expression', conditions: [], when: 'a == "x"' };
+    ensureConditionsFromWhen(legacy);
+    expect(legacy.conditions).toEqual([]);
+
+    // AST già presente: non sovrascritto
+    const withAst: any = expr(cond('a', TYPE_OPERATOR_V2.isEmpty));
+    withAst.version = 2;
+    withAst.when = 'b == "y"';
+    ensureConditionsFromWhen(withAst);
+    expect((withAst.conditions[0] as Condition).operand1).toBe('a');
+
+    // `when` non parsabile: AST vuoto, dato preservato
+    const bad: any = { type: 'expression', version: 2, conditions: [], when: 'weirdFunc(a)' };
+    ensureConditionsFromWhen(bad);
+    expect(bad.conditions).toEqual([]);
+    applyConditionSaveModeToPayload(payloadWith(bad));
+    expect(bad.when).toBe('weirdFunc(a)');
   });
 
 });

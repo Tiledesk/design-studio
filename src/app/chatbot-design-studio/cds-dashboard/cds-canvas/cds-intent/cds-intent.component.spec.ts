@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdsIntentComponent } from './cds-intent.component';
 
-describe('CdsDrawerOfIntentsComponent', () => {
+describe('CdsIntentComponent', () => {
   let component: CdsIntentComponent;
   let fixture: ComponentFixture<CdsIntentComponent>;
 

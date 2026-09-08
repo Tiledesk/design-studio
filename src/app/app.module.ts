@@ -36,24 +36,6 @@ import { DepartmentService } from './services/department.service';
 import { WebSocketJs } from './services/websocket/websocket-js';
 import { DatePipe, HashLocationStrategy, LocationStrategy, registerLocaleData } from '@angular/common';
 import { NotifyService } from './services/notify.service';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatTabsModule } from '@angular/material/tabs';
 import { FirebaseInitService } from 'src/chat21-core/providers/firebase/firebase-init-service';
 import { NativeImageRepoService } from 'src/chat21-core/providers/native/native-image-repo';
 import { FirebaseImageRepoService } from 'src/chat21-core/providers/firebase/firebase-image-repo';
@@ -66,6 +48,7 @@ import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { AppInterruptionComponent } from './modals/app-interruption/app-interruption.component';
 import { BrandResources } from './chatbot-design-studio/BrandResources';
+import { AiService } from './services/ai.service';
 
 import localeIt from '@angular/common/locales/it';
 registerLocaleData(localeIt, 'it');
@@ -206,7 +189,9 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     DepartmentService,
     UsersService,
     KnowledgeBaseService,
+    AiService,
     OpenaiService,
+    AiService,
     WhatsappService,
     BrandService,
     MultichannelService,
