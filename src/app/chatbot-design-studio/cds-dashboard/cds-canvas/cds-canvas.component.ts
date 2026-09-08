@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostBinding, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
 import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -130,6 +130,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel agent chat */
   private subscriptionAgentChatPanel: Subscription;
   IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
+
+  /** The chat opens in its own column rather than over the canvas: the stage
+   *  narrows by its width, and every panel that docks on the right stops at
+   *  its edge instead of opening behind it. Both are stylesheet rules keyed
+   *  off this class -- see `:host(.agent-chat-open)` in the component's
+   *  scss. */
+  @HostBinding('class.agent-chat-open')
+  get isAgentChatOpen(): boolean { return this.IS_OPEN_PANEL_AGENT_CHAT; }
 
 
   /** panel options */
