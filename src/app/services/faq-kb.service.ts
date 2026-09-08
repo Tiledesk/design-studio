@@ -251,6 +251,25 @@ export class FaqKbService {
     return this._httpClient.put(url, body, httpOptions)
   }
 
+  /**
+   * DELETE dell'intero agent (chatbot). Il server rimuove il documento `faq_kb`
+   * e, in cascade, i suoi blocchi. Operazione irreversibile.
+   */
+  public deleteBot(botId: string) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+
+    const url = this.FAQKB_URL + botId;
+    this.logger.log('[FAQ-KB.SERV] - DELETE BOT - URL', url);
+
+    return this._httpClient.delete(url, httpOptions);
+  }
+
+
   public getBotReleaseHistory(botid: string): Observable<FaqKb> {
     const httpOptions = {
       headers: new HttpHeaders({

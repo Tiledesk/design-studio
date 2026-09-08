@@ -11,6 +11,7 @@ import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
+import { AgentGeneratorService } from '../../services/agent-generator.service';
 import { NoteResizeStateService } from './note-resize-state.service';
 
 // MODEL //
@@ -191,7 +192,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    private readonly agentGeneratorService: AgentGeneratorService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -931,6 +933,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     */
     this.listnerKeydown = (e) => {
     this.logger.log('[CDS-CANVAS]  keydown ', e);
+    // Modale "Crea agente" aperta: l'interfaccia sotto e' bloccata, il canvas
+    // non deve reagire ai tasti digitati nella modale.
+    if (this.agentGeneratorService.isOpen) {
+      return;
+    }
     var focusedElement = document.activeElement;
     if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
       return;
@@ -972,6 +979,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
     this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target, event);
+    if (this.agentGeneratorService.isOpen) {
+      return;
+    }
     if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
       this.controllerService.stopTestItOut();
@@ -987,6 +997,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   */
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
+    if (this.agentGeneratorService.isOpen) {
+      return;
+    }
     // event.key === 'Backspace' ||
     if (event.key === 'Escape' || event.key === 'Canc' && !this.hasClickedAddAction) {
       if (!this.hasClickedAddAction) {

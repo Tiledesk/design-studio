@@ -30,8 +30,21 @@
         <span class="cds-text title"> {{BRAND_BASE_INFO['META_TITLE']}}</span>    
     </div>
     <div class="header-title ellips">
-        {{ selectedChatbot?.name }}
+        <!-- Selettore dell'agent: cambia agent senza uscire dal Design Studio -->
+        <button type="button" class="agent-selector" [matMenuTriggerFor]="menuAgents"
+            [attr.aria-label]="'CDSHeader.SelectAgent' | translate">
+            <span class="agent-selector__name ellips">{{ selectedChatbot?.name }}</span>
+            <span class="material-icons agent-selector__caret">arrow_drop_down</span>
+        </button>
         <span class="material-icons" *ngIf="(SHARE_MENU_ITEMS | filter:{key: 'status', value: 'active' }).length > 0" [matMenuTriggerFor]="menuShare">ios_share</span>
+        <span class="material-icons-outlined delete-agent-icon"
+            *ngIf="selectedChatbot?._id"
+            [class.is-disabled]="isDeletingAgent"
+            matTooltip="{{ 'CDSHeader.DeleteAgent' | translate }}"
+            matTooltipClass="cds-mat-tooltip"
+            matTooltipPosition="below"
+            matTooltipHideDelay="100"
+            (click)="onDeleteAgent()">delete_outline</span>
     </div>
     <div class="right-opts">
 
@@ -164,6 +177,23 @@
             [items]="LOGO_MENU_ITEMS"
             (onMenuOption)="onMenuOptionFN($event)">
         </cds-menu>
+    </ng-template>
+</mat-menu>
+
+<!-- ELENCO DEGLI AGENT DEL PROGETTO -->
+<mat-menu #menuAgents="matMenu" class="agentsMenu" xPosition="after" yPosition="below">
+    <ng-template matMenuContent>
+        <button mat-menu-item class="agent-item"
+            *ngFor="let agent of agents"
+            [class.is-active]="agent._id === id_faq_kb"
+            (click)="onSelectAgent(agent)">
+            <span class="material-icons-outlined agent-item__icon">smart_toy</span>
+            <span class="agent-item__name">{{ agent.name }}</span>
+            <span class="material-icons agent-item__check" *ngIf="agent._id === id_faq_kb">check</span>
+        </button>
+        <div class="agents-menu__empty" *ngIf="agents.length === 0">
+            {{ 'CDSHeader.NoAgents' | translate }}
+        </div>
     </ng-template>
 </mat-menu>
 

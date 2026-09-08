@@ -303,5 +303,43 @@
         "field_label": "Scrivi un'etichetta chiara che aiuti gli utenti a inserire i dati corretti (es: come ti chiami?)",
         "field_error": "Scrivi un messaggio di errore se i dati inseriti dall'utente non sono corretti"
       }
+    },
+    "CDSAgentGenerator": {
+        "SidebarTooltip": "Crea agente con l'AI",
+        "Title": "Che agente vuoi creare?",
+        "Subtitle": "Descrivi cosa deve fare il tuo chatbot — l'AI progetterà il flow per te.",
+        "Close": "Chiudi",
+        "BotType": {
+            "Label": "Tipo di agente",
+            "Chat": "Chat",
+            "Webhook": "Webhook",
+            "Copilot": "Copilot"
+        },
+        "TextareaPlaceholder": "Es. Un bot di supporto che risponde alle domande sul prodotto e passa a un operatore quando serve…",
+        "SubmitHint": "L'AI genera un flow iniziale che potrai perfezionare.",
+        "SubmitButton": "Crea agente",
+        "Generating": "Sto generando il flow…",
+        "ExamplesLabel": "Prova un esempio",
+        "FilterLabel": "Filtra per categoria",
+        "ShowMore": "Mostra altri",
+        "ShowLess": "Mostra meno",
+        "Category": {
+            "all": "Tutti",
+            "booking": "Prenotazioni",
+            "hr": "HR",
+            "marketing": "Marketing",
+            "sales": "Vendite",
+            "support": "Supporto"
+        },
+        "ErrorEndpointMissing": "Il servizio di generazione non è ancora disponibile su questo server.",
+        "ErrorGeneric": "Non sono riuscito a generare l'agente. Riprova."
+    },
+    "CDSHeader": {
+        "SelectAgent": "Seleziona agente",
+        "DeleteAgent": "Elimina agent",
+        "DeleteAgentTitle": "Elimina agent",
+        "DeleteAgentText": "L'agente \"{{name}}\" e tutti i suoi blocchi verranno eliminati definitivamente. L'operazione non è reversibile.",
+        "DeleteAgentError": "Non sono riuscito a eliminare l'agente. Riprova.",
+        "NoAgents": "Nessun agente in questo progetto"
     }
-  }
+}

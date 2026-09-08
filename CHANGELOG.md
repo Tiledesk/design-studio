@@ -9,6 +9,11 @@
 
 
 
+# this branch 08/09/2026
+
+- **added**: **selettore dell'agent nell'header** — il nome del bot e' ora un menu a tendina con tutti gli agent del progetto: si passa da un agent all'altro senza uscire dal Design Studio. Accanto, l'icona **Elimina agent** con tooltip, coerente con le altre icone dell'header, e conferma esplicita prima di cancellare; a eliminazione avvenuta si apre il primo agent rimasto, o si torna alla dashboard se non ne restano. Aggiunto `deleteBot()` a `faq-kb.service.ts` (`DELETE /faq_kb/{botId}`, endpoint gia' presente sul server e riservato ai ruoli admin/owner — gli stessi che possono entrare nel DS). Il pannello dell'elenco non riusa la classe `menuElement` degli altri menu dell'header, che ha `overflow: hidden` e un posizionamento assoluto: e' scrollabile, contenuto in altezza e ancorato al pulsante. Il cambio di agent avviene con un caricamento completo della pagina: il DS si inizializza una volta sola in `ngOnInit` e una semplice `router.navigate` cambierebbe solo l'URL lasciando l'editor agganciato all'agent precedente
+- **added**: pulsante **"Crea agente con l'AI"** in cima alla sidebar del Design Studio: apre una modale in cui descrivere l'agente da generare (tipo Chat/Webhook/Copilot, prompt libero, galleria di 21 casi d'uso filtrabili per categoria). Mentre la modale e' aperta l'interfaccia sottostante e' **bloccata**: il backdrop ferma il puntatore, e gli ascoltatori da tastiera del canvas — che sono su `document` e riceverebbero comunque i tasti digitati nella modale — sono disattivati. La generazione chiama `POST /chatbots/generate`, **endpoint non ancora disponibile su questo server**: finche' manca, la modale mostra l'errore. Nessun impatto sui flussi esistenti
+
 # this branch 07/09/2026
 
 - **changed**: in V3 il pallino di uscita del blocco e' posizionato **dentro** il blocco, in basso a destra sul bordo, invece di pendere fuori; la regola base resta invariata e l'override e' delimitato da `.tds-v3-intent`, quindi i chatbot legacy non cambiano

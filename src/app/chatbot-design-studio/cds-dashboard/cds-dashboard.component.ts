@@ -20,6 +20,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
 import { DataTableService } from 'src/app/services/data-table.service';
 import { OpenaiService } from 'src/app/services/openai.service';
+import { AgentGeneratorService } from '../services/agent-generator.service';
 import { WhatsappService } from 'src/app/services/whatsapp.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DepartmentService } from 'src/app/services/department.service';
@@ -70,6 +71,7 @@ export class CdsDashboardComponent implements OnInit {
     public faqKbService: FaqKbService,
     public faqService: FaqService,
     private openaiService: OpenaiService,
+    private agentGeneratorService: AgentGeneratorService,
     private whatsappService: WhatsappService,
     private stageService: StageService, 
     private readonly webhookService: WebhookService
@@ -190,6 +192,7 @@ export class CdsDashboardComponent implements OnInit {
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.agentGeneratorService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
     this.uploadService.initialize(this.project._id);

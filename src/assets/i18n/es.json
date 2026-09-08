@@ -2595,5 +2595,35 @@
         "CHANGE_TO_AVAILABLE_UNAVAILABLE": "cambiar a disponible/no disponible",
         "CHANGE_TO_YOUR_STATUS_TO_AVAILABLE": "cambia tu estado a disponible",
         "CHANGE_TO_YOUR_STATUS_TO_UNAVAILABLE": "cambiar su estado a no disponible"
+    },
+    "CDSAgentGenerator": {
+        "SidebarTooltip": "Create agent with AI",
+        "Title": "What agent do you want to create?",
+        "Subtitle": "Describe what your chatbot must do — the AI will design the flow for you.",
+        "Close": "Close",
+        "BotType": {
+            "Label": "Agent type",
+            "Chat": "Chat",
+            "Webhook": "Webhook",
+            "Copilot": "Copilot"
+        },
+        "TextareaPlaceholder": "E.g. A support bot that answers product questions and hands over to an operator when needed…",
+        "SubmitHint": "The AI generates an initial flow that you can refine.",
+        "SubmitButton": "Create agent",
+        "Generating": "Generating the flow…",
+        "ExamplesLabel": "Try an example",
+        "FilterLabel": "Filter by category",
+        "ShowMore": "Show more",
+        "ShowLess": "Show less",
+        "Category": {
+            "all": "All",
+            "booking": "Booking",
+            "hr": "HR",
+            "marketing": "Marketing",
+            "sales": "Sales",
+            "support": "Support"
+        },
+        "ErrorEndpointMissing": "The generation service is not available yet on this server.",
+        "ErrorGeneric": "The agent could not be generated. Try again."
     }
 }

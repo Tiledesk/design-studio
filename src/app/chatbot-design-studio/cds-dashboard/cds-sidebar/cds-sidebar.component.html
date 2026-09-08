@@ -129,6 +129,27 @@
 
     <div style="width: 100%;">
 
+        <!-- ------------------------------------------------------- -->
+        <!-- @ Crea agente con l'AI                                  -->
+        <!-- E' un'azione, non una destinazione: niente routerLink,   -->
+        <!-- e un separatore che la stacca dalle voci di navigazione. -->
+        <!-- ------------------------------------------------------- -->
+        <div id="cds-sb-agent-generator" name="agent-generator" class="section ai-generator-section"
+            matTooltipClass="cds-mat-tooltip"
+            matTooltip="{{ 'CDSAgentGenerator.SidebarTooltip' | translate }}"
+            #tooltipAgentGenerator="matTooltip"
+            matTooltipPosition='right'
+            matTooltipHideDelay="100"
+            [matTooltipDisabled]="IS_OPEN_SIDEBAR"
+            (click)="openAgentGenerator()">
+            <span class="item-icon">
+                <i class="material-icons-outlined ai-generator-icon">auto_awesome</i>
+            </span>
+            <p *ngIf="IS_OPEN_SIDEBAR === true" class="item-label">
+                {{ 'CDSAgentGenerator.SidebarTooltip' | translate }}
+            </p>
+        </div>
+
         <div id="cds-sb-intents" name="intents" class="section"
             matTooltipClass="cds-mat-tooltip" 
             matTooltip="{{ 'Blocks' | translate }}" 
