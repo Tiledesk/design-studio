@@ -90,10 +90,22 @@ export class FlowOpsService {
     // stays right if an operation ever pushes none or two.
     const undoDepthBefore = this.undoStackDepth();
     const results: FlowOpResult[] = [];
+    // Blocks whose actions this batch actually wrote a destination field onto
+    // -- collected as operations apply, redrawn once each after the batch is
+    // done, rather than once per operation. A batch that touches the same
+    // block from several update_action calls (the common shape of a
+    // multi-action build) would otherwise redraw it several times over for a
+    // repaint the user only ever sees once. Only an intent an operation
+    // actually *applied* successfully is added here (see addAction /
+    // updateAction / addIntent below), so a mid-batch throw -- the only way
+    // this service ever partially applies a batch, since everything is
+    // validated up front -- never leaves an unapplied block queued for
+    // redraw: the loop below stops before reaching it.
+    const blocksToRedraw = new Set<string>();
     let ok = true;
     for (const op of ops) {
       try {
-        const result = await this.applyOne(op);
+        const result = await this.applyOne(op, blocksToRedraw);
         results.push(result);
         // An operation can refuse without throwing -- an action type the
         // studio cannot build, for one. Stop either way: continuing past a
@@ -106,6 +118,7 @@ export class FlowOpsService {
       }
     }
     this.lastBatchUndoDepth = Math.max(this.undoStackDepth() - undoDepthBefore, 0);
+    this.redrawBlocks(blocksToRedraw);
     return { ok, rejected_before_applying: false, results };
   }
 
@@ -341,6 +354,32 @@ export class FlowOpsService {
     return null;
   }
 
+  /** Whether `fields` writes at least one field `DESTINATION_FIELDS` lists for
+   *  `actionType` -- the trigger for redrawing the block's connectors after
+   *  the write, not just for validating it. Deliberately does not care what
+   *  the field's *value* is: `validateActionDestinations` already proved
+   *  every value here either resolves or is acceptably empty before this
+   *  runs, and a destination cleared back to empty still means the block's
+   *  drawn connector for that field has to disappear, the same as a newly set
+   *  one has to appear -- both are "this field was touched", not "this field
+   *  now points somewhere". Reuses `DESTINATION_FIELDS` (and, for
+   *  `ai_condition`, the same dynamic `intents[].conditionIntentId` shape
+   *  `validateActionDestinations` walks) rather than a third list of "fields
+   *  that matter here", so a field added to one is a field the other already
+   *  knows about. Called from every path that writes an action's `fields` --
+   *  `add_action`, `update_action`, and `add_intent`'s inline actions -- right
+   *  after the write, to decide whether the owning block belongs in this
+   *  batch's redraw set. */
+  private actionTouchesConnectors(actionType: string, fields?: Record<string, any>): boolean {
+    if (!fields) { return false; }
+    const destinationFields = FlowOpsService.DESTINATION_FIELDS[actionType] || [];
+    if (destinationFields.some(field => field in fields)) { return true; }
+    if (actionType === TYPE_ACTION.AI_CONDITION && Array.isArray(fields.intents)) {
+      return fields.intents.some((entry: any) => entry && 'conditionIntentId' in entry);
+    }
+    return false;
+  }
+
   /** Whether `action` is an `ai_condition` action carrying at least one
    *  configured dynamic branch -- `intents[].conditionIntentId` for some
    *  AI-classified intent the author already pointed somewhere. Split out
@@ -551,14 +590,14 @@ export class FlowOpsService {
     }
   }
 
-  private async applyOne(op: FlowOp): Promise<FlowOpResult> {
+  private async applyOne(op: FlowOp, blocksToRedraw: Set<string>): Promise<FlowOpResult> {
     switch (op.op) {
-      case 'add_intent': return this.addIntent(op);
+      case 'add_intent': return this.addIntent(op, blocksToRedraw);
       case 'update_intent': return this.updateIntent(op);
       case 'delete_intent': return this.deleteIntent(op);
       case 'move': return this.moveIntent(op);
-      case 'add_action': return this.addAction(op);
-      case 'update_action': return this.updateAction(op);
+      case 'add_action': return this.addAction(op, blocksToRedraw);
+      case 'update_action': return this.updateAction(op, blocksToRedraw);
       case 'delete_action': return this.deleteAction(op);
       case 'connect': return this.connect(op);
       default:
@@ -596,7 +635,9 @@ export class FlowOpsService {
       : { x: 0, y: 0 };
   }
 
-  private async addIntent(op: Extract<FlowOp, { op: 'add_intent' }>): Promise<FlowOpResult> {
+  private async addIntent(
+    op: Extract<FlowOp, { op: 'add_intent' }>, blocksToRedraw: Set<string>
+  ): Promise<FlowOpResult> {
     const position = op.position ?? this.computeNewBlockPosition();
     const intent: Intent = this.intentService.createNewIntent(
       this.dashboardService.id_faq_kb, null, position);
@@ -617,6 +658,16 @@ export class FlowOpsService {
       this.writeReplyText(action._tdActionType, action, actionSpec.fields);
       this.normalizeStoredDestinations(action, actionSpec.fields);
       intent.actions.push(action);
+      // A destination set inline can only reach a block that already exists
+      // on the canvas -- validateDestinationField refuses anything else, and
+      // an id this same batch's add_intent is still creating has no intent_id
+      // yet to be reached by. So the only new connector an inline action can
+      // draw here is outbound, from the block this add_intent is building --
+      // never inbound, since nothing else in this batch can already point at
+      // an id that did not exist before this call ran.
+      if (this.actionTouchesConnectors(action._tdActionType, actionSpec.fields)) {
+        blocksToRedraw.add(intent.intent_id);
+      }
     }
     this.intentService.addNewIntentToListOfIntents(intent);
     await this.intentService.saveNewIntent(intent, intent, null);
@@ -920,7 +971,9 @@ export class FlowOpsService {
     return null;
   }
 
-  private async addAction(op: Extract<FlowOp, { op: 'add_action' }>): Promise<FlowOpResult> {
+  private async addAction(
+    op: Extract<FlowOp, { op: 'add_action' }>, blocksToRedraw: Set<string>
+  ): Promise<FlowOpResult> {
     const intent = this.intentService.getIntentFromId(op.intent_id);
     // createNewAction owns every action type the studio can build -- including
     // the nested scaffolding an agent would never guess, like the Wait command
@@ -943,16 +996,24 @@ export class FlowOpsService {
       intent.actions.push(action);
     }
     await this.intentService.updateIntent(intent);
+    if (this.actionTouchesConnectors(action._tdActionType, op.fields)) {
+      blocksToRedraw.add(op.intent_id);
+    }
     return { op: op.op, ok: true, intent_id: op.intent_id, action_id: action._tdActionId };
   }
 
-  private async updateAction(op: Extract<FlowOp, { op: 'update_action' }>): Promise<FlowOpResult> {
+  private async updateAction(
+    op: Extract<FlowOp, { op: 'update_action' }>, blocksToRedraw: Set<string>
+  ): Promise<FlowOpResult> {
     const intent = this.intentService.getIntentFromId(op.intent_id);
     const action = intent.actions.find((a: any) => a._tdActionId === op.action_id);
     this.assignFields(action, op.fields);
     this.writeReplyText(action._tdActionType, action, op.fields);
     this.normalizeStoredDestinations(action, op.fields);
     await this.intentService.updateIntent(intent);
+    if (this.actionTouchesConnectors(action._tdActionType, op.fields)) {
+      blocksToRedraw.add(op.intent_id);
+    }
     return { op: op.op, ok: true, intent_id: op.intent_id, action_id: op.action_id };
   }
 
@@ -1083,6 +1144,64 @@ export class FlowOpsService {
     } catch {
       // Drawing is best-effort; the model is already right either way.
     }
+  }
+
+  /** Redraw every connector on `intentId`'s block from what its actions'
+   *  fields say now -- the fix for the live defect this feature exists for:
+   *  `update_action` (and `add_action`, and `add_intent`'s inline actions)
+   *  write a routing field like `askgptv2.trueIntent` straight onto the
+   *  model and persist it, but nothing about that write tells the canvas to
+   *  paint the resulting edge. Without this, the destination is correct in
+   *  the database and invisible on screen until a full reload rebuilds every
+   *  connector from scratch -- exactly the report: two branches "not
+   *  associated with any block" that were actually just never drawn.
+   *
+   *  `updateConnectorsOfBlock`, not `createConnectorsOfIntent`: the studio's
+   *  own code already had to make this exact choice, for the exact same
+   *  situation -- an existing, already-rendered block whose routing changed
+   *  after the initial load -- and picked `updateConnectorsOfBlock` both
+   *  times. `cds-intent.component.ts`'s `onDropAction` calls it after moving
+   *  an action into a different block changes that block's outbound edges;
+   *  `IntentService.restoreIntent`'s undo/redo `put` path calls it after a
+   *  restored intent's fields (routing fields included) land back on the
+   *  model. `createConnectorsOfIntent` is the other shape entirely: the
+   *  whole-canvas rebuild `createConnectors` runs once per intent on initial
+   *  load, and `IntentService.pasteIntentOntoStage` tried calling it for a
+   *  single freshly-pasted block and left it commented out in favour of
+   *  `updateConnectorsOfBlock` -- the same block-scoped tool this method
+   *  uses. `updateConnectorsOfBlock` walks the block's own rendered
+   *  `[connector]` elements, deletes whatever was drawn from each one, and
+   *  redraws from that element's current `idConnection` -- which is why it is
+   *  only correct for a block Angular has already rendered with the new
+   *  field values bound in, never for one being built from a bare data
+   *  object the way `createConnectorsOfIntent` reads.
+   *
+   *  Not awaited, and never allowed to fail the operation, for the same
+   *  reason as `drawConnector`: `updateConnectorsOfBlock` itself polls the
+   *  DOM (`isElementOnTheStage`) for up to a second and resolves quietly
+   *  either way, including when the canvas is not on screen at all -- and a
+   *  repaint failing must never turn a write that already succeeded and
+   *  saved into a reported failure. Called once per affected block after a
+   *  whole batch applies (see `blocksToRedraw` in `apply()`), not once per
+   *  operation -- a batch of a dozen `update_action` calls across a few
+   *  blocks would otherwise ask the DOM to redraw the same block a dozen
+   *  times for a repaint the user only ever sees once. */
+  private redrawBlockConnectors(intentId: string): void {
+    try {
+      const result: any = this.connectorService.updateConnectorsOfBlock(intentId);
+      Promise.resolve(result).catch(() => {});
+    } catch {
+      // Drawing is best-effort; the model is already right either way.
+    }
+  }
+
+  /** Redraw every block in `intentIds`, each independently best-effort: one
+   *  block's redraw throwing (synchronously or via its settled promise) must
+   *  not stop the others from being asked, the same "drawing never blocks or
+   *  fails the operation" guarantee `redrawBlockConnectors` itself already
+   *  gives for a single block. */
+  private redrawBlocks(intentIds: Set<string>): void {
+    intentIds.forEach(intentId => this.redrawBlockConnectors(intentId));
   }
 
   /** Make the actions-list action's new edge visible now, the way the UI
