@@ -74,7 +74,10 @@
     &.active {
         background: #e7effe;
 
-        .subagent-icon { color: var(--blu, #1f64ef); }
+        // mat-icon rende un <svg>: la dimensione va data a icona e box, non con font-size
+    .subagent-icon {
+        width: 18px;
+        height: 18px; color: var(--blu, #1f64ef); }
         .subagent-name { color: var(--blu, #1f64ef); font-weight: 600; }
     }
 
@@ -220,6 +223,8 @@
     color: #9ba6b3;
 
     .empty-icon {
+        width: 40px;
+        height: 40px;
         font-size: 40px;
         opacity: 0.5;
         margin-bottom: 10px;
@@ -232,7 +237,11 @@
 }
 
 .subagents-new {
-    padding: 4px 12px 10px;
+    // Footer del pannello: fuori dall'area che scorre, sempre raggiungibile.
+    flex: 0 0 auto;
+    padding: 8px 12px 10px;
+    border-top: 1px solid #e8ecf1;
+    background: inherit;
 
     .new-subagent-btn {
         display: flex;

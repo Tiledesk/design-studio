@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -28,7 +29,8 @@ export class CdsNewSubagentDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<CdsNewSubagentDialogComponent>,
     private faqKbService: FaqKbService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    @Inject(MAT_DIALOG_DATA) public data: { parentId?: string }
   ) { }
 
   ngOnInit(): void { }
@@ -59,7 +61,11 @@ export class CdsNewSubagentDialogComponent implements OnInit {
       subtype: 'subagent',
       template: 'blank',
       type: 'tilebot',
-      parent_id: this.dashboardService.id_faq_kb // chatbot principale (quello corrente)
+      // Il parent arriva dal pannello: e' il parent della FAMIGLIA, non il chatbot
+      // aperto. Aprendo la modale da dentro un subagent, senza questo il nuovo
+      // agent verrebbe agganciato al subagent stesso (annidamento non previsto).
+      // Fallback al chatbot corrente per sicurezza se il dato non arriva.
+      parent_id: this.data?.parentId || this.dashboardService.id_faq_kb
     };
 
     try {

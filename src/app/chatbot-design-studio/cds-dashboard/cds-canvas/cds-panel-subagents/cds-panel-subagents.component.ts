@@ -9,9 +9,25 @@ import { CdsNewSubagentDialogComponent } from './cds-new-subagent-dialog/cds-new
 import { TranslateService } from '@ngx-translate/core';
 import { DialogYesNoComponent } from 'src/app/chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
 
-interface SubagentItem {
+export interface SubagentItem {
   _id: string;
   name: string;
+}
+
+/**
+ * Ordina i subagent per nome, in ordine alfabetico.
+ *
+ * `localeCompare` con `sensitivity: 'base'` ignora maiuscole e accenti (cosi' "Ordini"
+ * e "ordini" non finiscono in due blocchi separati) e `numeric: true` confronta i numeri
+ * come numeri: "Agente 2" precede "Agente 10", che con l'ordinamento per stringa
+ * finirebbe prima.
+ *
+ * Funzione pura ed esportata apposta per poterla testare senza montare il componente.
+ */
+export function sortSubagentsByName(items: SubagentItem[]): SubagentItem[] {
+  return [...items].sort((a, b) =>
+    (a?.name || '').localeCompare(b?.name || '', undefined, { sensitivity: 'base', numeric: true })
+  );
 }
 
 /**
@@ -47,8 +63,16 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
 
   /** id del chatbot correntemente aperto (per l'evidenziazione). */
   currentId: string = '';
-  /** true se il chatbot corrente è esso stesso un subagent (nasconde "+ New subagent"). */
+  /** true se il chatbot corrente è esso stesso un subagent. */
   isSubagent: boolean = false;
+  /**
+   * Id del parent della famiglia: il chatbot corrente quando siamo sul parent,
+   * il suo `parent_id` quando siamo dentro un subagent.
+   *
+   * E' l'id sotto cui vanno creati i nuovi subagent: creandoli sotto il subagent
+   * corrente si otterrebbe un annidamento a due livelli, che il prodotto non prevede.
+   */
+  familyParentId: string = '';
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -76,10 +100,12 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     if (this.isSubagent) {
       // Dentro un subagent: il riferimento per la lista è il parent (parent_id).
       const parentId = current?.parent_id;
+      this.familyParentId = parentId;
       this.loadSubagents(parentId);
       this.loadParent(parentId);
     } else {
       // Sul parent: il parent è il chatbot corrente.
+      this.familyParentId = this.currentId;
       this.parentItem = { _id: this.currentId, name: current?.name || '' };
       this.loadSubagents(this.currentId);
     }
@@ -92,7 +118,7 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     this.faqKbService.getSubagentsByFaqKbId(parentFaqKbId).subscribe({
       next: (res: any) => {
         const list: any[] = Array.isArray(res) ? res : (res?.subagents || res?.data || []);
-        this.subagents = list.map((c: any) => ({ _id: c._id, name: c.name }));
+        this.subagents = sortSubagentsByName(list.map((c: any) => ({ _id: c._id, name: c.name })));
         this.applyFilter();
         this.isLoading = false;
         this.logger.log('[CDS-PANEL-SUBAGENTS] subagents loaded:', this.subagents.length);
@@ -173,7 +199,10 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     const ref = this.dialog.open(CdsNewSubagentDialogComponent, {
       panelClass: 'cds-new-subagent-dialog-container',
       width: '420px',
-      disableClose: true
+      disableClose: true,
+      // Il parent lo decide il pannello, non la modale: da dentro un subagent il
+      // nuovo agent va agganciato al parent della famiglia, non al subagent aperto.
+      data: { parentId: this.familyParentId }
     });
     ref.afterClosed().subscribe((created: any) => {
       if (created && created._id) {

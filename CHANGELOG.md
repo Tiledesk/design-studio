@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 08/09/2026
+
+- **fixed**: l'icona della tab **Blocks** non e' piu' bianca — `search.svg` porta `fill="#FFFFFF"` nell'asset e l'attributo sull'elemento vince sul colore ereditato; ora l'icona segue il colore della tab (grigio, blu quando attiva) come tutte le altre
+- **changed**: il pulsante **New subagent** e' visibile anche **dentro un subagent**. Il nuovo agent viene creato sotto il **parent della famiglia**, non sotto il subagent aperto: si ottiene un fratello, non un annidamento. L'id del parent lo decide il pannello e viaggia nei `data` della modale, che prima lo ricavava da se' con `id_faq_kb`; il pulsante non compare se quell'id non e' risolvibile
+- **changed**: la tab **Blocks** e' ora un pulsante quadrato con la sola icona a **lente**, che dice a colpo d'occhio che da li' si cerca un blocco; l'etichetta e' passata nel tooltip e la tab **Subagents** occupa tutta la larghezza rimanente
+- **changed**: rinominate tre action — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. Il nuovo nome e' allineato ovunque compaia: menu delle action, etichetta sul blocco nel canvas e titolo nella documentazione del pannello
+- **changed**: pannello **Subagents** — la tab passa al primo posto (Blocks seconda) ed e' quella aperta di default **quando l'agente non ha ancora una preferenza salvata**: se l'utente ne sceglie una, vince la sua (`getActiveLeftPanel` ora distingue "nessuna preferenza" da "Blocks", prima erano lo stesso valore). Entrambe le tab hanno un'icona; la risoluzione della tab si e' spostata in `ngOnInit`, cosi' il pannello Blocks non viene piu' montato e subito distrutto a ogni apertura. Il pulsante **New subagent** e' ora un footer ancorato in fondo al pannello invece che sopra l'elenco, quindi resta raggiungibile anche con la lista lunga. Icone dei subagent sostituite con SVG registrati in `IconService`, in linea con le altre del DS. L'elenco dei subagent e' ordinato **alfabeticamente** (case e accenti ignorati, numeri confrontati come numeri: "Agente 2" prima di "Agente 10"); il parent resta sempre primo
+- **added**: primi test unitari sul pannello Subagents — l'ordinamento alfabetico (estratto in `sortSubagentsByName`, funzione pura: maiuscole, accenti, numeri, lista vuota) e `getActiveLeftPanel` (preferenza assente, salvata, famiglie separate). ⚠️ **Non sono eseguibili**: l'harness Karma del repo non esegue alcun test (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — guasto preesistente, indipendente da queste modifiche
 # this branch gio 27 ago 2026
 - **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
 - **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent

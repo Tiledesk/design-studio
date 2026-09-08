@@ -208,10 +208,17 @@ cds-fulfillment {
       padding: 10px 12px 4px;
     }
     .cds-left-panel-tab {
-      flex: 1;
+      // Subagents occupa tutto lo spazio che avanza; Blocks e' un quadrato fisso.
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 32px;
       border: 0;
       background: transparent;
-      padding: 6px 8px;
+      padding: 0 8px;
       font-family: var(--font-family-poppins);
       font-size: 13px;
       font-weight: 600;
@@ -221,17 +228,49 @@ cds-fulfillment {
       transition: background-color .2s, color .2s;
       &:hover { background: #eef2f6; }
       &.active { background: #fff; color: var(--blu); }
+
+      .cds-left-panel-tab-icon {
+        flex: 0 0 auto;
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+
+        // search.svg porta fill="#FFFFFF" nell'asset e l'attributo sull'elemento
+        // vince sul color ereditato: senza questo l'icona resta bianca. Stesso
+        // rimedio gia' usato in cds-panel-intent-list per la medesima icona.
+        ::ng-deep svg {
+          fill: currentColor;
+        }
+      }
+
+      // Blocks: quadrato, solo icona. L'etichetta e' nel tooltip.
+      &.cds-left-panel-tab--icon-only {
+        flex: 0 0 auto;
+        width: 32px;
+        padding: 0;
+        gap: 0;
+      }
+
+      // Lo slot e' 230px per due tab: l'etichetta tronca invece di far crescere il pulsante.
+      .cds-left-panel-tab-label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
     .panel-subagents {
       position: relative;
-      display: block;
+      display: flex;
+      flex-direction: column;
       width: 100%;
       flex: 1 1 auto;
       min-height: 0;
+      // Lo scroll vive nella lista interna: qui resta hidden, altrimenti il
+      // pulsante "New subagent" in fondo scorrerebbe via insieme all'elenco.
       overflow: hidden;
-      overflow-y: auto;
       margin: 0;
-      padding: 0 2px 10px 2px;
+      padding: 0 2px 0 2px;
 
       &::-webkit-scrollbar { width: 6px; height: 6px; }
       &::-webkit-scrollbar-track { background: transparent; }

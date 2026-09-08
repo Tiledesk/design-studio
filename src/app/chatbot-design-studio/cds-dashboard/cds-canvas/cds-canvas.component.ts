@@ -96,8 +96,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel list of intent */
   IS_OPEN_INTENTS_LIST: boolean = true;
 
-  /** pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab) */
-  activeLeftPanel: 'blocks' | 'subagents' = 'blocks';
+  /**
+   * Pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab).
+   * Default 'subagents': e' la tab che si apre quando l'agente non ha ancora una preferenza
+   * salvata. Se l'utente ne ha scelta una, vince la sua (vedi resolveActiveLeftPanel).
+   */
+  activeLeftPanel: 'blocks' | 'subagents' = 'subagents';
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -203,6 +207,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
+    this.resolveActiveLeftPanel();
     this.initialize();
   }
 
@@ -278,9 +283,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if(this.stageService.settings?.open_intent_list_state != null){
       this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
     }
-    this.activeLeftPanel = this.stageService.getActiveLeftPanel(this.getLeftPanelFamilyId());
-    
-    
     // this.stageService.initStageSettings(this.id_faq_kb);
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
@@ -1156,6 +1158,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     return current?.subtype === 'subagent'
       ? current?.parent_id
       : this.dashboardService.id_faq_kb;
+  }
+
+  /**
+   * Decide la tab del pannello sinistro all'apertura dell'agente: vince la preferenza
+   * salvata per la famiglia, altrimenti si apre 'subagents'.
+   *
+   * Sta in ngOnInit e non in ngAfterViewInit: risolvendola dopo il primo render il
+   * pannello Blocks verrebbe montato e subito distrutto (i due pannelli sono in
+   * mutua esclusione via *ngIf), con lo sfarfallio che ne consegue.
+   */
+  private resolveActiveLeftPanel(): void {
+    const saved = this.stageService.getActiveLeftPanel(this.getLeftPanelFamilyId());
+    this.activeLeftPanel = saved ? saved : 'subagents';
   }
 
   /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
