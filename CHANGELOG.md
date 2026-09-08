@@ -9,6 +9,12 @@
 
 # this branch 08/09/2026
 
+- **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
+- **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
+- **changed**: nel pannello Subagents la **casella di ricerca** "Search a subagent" e il **badge `parent`** sono nascosti: rimosso il markup, conservati stili e logica di filtro (`onSearch`/`applyFilter`), cosi' ripristinarli e' questione di poche righe
+- **changed**: il **parent** usa ora l'icona di gruppo e ogni **subagent** un **omino blu a mezzo busto** — nuova icona `person` registrata in `IconService`, ricavata dai tracciati gia' presenti in `actions/online_agents.svg` (testa e spalle, senza le onde del segnale) e ricentrata con una `translate`, per non alterare i numeri originali
+- **changed**: icone delle righe del pannello da 18 a 20px e grigio piu' carico (`#5a6672`): l'icona di gruppo e' fitta e alla dimensione precedente si leggeva male. L'omino dei **subagent** e' disegnato piu' piccolo (svg 12x12) ma il suo box resta 20px, cosi' i nomi restano allineati fra riga del parent e righe dei subagent
+- **fixed**: nel pannello Subagents la dimensione dell'icona era applicata solo alla riga **attiva**, quindi tutte le altre rendevano alla misura di default di `mat-icon` (24px) invece che a quella prevista
 - **fixed**: l'icona della tab **Blocks** non e' piu' bianca — `search.svg` porta `fill="#FFFFFF"` nell'asset e l'attributo sull'elemento vince sul colore ereditato; ora l'icona segue il colore della tab (grigio, blu quando attiva) come tutte le altre
 - **changed**: il pulsante **New subagent** e' visibile anche **dentro un subagent**. Il nuovo agent viene creato sotto il **parent della famiglia**, non sotto il subagent aperto: si ottiene un fratello, non un annidamento. L'id del parent lo decide il pannello e viaggia nei `data` della modale, che prima lo ricavava da se' con `id_faq_kb`; il pulsante non compare se quell'id non e' risolvibile
 - **changed**: la tab **Blocks** e' ora un pulsante quadrato con la sola icona a **lente**, che dice a colpo d'occhio che da li' si cerca un blocco; l'etichetta e' passata nel tooltip e la tab **Subagents** occupa tutta la larghezza rimanente

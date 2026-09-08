@@ -205,22 +205,24 @@ cds-fulfillment {
       flex: 0 0 auto;
       display: flex;
       gap: 4px;
-      padding: 10px 12px 4px;
+      padding: 10px 10px 4px;
     }
     .cds-left-panel-tab {
-      // Subagents occupa tutto lo spazio che avanza; Blocks e' un quadrato fisso.
-      flex: 1 1 auto;
+      // Meta' larghezza ciascuna. Nei ~103px che ne risultano "Subagents" ci sta
+      // per intero solo riducendo font e padding: 12px + 4px di padding lasciano
+      // una quindicina di pixel di margine.
+      flex: 1 1 0;
       min-width: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 4px;
       height: 32px;
       border: 0;
       background: transparent;
-      padding: 0 8px;
+      padding: 0 4px;
       font-family: var(--font-family-poppins);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       color: #7d8a97;
       border-radius: 6px;
@@ -231,24 +233,24 @@ cds-fulfillment {
 
       .cds-left-panel-tab-icon {
         flex: 0 0 auto;
-        width: 16px;
-        height: 16px;
-        font-size: 16px;
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
 
-        // search.svg porta fill="#FFFFFF" nell'asset e l'attributo sull'elemento
-        // vince sul color ereditato: senza questo l'icona resta bianca. Stesso
-        // rimedio gia' usato in cds-panel-intent-list per la medesima icona.
+        // Alcuni asset (search.svg, man.svg...) portano fill="#FFFFFF" inchiodato
+        // e l'attributo sull'elemento vince sul color ereditato: senza questo
+        // l'icona resta bianca. Stesso rimedio gia' usato in cds-panel-intent-list.
         ::ng-deep svg {
+          width: 18px;
+          height: 18px;
           fill: currentColor;
         }
       }
 
-      // Blocks: quadrato, solo icona. L'etichetta e' nel tooltip.
-      &.cds-left-panel-tab--icon-only {
-        flex: 0 0 auto;
-        width: 32px;
-        padding: 0;
-        gap: 0;
+      // Subagents: l'etichetta non deve mai troncare (il font e' tarato apposta).
+      &.cds-left-panel-tab--nowrap .cds-left-panel-tab-label {
+        overflow: visible;
+        text-overflow: clip;
       }
 
       // Lo slot e' 230px per due tab: l'etichetta tronca invece di far crescere il pulsante.

@@ -11,23 +11,19 @@
     <!-- Tab: alterna Blocks / Subagents nello stesso slot (mutua esclusione via activeLeftPanel).
          Visibili anche dentro un subagent (la lista mostra parent + subagent fratelli). -->
     <div class="cds-left-panel-tabs" *ngIf="IS_OPEN_INTENTS_LIST">
-        <button type="button" class="cds-left-panel-tab"
+        <!-- Subagents non si restringe mai (--nowrap): l'etichetta deve leggersi
+             per intero. Blocks prende lo spazio che resta. -->
+        <button type="button" class="cds-left-panel-tab cds-left-panel-tab--nowrap"
             [class.active]="activeLeftPanel === 'subagents'"
             (click)="onSelectLeftPanel('subagents')">
             <mat-icon class="cds-left-panel-tab-icon" svgIcon="groups" aria-hidden="true"></mat-icon>
             <span class="cds-left-panel-tab-label">{{ 'CDSCanvas.Subagents' | translate }}</span>
         </button>
-        <!-- Blocks: solo icona, quadrata. La lente dice che da qui si cerca un blocco;
-             l'etichetta vive nel tooltip, cosi' lo spazio resta alla tab Subagents. -->
-        <button type="button" class="cds-left-panel-tab cds-left-panel-tab--icon-only"
+        <button type="button" class="cds-left-panel-tab"
             [class.active]="activeLeftPanel === 'blocks'"
-            (click)="onSelectLeftPanel('blocks')"
-            matTooltip="{{ 'Blocks' | translate }}"
-            matTooltipClass="cds-mat-tooltip"
-            matTooltipPosition="below"
-            matTooltipHideDelay="100"
-            [attr.aria-label]="'Blocks' | translate">
-            <mat-icon class="cds-left-panel-tab-icon" svgIcon="search" aria-hidden="true"></mat-icon>
+            (click)="onSelectLeftPanel('blocks')">
+            <mat-icon class="cds-left-panel-tab-icon" svgIcon="block" aria-hidden="true"></mat-icon>
+            <span class="cds-left-panel-tab-label">{{ 'Blocks' | translate }}</span>
         </button>
     </div>
 

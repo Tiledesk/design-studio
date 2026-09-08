@@ -74,17 +74,39 @@
     &.active {
         background: #e7effe;
 
-        // mat-icon rende un <svg>: la dimensione va data a icona e box, non con font-size
-    .subagent-icon {
-        width: 18px;
-        height: 18px; color: var(--blu, #1f64ef); }
+        .subagent-icon { color: var(--blu, #1f64ef); }
         .subagent-name { color: var(--blu, #1f64ef); font-weight: 600; }
     }
 
+    // mat-icon rende un <svg>: la dimensione va data all'icona e al box, non con
+    // font-size. Alcuni asset (man.svg) hanno fill="#FFFFFF" inchiodato e vince
+    // sul color ereditato: va riportato a currentColor.
     .subagent-icon {
-        font-size: 18px;
-        color: #7d8a97;
+        width: 20px;
+        height: 20px;
+        // Grigio piu' carico del testo: l'icona di gruppo e' fitta e a 18px
+        // chiaro si leggeva male.
+        color: #5a6672;
         flex-shrink: 0;
+
+        ::ng-deep svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    }
+
+    // L'omino dei subagent e' sempre blu; il parent resta grigio finche' non e' attivo.
+    // Altezza ridotta rispetto all'icona del parent: l'altezza va data sia al box
+    // di mat-icon sia all'<svg> interno, altrimenti l'svg resta alla misura piena.
+    &:not(.parent-item) .subagent-icon {
+        color: var(--blu, #1f64ef);
+       
+
+        ::ng-deep svg {
+            width: 12px;
+            height: 12px;
+        }
     }
 
     .subagent-name {
@@ -237,11 +259,8 @@
 }
 
 .subagents-new {
-    // Footer del pannello: fuori dall'area che scorre, sempre raggiungibile.
-    flex: 0 0 auto;
-    padding: 8px 12px 10px;
-    border-top: 1px solid #e8ecf1;
-    background: inherit;
+    // In coda alla lista, subito sotto l'ultimo subagent: scorre con essa.
+    padding: 6px 0 10px;
 
     .new-subagent-btn {
         display: flex;

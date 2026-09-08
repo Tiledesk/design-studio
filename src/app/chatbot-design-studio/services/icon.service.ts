@@ -503,6 +503,10 @@ export class IconService {
       'change_circle',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/change_circle.svg')
     );
+    this.matIconRegistry.addSvgIcon(
+      'person',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/person.svg')
+    );
   }
 }
 

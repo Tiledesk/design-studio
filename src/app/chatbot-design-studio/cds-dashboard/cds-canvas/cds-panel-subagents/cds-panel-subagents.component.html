@@ -1,12 +1,7 @@
 <div class="content">
 
-    <!-- Search -->
-    <div class="subagents-search" *ngIf="IS_OPEN">
-        <span class="material-icons search-icon">search</span>
-        <input type="text" class="search-input"
-            (input)="onSearch($any($event.target).value)"
-            [placeholder]="'CDSCanvas.SearchASubagent' | translate">
-    </div>
+    <!-- Casella di ricerca nascosta su richiesta. La logica di filtro resta in
+         onSearch()/applyFilter(): senza termine, filteredSubagents = tutti. -->
 
     <!-- Lista: parent (sempre primo) + subagent -->
     <div class="subagents-list" *ngIf="IS_OPEN">
@@ -16,9 +11,8 @@
             [class.active]="parentItem._id === currentId"
             (click)="openAgent(parentItem._id)"
             [attr.title]="parentItem.name">
-            <mat-icon class="subagent-icon" svgIcon="stacks" aria-hidden="true"></mat-icon>
+            <mat-icon class="subagent-icon" svgIcon="groups" aria-hidden="true"></mat-icon>
             <span class="subagent-name">{{ parentItem.name }}</span>
-            <span class="parent-badge">parent</span>
         </div>
 
         <!-- Subagent -->
@@ -26,7 +20,7 @@
             [class.active]="sa._id === currentId"
             (click)="openAgent(sa._id)"
             [attr.title]="sa.name">
-            <mat-icon class="subagent-icon" svgIcon="groups" aria-hidden="true"></mat-icon>
+            <mat-icon class="subagent-icon" svgIcon="person" aria-hidden="true"></mat-icon>
             <span class="subagent-name">{{ sa.name }}</span>
 
             <!-- Azioni del subagent. Si apre in hover e si chiude 1s dopo l'uscita del mouse
@@ -61,17 +55,17 @@
             <mat-icon class="empty-icon" svgIcon="groups" aria-hidden="true"></mat-icon>
             <p class="empty-text">{{ 'CDSCanvas.NoSubagentsYet' | translate }}</p>
         </div>
-    </div>
 
-    <!-- New subagent: footer ancorato in fondo al pannello, cosi' resta raggiungibile
-         anche con la lista lunga. Visibile anche DENTRO un subagent: il nuovo agent
-         viene creato sotto il parent della famiglia (familyParentId), quindi si
-         ottiene un fratello e non un annidamento. -->
-    <div class="subagents-new" *ngIf="IS_OPEN && familyParentId">
-        <button type="button" class="new-subagent-btn" (click)="onNewSubagent()">
-            <span class="material-icons">add</span>
-            {{ 'CDSCanvas.NewSubagent' | translate }}
-        </button>
+        <!-- New subagent: subito sotto l'ultimo della lista, quindi scorre con essa.
+             Visibile anche DENTRO un subagent: il nuovo agent viene creato sotto il
+             parent della famiglia (familyParentId), cosi' si ottiene un fratello e
+             non un annidamento. -->
+        <div class="subagents-new" *ngIf="familyParentId">
+            <button type="button" class="new-subagent-btn" (click)="onNewSubagent()">
+                <span class="material-icons">add</span>
+                {{ 'CDSCanvas.NewSubagent' | translate }}
+            </button>
+        </div>
     </div>
 
 </div>
