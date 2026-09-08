@@ -933,7 +933,20 @@ export class FlowOpsService {
     let nextWait = 0;
     for (const command of commands) {
       if (!command || command.type === TYPE_COMMAND.WAIT) { continue; }
-      if (command.message) { ordered.push(waits[nextWait++] ?? new Wait()); }
+      if (command.message) {
+        ordered.push(waits[nextWait++] ?? new Wait());
+        // A command that carries a `message` *is* a message command --
+        // `Command(TYPE_COMMAND.MESSAGE)` is the only thing the studio ever
+        // puts one on. Stamping the tag rather than trusting the caller to
+        // remember it: the canvas finds the message by shape and renders such
+        // a command perfectly either way, but the flow engine's
+        // `allReplyButtons` walks `command.type === 'message'` and skips
+        // anything else -- so a missing tag costs the block its buttons. A
+        // run found it: the approval block rendered both buttons, then never
+        // locked to wait for the choice, and the click fell through to
+        // defaultFallback.
+        command.type = TYPE_COMMAND.MESSAGE;
+      }
       ordered.push(command);
     }
     ordered.push(...waits.slice(nextWait));

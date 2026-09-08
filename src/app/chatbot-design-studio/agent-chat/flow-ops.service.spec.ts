@@ -2273,6 +2273,35 @@ describe('FlowOpsService — a reply\'s requested text lands where the studio re
     expect(commands[1].message.text).toBe('senza wait');
   });
 
+  // Also found by running a flow, one layer deeper than the ordering bug: the
+  // agent supplied `{ message: { ... } }` with no `type`, the canvas rendered
+  // the block and both its buttons, and the run still broke -- the engine's
+  // `TiledeskChatbotUtil.allReplyButtons` collects buttons only from commands
+  // whose `type === 'message'`, so it found none, `DirReplyV2.lockUnlock`
+  // never locked the intent, and the visitor's click on a button fell through
+  // to defaultFallback on the next turn.
+  it('tags a message command the caller left untyped, so the engine can find its buttons', async () => {
+    await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'replyv2',
+      fields: {
+        attributes: {
+          disableInputMessage: false,
+          commands: [{
+            message: {
+              type: 'text', text: 'Procedo?',
+              attributes: { attachment: { type: 'template', buttons: [
+                { uid: 'b1', type: 'action', value: 'Sì', action: '#i1' }
+              ] } }
+            }
+          }]
+        }
+      }
+    }]);
+    const commands = intentService.getIntentFromId('i2').actions[0].attributes.commands;
+    expect(commands.map((c: any) => c.type)).toEqual(['wait', 'message']);
+    expect(commands[1].message.attributes.attachment.buttons[0].value).toBe('Sì');
+  });
+
   it('leaves an already-canonical array element for element', async () => {
     const report = await service.apply([{
       op: 'add_action', intent_id: 'i2', type: 'reply',
