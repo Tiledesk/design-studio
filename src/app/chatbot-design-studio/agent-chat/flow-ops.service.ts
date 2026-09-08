@@ -34,6 +34,31 @@ const CANVAS_BLOCK_GAP_PX = 60;
  *  invent a position. */
 const NEW_BLOCK_HORIZONTAL_STEP_PX = CANVAS_BLOCK_WIDTH_PX + CANVAS_BLOCK_GAP_PX;
 
+/** Clear air between two blocks stacked one above the other in a branch
+ *  column. Smaller than the horizontal gap because the cards are far taller
+ *  than they are wide: the same 60px that reads as a comfortable gutter
+ *  between two columns reads as a chasm between two stacked cards. */
+const CANVAS_BLOCK_VERTICAL_GAP_PX = 40;
+
+/** The height to assume for a block whose card cannot be measured -- it has
+ *  not rendered yet, or there is no DOM at all (unit tests). Roughly a
+ *  two-action block; the column still lays out, just on an estimate instead
+ *  of the real card. */
+const CANVAS_BLOCK_FALLBACK_HEIGHT_PX = 160;
+
+/** The highest a branch column is allowed to start. Centring a tall column on
+ *  a block near the top of the canvas would put its first arms at a negative
+ *  y -- off the top of the canvas, where the studio's own blocks never go and
+ *  the user has to hunt for them. A column that would overflow upwards starts
+ *  here and grows downwards instead: no longer centred, but all of it
+ *  reachable, which matters more. */
+const CANVAS_MIN_Y = 0;
+
+/** The id `cds-intent.component.html` puts on a block's card
+ *  (`[id]="'intent-content-'+ intent?.intent_id"`) -- the only handle the
+ *  canvas offers for measuring how tall a block actually turned out. */
+const BLOCK_CARD_ELEMENT_ID_PREFIX = 'intent-content-';
+
 const RESERVED_NAMES: string[] = Object.values(RESERVED_INTENT_NAMES);
 
 /** Applies the agent's operations to the open flow.
@@ -52,6 +77,21 @@ export class FlowOpsService {
    *  one operation and leaves the other N-1 applied, with the offer withdrawn
    *  and no way back. */
   private lastBatchUndoDepth = 0;
+
+  /** Where this service put each block it positioned itself, keyed by
+   *  intent_id -- the blocks it is allowed to move again later.
+   *
+   *  Branch layout has to reposition blocks that were created before the
+   *  branch existed: the agent builds the destinations first and wires them
+   *  up afterwards (§1 of its prompt tells it to), so the fan-out is only
+   *  knowable one call *after* the blocks were placed. Moving them is right;
+   *  moving a block the *user* put somewhere is not. Comparing a block's
+   *  current position against the one recorded here separates the two
+   *  without needing a flag on the model: a block the user has dragged no
+   *  longer sits where this service left it, and is left alone from then on.
+   *  A block positioned by an explicit `position` (or `move`) never enters
+   *  the register at all -- the caller said where it goes. */
+  private autoPlacedPositions = new Map<string, FlowPosition>();
 
   constructor(
     private intentService: IntentService,
@@ -116,6 +156,12 @@ export class FlowOpsService {
         results.push({ op: op.op, ok: false, error: String(err?.message ?? err) });
         break;
       }
+    }
+    // Before the undo depth is taken, so a single Undo takes the layout back
+    // with the operations that caused it -- moving the blocks is part of
+    // applying the batch, not a separate thing done to the flow afterwards.
+    for (const movedId of await this.relayoutBranches(blocksToRedraw)) {
+      blocksToRedraw.add(movedId);
     }
     this.lastBatchUndoDepth = Math.max(this.undoStackDepth() - undoDepthBefore, 0);
     this.redrawBlocks(blocksToRedraw);
@@ -665,6 +711,12 @@ export class FlowOpsService {
     const position = op.position ?? this.computeNewBlockPosition();
     const intent: Intent = this.intentService.createNewIntent(
       this.dashboardService.id_faq_kb, null, position);
+    if (!op.position) {
+      // Placed by the studio, so the studio may place it again once the
+      // branch it belongs to exists. A caller-supplied position is a
+      // decision, and is never revisited.
+      this.autoPlacedPositions.set(intent.intent_id, { x: position.x, y: position.y });
+    }
     // createNewIntent pushes the action it is handed; a null one leaves an
     // empty slot behind, so start from a clean list.
     intent.actions = [];
@@ -764,6 +816,9 @@ export class FlowOpsService {
     const intent = this.intentService.getIntentFromId(op.intent_id);
     intent.attributes = intent.attributes || ({} as any);
     intent.attributes.position = { x: op.position.x, y: op.position.y };
+    // Someone asked for this block to be *here*. Branch layout must not
+    // second-guess that later, so the block leaves the auto-placed register.
+    this.autoPlacedPositions.delete(op.intent_id);
     await this.intentService.updateIntent(intent);
     return { op: op.op, ok: true, intent_id: op.intent_id };
   }
@@ -1451,5 +1506,193 @@ export class FlowOpsService {
    *  gives for a single block. */
   private redrawBlocks(intentIds: Set<string>): void {
     intentIds.forEach(intentId => this.redrawBlockConnectors(intentId));
+  }
+
+  /** Lays a block's branches out as a vertical column instead of a row.
+   *
+   *  `computeNewBlockPosition` only knows how to go right, because when a
+   *  block is created nothing points at it yet. That is fine for a chain and
+   *  wrong for a fork: a menu with three buttons ends up as three blocks in a
+   *  line, each one further right than the last, with three connectors
+   *  reaching across the whole canvas to get there. What a fork wants is the
+   *  destinations stacked in one column just right of the block that feeds
+   *  them, centred on it -- and the chain out of each of them carrying on to
+   *  the right from there, which is what the horizontal rule already does for
+   *  every block placed afterwards.
+   *
+   *  Runs once per batch, over the blocks whose connectors this batch changed
+   *  -- the same set `redrawBlocks` uses, which is exactly "blocks whose
+   *  branching may have just changed". A block with fewer than two
+   *  destinations is not a fork and is left alone.
+   *
+   *  Each destination keeps its own subtree: a moved block carries every
+   *  auto-placed block downstream of it by the same delta, so an arm of the
+   *  fork that is already three blocks long arrives intact rather than
+   *  folding onto itself. The walk stops at any block the user has moved --
+   *  that block, and everything behind it, stays where they put it.
+   *
+   *  Returns the ids it moved, so the caller can redraw their connectors:
+   *  nothing about *which* connectors exist changed, but every path in and
+   *  out of a moved block is now drawn to the wrong coordinates.
+   *
+   *  Heights are measured off the rendered cards, so the column spaces real
+   *  blocks rather than assumed ones. The one card that can be measured stale
+   *  is the source's own, when this same batch just added actions to it and
+   *  the canvas has not repainted yet: the column is then centred a little
+   *  high. Everything still lays out; only the centring is approximate. */
+  private async relayoutBranches(sourceIds: Set<string>): Promise<Set<string>> {
+    const moved = new Map<string, any>();
+    for (const sourceId of sourceIds) {
+      const source = this.intentService.getIntentFromId(sourceId);
+      const sourcePosition = this.positionOf(source);
+      if (!sourcePosition) { continue; }
+      const children = this.outgoingTargets(source)
+        .filter(id => id !== sourceId)
+        .map(id => this.intentService.getIntentFromId(id))
+        .filter(child => !!this.positionOf(child));
+      if (children.length < 2) { continue; }
+      // All or nothing. Arranging only the blocks this service happens to own
+      // would drop them on top of the ones it does not, which is worse than
+      // the row it was trying to improve on.
+      if (!children.every(child => this.isAutoPlaced(child))) { continue; }
+
+      const heights = children.map(child => this.blockHeightPx(child.intent_id));
+      const columnHeight = heights.reduce((total, h) => total + h, 0)
+        + CANVAS_BLOCK_VERTICAL_GAP_PX * (children.length - 1);
+      const x = sourcePosition.x + NEW_BLOCK_HORIZONTAL_STEP_PX;
+      // Centre the column on the middle of the source card, not on its top
+      // edge, so the connectors leave the block symmetrically -- unless that
+      // would push the top of the column off the canvas.
+      let y = Math.max(
+        sourcePosition.y + this.blockHeightPx(sourceId) / 2 - columnHeight / 2,
+        CANVAS_MIN_Y);
+      const siblings = new Set<string>(children.map(child => child.intent_id));
+      siblings.add(sourceId);
+      for (let i = 0; i < children.length; i++) {
+        this.moveWithSubtree(children[i], x, Math.round(y), siblings, moved);
+        y += heights[i] + CANVAS_BLOCK_VERTICAL_GAP_PX;
+      }
+    }
+    for (const intent of moved.values()) {
+      await this.intentService.updateIntent(intent);
+    }
+    return new Set<string>(moved.keys());
+  }
+
+  /** Moves `intent` to (`x`, `y`) and carries its auto-placed subtree along by
+   *  the same delta. `excluded` names the blocks the subtree walk must not
+   *  claim -- the fork's own source and its other arms, which have their own
+   *  place in the column. */
+  private moveWithSubtree(
+    intent: any, x: number, y: number, excluded: Set<string>, moved: Map<string, any>
+  ): void {
+    const position = this.positionOf(intent);
+    const dx = x - position.x;
+    const dy = y - position.y;
+    const subtree = (dx === 0 && dy === 0)
+      ? [] : this.autoPlacedSubtreeOf(intent.intent_id, excluded);
+    this.placeBlock(intent, x, y, moved);
+    for (const descendant of subtree) {
+      const p = this.positionOf(descendant);
+      this.placeBlock(descendant, p.x + dx, p.y + dy, moved);
+    }
+  }
+
+  /** Every auto-placed block reachable from `rootId`, breadth first. A block
+   *  the user has moved is not returned *and* is not walked through: the
+   *  layout stops at the first thing someone placed by hand rather than
+   *  reaching past it to rearrange what is behind it. Already-seen ids are
+   *  skipped, so a cycle terminates and a block two arms converge on is
+   *  carried by the first arm only. */
+  private autoPlacedSubtreeOf(rootId: string, excluded: Set<string>): any[] {
+    const seen = new Set<string>(excluded);
+    seen.add(rootId);
+    const subtree: any[] = [];
+    const queue: string[] = [rootId];
+    while (queue.length > 0) {
+      const current = this.intentService.getIntentFromId(queue.shift() as string);
+      if (!current) { continue; }
+      for (const targetId of this.outgoingTargets(current)) {
+        if (seen.has(targetId)) { continue; }
+        seen.add(targetId);
+        const target = this.intentService.getIntentFromId(targetId);
+        if (!target || !this.positionOf(target) || !this.isAutoPlaced(target)) { continue; }
+        subtree.push(target);
+        queue.push(targetId);
+      }
+    }
+    return subtree;
+  }
+
+  /** Every block `intent` routes to, in the order the canvas draws those exits
+   *  -- the block's own dot first, then each action's destinations in action
+   *  order, so a column laid out in this order has connectors that do not
+   *  cross. Reads exactly what `ConnectorService.createConnectorsOfIntent`
+   *  reads, through the same field lists this service already validates
+   *  against, so "has a connector" and "counts as a branch" cannot drift
+   *  apart. Deduplicated: two exits onto the same block are one destination
+   *  to place. */
+  private outgoingTargets(intent: any): string[] {
+    const targets: string[] = [];
+    const push = (value: any) => {
+      if (typeof value !== 'string') { return; }
+      const id = this.normalizedDestinationId(value);
+      if (id && targets.indexOf(id) === -1) { targets.push(id); }
+    };
+    push(intent?.attributes?.nextBlockAction?.intentName);
+    for (const action of intent?.actions || []) {
+      if (!action) { continue; }
+      const type = action._tdActionType;
+      if (type === TYPE_ACTION.INTENT || type === TYPE_ACTION.CONNECT_BLOCK) {
+        push(action.intentName);
+      }
+      for (const field of FlowOpsService.DESTINATION_FIELDS[type] || []) {
+        push(action[field]);
+      }
+      if (type === TYPE_ACTION.AI_CONDITION) {
+        for (const branch of action.intents || []) { push(branch?.conditionIntentId); }
+      }
+      if (FlowOpsService.REPLY_LIKE_ACTION_TYPES.indexOf(type) !== -1) {
+        for (const button of this.replyButtonsOf(action)) {
+          if (button.type === TYPE_BUTTON.ACTION) { push(this.buttonDestination(button)); }
+        }
+      }
+    }
+    return targets;
+  }
+
+  /** `intent`'s position, or null when it has none this layout can reason
+   *  about. */
+  private positionOf(intent: any): FlowPosition | null {
+    const position = intent?.attributes?.position;
+    return position && typeof position.x === 'number' && typeof position.y === 'number'
+      ? position : null;
+  }
+
+  /** Whether this service placed `intent` and it has not been moved since --
+   *  see `autoPlacedPositions`. */
+  private isAutoPlaced(intent: any): boolean {
+    const assigned = this.autoPlacedPositions.get(intent?.intent_id);
+    const position = this.positionOf(intent);
+    return !!assigned && !!position && position.x === assigned.x && position.y === assigned.y;
+  }
+
+  private placeBlock(intent: any, x: number, y: number, moved: Map<string, any>): void {
+    intent.attributes = intent.attributes || {};
+    intent.attributes.position = { x, y };
+    this.autoPlacedPositions.set(intent.intent_id, { x, y });
+    moved.set(intent.intent_id, intent);
+  }
+
+  /** How tall a block's card actually is, measured off the canvas. Uses
+   *  `offsetHeight` rather than `getBoundingClientRect`: the canvas scales its
+   *  content, and positions are in unscaled canvas coordinates, which is what
+   *  `offsetHeight` reports. Falls back to an estimate when there is nothing
+   *  to measure -- the block has not rendered yet, or there is no DOM. */
+  private blockHeightPx(intentId: string): number {
+    if (typeof document === 'undefined') { return CANVAS_BLOCK_FALLBACK_HEIGHT_PX; }
+    const card = document.getElementById(BLOCK_CARD_ELEMENT_ID_PREFIX + intentId);
+    const height = card ? card.offsetHeight : 0;
+    return height > 0 ? height : CANVAS_BLOCK_FALLBACK_HEIGHT_PX;
   }
 }

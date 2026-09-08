@@ -2602,6 +2602,287 @@ describe('FlowOpsService — add_intent lays new blocks out left to right', () =
   });
 });
 
+/** A branching block laid out as a row is what the horizontal rule produces on
+ *  its own: the destinations are created before anything points at them, so
+ *  each one lands further right than the last and the fork's connectors have
+ *  to reach across the canvas. These tests are about the second pass, which
+ *  runs once the branch actually exists and stacks the destinations in one
+ *  column beside the block that feeds them. */
+describe('FlowOpsService — a fork\'s destinations are stacked, not strung out to the right', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+  let connectorService: any;
+
+  /** The estimate the layout uses when a block's card cannot be measured,
+   *  which is always the case here: karma renders no canvas. */
+  const BLOCK_HEIGHT = 160;
+  const VERTICAL_GAP = 40;
+  const HORIZONTAL_STEP = 264 + 60;
+
+  function positionsOf(ids: string[]): any[] {
+    return ids.map(id => intentService.getIntentFromId(id).attributes.position);
+  }
+
+  /** Builds the flow the way the agent does: a block, then its destinations,
+   *  all position-less so the studio places them -- which is what makes them
+   *  its to rearrange later. Returns the created ids in order. */
+  async function buildBlocks(count: number): Promise<string[]> {
+    const ops: any[] = [];
+    for (let i = 0; i < count; i++) {
+      ops.push({ op: 'add_intent', intent_display_name: 'Blocco ' + (i + 1) });
+    }
+    const report = await service.apply(ops);
+    expect(report.ok).toBe(true);
+    return report.results.map((r: any) => r.intent_id);
+  }
+
+  beforeEach(() => {
+    let nextId = 1;
+    intentService = {
+      listOfIntents: [],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('b' + nextId++, 'Untitled Block');
+          intent.attributes.position = pos;
+          return intent;
+        }),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents')
+        .and.callFake((intent: Intent) => { intentService.listOfIntents.push(intent); }),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => ({
+        _tdActionId: 'a' + nextId++, _tdActionType: type
+      })),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  it('stacks a condition\'s two destinations in one column beside it, centred on the block', async () => {
+    const [source, yes, no] = await buildBlocks(3);
+    // Far enough down the canvas that a centred column fits above the source
+    // without hitting the top edge -- the clamp has its own test.
+    intentService.getIntentFromId(source).attributes.position.y = 1000;
+    const sourcePosition = { ...intentService.getIntentFromId(source).attributes.position };
+
+    const report = await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + yes, falseIntent: '#' + no }
+    }]);
+    expect(report.ok).toBe(true);
+
+    const [yesPos, noPos] = positionsOf([yes, no]);
+    // One column, just right of the source.
+    expect(yesPos.x).toBe(sourcePosition.x + HORIZONTAL_STEP);
+    expect(noPos.x).toBe(yesPos.x);
+    // Stacked, in the order the block's exits are drawn, a clear gap apart.
+    expect(noPos.y - yesPos.y).toBe(BLOCK_HEIGHT + VERTICAL_GAP);
+    // Centred on the middle of the source card.
+    const columnCentre = (yesPos.y + noPos.y + BLOCK_HEIGHT) / 2;
+    expect(columnCentre).toBe(sourcePosition.y + BLOCK_HEIGHT / 2);
+    // The source itself did not move.
+    expect(intentService.getIntentFromId(source).attributes.position).toEqual(sourcePosition);
+  });
+
+  it('stacks the three destinations of a reply\'s buttons the same way', async () => {
+    const [menu, ordini, fatture, altro] = await buildBlocks(4);
+    intentService.getIntentFromId(menu).attributes.position.y = 1000;
+    const menuPosition = { ...intentService.getIntentFromId(menu).attributes.position };
+
+    const report = await service.apply([{
+      op: 'add_action', intent_id: menu, type: 'replyv2',
+      fields: {
+        attributes: {
+          disableInputMessage: false,
+          commands: [
+            { type: 'wait', time: 500 },
+            { type: 'message', message: { type: 'text', text: 'Scegli', attributes: { attachment: {
+              type: 'template',
+              buttons: [
+                { type: 'action', value: 'Ordini', action: '#' + ordini },
+                { type: 'action', value: 'Fatture', action: '#' + fatture },
+                { type: 'action', value: 'Altro', action: '#' + altro }
+              ]
+            } } } }
+          ]
+        }
+      }
+    }]);
+    expect(report.ok).toBe(true);
+
+    const [a, b, c] = positionsOf([ordini, fatture, altro]);
+    expect(a.x).toBe(menuPosition.x + HORIZONTAL_STEP);
+    expect(b.x).toBe(a.x);
+    expect(c.x).toBe(a.x);
+    expect(b.y - a.y).toBe(BLOCK_HEIGHT + VERTICAL_GAP);
+    expect(c.y - b.y).toBe(BLOCK_HEIGHT + VERTICAL_GAP);
+    // Three blocks tall, centred on the menu: the middle one sits level with it.
+    expect(b.y).toBe(menuPosition.y);
+  });
+
+  it('leaves a chain alone -- one destination is not a fork', async () => {
+    const [first, second] = await buildBlocks(2);
+    const before = positionsOf([first, second]).map(p => ({ ...p }));
+
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: first, to_intent_id: second }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(positionsOf([first, second])).toEqual(before);
+  });
+
+  it('carries each arm\'s own downstream blocks along, so a branch that is already a chain stays one', async () => {
+    // source -> {armA, armB}; armA -> tail. Stacking armA must take tail with
+    // it, or the arm folds back on itself.
+    const [source, armA, armB, tail] = await buildBlocks(4);
+    const tailBefore = { ...intentService.getIntentFromId(tail).attributes.position };
+    const armABefore = { ...intentService.getIntentFromId(armA).attributes.position };
+
+    await service.apply([
+      { op: 'connect', from_intent_id: armA, to_intent_id: tail }
+    ]);
+    await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + armA, falseIntent: '#' + armB }
+    }]);
+
+    const armAAfter = intentService.getIntentFromId(armA).attributes.position;
+    const tailAfter = intentService.getIntentFromId(tail).attributes.position;
+    // The tail moved by exactly the same delta as the arm it hangs off.
+    expect(tailAfter.x - tailBefore.x).toBe(armAAfter.x - armABefore.x);
+    expect(tailAfter.y - tailBefore.y).toBe(armAAfter.y - armABefore.y);
+    // And it is still to the right of its own arm: the chain still reads
+    // left to right after the fork was stacked.
+    expect(tailAfter.x).toBeGreaterThan(armAAfter.x);
+  });
+
+  it('leaves the whole fork alone when the user has moved one of its destinations', async () => {
+    const [source, yes, no] = await buildBlocks(3);
+    // A drag: the block no longer sits where the studio left it.
+    intentService.getIntentFromId(no).attributes.position = { x: 1234, y: 5678 };
+    const before = positionsOf([yes, no]).map(p => ({ ...p }));
+
+    const report = await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + yes, falseIntent: '#' + no }
+    }]);
+    expect(report.ok).toBe(true);
+    expect(positionsOf([yes, no])).toEqual(before);
+  });
+
+  it('never moves a block the caller positioned explicitly', async () => {
+    const source = (await service.apply([{ op: 'add_intent', intent_display_name: 'Sorgente' }]))
+      .results[0].intent_id as string;
+    const report0 = await service.apply([
+      { op: 'add_intent', intent_display_name: 'Uno', position: { x: 900, y: 10 } },
+      { op: 'add_intent', intent_display_name: 'Due', position: { x: 900, y: 400 } }
+    ]);
+    const [yes, no] = report0.results.map((r: any) => r.intent_id);
+
+    await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + yes, falseIntent: '#' + no }
+    }]);
+    expect(positionsOf([yes, no])).toEqual([{ x: 900, y: 10 }, { x: 900, y: 400 }]);
+  });
+
+  it('stops treating a block as its own once an explicit move has placed it', async () => {
+    const [source, yes, no] = await buildBlocks(3);
+    await service.apply([{ op: 'move', intent_id: no, position: { x: 77, y: 88 } }]);
+
+    await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + yes, falseIntent: '#' + no }
+    }]);
+    expect(intentService.getIntentFromId(no).attributes.position).toEqual({ x: 77, y: 88 });
+  });
+
+  it('redraws the connectors of every block it moved, not only the fork itself', async () => {
+    const [source, yes, no] = await buildBlocks(3);
+    connectorService.createConnectorsOfIntent.calls.reset();
+
+    await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + yes, falseIntent: '#' + no }
+    }]);
+
+    const redrawn = connectorService.createConnectorsOfIntent.calls.allArgs()
+      .map((args: any[]) => args[0].intent_id);
+    expect(redrawn).toContain(source);
+    expect(redrawn).toContain(yes);
+    expect(redrawn).toContain(no);
+  });
+
+  it('does not loop forever on a cycle between two branches', async () => {
+    const [source, armA, armB] = await buildBlocks(3);
+    await service.apply([{ op: 'connect', from_intent_id: armA, to_intent_id: armB }]);
+    await service.apply([{ op: 'connect', from_intent_id: armB, to_intent_id: armA }]);
+
+    const report = await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + armA, falseIntent: '#' + armB }
+    }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('never puts an arm above the top of the canvas, even when centring would', async () => {
+    // Four arms is 760px of column. Centred on a source near the top of the
+    // canvas that reaches well above y:0, where the studio's own blocks never
+    // go and the user would have to hunt for them.
+    const [source, ...arms] = await buildBlocks(5);
+    intentService.getIntentFromId(source).attributes.position = { x: 0, y: 0 };
+    (service as any).autoPlacedPositions.set(source, { x: 0, y: 0 });
+
+    const report = await service.apply([{
+      op: 'add_action', intent_id: source, type: 'ai_condition',
+      fields: {
+        intents: arms.map((id, i) => ({
+          label: 'ramo' + i, prompt: 'p', conditionIntentId: '#' + id
+        }))
+      }
+    }]);
+    expect(report.ok).toBe(true);
+
+    const ys = positionsOf(arms).map(p => p.y);
+    expect(Math.min(...ys)).toBe(0);
+    // Still a column: stacked downwards from the top edge, evenly spaced.
+    for (let i = 1; i < ys.length; i++) {
+      expect(ys[i] - ys[i - 1]).toBe(BLOCK_HEIGHT + VERTICAL_GAP);
+    }
+  });
+
+  it('keeps placing later position-less blocks to the right of everything, fork included', async () => {
+    const [source, yes, no] = await buildBlocks(3);
+    await service.apply([{
+      op: 'add_action', intent_id: source, type: 'jsoncondition2',
+      fields: { trueIntent: '#' + yes, falseIntent: '#' + no }
+    }]);
+    const columnX = intentService.getIntentFromId(yes).attributes.position.x;
+
+    const report = await service.apply([{ op: 'add_intent', intent_display_name: 'Dopo' }]);
+    const added = intentService.getIntentFromId(report.results[0].intent_id);
+    expect(added.attributes.position.x).toBeGreaterThan(columnX);
+  });
+});
+
 describe('FlowOpsService — connect refuses a block that already routes conditionally', () => {
   // The live defect: a block whose routing is already fully decided by a
   // condition-like action (jsoncondition2's trueIntent/falseIntent, for one)
