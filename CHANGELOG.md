@@ -9,6 +9,14 @@
 
 
 
+# this branch 09/09/2026
+- **added**: new **Gemini Agent Platform** provider in the AI model selector of the Ask KB, AI Prompt and AI Condition actions. Its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
+- **bug fix**: when the same model was offered by more than one provider or server (for example Gemini 2.5 Flash, available both from Google and from Agent Platform), the selector showed the wrong entry
+- **changed**: opening an AI action is faster — the model list is now loaded in one go for every provider instead of one provider at a time
+- **changed**: in the model selector the providers are grouped under their full name (OpenAI, Anthropic, Gemini Agent Platform, …) instead of their lowercase internal name
+- **added**: authentication persistence setting in the design studio configuration
+- **changed**: removed unused interface components from the application startup
+
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
 - **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
