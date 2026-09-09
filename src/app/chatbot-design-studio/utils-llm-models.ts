@@ -8,11 +8,28 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { loadTokenMultiplier } from 'src/app/utils/util';
-import { OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
+import { OPENAI_MODEL, LLM_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
+
+/**
+ * Provider i cui modelli NON sono hardcoded ma arrivano dall'integration di progetto
+ * (GET /integration/name/<provider>). Unico punto da toccare per aggiungerne altri.
+ */
+export const DYNAMIC_MODEL_PROVIDERS = ['ollama', 'vllm', 'agentplatform', 'openrouter'] as const;
+
+/**
+ * Provider da considerare configurati senza cercare `value.apikey` al primo livello:
+ * openai lo e' di default, vllm/agentplatform tengono la apikey dentro `value.servers[]`.
+ * OpenRouter NON e' qui: la sua apikey sta al primo livello e va verificata davvero.
+ */
+const ALWAYS_CONFIGURED_PROVIDERS: string[] = ['openai', 'ollama', 'vllm', 'agentplatform'];
 
 export interface LlmModel {
+  /** Identità univoca della voce nella select: `${llm}::${server}::${model}`. */
+  uid: string;
   modelName: string;
   llm: string;
+  /** Nome leggibile del provider, usato come intestazione di gruppo nella select. */
+  llmLabel: string;
   model: string;
   description: string;
   src: string;
@@ -22,8 +39,8 @@ export interface LlmModel {
   min_tokens?: number;
   max_output_tokens?: number;
   reasoning?: boolean;
-  /** vLLM endpoint url this model belongs to. Set only when llm === 'vllm'. */
-  vllmServer?: string;
+  /** Nome del server dell'integration a cui il modello appartiene (solo provider multi-server). */
+  server?: string;
 }
 
 export interface AutocompleteOption {
@@ -36,8 +53,8 @@ export interface ModelOption {
   value: string;
   description: string;
   status: "active" | "inactive";
-  /** vLLM endpoint url this model belongs to (carried through to the flat model). */
-  vllmServer?: string;
+  /** Nome del server dell'integration a cui il modello appartiene (propagato al modello flat). */
+  server?: string;
 }
 
 export interface ActionModel {
@@ -184,14 +201,14 @@ export async function getIntegrationModels(
         continue;
       }
       // Build model entries supporting ALL integration shapes:
-      // - multi-endpoint (refactored vLLM): value.servers[].models
-      //   -> modelName label = "<server name> ・ model" and vllmServer = server NAME (the server's name, NOT the url)
+      // - multi-endpoint (vLLM, Gemini Agent Platform): value.servers[].models
+      //   -> modelName label = "<server name> ・ model" and server = server NAME (the server's name, NOT the url)
       // - legacy flat (e.g. ollama / old vLLM): value.models is string[] -> label = value = model id
       // - per-model config (OpenRouter): value.models is object[] carrying the
       //   provider routing -> label = the catalogue name, value = the routable id.
       //   The routing itself is NOT sent from here: the server resolves it from
       //   the integration by model id, so only the id has to survive.
-      let entries: Array<{ name: string; value: string; vllmServer?: string }> = [];
+      let entries: Array<{ name: string; value: string; server?: string }> = [];
       if (Array.isArray(value.servers)) {
         for (const server of value.servers) {
           const serverName = (server?.name ?? '').toString().trim();
@@ -200,7 +217,7 @@ export async function getIntegrationModels(
             if (typeof m !== 'string' || m.trim().length === 0) {
               continue;
             }
-            entries.push({ name: serverName ? `${serverName} ・ ${m}` : m, value: m, vllmServer: serverName || undefined });
+            entries.push({ name: serverName ? `${serverName} ・ ${m}` : m, value: m, server: serverName || undefined });
           }
         }
       } else if (Array.isArray(value.models)) {
@@ -234,7 +251,7 @@ export async function getIntegrationModels(
           value: e.value,
           description: '',
           status: 'active' as const,
-          vllmServer: e.vllmServer
+          server: e.server
         }));
       if (models.length > 0) {
         logger.log(`[LLM-UTILS] - NEW_MODELS for ${modelName}:`, models);
@@ -311,6 +328,43 @@ export function setModel(
   return model;
 }
 
+/** Action che possono puntare a un server di un provider multi-server. */
+export interface ActionWithServer {
+  llm?: string;
+  vllmServer?: string;
+  agentPlatformServer?: string;
+}
+
+/**
+ * Persiste sull'action il server dell'integration a cui appartiene il modello scelto.
+ * Ogni provider ha il proprio attributo perché il backend li legge con nomi diversi.
+ * I campi vengono sempre azzerati prima, così cambiando provider non resta un server orfano.
+ */
+export function applySelectedServerToAction(action: ActionWithServer, model: LlmModel | undefined): void {
+  delete action.vllmServer;
+  delete action.agentPlatformServer;
+  if (!model?.server) {
+    return;
+  }
+  if (model.llm === 'vllm') {
+    action.vllmServer = model.server;
+  } else if (model.llm === 'agentplatform') {
+    action.agentPlatformServer = model.server;
+  }
+}
+
+/**
+ * Aggiunge al payload di preview il server di destinazione.
+ * Senza, il backend risponde "<provider>Server attribute is undefined".
+ */
+export function appendSelectedServerToPayload(action: ActionWithServer, data: any): void {
+  if (action?.llm === 'vllm' && action.vllmServer) {
+    data.vllmServer = action.vllmServer;
+  } else if (action?.llm === 'agentplatform' && action.agentPlatformServer) {
+    data.agentPlatformServer = action.agentPlatformServer;
+  }
+}
+
 /**
  * Initializes LLM models configuration
  * @param params Parameters for initialization
@@ -321,6 +375,14 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
   
   const INTEGRATIONS = await getIntegrations(projectService, dashboardService, logger);
   // logger.log(`[${componentName}] 1 - integrations:`, INTEGRATIONS);
+
+  // I provider dinamici vanno risolti PRIMA di generateLlmModelsFlat(): quest'ultima
+  // appiattisce LLM_MODEL, che getIntegrationModels muta in-place.
+  await Promise.all(
+    DYNAMIC_MODEL_PROVIDERS.map(provider =>
+      getIntegrationModels(projectService, dashboardService, logger, LLM_MODEL, provider)
+    )
+  );
 
   // Generate LLM models
   let llm_models_flat = generateLlmModelsFlat();
@@ -348,11 +410,11 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
     });
   }
   
-  // Second pass: Always set configured = true for openai, ollama, vllm
-  // (these don't require explicit project integration configuration)
+  // Second pass: vedi ALWAYS_CONFIGURED_PROVIDERS — questi provider non espongono
+  // `value.apikey` al primo livello, quindi il passaggio precedente non li vedrebbe.
   llm_models_flat.forEach(model => {
     const llmLower = model.llm.toLowerCase();
-    if(llmLower === 'openai' || llmLower === 'ollama' || llmLower === 'vllm'){
+    if(ALWAYS_CONFIGURED_PROVIDERS.includes(llmLower)){
       model.configured = true;
     }
   });

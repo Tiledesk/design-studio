@@ -75,7 +75,32 @@ describe('getIntegrationModels', () => {
     expect(models.length).toBe(1);
     expect(models[0].name).toBe('gpu-box ・ qwen3');
     expect(models[0].value).toBe('qwen3');
-    expect(models[0].vllmServer).toBe('gpu-box');
+    expect(models[0].server).toBe('gpu-box');
+  });
+
+  it('reads the Gemini Agent Platform shape, one entry per server model', async () => {
+    const models = await load('agentplatform', {
+      servers: [
+        { name: 'Test', url: 'https://…', project: 'p', location: 'l', apikey: '******',
+          models: ['gemini-2.5-flash', 'test'] },
+      ],
+    });
+
+    expect(models.map(m => m.name)).toEqual(['Test ・ gemini-2.5-flash', 'Test ・ test']);
+    expect(models.map(m => m.value)).toEqual(['gemini-2.5-flash', 'test']);
+    expect(models.every(m => m.server === 'Test')).toBe(true);
+  });
+
+  it('keeps the servers apart when two of them expose the same model id', async () => {
+    const models = await load('agentplatform', {
+      servers: [
+        { name: 'eu', models: ['gemini-2.5-flash'] },
+        { name: 'us', models: ['gemini-2.5-flash'] },
+      ],
+    });
+
+    expect(models.map(m => m.name)).toEqual(['eu ・ gemini-2.5-flash', 'us ・ gemini-2.5-flash']);
+    expect(models.map(m => m.server)).toEqual(['eu', 'us']);
   });
 
   it('leaves the list untouched when the integration has no models', async () => {
