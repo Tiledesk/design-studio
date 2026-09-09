@@ -134,10 +134,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   /** panel widget loaded */
   private subscriptionWidgetLoaded: Subscription;
 
-  /** panel agent chat */
-  private subscriptionAgentChatPanel: Subscription;
-  IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
-
   /** panel options */
   private subscriptionUndoRedo: Subscription;
   stateUndoRedo: any = {undo:false, redo: false};
@@ -261,10 +257,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
     if (this.subscriptionTogglePublishPanelState) {
       this.subscriptionTogglePublishPanelState.unsubscribe();
-    }
-
-    if (this.subscriptionAgentChatPanel) {
-      this.subscriptionAgentChatPanel.unsubscribe();
     }
 
 
@@ -581,10 +573,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         //this.IS_OPEN_WIDGET_LOG = false;
       }
     });
-
-    /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
-    this.subscriptionAgentChatPanel = this.controllerService.isOpenAgentChatPanel$
-      .subscribe((isOpen: boolean) => { this.IS_OPEN_PANEL_AGENT_CHAT = isOpen; });
 
     this.subscriptionTogglePublishPanelState = this.controllerService.isOpenPublishPanel$.subscribe((event: any) => {
         this.logger.log("[CDS-CANVAS] has opened Publish panel ", event);

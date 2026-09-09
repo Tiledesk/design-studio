@@ -18,9 +18,19 @@
             (onClose)="onCloseChangelog()">
         </cds-changelog> -->
 
-        <cds-sidebar class="cds-sidebar" 
+        <cds-sidebar class="cds-sidebar"
             [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR">
         </cds-sidebar>
+
+        <!-- Mounted here, not inside cds-canvas, so a flow switch can destroy
+             and rebuild the canvas without taking the iframe -- and the
+             conversation inside it -- with it. Still before the outlet in this
+             flex row, so it opens as a column rather than an overlay. -->
+        <cds-panel-agent-chat
+            [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT"
+            [class.isHidden]="!IS_OPEN_PANEL_AGENT_CHAT"
+            [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT">
+        </cds-panel-agent-chat>
 
         <router-outlet></router-outlet>
 

@@ -1,10 +1,12 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { ControllerService } from '../services/controller.service';
 
 // MODEL //
 import { Project } from 'src/app/models/project-model';
@@ -38,14 +40,19 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
   templateUrl: './cds-dashboard.component.html',
   styleUrls: ['./cds-dashboard.component.scss']
 })
-export class CdsDashboardComponent implements OnInit {
+export class CdsDashboardComponent implements OnInit, OnDestroy {
   // @ViewChild('chatbot--dashboard') canvas!: ElementRef;
-  
+
   SIDEBAR_PAGES = SIDEBAR_PAGES;
   initFinished:boolean = false;
   IS_OPEN_SIDEBAR: boolean = false;
   IS_OPEN_INTENTS_LIST: boolean = true;
   IS_OPEN_PANEL_WIDGET: boolean = false;
+
+  /** panel agent chat -- mounted here (not in cds-canvas) so it survives a
+   *  canvas rebuild on flow switch; see cds-dashboard.component.html. */
+  private subscriptionAgentChatPanel: Subscription;
+  IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
 
   
   project: Project;
@@ -71,11 +78,12 @@ export class CdsDashboardComponent implements OnInit {
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
-    private stageService: StageService, 
-    private readonly webhookService: WebhookService
+    private stageService: StageService,
+    private readonly webhookService: WebhookService,
+    private readonly controllerService: ControllerService
   ) {}
 
-  
+
 
   ngOnInit() {
     // ---------------------------------------
@@ -84,6 +92,16 @@ export class CdsDashboardComponent implements OnInit {
     this.showChangelog = this.checkForChangelogNotify();
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide');
+
+    /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
+    this.subscriptionAgentChatPanel = this.controllerService.isOpenAgentChatPanel$
+      .subscribe((isOpen: boolean) => { this.IS_OPEN_PANEL_AGENT_CHAT = isOpen; });
+  }
+
+  ngOnDestroy() {
+    if (this.subscriptionAgentChatPanel) {
+      this.subscriptionAgentChatPanel.unsubscribe();
+    }
   }
 
   onSwipe(event: WheelEvent){
