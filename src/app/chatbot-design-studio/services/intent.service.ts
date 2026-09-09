@@ -882,13 +882,16 @@ export class IntentService {
         /// let id_faq_kb = this.dashboardService.id_faq_kb;
         /// this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         /// this.stageService.centerStageOnHorizontalPosition(startElement);
-        let left = 0;
-        const element = document.getElementById('cdsPanelIntentList');
-        if (element) {
-          left = element.offsetWidth+100;
-        }
+        // This used to nudge the centred position right by roughly
+        // #cdsPanelIntentList's (.box-left's) own width, to clear the
+        // sidebar back when #tds_container spanned underneath it and
+        // .box-left merely floated on top via z-index. #tds_container is a
+        // real flex sibling starting after .box-left (and the chat panel)
+        // now, so centring within the container's own coordinate space
+        // already lands past both -- re-adding their width here would push
+        // the 'start' block needlessly far right instead of centring it.
         let id_faq_kb = this.dashboardService.id_faq_kb;
-        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
+        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement);
       }
     }
   }
