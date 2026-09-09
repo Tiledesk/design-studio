@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NavigationStart, Router } from '@angular/router';
+import {
+  NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router
+} from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 import { AgentChatHostService } from './agent-chat-host.service';
 import { AgentChatFamilyService } from './agent-chat-family.service';
@@ -123,23 +125,76 @@ describe('flow switch: the canvas is destroyed and rebuilt, the chat panel is no
     expect(fixture.nativeElement.querySelector('flow-switch-panel')).toBe(panel);
   }));
 
-  // A flow switch does raise a NavigationStart -- openFlow() navigates the
-  // router. The gate survives it because :faqkbid is on the PARENT route and
+  // A flow switch does raise router events -- openFlow() navigates the
+  // router. The gate survives them because :faqkbid is on the PARENT route and
   // the URL's last segment is 'blocks' on both sides of the switch.
   it('keeps the blocks gate true across a flow switch, so the panel is never torn down', () => {
-    const events = new Subject<any>();
-    const component = makeDashboard({
-      router: {
-        url: '/project/p1/chatbot/kb1/blocks',
-        events,
-        navigate: () => Promise.resolve(true)
-      }
-    });
+    const router = aRouter('/project/p1/chatbot/kb1/blocks');
+    const component = makeDashboard({ router });
     expect(component.isBlockSectionActive).toBe(true);
-    events.next(new NavigationStart(1, '/project/p1/chatbot/sub1/blocks'));
+
+    router.events.next(new NavigationStart(1, '/project/p1/chatbot/sub1/blocks'));
+    expect(component.isBlockSectionActive).toBe(true);
+    router.url = '/project/p1/chatbot/sub1/blocks';
+    router.events.next(new NavigationEnd(1, router.url, router.url));
     expect(component.isBlockSectionActive).toBe(true);
   });
+
+  // The failure: NavigationStart fires before guards run and before a lazy
+  // chunk loads. Every child section is loadChildren and the parent route
+  // carries AuthGuard and RoleGuard, so a click on a section the user may not
+  // enter raises a NavigationStart for it and then a NavigationCancel -- and
+  // gating on the start alone destroys the panel, the iframe inside it and
+  // any tool call in flight, for a navigation that never happens. Nothing
+  // restores it: the user is still on blocks, with the conversation gone.
+  it('keeps the panel mounted when a guard cancels the navigation away from blocks', () => {
+    const router = aRouter('/project/p1/chatbot/kb1/blocks');
+    const component = makeDashboard({ router });
+
+    router.events.next(new NavigationStart(2, '/project/p1/chatbot/kb1/settings'));
+    // The URL never moved: the guard said no.
+    router.events.next(new NavigationCancel(2, '/project/p1/chatbot/kb1/settings', 'guard'));
+
+    expect(component.isBlockSectionActive).toBe(true);
+  });
+
+  // Same shape, other cause: the lazy chunk for the section fails to load.
+  it('keeps the panel mounted when the navigation errors out', () => {
+    const router = aRouter('/project/p1/chatbot/kb1/blocks');
+    const component = makeDashboard({ router });
+
+    router.events.next(new NavigationStart(3, '/project/p1/chatbot/kb1/settings'));
+    router.events.next(
+      new NavigationError(3, '/project/p1/chatbot/kb1/settings', new Error('chunk load failed')));
+
+    expect(component.isBlockSectionActive).toBe(true);
+  });
+
+  // And it still closes when the user really does leave: the gate is driven
+  // by arrival, not by intention.
+  it('drops the panel once a navigation to another section actually completes', () => {
+    const router = aRouter('/project/p1/chatbot/kb1/blocks');
+    const component = makeDashboard({ router });
+
+    router.url = '/project/p1/chatbot/kb1/settings';
+    router.events.next(
+      new NavigationEnd(4, '/project/p1/chatbot/kb1/settings', router.url));
+
+    expect(component.isBlockSectionActive).toBe(false);
+  });
+
+  it('starts closed when the studio loads straight into another section', () => {
+    const component = makeDashboard({ router: aRouter('/project/p1/chatbot/kb1/settings') });
+    expect(component.isBlockSectionActive).toBe(false);
+  });
 });
+
+/** A Router stand-in whose `url` the test moves by hand, the way the real one
+ *  moves it before it raises NavigationEnd -- and does NOT move it for a
+ *  cancel or an error, which is the whole distinction under test. */
+function aRouter(url: string): any {
+  return { url, events: new Subject<any>(), navigate: () => Promise.resolve(true) };
+}
 
 /** Builds CdsDashboardComponent by hand: its constructor only touches the
  *  router (manageRouteChanges), so everything else can be left empty. */
@@ -147,6 +202,18 @@ function makeDashboard(parts: any): any {
   LoggerInstance.setInstance({
     log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
   } as any);
+  // openFlow() now also closes the studio's own undo controls and tells the
+  // chat host the canvas moved, so every stand-in needs those members. Filled
+  // in only where the caller did not supply them: the third describe below
+  // passes the REAL AgentChatHostService, whose own methods must win.
+  const intentService = parts.intentService ?? { getAllIntents: () => Promise.resolve(true) };
+  intentService.arrayUNDO = intentService.arrayUNDO ?? [];
+  intentService.arrayREDO = intentService.arrayREDO ?? [];
+  intentService.behaviorUndoRedo = intentService.behaviorUndoRedo
+    ?? new BehaviorSubject({ undo: false, redo: false });
+  const agentChatHostService = parts.agentChatHostService ?? { setFlowNavigator: () => {} };
+  agentChatHostService.notifyFlowSwitched = agentChatHostService.notifyFlowSwitched ?? (() => {});
+  agentChatHostService.clearFlowNavigator = agentChatHostService.clearFlowNavigator ?? (() => {});
   const args = [
     parts.route ?? { params: { subscribe: () => {} } },
     parts.router,
@@ -155,8 +222,8 @@ function makeDashboard(parts: any): any {
     parts.dashboardService ?? {},
     {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
     parts.controllerService ?? { isOpenAgentChatPanel$: new Subject() },
-    parts.agentChatHostService ?? { setFlowNavigator: () => {} },
-    parts.intentService ?? { getAllIntents: () => Promise.resolve(true) },
+    agentChatHostService,
+    intentService,
     parts.changeDetectorRef ?? { detectChanges: () => {} }
   ];
   return new (CdsDashboardComponent as any)(...args);
@@ -237,7 +304,7 @@ describe('CdsDashboardComponent.openFlow', () => {
     // The bare `false` DashboardService.getBotById() really rejects with.
     dashboardService.getBotById = () => { order.push('getBotById'); return Promise.reject(false); };
     await expectAsync(component.openFlow('sub1'))
-      .toBeRejectedWithError(/^Opened "sub1" but could not load it\. Read it with get_flow/);
+      .toBeRejectedWithError(/^Opened "sub1" but could not load it\. The flow is not readable/);
     expect(component.flowVisible).toBe(true);
     expect(order).toEqual([
       'navigate:project/p1/chatbot/sub1/blocks',
@@ -258,6 +325,52 @@ describe('CdsDashboardComponent.openFlow', () => {
       .toBeRejectedWithError(/Opened "sub1" but could not load it: 403 forbidden\./);
   });
 
+  // The canvas's own Ctrl+Z and toolbar control read IntentService's stacks,
+  // which are root-scoped and were never cleared by anything: a switch used to
+  // be a page reload. Left in place they pop an entry holding the PREVIOUS
+  // flow's intents and hand them to restoreIntent(), which inserts them into
+  // the flow now open -- each still carrying its old id_faq_kb, which
+  // IntentService.updateIntent copies into the payload of the next write that
+  // touches it.
+  it('empties the studio\'s undo and redo stacks when the canvas moves', async () => {
+    const { component } = build();
+    const intentService: any = (component as any).intentService;
+    intentService.arrayUNDO.push({ undo: [], redo: [] });
+    intentService.arrayREDO.push({ undo: [], redo: [] });
+
+    await component.openFlow('sub1');
+
+    expect(intentService.arrayUNDO).toEqual([]);
+    expect(intentService.arrayREDO).toEqual([]);
+  });
+
+  // Emptying the arrays is not enough on its own: the toolbar's enabled state
+  // is driven by the observable, not read off the arrays, so a control left
+  // enabled still calls restoreLastUNDO().
+  it('re-emits the undo/redo state so the toolbar control goes with it', async () => {
+    const { component } = build();
+    const intentService: any = (component as any).intentService;
+    intentService.behaviorUndoRedo.next({ undo: true, redo: true });
+
+    await component.openFlow('sub1');
+
+    expect(intentService.behaviorUndoRedo.value).toEqual({ undo: false, redo: false });
+  });
+
+  // The chat panel survives the switch and keeps whatever it was saying about
+  // the last batch, Undo button included -- an Undo FlowOpsService now
+  // refuses. It has to be told.
+  it('tells the chat host the canvas moved, so the panel drops its Undo offer', async () => {
+    const switched: string[] = [];
+    const { component } = build();
+    (component as any).agentChatHostService.notifyFlowSwitched =
+      (id: string) => switched.push(id);
+
+    await component.openFlow('sub1');
+
+    expect(switched).toEqual(['sub1']);
+  });
+
   it('does nothing for the flow that is already open', async () => {
     const { component, order } = build();
     await component.openFlow('kb1');
@@ -275,7 +388,8 @@ describe('CdsDashboardComponent.openFlow', () => {
   it('publishes the same navigator to the chat host and to DashboardService', () => {
     const { component, dashboardService } = build();
     let chatNavigator: any = null;
-    (component as any).agentChatHostService = { setFlowNavigator: (fn: any) => chatNavigator = fn };
+    (component as any).agentChatHostService =
+      { setFlowNavigator: (fn: any) => chatNavigator = fn, clearFlowNavigator: () => {} };
     component.ngOnInit();
     expect(typeof chatNavigator).toBe('function');
     expect(typeof dashboardService.openFlow).toBe('function');
@@ -283,12 +397,17 @@ describe('CdsDashboardComponent.openFlow', () => {
 
   // Left behind on an app-scoped service, it would navigate through a
   // destroyed component's router and change detector.
-  it('withdraws the navigator from DashboardService when the dashboard goes away', () => {
+  it('withdraws the navigator from both services when the dashboard goes away', () => {
     const { component, dashboardService } = build();
-    (component as any).agentChatHostService = { setFlowNavigator: () => {} };
+    let cleared = false;
+    (component as any).agentChatHostService =
+      { setFlowNavigator: () => {}, clearFlowNavigator: () => cleared = true };
     component.ngOnInit();
     component.ngOnDestroy();
     expect(dashboardService.openFlow).toBeNull();
+    // The same withdrawal on the other side: the callback closes over this
+    // component's router and change detector, and the host is root-scoped.
+    expect(cleared).toBe(true);
   });
 });
 
@@ -468,6 +587,21 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
     expect(fetched).toEqual([]);
   });
 
+  // family.contains() reaches the server through FaqKbService, so it rejects
+  // with an Angular HttpErrorResponse whose `message` is boilerplate about a
+  // status code. Every other failure on this path is already a sentence the
+  // agent can act on; this was the last raw HTTP error escaping the host.
+  it('turns a failed family lookup into a refusal the agent can read, and moves nothing', async () => {
+    await wire();
+    (TestBed.inject(AgentChatFamilyService) as any).contains =
+      () => Promise.reject({ message: 'Http failure response for /faq_kb: 500 Internal Server Error' });
+
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' }))
+      .toBeRejectedWithError(/Could not check whether "sub1" is in this family[\s\S]*retry/i);
+    expect(dashboardService.id_faq_kb).toBe('kb1');
+    expect(fetched).toEqual([]);
+  });
+
   // DashboardService.getBotById() rejects with the bare value `false`, not an
   // Error. Passed through untouched the agent would be handed an empty
   // message; this is the only failure text it ever sees.
@@ -478,5 +612,35 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
       .toBeRejectedWithError(/sub1[\s\S]*load/i);
     // Still visible: the alternative is a studio with no canvas at all.
     expect(dashboard.flowVisible).toBe(true);
+  });
+
+  // The failure path re-opened the very window the success path closes.
+  // navigate() already moved id_faq_kb to the new flow, while listOfIntents
+  // still held the previous flow's blocks -- and the old refusal text told the
+  // agent to "read it with get_flow before patching anything". get_flow would
+  // then answer with the NEW id and the OLD flow's intents, and a patch
+  // declaring the new id passes apply_flow_patch's guard, which compares only
+  // ids. The agent writes the parent's intent_ids into the subagent, with
+  // every check it was given saying yes.
+  it('does not leave the previous flow\'s intents readable under the new flow\'s id', async () => {
+    await wire();
+    dashboardService.getBotById = () => Promise.reject(false);
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' })).toBeRejected();
+
+    const snapshot = await registered['get_flow']({});
+    expect(snapshot.id_faq_kb).toBe('sub1');
+    // Empty, not the parent's. Incomplete is recoverable; another flow's
+    // blocks presented as this one's is not.
+    expect(snapshot.intents).toEqual([]);
+    expect(snapshot.intents).not.toEqual(FLOWS['kb1']);
+  });
+
+  // And the refusal says so, rather than sending the agent to read a flow
+  // that cannot be read.
+  it('tells the agent not to patch, and to open the flow again', async () => {
+    await wire();
+    dashboardService.getBotById = () => Promise.reject(false);
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' }))
+      .toBeRejectedWithError(/do not patch anything[\s\S]*open_flow/i);
   });
 });

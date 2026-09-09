@@ -17,6 +17,7 @@ describe('CdsPanelAgentChatComponent', () => {
       attach: jasmine.createSpy('attach').and.returnValue(Promise.resolve()),
       detach: jasmine.createSpy('detach'),
       applied$: { subscribe: () => ({ unsubscribe: () => {} }) },
+      flowSwitched$: new Subject<string>(),
       lastError: null
     };
     await TestBed.configureTestingModule({
@@ -236,6 +237,38 @@ describe('CdsPanelAgentChatComponent', () => {
     // still claiming "Applied 1 change" is wrong about the flow's state.
     expect(component.appliedCount).toBe(0);
     fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.agent-chat-applied')).toBeNull();
+  });
+
+  // This panel is mounted above the canvas precisely so it survives a flow
+  // switch -- which means its summary row survives one too, Undo button and
+  // all. That button belongs to a flow the canvas has left: FlowOpsService
+  // refuses an undo across a switch, so leaving it on screen offers the user
+  // a control that now does nothing. The whole row goes: "Applied 2 changes"
+  // describes a flow that is no longer in front of them.
+  it('drops what it was saying about the last batch when the canvas moves to another flow', async () => {
+    const reports = new Subject<any>();
+    hostService.applied$ = reports;
+    fixture.detectChanges();
+    component.isPanelVisible = true;
+    component.ngOnChanges({ isPanelVisible: { currentValue: true } } as any);
+    await fixture.whenStable();
+
+    reports.next({ ok: true, rejected_before_applying: false, results: [
+      { op: 'add_intent', ok: true }, { op: 'add_action', ok: false, error: 'network down' }
+    ]});
+    fixture.detectChanges();
+    expect(component.canUndo).toBe(true);
+
+    hostService.flowSwitched$.next('sub1');
+    fixture.detectChanges();
+
+    expect(component.canUndo).toBe(false);
+    expect(component.lastReport).toBeNull();
+    expect(component.appliedCount).toBe(0);
+    expect(component.failedCount).toBe(0);
+    expect(component.firstError).toBeNull();
+    // Nothing left on screen either -- no Undo button, no stale count.
     expect(fixture.nativeElement.querySelector('.agent-chat-applied')).toBeNull();
   });
 

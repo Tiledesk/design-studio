@@ -74,6 +74,7 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
 
   private attached = false;
   private appliedSub: Subscription;
+  private flowSwitchedSub: Subscription;
 
   constructor(
     public hostService: AgentChatHostService,
@@ -87,6 +88,23 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
   ngOnInit(): void {
     this.restorePersistedWidth();
     window.addEventListener('resize', this.onWindowResize);
+    // This panel is deliberately mounted above the canvas so it survives a
+    // flow switch -- which means the summary row survives it too, Undo button
+    // and all. That button now belongs to a flow the canvas has left:
+    // FlowOpsService refuses an undo across a switch, so offering it would be
+    // offering a no-op. The whole row goes, not just the button: "Applied 3
+    // changes" describes a flow that is no longer on screen.
+    this.flowSwitchedSub = this.hostService.flowSwitched$
+      .subscribe(() => this.clearLastBatch());
+  }
+
+  /** Nothing is being said about a last batch any more. */
+  private clearLastBatch(): void {
+    this.lastReport = null;
+    this.appliedCount = 0;
+    this.failedCount = 0;
+    this.firstError = null;
+    this.canUndo = false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -136,6 +154,7 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
 
   ngOnDestroy(): void {
     this.appliedSub?.unsubscribe();
+    this.flowSwitchedSub?.unsubscribe();
     this.hostService.detach();
     this.stopDragListeners();
     window.removeEventListener('resize', this.onWindowResize);

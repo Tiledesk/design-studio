@@ -44,6 +44,17 @@ export class AgentChatHostService {
   /** Emits after every apply_flow_patch, for the panel's summary row. */
   public readonly applied$ = this.appliedSource.asObservable();
 
+  private flowSwitchedSource = new Subject<string>();
+  /** Emits the newly open flow's id whenever the canvas moves to another flow
+   *  of the family -- from `open_flow` or from the Subagents panel, both of
+   *  which go through the dashboard's one navigator.
+   *
+   *  The panel survives that move now, and so does everything it was saying
+   *  about the last batch. An Undo offered across a switch is an Undo
+   *  FlowOpsService will refuse (the entries describe the flow that is no
+   *  longer open), so it must stop being offered. */
+  public readonly flowSwitched$ = this.flowSwitchedSource.asObservable();
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   /** How the host moves the canvas. Registered by the dashboard, which owns
@@ -173,7 +184,22 @@ export class AgentChatHostService {
       const id = String(args?.['faq_kb_id'] ?? '');
       // The agent is a way to build one family, not a way to walk the
       // project: anything outside it is refused before the studio moves.
-      if (!await this.family.contains(id)) {
+      //
+      // contains() reaches the server, and a rejection here is an Angular
+      // HttpErrorResponse whose `message` is boilerplate about a status code.
+      // Every other failure on this path is already a sentence the agent can
+      // act on; this one is not allowed to be the exception that escapes raw.
+      let inFamily: boolean;
+      try {
+        inFamily = await this.family.contains(id);
+      } catch (error) {
+        this.logger.error('[AGENT-CHAT-HOST] open_flow: family lookup failed:', error);
+        throw new Error(
+          `Could not check whether "${id}" is in this family `
+          + `(${String(error?.message ?? error)}). Nothing was opened; this is `
+          + `usually transient -- retry the call.`);
+      }
+      if (!inFamily) {
         throw new Error(
           `"${id}" is not in this family. open_flow moves between this agent and `
           + `its subagents only; use get_flow to see them.`);
@@ -207,6 +233,20 @@ export class AgentChatHostService {
    *  never learns how a flow switch is performed -- only when it is done. */
   public setFlowNavigator(fn: (faqKbId: string) => Promise<void>): void {
     this.flowNavigator = fn;
+  }
+
+  /** Withdraw the navigator when the dashboard that registered it goes away.
+   *  The callback closes over that component's router and change detector;
+   *  this service is root-scoped and would otherwise keep calling through a
+   *  destroyed component. The mirror of DashboardService.openFlow = null. */
+  public clearFlowNavigator(): void {
+    this.flowNavigator = null;
+  }
+
+  /** Told by the dashboard once the canvas has been pointed at another flow.
+   *  See `flowSwitched$`. */
+  public notifyFlowSwitched(faqKbId: string): void {
+    this.flowSwitchedSource.next(faqKbId);
   }
 
   /** Switch the chat to another family's session without reloading the frame.

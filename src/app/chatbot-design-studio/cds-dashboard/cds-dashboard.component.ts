@@ -1,6 +1,8 @@
 
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import {
+  ActivatedRoute, Event as RouterEvent, NavigationCancel, NavigationEnd, NavigationError, Router
+} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 // import { TranslateService } from '@ngx-translate/core';
@@ -57,12 +59,20 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   private subscriptionAgentChatPanel: Subscription;
   IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
 
-  /** Gates the chat panel to the blocks section -- same condition and same
-   *  router-event mechanism as cds-header.component.ts's isBlockSectionActive,
-   *  which already gates the header's own toggle button. It reads only the
-   *  URL's last segment, which a flow switch leaves as 'blocks', so it cannot
-   *  flicker across a flow rebuild: it only flips when the user leaves or
-   *  re-enters the blocks route entirely. */
+  /** Gates the chat panel to the blocks section. It reads only the URL's last
+   *  segment, which a flow switch leaves as 'blocks', so it cannot flicker
+   *  across a flow rebuild: it only flips when the user leaves or re-enters
+   *  the blocks route entirely.
+   *
+   *  Driven by *completed* navigation, not by NavigationStart. Every child
+   *  section is `loadChildren` and the parent route carries AuthGuard and
+   *  RoleGuard, so a NavigationStart is only an intention: a guard can reject
+   *  it and a lazy chunk can fail to load. Gating on the intention destroys
+   *  this panel -- and the iframe, the conversation and any tool call in
+   *  flight with it -- for a navigation that then never happens, leaving the
+   *  user still on `blocks` with the chat gone and nothing to bring it back.
+   *  cds-header.component.ts has the same shape, where the same weakness only
+   *  hides a button until the next navigation. */
   private subscriptionRouteChanges: Subscription;
   isBlockSectionActive: boolean = true;
 
@@ -107,30 +117,38 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.manageRouteChanges();
   }
 
-  /** Mirrors cds-header.component.ts's manageRouteChanges(): checks the
-   *  current route once at construction time (the initial load may already
-   *  be on a non-blocks section), then keeps isBlockSectionActive in sync on
-   *  every subsequent NavigationStart.
+  /** Checks the current route once at construction time (the initial load may
+   *  already be on a non-blocks section), then recomputes isBlockSectionActive
+   *  from `router.url` every time a navigation *settles* -- completed
+   *  (NavigationEnd), rejected by a guard or redirected (NavigationCancel), or
+   *  failed to load its chunk (NavigationError).
    *
-   *  A flow switch DOES raise a NavigationStart -- openFlow() below navigates
-   *  the router. It cannot flicker this value anyway, because only the URL's
-   *  last segment is read and `:faqkbid` sits on the parent route: the last
-   *  segment is 'blocks' before and after the switch, so this never
-   *  observably passes through false and the chat panel is never destroyed. */
+   *  Recomputed from `router.url` rather than from the event's own url so all
+   *  three cases read the same source: after a NavigationEnd it is the URL
+   *  just reached, and after a cancel or an error it is the URL the studio is
+   *  still on -- which is precisely the answer the gate needs in that case.
+   *
+   *  A flow switch DOES raise these events -- openFlow() below navigates the
+   *  router -- and cannot flicker this value, because only the URL's last
+   *  segment is read and `:faqkbid` sits on the parent route: the last segment
+   *  is 'blocks' before and after the switch, so this never observably passes
+   *  through false and the chat panel is never destroyed. */
   private manageRouteChanges() {
-    const urlWithoutParams = this.router.url.split('?')[0];
-    const child = urlWithoutParams.split('/').slice(-1)[0];
-    if (child !== 'blocks') {
-      this.isBlockSectionActive = false;
-    }
+    this.isBlockSectionActive = this.isBlocksUrl(this.router.url);
 
     this.subscriptionRouteChanges = this.router.events
-      .pipe(filter(event => event instanceof NavigationStart))
-      .subscribe((event: NavigationStart) => {
-        const urlWithoutParams = event.url.split('?')[0];
-        const child = urlWithoutParams.split('/').slice(-1)[0];
-        this.isBlockSectionActive = child === 'blocks';
+      .pipe(filter((event: RouterEvent) =>
+        event instanceof NavigationEnd
+        || event instanceof NavigationCancel
+        || event instanceof NavigationError))
+      .subscribe(() => {
+        this.isBlockSectionActive = this.isBlocksUrl(this.router.url);
       });
+  }
+
+  /** The blocks section is the URL whose last segment is 'blocks'. */
+  private isBlocksUrl(url: string): boolean {
+    return (url || '').split('?')[0].split('/').slice(-1)[0] === 'blocks';
   }
 
   ngOnInit() {
@@ -158,6 +176,12 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // left behind, it would navigate through a destroyed component's router
     // and change detector.
     this.dashboardService.openFlow = null;
+    // The same withdrawal, for the same reason, from the other service this
+    // component published a navigator on: it closes over this component's
+    // router and change detector, and this component is going away. Harmless
+    // today only because the chat panel's own ngOnDestroy calls detach();
+    // symmetry is what keeps it harmless.
+    this.agentChatHostService.clearFlowNavigator();
     if (this.subscriptionAgentChatPanel) {
       this.subscriptionAgentChatPanel.unsubscribe();
     }
@@ -193,6 +217,22 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
         `Could not open "${faqKbId}": the studio refused to navigate to it. `
         + `The open flow is still "${this.dashboardService.id_faq_kb}".`);
     }
+    // The canvas has moved, so nothing on the studio's undo stack belongs to
+    // the flow now open. Left in place, the canvas's own Ctrl+Z (and the
+    // toolbar control driven by behaviorUndoRedo) would pop an entry holding
+    // the PREVIOUS flow's intents and hand them to restoreIntent(), which
+    // inserts them into this one -- each still carrying its old id_faq_kb,
+    // which IntentService.updateIntent copies into the payload of the next
+    // write that touches it. That write then persists into the other chatbot
+    // while the chat host's guard, which compares tool-level ids, sees
+    // nothing wrong. FlowOpsService refuses its own Undo across a switch; the
+    // canvas's controls are closed here, at the same event.
+    this.intentService.arrayUNDO = [];
+    this.intentService.arrayREDO = [];
+    this.intentService.behaviorUndoRedo.next({ undo: false, redo: false });
+    // And the chat panel drops the Undo it was offering, so it stops offering
+    // one that would now be refused.
+    this.agentChatHostService.notifyFlowSwitched(faqKbId);
     // `route.params` is still subscribed from getUrlParams(), so setParams()
     // has already run for the new id by the time navigate() resolves.
     this.flowVisible = false;
@@ -216,13 +256,25 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       // switch, and makes that window impossible instead of merely short.
       await this.intentService.getAllIntents(this.dashboardService.id_faq_kb);
     } catch (error) {
+      // id_faq_kb has already moved to the new flow, while listOfIntents still
+      // holds the previous flow's blocks -- the exact pairing the awaited load
+      // above exists to make impossible. Telling the agent to "read it with
+      // get_flow" would hand it the new id with the old flow's intents, and a
+      // patch declaring the new id then passes the host's guard and writes the
+      // old flow's intent ids into the new flow. Emptying the list makes
+      // get_flow answer with an empty flow -- wrong only in that it is
+      // incomplete, and unusable for a patch either way -- instead of another
+      // flow's contents presented as this one's.
+      this.intentService.listOfIntents = [];
+      this.intentService.prevListOfIntent = [];
       // Both getBotById() and getAllIntents() reject with the bare value
       // `false`, not an Error. Passed through, the agent is handed a tool
       // failure with no message at all; this is the only text it ever sees.
       throw new Error(
         `Opened "${faqKbId}" but could not load it`
         + `${error instanceof Error ? ': ' + error.message : ''}. `
-        + `Read it with get_flow before patching anything.`);
+        + `The flow is not readable in this state -- do not patch anything; `
+        + `open it again with open_flow.`);
     } finally {
       // In `finally`, not because the studio would otherwise be stranded --
       // DashboardService sends a bot it cannot load to project/unauthorized
