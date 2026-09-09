@@ -1,3 +1,5 @@
+import { Family } from './agent-chat-family.service';
+
 /** What the agent may ask the canvas to do.
  *
  *  A small, explicit verb set rather than a JSON Patch: array indices are
@@ -55,4 +57,7 @@ export interface FlowOpsReport {
 export interface FlowSnapshot {
   id_faq_kb: string;
   intents: any[];
+  /** Added by the host, not by FlowOpsService: the family is an account
+   *  question, and the canvas knows nothing about it. */
+  family?: Family;
 }

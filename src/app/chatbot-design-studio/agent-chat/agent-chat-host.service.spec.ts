@@ -139,7 +139,23 @@ describe('AgentChatHostService', () => {
     await service.attach(document.createElement('iframe'));
     const result = await registered['get_flow']({});
     expect(flowOps.readFlow).toHaveBeenCalled();
-    expect(result).toEqual({ id_faq_kb: 'kb1', intents: [] });
+    expect(result).toEqual({
+      id_faq_kb: 'kb1', intents: [],
+      family: {
+        root_id: 'parent1', root_name: 'Parent', is_subagent: false,
+        subagents: [{ _id: 'sub1', name: 'Alfa' }]
+      }
+    });
+  });
+
+  // Without this the agent cannot tell a parent from a subagent, and would
+  // guess from names.
+  it('reports the family alongside the open flow', async () => {
+    await service.attach({} as any);
+    const snapshot = await registered['get_flow']({});
+    expect(snapshot.id_faq_kb).toBe('kb1');
+    expect(snapshot.family.root_id).toBe('parent1');
+    expect(snapshot.family.subagents).toEqual([{ _id: 'sub1', name: 'Alfa' }]);
   });
 
   it('answers get_canvas_selection with the selected intent id', async () => {

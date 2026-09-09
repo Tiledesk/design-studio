@@ -111,7 +111,10 @@ export class AgentChatHostService {
       })
     });
 
-    this.host.registerTool('get_flow', async () => this.flowOps.readFlow());
+    this.host.registerTool('get_flow', async () => ({
+      ...this.flowOps.readFlow(),
+      family: await this.family.read()
+    }));
 
     this.host.registerTool('get_canvas_selection', async () => {
       const selected = this.intentService.intentSelected;
