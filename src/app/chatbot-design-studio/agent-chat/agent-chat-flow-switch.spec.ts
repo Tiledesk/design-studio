@@ -1,6 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NavigationStart, Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { AgentChatHostService } from './agent-chat-host.service';
+import { AgentChatFamilyService } from './agent-chat-family.service';
+import { FlowOpsService } from './flow-ops.service';
+import { IntentService } from '../services/intent.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { AppConfigService } from 'src/app/services/app-config';
+import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { moduleImporter } from './agent-chat-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -146,6 +155,7 @@ function makeDashboard(parts: any): any {
     {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
     parts.controllerService ?? { isOpenAgentChatPanel$: new Subject() },
     parts.agentChatHostService ?? { setFlowNavigator: () => {} },
+    parts.intentService ?? { getAllIntents: () => Promise.resolve(true) },
     parts.changeDetectorRef ?? { detectChanges: () => {} }
   ];
   return new (CdsDashboardComponent as any)(...args);
@@ -168,6 +178,12 @@ describe('CdsDashboardComponent.openFlow', () => {
     };
     const component = makeDashboard({
       dashboardService,
+      intentService: {
+        getAllIntents: (id: string) => {
+          order.push('getAllIntents:' + id);
+          return Promise.resolve(true);
+        }
+      },
       router: {
         url: '/project/p1/chatbot/kb1/blocks',
         events: new Subject(),
@@ -197,6 +213,9 @@ describe('CdsDashboardComponent.openFlow', () => {
       'navigate:project/p1/chatbot/sub1/blocks',
       'detectChanges:flowVisible=false',
       'getBotById',
+      // Before the canvas comes back, and before this promise resolves: what
+      // get_flow reads must already be the new flow's.
+      'getAllIntents:sub1',
       'detectChanges:flowVisible=true'
     ]);
     expect(component.flowVisible).toBe(true);
@@ -214,15 +233,28 @@ describe('CdsDashboardComponent.openFlow', () => {
   // would be a blank studio with no canvas and no way back.
   it('brings the canvas back even when the new bot fails to load, and still reports the failure', async () => {
     const { component, dashboardService, order } = build();
-    dashboardService.getBotById = () => { order.push('getBotById'); return Promise.reject(new Error('boom')); };
-    await expectAsync(component.openFlow('sub1')).toBeRejectedWithError('boom');
+    // The bare `false` DashboardService.getBotById() really rejects with.
+    dashboardService.getBotById = () => { order.push('getBotById'); return Promise.reject(false); };
+    await expectAsync(component.openFlow('sub1'))
+      .toBeRejectedWithError(/^Opened "sub1" but could not load it\. Read it with get_flow/);
     expect(component.flowVisible).toBe(true);
     expect(order).toEqual([
       'navigate:project/p1/chatbot/sub1/blocks',
       'detectChanges:flowVisible=false',
       'getBotById',
+      // No intent load: the flow could not be read at all, so the previous
+      // flow's intents stay put -- and open_flow rejects rather than letting
+      // the agent patch against them.
       'detectChanges:flowVisible=true'
     ]);
+  });
+
+  // The detail matters when there is one: it is all the agent gets.
+  it('keeps the underlying message when the failure is a real Error', async () => {
+    const { component, dashboardService } = build();
+    dashboardService.getBotById = () => Promise.reject(new Error('403 forbidden'));
+    await expectAsync(component.openFlow('sub1'))
+      .toBeRejectedWithError(/Opened "sub1" but could not load it: 403 forbidden\./);
   });
 
   it('does nothing for the flow that is already open', async () => {
@@ -256,5 +288,183 @@ describe('CdsDashboardComponent.openFlow', () => {
     component.ngOnInit();
     component.ngOnDestroy();
     expect(dashboardService.openFlow).toBeNull();
+  });
+});
+
+
+/** The bug this describe exists for.
+ *
+ *  CdsCanvasComponent.ngOnInit calls initialize() fire-and-forget, and
+ *  initialize() only replaces IntentService.listOfIntents after an HTTP
+ *  round trip. Nothing clears that array when the canvas is destroyed. So
+ *  between open_flow resolving and that fetch landing, get_flow answers with
+ *  the NEW id and the PREVIOUS flow's intents -- and because the id is the
+ *  new one, apply_flow_patch's guard passes. The agent then patches the new
+ *  flow with intent ids that exist only in the old one: exactly the silent
+ *  cross-flow write the guard was built to stop, through the one door the
+ *  guard cannot see. It hides whenever the model's round trip is slower than
+ *  the fetch, which is most of the time.
+ *
+ *  The state below is real, not narrated: one mutable IntentService stand-in
+ *  shared by the dashboard and by the REAL FlowOpsService that get_flow reads
+ *  through, and a getAllIntents() that only swaps the array on a macrotask. */
+describe('open_flow resolves only once get_flow would see the new flow', () => {
+
+  const FLOWS: { [id: string]: any[] } = {
+    kb1: [{ intent_id: 'parent-start', intent_display_name: 'start' }],
+    sub1: [{ intent_id: 'refund-start', intent_display_name: 'refund start' }]
+  };
+
+  let intentService: any;
+  let dashboardService: any;
+  let host: AgentChatHostService;
+  let dashboard: any;
+  let registered: { [name: string]: Function };
+  let fetched: string[];
+  let originalImport: any;
+  let navigateResult: boolean;
+
+  beforeEach(() => {
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+    registered = {};
+    fetched = [];
+    navigateResult = true;
+    originalImport = moduleImporter.load;
+    moduleImporter.load = () => Promise.resolve({
+      PROTOCOL_VERSION: 1,
+      createAgentChatHost: () => ({
+        registerTool: (name: string, fn: Function) => { registered[name] = fn; },
+        setContext: () => {}, setToken: () => {}, destroy: () => {}
+      })
+    });
+
+    intentService = {
+      // What the destroyed canvas left behind: the parent's blocks. Nothing
+      // in CdsCanvasComponent.ngOnDestroy clears this.
+      listOfIntents: FLOWS['kb1'],
+      intentSelected: null,
+      getAllIntents: (id: string) => {
+        fetched.push(id);
+        return new Promise<boolean>(resolve => setTimeout(() => {
+          intentService.listOfIntents = FLOWS[id] || [];
+          resolve(true);
+        }, 0));
+      }
+    };
+
+    dashboardService = {
+      projectID: 'p1',
+      id_faq_kb: 'kb1',
+      selectedChatbot: { _id: 'kb1', name: 'Parent' },
+      selectedChatbot$: new BehaviorSubject<any>(null),
+      openFlow: null,
+      getBotById: () => {
+        dashboardService.selectedChatbot =
+          { _id: dashboardService.id_faq_kb, name: 'Alfa',
+            subtype: 'subagent', parent_id: 'kb1' };
+        return Promise.resolve(true);
+      }
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        AgentChatHostService,
+        // The real one: get_flow's answer must come through the real read
+        // path, or the staleness this test is about could not appear.
+        { provide: FlowOpsService,
+          useValue: new (FlowOpsService as any)(intentService, {}, dashboardService) },
+        { provide: IntentService, useValue: intentService },
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: new Subject<string>() } },
+        { provide: AppConfigService,
+          useValue: { getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } },
+        { provide: AgentChatFamilyService, useValue: {
+            rootId: () => 'kb1',
+            isSubagent: () => dashboardService.selectedChatbot?.subtype === 'subagent',
+            read: () => Promise.resolve({ root_id: 'kb1', root_name: 'Parent',
+              is_subagent: false, subagents: [{ _id: 'sub1', name: 'Alfa' }] }),
+            contains: (id: string) => Promise.resolve(['kb1', 'sub1'].includes(id)),
+            createSubagent: (name: string) => Promise.resolve({ _id: 'new1', name })
+          } }
+      ]
+    });
+    host = TestBed.inject(AgentChatHostService);
+
+    dashboard = makeDashboard({
+      dashboardService,
+      intentService,
+      agentChatHostService: host,
+      router: {
+        url: '/project/p1/chatbot/kb1/blocks',
+        events: new Subject(),
+        navigate: (commands: any[]) => {
+          dashboardService.id_faq_kb = navigateResult ? commands[3] : dashboardService.id_faq_kb;
+          return Promise.resolve(navigateResult);
+        }
+      },
+      changeDetectorRef: { detectChanges: () => {} }
+    });
+  });
+
+  afterEach(() => { moduleImporter.load = originalImport; });
+
+  async function wire(): Promise<void> {
+    await host.attach({} as any);
+    host.setFlowNavigator((id: string) => dashboard.openFlow(id));
+  }
+
+  it('leaves the previous flow\'s intents in place until something reloads them', async () => {
+    await wire();
+    // The premise, stated as a fact of the fixture rather than assumed.
+    expect((await registered['get_flow']({})).intents).toEqual(FLOWS['kb1']);
+  });
+
+  it('answers the very next get_flow with the new flow\'s intents, not the previous ones', async () => {
+    await wire();
+
+    await registered['open_flow']({ faq_kb_id: 'sub1' });
+
+    // No tick, no flush: this is the first thing the agent does after
+    // open_flow resolves, and awaiting get_flow only drains microtasks -- the
+    // canvas's own fetch is a macrotask and has not landed.
+    const snapshot = await registered['get_flow']({});
+    expect(snapshot.id_faq_kb).toBe('sub1');
+    expect(snapshot.intents).toEqual(FLOWS['sub1']);
+    // The id moved and the intents did not: that is what makes it dangerous.
+    // apply_flow_patch compares only the id, so its guard would pass while
+    // every intent_id in the batch belonged to the parent.
+    expect(snapshot.intents).not.toEqual(FLOWS['kb1']);
+  });
+
+  it('loads the intents of the flow it navigated to', async () => {
+    await wire();
+    await registered['open_flow']({ faq_kb_id: 'sub1' });
+    expect(fetched).toEqual(['sub1']);
+  });
+
+  // A route guard can cancel the navigation: navigate() then resolves false,
+  // the studio is still on the old flow, and rebuilding the canvas there and
+  // returning normally would tell the agent it moved when it did not.
+  it('refuses when the navigation is cancelled instead of reporting success', async () => {
+    await wire();
+    navigateResult = false;
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' }))
+      .toBeRejectedWithError(/could not open|refused/i);
+    expect(dashboardService.id_faq_kb).toBe('kb1');
+    expect(fetched).toEqual([]);
+  });
+
+  // DashboardService.getBotById() rejects with the bare value `false`, not an
+  // Error. Passed through untouched the agent would be handed an empty
+  // message; this is the only failure text it ever sees.
+  it('turns a bare-false load failure into a message the agent can read', async () => {
+    await wire();
+    dashboardService.getBotById = () => Promise.reject(false);
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' }))
+      .toBeRejectedWithError(/sub1[\s\S]*load/i);
+    // Still visible: the alternative is a studio with no canvas at all.
+    expect(dashboard.flowVisible).toBe(true);
   });
 });

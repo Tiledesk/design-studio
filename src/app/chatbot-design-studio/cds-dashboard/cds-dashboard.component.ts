@@ -36,6 +36,7 @@ import { StageService } from 'src/app/chatbot-design-studio/services/stage.servi
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
+import { IntentService } from '../services/intent.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -100,6 +101,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly webhookService: WebhookService,
     private readonly controllerService: ControllerService,
     private readonly agentChatHostService: AgentChatHostService,
+    private readonly intentService: IntentService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
     this.manageRouteChanges();
@@ -179,8 +181,18 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     if (!faqKbId || faqKbId === this.dashboardService.id_faq_kb) { return; }
     // The URL is part of the state: a manual refresh, or the back button,
     // must land where the user actually is.
-    await this.router.navigate(
+    const navigated = await this.router.navigate(
       ['project', this.dashboardService.projectID, 'chatbot', faqKbId, 'blocks']);
+    if (!navigated) {
+      // AuthGuard and RoleGuard sit on this route, and a redirect cancels a
+      // navigation too: navigate() then resolves false and the studio is
+      // still on the old flow. Rebuilding the canvas and returning normally
+      // would report a move that did not happen -- the one outcome worse
+      // than refusing, because the agent then patches what it did not open.
+      throw new Error(
+        `Could not open "${faqKbId}": the studio refused to navigate to it. `
+        + `The open flow is still "${this.dashboardService.id_faq_kb}".`);
+    }
     // `route.params` is still subscribed from getUrlParams(), so setParams()
     // has already run for the new id by the time navigate() resolves.
     this.flowVisible = false;
@@ -193,10 +205,30 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     try {
       await this.dashboardService.getBotById();
       this.selectedChatbot = this.dashboardService.selectedChatbot;
+      // The canvas loads the intents itself -- but fire-and-forget from its
+      // own ngOnInit, and only after an HTTP round trip. Until that lands,
+      // IntentService.listOfIntents (what get_flow reads) still holds the
+      // PREVIOUS flow's blocks, and nothing clears it on destroy. Resolving
+      // before then hands the agent the new id with the old intents, and
+      // apply_flow_patch compares only the id, so the guard would pass and
+      // the batch would be written to the new flow with the old flow's
+      // intent ids. Loading them here costs one duplicate GET on an explicit
+      // switch, and makes that window impossible instead of merely short.
+      await this.intentService.getAllIntents(this.dashboardService.id_faq_kb);
+    } catch (error) {
+      // Both getBotById() and getAllIntents() reject with the bare value
+      // `false`, not an Error. Passed through, the agent is handed a tool
+      // failure with no message at all; this is the only text it ever sees.
+      throw new Error(
+        `Opened "${faqKbId}" but could not load it`
+        + `${error instanceof Error ? ': ' + error.message : ''}. `
+        + `Read it with get_flow before patching anything.`);
     } finally {
-      // In `finally` because the alternative to a canvas rebuilt on a flow
-      // that failed to load is no canvas at all: a blank studio with no way
-      // back. The caller still gets the rejection.
+      // In `finally`, not because the studio would otherwise be stranded --
+      // DashboardService sends a bot it cannot load to project/unauthorized
+      // -- but because that navigation is asynchronous and a guard can
+      // cancel it, and a canvas left hidden here would then be a studio with
+      // no canvas and no error on screen.
       //
       // The canvas reads selectedChatbot and id_faq_kb in its own ngOnInit,
       // so it may only come back now that both name the new flow. Detected
