@@ -9,6 +9,7 @@ import { CdsNewSubagentDialogComponent } from './cds-new-subagent-dialog/cds-new
 import { TranslateService } from '@ngx-translate/core';
 import { DialogYesNoComponent } from 'src/app/chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { NotifyService } from 'src/app/services/notify.service';
+import { AgentChatFamilyService, sortSubagentsByName } from '../../../agent-chat/agent-chat-family.service';
 
 export interface SubagentItem {
   _id: string;
@@ -16,20 +17,11 @@ export interface SubagentItem {
 }
 
 /**
- * Ordina i subagent per nome, in ordine alfabetico.
- *
- * `localeCompare` con `sensitivity: 'base'` ignora maiuscole e accenti (cosi' "Ordini"
- * e "ordini" non finiscono in due blocchi separati) e `numeric: true` confronta i numeri
- * come numeri: "Agente 2" precede "Agente 10", che con l'ordinamento per stringa
- * finirebbe prima.
- *
- * Funzione pura ed esportata apposta per poterla testare senza montare il componente.
+ * Ordina i subagent per nome: ora vive in agent-chat-family.service.ts, che serve la
+ * stessa risposta anche alla chat AI. Re-esportata qui perche' e' cosi' che questo
+ * pannello (e i suoi test) la conoscono da sempre.
  */
-export function sortSubagentsByName(items: SubagentItem[]): SubagentItem[] {
-  return [...items].sort((a, b) =>
-    (a?.name || '').localeCompare(b?.name || '', undefined, { sensitivity: 'base', numeric: true })
-  );
-}
+export { sortSubagentsByName };
 
 /**
  * Estrae il messaggio da mostrare quando la DELETE di un subagent fallisce.
@@ -96,7 +88,8 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
     private translate: TranslateService,
-    private notify: NotifyService
+    private notify: NotifyService,
+    private family: AgentChatFamilyService
   ) { }
 
   ngOnDestroy(): void {
@@ -112,18 +105,16 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
 
   /** Determina parent e lista subagent in base al contesto (parent vs subagent). */
   private loadData(): void {
-    const current: any = this.dashboardService.selectedChatbot;
+    this.familyParentId = this.family.rootId();
     if (this.isSubagent) {
-      // Dentro un subagent: il riferimento per la lista è il parent (parent_id).
-      const parentId = current?.parent_id;
-      this.familyParentId = parentId;
-      this.loadSubagents(parentId);
-      this.loadParent(parentId);
+      this.loadSubagents(this.familyParentId);
+      this.loadParent(this.familyParentId);
     } else {
-      // Sul parent: il parent è il chatbot corrente.
-      this.familyParentId = this.currentId;
-      this.parentItem = { _id: this.currentId, name: current?.name || '' };
-      this.loadSubagents(this.currentId);
+      this.parentItem = {
+        _id: this.currentId,
+        name: (this.dashboardService.selectedChatbot as any)?.name || ''
+      };
+      this.loadSubagents(this.familyParentId);
     }
   }
 
