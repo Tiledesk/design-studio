@@ -12,7 +12,6 @@ $toogle-sidebar-width: 22px;
 
 :host {
   display: flex;
-  width: calc(100% - var(--sidebar-base-width));
   overflow: hidden;
 
   // The dashboard's row now owns the chat panel, so :host is one item in that

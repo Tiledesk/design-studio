@@ -1,7 +1,8 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
@@ -54,6 +55,15 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   private subscriptionAgentChatPanel: Subscription;
   IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
 
+  /** Gates the chat panel to the blocks section -- same condition and same
+   *  router-event mechanism as cds-header.component.ts's isBlockSectionActive,
+   *  which already gates the header's own toggle button. Driven by
+   *  NavigationStart (a route *section* change), not by anything a flow
+   *  switch touches, so it cannot flicker across a flow rebuild: it only
+   *  flips when the user leaves/re-enters the blocks route entirely. */
+  private subscriptionRouteChanges: Subscription;
+  isBlockSectionActive: boolean = true;
+
   
   project: Project;
   defaultDepartmentId: string;
@@ -67,6 +77,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private appConfigService: AppConfigService,
     private appStorageService: AppStorageService,
     private dashboardService: DashboardService,
@@ -81,9 +92,31 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private stageService: StageService,
     private readonly webhookService: WebhookService,
     private readonly controllerService: ControllerService
-  ) {}
+  ) {
+    this.manageRouteChanges();
+  }
 
+  /** Mirrors cds-header.component.ts's manageRouteChanges(): checks the
+   *  current route once at construction time (the initial load may already
+   *  be on a non-blocks section), then keeps isBlockSectionActive in sync on
+   *  every subsequent NavigationStart. Only the route's last segment matters
+   *  -- a flow switch does not navigate the Angular router, so it never
+   *  raises a NavigationStart and this value cannot flicker because of one. */
+  private manageRouteChanges() {
+    const urlWithoutParams = this.router.url.split('?')[0];
+    const child = urlWithoutParams.split('/').slice(-1)[0];
+    if (child !== 'blocks') {
+      this.isBlockSectionActive = false;
+    }
 
+    this.subscriptionRouteChanges = this.router.events
+      .pipe(filter(event => event instanceof NavigationStart))
+      .subscribe((event: NavigationStart) => {
+        const urlWithoutParams = event.url.split('?')[0];
+        const child = urlWithoutParams.split('/').slice(-1)[0];
+        this.isBlockSectionActive = child === 'blocks';
+      });
+  }
 
   ngOnInit() {
     // ---------------------------------------
@@ -101,6 +134,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.subscriptionAgentChatPanel) {
       this.subscriptionAgentChatPanel.unsubscribe();
+    }
+    if (this.subscriptionRouteChanges) {
+      this.subscriptionRouteChanges.unsubscribe();
     }
   }
 
