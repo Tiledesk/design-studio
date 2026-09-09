@@ -6,6 +6,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { FaqService } from 'src/app/services/faq.service';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { DashboardService } from 'src/app/services/dashboard.service';
+import { TYPE_INTENT_NAME } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
   selector: 'cds-action-replace-bot-v4',
@@ -28,7 +30,8 @@ export class CdsActionReplaceBotV4Component implements OnInit, OnChanges {
   
   constructor(
     private chatbotService: FaqKbService,
-    private faqService: FaqService
+    private faqService: FaqService,
+    private dashboardService: DashboardService
   ) { }
 
   ngOnInit(): void {
@@ -50,9 +53,33 @@ export class CdsActionReplaceBotV4Component implements OnInit, OnChanges {
     }
   }
 
+  /**
+   * Id del chatbot da cui leggere l'elenco dei subagent invocabili:
+   * - su un agent normale e' il chatbot corrente (i suoi subagent);
+   * - dentro un subagent e' il PARENT, perche' gli invocabili sono i FRATELLI
+   *   (un subagent non ha figli: "+ New subagent" e' disponibile solo dal parent).
+   */
+  private getParentFaqKbId(): string {
+    const current: any = this.dashboardService.selectedChatbot;
+    return current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+  }
+
+  /** Elenca i SUBAGENT invocabili, escluso l'agent corrente (niente auto-invocazione). */
   async getAllBots() {
     return new Promise((resolve, reject) => {
-      this.chatbotService.getFaqKbByProjectId().subscribe({ next: (chatbots) => {
+      const faqKbId = this.getParentFaqKbId();
+      if (!faqKbId) {
+        this.chatbots_name_list = [];
+        this.autocompleteOptions = [];
+        resolve(true);
+        return;
+      }
+      this.chatbotService.getSubagentsByFaqKbId(faqKbId).subscribe({ next: (res: any) => {
+        const list: any[] = Array.isArray(res) ? res : (res?.subagents || res?.data || []);
+        const currentId = this.dashboardService.id_faq_kb;
+        const chatbots = list.filter((a: any) => a?._id !== currentId);
         this.logger.log("[ACTION REPLACE BOT V4] chatbots: ", chatbots, this.autocompleteOptions);
         this.autocompleteOptions = [];
         this.chatbots_name_list = chatbots.map(a => {
@@ -75,7 +102,12 @@ export class CdsActionReplaceBotV4Component implements OnInit, OnChanges {
     })
   }
 
-  getAllFaqById(chatbotId: string){
+  /**
+   * @param autoSelectStart alla SELEZIONE di un subagent preseleziona il suo blocco di
+   * partenza ('start'). Non passato in apertura pannello, per non sovrascrivere ne'
+   * risalvare la scelta gia' fatta dall'utente.
+   */
+  getAllFaqById(chatbotId: string, autoSelectStart: boolean = false){
     this.logger.log("[ACTION REPLACE BOT V4] get AllFaqById: ",chatbotId);
     
     this.faqService.getAllFaqByFaqKbId(chatbotId).subscribe({ next: (faks)=> {
@@ -84,6 +116,14 @@ export class CdsActionReplaceBotV4Component implements OnInit, OnChanges {
         label: faq.intent_display_name,
         value: faq.intent_display_name
       }));
+      if (autoSelectStart && !this.action?.blockName) {
+        const startBlock = this.autocompleteOptionsBlockName.find(o => o.value === TYPE_INTENT_NAME.START);
+        if (startBlock) {
+          this.action.blockName = startBlock.value;
+          this.logger.log("[ACTION REPLACE BOT V4] start block preselezionato: ", startBlock.value);
+          this.updateAndSaveAction.emit();
+        }
+      }
       this.logger.log("[ACTION REPLACE BOT V4] get AllFaqById blocks: ", this.autocompleteOptionsBlockName);
     }, error: (error)=> {
       this.logger.error("[ACTION REPLACE BOT V4] error get AllFaqById: ", error);
@@ -97,7 +137,7 @@ export class CdsActionReplaceBotV4Component implements OnInit, OnChanges {
     this.action.botId = event.id;
     this.action.botSlug = event.slug;
     this.action.blockName = ''
-    this.getAllFaqById(event.id)
+    this.getAllFaqById(event.id, true)
     this.updateAndSaveAction.emit()
     this.logger.log("[ACTION REPLACE BOT V4] action edited: ", this.action)
   }
@@ -141,6 +181,10 @@ export class CdsActionReplaceBotV4Component implements OnInit, OnChanges {
       case 'botId':
         this.action.botId = null;
         this.action.botSlug = null;
+        // senza subagent selezionato il blocco non ha piu' significato: si svuota il valore
+        // e le opzioni, altrimenti resterebbe puntato a un blocco del subagent precedente
+        this.action.blockName = null;
+        this.autocompleteOptionsBlockName = [];
         break;
       case 'blockName':
         this.action.blockName = null

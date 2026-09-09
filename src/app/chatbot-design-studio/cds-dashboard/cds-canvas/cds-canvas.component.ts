@@ -123,7 +123,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   // ============================================================
   IS_OPEN_INTENTS_LIST: boolean = true;
   /** pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab) */
-  activeLeftPanel: 'blocks' | 'subagents' = 'blocks';
+  /**
+   * Pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab).
+   * Default 'subagents': e' la tab che si apre quando l'agente non ha ancora una preferenza
+   * salvata. Se l'utente ne ha scelta una, vince la sua (vedi resolveActiveLeftPanel).
+   */
+  activeLeftPanel: 'blocks' | 'subagents' = 'subagents';
   /** true se il chatbot aperto è esso stesso un subagent: nasconde tab/pannello Subagents e action Sub Agent */
   isSubagent: boolean = false;
   IS_OPEN_ADD_ACTIONS_MENU: boolean = false;
@@ -203,6 +208,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
+    this.resolveActiveLeftPanel();
     this.initialize();
   }
 
@@ -297,9 +303,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
 
     this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
     this.isSubagent = this.dashboardService.selectedChatbot.subtype === 'subagent';
-    if (this.isSubagent && this.activeLeftPanel === 'subagents') {
-      this.activeLeftPanel = 'blocks';
-    }
 
     const rawNotes = this.dashboardService.selectedChatbot.attributes?.notes || [];
     this.listOfNotes = rawNotes.map((n: any) => {
@@ -842,9 +845,35 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ', this.IS_OPEN_INTENTS_LIST);
   }
 
+  /**
+   * Id della "famiglia" a cui appartiene la tab del pannello sinistro: il parent quando siamo
+   * dentro un subagent, il chatbot corrente altrimenti. Cosi' la scelta Blocks/Subagents
+   * sopravvive alla navigazione parent <-> subagent, che cambia id_faq_kb.
+   */
+  private getLeftPanelFamilyId(): string {
+    const current: any = this.dashboardService.selectedChatbot;
+    return current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+  }
+
+  /**
+   * Decide la tab del pannello sinistro all'apertura dell'agente: vince la preferenza
+   * salvata per la famiglia, altrimenti si apre 'subagents'.
+   *
+   * Sta in ngOnInit e non in ngAfterViewInit: risolvendola dopo il primo render il
+   * pannello Blocks verrebbe montato e subito distrutto (i due pannelli sono in
+   * mutua esclusione via *ngIf), con lo sfarfallio che ne consegue.
+   */
+  private resolveActiveLeftPanel(): void {
+    const saved = this.stageService.getActiveLeftPanel(this.getLeftPanelFamilyId());
+    this.activeLeftPanel = saved ? saved : 'subagents';
+  }
+
   /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
   onSelectLeftPanel(panel: 'blocks' | 'subagents') {
     this.activeLeftPanel = panel;
+    this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), panel);
     if (!this.IS_OPEN_INTENTS_LIST) {
       this.onToogleSidebarIntentsList();
     }

@@ -140,14 +140,31 @@ export class CdsActionSubAgentComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Popola la select "Choose an Agent" con i SUBAGENT collegati al chatbot corrente
-   * (endpoint dedicato: /faq_kb/{id}/subagents).
+   * Id del chatbot da cui leggere l'elenco dei subagent invocabili:
+   * - su un agent normale e' il chatbot corrente (i suoi subagent);
+   * - dentro un subagent e' il PARENT, perche' i subagent invocabili sono i FRATELLI
+   *   (un subagent non ha figli: "+ New subagent" e' disponibile solo dal parent).
+   */
+  private getParentFaqKbId(): string {
+    const current: any = this.dashboardService.selectedChatbot;
+    return current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+  }
+
+  /**
+   * Popola la select "Choose an Agent" con i SUBAGENT invocabili
+   * (endpoint dedicato: /{id_project}/faq_kb/{id}/subagents), escluso l'agent corrente.
    */
   private async getAllBots(): Promise<void> {
     try {
-      const faqKbId = this.dashboardService.id_faq_kb;
+      const faqKbId = this.getParentFaqKbId();
+      if (!faqKbId) { this.chatbots_name_list = []; return; }
       const res: any = await firstValueFrom(this.chatbotService.getSubagentsByFaqKbId(faqKbId));
-      const subagents: any[] = Array.isArray(res) ? res : (res?.subagents || res?.data || []);
+      const list: any[] = Array.isArray(res) ? res : (res?.subagents || res?.data || []);
+      // un subagent non puo' richiamare se stesso
+      const currentId = this.dashboardService.id_faq_kb;
+      const subagents = list.filter((a: any) => a?._id !== currentId);
       this.chatbots_name_list = subagents.map((a: any) => {
         const name2 = a.slug ? `${a.name} (${a.slug})` : a.name;
         return { name: a.name, value: a.name, slug: a.slug, id: a._id, name2, icon: 'smart_toy' };

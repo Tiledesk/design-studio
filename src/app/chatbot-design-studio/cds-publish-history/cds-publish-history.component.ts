@@ -145,6 +145,9 @@ export class CdsPublishHistoryComponent implements OnInit {
   }
 
   manageUserAvatar(projectuser: any) {
+    // publishedBy puo' mancare (autore rimosso, o release precedenti all'introduzione
+    // del campo): senza questa guardia ogni scrittura sotto esplode su undefined
+    if (!projectuser) { return; }
     projectuser.loadingImage = true; // set loading flag before checking
     const userid = projectuser._id
     this.logger.log('[CDS-PUBLISH-HISTORY] manageUserAvatar ',userid )

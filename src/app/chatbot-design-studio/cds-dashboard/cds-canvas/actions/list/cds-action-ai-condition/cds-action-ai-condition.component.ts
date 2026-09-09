@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
@@ -126,9 +126,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.project_id = this.dashboardService.projectID;
-    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
-    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
-
+    // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name;
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
@@ -205,12 +203,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.action.llm = result?.llm ? result.llm : '';
     this.action.model = result?.model ? result.model : '';
     this.action.modelName = result?.modelName ? result.modelName : '';
-    // vLLM: persist the endpoint url on the action; clear it for any other provider.
-    if (result?.llm === 'vllm' && result?.vllmServer) {
-      this.action.vllmServer = result.vllmServer;
-    } else {
-      delete this.action.vllmServer;
-    }
+    applySelectedServerToAction(this.action, result);
     this.logger.log("[ACTION AI_PROMPT] action: ", this.action);
     if (result) {
       this.ai_setting['max_tokens'].max = result.max_output_tokens;
@@ -563,11 +556,8 @@ export class CdsActionAiConditionComponent implements OnInit {
       temperature: this.action.temperature,
     }
 
-    // vLLM: the preview API needs the target server to route the request.
-    // Without it the backend responds: "vllmServer attribute is undefined".
-    if (this.action.llm === 'vllm' && this.action.vllmServer) {
-      data.vllmServer = this.action.vllmServer;
-    }
+    // vLLM / Agent Platform: la preview API ha bisogno del server per instradare la richiesta.
+    appendSelectedServerToPayload(this.action, data);
 
     this.showAiError = false;
     this.searching = true;

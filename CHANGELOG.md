@@ -7,12 +7,62 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 
+- **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
+- **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
+- **changed**: the edit icon is shown only on the servers already added to the prompt
+- **changed**: native servers are marked with an outlined shield and show their description instead of the URL
+- **added**: in the action, when no MCP tool is attached yet the section shows a dashed "Select MCP tools" call to action, which turns into "Manage MCP tools" as soon as a server is attached
+- **added**: tooltips on every button of the MCP interface, both in the action and in the dialogs
+- **changed**: smaller and lighter "Use tools to complete the operation" label
+- **bug fix**: the "Manage MCP tools" button ignored its own size and was rendered bigger than intended
+- **bug fix**: missing italian translations in the MCP interface
+
+# 1.40.14-rc9
+- **fixed**: when attempting to delete a subagent that is still in use by another agent, the error message returned by the service is now displayed, instead of the operation appearing to have no visible outcome.
+
+# 1.40.14-rc8
+- **added**: new **Gemini Agent Platform** provider in the AI model selector of the Ask KB, AI Prompt and AI Condition actions. Its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
+- **bug fix**: when the same model was offered by more than one provider or server (for example Gemini 2.5 Flash, available both from Google and from Agent Platform), the selector showed the wrong entry
+- **changed**: opening an AI action is faster — the model list is now loaded in one go for every provider instead of one provider at a time
+- **changed**: in the model selector the providers are grouped under their full name (OpenAI, Anthropic, Gemini Agent Platform, …) instead of their lowercase internal name
+
+# 1.40.14-rc7
+- **changed**: The left panel tabs return to **both with icon + label** and take up **half the width** — replacing the square button with just the magnifying glass introduced just below. The 12px font and padding have been reduced so that "Subagents" can be read in full in the remaining ~103px per tab; Tab icons from 16 to 18px
+- **changed**: The **New subagent** button moves to the bottom of the list, immediately below the last subagent, and scrolls with it — it replaces the anchored footer introduced just below.
+- **changed**: In the Subagents panel, the **search box** "Search a subagent" and the **parent` badge** are hidden: the markup has been removed, while the styles and filter logic (`onSearch`/`applyFilter`) have been preserved, so restoring them is a matter of a few lines.
+- **changed**: The **parent` now uses the group icon, and each **subagent** uses a **little blue half-length person`. — A new `person` icon registered in `IconService`, derived from the paths already present in `actions/online_agents.svg` (head and shoulders, without the signal waves) and re-centered with a `translate` to avoid altering the original numbers.
+- **changed**: icons panel rows from 18 to 20px and darker gray (`#5a6672`): the group icon is crowded and was difficult to read at the previous size. The **subagent** icon is drawn smaller (12x12 svg), but its box remains 20px, so the names remain aligned between the parent row and the subagent rows.
+- **fixed**: In the Subagents panel, the icon size was applied only to the **active** row, so all the others rendered at the default `mat-icon` size (24px) instead of the expected one.
+- **fixed**: the **Blocks** tab icon is no longer white — `search.svg` brings `fill="#FFFFFF"` into the asset, and the on-element attribute overrides the inherited color; The icon now follows the tab's color (gray, blue when active) like all the others.
+- **changed**: The **New subagent** button is also visible **within a subagent**. The new agent is created under the **family parent**, not under the open subagent: it creates a sibling, not a nested subagent. The parent's ID is determined by the panel and stored in the modal's `data`, which previously derived it automatically with `id_faq_kb`; the button doesn't appear if that ID isn't resolvable.
+- **changed**: The **Blocks** tab is now a square button with only the **magnifying glass** icon, which indicates at a glance that a block is being searched for from there. The label has moved to the tooltip, and the **Subagents** tab now occupies the entire remaining width.
+- **changed**: Renamed three actions — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. The new name is aligned everywhere it appears: in the action menu, the block label in the canvas, and the title in the panel documentation.
+- **changed**: **Subagents** panel — the tab moves to first place (Blocks second) and is the default open tab **when the agent doesn't yet have a saved preference**: if the user chooses one, their preference wins (`getActiveLeftPanel` now distinguishes "no preference" from "Blocks," previously they were the same value). Both tabs have an icon; the tab resolution has moved to `ngOnInit`, so the Blocks panel is no longer mounted and immediately destroyed every time it's opened. The **New subagent** button is now a footer anchored to the bottom of the panel instead of above the list, so it remains accessible even when the list is long. Subagent icons have been replaced with SVGs registered in `IconService`, in line with the other DS icons. The subagent list is sorted **alphabetically** (cases and accents are ignored, numbers are compared as numbers: "Agent 2" before "Agent 10"); the parent always comes first.
+- **added**: First unit tests on the Subagents panel — alphabetical sorting (extracted in `sortSubagentsByName`, pure function: uppercase, accents, numbers, empty list) and `getActiveLeftPanel` (preference absent, saved, separate families). ⚠️ **Not executable**: The repo's Karma harness doesn't run any tests (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — pre-existing break, independent of these changes
+
+# 1.40.14-rc4
+- **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
+- **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
+- **changed**: the **Return** action is available again in the menu, with its original name "Return"
+- **added**: **Invoke Agent** preselects the start block when an agent is selected and clears the block when the agent is cleared, like **Invoke subagent**
+- **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
+- **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
 
 
-# 1.40.14-rc2
-- **changed**: in the MCP servers dialog the edit (pencil) icon is now shown ONLY on selected servers: an unselected server can just be toggled, so managing a server always goes through selecting it first
-- **added**: the tool selection of a server survives its deselection — it is remembered per ACTION + SERVER (`McpService` memory on `AppStorageService`, with 90-day expiry and a 200-action cap), so deselecting and re-selecting a server, closing the dialog or reloading the page no longer resets the chosen tools. Nothing is written to the MCP integration nor to the action payload; on recall the tools are filtered against the ones still exposed by the server
-- **added**: the Edit MCP Server dialog now lists the selected tool names under "Tools selected", with the same single-line + "more.." rendering used in the servers list; "more.." opens the existing Select tools modal
+# 1.40.14-rc3 
+- **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
+- **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
+- **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
+- **changed**: the Sub Agent action is hidden from the Special actions
+- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent), superseding the `subagent_visibility: never` rule on **Invoke subagent**
+- **bug fix**: inside a subagent the invocable agents are now the siblings (parent's subagents), excluding itself, instead of an empty list
+- **added**: selecting a subagent preselects its start block
+- **bug fix**: clearing the selected subagent left the previously selected block
+- **changed**: the "Return" action is renamed "Return to agent"
+- **added**: the Blocks/Subagents tab is kept across reloads and parent/subagent navigation
+- **added**: delete a subagent from the Subagents panel (hover menu + confirmation modal)
+- **changed**: after creating a subagent the Design Studio reloads on the new subagent; after deleting one it reloads on the parent
 
 # 1.40.14
 - **added**: connector plugin pattern — an installed connector microservice's catalog (`GET /api/manifest`) now drives the flow-builder action palette. A connector action is authored as a normal block but **persists as an ordinary `webrequestv2` action plus a `_tdConnectorRef` marker**, so the chatbot runtime executes it with zero core changes; adding a new connector needs no further design-studio work — it only has to be installed (an integration record with a `baseUrl`) and serve a valid manifest

@@ -163,6 +163,22 @@ export class FaqKbService {
   }
 
   /**
+   * DELETE — elimina un faq_kb (es. un subagent).
+   * API: DELETE {SERVER_BASE_PATH}{project_id}/faq_kb/{id}
+   */
+  public deleteFaqKb(id: string): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const url = this.FAQKB_URL + id;
+    this.logger.log('[FAQ-KB.SERV] - DELETE FAQ-KB - URL', url);
+    return this._httpClient.delete(url, httpOptions);
+  }
+
+  /**
    * UPDATE (PUT)
    * @param id
    * @param fullName
