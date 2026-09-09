@@ -139,10 +139,11 @@ describe('AgentChatHostService', () => {
     expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
   });
 
-  it('registers exactly the four client tools', async () => {
+  it('registers exactly the five client tools', async () => {
     await service.attach(document.createElement('iframe'));
     expect(Object.keys(registered).sort())
-      .toEqual(['apply_flow_patch', 'create_subagent', 'get_canvas_selection', 'get_flow']);
+      .toEqual(['apply_flow_patch', 'create_subagent', 'get_canvas_selection', 'get_flow',
+                'open_flow']);
   });
 
   it('answers get_flow from the canvas', async () => {
@@ -212,7 +213,7 @@ describe('AgentChatHostService', () => {
     const iframe = document.createElement('iframe');
     await service.attach(iframe);
     expect(iframe.getAttribute('src')).toBeNull();
-    expect(Object.keys(registered).length).toBe(4);
+    expect(Object.keys(registered).length).toBe(5);
   });
 
   it('emits the flow ops report on applied$ after apply_flow_patch', async () => {
@@ -353,5 +354,37 @@ describe('AgentChatHostService', () => {
     await service.attach({} as any);
     await expectAsync(registered['create_subagent']({ name: '   ' }))
       .toBeRejectedWithError(/name/i);
+  });
+
+  // The move itself belongs to the studio -- it owns the router and the
+  // canvas's lifetime -- so the host only holds the callback. The tool must
+  // not resolve before that callback does: the agent's very next act is a
+  // get_flow, and an early resolve would answer it with the old flow.
+  it('opens a flow of this family, after the canvas has rebuilt', async () => {
+    await service.attach({} as any);
+    const order: string[] = [];
+    service.setFlowNavigator(async (id: string) => {
+      order.push(`navigated:${id}`);
+      dashboardService.id_faq_kb = id;
+      dashboardService.selectedChatbot =
+        { _id: id, name: 'Alfa', subtype: 'subagent', parent_id: 'parent1' };
+    });
+    const opened = await registered['open_flow']({ faq_kb_id: 'sub1' });
+    expect(order).toEqual(['navigated:sub1']);
+    expect(opened).toEqual({ faq_kb_id: 'sub1', name: 'Alfa', is_subagent: true });
+  });
+
+  // The agent is a way to build a family, not a way to walk the project.
+  it('refuses to open a flow outside the family', async () => {
+    await service.attach({} as any);
+    service.setFlowNavigator(async () => { fail('must not navigate'); });
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'stranger' }))
+      .toBeRejectedWithError(/family/i);
+  });
+
+  it('refuses to open a flow when nothing can navigate', async () => {
+    await service.attach({} as any);
+    await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' }))
+      .toBeRejectedWithError(/cannot open/i);
   });
 });

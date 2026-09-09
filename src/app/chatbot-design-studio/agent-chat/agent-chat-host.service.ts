@@ -46,6 +46,11 @@ export class AgentChatHostService {
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
+  /** How the host moves the canvas. Registered by the dashboard, which owns
+   *  the router and the canvas's lifetime; the host knows only that the
+   *  promise resolves when the new flow is open and loaded. */
+  private flowNavigator: ((faqKbId: string) => Promise<void>) | null = null;
+
   constructor(
     private appConfigService: AppConfigService,
     private dashboardService: DashboardService,
@@ -164,6 +169,28 @@ export class AgentChatHostService {
       return report;
     });
 
+    this.host.registerTool('open_flow', async (args) => {
+      const id = String(args?.['faq_kb_id'] ?? '');
+      // The agent is a way to build one family, not a way to walk the
+      // project: anything outside it is refused before the studio moves.
+      if (!await this.family.contains(id)) {
+        throw new Error(
+          `"${id}" is not in this family. open_flow moves between this agent and `
+          + `its subagents only; use get_flow to see them.`);
+      }
+      if (!this.flowNavigator) {
+        throw new Error('Cannot open another flow: the studio registered no navigator.');
+      }
+      // Awaited: the navigator resolves only once the canvas has been rebuilt
+      // on the new flow, so the agent's next get_flow cannot read the old one.
+      await this.flowNavigator(id);
+      return {
+        faq_kb_id: this.dashboardService.id_faq_kb,
+        name: (this.dashboardService.selectedChatbot as any)?.name ?? '',
+        is_subagent: this.family.isSubagent()
+      };
+    });
+
     this.host.registerTool('create_subagent', async (args) => {
       const name = String(args?.['name'] ?? '').trim();
       // Thrown, not returned as a refusal report: the adapter turns a throw
@@ -173,6 +200,13 @@ export class AgentChatHostService {
       const created = await this.family.createSubagent(name);
       return { faq_kb_id: created._id, name: created.name };
     });
+  }
+
+  /** Registered by CdsDashboardComponent, which owns the router and the
+   *  canvas. Kept as a callback rather than an injected Router so the host
+   *  never learns how a flow switch is performed -- only when it is done. */
+  public setFlowNavigator(fn: (faqKbId: string) => Promise<void>): void {
+    this.flowNavigator = fn;
   }
 
   /** Switch the chat to another family's session without reloading the frame.

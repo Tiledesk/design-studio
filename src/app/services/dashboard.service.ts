@@ -44,6 +44,15 @@ export class DashboardService {
   departments: Department[]
   defaultDepartment: Department;
 
+  /** Set by CdsDashboardComponent; how anything moves the studio to another
+   *  flow of the same family without a page reload.
+   *
+   *  It lives here, and not on the chat host, so a side panel does not have
+   *  to ask the AI chat to navigate for it: this service is the one thing
+   *  everything that moves the studio already depends on. Null while no
+   *  dashboard is mounted -- callers fall back to their old navigation. */
+  public openFlow: ((faqKbId: string) => Promise<void>) | null = null;
+
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(

@@ -1,5 +1,5 @@
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -35,6 +35,7 @@ import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
+import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -57,12 +58,18 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
 
   /** Gates the chat panel to the blocks section -- same condition and same
    *  router-event mechanism as cds-header.component.ts's isBlockSectionActive,
-   *  which already gates the header's own toggle button. Driven by
-   *  NavigationStart (a route *section* change), not by anything a flow
-   *  switch touches, so it cannot flicker across a flow rebuild: it only
-   *  flips when the user leaves/re-enters the blocks route entirely. */
+   *  which already gates the header's own toggle button. It reads only the
+   *  URL's last segment, which a flow switch leaves as 'blocks', so it cannot
+   *  flicker across a flow rebuild: it only flips when the user leaves or
+   *  re-enters the blocks route entirely. */
   private subscriptionRouteChanges: Subscription;
   isBlockSectionActive: boolean = true;
+
+  /** Gates the router-outlet -- and nothing else -- so a flow switch can
+   *  destroy and rebuild whatever the outlet holds. The chat panel is its
+   *  sibling on purpose: inside this gate every switch would take the iframe,
+   *  and the conversation in it, with the canvas. */
+  flowVisible: boolean = true;
 
   
   project: Project;
@@ -91,7 +98,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private whatsappService: WhatsappService,
     private stageService: StageService,
     private readonly webhookService: WebhookService,
-    private readonly controllerService: ControllerService
+    private readonly controllerService: ControllerService,
+    private readonly agentChatHostService: AgentChatHostService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {
     this.manageRouteChanges();
   }
@@ -99,9 +108,13 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   /** Mirrors cds-header.component.ts's manageRouteChanges(): checks the
    *  current route once at construction time (the initial load may already
    *  be on a non-blocks section), then keeps isBlockSectionActive in sync on
-   *  every subsequent NavigationStart. Only the route's last segment matters
-   *  -- a flow switch does not navigate the Angular router, so it never
-   *  raises a NavigationStart and this value cannot flicker because of one. */
+   *  every subsequent NavigationStart.
+   *
+   *  A flow switch DOES raise a NavigationStart -- openFlow() below navigates
+   *  the router. It cannot flicker this value anyway, because only the URL's
+   *  last segment is read and `:faqkbid` sits on the parent route: the last
+   *  segment is 'blocks' before and after the switch, so this never
+   *  observably passes through false and the chat panel is never destroyed. */
   private manageRouteChanges() {
     const urlWithoutParams = this.router.url.split('?')[0];
     const child = urlWithoutParams.split('/').slice(-1)[0];
@@ -124,6 +137,13 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // ---------------------------------------
     this.showChangelog = this.checkForChangelogNotify();
     this.executeAsyncFunctionsInSequence();
+    // Whoever wants to move the studio to another flow of the family -- the
+    // agent through open_flow, the Subagents panel through a click -- goes
+    // through the same method. The panel reads it off DashboardService rather
+    // than off the chat host: a side panel that navigates by asking the chat
+    // to navigate would stop working the day the chat is disabled.
+    this.agentChatHostService.setFlowNavigator((faqKbId) => this.openFlow(faqKbId));
+    this.dashboardService.openFlow = (faqKbId) => this.openFlow(faqKbId);
     this.hideShowWidget('hide');
 
     /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
@@ -132,11 +152,58 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // Published on an app-scoped service by an instance that is going away:
+    // left behind, it would navigate through a destroyed component's router
+    // and change detector.
+    this.dashboardService.openFlow = null;
     if (this.subscriptionAgentChatPanel) {
       this.subscriptionAgentChatPanel.unsubscribe();
     }
     if (this.subscriptionRouteChanges) {
       this.subscriptionRouteChanges.unsubscribe();
+    }
+  }
+
+  /** Open another flow of this family without reloading the page.
+   *
+   *  The canvas is destroyed and rebuilt rather than re-initialised in place.
+   *  It owns stage, connectors, undo stack, selection and drag listeners, and
+   *  its own initialize() already builds every one of them from an id_faq_kb;
+   *  a reset-by-hand path would have to remember each (stage.service.ts alone
+   *  reads the flow id in thirty places), and a forgotten one does not raise
+   *  -- it draws the new flow with the old flow's connectors.
+   *
+   *  Resolves only once the new canvas exists, because the agent's next act
+   *  after open_flow is a get_flow. */
+  public async openFlow(faqKbId: string): Promise<void> {
+    if (!faqKbId || faqKbId === this.dashboardService.id_faq_kb) { return; }
+    // The URL is part of the state: a manual refresh, or the back button,
+    // must land where the user actually is.
+    await this.router.navigate(
+      ['project', this.dashboardService.projectID, 'chatbot', faqKbId, 'blocks']);
+    // `route.params` is still subscribed from getUrlParams(), so setParams()
+    // has already run for the new id by the time navigate() resolves.
+    this.flowVisible = false;
+    // Not cosmetic, and the reason this method is not four plain statements:
+    // false and true set in the same turn collapse into one change-detection
+    // pass, the *ngIf never sees false, and the canvas is reused with the old
+    // flow's stage still on it -- which looks correct until the second switch.
+    // detectChanges() forces the destruction to happen here, before the load.
+    this.changeDetectorRef.detectChanges();
+    try {
+      await this.dashboardService.getBotById();
+      this.selectedChatbot = this.dashboardService.selectedChatbot;
+    } finally {
+      // In `finally` because the alternative to a canvas rebuilt on a flow
+      // that failed to load is no canvas at all: a blank studio with no way
+      // back. The caller still gets the rejection.
+      //
+      // The canvas reads selectedChatbot and id_faq_kb in its own ngOnInit,
+      // so it may only come back now that both name the new flow. Detected
+      // here too, so this promise resolves with the canvas already rebuilt --
+      // the agent's next act after open_flow is a get_flow.
+      this.flowVisible = true;
+      this.changeDetectorRef.detectChanges();
     }
   }
 

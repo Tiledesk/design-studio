@@ -36,7 +36,15 @@
             [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT">
         </cds-panel-agent-chat>
 
-        <router-outlet></router-outlet>
+        <!-- The outlet ALONE. cds-panel-agent-chat above is deliberately its
+             sibling: openFlow() drops flowVisible to destroy whatever the
+             outlet holds and rebuild it on the new flow, and anything inside
+             this container is destroyed with it -- which for the chat would
+             mean losing the iframe, and the conversation in it, on every
+             flow switch, silently. -->
+        <ng-container *ngIf="flowVisible">
+            <router-outlet></router-outlet>
+        </ng-container>
 
     </div>
 

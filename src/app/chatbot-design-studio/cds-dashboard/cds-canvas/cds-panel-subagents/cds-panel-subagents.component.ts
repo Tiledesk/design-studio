@@ -168,22 +168,59 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     return base + '#/project/' + this.dashboardService.projectID + '/chatbot/' + id + '/blocks';
   }
 
-  /** Apre il chatbot/subagent nella stessa tab (ricarica completa). No-op se è quello già aperto. */
+  /** Apre il chatbot/subagent nella stessa tab. No-op se è quello già aperto. */
   openAgent(id: string): void {
     if (!id || id === this.currentId) { return; }
-    // Cambia solo il fragment (#): impostare href da solo non ricarica → forziamo il reload completo
-    // così la Design Studio si re-inizializza sul nuovo agent.
+    this.goToFlow(id);
+  }
+
+  /**
+   * Sposta la Design Studio su un altro flusso della famiglia.
+   *
+   * Usa il navigatore pubblicato da CdsDashboardComponent su DashboardService:
+   * la canvas viene distrutta e ricostruita senza ricaricare la pagina, così
+   * l'iframe della chat AI -- e la conversazione dentro -- sopravvive allo
+   * spostamento. Un click nel pannello e un open_flow dell'agent diventano
+   * quindi lo stesso atto.
+   *
+   * Il pannello non passa da AgentChatHostService di proposito: chiedere alla
+   * chat di navigare avrebbe la dipendenza al contrario, e il pannello
+   * smetterebbe di funzionare il giorno in cui la chat viene disabilitata.
+   *
+   * Fallback al vecchio reload quando nessuna dashboard ha pubblicato il
+   * navigatore (nessuno monta il pannello fuori dalla dashboard oggi, ma un
+   * pannello che non naviga sarebbe un guasto silenzioso).
+   */
+  private goToFlow(id: string): void {
+    if (this.dashboardService.openFlow) {
+      // La canvas viene comunque ripristinata dal navigatore anche se il caricamento
+      // fallisce: qui resta solo da non lasciare una promise rejected senza handler.
+      this.dashboardService.openFlow(id).catch((error) => {
+        this.logger.error('[CDS-PANEL-SUBAGENTS] flow switch failed:', error);
+      });
+      return;
+    }
+    // Cambia solo il fragment (#): impostare href da solo non ricarica → forziamo il reload
+    // completo così la Design Studio si re-inizializza sul nuovo agent.
     window.location.href = this.getSubagentUrl(id);
     window.location.reload();
   }
 
   /**
-   * Riporta la Design Studio sul parent ricaricandola da zero.
-   * A differenza di openAgent() non ha la guardia "stesso id": se siamo gia' sul parent
-   * l'href non cambia, ma il reload deve avvenire comunque per rileggere il flusso.
+   * Riporta la Design Studio sul parent dopo una cancellazione.
+   *
+   * A differenza di openAgent() non basta la guardia "stesso id": se siamo gia' sul
+   * parent il flusso aperto va comunque riletto, perche' puo' contenere action che
+   * puntavano al subagent appena eliminato. Da un fratello ci si sposta in place
+   * (la chat sopravvive); stando gia' sul parent l'unico modo di ricostruire la
+   * canvas sullo STESSO id resta il reload completo di sempre.
    */
   private goToParentAndReload(): void {
     const parentId = this.parentItem?._id;
+    if (parentId && parentId !== this.currentId && this.dashboardService.openFlow) {
+      this.goToFlow(parentId);
+      return;
+    }
     if (parentId) {
       window.location.href = this.getSubagentUrl(parentId);
     }
@@ -199,8 +236,9 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
 
   /**
    * Apre la modale di creazione (bloccante); a creazione riuscita la Design Studio si
-   * ricarica direttamente SUL subagent appena creato, pronto per essere modificato.
-   * Non serve aggiornare la lista in memoria: la pagina viene ricaricata da zero.
+   * sposta direttamente SUL subagent appena creato, pronto per essere modificato.
+   * Non serve aggiornare la lista in memoria: il pannello vive dentro la canvas, che
+   * lo spostamento distrugge e ricostruisce sul nuovo flusso.
    */
   onNewSubagent(): void {
     const ref = this.dialog.open(CdsNewSubagentDialogComponent, {
