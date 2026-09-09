@@ -6,6 +6,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
+import { AgentChatFamilyService } from './agent-chat-family.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 describe('AgentChatHostService', () => {
@@ -59,7 +60,19 @@ describe('AgentChatHostService', () => {
         { provide: DashboardService, useValue: dashboardService },
         { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: tokenChanged } },
         { provide: AppConfigService, useValue: {
-            getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } }
+            getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } },
+        { provide: AgentChatFamilyService, useValue: {
+            rootId: () => (dashboardService.selectedChatbot?.subtype === 'subagent'
+              ? dashboardService.selectedChatbot.parent_id
+              : dashboardService.id_faq_kb),
+            isSubagent: () => dashboardService.selectedChatbot?.subtype === 'subagent',
+            read: () => Promise.resolve({
+              root_id: 'parent1', root_name: 'Parent',
+              is_subagent: dashboardService.selectedChatbot?.subtype === 'subagent',
+              subagents: [{ _id: 'sub1', name: 'Alfa' }] }),
+            contains: (id: string) => Promise.resolve(['parent1', 'sub1'].includes(id)),
+            createSubagent: (name: string) => Promise.resolve({ _id: 'new1', name })
+          } }
       ]
     });
     service = TestBed.inject(AgentChatHostService);
@@ -235,9 +248,26 @@ describe('AgentChatHostService', () => {
         { provide: IntentService, useValue: {} },
         { provide: DashboardService, useValue: { selectedChatbot$: new BehaviorSubject(null) } },
         { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: new Subject<string>() } },
-        { provide: AppConfigService, useValue: { getConfig: () => ({}) } }
+        { provide: AppConfigService, useValue: { getConfig: () => ({}) } },
+        { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } }
       ]
     });
     expect(TestBed.inject(AgentChatHostService).isConfigured()).toBe(false);
+  });
+
+  // One flow is one conversation, server-side: the runtime upserts a session
+  // by (project_id, flow_id). Sending the open flow would start a new
+  // conversation the moment the canvas moves into a subagent -- exactly when
+  // the agent most needs to remember what it was building.
+  it('keys the session on the family root, not on the open subagent', async () => {
+    dashboardService.id_faq_kb = 'sub1';
+    dashboardService.selectedChatbot =
+      { _id: 'sub1', name: 'Alfa', subtype: 'subagent', parent_id: 'parent1' };
+    await service.attach({} as any);
+    expect(created.getConfig().flowId).toBe('parent1');
+
+    service.setContext();
+    expect(createdHosts[createdHosts.length - 1].setContext)
+      .toHaveBeenCalledWith({ projectId: 'p1', flowId: 'parent1' });
   });
 });

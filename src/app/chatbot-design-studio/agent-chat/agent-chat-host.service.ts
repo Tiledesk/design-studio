@@ -9,6 +9,7 @@ import { FlowOp, FlowOpsReport } from './flow-ops.model';
 import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
+import { AgentChatFamilyService } from './agent-chat-family.service';
 
 /** `tiledesk_token` in localStorage holds the whole `Authorization` header
  *  value, scheme and all -- see webhook-service.service.ts, which sends it
@@ -46,7 +47,8 @@ export class AgentChatHostService {
     private dashboardService: DashboardService,
     private intentService: IntentService,
     private tiledeskAuthService: TiledeskAuthService,
-    private flowOps: FlowOpsService
+    private flowOps: FlowOpsService,
+    private family: AgentChatFamilyService
   ) {
     this.config = readAgentChatConfig(this.appConfigService.getConfig());
     // The chat is handed the token once, at `hello`, and then talks to the
@@ -105,7 +107,7 @@ export class AgentChatHostService {
         baseUrl: this.config.chatUrl,
         token: this.storedToken(),
         projectId: this.dashboardService.projectID,
-        flowId: this.dashboardService.id_faq_kb
+        flowId: this.family.rootId()
       })
     });
 
@@ -123,11 +125,15 @@ export class AgentChatHostService {
     });
   }
 
-  /** Switch the chat to another flow's session without reloading the frame. */
+  /** Switch the chat to another family's session without reloading the frame.
+   *
+   *  The key is the family root: moving between a parent and its subagents is
+   *  the same conversation, and only a move to another family starts a new
+   *  one. */
   public setContext(): void {
     this.host?.setContext({
       projectId: this.dashboardService.projectID,
-      flowId: this.dashboardService.id_faq_kb
+      flowId: this.family.rootId()
     });
   }
 
