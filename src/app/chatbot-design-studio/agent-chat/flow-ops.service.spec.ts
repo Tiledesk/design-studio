@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
@@ -3470,14 +3470,20 @@ describe('FlowOpsService — the call to a subagent', () => {
       deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
     };
+    // Spies, not plain functions: a batch that mentions no callsubagent must
+    // fetch nothing from either, and a plain stub wouldn't let a test notice
+    // a stray fetch reintroduced by a later refactor. `.and.returnValue(...)`
+    // below gives each its normal, successful behaviour; individual tests
+    // override that to exercise the fetch-failure paths.
     familyService = {
-      read: () => Promise.resolve({
+      read: jasmine.createSpy('read').and.returnValue(Promise.resolve({
         root_id: 'parent1', root_name: 'Parent', is_subagent: false,
         subagents: [{ _id: 'sub1', name: 'Alfa' }]
-      })
+      }))
     };
     faqService = {
-      getAllFaqByFaqKbId: () => of([{ intent_display_name: 'start' }])
+      getAllFaqByFaqKbId: jasmine.createSpy('getAllFaqByFaqKbId')
+        .and.returnValue(of([{ intent_display_name: 'start' }]))
     };
 
     TestBed.resetTestingModule();
@@ -3544,5 +3550,41 @@ describe('FlowOpsService — the call to a subagent', () => {
         fields: { blockName: 'nowhere' } } as any]);
     expect(report.rejected_before_applying).toBe(true);
     expect(report.results[0].error).toContain('nowhere');
+  });
+
+  // Neither this.family.read() nor faqService.getAllFaqByFaqKbId() existed
+  // on this path before this feature -- they are network calls, and either
+  // can fail: a transient error, or a subagent deleted between the family
+  // listing and the per-subagent fetch. "A refusal is returned, never
+  // thrown" is the rule this whole service is built on; a rejected fetch
+  // must not be the one path that breaks it.
+  it('refuses the batch, without throwing, when the family cannot be read', async () => {
+    familyService.read.and.returnValue(Promise.reject(new Error('network down')));
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'callsubagent',
+        fields: { botId: 'sub1', blockName: 'start' } } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('retry');
+  });
+
+  it('refuses the batch, without throwing, when a subagent\'s blocks cannot be read', async () => {
+    faqService.getAllFaqByFaqKbId.and.returnValue(throwError(() => new Error('network down')));
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'callsubagent',
+        fields: { botId: 'sub1', blockName: 'start' } } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('sub1');
+    expect(report.results[0].error).toContain('retry');
+  });
+
+  // The stated constraint this whole feature rests on: an ordinary batch --
+  // one that never mentions callsubagent -- must not touch the network at
+  // all. Asserted directly against the spies above, not just inferred from
+  // reading subagentBlockNames' early return.
+  it('fetches nothing from the family or from FaqService for a batch that mentions no callsubagent', async () => {
+    const report = await service.apply([{ op: 'move', intent_id: 'i1', position: { x: 10, y: 20 } }]);
+    expect(report.ok).toBe(true);
+    expect(familyService.read).not.toHaveBeenCalled();
+    expect(faqService.getAllFaqByFaqKbId).not.toHaveBeenCalled();
   });
 });

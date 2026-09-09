@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { AgentChatFamilyService } from './agent-chat-family.service';
+import { AgentChatFamilyService, Family } from './agent-chat-family.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { Command, Wait, Message } from 'src/app/models/action-model';
@@ -15,6 +15,17 @@ const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
   'add_action', 'update_action', 'delete_action', 'connect'
 ];
+
+/** What `subagentBlockNames()` hands back to `apply()`: the block names it
+ *  managed to gather, plus -- when a fetch it needed failed -- the refusal
+ *  text to hand the agent instead of applying anything. `blocks` is still
+ *  populated with whatever was gathered before the failure, but `apply()`
+ *  never reads it when `error` is set: the whole point is that nothing in
+ *  the batch gets applied on a fetch failure, not a partial view. */
+interface SubagentBlockNamesResult {
+  blocks: Map<string, Set<string>>;
+  error?: string;
+}
 
 /** The characters a block name may contain, copied from the studio's own
  *  rename validator in `panel-intent-header.component.ts`. Anything the UI
@@ -128,7 +139,17 @@ export class FlowOpsService {
       };
     }
 
-    this.subagentBlocks = await this.subagentBlockNames(ops);
+    const subagentFetch = await this.subagentBlockNames(ops);
+    if (subagentFetch.error) {
+      // Same shape as any other batch-level refusal: nothing was applied, so
+      // nothing from this batch is (or was) on the undo stack.
+      this.lastBatchUndoDepth = 0;
+      return {
+        ok: false, rejected_before_applying: true,
+        results: [{ op: '(none)', ok: false, error: subagentFetch.error }]
+      };
+    }
+    this.subagentBlocks = subagentFetch.blocks;
     const validation = ops.map(op => this.validate(op));
     if (validation.some(r => !r.ok)) {
       // Nothing was applied, so nothing from this batch is on the undo stack.
@@ -215,8 +236,20 @@ export class FlowOpsService {
    *  check -- the action's own current `botId`, found via `targetActionOf`.
    *  A patch that touches neither `botId` nor `blockName` on an existing
    *  `callsubagent` fetches nothing, the same as any op that isn't a
-   *  `callsubagent` at all. */
-  private async subagentBlockNames(ops: FlowOp[]): Promise<Map<string, Set<string>>> {
+   *  `callsubagent` at all.
+   *
+   *  Both fetches below -- `this.family.read()` and
+   *  `this.faqService.getAllFaqByFaqKbId()` -- are network calls that did not
+   *  exist on this path before this feature, and either can fail: a
+   *  transient error, or a subagent deleted between the family listing and
+   *  the per-subagent fetch. `apply()` cannot let that reject straight out
+   *  of it -- "a refusal is returned, never thrown" is the rule this whole
+   *  service is built on, and a caller awaiting `apply()` for a refusal has
+   *  no reason to also wrap it in try/catch. So a failure here is caught and
+   *  turned into a `SubagentBlockNamesResult.error`, which `apply()` turns
+   *  into an ordinary `rejected_before_applying` batch -- nothing is applied,
+   *  same as any other batch-level refusal. */
+  private async subagentBlockNames(ops: FlowOp[]): Promise<SubagentBlockNamesResult> {
     const wanted = new Set<string>();
     for (const op of ops as any[]) {
       if (op?.op === 'add_action') {
@@ -228,8 +261,14 @@ export class FlowOpsService {
       const action = this.targetActionOf(op);
       if (!action || action._tdActionType !== TYPE_ACTION.REPLACE_BOTV4) { continue; }
       const fields = op?.fields;
-      if (fields && 'botId' in fields && fields.botId) {
-        wanted.add(String(fields.botId));
+      // Same question `validateSubagentUpdate` asks of the same `fields`:
+      // whether the patch supplies `botId` at all, not whether the value it
+      // supplies happens to be truthy. Gating on truthiness here while
+      // validation gates on presence would fetch the *existing* botId's
+      // blocks for a patch that (invalidly) sets `botId: ''` -- blocks that
+      // validation, asking the right question, would never end up using.
+      if (fields && 'botId' in fields) {
+        if (fields.botId) { wanted.add(String(fields.botId)); }
       } else if (fields && fields.blockName && action.botId) {
         // The patch leaves botId alone but wants a blockName checked: that
         // has to be checked against the subagent the call already points at.
@@ -237,15 +276,32 @@ export class FlowOpsService {
       }
     }
     const found = new Map<string, Set<string>>();
-    if (wanted.size === 0) { return found; }
-    const family = await this.family.read();
+    if (wanted.size === 0) { return { blocks: found }; }
+    let family: Family;
+    try {
+      family = await this.family.read();
+    } catch (err) {
+      return {
+        blocks: found,
+        error: `Could not read this agent's subagents (${String(err?.message ?? err)}). ` +
+          `This is usually transient -- retry the call.`
+      };
+    }
     const known = new Set(family.subagents.map(s => s._id));
     for (const id of wanted) {
       if (!known.has(id)) { continue; }   // membership is judged in validate()
-      const intents: any[] = await firstValueFrom(this.faqService.getAllFaqByFaqKbId(id));
-      found.set(id, new Set((intents || []).map(i => i.intent_display_name)));
+      try {
+        const intents: any[] = await firstValueFrom(this.faqService.getAllFaqByFaqKbId(id));
+        found.set(id, new Set((intents || []).map(i => i.intent_display_name)));
+      } catch (err) {
+        return {
+          blocks: found,
+          error: `Could not read subagent "${id}"'s blocks (${String(err?.message ?? err)}). ` +
+            `This is usually transient -- retry the call.`
+        };
+      }
     }
-    return found;
+    return { blocks: found };
   }
 
   /** The action an `update_action` targets, or null for any other op (or one
