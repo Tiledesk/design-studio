@@ -119,6 +119,27 @@ export class AgentChatHostService {
     });
 
     this.host.registerTool('apply_flow_patch', async (args) => {
+      const declared = args?.['faq_kb_id'] as string | undefined;
+      const open = this.dashboardService.id_faq_kb;
+      // The canvas can now move under a running turn -- the agent opens a
+      // subagent, or the user picks a sibling from the panel while the agent
+      // is thinking. A refusal is something the agent reads and recovers
+      // from; a batch applied to the wrong flow is discovered later, if ever.
+      if (!declared || declared !== open) {
+        return {
+          ok: false,
+          rejected_before_applying: true,
+          results: [{
+            op: '(batch)', ok: false,
+            error: declared
+              ? `This patch declares faq_kb_id "${declared}" but the open flow is `
+                + `"${open}". Read the open flow with get_flow, or open the one you `
+                + `meant with open_flow, then retry.`
+              : `Every patch must declare the faq_kb_id it edits. The open flow is `
+                + `"${open}".`
+          }]
+        } as FlowOpsReport;
+      }
       const report = await this.flowOps.apply((args?.['operations'] ?? []) as FlowOp[]);
       this.appliedSource.next(report);
       return report;

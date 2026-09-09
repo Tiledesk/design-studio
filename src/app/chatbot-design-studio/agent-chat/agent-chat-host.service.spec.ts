@@ -151,7 +151,7 @@ describe('AgentChatHostService', () => {
   it('passes apply_flow_patch operations to FlowOpsService', async () => {
     await service.attach(document.createElement('iframe'));
     const ops = [{ op: 'move', intent_id: 'i1', position: { x: 1, y: 2 } }];
-    await registered['apply_flow_patch']({ operations: ops });
+    await registered['apply_flow_patch']({ faq_kb_id: 'kb1', operations: ops });
     expect(flowOps.apply).toHaveBeenCalledWith(ops);
   });
 
@@ -182,7 +182,7 @@ describe('AgentChatHostService', () => {
     flowOps.apply.and.returnValue(Promise.resolve(report));
     const emitted: any[] = [];
     service.applied$.subscribe(r => emitted.push(r));
-    await registered['apply_flow_patch']({ operations: [] });
+    await registered['apply_flow_patch']({ faq_kb_id: 'kb1', operations: [] });
     expect(emitted).toEqual([report]);
   });
 
@@ -269,5 +269,38 @@ describe('AgentChatHostService', () => {
     service.setContext();
     expect(createdHosts[createdHosts.length - 1].setContext)
       .toHaveBeenCalledWith({ projectId: 'p1', flowId: 'parent1' });
+  });
+
+  // Until now "the open flow" could not be wrong: there was one per session.
+  // With the canvas moving between a parent and its subagents, a batch
+  // computed for one and arriving at the other would write the wrong blocks,
+  // silently -- the user opening a sibling from the panel mid-turn is enough.
+  it('refuses a patch that declares a flow other than the open one', async () => {
+    await service.attach({} as any);
+    const report = await registered['apply_flow_patch'](
+      { faq_kb_id: 'sub1', operations: [{ op: 'add_intent' }] });
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('sub1');
+    expect(report.results[0].error).toContain('kb1');
+    expect(flowOps.apply).not.toHaveBeenCalled();
+  });
+
+  // Optional would mean the guard protects every call except the ones a
+  // confused agent makes, which is the case it exists for.
+  it('refuses a patch that declares no flow at all', async () => {
+    await service.attach({} as any);
+    const report = await registered['apply_flow_patch']({ operations: [{ op: 'add_intent' }] });
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(flowOps.apply).not.toHaveBeenCalled();
+  });
+
+  it('applies a patch that declares the open flow', async () => {
+    await service.attach({} as any);
+    const report = await registered['apply_flow_patch'](
+      { faq_kb_id: 'kb1', operations: [{ op: 'add_intent' }] });
+    expect(report.ok).toBe(true);
+    expect(flowOps.apply).toHaveBeenCalledWith([{ op: 'add_intent' }]);
   });
 });
