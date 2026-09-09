@@ -10,6 +10,8 @@ import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 /** `tiledesk_token` in localStorage holds the whole `Authorization` header
  *  value, scheme and all -- see webhook-service.service.ts, which sends it
@@ -41,6 +43,8 @@ export class AgentChatHostService {
   private appliedSource = new Subject<FlowOpsReport>();
   /** Emits after every apply_flow_patch, for the panel's summary row. */
   public readonly applied$ = this.appliedSource.asObservable();
+
+  private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     private appConfigService: AppConfigService,
@@ -111,10 +115,22 @@ export class AgentChatHostService {
       })
     });
 
-    this.host.registerTool('get_flow', async () => ({
-      ...this.flowOps.readFlow(),
-      family: await this.family.read()
-    }));
+    this.host.registerTool('get_flow', async () => {
+      // readFlow() is synchronous and cannot fail; family.read() awaits up to
+      // two HTTP calls and can. Losing id_faq_kb and intents -- the flow the
+      // agent could always read -- to a transient family lookup failure would
+      // make get_flow, the agent's only way to read the flow, less reliable
+      // than it was before families existed. A degraded answer without the
+      // family is something the agent can still work from; no answer at all
+      // is not.
+      let family;
+      try {
+        family = await this.family.read();
+      } catch (error) {
+        this.logger.error('[AGENT-CHAT-HOST] get_flow: family read failed:', error);
+      }
+      return { ...this.flowOps.readFlow(), family };
+    });
 
     this.host.registerTool('get_canvas_selection', async () => {
       const selected = this.intentService.intentSelected;

@@ -7,11 +7,13 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 describe('AgentChatHostService', () => {
   let service: AgentChatHostService;
   let flowOps: any;
+  let familyService: any;
   let registered: Record<string, Function>;
   let created: any;
   let createdHosts: any[];
@@ -21,6 +23,14 @@ describe('AgentChatHostService', () => {
   let dashboardService: any;
 
   beforeEach(() => {
+    // The real logger is an app-wide singleton nothing has set up in a spec
+    // run; the host's get_flow handler logs through it when family.read()
+    // rejects, so a no-op stand-in keeps that path from throwing on an
+    // unrelated undefined.
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+
     registered = {};
     created = null;
     createdHosts = [];
@@ -61,7 +71,7 @@ describe('AgentChatHostService', () => {
         { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: tokenChanged } },
         { provide: AppConfigService, useValue: {
             getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } },
-        { provide: AgentChatFamilyService, useValue: {
+        { provide: AgentChatFamilyService, useValue: familyService = {
             rootId: () => (dashboardService.selectedChatbot?.subtype === 'subagent'
               ? dashboardService.selectedChatbot.parent_id
               : dashboardService.id_faq_kb),
@@ -156,6 +166,19 @@ describe('AgentChatHostService', () => {
     expect(snapshot.id_faq_kb).toBe('kb1');
     expect(snapshot.family.root_id).toBe('parent1');
     expect(snapshot.family.subagents).toEqual([{ _id: 'sub1', name: 'Alfa' }]);
+  });
+
+  // readFlow() is synchronous and cannot fail; family.read() awaits up to two
+  // HTTP calls and can. A transient failure there must not take away the
+  // id_faq_kb and intents the agent could always rely on -- get_flow is its
+  // only way to read the flow.
+  it('still answers with the flow when the family lookup fails', async () => {
+    familyService.read = () => Promise.reject(new Error('network error'));
+    await service.attach({} as any);
+    const snapshot = await registered['get_flow']({});
+    expect(snapshot.id_faq_kb).toBe('kb1');
+    expect(snapshot.intents).toEqual([]);
+    expect(snapshot.family).toBeUndefined();
   });
 
   it('answers get_canvas_selection with the selected intent id', async () => {
