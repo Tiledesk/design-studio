@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 09/09/2026
+# 1.40.14-rc8
 - **added**: new **Gemini Agent Platform** provider in the AI model selector of the Ask KB, AI Prompt and AI Condition actions. Its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
 - **bug fix**: when the same model was offered by more than one provider or server (for example Gemini 2.5 Flash, available both from Google and from Agent Platform), the selector showed the wrong entry
 - **changed**: opening an AI action is faster — the model list is now loaded in one go for every provider instead of one provider at a time
