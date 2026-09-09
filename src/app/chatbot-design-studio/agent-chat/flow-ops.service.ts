@@ -205,17 +205,35 @@ export class FlowOpsService {
    *  Gathered before validation rather than inside it: validate() is
    *  synchronous by design (a batch is judged whole before anything is
    *  applied), and reading another flow's blocks is a network call. Nothing
-   *  is fetched for a batch that calls no subagent. Both `add_action` (whose
-   *  `type` names the action directly) and `update_action` (which only
-   *  carries `fields`, so the action's current type has to be looked up via
-   *  `actionTypeOf`) are covered, since either can carry a `callsubagent`'s
-   *  `botId`. */
+   *  is fetched for a batch that calls no subagent.
+   *
+   *  `add_action` always wants `fields.botId` -- there is no existing action
+   *  to inherit one from, so a `callsubagent` being created always names its
+   *  subagent right there. `update_action` is a partial patch, like every
+   *  other op in this verb set: it wants `fields.botId` when the patch is
+   *  (re)setting it, or -- only when the patch supplies a `blockName` to
+   *  check -- the action's own current `botId`, found via `targetActionOf`.
+   *  A patch that touches neither `botId` nor `blockName` on an existing
+   *  `callsubagent` fetches nothing, the same as any op that isn't a
+   *  `callsubagent` at all. */
   private async subagentBlockNames(ops: FlowOp[]): Promise<Map<string, Set<string>>> {
     const wanted = new Set<string>();
     for (const op of ops as any[]) {
-      const type = op?.op === 'add_action' ? op.type : this.actionTypeOf(op);
-      if (type === TYPE_ACTION.REPLACE_BOTV4 && op?.fields?.botId) {
-        wanted.add(String(op.fields.botId));
+      if (op?.op === 'add_action') {
+        if (op.type === TYPE_ACTION.REPLACE_BOTV4 && op?.fields?.botId) {
+          wanted.add(String(op.fields.botId));
+        }
+        continue;
+      }
+      const action = this.targetActionOf(op);
+      if (!action || action._tdActionType !== TYPE_ACTION.REPLACE_BOTV4) { continue; }
+      const fields = op?.fields;
+      if (fields && 'botId' in fields && fields.botId) {
+        wanted.add(String(fields.botId));
+      } else if (fields && fields.blockName && action.botId) {
+        // The patch leaves botId alone but wants a blockName checked: that
+        // has to be checked against the subagent the call already points at.
+        wanted.add(String(action.botId));
       }
     }
     const found = new Map<string, Set<string>>();
@@ -230,12 +248,13 @@ export class FlowOpsService {
     return found;
   }
 
-  /** The type of the action an update_action targets, or null. */
-  private actionTypeOf(op: any): string | null {
+  /** The action an `update_action` targets, or null for any other op (or one
+   *  whose `intent_id`/`action_id` doesn't resolve to anything real --
+   *  `validate()` refuses those on its own, before this ever has to care). */
+  private targetActionOf(op: any): any | null {
     if (op?.op !== 'update_action') { return null; }
     const intent = this.intentService.getIntentFromId(op.intent_id);
-    const action = (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id);
-    return action?._tdActionType ?? null;
+    return (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id) ?? null;
   }
 
   private validate(op: FlowOp): FlowOpResult {
@@ -655,9 +674,13 @@ export class FlowOpsService {
    *  real subagent of this family and, when given, a block that actually
    *  exists on it -- checked against `subagentBlocks`, which `apply()`
    *  populated before validation ran (see `subagentBlockNames`). Returns the
-   *  refusal text, or null when the call is fine. Shared by `add_action` and
-   *  `update_action` so a call added in one operation is judged exactly like
-   *  one edited in another. */
+   *  refusal text, or null when the call is fine.
+   *
+   *  For `add_action`, where `fields.botId` is the only place a `botId` can
+   *  come from: there is no existing action to fall back to, so `botId` is
+   *  always required here. `update_action` does not use this directly -- see
+   *  `validateSubagentUpdate`, which only defers to this once it has decided
+   *  the patch really is (re)setting `botId`. */
   private validateSubagentCall(fields?: Record<string, any>): string | null {
     const botId = String(fields?.botId ?? '');
     const blocks = this.subagentBlocks.get(botId);
@@ -667,6 +690,41 @@ export class FlowOpsService {
     }
     const blockName = String(fields?.blockName ?? '');
     if (blockName && !blocks.has(blockName)) {
+      return `Subagent "${botId}" has no block named "${blockName}".`;
+    }
+    return null;
+  }
+
+  /** The same check as `validateSubagentCall`, but for `update_action` --
+   *  which is a partial patch everywhere else in this verb set, and must not
+   *  become the exception here. Validates only what `fields` actually
+   *  supplies:
+   *
+   *   - `fields.botId` present: the patch is (re)setting the subagent this
+   *     call points at, so it is judged exactly like `add_action`'s own
+   *     `botId` -- it must name a real subagent, and a `blockName` supplied
+   *     alongside it is checked against that (new) subagent.
+   *   - `fields.botId` absent, `fields.blockName` present: the patch leaves
+   *     the subagent alone and only wants the block re-pointed, so the block
+   *     name is checked against `existingBotId` -- the action's own current
+   *     `botId`, which the caller already has in hand from looking the
+   *     action up to learn its type. If `existingBotId` is itself empty (the
+   *     action was created without one) or not a subagent this family
+   *     recognises, there is nothing to check the new block name against; no
+   *     refusal is raised over a `botId` this same patch never touched --
+   *     that would blame the agent for a field it had no reason to send.
+   *   - Neither present: nothing this task cares about was touched. */
+  private validateSubagentUpdate(existingBotId: any, fields?: Record<string, any>): string | null {
+    if (fields && 'botId' in fields) {
+      return this.validateSubagentCall(fields);
+    }
+    if (!fields || !fields.blockName) { return null; }
+    const botId = String(existingBotId ?? '');
+    if (!botId) { return null; }
+    const blocks = this.subagentBlocks.get(botId);
+    if (!blocks) { return null; }
+    const blockName = String(fields.blockName);
+    if (!blocks.has(blockName)) {
       return `Subagent "${botId}" has no block named "${blockName}".`;
     }
     return null;
@@ -721,7 +779,7 @@ export class FlowOpsService {
         const violation = this.findScaffoldViolation(action._tdActionType, action, (op as any).fields);
         if (violation) { return fail(violation); }
         if (action._tdActionType === TYPE_ACTION.REPLACE_BOTV4) {
-          const subagentViolation = this.validateSubagentCall((op as any).fields);
+          const subagentViolation = this.validateSubagentUpdate((action as any).botId, (op as any).fields);
           if (subagentViolation) { return fail(subagentViolation); }
         }
         const destinationViolation =

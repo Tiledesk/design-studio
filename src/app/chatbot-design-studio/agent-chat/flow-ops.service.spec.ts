@@ -3518,4 +3518,31 @@ describe('FlowOpsService — the call to a subagent', () => {
         fields: { botId: 'sub1', blockName: 'start' } } as any]);
     expect(report.ok).toBe(true);
   });
+
+  // update_action is a partial patch everywhere else in this verb set: the
+  // agent sends only the fields it wants changed. Requiring botId on every
+  // update_action against an existing callsubagent would make "just flip
+  // useSlug" inexpressible, and blame the agent for a field it had no
+  // reason to resend.
+  it('accepts an update_action that changes only an unrelated field on an existing callsubagent action', async () => {
+    intentService.getIntentFromId('i1').actions.push(
+      { _tdActionId: 'call1', _tdActionType: 'callsubagent', botId: 'sub1', blockName: 'start' } as any);
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: 'call1',
+        fields: { useSlug: true } } as any]);
+    expect(report.ok).toBe(true);
+  });
+
+  // botId is untouched here, so the blockName is checked against the
+  // subagent the call already points at -- sub1, per the action set up
+  // above.
+  it('refuses an update_action that supplies a blockName the target subagent does not have', async () => {
+    intentService.getIntentFromId('i1').actions.push(
+      { _tdActionId: 'call1', _tdActionType: 'callsubagent', botId: 'sub1', blockName: 'start' } as any);
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: 'call1',
+        fields: { blockName: 'nowhere' } } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('nowhere');
+  });
 });
