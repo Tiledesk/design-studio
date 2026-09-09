@@ -27,7 +27,7 @@
                 <div class="_149y0hi2 " [ngClass]="{ '_149y0hi3': !last }">
                     <div class="vfui_176drylj vfui_176drylb vfui_176dryle vfui_176drylh"
                         data-testid="publish-release-history-page__item__avatar">
-                        <div class="vfui_176dryl0" data-testid="publish-release-history-page__item__avatar__letter">
+                        <div *ngIf="release.publishedBy" class="vfui_176dryl0" data-testid="publish-release-history-page__item__avatar__letter">
                             
                             <!-- Skeleton Avatar (loading) -->
                             <div *ngIf="release.publishedBy?.loadingImage"
@@ -39,9 +39,9 @@
                                 class="user-profile-photo" />
 
                             <div *ngIf="!release.publishedBy?.loadingImage && !release.publishedBy?.hasImage" class="avatar-no-profile-photo"
-                                [ngStyle]="{'background': release.publishedBy.fillColour}">
+                                [ngStyle]="{'background': release.publishedBy?.fillColour}">
                                 <div class="initials">
-                                    {{ release.publishedBy.fullname_initial }}
+                                    {{ release.publishedBy?.fullname_initial }}
                                 </div>
                             </div>
                             <!-- <span class="vfui_176dryl2">
@@ -85,9 +85,9 @@
                             <div class="vfui_ad6d3e0 vfui_ad6d3e7 vfui_ad6d3ef"
                                 data-testid="publish-release-history-page__item__bullet-list__item"
                                 style="color: rgb(120, 127, 134);">
-                                {{ release.publishedBy.firstname }} 
-                                <span *ngIf="release.publishedBy.lastname && release.publishedBy.lastname !== ' '">
-                                    {{ release.publishedBy.lastname }} 
+                                {{ release.publishedBy?.firstname }} 
+                                <span *ngIf="release.publishedBy?.lastname && release.publishedBy?.lastname !== ' '">
+                                    {{ release.publishedBy?.lastname }} 
                                 </span>
                             </div>
                             <div class="vfui_1ss6mi9c vfui_1ss6mi9j vfui_1ss6mi9o vfui_1ss6mi9l vfui_1ss6mi928"

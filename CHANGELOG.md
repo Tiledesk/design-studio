@@ -7,6 +7,68 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 09/09/2026
+
+- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+
+# this branch 08/09/2026
+
+- **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
+- **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
+- **changed**: nel pannello Subagents la **casella di ricerca** "Search a subagent" e il **badge `parent`** sono nascosti: rimosso il markup, conservati stili e logica di filtro (`onSearch`/`applyFilter`), cosi' ripristinarli e' questione di poche righe
+- **changed**: il **parent** usa ora l'icona di gruppo e ogni **subagent** un **omino blu a mezzo busto** — nuova icona `person` registrata in `IconService`, ricavata dai tracciati gia' presenti in `actions/online_agents.svg` (testa e spalle, senza le onde del segnale) e ricentrata con una `translate`, per non alterare i numeri originali
+- **changed**: icone delle righe del pannello da 18 a 20px e grigio piu' carico (`#5a6672`): l'icona di gruppo e' fitta e alla dimensione precedente si leggeva male. L'omino dei **subagent** e' disegnato piu' piccolo (svg 12x12) ma il suo box resta 20px, cosi' i nomi restano allineati fra riga del parent e righe dei subagent
+- **fixed**: nel pannello Subagents la dimensione dell'icona era applicata solo alla riga **attiva**, quindi tutte le altre rendevano alla misura di default di `mat-icon` (24px) invece che a quella prevista
+- **fixed**: l'icona della tab **Blocks** non e' piu' bianca — `search.svg` porta `fill="#FFFFFF"` nell'asset e l'attributo sull'elemento vince sul colore ereditato; ora l'icona segue il colore della tab (grigio, blu quando attiva) come tutte le altre
+- **changed**: il pulsante **New subagent** e' visibile anche **dentro un subagent**. Il nuovo agent viene creato sotto il **parent della famiglia**, non sotto il subagent aperto: si ottiene un fratello, non un annidamento. L'id del parent lo decide il pannello e viaggia nei `data` della modale, che prima lo ricavava da se' con `id_faq_kb`; il pulsante non compare se quell'id non e' risolvibile
+- **changed**: la tab **Blocks** e' ora un pulsante quadrato con la sola icona a **lente**, che dice a colpo d'occhio che da li' si cerca un blocco; l'etichetta e' passata nel tooltip e la tab **Subagents** occupa tutta la larghezza rimanente
+- **changed**: rinominate tre action — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. Il nuovo nome e' allineato ovunque compaia: menu delle action, etichetta sul blocco nel canvas e titolo nella documentazione del pannello
+- **changed**: pannello **Subagents** — la tab passa al primo posto (Blocks seconda) ed e' quella aperta di default **quando l'agente non ha ancora una preferenza salvata**: se l'utente ne sceglie una, vince la sua (`getActiveLeftPanel` ora distingue "nessuna preferenza" da "Blocks", prima erano lo stesso valore). Entrambe le tab hanno un'icona; la risoluzione della tab si e' spostata in `ngOnInit`, cosi' il pannello Blocks non viene piu' montato e subito distrutto a ogni apertura. Il pulsante **New subagent** e' ora un footer ancorato in fondo al pannello invece che sopra l'elenco, quindi resta raggiungibile anche con la lista lunga. Icone dei subagent sostituite con SVG registrati in `IconService`, in linea con le altre del DS. L'elenco dei subagent e' ordinato **alfabeticamente** (case e accenti ignorati, numeri confrontati come numeri: "Agente 2" prima di "Agente 10"); il parent resta sempre primo
+- **added**: primi test unitari sul pannello Subagents — l'ordinamento alfabetico (estratto in `sortSubagentsByName`, funzione pura: maiuscole, accenti, numeri, lista vuota) e `getActiveLeftPanel` (preferenza assente, salvata, famiglie separate). ⚠️ **Non sono eseguibili**: l'harness Karma del repo non esegue alcun test (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — guasto preesistente, indipendente da queste modifiche
+# this branch gio 27 ago 2026
+- **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
+- **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
+- **changed**: the **Return** action is available again in the menu, with its original name "Return"
+- **added**: **Invoke Agent** preselects the start block when an agent is selected and clears the block when the agent is cleared, like **Invoke subagent**
+- **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
+- **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
+
+# this branch 
+- **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
+- **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
+- **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
+- **changed**: the Sub Agent action is hidden from the Special actions
+- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent), superseding the `subagent_visibility: never` rule on **Invoke subagent**
+- **bug fix**: inside a subagent the invocable agents are now the siblings (parent's subagents), excluding itself, instead of an empty list
+- **added**: selecting a subagent preselects its start block
+- **bug fix**: clearing the selected subagent left the previously selected block
+- **changed**: the "Return" action is renamed "Return to agent"
+- **added**: the Blocks/Subagents tab is kept across reloads and parent/subagent navigation
+- **added**: delete a subagent from the Subagents panel (hover menu + confirmation modal)
+- **changed**: after creating a subagent the Design Studio reloads on the new subagent; after deleting one it reloads on the parent
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
+- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
+- **changed**: the Sub Agent action is not available inside a subagent
+- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
+- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
+- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
+- **changed**: Sub Agent detail panel now fills the panel height like the other actions
+- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
+- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
+
+
+# this branch
+- **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
+- **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
+- **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
+- **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
+- **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
+- **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
 
 
 # 1.40.13

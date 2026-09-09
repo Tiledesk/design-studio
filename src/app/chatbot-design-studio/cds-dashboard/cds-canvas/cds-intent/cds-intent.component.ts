@@ -11,7 +11,7 @@ import { ControllerService } from '../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, isReturnStackIntent } from 'src/app/chatbot-design-studio/utils-actions';
 import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -71,6 +71,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
+  /** true quando il blocco contiene SOLO l'azione "Return to parent agent":
+   *  in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita */
+  isReturnStack = false;
 
   startAction: any;
   isDragging: boolean = false;
@@ -138,6 +141,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
             this.listOfActions = this.intent.actions;
+            this.updateIsReturnStack();
             this.setActionIntent();
             // cerca il primo connect to block e fissalo in fondo
             // this.listOfActions = this.intent.actions.filter(function(obj) {
@@ -278,6 +282,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.updateIsUntitledBlock();
+      this.updateIsReturnStack();
       // Aggiorna showIntentOptions dopo l'inizializzazione
       this.updateShowIntentOptions();
       // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
@@ -432,6 +437,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     // Aggiorna isUntitledBlock se l'intent cambia
     if (changes['intent'] && !changes['intent'].firstChange) {
       this.updateIsUntitledBlock();
+      this.updateIsReturnStack();
     }
   }
 
@@ -450,6 +456,49 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   private updateIsUntitledBlock(){
     this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
+  }
+
+  /** updateIsReturnStack
+   * Ricalcola se il blocco va renderizzato come nodo terminale a pastiglia.
+   * Va chiamata OGNI volta che listOfActions può essere cambiata.
+   */
+  private updateIsReturnStack(){
+    const wasReturnStack = this.isReturnStack;
+    this.isReturnStack = !this.isStart && isReturnStackIntent(this.intent);
+    if(this.isReturnStack){
+      this.clearNextBlockConnector(wasReturnStack);
+    }
+  }
+
+  /** clearNextBlockConnector
+   * Il nodo "Return to parent agent" è terminale: non deve avere il connettore "next block".
+   * Non basta l'*ngIf nel template, perché ConnectorService.createConnectorsOfIntent
+   * lo ricrea al reload leggendo intent.attributes.nextBlockAction.intentName.
+   */
+  private clearNextBlockConnector(wasAlreadyReturnStack: boolean){
+    this.actionIntent = null;
+    const nextBlockAction = this.intent?.attributes?.nextBlockAction;
+    if(!nextBlockAction?.intentName){
+      return;
+    }
+    const fromId = this.intent.intent_id + '/' + nextBlockAction._tdActionId;
+    const toId = nextBlockAction.intentName.replace('#', '');
+    try {
+      // guardia obbligatoria: ConnectorService.deleteConnector fa intent.attributes?.connectors[idConnector],
+      // l'optional chaining protegge `attributes` ma NON `connectors`
+      if(!this.intent.attributes.connectors){
+        this.intent.attributes.connectors = {};
+      }
+      this.connectorService.deleteConnector(this.intent, fromId + '/' + toId, false, true);
+    } catch (error) {
+      this.logger.error('[CDS-INTENT] clearNextBlockConnector error: ', error);
+    }
+    // '' e non null: createConnectorsOfIntent testa `intentName && intentName !== ''`
+    nextBlockAction.intentName = '';
+    // salva solo alla transizione a runtime, per non generare una raffica di PUT al primo load
+    if(!wasAlreadyReturnStack && this.stageService.loaded === true){
+      this.intentService.updateIntent(this.intent);
+    }
   }
 
   /** updateShowIntentOptions
@@ -603,6 +652,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** setActionIntent */
   private setActionIntent(){
     try {
+      if(this.isReturnStack){
+        // nodo terminale "Return to parent agent": nessun connettore "next block".
+        // Senza questo early-return nextBlockAction verrebbe ricreato qui sotto.
+        this.actionIntent = null;
+        return;
+      }
       let connectorID = '';
       let fromId: string, toId: string;
       if(this.intent.attributes.nextBlockAction){
@@ -684,6 +739,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
         this.listOfActions = this.intent.actions;
+        this.updateIsReturnStack();
         if (this.intent.question) {
           const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
           this.questionCount = question_segment.length;

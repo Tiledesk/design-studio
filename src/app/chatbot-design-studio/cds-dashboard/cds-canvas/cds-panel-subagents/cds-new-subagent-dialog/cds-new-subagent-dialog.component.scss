@@ -1,0 +1,151 @@
+// Rimuove il padding di default di mat-dialog-container (causa degli spazi esagerati)
+::ng-deep .cds-new-subagent-dialog-container {
+    .mat-dialog-container {
+        padding: 0 !important;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+}
+
+.new-subagent-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-family-poppins);
+    background: #fff;
+    border-radius: 8px;
+}
+
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    border-radius: 8px;
+
+    .loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .spinner-large {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #e2e8ee;
+        border-top-color: var(--blu, #1f64ef);
+        border-radius: 50%;
+        animation: cds-new-subagent-spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+        font-size: 13px;
+        color: #4b5052;
+    }
+}
+
+@keyframes cds-new-subagent-spin {
+    to { transform: rotate(360deg); }
+}
+
+.new-subagent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef2f6;
+
+    .title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #22272d;
+    }
+
+    .close-icon {
+        cursor: pointer;
+        color: #9ba6b3;
+        font-size: 20px;
+        line-height: 1;
+
+        &:hover { color: #22272d; }
+        &.disabled { opacity: 0.4; pointer-events: none; }
+    }
+}
+
+.new-subagent-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+
+    .field-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #22272d;
+        margin-bottom: 6px;
+    }
+
+    .subagent-name-input {
+        width: 100%;
+        height: 38px;
+        padding: 0 12px;
+        border: 1px solid #c6cdd4;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #22272d;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+
+        &:focus { border-color: var(--blu, #1f64ef); }
+        &:disabled { background: #f4f6f8; color: #9ba6b3; }
+    }
+
+    .error-alert {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: #fdecea;
+        color: #b3261e;
+        font-size: 13px;
+
+        .error-icon { font-size: 18px; }
+    }
+}
+
+.new-subagent-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 16px 16px;
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 84px;
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 0;
+        line-height: 1;
+
+        &:disabled { opacity: 0.55; cursor: default; }
+    }
+
+    .cancel-btn {
+        background: #e5e5e5;
+        color: #4b5052;
+        &:hover:enabled { opacity: 0.85; }
+    }
+}

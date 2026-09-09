@@ -272,6 +272,24 @@ export class ActionReplaceBotV3 extends Action {
     }
 }
 
+export class ActionReplaceBotV4 extends Action {
+    botId: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV4;
+    }
+}
+
+export class ActionReturnStack extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN_STACK;
+    }
+}
+
 export class ActionChangeDepartment extends Action {
     depName: string;
     constructor(){
@@ -988,5 +1006,42 @@ export class ActionDataTable extends Action {
         this.data = {};
         this.assignResultTo = 'data_table_result';
         this.assignErrorTo = 'error';
+    }
+}
+
+export class ActionReturn extends Action {
+    payload: string;
+    status: string | number;
+    bodyType: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN;
+        this.payload = JSON.stringify({});
+        this.bodyType = 'json';
+        this.status = '200';
+    }
+}
+
+export class ActionSubAgent extends Action {
+    subagent_id: string;
+    intentName: string;
+    mode: 'fire_and_continue' | 'wait_result';
+    input: { [key: string]: string };
+    awaitWebhookPublish: boolean;
+    assignRunIdTo: string;
+    assignSubRequestIdTo: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    timeoutMs: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.INVOKE_SUB_AGENT;
+        this.mode = 'fire_and_continue';
+        this.input = {};
+        this.awaitWebhookPublish = false;
+        this.assignResultTo = 'subagent_result';
     }
 }

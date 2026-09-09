@@ -1,0 +1,41 @@
+<div class="new-subagent-box">
+
+    <!-- Overlay di blocco durante la creazione -->
+    <div class="loading-overlay" *ngIf="isCreating">
+        <div class="loading-content">
+            <div class="spinner-large"></div>
+            <span class="loading-text">{{ 'CDSCanvas.CreatingSubagent' | translate }}...</span>
+        </div>
+    </div>
+
+    <div class="new-subagent-header">
+        <span class="title">{{ 'CDSCanvas.NewSubagent' | translate }}</span>
+        <i class="material-icons close-icon" [class.disabled]="isCreating" (click)="onClose()">close</i>
+    </div>
+
+    <div class="new-subagent-content">
+        <div class="error-alert" *ngIf="showError">
+            <span class="material-icons error-icon">error_outline</span>
+            <span class="error-text">{{ errorMessage }}</span>
+        </div>
+
+        <label class="field-label">{{ 'CDSCanvas.Name' | translate }}</label>
+        <input type="text" class="subagent-name-input"
+            [value]="name"
+            [disabled]="isCreating"
+            (input)="onNameChange($any($event.target).value)"
+            (keyup.enter)="onCreate()"
+            [placeholder]="'CDSCanvas.EnterSubagentName' | translate" />
+    </div>
+
+    <div class="new-subagent-buttons">
+        <button type="button" class="btn cancel-btn" [disabled]="isCreating" (click)="onClose()">
+            {{ 'Cancel' | translate }}
+        </button>
+        <button type="button" class="btn btn-primary cds-blue-button" [disabled]="!canCreate" (click)="onCreate()">
+            <span *ngIf="!isCreating">{{ 'CDSCanvas.Create' | translate }}</span>
+            <span *ngIf="isCreating">{{ 'CDSCanvas.Creating' | translate }}...</span>
+        </button>
+    </div>
+
+</div>
