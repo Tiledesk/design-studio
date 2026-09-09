@@ -163,6 +163,16 @@ export class AgentChatHostService {
       this.appliedSource.next(report);
       return report;
     });
+
+    this.host.registerTool('create_subagent', async (args) => {
+      const name = String(args?.['name'] ?? '').trim();
+      // Thrown, not returned as a refusal report: the adapter turns a throw
+      // into a `handler_error` tool result the agent reads. There is no
+      // partial success to describe here.
+      if (!name) { throw new Error('A subagent needs a name.'); }
+      const created = await this.family.createSubagent(name);
+      return { faq_kb_id: created._id, name: created.name };
+    });
   }
 
   /** Switch the chat to another family's session without reloading the frame.

@@ -139,10 +139,10 @@ describe('AgentChatHostService', () => {
     expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
   });
 
-  it('registers exactly the three client tools', async () => {
+  it('registers exactly the four client tools', async () => {
     await service.attach(document.createElement('iframe'));
     expect(Object.keys(registered).sort())
-      .toEqual(['apply_flow_patch', 'get_canvas_selection', 'get_flow']);
+      .toEqual(['apply_flow_patch', 'create_subagent', 'get_canvas_selection', 'get_flow']);
   });
 
   it('answers get_flow from the canvas', async () => {
@@ -212,7 +212,7 @@ describe('AgentChatHostService', () => {
     const iframe = document.createElement('iframe');
     await service.attach(iframe);
     expect(iframe.getAttribute('src')).toBeNull();
-    expect(Object.keys(registered).length).toBe(3);
+    expect(Object.keys(registered).length).toBe(4);
   });
 
   it('emits the flow ops report on applied$ after apply_flow_patch', async () => {
@@ -341,5 +341,17 @@ describe('AgentChatHostService', () => {
       { faq_kb_id: 'kb1', operations: [{ op: 'add_intent' }] });
     expect(report.ok).toBe(true);
     expect(flowOps.apply).toHaveBeenCalledWith([{ op: 'add_intent' }]);
+  });
+
+  it('creates a subagent and returns its id', async () => {
+    await service.attach({} as any);
+    const created = await registered['create_subagent']({ name: 'Rimborsi' });
+    expect(created).toEqual({ faq_kb_id: 'new1', name: 'Rimborsi' });
+  });
+
+  it('refuses a subagent with no name, without calling the server', async () => {
+    await service.attach({} as any);
+    await expectAsync(registered['create_subagent']({ name: '   ' }))
+      .toBeRejectedWithError(/name/i);
   });
 });
