@@ -12,8 +12,6 @@
 - **bug fix**: when the same model was offered by more than one provider or server (for example Gemini 2.5 Flash, available both from Google and from Agent Platform), the selector showed the wrong entry
 - **changed**: opening an AI action is faster — the model list is now loaded in one go for every provider instead of one provider at a time
 - **changed**: in the model selector the providers are grouped under their full name (OpenAI, Anthropic, Gemini Agent Platform, …) instead of their lowercase internal name
-- **added**: authentication persistence setting in the design studio configuration
-- **changed**: removed unused interface components from the application startup
 
 # 1.40.14-rc7
 - **changed**: The left panel tabs return to **both with icon + label** and take up **half the width** — replacing the square button with just the magnifying glass introduced just below. The 12px font and padding have been reduced so that "Subagents" can be read in full in the remaining ~103px per tab; Tab icons from 16 to 18px
