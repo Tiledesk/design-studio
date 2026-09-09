@@ -7,8 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 09/09/2026
-- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+# 1.40.14-rc9
+- **fixed**: when attempting to delete a subagent that is still in use by another agent, the error message returned by the service is now displayed, instead of the operation appearing to have no visible outcome.
 
 # 1.40.14-rc8
 - **added**: new **Gemini Agent Platform** provider in the AI model selector of the Ask KB, AI Prompt and AI Condition actions. Its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
