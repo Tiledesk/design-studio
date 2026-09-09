@@ -10,6 +10,18 @@
 
 
 # this branch
+
+### 09/09/2026
+- **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
+- **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
+- **changed**: the edit icon is shown only on the servers already added to the prompt
+- **changed**: native servers are marked with an outlined shield and show their description instead of the URL
+- **added**: in the action, when no MCP tool is attached yet the section shows a dashed "Select MCP tools" call to action, which turns into "Manage MCP tools" as soon as a server is attached
+- **added**: tooltips on every button of the MCP interface, both in the action and in the dialogs
+- **changed**: smaller and lighter "Use tools to complete the operation" label
+- **bug fix**: the "Manage MCP tools" button ignored its own size and was rendered bigger than intended
+- **bug fix**: missing italian translations in the MCP interface
+
 - **changed**: in the MCP servers dialog the edit (pencil) icon is now shown ONLY on selected servers: an unselected server can just be toggled, so managing a server always goes through selecting it first
 - **added**: the tool selection of a server survives its deselection — it is remembered per ACTION + SERVER (`McpService` memory on `AppStorageService`, with 90-day expiry and a 200-action cap), so deselecting and re-selecting a server, closing the dialog or reloading the page no longer resets the chosen tools. Nothing is written to the MCP integration nor to the action payload; on recall the tools are filtered against the ones still exposed by the server
 - **added**: the Edit MCP Server dialog now lists the selected tool names under "Tools selected", with the same single-line + "more.." rendering used in the servers list; "more.." opens the existing Select tools modal
