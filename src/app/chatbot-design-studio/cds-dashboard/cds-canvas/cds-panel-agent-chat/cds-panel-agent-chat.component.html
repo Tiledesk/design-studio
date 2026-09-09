@@ -31,3 +31,17 @@
     </button>
   </div>
 </div>
+
+<div class="agent-chat-resize-handle"
+  role="separator"
+  aria-orientation="vertical"
+  (mousedown)="onResizeStart($event)"
+  (dblclick)="onResizeReset()">
+</div>
+
+<!-- The chat frame is on another origin: while dragging, any mousemove that
+     crosses over it would be swallowed by the iframe's own document instead
+     of reaching ours, and the drag would stick. This mask sits above
+     everything only for the duration of the gesture so the move/up listeners
+     on the parent document keep receiving events. -->
+<div class="agent-chat-drag-mask" *ngIf="resizing"></div>

@@ -73,18 +73,18 @@
         height: 100%;
     }
 
-    .header-go-back {
-        cursor: pointer;
-        position: relative;
+    // The agent-chat toggle now anchors the left edge of header-right, where the
+    // wordmark used to sit: it reads as a deliberate primary control (flush
+    // left, no group padding) rather than a leftover from .right-opts.
+    .header-agent-chat-btn {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100%;
+        margin: 0;
 
-        
-        .cds-text{
-            font-weight: 700;
-            color: var(--base-brand-color);
-
-            &.title{
-                font-weight: 200;
-            }
+        #cds-agent-chat-btn {
+            margin: 0;
         }
     }
     .toggle-setting-sidebar-icon-wpr {

@@ -53,29 +53,6 @@ $toogle-sidebar-width: 22px;
   }
 }
 
-/** The vibe-coding chat docks on the right, in its own column. Everything
- *  else that docks on the right -- the action / intent / button detail
- *  panels, publish, the test widget -- has to stop where the chat starts, or
- *  it opens *behind* it: they share `right: 0` and a z-index, and the chat
- *  comes later in the template, so it simply covers them. Making the canvas
- *  itself narrower by the same amount is what puts the chat outside the
- *  canvas rather than on top of it. */
-:host(.agent-chat-open) {
-  .cds-generic-panel {
-    right: var(--agent-chat-width);
-  }
-
-  #tds_container {
-    width: calc(100% - var(--sidebar-base-width) - var(--agent-chat-width));
-  }
-}
-
-// Matches the chat panel's own slide, so the canvas gives up the room at the
-// same rate the chat takes it rather than snapping first.
-#tds_container {
-  transition: width 0.2s ease-in-out;
-}
-
 @keyframes slide-in {
   to {
     transform: translateX(0);

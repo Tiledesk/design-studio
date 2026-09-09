@@ -1,4 +1,13 @@
-<div class="cds-toggle-setting-sidebar-icon-right-wpr" 
+<!-- In-flow column between the 60px menu rail and the blocks sidebar below --
+     must come before .box-left in this flex row so it opens as a column
+     rather than an overlay over the canvas. -->
+<cds-panel-agent-chat
+    [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT"
+    [class.isHidden]="!IS_OPEN_PANEL_AGENT_CHAT"
+    [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT">
+</cds-panel-agent-chat>
+
+<div class="cds-toggle-setting-sidebar-icon-right-wpr"
     [class.is_opened]="IS_OPEN_INTENTS_LIST"
     (click)="onToogleSidebarIntentsList()">
     <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
@@ -177,12 +186,6 @@
     [intent]="intentSelected"
     (newConversation)="onNewConversation($event)">
 </cds-panel-widget>
-
-<cds-panel-agent-chat
-    [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT"
-    [class.isHidden]="!IS_OPEN_PANEL_AGENT_CHAT"
-    [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT">
-</cds-panel-agent-chat>
 
 <cds-context-menu *ngIf="IS_OPEN_CONTEXT_MENU"
     class="context-menu"

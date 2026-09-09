@@ -22,12 +22,17 @@
         </span>
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
-    <div class="header-go-back">
-        <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#006cff">
-            <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
-        </svg> -->
-        <span class="cds-text"> {{BRAND_BASE_INFO['COMPANY_NAME']}}</span> 
-        <span class="cds-text title"> {{BRAND_BASE_INFO['META_TITLE']}}</span>    
+    <!-- Agent chat toggle: takes the leftmost spot in header-right, where the
+         wordmark used to sit. It drives the canvas, so it has no meaning on a
+         section where the canvas is not present (isBlockSectionActive guard). -->
+    <div *ngIf="isBlockSectionActive && isAgentChatAvailable" class="btn-group header-agent-chat-btn">
+        <button id="cds-agent-chat-btn"
+            class="btn btn-primary cds-blue-button"
+            type="button"
+            [title]="'CDS.AgentChat.Toggle' | translate"
+            (click)="onToggleAgentChat()">
+            <span class="material-icons">auto_awesome</span>
+        </button>
     </div>
     <div class="header-title ellips">
         {{ selectedChatbot?.name }}
@@ -118,19 +123,6 @@
                     <span>{{ messageWebhookUrl }}</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Inside the isBlockSectionActive guard, alongside Test it out: the
-             chat drives the canvas, so it has no meaning on a section where
-             the canvas is not present. -->
-        <div *ngIf="isBlockSectionActive && isAgentChatAvailable" class="btn-group">
-            <button id="cds-agent-chat-btn"
-                class="btn btn-primary pull-right cds-blue-button"
-                type="button"
-                [title]="'CDS.AgentChat.Toggle' | translate"
-                (click)="onToggleAgentChat()">
-                <span class="material-icons">auto_awesome</span>
-            </button>
         </div>
 
         <div *ngIf="isBlockSectionActive" class="btn-group"
