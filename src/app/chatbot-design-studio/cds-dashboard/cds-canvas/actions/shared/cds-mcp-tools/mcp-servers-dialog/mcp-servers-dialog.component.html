@@ -4,24 +4,42 @@
             <span class="mcp-dialog__title">{{'CDSCanvas.ServerMCP' | translate}}</span>
             <span class="mcp-dialog__subtitle">{{'CDSCanvas.ChooseToolOrAddMCPServer' | translate}}</span>
         </div>
-        <i text-color="light" class="material-icons cds-close-btn-icon" [mat-dialog-close]="false">close</i>
+        <i text-color="light" class="material-icons cds-close-btn-icon"
+            [matTooltip]="'CDSCanvas.Close' | translate" matTooltipClass="cds-mat-tooltip"
+            [mat-dialog-close]="false">close</i>
     </div>
     
     <hr class="custom-hr mcp-dialog__hr">
     
-    <!-- Search and Counter Section - Always visible -->
+    <!-- Search + creation actions - Always visible -->
     <div class="search-section">
         <div class="server-count">
-            {{'CDSCanvas.TotalMCPServers' | translate}}: <span class="count-number">{{ filteredServers.length }}</span>
+            {{'CDSCanvas.AvailableMCPServers' | translate}}: <span class="count-number">{{ filteredServers.length }}</span>
         </div>
         <div class="search-input-wrapper">
-            <input 
-                type="text" 
+            <span class="material-icons search-icon">search</span>
+            <input
+                type="text"
                 class="search-input"
                 [(ngModel)]="searchFilter"
                 (input)="onSearchChange()"
-                [placeholder]="'CDSCanvas.SearchByNameURLOrType' | translate">
-            <span class="material-icons search-icon">search</span>
+                [placeholder]="'CDSCanvas.SearchByNameOrURL' | translate">
+        </div>
+
+        <!-- Creation actions on the left, servers summary pushed to the right -->
+        <div class="mcp-dialog__actions-row">
+            <button id="cds-add-server-btn" class="mcp-dialog__secondary-btn" type="button"
+                [matTooltip]="'CDSCanvas.NewMCPServerTooltip' | translate" matTooltipClass="cds-mat-tooltip"
+                (click)="onAddMcpServer()">
+                <span class="material-icons-outlined mcp-dialog__btn-icon">dns</span>
+                {{'CDSCanvas.NewMCPServer' | translate}}
+            </button>
+            <button id="cds-add-tiledesk-tools-btn" class="mcp-dialog__secondary-btn" type="button"
+                [matTooltip]="'CDSCanvas.NativeToolsSubtitle' | translate" matTooltipClass="cds-mat-tooltip"
+                (click)="onAddTiledeskTools()">
+                <span class="material-icons-outlined mcp-dialog__btn-icon">handyman</span>
+                {{'CDSCanvas.NativeTools' | translate}}
+            </button>
         </div>
     </div>
     
@@ -38,33 +56,46 @@
             </div>
             
             <div class="mcp-server-item-wrapper" *ngFor="let server of filteredServers">
-                <button 
+                <!-- La card NON e' cliccabile: le uniche azioni sono il pulsante, la matita e "more..". -->
+                <div
                     class="mcp-server-item"
-                    [class.selected]="isServerSelected(server)"
-                    type="button"
-                    (click)="toggleServerSelection(server, $event)">
-                    <!-- Edit badge: solo sui server SELEZIONATI (must NOT trigger server selection) -->
-                    <span
-                        *ngIf="isServerSelected(server)"
-                        class="edit-button mcp-server__edit-badge"
-                        role="button"
-                        tabindex="0"
-                        (click)="openEditServerDialog(server, $event)"
-                        (keydown.enter)="openEditServerDialog(server, $event)"
-                        (keydown.space)="openEditServerDialog(server, $event)">
-                        <span class="material-icons mcp-server__edit-icon">edit</span>
-                    </span>
+                    [class.selected]="isServerSelected(server)">
                     <div class="server-info">
                         <div class="server-name">
-                            {{ server.name }}
-                            <span *ngIf="server.native" class="material-icons mcp-server__native-icon"
-                                [matTooltip]="'CDSCanvas.Native' | translate" matTooltipClass="cds-mat-tooltip">verified</span>
-                            <span *ngIf="isServerSelected(server)" class="material-icons mcp-server__status-icon mcp-server__status-icon--active"
-                                [matTooltip]="'CDSCanvas.Active' | translate" matTooltipClass="cds-mat-tooltip">check_circle</span>
-                            <span *ngIf="!isServerSelected(server)" class="material-icons mcp-server__status-icon mcp-server__status-icon--available"
-                                [matTooltip]="'CDSCanvas.Available' | translate" matTooltipClass="cds-mat-tooltip">check_circle_outline</span>
+                            <span class="server-name__text">{{ server.name }}</span>
+                            <span *ngIf="server.native" class="material-icons-outlined mcp-server__native-icon"
+                                [matTooltip]="'CDSCanvas.Native' | translate" matTooltipClass="cds-mat-tooltip">shield</span>
+                            <span *ngIf="isServerSelected(server)" class="mcp-server__added-note">
+                                &middot; {{'CDSCanvas.AddedToPrompt' | translate}}
+                            </span>
+                            <!-- Azioni: toggle di aggiunta al prompt + edit (solo sui server aggiunti) -->
+                            <div class="mcp-server__actions">
+                                <button
+                                    class="mcp-server__add-btn"
+                                    [class.mcp-server__add-btn--added]="isServerSelected(server)"
+                                    type="button"
+                                    [matTooltip]="(isServerSelected(server) ? 'CDSCanvas.DetachToolsTooltip' : 'CDSCanvas.AddToPromptTooltip') | translate"
+                                    matTooltipClass="cds-mat-tooltip"
+                                    (click)="toggleServerSelection(server, $event)">
+                                    <span *ngIf="isServerSelected(server)" class="material-icons mcp-server__add-btn-icon">link_off</span>
+                                    {{ (isServerSelected(server) ? 'CDSCanvas.DetachTools' : 'CDSCanvas.AddToPrompt') | translate }}
+                                </button>
+                                <span
+                                    *ngIf="isServerSelected(server)"
+                                    class="edit-button"
+                                    role="button"
+                                    tabindex="0"
+                                    [matTooltip]="'CDSCanvas.EditMCPServer' | translate"
+                                    matTooltipClass="cds-mat-tooltip"
+                                    (click)="openEditServerDialog(server, $event)"
+                                    (keydown.enter)="openEditServerDialog(server, $event)"
+                                    (keydown.space)="openEditServerDialog(server, $event)">
+                                    <span class="material-icons mcp-server__edit-icon">edit</span>
+                                </span>
+                            </div>
                         </div>
-                        <div class="server-url">{{ server.url }}</div>
+                        <!-- I server nativi non hanno un URL utile: mostrano la loro description dal catalogo. -->
+                        <div class="server-url">{{ (server.native && server.description) ? server.description : server.url }}</div>
                         <div class="server-type">{{ server.transport }}</div>
                         <div class="server-type mcp-server__tools-active-row">
                             <span class="mcp-server__tools-active-label">{{'CDSCanvas.ToolsActiveLabel' | translate}}:</span>
@@ -74,23 +105,17 @@
                             </mcp-active-tools-inline>
                         </div>
                     </div>
-                    <!-- <span class="material-icons checkmark-icon" *ngIf="isServerSelected(server)">check_circle</span> -->
-                </button>
+                </div>
             </div>
             
         </div>
     </div>
 
     <div class="tpl-modal-buttons">
-        <button id="cds-add-server-btn" class="btn btn-primary cds-blue-button" type="button"
-            (click)="onAddMcpServer()">
-            <span class="material-icons mcp-dialog__add-icon">add</span>
-            {{'CDSCanvas.MCPServer' | translate}}
-        </button>
-        <button id="cds-add-tiledesk-tools-btn" class="btn btn-primary cds-blue-button" type="button"
-            (click)="onAddTiledeskTools()">
-            <span class="material-icons mcp-dialog__add-icon">add</span>
-            {{'CDSCanvas.NativeTools' | translate}}
+        <button id="cds-close-btn" class="mcp-dialog__secondary-btn" type="button"
+            [matTooltip]="'CDSCanvas.Close' | translate" matTooltipClass="cds-mat-tooltip"
+            (click)="onCloseDialog()">
+            {{'CDSCanvas.Close' | translate}}
         </button>
     </div>
 
@@ -102,7 +127,9 @@
                 <span class="mcp-dialog__title">{{'CDSCanvas.AvailableTools' | translate}} ({{ activeToolsModalTools.length }})</span>
                 <span class="mcp-dialog__subtitle">{{'CDSCanvas.ToolsActiveLabel' | translate}}: {{ activeToolsModalSelected.size }} / {{ activeToolsModalTools.length }}</span>
             </div>
-            <i class="material-icons cds-close-btn-icon" (click)="closeActiveToolsModal()">close</i>
+            <i class="material-icons cds-close-btn-icon"
+                [matTooltip]="'CDSCanvas.Close' | translate" matTooltipClass="cds-mat-tooltip"
+                (click)="closeActiveToolsModal()">close</i>
         </div>
         <hr class="custom-hr mcp-dialog__hr">
         <div class="tools-modal__list">
