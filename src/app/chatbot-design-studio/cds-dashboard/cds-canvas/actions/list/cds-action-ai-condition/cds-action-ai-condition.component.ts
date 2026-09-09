@@ -126,7 +126,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.project_id = this.dashboardService.projectID;
-    // i modelli dei provider dinamici (ollama, vllm, agentplatform) vengono caricati da initLLMModels()
+    // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name;
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
@@ -294,7 +294,7 @@ export class CdsActionAiConditionComponent implements OnInit {
         if(found){
           found.conditionIntentId = null;
         }
-      } else {
+      } else if (this.connector.created) {
         if(this.listOfConnectors[idCondition]){
           this.listOfConnectors[idCondition].idConnection =  this.connector.id;
           this.listOfConnectors[idCondition].isConnected  =  true;
@@ -303,6 +303,7 @@ export class CdsActionAiConditionComponent implements OnInit {
           found.conditionIntentId = '#'+this.connector.toId;
         }
       }
+      this.logger.log('[ACTION AI_CONDITION] updateConnectionTrue:', this.listOfConnectors, idCondition, found);
       this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
     } catch (error) {
       this.logger.log('error: ', error);
@@ -359,13 +360,6 @@ export class CdsActionAiConditionComponent implements OnInit {
       return;
     }
     if(property === 'model'){
-      this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
-        this.action.temperature = 1
-        this.ai_setting['temperature'].disabled= true
-      } else {
-        this.ai_setting['temperature'].disabled= false
-      }
       this.action['labelModel'] = event;
     } else if (property === 'question'){
       this.action['question'] = event;

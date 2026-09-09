@@ -62,9 +62,10 @@
 }
 
 
-.cds-custom-tooltip {
-    background-color: #fff;
-    color: #555555;
+.cds-custom-tooltip,
+.mat-tooltip.cds-custom-tooltip {
+    background-color: #fff !important;
+    color: #555555 !important;
     font-size: 12px;
     border-radius: 2px;
     font-family: var(--font-family-poppins);

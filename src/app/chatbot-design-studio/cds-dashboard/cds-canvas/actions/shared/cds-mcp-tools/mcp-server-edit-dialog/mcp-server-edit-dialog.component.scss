@@ -1,23 +1,29 @@
 @import "./src/assets/sass/cds/_variables.scss";
 @import "./src/assets/sass/cds/styles.scss";
 
+/* Frame aligned to the parent dialog (.custom-mcp-dialog-container): same dimensions, header, footer. */
 ::ng-deep .custom-mcp-edit-dialog-container {
-    width: 35vw!important;
-    min-width: 450px;
-    max-width: 600px!important;
+    width: 40vw!important;
+    min-width: 500px;
+    max-width: 700px!important;
     max-height: 80vh;
 
+    .mat-dialog-container {
+        padding: 0px 10px;
+    }
+
     .tpl-modal-box {
+        position: relative;
         border-radius: 6px;
         display: flex;
         flex-direction: column;
         background: rgb(255, 255, 255);
         max-height: 80vh;
-        position: relative;
+        min-height: 335px;
+        height: 80vh;
     }
 
     .tpl-modal-header {
-        align-items: flex-start;
         align-items: center;
         display: flex;
         flex-shrink: 0;
@@ -38,30 +44,60 @@
             }
         }
     }
-    
+
+    .mcp-dialog__hr {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
+
     .tpl-modal-header-text {
         flex-grow: 1;
         text-align: center;
         width: 0;
 
-        span {
+        .mcp-dialog__title {
+            display: block;
             word-wrap: break-word;
-            display: -webkit-box;
-            line-height: 23px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 69px;
+            line-height: 22px;
             font-weight: 600;
             font-size: 16px;
         }
+
+        .mcp-dialog__subtitle {
+            display: block;
+            word-wrap: break-word;
+            line-height: 16px;
+            font-weight: 400;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
     }
-    
+
     .tpl-modal-content {
         flex-grow: 1;
-        padding: 20px;
+        padding: 16px 20px 20px 20px;
         width: 100%;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: var(--blu-02);
+            border-radius: 4px;
+            &:hover {
+                background: var(--blu);
+            }
+        }
+        scrollbar-width: thin;
+        scrollbar-color: var(--blu-02) transparent;
     }
-    
+
     .tpl-modal-buttons {
         display: flex;
         flex-shrink: 0;
@@ -137,125 +173,107 @@
     gap: 8px;
 }
 
-.tools-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 2000;
-}
-
-.tools-modal__backdrop {
+/* ---- "Select tools" overlay: fills the dialog box exactly, same style as the picker popup ---- */
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-}
-
-.tools-modal__panel {
-    position: relative;
-    margin: 6vh auto;
-    width: min(820px, 92vw);
-    max-height: 88vh;
-    background: #fff;
-    border-radius: 10px;
-    padding: 16px;
-    overflow: hidden;
-}
-
-.tools-modal__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.tools-modal__header-left {
+    z-index: 10;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    background: #fff;
+    border-radius: 6px;
 }
 
-.tools-modal__title {
-    font-weight: 700;
-}
-
-.tools-modal__subtitle {
-    color: #6b7280;
-    font-size: 12px;
-}
-
-.tools-modal__list {
-    margin-top: 12px;
-    overflow: auto;
-    max-height: calc(88vh - 92px);
-    padding-right: 6px;
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__list {
+    flex: 1;
+    overflow-y: auto;
     overflow-x: hidden;
+    padding: 4px 20px 16px 20px;
 
-    /* Custom scrollbar styles (aligned with .custom-mcp-dialog-container .tpl-modal-content) */
     &::-webkit-scrollbar {
         width: 8px;
     }
-
     &::-webkit-scrollbar-track {
         background: transparent;
         border-radius: 4px;
     }
-
     &::-webkit-scrollbar-thumb {
         background: var(--blu-02);
         border-radius: 4px;
-
         &:hover {
             background: var(--blu);
         }
     }
-
-    /* Firefox */
     scrollbar-width: thin;
     scrollbar-color: var(--blu-02) transparent;
 }
 
-::ng-deep .custom-mcp-edit-dialog-container .tools-modal__item {
-    display: block;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__empty {
+    font-size: 13px;
+    color: #6b7280;
+    padding: 12px 2px;
 }
 
-.tools-modal__item-content {
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 2px;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+    &:hover {
+        background-color: #f8fafc;
+    }
+}
+
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__selectall {
+    border-bottom: 2px solid #e5e7eb;
+
+    .tools-modal__item-name {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #374151;
+    }
+}
+
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__item-check {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 18px;
+    color: #cbd5e1;
+}
+
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__item-check--on {
+    color: var(--blu-02);
+}
+
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__item-content {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
-.tools-modal__item-name {
-    font-weight: 700;
-}
-
-.tools-modal__item-title {
-    color: #111827;
-    margin-top: 2px;
-}
-
-.tools-modal__item-description {
-    color: #6b7280;
-    white-space: normal;
-    overflow-wrap: anywhere;
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
     word-break: break-word;
 }
 
-/* Ensure no horizontal scrollbar is introduced by long tokens */
-.tools-modal__panel,
-.tools-modal__list,
-.tools-modal__item-content {
-    overflow-x: hidden;
-}
-
-/**
- * Remove ANY background/ripple effect for checkboxes in Available tools list
- * (hover, focus, active, etc.)
- */
-::ng-deep .custom-mcp-edit-dialog-container .tools-modal__list .mat-checkbox-ripple,
-::ng-deep .custom-mcp-edit-dialog-container .tools-modal__list .mat-checkbox-persistent-ripple,
-::ng-deep .custom-mcp-edit-dialog-container .tools-modal__list .mat-ripple-element {
-    display: none !important;
-    background: transparent !important;
+::ng-deep .custom-mcp-edit-dialog-container .tools-modal .tools-modal__item-desc {
+    font-size: 12px;
+    line-height: 16px;
+    color: #6b7280;
+    margin-top: 2px;
+    word-break: break-word;
 }
 
 /**
@@ -277,15 +295,6 @@
 #cds-save-btn:disabled {
     opacity: 0.5;
     cursor: default;
-}
-
-#cds-cancel-btn {
-    background: #e5e5e5;
-    color: #4b5052;
-
-    &:hover {
-        opacity: 0.8;
-    }
 }
 
 .spinner {
@@ -368,7 +377,7 @@
 }
 
 ::ng-deep .custom-mcp-edit-dialog-container .auth-accordion .mat-expansion-panel-body {
-    padding: 0 10px!important;
+    padding: 0 10px 10px!important;
 }
 
 .auth-header {
@@ -461,6 +470,70 @@
     font-size: 14px;
     line-height: 1;
     color: #64748b;
+}
+
+/* OAuth 2.0 Flow Card */
+.oauth-card {
+    background: #ffffff;
+    border: 1px solid #e4e6eb;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    padding: 18px;
+    margin-top: 12px;
+}
+
+.oauth-head {
+    margin-bottom: 14px;
+}
+
+.oauth-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.oauth-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.oauth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.oauth-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.oauth-label--with-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.oauth-info-icon {
+    font-size: 15px;
+    line-height: 1;
+    color: #94a3b8;
+    cursor: help;
+    transition: color 120ms ease;
+
+    &:hover {
+        color: #64748b;
+    }
+}
+
+/* Wrapper so the absolutely-positioned .eye aligns inside the secret input */
+.oauth-secret {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 /* Header Rows */

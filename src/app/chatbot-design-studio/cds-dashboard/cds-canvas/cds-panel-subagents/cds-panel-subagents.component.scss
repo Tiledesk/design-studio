@@ -1,0 +1,291 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.subagents-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    margin: 6px 0 10px;
+
+    .search-icon {
+        position: absolute;
+        left: 22px;
+        font-size: 18px;
+        color: #9ba6b3;
+        pointer-events: none;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 34px;
+        padding: 0 10px 0 34px;
+        border: 1px solid #e2e8ee;
+        border-radius: 6px;
+        background: #fff;
+        font-family: var(--font-family-poppins);
+        font-size: 13px;
+        color: #22272d;
+        outline: none;
+        transition: border-color .2s;
+
+        &:focus {
+            border-color: var(--blu, #1f64ef);
+        }
+    }
+}
+
+.subagents-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px;
+
+    // Scrollbar minimalista: track trasparente, thumb sottile visibile solo su hover
+    &::-webkit-scrollbar { width: 6px; height: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
+    &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
+    &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
+}
+
+.subagent-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color .2s;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        background: #f0f4f7;
+    }
+
+    // elemento correntemente aperto (parent o subagent)
+    &.active {
+        background: #e7effe;
+
+        .subagent-icon { color: var(--blu, #1f64ef); }
+        .subagent-name { color: var(--blu, #1f64ef); font-weight: 600; }
+    }
+
+    // mat-icon rende un <svg>: la dimensione va data all'icona e al box, non con
+    // font-size. Alcuni asset (man.svg) hanno fill="#FFFFFF" inchiodato e vince
+    // sul color ereditato: va riportato a currentColor.
+    .subagent-icon {
+        width: 20px;
+        height: 20px;
+        // Grigio piu' carico del testo: l'icona di gruppo e' fitta e a 18px
+        // chiaro si leggeva male.
+        color: #5a6672;
+        flex-shrink: 0;
+
+        ::ng-deep svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+    }
+
+    // L'omino dei subagent e' sempre blu; il parent resta grigio finche' non e' attivo.
+    // Altezza ridotta rispetto all'icona del parent: l'altezza va data sia al box
+    // di mat-icon sia all'<svg> interno, altrimenti l'svg resta alla misura piena.
+    &:not(.parent-item) .subagent-icon {
+        color: var(--blu, #1f64ef);
+       
+
+        ::ng-deep svg {
+            width: 12px;
+            height: 12px;
+        }
+    }
+
+    .subagent-name {
+        flex: 1;
+        font-size: 14px;
+        color: #444a51;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    // tre puntini: compaiono su hover della riga, restano visibili se il menu e' aperto
+    // (aria-expanded) o se la riga e' quella attiva, cosi' il target non "scappa".
+    .subagent-menu-btn {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: #7d8a97;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity .15s, background-color .15s;
+
+        .material-icons { font-size: 18px; }
+
+        &:hover { background: #dfe6ec; color: #444a51; }
+        &[aria-expanded="true"] { opacity: 1; background: #dfe6ec; }
+    }
+
+    &:hover .subagent-menu-btn,
+    &.active .subagent-menu-btn { opacity: 1; }
+}
+
+// Menu azioni del subagent: stessa grammatica visiva del menu "Options" (cds-menu +
+// context-menu): pannello bianco con bordo gray-02, niente ombra, voci da 30px con
+// icona 16px grigia e testo 11px blu, ombra soffusa in hover.
+::ng-deep .mat-menu-panel.subagent-menu-panel {
+    min-width: 0;
+    max-width: none;
+    // Material impone min-height:64px alle mat-menu-panel: senza azzerarlo il pannello
+    // resta molto piu' alto della voce che contiene.
+    min-height: 0;
+    width: 160px;
+    border-radius: 8px;
+    border: 2px solid var(--gray-02);
+    box-shadow: none;
+    background: #fff;
+    overflow: hidden;
+
+    // il padding del content e' l'UNICO margine: 6px identici sui 4 lati attorno alla voce
+    .mat-menu-content:not(:empty) { padding: 6px; }
+
+    .subagent-menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        height: 30px;
+        margin: 0;
+        padding: 0 2px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+            box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+
+            .subagent-menu-item-icon span { color: var(--blu); }
+            .subagent-menu-item-text { color: var(--blu); }
+        }
+    }
+
+    .subagent-menu-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+            width: 16px;
+            font-size: 16px;
+            color: var(--gray-light-01);
+        }
+    }
+
+    .subagent-menu-item-text {
+        color: var(--blu);
+        padding: 0 6px;
+        font-size: 11px;
+        font-weight: 400;
+    }
+
+    .truncate {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+}
+
+// riga del chatbot parent: sempre in cima, con badge e separatore
+.parent-item {
+    margin-bottom: 4px;
+    border-bottom: 1px solid #eef2f6;
+    border-radius: 6px 6px 0 0;
+
+    .parent-badge {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .3px;
+        color: #7d8a97;
+        background: #eef2f6;
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+
+    &.active .parent-badge {
+        color: var(--blu, #1f64ef);
+        background: #dbe7fe;
+    }
+}
+
+.subagents-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    text-align: center;
+    color: #9ba6b3;
+
+    .empty-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 40px;
+        opacity: 0.5;
+        margin-bottom: 10px;
+    }
+
+    .empty-text {
+        font-size: 13px;
+        margin: 0;
+    }
+}
+
+.subagents-new {
+    // In coda alla lista, subito sotto l'ultimo subagent: scorre con essa.
+    padding: 6px 0 10px;
+
+    .new-subagent-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        height: 36px;
+        border: 1px solid #c6cdd4;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--blu, #1f64ef);
+        font-family: var(--font-family-poppins);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color .2s, border-color .2s;
+
+        .material-icons {
+            font-size: 18px;
+        }
+
+        &:hover {
+            background: #f0f4f7;
+            border-color: var(--blu, #1f64ef);
+        }
+    }
+}

@@ -14,7 +14,14 @@ import { OPENAI_MODEL, LLM_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-
  * Provider i cui modelli NON sono hardcoded ma arrivano dall'integration di progetto
  * (GET /integration/name/<provider>). Unico punto da toccare per aggiungerne altri.
  */
-export const DYNAMIC_MODEL_PROVIDERS = ['ollama', 'vllm', 'agentplatform'] as const;
+export const DYNAMIC_MODEL_PROVIDERS = ['ollama', 'vllm', 'agentplatform', 'openrouter'] as const;
+
+/**
+ * Provider da considerare configurati senza cercare `value.apikey` al primo livello:
+ * openai lo e' di default, vllm/agentplatform tengono la apikey dentro `value.servers[]`.
+ * OpenRouter NON e' qui: la sua apikey sta al primo livello e va verificata davvero.
+ */
+const ALWAYS_CONFIGURED_PROVIDERS: string[] = ['openai', 'ollama', 'vllm', 'agentplatform'];
 
 export interface LlmModel {
   /** Identità univoca della voce nella select: `${llm}::${server}::${model}`. */
@@ -31,6 +38,7 @@ export interface LlmModel {
   multiplier?: string;
   min_tokens?: number;
   max_output_tokens?: number;
+  reasoning?: boolean;
   /** Nome del server dell'integration a cui il modello appartiene (solo provider multi-server). */
   server?: string;
 }
@@ -192,10 +200,14 @@ export async function getIntegrationModels(
       if (!value) {
         continue;
       }
-      // Build model entries supporting BOTH integration shapes:
+      // Build model entries supporting ALL integration shapes:
       // - multi-endpoint (vLLM, Gemini Agent Platform): value.servers[].models
       //   -> modelName label = "<server name> ・ model" and server = server NAME (the server's name, NOT the url)
-      // - legacy flat (e.g. ollama / old vLLM): value.models -> label = value = model id
+      // - legacy flat (e.g. ollama / old vLLM): value.models is string[] -> label = value = model id
+      // - per-model config (OpenRouter): value.models is object[] carrying the
+      //   provider routing -> label = the catalogue name, value = the routable id.
+      //   The routing itself is NOT sent from here: the server resolves it from
+      //   the integration by model id, so only the id has to survive.
       let entries: Array<{ name: string; value: string; server?: string }> = [];
       if (Array.isArray(value.servers)) {
         for (const server of value.servers) {
@@ -210,8 +222,19 @@ export async function getIntegrationModels(
         }
       } else if (Array.isArray(value.models)) {
         entries = value.models
-          .filter((m: any) => typeof m === 'string' && m.trim().length > 0)
-          .map((m: string) => ({ name: m, value: m }));
+          .map((m: any) => {
+            if (typeof m === 'string') {
+              const id = m.trim();
+              return id.length > 0 ? { name: id, value: id } : null;
+            }
+            const id = (m?.id ?? '').toString().trim();
+            if (id.length === 0) {
+              return null;
+            }
+            const label = (m?.name ?? '').toString().trim();
+            return { name: label.length > 0 ? label : id, value: id };
+          })
+          .filter((e: any): e is { name: string; value: string } => e !== null);
       }
       // De-duplicate by display label, preserving order.
       const seen = new Set<string>();
@@ -236,6 +259,56 @@ export async function getIntegrationModels(
       }
     }
   }
+}
+
+/** 
+ * Manages GPT-5 model specific settings
+ * @param modelName The model name to check
+ * @param action The action object to update
+ * @param ai_setting The AI settings object to update
+ */
+export function manageGpt5ModelSettings(
+  action: any,
+  ai_setting: any
+): void {
+  let modelName = action?.model;
+  if (!modelName || !action || !ai_setting) {
+    return;
+  }
+
+  const isGpt5 = modelName.toLowerCase().startsWith('gpt-5');
+  
+  if (isGpt5) {
+    action.temperature = 1;
+    ai_setting['temperature'].disabled = true;
+    // if (ai_setting['max_tokens']) {
+    //   ai_setting['max_tokens'].max = 100000;
+    // }
+  } else {
+    ai_setting['temperature'].disabled = false;
+    // if (ai_setting['max_tokens']) {
+    //   ai_setting['max_tokens'].max = 8192;
+    //   if (action.max_tokens > 8192) {
+    //     action.max_tokens = 8192;
+    //   }
+    // }
+  }
+}
+
+/**
+ * Filters models to keep only those present in the aiModels configuration.
+ * @param models Array of models to filter
+ * @param aiModelsParsed Parsed aiModels config from loadTokenMultiplier
+ * @param getModelKey Function to extract the model key from each item
+ * @returns Filtered array of models
+ */
+export function filterModelsByAiModelsConfig<T>(
+  models: T[],
+  aiModelsParsed: Record<string, number | null>,
+  getModelKey: (model: T) => string
+): T[] {
+  const allowedKeys = Object.keys(aiModelsParsed || {});
+  return models.filter(m => allowedKeys.includes(getModelKey(m)));
 }
 
 /**
@@ -337,13 +410,11 @@ export async function initLLMModels(params: InitLLMModelsParams): Promise<LlmMod
     });
   }
   
-  // Second pass: Always set configured = true for openai and the dynamic providers.
-  // I provider dinamici non hanno `value.apikey` al primo livello (in agentplatform/vllm
-  // la apikey sta dentro value.servers[]), quindi il primo passaggio non li vedrebbe.
-  const ALWAYS_CONFIGURED: string[] = ['openai', ...DYNAMIC_MODEL_PROVIDERS];
+  // Second pass: vedi ALWAYS_CONFIGURED_PROVIDERS — questi provider non espongono
+  // `value.apikey` al primo livello, quindi il passaggio precedente non li vedrebbe.
   llm_models_flat.forEach(model => {
     const llmLower = model.llm.toLowerCase();
-    if(ALWAYS_CONFIGURED.includes(llmLower)){
+    if(ALWAYS_CONFIGURED_PROVIDERS.includes(llmLower)){
       model.configured = true;
     }
   });
