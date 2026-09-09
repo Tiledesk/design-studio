@@ -1454,7 +1454,12 @@ export class IntentService {
       this.setBehaviorUndoRedo();
       this.opsUpdate(this.payload);
     }
-    const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
+    // Optional all the way down: this is a log line, and `intentSelected` is
+    // null on a freshly rebuilt canvas (a flow switch destroys and recreates
+    // it, and nothing re-selects a block). Dereferencing it there threw --
+    // out of a public method the canvas's own Ctrl+Z and the chat panel's
+    // Undo both call -- for the sake of a message nobody reads.
+    const action = this.intentSelected?.actions?.find((obj) => obj._tdActionId === this.actionSelectedID);
     this.logger.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
   }
 

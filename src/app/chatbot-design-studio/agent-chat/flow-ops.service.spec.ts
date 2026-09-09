@@ -266,6 +266,49 @@ describe('FlowOpsService — intent operations', () => {
     expect(intentService.restoreLastUNDO).not.toHaveBeenCalled();
   });
 
+  // The failure this test exists for: the canvas used to move only by page
+  // reload, which took this service's state with it. It does not any more,
+  // and neither the undo stack nor this service's depth counter is cleared by
+  // a switch. Popping here feeds the PARENT's intents to restoreIntent(),
+  // which inserts them into the flow now open -- each still carrying the
+  // parent's id_faq_kb, which IntentService.updateIntent copies straight into
+  // the payload of the next write that touches it. That write persists into
+  // the parent while the host's guard, which compares tool-level ids only,
+  // sees a perfectly ordinary patch.
+  it('refuses to undo a batch applied to a flow the canvas has since left', async () => {
+    await service.apply([
+      { op: 'update_intent', intent_id: 'i2', intent_display_name: 'first' },
+      { op: 'update_intent', intent_id: 'i3', intent_display_name: 'second' }
+    ]);
+    // What open_flow does: the studio is now on another flow of the family.
+    dashboardService.id_faq_kb = 'sub1';
+
+    expect(service.undoLast()).toBe(false);
+    expect(intentService.restoreLastUNDO).not.toHaveBeenCalled();
+    // The entries the batch pushed are still on the stack -- this refuses to
+    // spend them here, it does not pretend they were spent.
+    expect(undoStack.length).toBe(2);
+  });
+
+  // And the depth is zeroed by the refusal, so coming back does not make the
+  // stale offer live again: the batch belongs to a canvas instance that no
+  // longer exists, whatever flow is on screen now.
+  it('does not resurrect the offer when the canvas comes back to the original flow', async () => {
+    await service.apply([{ op: 'update_intent', intent_id: 'i2', intent_display_name: 'first' }]);
+    dashboardService.id_faq_kb = 'sub1';
+    service.undoLast();
+    dashboardService.id_faq_kb = 'kb1';
+
+    expect(service.undoLast()).toBe(false);
+    expect(intentService.restoreLastUNDO).not.toHaveBeenCalled();
+  });
+
+  it('still undoes a batch applied to the flow that is still open', async () => {
+    await service.apply([{ op: 'update_intent', intent_id: 'i2', intent_display_name: 'first' }]);
+    expect(service.undoLast()).toBe(true);
+    expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(1);
+  });
+
   it('undoes only what actually applied when a batch failed midway', async () => {
     intentService.updateIntent.and.callFake((intent: Intent) => {
       if (intent.intent_id === 'i3') { return Promise.reject(new Error('network down')); }
@@ -3464,10 +3507,20 @@ describe('FlowOpsService — the call to a subagent', () => {
         return { _tdActionId: 'generated', _tdActionType: type };
       }),
       updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
-      createNewIntent: jasmine.createSpy('createNewIntent'),
+      // Returns a real Intent, not a bare spy: the inline-actions tests below
+      // let add_intent run all the way through, and addIntent() populates the
+      // object this hands back.
+      createNewIntent: jasmine.createSpy('createNewIntent')
+        .and.callFake((id_faq_kb: string, action: any, pos: any) => {
+          const intent = anIntent('new-id', 'Untitled Block 1');
+          intent.attributes.position = pos;
+          return intent;
+        }),
       addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
       saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
       deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
     };
     // Spies, not plain functions: a batch that mentions no callsubagent must
@@ -3516,6 +3569,45 @@ describe('FlowOpsService — the call to a subagent', () => {
         fields: { botId: 'sub1', blockName: 'nowhere' } } as any]);
     expect(report.rejected_before_applying).toBe(true);
     expect(report.results[0].error).toContain('nowhere');
+  });
+
+  // The same two rules, through the door the agent is actually most likely to
+  // use: the shipped prompt tells it to create every block with its actions
+  // inline, so `add_intent` -- not `add_action` -- is the likely shape of the
+  // wiring step. Neither the prefetch nor validation looked at it, so a call
+  // to any botId at all, naming any block at all, was applied unchecked.
+  it('refuses a botId that is not a subagent, through add_intent\'s inline actions', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'call it',
+        actions: [{ type: 'callsubagent', fields: { botId: 'stranger', blockName: 'start' } }]
+      } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('stranger');
+    // Refused before anything ran: no block was created either.
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+  });
+
+  it('refuses a blockName the subagent does not have, through add_intent\'s inline actions', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'call it',
+        actions: [{ type: 'callsubagent', fields: { botId: 'sub1', blockName: 'nowhere' } }]
+      } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('nowhere');
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+  });
+
+  // The other half of the fix: validation can only refuse what the prefetch
+  // gathered. If add_intent's inline actions were still invisible to
+  // subagentBlockNames, a perfectly valid call would be refused as "not a
+  // subagent" because nothing had ever been fetched for it.
+  it('accepts a real call built through add_intent\'s inline actions', async () => {
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'call it',
+        actions: [{ type: 'callsubagent', fields: { botId: 'sub1', blockName: 'start' } }]
+      } as any]);
+    expect(report.ok).toBe(true);
+    expect(faqService.getAllFaqByFaqKbId).toHaveBeenCalledWith('sub1');
   });
 
   it('accepts a call to a real block of a real subagent', async () => {

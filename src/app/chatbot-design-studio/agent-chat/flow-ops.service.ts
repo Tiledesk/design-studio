@@ -92,6 +92,23 @@ export class FlowOpsService {
    *  and no way back. */
   private lastBatchUndoDepth = 0;
 
+  /** Which flow the entries counted by `lastBatchUndoDepth` were applied to.
+   *
+   *  Undo does not cross a flow switch -- that has always been the rule, but
+   *  until the canvas could move without a page reload it was enforced by the
+   *  reload itself. It no longer is: this service is `providedIn: 'root'`, so
+   *  `lastBatchUndoDepth` survives a switch, and so does the panel that offers
+   *  the Undo. Popping then feeds the *parent's* intents into
+   *  `restoreIntent()`, which inserts them into whatever flow is now open --
+   *  and each of those intents still carries the parent's `id_faq_kb`, which
+   *  `IntentService.updateIntent` copies straight into its payload. The next
+   *  write touching one of them persists into the parent while the host's
+   *  guard, which compares tool-level ids only, sees nothing wrong.
+   *
+   *  So the depth is only ever spent on the flow that earned it. null means
+   *  there is nothing to undo. */
+  private lastBatchFaqKbId: string | null = null;
+
   /** Where this service put each block it positioned itself, keyed by
    *  intent_id -- the blocks it is allowed to move again later.
    *
@@ -143,7 +160,7 @@ export class FlowOpsService {
     if (subagentFetch.error) {
       // Same shape as any other batch-level refusal: nothing was applied, so
       // nothing from this batch is (or was) on the undo stack.
-      this.lastBatchUndoDepth = 0;
+      this.forgetLastBatch();
       return {
         ok: false, rejected_before_applying: true,
         results: [{ op: '(none)', ok: false, error: subagentFetch.error }]
@@ -155,7 +172,7 @@ export class FlowOpsService {
       // Nothing was applied, so nothing from this batch is on the undo stack.
       // Leaving a previous batch's depth in place would make the next Undo
       // pop entries this batch never pushed.
-      this.lastBatchUndoDepth = 0;
+      this.forgetLastBatch();
       return { ok: false, rejected_before_applying: true, results: validation };
     }
 
@@ -199,6 +216,10 @@ export class FlowOpsService {
       blocksToRedraw.add(movedId);
     }
     this.lastBatchUndoDepth = Math.max(this.undoStackDepth() - undoDepthBefore, 0);
+    // Recorded beside the depth, and read again by undoLast(): the depth is
+    // only spendable on the flow that was open when the batch was applied.
+    this.lastBatchFaqKbId = this.lastBatchUndoDepth > 0
+      ? this.dashboardService.id_faq_kb : null;
     this.redrawBlocks(blocksToRedraw);
     return { ok, rejected_before_applying: false, results };
   }
@@ -214,11 +235,28 @@ export class FlowOpsService {
    *  operations, and each of those pushed its own entry. Popping one would
    *  leave N-1 applied while the button disappears, so the user is told the
    *  flow was restored when most of it was not. */
-  public undoLast(): void {
+  public undoLast(): boolean {
+    // Refused rather than performed once the canvas has moved: the entries on
+    // the stack describe the previous flow's blocks, and restoring them here
+    // would insert them into this one -- carrying the previous flow's
+    // id_faq_kb with them, which is what later persists the write back into
+    // the wrong chatbot. See `lastBatchFaqKbId`.
+    if (!this.lastBatchUndoDepth
+        || this.lastBatchFaqKbId !== this.dashboardService.id_faq_kb) {
+      this.forgetLastBatch();
+      return false;
+    }
     for (let i = 0; i < this.lastBatchUndoDepth; i++) {
       this.intentService.restoreLastUNDO();
     }
+    this.forgetLastBatch();
+    return true;
+  }
+
+  /** There is nothing of this service's to undo any more. */
+  private forgetLastBatch(): void {
     this.lastBatchUndoDepth = 0;
+    this.lastBatchFaqKbId = null;
   }
 
   /** Block names, per subagent, for every `callsubagent` this batch mentions.
@@ -228,9 +266,10 @@ export class FlowOpsService {
    *  applied), and reading another flow's blocks is a network call. Nothing
    *  is fetched for a batch that calls no subagent.
    *
-   *  `add_action` always wants `fields.botId` -- there is no existing action
-   *  to inherit one from, so a `callsubagent` being created always names its
-   *  subagent right there. `update_action` is a partial patch, like every
+   *  `add_action` -- and `add_intent`'s inline `actions`, which are the same
+   *  payload by another name -- always want `fields.botId`: there is no
+   *  existing action to inherit one from, so a `callsubagent` being created
+   *  always names its subagent right there. `update_action` is a partial patch, like every
    *  other op in this verb set: it wants `fields.botId` when the patch is
    *  (re)setting it, or -- only when the patch supplies a `blockName` to
    *  check -- the action's own current `botId`, found via `targetActionOf`.
@@ -252,6 +291,19 @@ export class FlowOpsService {
   private async subagentBlockNames(ops: FlowOp[]): Promise<SubagentBlockNamesResult> {
     const wanted = new Set<string>();
     for (const op of ops as any[]) {
+      if (op?.op === 'add_intent') {
+        // The shipped prompt tells the agent to create a block with its
+        // actions inline, so this -- not add_action -- is the likely shape of
+        // the wiring step. An inline action is `add_action`'s payload by
+        // another name (a `type` and a `fields`), and there is no existing
+        // action to inherit a botId from, so it is gathered the same way.
+        for (const action of (Array.isArray(op.actions) ? op.actions : []) as any[]) {
+          if (action?.type === TYPE_ACTION.REPLACE_BOTV4 && action?.fields?.botId) {
+            wanted.add(String(action.fields.botId));
+          }
+        }
+        continue;
+      }
       if (op?.op === 'add_action') {
         if (op.type === TYPE_ACTION.REPLACE_BOTV4 && op?.fields?.botId) {
           wanted.add(String(op.fields.botId));
@@ -717,6 +769,16 @@ export class FlowOpsService {
       const violation = this.findScaffoldViolation(action.type, scaffold, action.fields);
       if (violation) {
         return { op: op.op, ok: false, error: violation };
+      }
+      // The same two rules add_action is held to. An inline action is the
+      // only difference between "create the block, then wire it" and "create
+      // the block wired"; it must not also be the difference between a
+      // checked callsubagent and an unchecked one.
+      if (action.type === TYPE_ACTION.REPLACE_BOTV4) {
+        const subagentViolation = this.validateSubagentCall(action.fields);
+        if (subagentViolation) {
+          return { op: op.op, ok: false, error: subagentViolation };
+        }
       }
       const destinationViolation = this.validateActionDestinations(action.type, action.fields);
       if (destinationViolation) {
