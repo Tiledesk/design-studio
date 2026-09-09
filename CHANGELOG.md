@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 09/09/2026
+
+- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+
 # this branch 08/09/2026
 
 - **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px

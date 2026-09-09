@@ -8,6 +8,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { CdsNewSubagentDialogComponent } from './cds-new-subagent-dialog/cds-new-subagent-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogYesNoComponent } from 'src/app/chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
+import { NotifyService } from 'src/app/services/notify.service';
 
 export interface SubagentItem {
   _id: string;
@@ -28,6 +29,20 @@ export function sortSubagentsByName(items: SubagentItem[]): SubagentItem[] {
   return [...items].sort((a, b) =>
     (a?.name || '').localeCompare(b?.name || '', undefined, { sensitivity: 'base', numeric: true })
   );
+}
+
+/**
+ * Estrae il messaggio da mostrare quando la DELETE di un subagent fallisce.
+ * Il backend risponde 4xx con un body { success, msg, error_code, referenced_by } e il `msg`
+ * e' gia' esplicito ("Cannot delete subagent because it is still referenced by another chatbot"),
+ * quindi si mostra cosi' com'e'. Ritorna null quando non c'e' un msg utilizzabile: in quel caso
+ * il chiamante ricade sul testo generico.
+ *
+ * Funzione pura ed esportata apposta per poterla testare senza montare il componente.
+ */
+export function getDeleteSubagentErrorMessage(error: any): string | null {
+  const msg = error?.error?.msg;
+  return typeof msg === 'string' && msg.trim().length > 0 ? msg.trim() : null;
 }
 
 /**
@@ -80,7 +95,8 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private notify: NotifyService
   ) { }
 
   ngOnDestroy(): void {
@@ -286,6 +302,9 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.isDeleting = false;
         this.logger.error('[CDS-PANEL-SUBAGENTS] delete error:', error);
+        const message = getDeleteSubagentErrorMessage(error)
+          ?? this.translate.instant('CDSSetting.ThereHasBeenAnErrorProcessing');
+        this.notify.showWidgetStyleUpdateNotification(message, 4, 'report_problem');
       }
     });
   }
