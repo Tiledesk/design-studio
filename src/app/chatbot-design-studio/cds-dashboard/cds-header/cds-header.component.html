@@ -23,10 +23,15 @@
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
     <!-- Agent chat toggle: takes the leftmost spot in header-right, where the
-         wordmark used to sit. It drives the canvas, so it has no meaning on a
-         section where the canvas is not present (isBlockSectionActive guard). -->
-    <div *ngIf="isBlockSectionActive && isAgentChatAvailable" class="btn-group header-agent-chat-btn">
-        <button id="cds-agent-chat-btn"
+         wordmark used to sit. This cell renders unconditionally -- .header-right
+         is a 3-column grid, and .header-title needs to stay in the middle column
+         whether or not the button inside is shown, so the *ngIf goes on the
+         button, not the cell. It drives the canvas, so it has no meaning on a
+         section where the canvas is not present (isBlockSectionActive guard),
+         and needs the host to be configured (isAgentChatAvailable). -->
+    <div class="btn-group header-agent-chat-btn">
+        <button *ngIf="isBlockSectionActive && isAgentChatAvailable"
+            id="cds-agent-chat-btn"
             class="btn btn-primary cds-blue-button"
             type="button"
             [title]="'CDS.AgentChat.Toggle' | translate"

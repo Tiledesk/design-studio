@@ -30,8 +30,27 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
   private dragStartX = 0;
   private dragStartWidth = 0;
   private currentWidth = 0;
+  /** The width the user actually asked for -- restored from storage or set at
+   *  the end of a drag -- kept separate from whatever is currently applied so
+   *  a window resize can re-derive a clamped display width from it without
+   *  ever touching storage: shrinking the window clamps the display live,
+   *  growing it back restores the full preferred value, and the user's
+   *  stored choice is never silently downgraded by a transient narrow
+   *  window. null means "no override, use the stylesheet default". */
+  private preferredWidth: number | null = null;
   private readonly onDragMove = (event: MouseEvent): void => this.handleDragMove(event);
   private readonly onDragEnd = (): void => this.handleDragEnd();
+  // A drag that ends anywhere other than a `mouseup` inside this document --
+  // released over another application, or the window losing focus mid-drag
+  // -- must still tear the mask down; both route to the same handleDragEnd
+  // as a normal mouseup.
+  private readonly onWindowBlur = (): void => this.handleDragEnd();
+  private readonly onKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape') {
+      this.handleDragEnd();
+    }
+  };
+  private readonly onWindowResize = (): void => this.reclampToWindow();
 
   /** Null until the host is wired. Setting it is what loads the chat.
    *  Kept as a plain string beside the sanitised one so tests can assert the
@@ -67,6 +86,7 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
 
   ngOnInit(): void {
     this.restorePersistedWidth();
+    window.addEventListener('resize', this.onWindowResize);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -118,6 +138,7 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
     this.appliedSub?.unsubscribe();
     this.hostService.detach();
     this.stopDragListeners();
+    window.removeEventListener('resize', this.onWindowResize);
   }
 
   // --- Resize -------------------------------------------------------------
@@ -142,10 +163,27 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
     this.currentWidth = this.dragStartWidth;
     document.addEventListener('mousemove', this.onDragMove);
     document.addEventListener('mouseup', this.onDragEnd);
+    // Belt-and-braces exits for a drag that never gets a `mouseup` delivered
+    // to this document at all: the window loses focus (alt-tab, click into
+    // another app while the button happens to still be down at the OS
+    // level), or the user bails out with Escape. handleDragMove's own
+    // event.buttons === 0 check covers the remaining case -- the pointer
+    // re-entering the window after the button was already released outside
+    // it, which arrives as a plain mousemove with no mouseup ever firing.
+    window.addEventListener('blur', this.onWindowBlur);
+    document.addEventListener('keydown', this.onKeyDown);
   }
 
   private handleDragMove(event: MouseEvent): void {
     if (!this.resizing) {
+      return;
+    }
+    if (event.buttons === 0) {
+      // The button was released somewhere this document never saw a mouseup
+      // for (typically outside the browser window), and the pointer has now
+      // moved back over us with nothing held. Treat it exactly as an end of
+      // drag rather than continuing to resize with no button down.
+      this.handleDragEnd();
       return;
     }
     const delta = event.clientX - this.dragStartX;
@@ -160,18 +198,42 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
     this.resizing = false;
     this.elementRef.nativeElement.classList.remove('is-resizing');
     this.stopDragListeners();
-    this.persistWidth(Math.round(this.currentWidth));
+    const rounded = Math.round(this.currentWidth);
+    // A plain click on the handle -- mousedown immediately followed by
+    // mouseup, no movement in between -- must not pin whatever width was
+    // already in effect (often just the untouched stylesheet default) into
+    // storage as an explicit override.
+    if (rounded !== Math.round(this.dragStartWidth)) {
+      this.preferredWidth = rounded;
+      this.persistWidth(rounded);
+    }
   }
 
   private stopDragListeners(): void {
     document.removeEventListener('mousemove', this.onDragMove);
     document.removeEventListener('mouseup', this.onDragEnd);
+    window.removeEventListener('blur', this.onWindowBlur);
+    document.removeEventListener('keydown', this.onKeyDown);
   }
 
   /** Double-click on the handle: back to the stylesheet default. */
   onResizeReset(): void {
+    this.preferredWidth = null;
     this.elementRef.nativeElement.style.removeProperty('--agent-chat-width');
     this.removePersistedWidth();
+  }
+
+  /** Re-clamps the last width the user actually chose against the current
+   *  window size, without ever writing to storage: shrinking the window
+   *  clamps what's on screen; growing it back restores the full preferred
+   *  value from the same unmodified number, rather than from whatever a
+   *  temporary clamp had reduced it to. A no-op when the panel has never
+   *  been given an explicit width (still on the stylesheet default). */
+  private reclampToWindow(): void {
+    if (this.preferredWidth === null) {
+      return;
+    }
+    this.applyWidth(this.clampWidth(this.preferredWidth));
   }
 
   private clampWidth(px: number): number {
@@ -197,9 +259,16 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
       return;
     }
     const parsed = parseInt(stored, 10);
+    // A corrupt value (NaN from a non-numeric string, or anything from a
+    // future/foreign format written under the same key) must not break the
+    // layout -- fall back to the stylesheet default exactly as if nothing
+    // were stored, rather than applying an unusable width. Negative or huge
+    // numbers are legitimately clamped, not rejected: clampWidth already
+    // pulls them back into [MIN_WIDTH, maxWidth()].
     if (!Number.isFinite(parsed)) {
       return;
     }
+    this.preferredWidth = parsed;
     this.applyWidth(this.clampWidth(parsed));
   }
 

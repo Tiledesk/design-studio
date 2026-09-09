@@ -352,8 +352,25 @@ cds-fulfillment {
 
 
 /*********** START Draggable  *************/
+// #tds_container is a real flex item of :host's row now, not the hard
+// calc(100% - rail) it used to be. That old width never subtracted
+// .box-left's 230px either (a pre-existing, smaller version of the same
+// bug) -- it only "worked" because nothing before it in the row consumed
+// enough of the layout to matter, and the leftover was clipped by :host's
+// overflow: hidden. With the chat panel now also a real preceding sibling
+// (up to 708px), the clipped fraction got big enough that fit-to-screen
+// (utils.ts scaleAndcenterStageOnCenterPosition, which reads this exact
+// element's getBoundingClientRect().width) started computing its scale
+// against a stage that was half off-screen. flex: 1 1 auto + min-width: 0
+// makes the browser compute the true remaining width after every real
+// sibling -- cds-panel-agent-chat AND .box-left alike -- so both cases are
+// fixed by the one rule instead of two calc() special cases.
+// The #id selector's specificity is what's needed to win over
+// .tds-drag-container's `position: absolute` below.
 #tds_container {
-  width: calc(100% - var(--sidebar-base-width));
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .tds-drag-container {

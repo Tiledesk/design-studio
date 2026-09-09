@@ -238,4 +238,179 @@ describe('CdsPanelAgentChatComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.agent-chat-applied')).toBeNull();
   });
+
+  describe('resize', () => {
+    const STORAGE_KEY = 'cds.agentChatPanel.width';
+    // A real, attached, explicitly-sized parent: maxWidth() reads
+    // parentElement.clientWidth as "the canvas host's width", and that is
+    // only ever non-zero for an element actually in the rendered document.
+    let hostDiv: HTMLDivElement;
+    let start: number;
+
+    beforeEach(() => {
+      localStorage.removeItem(STORAGE_KEY);
+      fixture.detectChanges();
+      hostDiv = document.createElement('div');
+      hostDiv.style.width = '1000px';
+      document.body.appendChild(hostDiv);
+      hostDiv.appendChild(fixture.nativeElement);
+      // Inline style beats every stylesheet rule, including :host's own, so
+      // the drag math below is deterministic regardless of whether this
+      // narrow test bundle even loads the app's global --agent-chat-width
+      // default.
+      (fixture.nativeElement as HTMLElement).style.width = '420px';
+      start = Math.round(fixture.nativeElement.getBoundingClientRect().width);
+    });
+
+    afterEach(() => {
+      localStorage.removeItem(STORAGE_KEY);
+      hostDiv.remove();
+    });
+
+    function handle(): HTMLElement {
+      return fixture.nativeElement.querySelector('.agent-chat-resize-handle');
+    }
+
+    function mask(): HTMLElement | null {
+      return fixture.nativeElement.querySelector('.agent-chat-drag-mask');
+    }
+
+    function currentWidthVar(): string {
+      return (fixture.nativeElement as HTMLElement).style.getPropertyValue('--agent-chat-width');
+    }
+
+    function mousedown(clientX: number): void {
+      handle().dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, clientX, buttons: 1 }));
+    }
+
+    function mousemove(clientX: number, buttons = 1): void {
+      document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX, buttons }));
+    }
+
+    function mouseup(clientX: number): void {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, clientX }));
+    }
+
+    it('clamps a drag to the 320px floor', () => {
+      mousedown(start);
+      mousemove(start - 10000);
+      expect(currentWidthVar()).toBe('320px');
+      mouseup(start - 10000);
+    });
+
+    it('clamps a drag to 50% of the canvas host width', () => {
+      mousedown(start);
+      mousemove(start + 10000);
+      // hostDiv is 1000px; half of it is 500px.
+      expect(currentWidthVar()).toBe('500px');
+      mouseup(start + 10000);
+    });
+
+    it('tracks the cursor 1:1 for an in-range drag and persists the result', () => {
+      mousedown(start);
+      mousemove(start + 50);
+      expect(currentWidthVar()).toBe(`${start + 50}px`);
+      mouseup(start + 50);
+      expect(localStorage.getItem(STORAGE_KEY)).toBe(String(start + 50));
+    });
+
+    it('does not persist a plain click with no movement', () => {
+      mousedown(start);
+      mouseup(start);
+      expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    });
+
+    // Finding 1: a drag that never gets a mouseup delivered to this document
+    // -- released past the browser edge, over another application -- must
+    // not leave the full-viewport mask attached forever.
+    it('ends the drag and removes the mask when the window loses focus mid-drag', () => {
+      mousedown(start);
+      fixture.detectChanges();
+      expect(mask()).toBeTruthy();
+      expect(component.resizing).toBe(true);
+
+      window.dispatchEvent(new Event('blur'));
+      fixture.detectChanges();
+
+      expect(component.resizing).toBe(false);
+      expect(mask()).toBeNull();
+    });
+
+    it('ends the drag and removes the mask on Escape', () => {
+      mousedown(start);
+      fixture.detectChanges();
+      expect(mask()).toBeTruthy();
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      fixture.detectChanges();
+
+      expect(component.resizing).toBe(false);
+      expect(mask()).toBeNull();
+    });
+
+    it('ends the drag and removes the mask when the pointer re-enters with no button held', () => {
+      // Simulates the button having been released outside the window: the
+      // next mousemove this document sees carries buttons === 0.
+      mousedown(start);
+      fixture.detectChanges();
+      expect(mask()).toBeTruthy();
+
+      mousemove(start + 40, 0);
+      fixture.detectChanges();
+
+      expect(component.resizing).toBe(false);
+      expect(mask()).toBeNull();
+    });
+
+    it('leaves no dangling document/window listeners after any exit path', () => {
+      // Regression guard for Finding 1's root cause: every exit routes
+      // through stopDragListeners(), so a *second* drag started right after
+      // must behave like a fresh one rather than being affected by
+      // leftover handlers from the first.
+      mousedown(start);
+      window.dispatchEvent(new Event('blur'));
+      fixture.detectChanges();
+
+      mousedown(start);
+      mousemove(start + 25);
+      mouseup(start + 25);
+
+      expect(currentWidthVar()).toBe(`${start + 25}px`);
+      expect(mask()).toBeNull();
+    });
+
+    it('ignores a corrupt, non-numeric stored width and falls back to the default', () => {
+      localStorage.setItem(STORAGE_KEY, 'not-a-number');
+      component.ngOnInit();
+      expect(currentWidthVar()).toBe('');
+    });
+
+    it('clamps a huge stored width down to the max on restore', () => {
+      localStorage.setItem(STORAGE_KEY, '999999');
+      component.ngOnInit();
+      expect(currentWidthVar()).toBe('500px');
+    });
+
+    it('clamps a negative stored width up to the min on restore', () => {
+      localStorage.setItem(STORAGE_KEY, '-50');
+      component.ngOnInit();
+      expect(currentWidthVar()).toBe('320px');
+    });
+
+    it('re-clamps to a shrunk window without touching storage, and restores the full value on regrow', () => {
+      mousedown(start);
+      mousemove(start + 10000); // clamps to 500 (half of the 1000px host)
+      mouseup(start + 10000);
+      expect(localStorage.getItem(STORAGE_KEY)).toBe('500');
+
+      hostDiv.style.width = '400px'; // shrink the canvas host
+      window.dispatchEvent(new Event('resize'));
+      expect(currentWidthVar()).toBe('320px'); // half of 400 is 200, clamped up to the 320 floor
+      expect(localStorage.getItem(STORAGE_KEY)).toBe('500'); // untouched by the live re-clamp
+
+      hostDiv.style.width = '1000px'; // regrow
+      window.dispatchEvent(new Event('resize'));
+      expect(currentWidthVar()).toBe('500px'); // restored from the same unmodified preferred value
+    });
+  });
 });
