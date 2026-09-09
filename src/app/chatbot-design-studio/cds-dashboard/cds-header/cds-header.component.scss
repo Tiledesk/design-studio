@@ -75,7 +75,10 @@
 
     // The agent-chat toggle now anchors the left edge of header-right, where the
     // wordmark used to sit: it reads as a deliberate primary control (flush
-    // left, no group padding) rather than a leftover from .right-opts.
+    // left, no group padding) rather than a leftover from .right-opts. This
+    // cell renders unconditionally (see the *ngIf on the button, not here --
+    // Finding 3), so it always claims the grid's first 1fr column; only the
+    // button inside is sized to its content.
     .header-agent-chat-btn {
         display: flex;
         align-items: center;
@@ -84,7 +87,25 @@
         margin: 0;
 
         #cds-agent-chat-btn {
+            // .btn-group > .btn is `flex: 1 1 auto` (Bootstrap's grouped-button
+            // rule, meant to split several buttons evenly across the group's
+            // width) -- with a single button in a cell now stretched to a full
+            // 1fr grid column, that rule alone turned this into a 465px blue
+            // bar. Sized to its content instead, like the other icon-only
+            // header control (#cds-test-it-out-btn).
+            flex: 0 0 auto;
             margin: 0;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--button-border-radius-base);
+
+            .material-icons {
+                font-size: 20px;
+            }
         }
     }
     .toggle-setting-sidebar-icon-wpr {
