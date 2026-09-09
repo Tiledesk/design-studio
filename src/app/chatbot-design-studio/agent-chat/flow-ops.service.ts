@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { AgentChatFamilyService } from './agent-chat-family.service';
+import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
@@ -93,10 +96,20 @@ export class FlowOpsService {
    *  the register at all -- the caller said where it goes. */
   private autoPlacedPositions = new Map<string, FlowPosition>();
 
+  /** Block names, per subagent `_id`, for every `callsubagent` the batch
+   *  currently being applied mentions -- populated by `subagentBlockNames()`
+   *  as the first step of `apply()`, and read back by `validateShape()`,
+   *  which is synchronous and so cannot fetch this itself. See
+   *  `subagentBlockNames`'s own doc comment for why the fetch happens there
+   *  instead of inside validation. */
+  private subagentBlocks = new Map<string, Set<string>>();
+
   constructor(
     private intentService: IntentService,
     private connectorService: ConnectorService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private family: AgentChatFamilyService,
+    private faqService: FaqService
   ) {}
 
   public readFlow(): FlowSnapshot {
@@ -115,6 +128,7 @@ export class FlowOpsService {
       };
     }
 
+    this.subagentBlocks = await this.subagentBlockNames(ops);
     const validation = ops.map(op => this.validate(op));
     if (validation.some(r => !r.ok)) {
       // Nothing was applied, so nothing from this batch is on the undo stack.
@@ -184,6 +198,44 @@ export class FlowOpsService {
       this.intentService.restoreLastUNDO();
     }
     this.lastBatchUndoDepth = 0;
+  }
+
+  /** Block names, per subagent, for every `callsubagent` this batch mentions.
+   *
+   *  Gathered before validation rather than inside it: validate() is
+   *  synchronous by design (a batch is judged whole before anything is
+   *  applied), and reading another flow's blocks is a network call. Nothing
+   *  is fetched for a batch that calls no subagent. Both `add_action` (whose
+   *  `type` names the action directly) and `update_action` (which only
+   *  carries `fields`, so the action's current type has to be looked up via
+   *  `actionTypeOf`) are covered, since either can carry a `callsubagent`'s
+   *  `botId`. */
+  private async subagentBlockNames(ops: FlowOp[]): Promise<Map<string, Set<string>>> {
+    const wanted = new Set<string>();
+    for (const op of ops as any[]) {
+      const type = op?.op === 'add_action' ? op.type : this.actionTypeOf(op);
+      if (type === TYPE_ACTION.REPLACE_BOTV4 && op?.fields?.botId) {
+        wanted.add(String(op.fields.botId));
+      }
+    }
+    const found = new Map<string, Set<string>>();
+    if (wanted.size === 0) { return found; }
+    const family = await this.family.read();
+    const known = new Set(family.subagents.map(s => s._id));
+    for (const id of wanted) {
+      if (!known.has(id)) { continue; }   // membership is judged in validate()
+      const intents: any[] = await firstValueFrom(this.faqService.getAllFaqByFaqKbId(id));
+      found.set(id, new Set((intents || []).map(i => i.intent_display_name)));
+    }
+    return found;
+  }
+
+  /** The type of the action an update_action targets, or null. */
+  private actionTypeOf(op: any): string | null {
+    if (op?.op !== 'update_action') { return null; }
+    const intent = this.intentService.getIntentFromId(op.intent_id);
+    const action = (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id);
+    return action?._tdActionType ?? null;
   }
 
   private validate(op: FlowOp): FlowOpResult {
@@ -599,6 +651,27 @@ export class FlowOpsService {
     return null;
   }
 
+  /** Whether a `callsubagent` (`TYPE_ACTION.REPLACE_BOTV4`)'s `fields` name a
+   *  real subagent of this family and, when given, a block that actually
+   *  exists on it -- checked against `subagentBlocks`, which `apply()`
+   *  populated before validation ran (see `subagentBlockNames`). Returns the
+   *  refusal text, or null when the call is fine. Shared by `add_action` and
+   *  `update_action` so a call added in one operation is judged exactly like
+   *  one edited in another. */
+  private validateSubagentCall(fields?: Record<string, any>): string | null {
+    const botId = String(fields?.botId ?? '');
+    const blocks = this.subagentBlocks.get(botId);
+    if (!blocks) {
+      return `botId "${botId}" is not a subagent of this agent. get_flow lists `
+        + `the ones that are; create_subagent makes a new one.`;
+    }
+    const blockName = String(fields?.blockName ?? '');
+    if (blockName && !blocks.has(blockName)) {
+      return `Subagent "${botId}" has no block named "${blockName}".`;
+    }
+    return null;
+  }
+
   /** Per-operation required fields, beyond the intent existing. */
   private validateShape(op: FlowOp): FlowOpResult {
     const fail = (error: string): FlowOpResult => ({ op: op.op, ok: false, error });
@@ -626,6 +699,10 @@ export class FlowOpsService {
           ? this.findScaffoldViolation(op.type, scaffold, op.fields)
           : null;
         if (violation) { return fail(violation); }
+        if (op.type === TYPE_ACTION.REPLACE_BOTV4) {
+          const subagentViolation = this.validateSubagentCall(op.fields);
+          if (subagentViolation) { return fail(subagentViolation); }
+        }
         const destinationViolation = this.validateActionDestinations(op.type, op.fields);
         return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
@@ -643,6 +720,10 @@ export class FlowOpsService {
         // those are not damage for update_action to flag.
         const violation = this.findScaffoldViolation(action._tdActionType, action, (op as any).fields);
         if (violation) { return fail(violation); }
+        if (action._tdActionType === TYPE_ACTION.REPLACE_BOTV4) {
+          const subagentViolation = this.validateSubagentCall((op as any).fields);
+          if (subagentViolation) { return fail(subagentViolation); }
+        }
         const destinationViolation =
           this.validateActionDestinations(action._tdActionType, (op as any).fields);
         return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };

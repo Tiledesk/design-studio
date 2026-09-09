@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NavigationStart, Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { AgentChatHostService } from './agent-chat-host.service';
 import { AgentChatFamilyService } from './agent-chat-family.service';
 import { FlowOpsService } from './flow-ops.service';
@@ -9,6 +9,7 @@ import { IntentService } from '../services/intent.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
+import { FaqService } from 'src/app/services/faq.service';
 import { moduleImporter } from './agent-chat-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
@@ -368,26 +369,37 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
       }
     };
 
+    // Shared with the FlowOpsService instance built by hand below: a second,
+    // separately-shaped stub passed positionally could drift from this one
+    // and hide a real disagreement behind two different fakes.
+    const familyServiceStub = {
+      rootId: () => 'kb1',
+      isSubagent: () => dashboardService.selectedChatbot?.subtype === 'subagent',
+      read: () => Promise.resolve({ root_id: 'kb1', root_name: 'Parent',
+        is_subagent: false, subagents: [{ _id: 'sub1', name: 'Alfa' }] }),
+      contains: (id: string) => Promise.resolve(['kb1', 'sub1'].includes(id)),
+      createSubagent: (name: string) => Promise.resolve({ _id: 'new1', name })
+    };
+    // FlowOpsService reads FaqService only for a batch that actually mentions
+    // callsubagent, which none of these open_flow / get_flow tests build --
+    // this stub exists only so the constructor has something to inject.
+    const faqServiceStub = { getAllFaqByFaqKbId: () => of([]) };
+
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
         // The real one: get_flow's answer must come through the real read
         // path, or the staleness this test is about could not appear.
         { provide: FlowOpsService,
-          useValue: new (FlowOpsService as any)(intentService, {}, dashboardService) },
+          useValue: new (FlowOpsService as any)(
+            intentService, {}, dashboardService, familyServiceStub, faqServiceStub) },
         { provide: IntentService, useValue: intentService },
         { provide: DashboardService, useValue: dashboardService },
         { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: new Subject<string>() } },
         { provide: AppConfigService,
           useValue: { getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } },
-        { provide: AgentChatFamilyService, useValue: {
-            rootId: () => 'kb1',
-            isSubagent: () => dashboardService.selectedChatbot?.subtype === 'subagent',
-            read: () => Promise.resolve({ root_id: 'kb1', root_name: 'Parent',
-              is_subagent: false, subagents: [{ _id: 'sub1', name: 'Alfa' }] }),
-            contains: (id: string) => Promise.resolve(['kb1', 'sub1'].includes(id)),
-            createSubagent: (name: string) => Promise.resolve({ _id: 'new1', name })
-          } }
+        { provide: AgentChatFamilyService, useValue: familyServiceStub },
+        { provide: FaqService, useValue: faqServiceStub }
       ]
     });
     host = TestBed.inject(AgentChatHostService);

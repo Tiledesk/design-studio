@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { AgentChatFamilyService } from './agent-chat-family.service';
+import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -49,6 +52,26 @@ function aConnectorService(): any {
       .and.returnValue(Promise.resolve()),
     deleteConnectorsOutOfBlock: jasmine.createSpy('deleteConnectorsOutOfBlock')
   };
+}
+
+/** A stand-in for AgentChatFamilyService with no subagents, for every describe
+ *  below that never builds a `callsubagent` action -- `apply()` fetches
+ *  nothing from it unless a batch actually mentions `callsubagent`, so these
+ *  pre-existing specs never call `read()` at all. Provided anyway because
+ *  FlowOpsService's constructor now requires it: without it, TestBed.inject
+ *  throws NullInjectorError before any of these tests can run. */
+function defaultFamilyStub(): any {
+  return {
+    read: () => Promise.resolve(
+      { root_id: 'kb1', root_name: 'Root', is_subagent: false, subagents: [] })
+  };
+}
+
+/** A stand-in for FaqService, for the same reason as `defaultFamilyStub` --
+ *  required by the constructor, never actually called by these pre-existing
+ *  specs. */
+function defaultFaqServiceStub(): any {
+  return { getAllFaqByFaqKbId: () => of([]) };
 }
 
 /** The real IntentService pushes exactly one entry onto `arrayUNDO` per
@@ -104,7 +127,9 @@ describe('FlowOpsService — intent operations', () => {
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: dashboardService }
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -302,7 +327,9 @@ describe('FlowOpsService — display names obey the studio\'s own rules', () => 
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -407,7 +434,9 @@ describe('FlowOpsService — action operations', () => {
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectorService },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -623,7 +652,9 @@ describe('FlowOpsService — redrawing a block\'s connectors after a routing fie
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectorService },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -801,7 +832,9 @@ describe('FlowOpsService — connect retargets whichever mechanism is actually l
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectorService },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -939,7 +972,9 @@ describe('FlowOpsService — add_intent with inline actions', () => {
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -1170,7 +1205,9 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -1306,7 +1343,9 @@ describe('FlowOpsService — a routing destination is actually drawn, real DOM a
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectors },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -1497,7 +1536,9 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectors },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     const service = TestBed.inject(FlowOpsService);
@@ -1616,7 +1657,9 @@ describe('FlowOpsService — connect actually draws, and clears a retarget\'s st
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectors },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -1827,7 +1870,9 @@ describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () 
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -2069,7 +2114,9 @@ describe('FlowOpsService — a reply\'s requested text lands where the studio re
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -2425,7 +2472,9 @@ describe('FlowOpsService — reply buttons get the wiring only the studio can su
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -2578,7 +2627,9 @@ describe('FlowOpsService — add_intent lays new blocks out left to right', () =
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -2699,7 +2750,9 @@ describe('FlowOpsService — a fork\'s destinations are stacked, not strung out 
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectorService },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -2967,7 +3020,9 @@ describe('FlowOpsService — connect refuses a block that already routes conditi
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: connectorService },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -3095,7 +3150,9 @@ describe('FlowOpsService — an action\'s own destination fields must resolve on
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -3265,7 +3322,9 @@ describe('FlowOpsService — a bare \'#\' destination is an empty one, not an in
         FlowOpsService,
         { provide: IntentService, useValue: intentService },
         { provide: ConnectorService, useValue: aConnectorService() },
-        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } }
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
       ]
     });
     service = TestBed.inject(FlowOpsService);
@@ -3386,5 +3445,77 @@ describe('FlowOpsService — a bare \'#\' destination is an empty one, not an in
     expect(added.fallbackIntent).toBe('');
     expect(added.errorIntent).toBe('');
     expect(added.intents[0].conditionIntentId).toBe('#i3');
+  });
+});
+
+describe('FlowOpsService — the call to a subagent', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+  let familyService: any;
+  let faqService: any;
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [anIntent('i1', 'start')],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) => {
+        return { _tdActionId: 'generated', _tdActionType: type };
+      }),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    familyService = {
+      read: () => Promise.resolve({
+        root_id: 'parent1', root_name: 'Parent', is_subagent: false,
+        subagents: [{ _id: 'sub1', name: 'Alfa' }]
+      })
+    };
+    faqService = {
+      getAllFaqByFaqKbId: () => of([{ intent_display_name: 'start' }])
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: familyService },
+        { provide: FaqService, useValue: faqService }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  // The agent will reach for the name that reads best. `invoke_subagent`
+  // reads best and does nothing: it is status: 'inactive' in ACTIONS_LIST.
+  it('refuses a botId that is not a subagent of this family', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'callsubagent',
+        fields: { botId: 'stranger', blockName: 'start' } } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('stranger');
+  });
+
+  it('refuses a blockName the subagent does not have', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'callsubagent',
+        fields: { botId: 'sub1', blockName: 'nowhere' } } as any]);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('nowhere');
+  });
+
+  it('accepts a call to a real block of a real subagent', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'callsubagent',
+        fields: { botId: 'sub1', blockName: 'start' } } as any]);
+    expect(report.ok).toBe(true);
   });
 });
