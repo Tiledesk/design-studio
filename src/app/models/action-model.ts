@@ -446,8 +446,10 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     llm: string;
     modelName: string;
-    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
+    /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    agentPlatformServer?: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignJsonSourcesTo: string;
@@ -522,8 +524,10 @@ export class ActionAiPrompt extends Action {
     llm: string;
     modelName: string;
     model: string;
-    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
+    /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    agentPlatformServer?: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
@@ -542,8 +546,10 @@ export class ActionAiCondition extends Action {
     llm: string;
     modelName: string;
     model: string;
-    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
+    /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    agentPlatformServer?: string;
     max_tokens: number;
     temperature: number;
     labelModel: string;

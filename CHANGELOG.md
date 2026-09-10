@@ -9,30 +9,19 @@
 
 
 
-- **added**: in the Native Tools dialog every Tiledesk server now shows its active tools, and the dialog has a "Close" button in the footer like the MCP servers one
-- **added**: the tool selection modal has a "Close" button in its footer too
-- **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
-- **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
-- **changed**: the edit icon is shown only on the servers already added to the prompt
-- **changed**: native servers are marked with an outlined shield and show their description instead of the URL
-- **added**: in the action, when no MCP tool is attached yet the section shows a dashed "Select MCP tools" call to action, which turns into "Manage MCP tools" as soon as a server is attached
-- **added**: tooltips on every button of the MCP interface, both in the action and in the dialogs
-- **changed**: smaller and lighter "Use tools to complete the operation" label
-- **bug fix**: the "Manage MCP tools" button ignored its own size and was rendered bigger than intended
-- **bug fix**: missing italian translations in the MCP interface
-- **changed**: in the MCP servers dialog the edit (pencil) icon is now shown ONLY on selected servers: an unselected server can just be toggled, so managing a server always goes through selecting it first
-- **added**: the tool selection of a server survives its deselection — it is remembered per ACTION + SERVER (`McpService` memory on `AppStorageService`, with 90-day expiry and a 200-action cap), so deselecting and re-selecting a server, closing the dialog or reloading the page no longer resets the chosen tools. Nothing is written to the MCP integration nor to the action payload; on recall the tools are filtered against the ones still exposed by the server
-- **added**: the Edit MCP Server dialog now lists the selected tool names under "Tools selected", with the same single-line + "more.." rendering used in the servers list; "more.." opens the existing Select tools modal
-- **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
-- **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
-- **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header
-- **changed**: MCP tool selection is saved ONLY on the action (`action.servers[]`) and never modifies the MCP integration; adding a server pre-selects no tools
-- **changed**: persisted `action.servers[]` normalized — `native` always present, `id` only for native servers, `tools` as an array of names
-- **bug fix**: custom headers are now forwarded to the `/mcp/tools` discovery call, so the backend can authenticate during the tool scan
-- **bug fix**: reactivated the Custom Headers section in the Add/Edit MCP Server dialog (was hidden)
-- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it, and both the "Add action" button and the empty-block message are hidden. Chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
-- **changed**: in the release history, the "Restore" button is now "Re-publish" and carries a tooltip explaining that it puts that version back online without changing the chatbot you are currently editing
-
+# 1.40.14
+- **added**: the management of MCP servers and tools has been extracted from the AI Prompt action into a reusable section, so the other LLM actions can adopt it as it is
+- **added**: a Native Tools catalog listing the MCP servers provided by Tiledesk, each one showing its description and the tools currently active on it
+- **changed**: the MCP dialogs have been redesigned around a single consistent frame, with tooltips on every button and a Close button in the footer; a server is now attached to the prompt with an explicit button that becomes "Detach tools" once added, and it can be edited only once attached
+- **added**: a popup listing all the tools of a server with select and deselect all, reachable both from the servers list and from the server detail, where the selected ones are also summarised at a glance
+- **changed**: the tool selection is saved only on the action and never alters the shared MCP integration, and it is remembered per action and per server: detaching and re-attaching a server, closing the dialog or reloading the page no longer loses the chosen tools
+- **bug fix**: several fixes to the MCP interface — authentication is now honoured while discovering the tools of a server, the custom headers section is reachable again, some sizing glitches have been corrected and the missing italian translations have been added
+- **added**: new Gemini Agent Platform provider in the model selector of the Ask KB, AI Prompt and AI Condition actions; its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
+- **changed**: the model selector is faster and more accurate — every provider is loaded in one go instead of one at a time, providers are grouped under their full name instead of their internal one, and a model offered by more than one provider no longer selects the wrong entry
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it and both the "Add action" button and the empty-block message are hidden; chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history the "Restore" button is now "Re-publish", with a tooltip clarifying that it puts that version back online without changing the chatbot you are currently editing
+- **added**: a reference document describing the condition grammar the Design Studio emits, for the runtime and the LLM that have to evaluate it
+- **changed**: authentication persistence setting added to the design studio configuration, and the application startup no longer loads unused interface components
 
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
