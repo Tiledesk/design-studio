@@ -100,6 +100,34 @@ describe('AgentChatLlmSettingsComponent', () => {
     expect(settings.saved[0].model).toBeNull();
   });
 
+  // Fix round 2 (Important): the default was selectable while the number
+  // fields stayed editable and enabled, so a temperature typed after
+  // switching back to the default was silently discarded by save() --
+  // same false "Saved." confirmation as the Critical, reached by a
+  // shorter path. onModelChange now clears both params when the sentinel
+  // is chosen, and the template disables the fields for it, so this pins
+  // both the state clearing and what actually lands on screen.
+  it('clears and disables the params when switching back to the default',
+     async () => {
+    await setup();
+    const c = fixture.componentInstance;
+    c.onModelChange('openai:gpt-5.5');
+    c.temperature = 0.9;
+    c.maxTokens = 1500;
+
+    c.onModelChange('');
+    fixture.detectChanges();
+
+    expect(c.temperature).toBeNull();
+    expect(c.maxTokens).toBeNull();
+    const temperatureInput: HTMLInputElement =
+      fixture.nativeElement.querySelector('#llm-temperature');
+    expect(temperatureInput.disabled).toBe(true);
+
+    await c.save();
+    expect(settings.saved[0].model).toBeNull();
+  });
+
   // `error` now holds an i18n key rather than a hardcoded sentence (fix
   // round 1, MINOR 6), so this no longer checks for the substring 'admin' --
   // it checks the exact key the template translates. The form is also fully

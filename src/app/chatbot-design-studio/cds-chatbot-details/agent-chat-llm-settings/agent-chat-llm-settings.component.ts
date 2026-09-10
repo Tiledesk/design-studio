@@ -82,6 +82,14 @@ export class AgentChatLlmSettingsComponent implements OnInit {
 
   onModelChange(id: string): void {
     this.selectedModelId = id;
+    if (id === '') {
+      // The deployment default carries no params of its own -- the fields
+      // are about to become disabled (see the template), and leaving a
+      // stale number sitting in a disabled box would read as "still in
+      // effect" when it is about to be discarded on save.
+      this.temperature = null;
+      this.maxTokens = null;
+    }
     this.saved = false;
   }
 
