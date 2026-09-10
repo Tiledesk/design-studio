@@ -200,6 +200,14 @@ export class IntentService {
 
 
   public setMapOfIntents(){
+    // Built from scratch, not added to. This map is the canvas's checklist of
+    // the blocks it is waiting to render, so it describes ONE flow. Adding to
+    // it was harmless only while changing flow meant reloading the page, which
+    // threw this singleton away with everything else; now that the canvas is
+    // rebuilt in place, a block left over from the previous flow never
+    // renders, the checklist never completes, and the connectors -- drawn only
+    // once every block has reported in -- are never drawn at all.
+    this.mapOfIntents = {};
     this.listOfIntents.forEach( intent => {
       const intentID = intent.intent_id;
       this.mapOfIntents[intentID] = {'shown': false };
