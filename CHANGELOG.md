@@ -7,7 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 
+
+
+# this branch
+
+### 10/09/2026
+- **added**: in the Native Tools dialog every Tiledesk server now shows its active tools, and the dialog has a "Close" button in the footer like the MCP servers one
+- **added**: the tool selection modal has a "Close" button in its footer too
+
+### 09/09/2026
 - **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
 - **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
 - **changed**: the edit icon is shown only on the servers already added to the prompt
