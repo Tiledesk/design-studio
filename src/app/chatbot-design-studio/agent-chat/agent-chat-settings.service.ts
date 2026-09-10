@@ -46,13 +46,19 @@ export class AgentChatSettingsService {
     return res?.data ?? [];
   }
 
-  public read(projectId: string): Promise<ProjectModelSettings> {
+  // `async`, not a bare `firstValueFrom(...)` return: `settingsUrl()` calls
+  // `base()` eagerly, and `base()` throws synchronously when the chat isn't
+  // configured. A `Promise<...>`-typed method that can throw synchronously is
+  // a trap for a caller who writes `.catch(...)`, as `listModels()`'s own
+  // `async` already protects it from doing -- these two must fail the same
+  // way, as a rejection, not an uncaught exception.
+  public async read(projectId: string): Promise<ProjectModelSettings> {
     return firstValueFrom(this.http.get<ProjectModelSettings>(
       this.settingsUrl(projectId), { headers: this.headers() }));
   }
 
-  public save(projectId: string,
-              model: ProjectModelSettings['model']): Promise<ProjectModelSettings> {
+  public async save(projectId: string,
+                    model: ProjectModelSettings['model']): Promise<ProjectModelSettings> {
     return firstValueFrom(this.http.put<ProjectModelSettings>(
       this.settingsUrl(projectId), { model }, { headers: this.headers() }));
   }

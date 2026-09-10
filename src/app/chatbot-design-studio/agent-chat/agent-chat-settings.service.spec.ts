@@ -25,7 +25,13 @@ describe('AgentChatSettingsService', () => {
     return TestBed.inject(AgentChatSettingsService);
   }
 
-  afterEach(() => { localStorage.removeItem('tiledesk_token'); });
+  afterEach(() => {
+    localStorage.removeItem('tiledesk_token');
+    // Each test's own expectOne() already asserts the request it expects;
+    // verify() is what would catch a stray or unexpected call that no
+    // expectOne() in that test looked for.
+    http.verify();
+  });
 
   it('is unavailable when no chat url is configured', () => {
     expect(setup({}).isAvailable()).toBe(false);
@@ -61,6 +67,13 @@ describe('AgentChatSettingsService', () => {
     req.flush({ project_id: 'p1', model: { id: 'openai:gpt-5.5', params: { temperature: 0.2 } },
                 updated_at: 't', updated_by: 'u' });
     expect((await promise).model!.id).toBe('openai:gpt-5.5');
+  });
+
+  it('rejects every call instead of throwing when unconfigured', async () => {
+    const service = setup({});
+    await expectAsync(service.listModels()).toBeRejected();
+    await expectAsync(service.read('p1')).toBeRejected();
+    await expectAsync(service.save('p1', null)).toBeRejected();
   });
 
   it('sends a bare token with the JWT scheme added exactly once', async () => {
