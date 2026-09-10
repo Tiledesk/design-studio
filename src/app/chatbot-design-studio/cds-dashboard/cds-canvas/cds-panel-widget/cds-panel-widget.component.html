@@ -21,8 +21,8 @@
                     {{ 'TestIt' | translate }}
                 </button>
             </div>
-            <!-- (load)="onLoaded($event) -->
            <iframe allowfullscreen [style.display]="iframeVisibility? 'block':'none'"
+                (load)="onLoaded($event)"
                 #widgetIframe
                 id="widgetIframe"
                 allow="microphone"
