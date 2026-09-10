@@ -14,6 +14,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { IntegrationService } from 'src/app/services/integration.service';
+import { AgentChatSettingsService } from '../agent-chat/agent-chat-settings.service';
 const swal = require('sweetalert');
 
 @Component({
@@ -49,8 +50,9 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     private translate: TranslateService,
     private dashboardService: DashboardService,
     private router: Router,
-    private route: ActivatedRoute
-  ) { super(); 
+    private route: ActivatedRoute,
+    public settingsService: AgentChatSettingsService
+  ) { super();
   }
 
   ngOnInit(): void {

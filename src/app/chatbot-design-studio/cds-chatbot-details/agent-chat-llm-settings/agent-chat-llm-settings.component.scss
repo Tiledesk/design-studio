@@ -1,0 +1,15 @@
+@import "./src/assets/sass/cds/settings-section.scss";
+
+.llm-settings {
+  padding: 24px;
+
+  .scope-note {
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  label { display: block; margin: 12px 0 4px; }
+  select, input[type="number"] { min-width: 260px; }
+  .error { color: #b00020; margin: 8px 0; }
+  .saved { margin-left: 12px; }
+}

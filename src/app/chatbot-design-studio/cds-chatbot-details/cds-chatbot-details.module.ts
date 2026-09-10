@@ -15,6 +15,7 @@ import { CDSDetailDeveloperComponent } from './developer/developer.component';
 import { CDSAdvancedComponent } from './advanced/advanced.component';
 import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
 import { CDSVoiceSettingsComponent } from './voice-settings/voice-settings.component';
+import { AgentChatLlmSettingsComponent } from './agent-chat-llm-settings/agent-chat-llm-settings.component';
 
 const routes: Routes = [
   {
@@ -50,6 +51,7 @@ const routes: Routes = [
     CDSDetailCommunityComponent,
     CDSDetailDeveloperComponent,
     CDSAdvancedComponent,
+    AgentChatLlmSettingsComponent,
     // ******* CDS CHATBOT DETAIL:: end *******
 
 

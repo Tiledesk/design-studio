@@ -8,6 +8,7 @@
   "include": [
     "src/app/chatbot-design-studio/agent-chat/**/*.spec.ts",
     "src/app/chatbot-design-studio/cds-dashboard/cds-canvas/cds-panel-agent-chat/**/*.spec.ts",
+    "src/app/chatbot-design-studio/cds-chatbot-details/agent-chat-llm-settings/**/*.spec.ts",
     "src/**/*.d.ts"
   ]
 }

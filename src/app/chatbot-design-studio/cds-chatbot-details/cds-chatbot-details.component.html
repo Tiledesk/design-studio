@@ -42,6 +42,14 @@
                     }">
             <a href="javascript:;" role="button"> {{ "Advanced" | translate }} </a>
           </li>
+
+          <li *ngIf="settingsService.isAvailable()"
+              (click)="toggleTab(SETTINGS_SECTION.LLM_SETTINGS)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.LLM_SETTINGS,
+                      'li-active' :           activeSection === SETTINGS_SECTION.LLM_SETTINGS
+                    }">
+            <a href="javascript:;" role="button"> {{ "LlmSettingsTab" | translate }} </a>
+          </li>
         </ul>
     </div>
 
@@ -80,6 +88,9 @@
       [project]="project"
       [translationsMap]="translationsMap">
     </cds-detail-advanced>
+
+    <cds-agent-chat-llm-settings *ngIf="activeSection===SETTINGS_SECTION.LLM_SETTINGS">
+    </cds-agent-chat-llm-settings>
   </div>
 </div>
 
