@@ -215,6 +215,14 @@
     justify-content: flex-end;
   }
 
+  /* defaultFallback vuota e quindi bloccata: il corpo del blocco non viene
+     renderizzato, quindi l'header non ha bisogno di spaziatura in basso. */
+  &.cds-fallback-locked {
+    .pic-header {
+      padding: 0;
+    }
+  }
+
   .agents-available {
     margin-top: -70px;
     margin-left: -10px;
@@ -332,6 +340,14 @@
   flex-direction: column;
   gap: 18px;
   padding-top: 0;
+}
+
+/* defaultFallback vuota e quindi bloccata: il contenitore delle action non
+   viene mostrato affatto (non c'e' nulla da renderizzare e nulla puo' essere
+   aggiunto). Come effetto collaterale il drop target ha client rect nullo,
+   quindi il CDK non lo considera piu' ricevibile. */
+.actions-list-wpr.cds-fallback-locked {
+  display: none;
 }
 
 .box-action {

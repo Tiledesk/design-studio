@@ -203,6 +203,13 @@
   color: var(--blu-02);
   display: none;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+/* .release-item accanto occupa width: 100%, quindi senza questo il wrapper del
+   pulsante verrebbe compresso e l'etichetta andrebbe a capo sul trattino. */
+.restore-release {
+  flex-shrink: 0;
 }
 
 .clamped-wrapper {

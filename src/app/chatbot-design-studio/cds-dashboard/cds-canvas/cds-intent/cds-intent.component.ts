@@ -21,7 +21,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, isReturnStackIntent } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
 import { IntentService } from '../../../services/intent.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { StageService } from '../../../services/stage.service';
@@ -85,6 +85,19 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   /** true quando il blocco contiene SOLO l'azione "Return to parent agent":
    *  in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita */
   isReturnStack = false;
+
+  /** isDefaultFallbackLocked
+   * true SOLO se il blocco e' la defaultFallback e non contiene alcuna action
+   * (perche' nasce vuota nei chatbot nuovi, o perche' l'unica action e' stata
+   * cancellata/spostata). In questo stato il blocco e' chiuso: niente drop,
+   * niente pulsante "Add action", niente placeholder di blocco vuoto.
+   * Una defaultFallback legacy (con action al suo interno) NON e' bloccata.
+   * E' un getter e non un campo: lo spostamento di una action verso un altro
+   * blocco muta l'array in place senza emettere behaviorIntent, quindi un
+   * valore memorizzato resterebbe stale. */
+  public get isDefaultFallbackLocked(): boolean {
+    return this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
+  }
 
   startAction: any;
   isDragging: boolean = false;
@@ -997,6 +1010,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Blocca l’ingresso nella lista se il chatbot è “nuovo” e l’intent ha già un’action (limite un’action per blocco).
    */
   readonly dropListEnterPredicate = (item: CdkDrag<any>) => {
+    // defaultFallback vuota: blocco chiuso, nessun drop consentito al suo interno
+    if (this.isDefaultFallbackLocked) {
+      return false;
+    }
     if (this.isNewChatbot && this.intent?.actions?.length) {
       return false;
     }
@@ -1062,6 +1079,13 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
+
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta
+    if (this.isDefaultFallbackLocked) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - defaultFallback vuota (bloccata)');
+      return;
+    }
+
     if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
       this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
       return;
@@ -1117,6 +1141,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   openActionMenu(intent: Intent, calleBy: string): void {
     this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent);
     this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy);
+    // nessun pulsante "Add action" renderizzato (es. defaultFallback vuota): niente da aprire
+    if (!this.openActionMenuBtnRef) {
+      return;
+    }
     const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect();
     let xOffSet = openActionMenuElm.width + 10;
     if (calleBy === 'add-action-placeholder') {

@@ -5,6 +5,7 @@
     [class.isStart]="isStart"
     [class.isReturnStack]="isReturnStack"
     [class.tds-slim-intent]="isNewChatbot"
+    [class.cds-fallback-locked]="isDefaultFallbackLocked"
     [id]="'intent-content-'+ intent?.intent_id"
     [style.background-color]="vm.backgroundColor"
     [style.outline]="vm.outline">
@@ -80,12 +81,13 @@
     </div>
 
     <div *ngIf="!isStart && !isReturnStack" class="actions-list-wpr"
+        [class.cds-fallback-locked]="isDefaultFallbackLocked"
         cdkDropList
         [cdkDropListData]="listOfActions"
-        [cdkDropListDisabled]="isNewChatbot"
+        [cdkDropListDisabled]="isNewChatbot || isDefaultFallbackLocked"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="dropListEnterPredicate">
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
+        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked" 
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isNewChatbot">
             <div class="add--action-placeholder-text">

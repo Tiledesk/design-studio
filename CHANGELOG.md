@@ -10,12 +10,15 @@
 
 
 # this branch
-
 ### 10/09/2026
 - **added**: in the Native Tools dialog every Tiledesk server now shows its active tools, and the dialog has a "Close" button in the footer like the MCP servers one
 - **added**: the tool selection modal has a "Close" button in its footer too
 
-### 09/09/2026
+# 1.40.14-rc11
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it, and both the "Add action" button and the empty-block message are hidden. Chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history, the "Restore" button is now "Re-publish" and carries a tooltip explaining that it puts that version back online without changing the chatbot you are currently editing
+
+# 1.40.14-rc10
 - **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
 - **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
 - **changed**: the edit icon is shown only on the servers already added to the prompt
@@ -80,6 +83,7 @@
 - **added**: isolated Karma test setup for the connector folder and for unit specs (`ng test --configuration connector`), with `src/test.connector.ts`, `src/test.units.ts` and dedicated tsconfigs, so these specs run independently of the pre-existing broken ones
 - **changed**: `cds-action-description` now receives the whole action (`[actionSelected]`), so a connector block renders the connector's own name and icon instead of the generic web-request label
 - **changed**: a `webrequestv2` block carrying a `_tdConnectorRef` renders the connector's required-input summary (`cds-action-connector`) instead of the generic web-request preview
+
 
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
