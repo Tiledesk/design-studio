@@ -10,6 +10,8 @@ import { CdsBaseElementModule } from 'src/app/shared/cds-base-element.module';
 import { ChangeBotLangModalComponent } from 'src/app/modals/change-bot-lang/change-bot-lang.component';
 import { CdsCanvasComponent } from './cds-canvas.component';
 import { CdsPanelIntentListComponent } from './cds-panel-intent-list/cds-panel-intent-list.component';
+import { CdsPanelSubagentsComponent } from './cds-panel-subagents/cds-panel-subagents.component';
+import { CdsNewSubagentDialogComponent } from './cds-panel-subagents/cds-new-subagent-dialog/cds-new-subagent-dialog.component';
 import { CdsPanelWidgetComponent } from './cds-panel-widget/cds-panel-widget.component';
 import { ContextMenuComponent } from './base-elements/context-menu/context-menu.component';
 import { CdsActionArrowComponent } from './actions/shared/cds-action-controls/cds-action-arrow/cds-action-arrow.component';
@@ -17,6 +19,7 @@ import { CdsActionControlsComponent } from './actions/shared/cds-action-controls
 import { CdsAddActionMenuComponent } from './actions/shared/cds-add-action-menu/cds-add-action-menu.component';
 import { CdsPanelActionsComponent } from './cds-panel-elements/cds-panel-actions/cds-panel-actions.component';
 import { CdsPanelElementsComponent } from './cds-panel-elements/cds-panel-elements.component';
+import { CdsActionDragListComponent } from './cds-panel-elements/cds-action-drag-list/cds-action-drag-list.component';
 import { MouseTipsComponent } from 'src/app/modals/mouse-tips/mouse-tips.component';
 import { CdsOptionsComponent } from './cds-options/cds-options.component';
 import { CdsPanelButtonConfigurationComponent } from './cds-panel-button-configuration/cds-panel-button-configuration.component';
@@ -26,6 +29,7 @@ import { CdsPanelConnectorMenuComponent } from './cds-panel-connector-menu/cds-p
 import { CdsActionsModule } from './actions/list/cds-actions.module';
 import { CdsActionDetailPanelComponent } from './cds-panel-action-detail/cds-panel-action-detail.component';
 import { CdsPanelIntentDetailComponent } from './cds-panel-intent-detail/cds-panel-intent-detail.component';
+import { CdsTriggerEntrypointComponent } from './actions/list/cds-trigger-entrypoint/cds-trigger-entrypoint.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsIntentComponent } from './cds-intent/cds-intent.component';
 import { PanelIntentControlsComponent } from './cds-intent/panel-intent-controls/panel-intent-controls.component';
@@ -69,12 +73,15 @@ const routes: Routes = [
 
     //CDS PANEL INTENT LIST
     CdsPanelIntentListComponent,
+    CdsPanelSubagentsComponent,
+    CdsNewSubagentDialogComponent,
 
     //CDS PANEL ACTION DETAIL
     CdsActionDetailPanelComponent,
 
     //CDS PANEL INENT DETAIL
     CdsPanelIntentDetailComponent,
+    CdsTriggerEntrypointComponent,
 
     //CDS PANEL WIDGET
     CdsPanelWidgetComponent,
@@ -82,6 +89,7 @@ const routes: Routes = [
     //CDS PANEL ELEMENTS
     CdsPanelElementsComponent,
     CdsPanelActionsComponent,
+    CdsActionDragListComponent,
 
     //CDS PANEL BUTTON CONFIGURATION
     CdsPanelButtonConfigurationComponent,

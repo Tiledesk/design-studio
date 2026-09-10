@@ -1,0 +1,23 @@
+:host {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    flex: 1;
+}
+
+.mcp-active-tools-inline__names {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mcp-active-tools-inline__more {
+    flex-shrink: 0;
+    margin-left: 4px;
+    color: var(--blu-02);
+    cursor: pointer;
+    text-decoration: underline;
+    white-space: nowrap;
+}
