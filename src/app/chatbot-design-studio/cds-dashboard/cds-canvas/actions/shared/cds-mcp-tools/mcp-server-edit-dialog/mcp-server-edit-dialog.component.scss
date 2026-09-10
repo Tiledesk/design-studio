@@ -107,6 +107,36 @@
         gap: 10px;
         border-top: 1px solid #e5e5e5;
     }
+
+    // Pulsante secondario dell'overlay "Available tools": stessa resa del Close
+    // della modale MCP servers. Va ridefinito qui perche' quella regola e'
+    // annidata sotto l'altro panelClass (.custom-mcp-dialog-container) e i due
+    // pannelli MatDialog sono fratelli nell'overlay CDK, non annidati.
+    .mcp-dialog__secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 10px;
+        background: #ffffff;
+        border: 1px solid #d4d7dd;
+        border-radius: 8px;
+        color: #0f172a;
+        font-family: var(--font-family-poppins);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 120ms ease, border-color 120ms ease;
+
+        &:hover {
+            background: #f8fafc;
+            border-color: #b8bcc6;
+        }
+
+        &:active {
+            background: #f1f5f9;
+        }
+    }
 }
 
 .edit-form {

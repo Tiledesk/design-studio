@@ -53,10 +53,25 @@
                         </div>
                         <div *ngIf="server.description" class="server-url">{{ server.description }}</div>
                         <div class="server-type">{{ server.transport }}</div>
+                        <div class="server-type mcp-server__tools-active-row">
+                            <span class="mcp-server__tools-active-label">{{'CDSCanvas.ToolsActiveLabel' | translate}}:</span>
+                            <mcp-active-tools-inline
+                                [names]="getActiveToolNames(server)"
+                                (more)="onSelectNative(server)">
+                            </mcp-active-tools-inline>
+                        </div>
                     </div>
                     <span class="material-icons">chevron_right</span>
                 </button>
             </div>
         </div>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-native-close-btn" class="mcp-dialog__secondary-btn" type="button"
+            [matTooltip]="'CDSCanvas.Close' | translate" matTooltipClass="cds-mat-tooltip"
+            [mat-dialog-close]="false">
+            {{'CDSCanvas.Close' | translate}}
+        </button>
     </div>
 </div>
