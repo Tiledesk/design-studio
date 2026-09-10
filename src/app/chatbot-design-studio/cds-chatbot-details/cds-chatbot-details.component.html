@@ -89,7 +89,8 @@
       [translationsMap]="translationsMap">
     </cds-detail-advanced>
 
-    <cds-agent-chat-llm-settings *ngIf="llmSettingsAvailable && activeSection===SETTINGS_SECTION.LLM_SETTINGS">
+    <cds-agent-chat-llm-settings *ngIf="llmSettingsAvailable && activeSection===SETTINGS_SECTION.LLM_SETTINGS"
+      (unavailable)="onLlmSettingsUnavailable()">
     </cds-agent-chat-llm-settings>
   </div>
 </div>

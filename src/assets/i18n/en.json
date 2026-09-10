@@ -84,6 +84,7 @@
     "LlmSettingsProjectScope": "The agent builder uses this model in every chatbot in this project, not only the one you have open.",
     "LlmSettingsModel": "Model",
     "LlmSettingsDefault": "default",
+    "LlmSettingsInherited": "leave blank to use the deployment’s own setting",
     "LlmSettingsTemperature": "Temperature",
     "LlmSettingsMaxTokens": "Max output tokens",
     "LlmSettingsSave": "Save",

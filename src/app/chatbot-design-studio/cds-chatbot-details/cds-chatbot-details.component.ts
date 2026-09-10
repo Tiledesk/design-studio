@@ -84,6 +84,17 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     })
   }
 
+  /** The runtime is reachable but declares no `model_catalog`, so there is
+   *  nothing for this tab to configure. `isAvailable()` cannot tell -- it only
+   *  knows whether `agentChatUrl` is set -- and the runtime only says so on
+   *  the settings route's 409, which the section itself is the one to make.
+   *  So the tab is dropped when the section reports back, and the panel falls
+   *  back to Details rather than leaving an empty body behind. */
+  onLlmSettingsUnavailable(): void {
+    this.llmSettingsAvailable = false;
+    this.toggleTab(SETTINGS_SECTION.DETAIL);
+  }
+
   toggleTab(section) {
     this.logger.log('[CDS-CHATBOT-DTLS] displaydetails', section)
     this.activeSection = section

@@ -190,6 +190,7 @@
     "LlmSettingsProjectScope": "Il generatore di agenti AI usa questo modello in tutti i chatbot di questo progetto, non solo in quello che hai aperto.",
     "LlmSettingsModel": "Modello",
     "LlmSettingsDefault": "predefinito",
+    "LlmSettingsInherited": "lascia vuoto per usare l’impostazione del deployment",
     "LlmSettingsTemperature": "Temperatura",
     "LlmSettingsMaxTokens": "Token massimi in uscita",
     "LlmSettingsSave": "Salva",

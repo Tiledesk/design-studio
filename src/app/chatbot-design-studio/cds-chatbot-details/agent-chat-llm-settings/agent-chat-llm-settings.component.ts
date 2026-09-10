@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import {
   AgentChatSettingsService, ProjectModelSettings, RuntimeModel
@@ -18,6 +20,12 @@ import {
 })
 export class AgentChatLlmSettingsComponent implements OnInit {
 
+  /** Fired once when this deployment declares no `model_catalog` at all, so
+   *  the parent can drop the tab rather than leave it opening onto nothing.
+   *  Not an error: §4 says such a deployment must behave exactly as it did
+   *  before this feature existed, and most of them are in that state. */
+  @Output() unavailable = new EventEmitter<void>();
+
   models: RuntimeModel[] = [];
   /** '' is the sentinel for "the deployment's own model": it is what the
    *  first, synthetic option in the dropdown carries. Saving with '' sends
@@ -34,6 +42,9 @@ export class AgentChatLlmSettingsComponent implements OnInit {
   temperature: number | null = null;
   maxTokens: number | null = null;
   readOnly = false;
+  /** The deployment declares no catalog (`409 not_configured`). Nothing is
+   *  wrong, so nothing is said: the template renders no form and no message. */
+  notConfigured = false;
   loading = true;
   saving = false;
   /** An i18n key, not a sentence -- the template translates it. When it
@@ -44,13 +55,41 @@ export class AgentChatLlmSettingsComponent implements OnInit {
   error: string | null = null;
   saved = false;
 
+  /** Resolved once in `ngOnInit`: `optionLabel` is called from the template
+   *  on every change-detection pass, and the translate pipe is not available
+   *  to it there. */
+  private defaultMarker = 'LlmSettingsDefault';
+
   constructor(
     public settings: AgentChatSettingsService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private translate: TranslateService
   ) {}
 
   get defaultModel(): RuntimeModel | undefined {
     return this.models.find(m => m.default);
+  }
+
+  /** Everything except the deployment default, which the sentinel option
+   *  already offers. `GET /v1/models` always includes the default flagged
+   *  `default: true`, so looping over the whole list rendered it twice --
+   *  two indistinguishable lines, and picking the second one pinned the
+   *  project to that model *by name*, which is the outcome §4.1 exists to
+   *  prevent (and makes every run build a model instead of reusing the boot
+   *  instance, since such an override is still `is_override: true`). */
+  get selectableModels(): RuntimeModel[] {
+    return this.models.filter(m => !m.default);
+  }
+
+  /** The option's text, as a plain string.
+   *
+   *  It has to be built here rather than in the template: the marker used to
+   *  be a `<span *ngIf>` nested inside the `<option>`, and a browser renders
+   *  no elements inside an option -- so the one thing that distinguished the
+   *  default from its duplicate never appeared on screen. */
+  optionLabel(model: RuntimeModel | undefined): string {
+    if (!model) { return ''; }
+    return model.default ? `${model.label} — ${this.defaultMarker}` : model.label;
   }
 
   async ngOnInit(): Promise<void> {
@@ -59,8 +98,18 @@ export class AgentChatLlmSettingsComponent implements OnInit {
       const current: ProjectModelSettings =
         await this.settings.read(this.dashboardService.projectID);
       this.apply(current);
+      this.defaultMarker =
+        await firstValueFrom(this.translate.get('LlmSettingsDefault'));
     } catch (e: any) {
-      if (e?.status === 403) {
+      if (e?.status === 409 && e?.error?.error?.code === 'not_configured') {
+        // A deployment with no `model_catalog`. `GET /v1/models` still answers
+        // 200 with the single default entry, so only this 409 says so -- and
+        // reporting it as "the runtime configuration could not be loaded" told
+        // every correctly configured deployment that something was broken,
+        // over a form whose Save could only 409 again.
+        this.notConfigured = true;
+        this.unavailable.emit();
+      } else if (e?.status === 403) {
         // The runtime 403s the GET as well as the PUT, so the current value
         // genuinely cannot be shown -- the template hides the form entirely
         // rather than leaving fields on screen that look like real state.

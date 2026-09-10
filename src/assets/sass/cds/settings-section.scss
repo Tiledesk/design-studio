@@ -1,5 +1,13 @@
 
-input[type="text"] {
+// `select` and `input[type="number"]` are here so this section's controls are
+// not the only ones in the settings panel rendered as raw browser defaults.
+// The rule list below is keyed on `input[type="text"]`, which was every control
+// any importer of this sheet had until the LLM section arrived with a dropdown
+// and two number boxes; unstyled, they inherited no height, border, radius or
+// width and sat visibly apart from their styled siblings.
+input[type="text"],
+input[type="number"],
+select {
     // min-width: 307px !important;
     height: 36px;
     font-size: 14px;
@@ -37,7 +45,9 @@ textarea[type="text"] {
     color:#808080;
 }
 
-input[type="text"]:disabled {
+input[type="text"]:disabled,
+input[type="number"]:disabled,
+select:disabled {
     background-color: var(--input-disabled) !important;
     // cursor: not-allowed;
 }
@@ -47,7 +57,8 @@ textarea[type="text"]:disabled {
     // cursor: not-allowed;
 }
 
-input[type="text"]:disabled::placeholder {
+input[type="text"]:disabled::placeholder,
+input[type="number"]:disabled::placeholder {
     color: var(--input-disabled);
     // font-size: 1.2em;
     // font-style: italic;

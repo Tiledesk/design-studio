@@ -128,6 +128,98 @@ describe('AgentChatLlmSettingsComponent', () => {
     expect(settings.saved[0].model).toBeNull();
   });
 
+  // Fix round 3 (IMPORTANT 2): `expect(models.length).toBe(2)` above passes
+  // while the *rendered* dropdown lists the deployment default twice -- the
+  // sentinel option and the `*ngFor` both render it, because `GET /v1/models`
+  // always includes the default flagged `default: true`. Two identical lines,
+  // and picking the second pins the model by name, which is the outcome §4.1
+  // exists to prevent. So this asserts the DOM, where the defect lived.
+  it('lists the deployment default exactly once, and marks it', async () => {
+    await setup();
+    const options: HTMLOptionElement[] =
+      Array.from(fixture.nativeElement.querySelectorAll('#llm-model option'));
+
+    expect(options.length).toBe(2);
+    const forDefault = options.filter(o => (o.textContent || '').includes('Opus 5'));
+    expect(forDefault.length).toBe(1);
+    // TranslateModule.forRoot() with no translations renders the key itself.
+    expect(forDefault[0].textContent).toContain('LlmSettingsDefault');
+    // The marker used to be a `<span *ngIf>` INSIDE the `<option>`, which a
+    // browser does not render -- so the option text must be a plain string
+    // with no child markup at all.
+    options.forEach(o => expect(o.children.length).toBe(0));
+    // The sentinel is still what "the deployment's own model" carries.
+    expect(forDefault[0].value).toBe('');
+  });
+
+  // Fix round 3 (IMPORTANT 3): `<form class="row">` put all seven children
+  // into one grid row, so labels and controls did not pair up on screen --
+  // "Temperature" at the far right with its input under "Model". Every
+  // sibling section wraps each label+control pair in its own `.row`.
+  it('pairs every label with its own control, one row each', async () => {
+    await setup();
+    const form: HTMLElement = fixture.nativeElement.querySelector('form');
+    expect(form.classList.contains('row')).toBe(false);
+
+    for (const selector of ['#llm-model', '#llm-temperature', '#llm-max-tokens']) {
+      const control: HTMLElement = fixture.nativeElement.querySelector(selector);
+      const row = control.closest('.row');
+      expect(row).withContext(`${selector} has no row of its own`).not.toBeNull();
+      const labels = row!.querySelectorAll('label');
+      expect(labels.length).withContext(`${selector}'s row holds other labels`).toBe(1);
+      expect(labels[0].getAttribute('for')).toBe(control.id);
+    }
+  });
+
+  // Fix round 3 (MINOR 8): blank does not mean "no temperature" -- agent.yaml's
+  // own params are in force and merge at resolve time. An empty box with no
+  // hint reads as "nothing is set", which is wrong.
+  it('says what a blank param field means', async () => {
+    await setup();
+    const temperature: HTMLInputElement =
+      fixture.nativeElement.querySelector('#llm-temperature');
+    const maxTokens: HTMLInputElement =
+      fixture.nativeElement.querySelector('#llm-max-tokens');
+    expect(temperature.getAttribute('placeholder')).toBe('LlmSettingsInherited');
+    expect(maxTokens.getAttribute('placeholder')).toBe('LlmSettingsInherited');
+  });
+
+  // Fix round 3 (IMPORTANT 4): a deployment with no `model_catalog` is
+  // behaving exactly as §4 says it must, and every deployment this image
+  // serves other than the vibe coder's is in that state. `GET /v1/models`
+  // answers 200 with the one entry and the settings route answers 409
+  // `not_configured` -- which the catch-all branch reported as "The runtime
+  // configuration could not be loaded." over a form whose Save could only
+  // 409 again. Nothing is wrong, so nothing should be said.
+  it('renders nothing at all when the deployment declares no catalog', async () => {
+    const fake = new FakeSettings();
+    fake.readError = {
+      status: 409,
+      error: { error: { code: 'not_configured', message: 'no model_catalog' } },
+    };
+    await TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      declarations: [AgentChatLlmSettingsComponent],
+      imports: [FormsModule, TranslateModule.forRoot()],
+      providers: [
+        { provide: AgentChatSettingsService, useValue: fake },
+        { provide: DashboardService, useValue: { projectID: 'p1' } },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(AgentChatLlmSettingsComponent);
+    const unavailable: boolean[] = [];
+    fixture.componentInstance.unavailable.subscribe(() => unavailable.push(true));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('#llm-model')).toBeNull();
+    expect(fixture.nativeElement.textContent.trim()).toBe('');
+    // And the parent is told, so the tab goes away rather than sitting there
+    // opening onto an empty panel.
+    expect(unavailable.length).toBe(1);
+  });
+
   // `error` now holds an i18n key rather than a hardcoded sentence (fix
   // round 1, MINOR 6), so this no longer checks for the substring 'admin' --
   // it checks the exact key the template translates. The form is also fully
