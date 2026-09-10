@@ -23,9 +23,8 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
-import { firstValueFrom } from 'rxjs';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 import { environment } from 'src/environments/environment';
 
@@ -411,11 +410,10 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
   }
   
   onBlur(event, property){
-    if(property === 'namespace'){
-      this.action[property] = event;
-    } else {
-      this.action[property] = event.target.value;
-    }
+    // `cds-text`/`cds-textarea` ri-emettono il DOM FocusEvent grezzo sul loro output `blur`:
+    // estraiamo il valore stringa dell'input, evitando di salvare "[object FocusEvent]".
+    const value = (typeof event === 'string') ? event : (event?.target?.value ?? event);
+    this.action[property] = value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 

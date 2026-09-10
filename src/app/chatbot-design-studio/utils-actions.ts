@@ -34,6 +34,7 @@ export enum TYPE_ACTION {
     OPEN_HOURS          = 'ifopenhours',
     HIDE_MESSAGE        = 'hmessage',
     JSON_CONDITION      = 'jsoncondition',
+    JSON_CONDITION2     = 'jsoncondition2',
     CONDITION           = 'condition',
     CAPTURE_USER_REPLY  = 'capture_user_reply',
     ITERATION           = 'iteration',
@@ -51,7 +52,8 @@ export enum TYPE_ACTION {
     SEND_WHATSAPP       = 'send_whatsapp',
     AI_PROMPT           = 'ai_prompt',
     AI_CONDITION        = 'ai_condition',
-    WEB_RESPONSE        = 'web_response'
+    WEB_RESPONSE        = 'web_response',
+    DATA_TABLE          = 'data_table'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -139,8 +141,9 @@ export const ACTIONS_LIST: {
     ONLINE_AGENTSV2:        { name: 'CDSActionList.NAME.IfOnlineAgent',         chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTSV2,      src: "assets/images/actions/online_agents.svg",         status: "active",                       doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
     CLEAR_TRANSCRIPT:       { name: 'CDSActionList.NAME.ClearTranscript',       chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLEAR_TRANSCRIPT,     src: "assets/images/actions/clear_transcript.svg",      status: "active",                       doc: "CDSActionList.DOC.ClearTranscript"                                },
     MOVE_TO_UNASSIGNED:     { name: 'CDSActionList.NAME.MoveToUnassigned',      chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.MOVE_TO_UNASSIGNED,   src: "assets/images/actions/move_to_unassigned.svg",    status: "active",                       doc: "CDSActionList.DOC.MoveToUnassigned"                               },
-    CONDITION:              { name: 'CDSActionList.NAME.Condition',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.Condition"                                      },
-    JSON_CONDITION:         { name: 'CDSActionList.NAME.ConditionElse',         chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION,       src: "assets/images/actions/condition.svg",             status: "active",                       doc: "CDSActionList.DOC.ConditionElse"                                  },
+    CONDITION:              { name: 'CDSActionList.NAME.Condition',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "inactive",                     doc: "CDSActionList.DOC.Condition"                                      },
+    JSON_CONDITION:         { name: 'CDSActionList.NAME.ConditionElse',         chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION,       src: "assets/images/actions/condition.svg",             status: "inactive",                     doc: "CDSActionList.DOC.ConditionElse"                                  },
+    JSON_CONDITION2:        { name: 'CDSActionList.NAME.ConditionElseV2',       chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.JSON_CONDITION2,      src: "assets/images/actions/condition.svg",             status: "active", badge: 'NEW',         doc: "CDSActionList.DOC.ConditionElseV2"                                },
     INTENT :                { name: 'CDSActionList.NAME.ConnectBlock',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.INTENT,               src:"assets/images/actions/connect_intent.svg",         status: "inactive",                     doc: ""                                                                 },
     CONNECT_BLOCK :         { name: 'CDSActionList.NAME.ConnectBlock',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONNECT_BLOCK,        src:"assets/images/actions/connect_intent.svg",         status: "active", plan: PLAN_NAME.G,    doc: ""                                                                 },
     ASSIGN_VARIABLE:        { name: 'CDSActionList.NAME.SetAttribute',          chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.ASSIGN_VARIABLE,      src: "assets/images/actions/assign_var.svg",            status: "inactive",                     doc: "CDSActionList.DOC.SetAttribute"                                   },
@@ -151,6 +154,7 @@ export const ACTIONS_LIST: {
     REPLACE_BOTV3:          { name: 'CDSActionList.NAME.ReplaceAIAgent',        chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.REPLACE_BOTV3,        src: "assets/images/actions/replace_bot.svg",           status: "active",   badge: '',          doc: "CDSActionList.DOC.ReplaceAIAgent"                                 },
     WAIT :                  { name: 'CDSActionList.NAME.Wait',                  chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.WAIT,                 src:"assets/images/actions/wait.svg",                   status: "active",                       doc: "CDSActionList.DOC.Wait"                                           },
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
+    DATA_TABLE :            { name: 'CDSActionList.NAME.DataTable',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.DATA_TABLE,           src:"assets/images/actions/data_table.svg",             status: "active", badge: 'BETA',        doc: "CDSActionList.DOC.DataTable"                                      },
     WEB_REQUESTV2 :         { name: 'CDSActionList.NAME.WebRequest',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_REQUESTV2,        src:"assets/images/actions/web_request.svg",            status: "active",                       doc: "CDSActionList.DOC.WebRequest"                                     },
     WEB_RESPONSE :          { name: 'CDSActionList.NAME.WebResponse',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT],                                                   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_RESPONSE,         src:"assets/images/actions/web_response.svg",           status: "active",                       doc: ""                                                                 },
     EMAIL :                 { name: 'CDSActionList.NAME.SendEmail',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.EMAIL,                src:"assets/images/actions/send_email.svg",             status: "active",                       doc: "CDSActionList.DOC.SendEmail"                                      },
@@ -194,3 +198,34 @@ export const ACTIONS_LIST: {
     PLAY_PROMPT_TWILIO:     { name: 'CDSActionList.NAME.PlayPrompt',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.PLAY_PROMPT,     src:"assets/images/actions-voice/play_prompt.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
     SPEECH_FORM_TWILIO:     { name: 'CDSActionList.NAME.SpeechForm',            chatbot_types: [TYPE_CHATBOT.VOICE_TWILIO ],                                                                                         category: TYPE_ACTION_CATEGORY.VOICE_TWILIO,        type: TYPE_ACTION_VXML.SPEECH_FORM,     src:"assets/images/actions-voice/speech_form.svg",      status: "active",   plan: PLAN_NAME.G,                  doc: ""                                                 },
 }
+
+// ----- Data Table action constants -----
+export const DATA_TABLE_OPERATIONS: Array<{ name: string, value: string }> = [
+    { name: 'Get',    value: 'get' },
+    { name: 'Insert', value: 'insert' },
+    { name: 'Update', value: 'update' },
+    { name: 'Upsert', value: 'upsert' },
+    { name: 'Delete', value: 'delete' }
+];
+
+export const DATA_TABLE_OPERATORS: Array<{ name: string, value: string }> = [
+    { name: 'Equal',            value: 'equal' },
+    { name: 'Not equal',        value: 'not_equal' },
+    { name: 'Contains',         value: 'contains' },
+    { name: 'Starts with',      value: 'starts_with' },
+    { name: 'Ends with',        value: 'ends_with' },
+    { name: 'Greater than',     value: 'greater_than' },
+    { name: 'Greater or equal', value: 'greater_or_equal' },
+    { name: 'Less than',        value: 'less_than' },
+    { name: 'Less or equal',    value: 'less_or_equal' },
+    { name: 'Exists',           value: 'exists' },
+    { name: 'Not exists',       value: 'not_exists' }
+];
+
+// Operators that don't require a value
+export const DATA_TABLE_OPERATORS_NO_VALUE: string[] = ['exists', 'not_exists'];
+
+export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
+    { name: 'all (AND)', value: 'all' },
+    { name: 'any (OR)',  value: 'any' }
+];

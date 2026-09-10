@@ -37,6 +37,42 @@
 - **bug fix**: custom headers are now forwarded to the `/mcp/tools` discovery call, so the backend can authenticate during the tool scan
 - **bug fix**: reactivated the Custom Headers section in the Add/Edit MCP Server dialog (was hidden)
 
+# 1.40.13
+- **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
+- **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
+
+# 1.40.12
+- **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
+- **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
+- **changed**: the AI actions no longer re-fetch the same data per instance — the `integration`, `integration/name/ollama`, `integration/name/vllm` and `kb/namespace/all` GETs are now cached in `ProjectService`/`OpenaiService` through a new `HttpMemoCache` (in-flight dedup + short TTL, invalidated on `saveIntegration` and on project change). A canvas with N Ask KB / AI Prompt / AI Condition actions now issues 1 request per endpoint instead of N
+- **changed**: removed the duplicated `/integration` GET in the AI Prompt action and the dead `getIntegrationByName`/`getIntegrations` copies in AI Prompt and AI Condition, now using the shared util
+- **bug fix**: the MCP servers array is copied instead of referenced, so the MCP dialogs can no longer mutate the shared integration payload
+- **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
+
+# 1.40.11
+- **added**: added new google models
+
+# 1.40.10 
+- **added**: added documentation image and guide link to the Data Table action tooltip
+- **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
+- **changed**: cds-config-*.json assets are now published under /environments/real_data
+
+# 1.40.9 
+- **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
+
+# 1.40.8 
+- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
+- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
+- **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
+- **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
+- **added**: multi-line tooltip for the "Attribute name" syntax help
+- **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
+
+
+# 1.40.7
+- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
+
 # 1.40.6
 - **bug fix**: change env
 

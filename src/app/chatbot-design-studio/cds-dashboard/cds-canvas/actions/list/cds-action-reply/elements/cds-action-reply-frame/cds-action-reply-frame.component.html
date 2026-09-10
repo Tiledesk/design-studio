@@ -40,12 +40,20 @@
 
     <div class="filter-wrapper"
         [ngStyle]="{width: filterConditionExist? '100%': 'auto'}">
-        <appdashboard-filter
+        <!-- Filtro LEGACY (esistente, senza marker version=2): editor congelato a master -->
+        <appdashboard-filter *ngIf="isLegacyFilter(response._tdJSONCondition)"
             [expression]="response._tdJSONCondition"
             [booleanOperators]="booleanOperators"
             [previewMode]="previewMode"
             (onChangeExpression)="onChangeExpression($event)">
         </appdashboard-filter>
+        <!-- Filtro V2: nuovi filtri e filtri marcati version=2 -->
+        <appdashboard-filter2 *ngIf="!isLegacyFilter(response._tdJSONCondition)"
+            [expression]="response._tdJSONCondition"
+            [booleanOperators]="booleanOperators"
+            [previewMode]="previewMode"
+            (onChangeExpression)="onChangeExpression($event)">
+        </appdashboard-filter2>
     </div>
 
 

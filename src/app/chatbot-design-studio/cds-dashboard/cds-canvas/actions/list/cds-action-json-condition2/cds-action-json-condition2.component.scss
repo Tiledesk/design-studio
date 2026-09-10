@@ -1,0 +1,264 @@
+:host{
+    --icon-color: #{var(--blu)};
+    --textColor: #{var(--blu)};
+    --backGroundColor: #{var(--blu-light-03)};
+    --hoverBackgroundColor: #{var(--blu-light-03)};
+
+    --border-radius-base: 8px
+}
+
+/* customize scrollbar */
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+.flex-element{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+// _________________CONDITION ::: START ___________________________
+::ng-deep .add-filter-panel {
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    // max-height: 600px;
+    min-height: 200px;
+    box-shadow: 0 0 20px 4px rgb(154 161 177 / 15%), 0 4px 80px -8px rgb(36 40 47 / 25%),
+        0 4px 4px -2px rgb(91 94 105 / 15%);
+    background: rgb(255, 255, 255);
+    border-radius: 4px;
+    // padding: 15px;
+    margin-top: 10px;
+    width: 500px
+}
+
+
+
+.filter-add-group-wrapper,
+.group-operator-wrapper{
+    align-items: center;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    .filter-add-group{
+        cursor: pointer;
+        display: flex;
+        margin: 0px 10px;
+        transition: opacity 0.3s ease 0s;
+        span.text{
+            color: var(--textColor);
+            font-weight: 600;
+        }
+    }
+
+    .filter-add-group-plus{
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        display: flex;
+        height: 22px;
+        justify-content: center;
+        margin-right: 10px;
+        width: 22px;
+        background: var(--action-item-background);
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+
+        span.material-icons{
+            color: var(--textColor);
+            font-size: 20px;
+            transition: color 0.6s ease 0s;
+        }
+    }
+
+    &::before{
+        -webkit-box-flex: 1;
+        content: "";
+        flex-grow: 1;
+        height: 0px;
+        width: 0px;
+        border-top: 1px solid var(--textColor);
+    }
+
+    &::after{
+        -webkit-box-flex: 1;
+        content: "";
+        flex-grow: 1;
+        height: 0px;
+        width: 0px;
+        border-top: 1px solid var(--textColor);
+    }
+
+    &:hover{
+        opacity: 0.8;
+    }
+}
+.add-conditions-group {
+    margin: 0px 0 40px;
+}
+
+.base-filter{
+    position: relative;
+    &:hover{
+        div.filter-remove{
+            opacity: 1;
+            transition: opacity 0.3s ease 0s;
+        }
+    }
+}
+
+form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+cds-select.operator ::ng-deep{
+    min-width:70px;
+    .ng-select.ng-select-single .ng-select-container{
+        height: 28px;
+        min-height: 28px;
+    }
+}
+
+.control-buttons{
+    height: 100%;
+    left: -44px;
+    position: absolute;
+    top: 0px;
+    width: 44px;
+
+    div.filter-remove{
+        position: absolute;
+        right: -8px;
+        top: -14px;
+        transition: opacity 0.3s ease 0s;
+        opacity: 0;
+        height: 28px;
+        width: 28px;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 1px 4px 0px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        background: white;
+        border-radius: 100%;
+        transition: background-color 0.3s ease 0s;
+        font-size: 12px;
+
+        span.material-icons,
+        span.material-icons-outlined{
+            font-size: 20px;
+            color: var(--textColor);
+        }
+
+        &:hover {
+            background-color: var(--hoverBackgroundColor);
+        }
+    }
+}
+
+// _________________CONDITION ::: END ___________________________
+
+
+
+
+// _________________ TRUE/FALSE/STOP::: START ___________________________
+
+.checkbox-condition{
+    position: absolute;
+    bottom: 10px;
+    margin: 0;  
+}
+  
+::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
+    border-color: var(--blu) !important;
+}
+  
+// overwrite the checkbox background
+::ng-deep .mat-checkbox-checked .mat-checkbox-background, 
+.mat-checkbox-indeterminate .mat-checkbox-background {
+    background-color: var(--blu) !important;
+    .mat-checkbox-checkmark {
+        background: var(--blu) !important;;
+        .mat-checkbox-checkmark-path {
+        stroke: white;
+        stroke-width: 5px;
+        }
+    }
+
+}
+
+// _________________ TRUE/FALSE/STOP::: END ___________________________
+
+
+
+#conditions{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .group{ 
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+    .group-operator{
+        font-size: 9px;
+        align-self: center;
+        justify-self: center;
+    }
+
+    .expression{
+        font-size: 9px;
+        line-height: 15px;
+        background-color: var(--intent-preview-background);
+        padding: 3px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .condition-group{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: rgb(245, 245, 245);
+        border-radius: 3px;
+        padding: 2px; 
+    }
+
+    div.filter-icon {
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        align-items: center;
+        color: var(--icon-color);
+        display: flex;
+        font-size: 15px;
+        justify-content: center;
+        width: 15px;
+        transition: color 0.3s ease 0s;
+        span.material-icons{
+            font-size: 15px;
+            color: var(--icon-color);
+        }
+    }
+
+    .ellips{
+        line-height: 20px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color 0.3s ease 0s;
+        overflow: hidden !important;
+    }
+}

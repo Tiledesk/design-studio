@@ -575,8 +575,8 @@ export class ConnectorService {
           }
         }
 
-        /**  JSON-CONDITION */
-        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION){
+        /**  JSON-CONDITION (legacy) + JSON-CONDITION2 (V2): stessi connettori true/false */
+        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION || action._tdActionType === TYPE_ACTION.JSON_CONDITION2){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo =  action.trueIntent.replace("#", "");
@@ -805,6 +805,32 @@ export class ConnectorService {
             this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - WEB-REQUEST-V2 ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
+        /** DATA-TABLE */
+        if(action._tdActionType === TYPE_ACTION.DATA_TABLE){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - DATA-TABLE ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - DATA-TABLE ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - DATA-TABLE ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - DATA-TABLE ACTION -> idConnectorTo', idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
         }

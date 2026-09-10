@@ -3,6 +3,7 @@ import { TYPE_ACTION } from '../../../../../../../utils-actions';
 import { Expression, Message, Wait, Metadata } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-redirect',
@@ -10,6 +11,9 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   styleUrls: ['./cds-action-reply-redirect.component.scss']
 })
 export class CdsActionReplyRedirectComponent implements OnInit {
+
+  /** true se il filtro esistente è legacy (pre-V2): il template usa il vecchio editor appdashboard-filter */
+  isLegacyFilter = isLegacyFilter;
 
   @Output() changeActionReply = new EventEmitter();
   @Output() deleteActionReply = new EventEmitter();
@@ -46,9 +50,7 @@ export class CdsActionReplyRedirectComponent implements OnInit {
     try {
       this.metadata = this.response.metadata;
 
-      if(this.response?._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-        this.filterConditionExist = true
-      }
+      this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
 
     } catch (error) {
       this.logger.log("error ", error);
@@ -75,7 +77,7 @@ export class CdsActionReplyRedirectComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
 

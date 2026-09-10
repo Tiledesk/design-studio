@@ -9,11 +9,13 @@ import { AttributesComponent } from '../chatbot-design-studio/cds-base-element/a
 import { SelectComponent } from '../chatbot-design-studio/cds-base-element/select/select.component';
 import { DialogYesNoComponent } from '../chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { CDSFilterComponent } from '../chatbot-design-studio/cds-base-element/filter/filter.component';
+import { CDSFilter2Component } from '../chatbot-design-studio/cds-base-element/filter2/filter2.component';
 import { CDSRadioButtonComponent } from '../chatbot-design-studio/cds-base-element/radio-button/radio-button.component';
 import { CDSToogleComponent } from '../chatbot-design-studio/cds-base-element/toogle/toogle.component';
 import { TextEditableDivComponent } from '../chatbot-design-studio/cds-base-element/text-editable-div/text-editable-div.component';
 import { BaseElementModule } from './base-element.module';
 import { BaseConditionRowComponent } from '../chatbot-design-studio/cds-dashboard/cds-canvas/actions/list/cds-action-json-condition/base-condition-row/base-condition-row.component';
+import { BaseConditionRow2Component } from '../chatbot-design-studio/cds-dashboard/cds-canvas/actions/list/cds-action-json-condition2/base-condition-row2/base-condition-row2.component';
 import { FilterPipe } from '../pipe/filter.pipe';
 import { FindPipe } from '../pipe/find.pipe';
 import { FormatNumberPipe } from '../pipe/format-number.pipe';
@@ -26,7 +28,9 @@ import { FormatNumberPipe } from '../pipe/format-number.pipe';
     DialogComponent,
     DialogYesNoComponent,
     CDSFilterComponent,
+    CDSFilter2Component,
     BaseConditionRowComponent,
+    BaseConditionRow2Component,
     CDSMenuComponent,
     CDSRadioButtonComponent,
     CDSToogleComponent,
@@ -50,7 +54,9 @@ import { FormatNumberPipe } from '../pipe/format-number.pipe';
     DialogComponent,
     DialogYesNoComponent,
     CDSFilterComponent,
+    CDSFilter2Component,
     BaseConditionRowComponent,
+    BaseConditionRow2Component,
     CDSMenuComponent,
     CDSRadioButtonComponent,
     CDSToogleComponent,

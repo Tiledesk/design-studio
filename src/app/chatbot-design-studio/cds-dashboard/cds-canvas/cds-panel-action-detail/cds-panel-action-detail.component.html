@@ -134,6 +134,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-json-condition>
 
+                    <cds-action-json-condition2 *ngSwitchCase="TYPE_ACTION.JSON_CONDITION2"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-json-condition2>
+
                     <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT"
                         class="panel-response"
                         [action]="elementSelected"
@@ -316,6 +325,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-qapla>
+
+                    <cds-action-data-table *ngSwitchCase="TYPE_ACTION.DATA_TABLE"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [project_id]="project_id"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-data-table>
 
                     <cds-action-make *ngSwitchCase="TYPE_ACTION.MAKE"
                         class="panel-response"
