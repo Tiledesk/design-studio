@@ -9,6 +9,11 @@
 
 
 
+# this branch 10/09/2026
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it, and both the "Add action" button and the empty-block message are hidden. Chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history, the "Restore" button is now "Re-publish" and carries a tooltip explaining that it puts that version back online without changing the chatbot you are currently editing
+
+
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
 - **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
