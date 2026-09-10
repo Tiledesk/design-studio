@@ -32,6 +32,10 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
   TYPE_CHATBOT = TYPE_CHATBOT;
   BRAND_BASE_INFO = BRAND_BASE_INFO
   isVisibleDEP: boolean;
+  /** Cached once in ngOnInit rather than called from the template's *ngIf on
+   *  every change-detection pass -- the same pattern the other tabs use to
+   *  gate their nav entries. */
+  llmSettingsAvailable = false;
 
   project: Project;
 
@@ -51,7 +55,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     private dashboardService: DashboardService,
     private router: Router,
     private route: ActivatedRoute,
-    public settingsService: AgentChatSettingsService
+    private settingsService: AgentChatSettingsService
   ) { super();
   }
 
@@ -60,6 +64,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
     // this.getParamsBotIdAndThenInit();
     this.getOSCODE();
+    this.llmSettingsAvailable = this.settingsService.isAvailable();
     this.project = this.projectService.getCurrentProject()
     this.integrationService.initialize(this.appConfigService.getConfig().serverBaseUrl, this.project._id)
     this.getTranslations();

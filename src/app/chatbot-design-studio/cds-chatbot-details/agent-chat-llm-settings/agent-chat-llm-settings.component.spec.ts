@@ -45,10 +45,16 @@ describe('AgentChatLlmSettingsComponent', () => {
     fixture.detectChanges();
   }
 
+  // Redesigned around a single control (fix round 1): the dropdown's own
+  // sentinel value ('') *is* "follow the deployment default" -- there is no
+  // second `useDeploymentDefault` flag left to agree or disagree with it.
+  // apply() therefore sets `selectedModelId` straight to the sentinel when
+  // nothing is configured, rather than resolving it to the current default's
+  // id, so this assertion changed from the id to '' to match.
   it('shows the deployment default as the selection when nothing is configured',
      async () => {
     await setup();
-    expect(fixture.componentInstance.selectedModelId).toBe('anthropic:claude-opus-5');
+    expect(fixture.componentInstance.selectedModelId).toBe('');
     expect(fixture.componentInstance.models.length).toBe(2);
   });
 
@@ -58,7 +64,6 @@ describe('AgentChatLlmSettingsComponent', () => {
     const c = fixture.componentInstance;
     expect(c.selectedModelId).toBe('openai:gpt-5.5');
     expect(c.temperature).toBe(0.7);
-    expect(c.useDeploymentDefault).toBe(false);
   });
 
   it('saves the selection with the params it holds', async () => {
@@ -84,22 +89,32 @@ describe('AgentChatLlmSettingsComponent', () => {
     expect(settings.saved[0].model).toEqual({ id: 'openai:gpt-5.5', params: {} });
   });
 
+  // Was: tick a separate `useDeploymentDefault` checkbox. Now the sentinel
+  // value on the single control *is* "deployment default" -- choosing it is
+  // choosing the sentinel, nothing more.
   it('clears the override by choosing the deployment default', async () => {
     await setup();
     const c = fixture.componentInstance;
-    c.selectedModelId = 'anthropic:claude-opus-5';
-    c.useDeploymentDefault = true;
+    c.selectedModelId = '';
     await c.save();
     expect(settings.saved[0].model).toBeNull();
   });
 
-  it('disables the form and explains when the caller is not an admin', async () => {
+  // `error` now holds an i18n key rather than a hardcoded sentence (fix
+  // round 1, MINOR 6), so this no longer checks for the substring 'admin' --
+  // it checks the exact key the template translates. The form is also fully
+  // suppressed on a 403 (IMPORTANT 4: the runtime 403s the GET too, so
+  // showing empty fields under the message would misreport "nothing
+  // configured"), which the DOM assertion below now checks directly
+  // (IMPORTANT 5) rather than trusting only the component's `readOnly` flag.
+  it('hides the form and explains when the caller is not an admin', async () => {
     settings = new FakeSettings();
     settings.readError = { status: 403 };
     await TestBed.resetTestingModule();
     await setup2(settings);
     expect(fixture.componentInstance.readOnly).toBe(true);
-    expect(fixture.componentInstance.error).toContain('admin');
+    expect(fixture.componentInstance.error).toBe('LlmSettingsForbidden');
+    expect(fixture.nativeElement.querySelector('#llm-model')).toBeNull();
   });
 
   async function setup2(fake: FakeSettings) {

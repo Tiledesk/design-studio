@@ -19,39 +19,39 @@ import {
 export class AgentChatLlmSettingsComponent implements OnInit {
 
   models: RuntimeModel[] = [];
+  /** '' is the sentinel for "the deployment's own model": it is what the
+   *  first, synthetic option in the dropdown carries. Saving with '' sends
+   *  `model: null` rather than the default's id by name, so a deployment
+   *  that later changes its default carries this project with it.
+   *
+   *  This used to be split across this field plus a separate
+   *  `useDeploymentDefault` checkbox -- two pieces of state that could
+   *  disagree (checkbox ticked, a different model still showing in the
+   *  dropdown; save honouring one while the screen showed the other). A
+   *  single control that is either the sentinel or a real id cannot
+   *  disagree with itself. */
+  selectedModelId = '';
   temperature: number | null = null;
   maxTokens: number | null = null;
-  /** True while the project is on the deployment's own model: saving then
-   *  clears the override rather than pinning the default by name, so a
-   *  deployment that later changes its model carries this project with it.
-   *
-   *  Picking a specific id always means "not the deployment default" --
-   *  enforced by the `selectedModelId` setter below rather than left to
-   *  whichever call site happens to touch it, so a direct assignment (as a
-   *  test, or any future caller, might make) can't leave this stale against
-   *  the id it no longer describes. */
-  useDeploymentDefault = true;
   readOnly = false;
   loading = true;
   saving = false;
+  /** An i18n key, not a sentence -- the template translates it. When it
+   *  instead holds the runtime's own message (a save-time 400, say) that
+   *  text has no matching key, and ngx-translate's fallback for a missing
+   *  key is to render the value verbatim, which is exactly the raw server
+   *  message we want in that case. */
   error: string | null = null;
   saved = false;
-
-  private _selectedModelId = '';
-
-  get selectedModelId(): string {
-    return this._selectedModelId;
-  }
-
-  set selectedModelId(id: string) {
-    this._selectedModelId = id;
-    this.useDeploymentDefault = false;
-  }
 
   constructor(
     public settings: AgentChatSettingsService,
     private dashboardService: DashboardService
   ) {}
+
+  get defaultModel(): RuntimeModel | undefined {
+    return this.models.find(m => m.default);
+  }
 
   async ngOnInit(): Promise<void> {
     try {
@@ -61,10 +61,13 @@ export class AgentChatLlmSettingsComponent implements OnInit {
       this.apply(current);
     } catch (e: any) {
       if (e?.status === 403) {
+        // The runtime 403s the GET as well as the PUT, so the current value
+        // genuinely cannot be shown -- the template hides the form entirely
+        // rather than leaving fields on screen that look like real state.
         this.readOnly = true;
-        this.error = 'Only a project admin can change this.';
+        this.error = 'LlmSettingsForbidden';
       } else {
-        this.error = 'The runtime configuration could not be loaded.';
+        this.error = 'LlmSettingsLoadError';
       }
     } finally {
       this.loading = false;
@@ -72,17 +75,23 @@ export class AgentChatLlmSettingsComponent implements OnInit {
   }
 
   private apply(current: ProjectModelSettings): void {
-    const fallback = this.models.find(m => m.default)?.id ?? '';
-    // Order matters: the setter above always clears `useDeploymentDefault` as
-    // a side effect, so the authoritative value is written back afterwards.
-    this.selectedModelId = current?.model?.id ?? fallback;
-    this.useDeploymentDefault = !current?.model;
+    this.selectedModelId = current?.model?.id ?? '';
     this.temperature = current?.model?.params?.temperature ?? null;
     this.maxTokens = current?.model?.params?.max_tokens ?? null;
   }
 
   onModelChange(id: string): void {
     this.selectedModelId = id;
+    this.saved = false;
+  }
+
+  onTemperatureChange(value: number | null): void {
+    this.temperature = value;
+    this.saved = false;
+  }
+
+  onMaxTokensChange(value: number | null): void {
+    this.maxTokens = value;
     this.saved = false;
   }
 
@@ -98,7 +107,7 @@ export class AgentChatLlmSettingsComponent implements OnInit {
       if (this.maxTokens !== null && this.maxTokens !== undefined) {
         params.max_tokens = Number(this.maxTokens);
       }
-      const model = this.useDeploymentDefault
+      const model = this.selectedModelId === ''
         ? null
         : { id: this.selectedModelId, params };
       const stored = await this.settings.save(this.dashboardService.projectID, model);
@@ -106,8 +115,8 @@ export class AgentChatLlmSettingsComponent implements OnInit {
       this.saved = true;
     } catch (e: any) {
       this.error = e?.status === 403
-        ? 'Only a project admin can change this.'
-        : (e?.error?.error?.message ?? 'The setting could not be saved.');
+        ? 'LlmSettingsForbidden'
+        : (e?.error?.error?.message ?? 'LlmSettingsSaveError');
     } finally {
       this.saving = false;
     }
