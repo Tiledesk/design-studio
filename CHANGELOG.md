@@ -9,8 +9,7 @@
 
 
 
-# this branch
-### 10/09/2026
+# 1.40.14-rc12
 - **added**: in the Native Tools dialog every Tiledesk server now shows its active tools, and the dialog has a "Close" button in the footer like the MCP servers one
 - **added**: the tool selection modal has a "Close" button in its footer too
 
