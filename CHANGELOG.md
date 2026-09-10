@@ -8,10 +8,9 @@
 *Tiledesk SRL*
 
 
-# this branch 10/09/2026
+# 1.40.14-rc11
 - **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it, and both the "Add action" button and the empty-block message are hidden. Chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
 - **changed**: in the release history, the "Restore" button is now "Re-publish" and carries a tooltip explaining that it puts that version back online without changing the chatbot you are currently editing
-
 
 # 1.40.14-rc10
 - **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
