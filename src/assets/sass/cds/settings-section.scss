@@ -57,8 +57,14 @@ textarea[type="text"]:disabled {
     // cursor: not-allowed;
 }
 
-input[type="text"]:disabled::placeholder,
-input[type="number"]:disabled::placeholder {
+// Deliberately NOT extended to `input[type="number"]`, unlike the two rules
+// above. This one paints the placeholder in the disabled *background* colour,
+// i.e. hides it -- and the LLM section's number fields are disabled in exactly
+// the state their placeholder exists to explain ("blank means the deployment's
+// own setting", with agent.yaml's params in force). It is inert either way,
+// since the generic `::placeholder` rule below carries `!important` and beats
+// it whatever the specificity, but it must not read as the intent here.
+input[type="text"]:disabled::placeholder {
     color: var(--input-disabled);
     // font-size: 1.2em;
     // font-style: italic;

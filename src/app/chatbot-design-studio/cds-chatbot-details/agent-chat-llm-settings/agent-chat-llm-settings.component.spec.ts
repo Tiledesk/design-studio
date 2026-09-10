@@ -152,6 +152,75 @@ describe('AgentChatLlmSettingsComponent', () => {
     expect(forDefault[0].value).toBe('');
   });
 
+  // Fix round 3, residual: with the duplicate option removed, a stored
+  // override naming the deployment's OWN model id matched no `<option>` at
+  // all -- Angular set `selectedIndex = -1` and the panel showed no model
+  // while the number fields sat enabled and populated. That state is real:
+  // the runtime has a branch for it (`effective.py`, `override.id ==
+  // config.model.id`), and the duplicate option was how a user reached it.
+  it('shows the default, not a blank select, when the override names the default',
+     async () => {
+    await setup({ project_id: 'p1', updated_at: 't', updated_by: 'u',
+                  model: { id: 'anthropic:claude-opus-5',
+                           params: { temperature: 0.5, max_tokens: 900 } } });
+    const select: HTMLSelectElement =
+      fixture.nativeElement.querySelector('#llm-model');
+
+    const selected = Array.from(select.options).filter(o => o.selected);
+    expect(selected.length).withContext('nothing is selected at all').toBe(1);
+    expect(select.selectedIndex).toBe(0);
+    expect(select.value).toBe('');
+    expect(selected[0].textContent).toContain('Opus 5');
+
+    // The sentinel carries no params, so the panel must not keep showing
+    // numbers it is about to discard.
+    const temperature: HTMLInputElement =
+      fixture.nativeElement.querySelector('#llm-temperature');
+    expect(temperature.value).toBe('');
+    expect(temperature.disabled).toBe(true);
+
+    // Saving from here normalises the unrepresentable override away.
+    await fixture.componentInstance.save();
+    expect(settings.saved[0].model).toBeNull();
+  });
+
+  // Fix round 3, residual: the I3 stylesheet change extended
+  // `input[type="text"]:disabled::placeholder { color: var(--input-disabled) }`
+  // to number inputs -- and `--input-disabled` is also the disabled
+  // *background*. Both number fields are disabled in exactly the state M8
+  // exists for (the sentinel selected, agent.yaml's own params in force), so
+  // the hint would have rendered invisible precisely when it is needed.
+  // Asserting the attribute, as the M8 test does, cannot see that.
+  it('keeps the blank-means-inherited hint readable while the fields are disabled',
+     async () => {
+    // `_variables.scss` declares these on `:root` and karma never loads it, so
+    // without this every `var()` in the sheet under test resolves to nothing
+    // and the measurement below is of an unstyled input. Set the real values
+    // and the assertion is about the real cascade.
+    const root = document.documentElement;
+    root.style.setProperty('--input-disabled', '#f9f9f9');
+    root.style.setProperty('--input-placeholder', '#a0a0a0');
+    root.style.setProperty('--color-white-hex', '#ffffff');
+    try {
+      await setup();
+      const temperature: HTMLInputElement =
+        fixture.nativeElement.querySelector('#llm-temperature');
+      expect(temperature.disabled).withContext('not the state M8 is about').toBe(true);
+
+      const placeholder = getComputedStyle(temperature, '::placeholder').color;
+      const background = getComputedStyle(temperature).backgroundColor;
+      expect(background).withContext('not the disabled background').toBe('rgb(249, 249, 249)');
+      expect(placeholder).withContext('the hint is the colour of its own background')
+        .not.toBe(background);
+      // The design system's own muted text colour, `--input-placeholder`.
+      expect(placeholder).toBe('rgb(160, 160, 160)');
+    } finally {
+      root.style.removeProperty('--input-disabled');
+      root.style.removeProperty('--input-placeholder');
+      root.style.removeProperty('--color-white-hex');
+    }
+  });
+
   // Fix round 3 (IMPORTANT 3): `<form class="row">` put all seven children
   // into one grid row, so labels and controls did not pair up on screen --
   // "Temperature" at the far right with its input under "Model". Every

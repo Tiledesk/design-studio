@@ -124,9 +124,26 @@ export class AgentChatLlmSettingsComponent implements OnInit {
   }
 
   private apply(current: ProjectModelSettings): void {
-    this.selectedModelId = current?.model?.id ?? '';
-    this.temperature = current?.model?.params?.temperature ?? null;
-    this.maxTokens = current?.model?.params?.max_tokens ?? null;
+    const storedId = current?.model?.id ?? '';
+    // An override naming the deployment's *own* model id is a state this
+    // panel cannot represent. The dropdown offers that model only as the ''
+    // sentinel, and the sentinel means "follow the deployment default" --
+    // which carries no params of its own. Left verbatim, `storedId` would
+    // match no `<option>` at all: Angular sets `selectedIndex = -1` and the
+    // panel shows a blank select while the number fields sit populated.
+    //
+    // So it is read as the sentinel, and the params are dropped with it
+    // rather than shown in boxes that are about to be disabled and then
+    // discarded. The consequence, stated plainly: opening this panel on such
+    // a project shows the deployment default, and saving from here writes
+    // `model: null` and normalises the unrepresentable override away. The
+    // runtime keeps a branch for the state (`effective.py`,
+    // `override.id == config.model.id`) -- it just cannot be reached, or
+    // preserved, from here.
+    const isDefault = storedId !== '' && storedId === this.defaultModel?.id;
+    this.selectedModelId = isDefault ? '' : storedId;
+    this.temperature = isDefault ? null : (current?.model?.params?.temperature ?? null);
+    this.maxTokens = isDefault ? null : (current?.model?.params?.max_tokens ?? null);
   }
 
   onModelChange(id: string): void {
