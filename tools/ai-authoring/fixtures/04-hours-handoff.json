@@ -1,0 +1,26 @@
+{
+  "version": "blueprint-1",
+  "name": "Contatto con le vendite",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": "benvenuto",
+  "notes": [],
+  "blocks": [
+    {
+      "id": "benvenuto", "name": "Benvenuto", "type": "replyv2", "text": "Ciao! Vuoi parlare con il nostro ufficio vendite?",
+      "buttons": [
+        { "label": "Sì", "goto": "verifica_orari", "url": null },
+        { "label": "No, grazie", "goto": "saluto", "url": null }
+      ]
+    },
+    { "id": "verifica_orari", "name": "Verifica orari", "type": "ifopenhours", "exits": { "true": "sposta_vendite", "false": "chiedi_email" } },
+    { "id": "sposta_vendite", "name": "Sposta a Vendite", "type": "department", "department": "Vendite", "next": "verifica_operatori" },
+    { "id": "verifica_operatori", "name": "Verifica operatori", "type": "ifonlineagentsv2", "exits": { "true": "annuncio_operatore", "false": "chiedi_email" } },
+    { "id": "annuncio_operatore", "name": "Annuncio operatore", "type": "replyv2", "text": "Ti passo a un consulente delle vendite.", "next": "operatore" },
+    { "id": "operatore", "name": "Operatore", "type": "agent" },
+    { "id": "chiedi_email", "name": "Chiedi email", "type": "ask", "text": "Ora non c'è nessuno disponibile. Lasciaci la tua email e ti ricontattiamo.", "saveTo": "user_email", "next": "conferma" },
+    { "id": "conferma", "name": "Conferma", "type": "replyv2", "text": "Grazie! Ti scriveremo a {{user_email}} appena possibile." },
+    { "id": "saluto", "name": "Saluto", "type": "replyv2", "text": "Nessun problema, a presto!" }
+  ]
+}

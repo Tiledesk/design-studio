@@ -13,7 +13,8 @@
     "start": "ng serve",
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ai-authoring": "node --test tools/ai-authoring/blueprint-compiler.test.mjs"
   },
   "private": false,
   "dependencies": {

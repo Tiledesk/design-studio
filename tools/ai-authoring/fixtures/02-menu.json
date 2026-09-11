@@ -1,0 +1,22 @@
+{
+  "version": "blueprint-1",
+  "name": "Menu informazioni",
+  "language": "it",
+  "start": "menu",
+  "fallbackText": "Non ho capito: scegli una delle opzioni.",
+  "fallbackNext": "menu",
+  "notes": [],
+  "blocks": [
+    {
+      "id": "menu", "name": "Menu", "type": "replyv2", "text": "Ciao! Come posso aiutarti?",
+      "buttons": [
+        { "label": "Orari di apertura", "goto": "orari", "url": null },
+        { "label": "Parla con un operatore", "goto": "annuncio_operatore", "url": null },
+        { "label": "Visita il sito", "goto": null, "url": "https://example.com" }
+      ]
+    },
+    { "id": "orari", "name": "Orari", "type": "replyv2", "text": "Siamo aperti dal lunedì al venerdì, dalle 9 alle 18.", "next": "menu" },
+    { "id": "annuncio_operatore", "name": "Annuncio operatore", "type": "replyv2", "text": "Ti metto in contatto con un operatore.", "next": "operatore" },
+    { "id": "operatore", "name": "Operatore", "type": "agent" }
+  ]
+}

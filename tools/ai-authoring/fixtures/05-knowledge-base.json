@@ -1,0 +1,27 @@
+{
+  "version": "blueprint-1",
+  "name": "Assistente FAQ",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": "altro",
+  "notes": [],
+  "blocks": [
+    { "id": "benvenuto", "name": "Benvenuto", "type": "replyv2", "text": "Ciao! Sono l'assistente virtuale: rispondo alle domande più frequenti.", "next": "chiedi_domanda" },
+    { "id": "chiedi_domanda", "name": "Chiedi domanda", "type": "ask", "text": "Qual è la tua domanda?", "saveTo": "domanda", "next": "cerca_risposta" },
+    { "id": "cerca_risposta", "name": "Cerca risposta", "type": "askgptv2", "knowledgeBase": "FAQ sito", "question": "{{domanda}}", "exits": { "true": "mostra_risposta", "false": "segna_mancata" } },
+    { "id": "mostra_risposta", "name": "Mostra risposta", "type": "replyv2", "text": "{{kb_reply}}", "next": "altro" },
+    {
+      "id": "altro", "name": "Altro", "type": "replyv2", "text": "Posso aiutarti in altro?",
+      "buttons": [
+        { "label": "Un'altra domanda", "goto": "chiedi_domanda", "url": null },
+        { "label": "Parla con un operatore", "goto": "annuncio_operatore", "url": null },
+        { "label": "No, grazie", "goto": "saluto", "url": null }
+      ]
+    },
+    { "id": "segna_mancata", "name": "Segna risposta mancata", "type": "setattribute-v2", "destination": "motivo_passaggio", "value": "risposta non trovata", "next": "annuncio_operatore" },
+    { "id": "annuncio_operatore", "name": "Annuncio operatore", "type": "replyv2", "text": "Ti passo a un operatore che saprà aiutarti.", "next": "operatore" },
+    { "id": "operatore", "name": "Operatore", "type": "agent" },
+    { "id": "saluto", "name": "Saluto", "type": "replyv2", "text": "Grazie, a presto!" }
+  ]
+}
