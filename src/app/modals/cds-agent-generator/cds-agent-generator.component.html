@@ -287,8 +287,12 @@
 
         <pre class="agent-generator__json" *ngIf="showJson">{{ result.blueprint | json }}</pre>
 
+        <ng-container *ngTemplateOutlet="errorBox"></ng-container>
+
         <div class="agent-generator__preview-footer">
-            <span class="agent-generator__hint">{{ 'CDSAgentGenerator.Preview.NotCreated' | translate }}</span>
+            <span class="agent-generator__hint">
+                {{ (creating ? 'CDSAgentGenerator.Preview.Creating' : 'CDSAgentGenerator.Preview.NotCreated') | translate }}
+            </span>
             <div class="agent-generator__preview-actions">
                 <button type="button" class="agent-generator__secondary" (click)="toggleJson()">
                     {{ (showJson ? 'CDSAgentGenerator.Preview.HideJson' : 'CDSAgentGenerator.Preview.ShowJson') | translate }}
@@ -296,12 +300,16 @@
                 <button type="button" class="agent-generator__secondary" (click)="copyJson()">
                     {{ (copied ? 'CDSAgentGenerator.Preview.Copied' : 'CDSAgentGenerator.Preview.CopyJson') | translate }}
                 </button>
-                <button type="button" class="agent-generator__secondary" (click)="backToBrief()">
+                <button type="button" class="agent-generator__secondary" [disabled]="creating" (click)="backToBrief()">
                     {{ 'CDSAgentGenerator.Preview.Edit' | translate }}
                 </button>
-                <button type="button" class="agent-generator__submit" (click)="regenerate()">
-                    <i class="material-icons-outlined">refresh</i>
+                <button type="button" class="agent-generator__secondary" [disabled]="creating" (click)="regenerate()">
                     {{ 'CDSAgentGenerator.Preview.Regenerate' | translate }}
+                </button>
+                <button type="button" class="agent-generator__submit" [disabled]="creating" (click)="createAgent()">
+                    <span class="agent-generator__spinner" *ngIf="creating"></span>
+                    <i class="material-icons-outlined" *ngIf="!creating">add_circle_outline</i>
+                    {{ 'CDSAgentGenerator.Preview.Create' | translate }}
                 </button>
             </div>
         </div>

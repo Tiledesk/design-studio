@@ -2799,7 +2799,9 @@
                 "department": "Department",
                 "agent": "Operator",
                 "close": "Close"
-            }
+            },
+            "Create": "Create the agent",
+            "Creating": "Creating the agent…"
         },
         "Plan": {
             "Title": "Let's complete the description",
@@ -2843,6 +2845,10 @@
             "Unsupported": "To configure by hand after creation",
             "BackToQuestions": "Back to the questions",
             "Generate": "Generate the agent"
-        }
+        },
+        "ErrorCompile": "The generated flow cannot be turned into an agent: generate it again or edit the prompt.",
+        "ErrorCreate": "Tiledesk did not create the agent. Try again.",
+        "ErrorNoAgentId": "The agent was created but cannot be opened: you can find it in the list of agents.",
+        "ErrorIdsNotPreserved": "The agent was created, but some links were not preserved: check it or delete it before using it."
     }
 }

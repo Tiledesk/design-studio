@@ -371,7 +371,9 @@
                 "department": "Dipartimento",
                 "agent": "Operatore",
                 "close": "Chiusura"
-            }
+            },
+            "Create": "Crea l'agente",
+            "Creating": "Sto creando l'agente…"
         },
         "Plan": {
             "Title": "Completiamo la descrizione",
@@ -415,7 +417,11 @@
             "Unsupported": "Da configurare a mano dopo la creazione",
             "BackToQuestions": "Torna alle domande",
             "Generate": "Genera l'agente"
-        }
+        },
+        "ErrorCompile": "Il flusso generato non si può trasformare in un agente: rigeneralo o modifica il prompt.",
+        "ErrorCreate": "Tiledesk non ha creato l'agente. Riprova.",
+        "ErrorNoAgentId": "L'agente è stato creato ma non riesco ad aprirlo: lo trovi nell'elenco degli agenti.",
+        "ErrorIdsNotPreserved": "L'agente è stato creato, ma alcuni collegamenti non sono stati conservati: controllalo o eliminalo prima di usarlo."
     },
     "CDSHeader": {
         "SelectAgent": "Seleziona agente",

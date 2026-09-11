@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subject, Subscription, interval } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 import {
-  AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, GenerateBrief, GenerateResponse, PLAN_SECTION_KEYS,
-  PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
+  AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, CreatedAgent, GenerateBrief, GenerateResponse,
+  PLAN_SECTION_KEYS, PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
 } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -24,7 +25,7 @@ const MAX_ERROR_DETAILS = 5;
 const MAX_AGENT_NAME = 60;
 
 /**
- * Fasi della modale: descrizione → intervista → prompt finale → generazione → anteprima.
+ * Fasi della modale: descrizione → intervista → prompt finale → generazione → anteprima → creazione.
  * Dall'anteprima si torna al prompt finale, dal prompt finale alle domande.
  */
 export enum PHASE {
@@ -121,6 +122,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   generationSeconds: number = 0;
   showJson: boolean = false;
   copied: boolean = false;
+  /** Creazione dell'agente in corso, dall'anteprima. */
+  creating: boolean = false;
 
   private timer: Subscription | null = null;
   private unsubscribe$: Subject<any> = new Subject<any>();
@@ -129,7 +132,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   constructor(
     public dialogRef: MatDialogRef<CdsAgentGeneratorComponent>,
     private agentGeneratorService: AgentGeneratorService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -158,8 +162,9 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
+  /** Generazione o creazione in corso: la modale non si chiude e i comandi sono bloccati. */
   get isSubmitting(): boolean {
-    return this.phase === PHASE.GENERATING;
+    return this.phase === PHASE.GENERATING || this.creating;
   }
 
   /** Lingua dell'interfaccia: le domande e il prompt finale arrivano in questa lingua. */
@@ -409,14 +414,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     // Durante l'attesa un click sul backdrop non deve chiudere la modale.
     this.dialogRef.disableClose = true;
     this.startTimer();
-    const brief: GenerateBrief = {
-      finalPrompt: this.finalPrompt.trim(),
-      agentLanguage: this.turn?.agentLanguage || this.uiLanguage,
-      agentName: this.agentName.trim() || null,
-      sections: this.turn?.sections || null
-    };
 
-    this.agentGeneratorService.generate(brief, this.botType)
+    this.agentGeneratorService.generate(this.currentBrief(), this.botType)
       .pipe(
         takeUntil(this.unsubscribe$),
         finalize(() => {
@@ -437,10 +436,22 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Il prompt finale, eventualmente modificato, con lingua, nome e sezioni del planner. */
+  private currentBrief(): GenerateBrief {
+    return {
+      finalPrompt: this.finalPrompt.trim(),
+      agentLanguage: this.turn?.agentLanguage || this.uiLanguage,
+      agentName: this.agentName.trim() || null,
+      sections: this.turn?.sections || null
+    };
+  }
+
   // -------------------------------------------------------
-  // Anteprima
+  // Anteprima → creazione
   // -------------------------------------------------------
   backToBrief(): void {
+    if (this.creating) return;
+    this.clearError();
     this.phase = PHASE.BRIEF;
     this.result = null;
     this.flow = [];
@@ -448,6 +459,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   }
 
   regenerate(): void {
+    if (this.creating) return;
     this.backToBrief();
     this.generateAgent();
   }
@@ -462,6 +474,42 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
       this.copied = true;
       setTimeout(() => this.copied = false, 1500);
     });
+  }
+
+  /** Crea l'agente dall'anteprima e lo apre. */
+  createAgent(): void {
+    if (!this.result || this.creating) return;
+    this.clearError();
+    this.creating = true;
+    this.dialogRef.disableClose = true;
+    this.agentGeneratorService.createAgent(this.result, this.currentBrief())
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        finalize(() => {
+          this.creating = false;
+          this.dialogRef.disableClose = false;
+        })
+      )
+      .subscribe({
+        next: (created: CreatedAgent) => {
+          this.logger.log('[CDS-AGENT-GENERATOR] agent created: ', created);
+          this.openCreatedAgent(created.botId);
+        },
+        error: (err: any) => {
+          this.logger.error('[CDS-AGENT-GENERATOR] create error: ', err);
+          this.showError(err);
+        }
+      });
+  }
+
+  /**
+   * Apre il nuovo agente come il selettore dell'agent nell'header: il Design Studio si inizializza
+   * una volta sola, quindi dopo la navigazione la pagina si ricarica.
+   */
+  private openCreatedAgent(botId: string): void {
+    this.dialogRef.close();
+    this.router.navigate(['/project', this.agentGeneratorService.projectId, 'chatbot', botId, 'blocks'])
+      .then(() => window.location.reload());
   }
 
   private showPreview(res: GenerateResponse): void {

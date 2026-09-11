@@ -7,6 +7,10 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { OpenaiService } from 'src/app/services/openai.service';
+import { FaqService } from 'src/app/services/faq.service';
+import {
+  CompileError, KnowledgeBaseRef, compileBlueprint
+} from 'src/app/chatbot-design-studio/ai-authoring/blueprint-compiler';
 
 /** Tipo di agente da generare: determina l'entry point del flow lato server. */
 export enum BOT_TYPE {
@@ -142,6 +146,15 @@ export interface GenerateResponse {
   usage?: { inputTokens: number; outputTokens: number; cachedTokens: number };
 }
 
+/** Agente creato nel progetto. */
+export interface CreatedAgent {
+  botId: string;
+  name: string;
+  intents: number;
+  /** True se la lettura di controllo degli intent non e' riuscita: l'agente e' creato ma non verificato. */
+  unverified?: boolean;
+}
+
 /** Errore del generatore, pronto per la UI: chiave i18n del messaggio e dettagli. */
 export interface GeneratorFailure {
   messageKey: string;
@@ -164,10 +177,20 @@ const MAX_OPTIONS = 5;
 /** Lunghezza massima di agentName accettata dal generatore. */
 const MAX_AGENT_NAME = 60;
 
-/** Traduce un errore della chiamata al generatore nel messaggio da mostrare. */
+/** Traduce un errore del generatore o della creazione dell'agente nel messaggio da mostrare. */
 export function describeGeneratorError(err: any): GeneratorFailure {
   const prefix = 'CDSAgentGenerator.';
   if (err?.notConfigured) return { messageKey: prefix + 'ErrorNotConfigured', details: [] };
+  if (err instanceof CompileError) return { messageKey: prefix + 'ErrorCompile', details: err.problems };
+  if (err?.stage === 'import') {
+    const cause = err.cause || {};
+    const text = cause.error?.msg || cause.error?.message || cause.message || '';
+    return { messageKey: prefix + 'ErrorCreate', details: [`HTTP ${cause.status ?? 0}${text ? ': ' + text : ''}`] };
+  }
+  if (err?.stage === 'no_id') return { messageKey: prefix + 'ErrorNoAgentId', details: [] };
+  if (err?.stage === 'ids') {
+    return { messageKey: prefix + 'ErrorIdsNotPreserved', details: [`${err.agentName}: ${err.missing.length}/${err.total}`] };
+  }
   const status = err?.status ?? 0;
   const body = err?.error ?? {};
   const details = Array.isArray(body?.details) ? body.details.map((d: any) => String(d)) : [];
@@ -237,13 +260,14 @@ export function planTurnToMessage(turn: PlanTurn): string {
 /**
  * Feature "Crea agente con l'AI".
  *
- * Due responsabilita':
+ * Tre responsabilita':
  * - lo stato di apertura della modale (il pulsante la apre, la modale osserva);
  * - le chiamate al servizio di generazione, esterno a Tiledesk (su Render), con la chiave
  *   `aiAgentGeneratorKey`: `POST {aiAgentGeneratorUrl}/plan` per l'intervista e
- *   `POST {aiAgentGeneratorUrl}/generate` per il Blueprint.
+ *   `POST {aiAgentGeneratorUrl}/generate` per il Blueprint;
+ * - la creazione dell'agente nel progetto: compilazione del Blueprint e import con creazione.
  *
- * Il servizio non riceve mai il token Tiledesk: le sue chiamate usano un client HTTP
+ * Il servizio di generazione non riceve mai il token Tiledesk: le sue chiamate usano un client HTTP
  * senza interceptor. Contratto: docs/V3/ai-authoring/endpoint-contract.md.
  */
 @Injectable({ providedIn: 'root' })
@@ -259,8 +283,8 @@ export class AgentGeneratorService {
 
   private galleryCache$: Observable<UseCaseGallery>;
   private catalogCache$: Observable<any>;
-  /** Nomi delle knowledge base: letti una volta per ogni apertura della modale. */
-  private namespacesCache$: Observable<string[]> | null = null;
+  /** Knowledge base del progetto: lette una volta per ogni apertura della modale. */
+  private knowledgeBasesCache$: Observable<KnowledgeBaseRef[]> | null = null;
 
   /** Client senza interceptor: le chiamate al generatore non devono portare credenziali Tiledesk. */
   private readonly externalHttp: HttpClient;
@@ -271,7 +295,8 @@ export class AgentGeneratorService {
     private http: HttpClient,
     httpBackend: HttpBackend,
     private dashboardService: DashboardService,
-    private openaiService: OpenaiService
+    private openaiService: OpenaiService,
+    private faqService: FaqService
   ) {
     this.externalHttp = new HttpClient(httpBackend);
   }
@@ -288,13 +313,17 @@ export class AgentGeneratorService {
     return !!this.generatorUrl && !!this.generatorKey;
   }
 
+  get projectId(): string {
+    return this.project_id;
+  }
+
   get isOpen(): boolean {
     return this._isOpen$.value;
   }
 
   open(): void {
     this.logger.log('[AGENT-GENERATOR] open');
-    this.namespacesCache$ = null;
+    this.knowledgeBasesCache$ = null;
     this._isOpen$.next(true);
   }
 
@@ -336,7 +365,7 @@ export class AgentGeneratorService {
       return throwError(() => ({ notConfigured: true }));
     }
     return this.projectFacts().pipe(
-      switchMap(({ catalog, namespaces }) => {
+      switchMap(({ catalog, knowledgeBases }) => {
         const body = {
           projectId: this.project_id,
           botType,
@@ -345,7 +374,7 @@ export class AgentGeneratorService {
           context: {
             catalogIndex: (catalog?.types || []).map((t: any) => ({ type: t.type, purpose: t.purpose })),
             departments: this.departmentNames(),
-            namespaces
+            namespaces: knowledgeBases.map(kb => kb.name)
           },
           limits: { maxQuestions: MAX_QUESTIONS }
         };
@@ -367,7 +396,7 @@ export class AgentGeneratorService {
       return throwError(() => ({ notConfigured: true }));
     }
     return this.projectFacts().pipe(
-      switchMap(({ catalog, namespaces }) => {
+      switchMap(({ catalog, knowledgeBases }) => {
         const body = {
           projectId: this.project_id,
           botType,
@@ -376,7 +405,7 @@ export class AgentGeneratorService {
           finalPrompt: brief.finalPrompt,
           sections: brief.sections || undefined,
           catalog,
-          context: { departments: this.departmentNames(), namespaces },
+          context: { departments: this.departmentNames(), namespaces: knowledgeBases.map(kb => kb.name) },
           limits: { maxBlocks: MAX_BLOCKS }
         };
         this.logger.log('[AGENT-GENERATOR] generate: ', this.generatorUrl, { ...body, catalog: catalog?.version });
@@ -390,12 +419,62 @@ export class AgentGeneratorService {
     );
   }
 
-  /** Catalogo delle action e nomi delle knowledge base: servono a entrambe le chiamate. */
-  private projectFacts(): Observable<{ catalog: any; namespaces: string[] }> {
-    if (!this.namespacesCache$) {
-      this.namespacesCache$ = this.namespaceNames().pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  /**
+   * Crea l'agente nel progetto:
+   * 1. compila il Blueprint nell'agente V3 (id reali, una action per blocco, nomi validi);
+   * 2. lo importa con creazione (`/faq_kb/importjson/null/?create=true`);
+   * 3. rilegge i blocchi creati e verifica che il server abbia conservato gli `intent_id`,
+   *    da cui dipendono tutti i collegamenti (spike F0, controllo C3).
+   * Se la sola rilettura fallisce, l'agente e' comunque creato: lo si apre, segnato come non verificato.
+   */
+  createAgent(result: GenerateResponse, brief: GenerateBrief): Observable<CreatedAgent> {
+    return this.projectFacts().pipe(
+      map(({ catalog, knowledgeBases }) => compileBlueprint(result.blueprint, {
+        name: brief.agentName || result.blueprint.name,
+        departments: this.departmentNames(),
+        namespaces: knowledgeBases,
+        generation: {
+          finalPrompt: brief.finalPrompt,
+          model: result.model,
+          promptVersion: result.promptVersion,
+          catalogVersion: catalog?.version
+        }
+      })),
+      switchMap(agent => {
+        this.logger.log('[AGENT-GENERATOR] createAgent: import ', { name: agent.name, intents: agent.intents.length });
+        return this.faqService.importChatbotFromJSONFromScratch(agent).pipe(
+          catchError(cause => throwError(() => ({ stage: 'import', cause }))),
+          map((res: any) => ({ agent, botId: res?._id || res?.id || res?.bot?._id }))
+        );
+      }),
+      switchMap(({ agent, botId }) => {
+        if (!botId) return throwError(() => ({ stage: 'no_id' }));
+        const created: CreatedAgent = { botId, name: agent.name, intents: agent.intents.length };
+        return this.faqService.getAllFaqByFaqKbId(botId).pipe(
+          catchError(err => {
+            this.logger.error('[AGENT-GENERATOR] createAgent: verification read failed ', err);
+            return of(null);
+          }),
+          switchMap((intents: any[] | null) => {
+            if (!intents) return of({ ...created, unverified: true });
+            const saved = new Set(intents.map(intent => intent?.intent_id));
+            const missing = agent.intents.map(intent => intent.intent_id).filter(id => !saved.has(id));
+            if (missing.length) {
+              return throwError(() => ({ stage: 'ids', botId, agentName: agent.name, missing, total: agent.intents.length }));
+            }
+            return of(created);
+          })
+        );
+      })
+    );
+  }
+
+  /** Catalogo delle action e knowledge base del progetto: servono a tutte le chiamate. */
+  private projectFacts(): Observable<{ catalog: any; knowledgeBases: KnowledgeBaseRef[] }> {
+    if (!this.knowledgeBasesCache$) {
+      this.knowledgeBasesCache$ = this.knowledgeBases().pipe(shareReplay({ bufferSize: 1, refCount: false }));
     }
-    return forkJoin({ catalog: this.catalog(), namespaces: this.namespacesCache$ });
+    return forkJoin({ catalog: this.catalog(), knowledgeBases: this.knowledgeBasesCache$ });
   }
 
   private post<T>(path: string, body: any): Observable<T> {
@@ -416,11 +495,11 @@ export class AgentGeneratorService {
     return (this.dashboardService.departments || []).map(d => d?.name).filter(name => !!name);
   }
 
-  /** Nomi delle knowledge base del progetto; in errore nessuna, e l'intervista procede. */
-  private namespaceNames(): Observable<string[]> {
+  /** Knowledge base del progetto, con id e nome; in errore nessuna, e l'intervista procede. */
+  private knowledgeBases(): Observable<KnowledgeBaseRef[]> {
     return this.openaiService.getAllNamespaces().pipe(
       take(1),
-      map(list => (list || []).map(n => n?.name).filter(name => !!name)),
+      map(list => (list || []).filter(n => !!n?.id && !!n?.name).map(n => ({ id: n.id, name: n.name }))),
       catchError(err => {
         this.logger.error('[AGENT-GENERATOR] namespaces load failed: ', err);
         return of([]);
