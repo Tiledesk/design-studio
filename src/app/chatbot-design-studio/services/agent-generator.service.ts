@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, defer, forkJoin, of, throwError } from 'rxjs';
 import { catchError, map, retry, shareReplay, switchMap, take } from 'rxjs/operators';
@@ -8,8 +8,12 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { FaqService } from 'src/app/services/faq.service';
+import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { DataTableService } from 'src/app/services/data-table.service';
+import { ProjectPlanUtils } from 'src/app/utils/project-utils';
+import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 import {
-  CompileError, GenerationInfo, KnowledgeBaseRef, compileBlueprint
+  ChatbotRef, CompileError, DataTableRef, GenerationInfo, KnowledgeBaseRef, compileBlueprint
 } from 'src/app/chatbot-design-studio/ai-authoring/blueprint-compiler';
 
 /** Tipo di agente da generare: determina l'entry point del flow lato server. */
@@ -113,13 +117,20 @@ export interface UseCaseGallery {
 }
 
 /**
- * Blueprint: il flusso semplificato prodotto dal generatore, un'action per blocco.
+ * Blueprint: il flusso semplificato prodotto dal generatore, un'action per blocco. Ogni blocco ha solo
+ * i campi del suo tipo (blueprint-2); i Blueprint blueprint-1, con tutti i campi a null, restano validi.
  * Contratto in docs/V3/ai-authoring (blueprint.schema.json nel repo del servizio).
  */
 export interface BlueprintButton {
   label: string;
   goto?: string | null;
   url?: string | null;
+}
+
+export interface BlueprintBranch {
+  label: string;
+  description: string;
+  goto: string;
 }
 
 export interface BlueprintBlock {
@@ -137,8 +148,34 @@ export interface BlueprintBlock {
   department?: string | null;
   knowledgeBase?: string | null;
   question?: string | null;
+  texts?: string[] | null;
+  seconds?: number | null;
+  variable?: string | null;
+  tags?: string[] | null;
+  target?: string | null;
+  level?: string | null;
+  log?: string | null;
+  leadFields?: { field: string; value: string }[] | null;
+  instructions?: string | null;
+  history?: boolean | null;
+  iterable?: string | null;
+  itemVariable?: string | null;
+  bot?: string | null;
+  title?: string | null;
+  content?: string | null;
+  to?: string | null;
+  subject?: string | null;
+  body?: string | null;
+  replyTo?: string | null;
+  table?: string | null;
+  operation?: string | null;
+  match?: string | null;
+  conditions?: { column: string; operator: string; value?: string | null }[] | null;
+  data?: { column: string; value: string }[] | null;
+  branches?: BlueprintBranch[] | null;
   next?: string | null;
-  exits?: { true: string; false: string } | null;
+  /** Uscite con nome: true/false, each/done, fallback/error. */
+  exits?: { [name: string]: string } | null;
 }
 
 export interface Blueprint {
@@ -184,8 +221,16 @@ export interface AgentGeneratorConfig {
   key?: string;
 }
 
+/** I dati del progetto che il generatore conosce: il catalogo che puo' usare e i nomi reali. */
+interface ProjectFacts {
+  catalog: any;
+  knowledgeBases: KnowledgeBaseRef[];
+  chatbots: ChatbotRef[];
+  dataTables: DataTableRef[];
+}
+
 const GALLERY_ASSET_URL = 'assets/gallery/use-cases.gallery.json';
-const CATALOG_ASSET_URL = 'assets/ai-authoring/v3-catalog-1.json';
+const CATALOG_ASSET_URL = 'assets/ai-authoring/v3-catalog-2.json';
 const EMPTY_GALLERY: UseCaseGallery = { categories: [], cases: [] };
 const MAX_BLOCKS = 40;
 /** Domande al massimo: raggiunto il limite, il planner deve chiudere con il prompt finale. */
@@ -195,6 +240,8 @@ const MAX_OPTIONS = 5;
 const MAX_AGENT_NAME = 60;
 /** Lunghezza massima della descrizione iniziale salvata nell'agente (come i messaggi del servizio). */
 const MAX_INITIAL_PROMPT = 4000;
+/** Tabelle del progetto mandate al generatore, al massimo: ognuna richiede una lettura delle colonne. */
+const MAX_DATA_TABLES = 10;
 /** Riletture dei blocchi dopo l'import: il server risponde prima di averli salvati tutti. */
 const VERIFY_READS = 6;
 const VERIFY_DELAY_MS = 1000;
@@ -305,8 +352,8 @@ export class AgentGeneratorService {
 
   private galleryCache$: Observable<UseCaseGallery>;
   private catalogCache$: Observable<any>;
-  /** Knowledge base del progetto: lette una volta per ogni apertura della modale. */
-  private knowledgeBasesCache$: Observable<KnowledgeBaseRef[]> | null = null;
+  /** Dati del progetto: letti una volta per ogni apertura della modale. */
+  private factsCache$: Observable<ProjectFacts> | null = null;
 
   /** Client senza interceptor: le chiamate al generatore non devono portare credenziali Tiledesk. */
   private readonly externalHttp: HttpClient;
@@ -318,7 +365,10 @@ export class AgentGeneratorService {
     httpBackend: HttpBackend,
     private dashboardService: DashboardService,
     private openaiService: OpenaiService,
-    private faqService: FaqService
+    private faqService: FaqService,
+    private faqKbService: FaqKbService,
+    private dataTableService: DataTableService,
+    private injector: Injector
   ) {
     this.externalHttp = new HttpClient(httpBackend);
   }
@@ -345,7 +395,7 @@ export class AgentGeneratorService {
 
   open(): void {
     this.logger.log('[AGENT-GENERATOR] open');
-    this.knowledgeBasesCache$ = null;
+    this.factsCache$ = null;
     this._isOpen$.next(true);
   }
 
@@ -387,16 +437,15 @@ export class AgentGeneratorService {
       return throwError(() => ({ notConfigured: true }));
     }
     return this.projectFacts().pipe(
-      switchMap(({ catalog, knowledgeBases }) => {
+      switchMap(facts => {
         const body = {
           projectId: this.project_id,
           botType,
           uiLanguage,
           messages,
           context: {
-            catalogIndex: (catalog?.types || []).map((t: any) => ({ type: t.type, purpose: t.purpose })),
-            departments: this.departmentNames(),
-            namespaces: knowledgeBases.map(kb => kb.name)
+            catalogIndex: (facts.catalog?.types || []).map((t: any) => ({ type: t.type, purpose: t.purpose })),
+            ...this.contextNames(facts)
           },
           limits: { maxQuestions: MAX_QUESTIONS }
         };
@@ -408,8 +457,8 @@ export class AgentGeneratorService {
   }
 
   /**
-   * Genera il Blueprint dal prompt finale. Manda anche il catalogo delle action e i nomi reali
-   * di dipartimenti e knowledge base.
+   * Genera il Blueprint dal prompt finale. Manda anche il catalogo delle action che il progetto puo'
+   * usare e i nomi reali di dipartimenti, knowledge base, altri agenti e tabelle.
    *
    * POST {aiAgentGeneratorUrl}/generate
    */
@@ -418,7 +467,7 @@ export class AgentGeneratorService {
       return throwError(() => ({ notConfigured: true }));
     }
     return this.projectFacts().pipe(
-      switchMap(({ catalog, knowledgeBases }) => {
+      switchMap(facts => {
         const body = {
           projectId: this.project_id,
           botType,
@@ -426,11 +475,11 @@ export class AgentGeneratorService {
           agentName: brief.agentName ? brief.agentName.slice(0, MAX_AGENT_NAME) : undefined,
           finalPrompt: brief.finalPrompt,
           sections: brief.sections || undefined,
-          catalog,
-          context: { departments: this.departmentNames(), namespaces: knowledgeBases.map(kb => kb.name) },
+          catalog: facts.catalog,
+          context: this.contextNames(facts),
           limits: { maxBlocks: MAX_BLOCKS }
         };
-        this.logger.log('[AGENT-GENERATOR] generate: ', this.generatorUrl, { ...body, catalog: catalog?.version });
+        this.logger.log('[AGENT-GENERATOR] generate: ', this.generatorUrl, { ...body, catalog: facts.catalog?.version });
         return this.post<GenerateResponse>('/generate', body);
       }),
       map(res => ({
@@ -452,15 +501,17 @@ export class AgentGeneratorService {
    */
   createAgent(result: GenerateResponse, brief: GenerateBrief, interview?: InterviewSummary): Observable<CreatedAgent> {
     return this.projectFacts().pipe(
-      map(({ catalog, knowledgeBases }) => compileBlueprint(result.blueprint, {
+      map(facts => compileBlueprint(result.blueprint, {
         name: brief.agentName || result.blueprint.name,
         departments: this.departmentNames(),
-        namespaces: knowledgeBases,
+        namespaces: facts.knowledgeBases,
+        chatbots: facts.chatbots,
+        dataTables: facts.dataTables,
         generation: {
           finalPrompt: brief.finalPrompt,
           model: result.model,
           promptVersion: result.promptVersion,
-          catalogVersion: catalog?.version,
+          catalogVersion: facts.catalog?.version,
           ...this.interviewInfo(brief, interview)
         }
       })),
@@ -531,12 +582,65 @@ export class AgentGeneratorService {
     };
   }
 
-  /** Catalogo delle action e knowledge base del progetto: servono a tutte le chiamate. */
-  private projectFacts(): Observable<{ catalog: any; knowledgeBases: KnowledgeBaseRef[] }> {
-    if (!this.knowledgeBasesCache$) {
-      this.knowledgeBasesCache$ = this.knowledgeBases().pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  /** I nomi reali del progetto, come li vuole il servizio: dipartimenti, knowledge base, agenti, tabelle con le colonne. */
+  private contextNames(facts: ProjectFacts) {
+    return {
+      departments: this.departmentNames(),
+      namespaces: facts.knowledgeBases.map(kb => kb.name),
+      chatbots: facts.chatbots.map(c => c.name),
+      dataTables: facts.dataTables.map(t => ({ name: t.name, columns: t.columns }))
+    };
+  }
+
+  /**
+   * Catalogo e dati del progetto: servono a tutte le chiamate. Il catalogo e' quello che il progetto
+   * puo' usare: senza le action che il menu del DS nasconde e senza quelle che richiedono dati assenti.
+   */
+  private projectFacts(): Observable<ProjectFacts> {
+    if (!this.factsCache$) {
+      this.factsCache$ = forkJoin({
+        catalog: this.catalog(),
+        knowledgeBases: this.knowledgeBases(),
+        chatbots: this.chatbots(),
+        dataTables: this.dataTables()
+      }).pipe(
+        map(facts => ({ ...facts, catalog: this.usableCatalog(facts.catalog, facts) })),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
     }
-    return forkJoin({ catalog: this.catalog(), knowledgeBases: this.knowledgeBasesCache$ });
+    return this.factsCache$;
+  }
+
+  /**
+   * Il catalogo filtrato con le stesse regole del menu delle action (stato, piano del progetto), piu'
+   * i dati del progetto: Data Table solo con tabelle, Replace AI Agent solo con altri agenti.
+   */
+  private usableCatalog(catalog: any, facts: { chatbots: ChatbotRef[]; dataTables: DataTableRef[] }): any {
+    const menu = Object.values(ACTIONS_LIST);
+    const types = (catalog?.types || []).filter((t: any) => {
+      const entry = menu.find(el => el.type === t.type);
+      if (entry?.status === 'inactive') return false;
+      if (entry?.plan && !this.planAllows(entry.type, entry.plan)) return false;
+      if (t.type === 'data_table') return facts.dataTables.length > 0;
+      if (t.type === 'replacebotv3') return facts.chatbots.length > 0;
+      return true;
+    });
+    const dropped = (catalog?.types || []).filter((t: any) => !types.includes(t)).map((t: any) => t.type);
+    if (dropped.length) this.logger.log('[AGENT-GENERATOR] catalog types not available in this project: ', dropped);
+    return { ...catalog, types };
+  }
+
+  /**
+   * Il controllo del piano che fa il menu delle action. ProjectPlanUtils si prende qui, e non nel
+   * costruttore, perche' alla sua creazione legge il progetto corrente, che deve essere gia' caricato.
+   */
+  private planAllows(type: any, plan: any): boolean {
+    try {
+      return !!this.injector.get(ProjectPlanUtils).checkIfCanLoad(type, plan);
+    } catch (err) {
+      this.logger.error('[AGENT-GENERATOR] plan check failed: ', err);
+      return false;
+    }
   }
 
   private post<T>(path: string, body: any): Observable<T> {
@@ -566,6 +670,48 @@ export class AgentGeneratorService {
         this.logger.error('[AGENT-GENERATOR] namespaces load failed: ', err);
         return of([]);
       })
+    );
+  }
+
+  /** Gli agenti del progetto, per Replace AI Agent; con nomi uguali resta il primo. In errore nessuno. */
+  private chatbots(): Observable<ChatbotRef[]> {
+    return this.faqKbService.getFaqKbByProjectId().pipe(
+      take(1),
+      map((list: any[]) => {
+        const refs: ChatbotRef[] = [];
+        (list || []).forEach(bot => {
+          if (bot?._id && bot?.name && !refs.some(r => r.name === bot.name)) refs.push({ id: bot._id, name: bot.name });
+        });
+        return refs;
+      }),
+      catchError(err => {
+        this.logger.error('[AGENT-GENERATOR] chatbots load failed: ', err);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Le tabelle del progetto con le loro colonne, per Data Table. Le tabelle esistono solo dal server
+   * 2.19.13: con un server piu' vecchio la lettura fallisce e il tipo resta fuori dal catalogo.
+   */
+  private dataTables(): Observable<DataTableRef[]> {
+    return this.dataTableService.listTables().pipe(
+      take(1),
+      map((res: any) => (Array.isArray(res) ? res : res?.tables || []).filter((t: any) => !!t?._id && !!t?.name).slice(0, MAX_DATA_TABLES)),
+      switchMap((tables: any[]) => (tables.length ? forkJoin(tables.map(t => this.tableColumns(t._id, t.name))) : of([]))),
+      catchError(err => {
+        this.logger.error('[AGENT-GENERATOR] data tables load failed: ', err);
+        return of([]);
+      })
+    );
+  }
+
+  private tableColumns(id: string, name: string): Observable<DataTableRef> {
+    return this.dataTableService.getTable(id).pipe(
+      take(1),
+      map((res: any) => ({ id, name, columns: (Array.isArray(res?.schema) ? res.schema : []).map((c: any) => c?.name).filter((n: any) => !!n) })),
+      catchError(() => of({ id, name, columns: [] }))
     );
   }
 }

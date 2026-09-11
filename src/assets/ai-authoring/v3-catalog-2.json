@@ -1,0 +1,392 @@
+{
+  "version": "v3-catalog-2",
+  "types": [
+    {
+      "type": "replyv2",
+      "purpose": "Sends a message to the user, optionally with buttons.",
+      "fields": [
+        { "name": "text", "required": true, "description": "The message. May contain {{variable}}. At most 300 characters." },
+        { "name": "buttons", "required": false, "description": "Up to 6 buttons: {label, goto} leads to a block, {label, url} opens a web page." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues right after the message is sent" },
+        { "name": "goto", "meaning": "the block reached when the user clicks that button" }
+      ],
+      "terminal": false,
+      "rules": [
+        "With at least one goto button it is a menu: next must be null.",
+        "It never stores what the user writes: use ask for questions.",
+        "Without next and without goto buttons it ends the conversation with that message."
+      ]
+    },
+    {
+      "type": "randomreply",
+      "purpose": "Sends one message chosen at random among a few variants, so that a repeated message sounds less repetitive.",
+      "fields": [
+        { "name": "texts", "required": true, "description": "2 to 6 variants of the same message, each at most 300 characters. May contain {{variable}}." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues right after the message is sent" }
+      ],
+      "terminal": false,
+      "rules": [
+        "All variants say the same thing in different words.",
+        "It has no buttons: for a menu use replyv2.",
+        "Without next it ends the conversation with that message."
+      ]
+    },
+    {
+      "type": "ask",
+      "purpose": "Asks the user a question and saves the answer in a variable.",
+      "fields": [
+        { "name": "text", "required": true, "description": "The question, about one thing only." },
+        { "name": "options", "required": false, "description": "Up to 6 quick replies; the chosen text is saved as the answer." },
+        { "name": "saveTo", "required": true, "description": "snake_case variable that stores the answer." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the user has answered" }
+      ],
+      "terminal": false,
+      "rules": [
+        "next is mandatory.",
+        "To branch on the answer, put a jsoncondition2 right after it and compare with the exact option text."
+      ]
+    },
+    {
+      "type": "setattribute-v2",
+      "purpose": "Sets a variable to a constant value or to the value of another variable.",
+      "fields": [
+        { "name": "destination", "required": true, "description": "snake_case variable to set." },
+        { "name": "value", "required": false, "description": "Constant value. Exactly one of value and fromVariable." },
+        { "name": "fromVariable", "required": false, "description": "Variable to copy. Exactly one of value and fromVariable." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the variable is set" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it to record a value that a later block or the human operator needs, e.g. why the conversation was handed over."
+      ]
+    },
+    {
+      "type": "delete",
+      "purpose": "Deletes a variable, so that a later question or check starts empty.",
+      "fields": [
+        { "name": "variable", "required": true, "description": "Name of a variable set earlier in the flow, without {{ }}." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the deletion" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it before asking again something already asked, or to clear the item of a finished loop."
+      ]
+    },
+    {
+      "type": "jsoncondition2",
+      "purpose": "Checks a condition on variables and continues on one of two branches.",
+      "fields": [
+        { "name": "when", "required": true, "description": "The condition, in the when grammar." }
+      ],
+      "exits": [
+        { "name": "true", "meaning": "the condition is met" },
+        { "name": "false", "meaning": "the condition is not met" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Both exits are mandatory.",
+        "Every variable in when is set earlier in the flow."
+      ]
+    },
+    {
+      "type": "ai_condition",
+      "purpose": "Lets an AI model choose among a few branches by understanding what the user wrote, when an exact condition on variables is not possible.",
+      "fields": [
+        { "name": "instructions", "required": false, "description": "The text the AI must judge, with any context, e.g. \"The customer wrote: {{request}}\". Null means the user's last message." },
+        { "name": "branches", "required": true, "description": "2 to 6 branches {label, description, goto}: a short unique label, when that branch applies in plain words (no {{variable}}), and the block it leads to." }
+      ],
+      "exits": [
+        { "name": "goto", "meaning": "the block of the chosen branch" },
+        { "name": "fallback", "meaning": "no branch applies" },
+        { "name": "error", "meaning": "the AI failed" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use jsoncondition2 instead when the criterion is exact on variables, such as a quick-reply answer.",
+        "Descriptions never contain {{variable}}: put the data the AI needs in instructions.",
+        "Both exits are mandatory: fallback usually asks again, error leads to a helpful message or a handoff."
+      ]
+    },
+    {
+      "type": "ifopenhours",
+      "purpose": "Checks whether the business is open now, according to the hours configured in Tiledesk.",
+      "fields": [],
+      "exits": [
+        { "name": "true", "meaning": "open" },
+        { "name": "false", "meaning": "closed" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Both exits are mandatory.",
+        "The closed branch says so and offers an alternative."
+      ]
+    },
+    {
+      "type": "ifonlineagentsv2",
+      "purpose": "Checks whether a human operator is available now.",
+      "fields": [],
+      "exits": [
+        { "name": "true", "meaning": "at least one operator is available" },
+        { "name": "false", "meaning": "no operator is available" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Both exits are mandatory.",
+        "The false branch offers an alternative, such as leaving a contact."
+      ]
+    },
+    {
+      "type": "askgptv2",
+      "purpose": "Searches a knowledge base for the answer to the user's question and saves it in kb_reply.",
+      "fields": [
+        { "name": "knowledgeBase", "required": true, "description": "Name of a knowledge base listed in the context." },
+        { "name": "question", "required": false, "description": "Question to search, may contain {{variable}}; null means the user's last message." }
+      ],
+      "exits": [
+        { "name": "true", "meaning": "an answer was found, in kb_reply" },
+        { "name": "false", "meaning": "no answer was found" }
+      ],
+      "terminal": false,
+      "rules": [
+        "It does not show the answer: its true exit leads to a replyv2 whose text contains {{kb_reply}}.",
+        "Its false exit leads to an alternative: a handoff or a helpful message.",
+        "Both exits are mandatory."
+      ]
+    },
+    {
+      "type": "ai_prompt",
+      "purpose": "Asks an AI model to write a text (a summary, a reply, a rewording, an extraction) and saves it in a variable.",
+      "fields": [
+        { "name": "question", "required": true, "description": "The task for the AI, with the {{variable}} values it needs, e.g. \"Summarise in two sentences: {{problem}}\"." },
+        { "name": "instructions", "required": false, "description": "Role, tone and constraints for the AI. Null for none." },
+        { "name": "saveTo", "required": true, "description": "snake_case variable that stores the text written by the AI." },
+        { "name": "history", "required": false, "description": "true to give the AI the conversation so far; null otherwise." }
+      ],
+      "exits": [
+        { "name": "true", "meaning": "the AI answered, the text is in saveTo" },
+        { "name": "false", "meaning": "the AI failed" }
+      ],
+      "terminal": false,
+      "rules": [
+        "It does not show the text: its true exit continues with a block that uses {{saveTo}}, usually a replyv2.",
+        "Its false exit leads to an alternative: a helpful message or a handoff.",
+        "To answer from a knowledge base use askgptv2 instead.",
+        "Both exits are mandatory."
+      ]
+    },
+    {
+      "type": "add_kb_content",
+      "purpose": "Adds a text to a knowledge base of the project, e.g. information or a note collected in the conversation.",
+      "fields": [
+        { "name": "knowledgeBase", "required": true, "description": "Name of a knowledge base listed in the context." },
+        { "name": "title", "required": true, "description": "Title of the content. May contain {{variable}}; a content with the same title is replaced." },
+        { "name": "content", "required": true, "description": "The text to add. May contain {{variable}}." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after saving" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Put a {{variable}} in the title when every conversation must add its own content.",
+        "It is invisible to the user."
+      ]
+    },
+    {
+      "type": "data_table",
+      "purpose": "Reads or writes rows of a data table of the project.",
+      "fields": [
+        { "name": "table", "required": true, "description": "Name of a data table listed in the context." },
+        { "name": "operation", "required": true, "description": "get reads rows; insert adds a row; update changes the matching rows; upsert updates the matching row or adds it; delete removes the matching rows." },
+        { "name": "match", "required": false, "description": "all: every condition must hold; any: at least one. Null means all." },
+        { "name": "conditions", "required": false, "description": "Which rows: {column, operator, value}. operator: equal, not_equal, contains, starts_with, ends_with, greater_than, greater_or_equal, less_than, less_or_equal, exists, not_exists. value may contain {{variable}}; it is null for exists and not_exists." },
+        { "name": "data", "required": false, "description": "Values to write: {column, value}; value may contain {{variable}}." },
+        { "name": "saveTo", "required": true, "description": "snake_case variable that stores the result: the list of rows read, or the row written." }
+      ],
+      "exits": [
+        { "name": "true", "meaning": "the operation succeeded, the result is in saveTo" },
+        { "name": "false", "meaning": "the operation failed" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use only columns of that table, as listed in the context.",
+        "get: conditions optional, data null. insert: conditions null, data required. update and upsert: conditions and data required. delete: conditions required, data null.",
+        "The rows read by get are a list: check with jsoncondition2 that it is not empty, then show each row with an iteration.",
+        "Both exits are mandatory."
+      ]
+    },
+    {
+      "type": "iteration",
+      "purpose": "Repeats a few blocks for every item of a list, such as the rows read by data_table.",
+      "fields": [
+        { "name": "iterable", "required": true, "description": "Variable holding the list, set earlier (e.g. the saveTo of a data_table get), without {{ }}." },
+        { "name": "itemVariable", "required": true, "description": "snake_case variable that holds the current item; its columns are {{item_variable.column}}." }
+      ],
+      "exits": [
+        { "name": "each", "meaning": "the first block run for every item" },
+        { "name": "done", "meaning": "continues after the last item" }
+      ],
+      "terminal": false,
+      "rules": [
+        "The blocks run for every item form a chain linked by next, and the last one has next = the iteration block.",
+        "That chain has no ask, no buttons, no branches and no terminal block.",
+        "Before the iteration, check with jsoncondition2 that the list is not empty: with an empty list the flow stops."
+      ]
+    },
+    {
+      "type": "wait",
+      "purpose": "Pauses the flow for a few seconds before the next block.",
+      "fields": [
+        { "name": "seconds", "required": true, "description": "Pause in seconds, from 0.5 to 15." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the pause" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it only when a pause helps the user, e.g. between two long messages. Never to pretend the agent is working."
+      ]
+    },
+    {
+      "type": "add_tags",
+      "purpose": "Adds tags to the conversation or to the contact, to classify them for the operators.",
+      "fields": [
+        { "name": "tags", "required": true, "description": "1 to 5 short tags, without commas. May contain {{variable}}." },
+        { "name": "target", "required": true, "description": "\"request\" tags the conversation, \"lead\" tags the contact." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after tagging" }
+      ],
+      "terminal": false,
+      "rules": [
+        "It is invisible to the user."
+      ]
+    },
+    {
+      "type": "leadupdate",
+      "purpose": "Saves data collected in the conversation into the contact (lead), where the operators see it.",
+      "fields": [
+        { "name": "leadFields", "required": true, "description": "Pairs {field, value}: field is one of email, fullname, phone, company, streetAddress, city, region, zipcode, country; value is usually a {{variable}} set earlier." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the update" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Each field appears at most once.",
+        "Use it after collecting the data, before the handoff or the end."
+      ]
+    },
+    {
+      "type": "email",
+      "purpose": "Sends an email, for example to notify the team or to send the user a summary.",
+      "fields": [
+        { "name": "to", "required": true, "description": "An email address, or a {{variable}} holding one." },
+        { "name": "subject", "required": true, "description": "At most 150 characters. May contain {{variable}}." },
+        { "name": "body", "required": true, "description": "The email text, at most 1024 characters. May contain {{variable}}." },
+        { "name": "replyTo", "required": false, "description": "Reply-to address, or a {{variable}} holding one; null for none." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the email is queued" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Delivery is not confirmed: never tell the user that the email has arrived."
+      ]
+    },
+    {
+      "type": "flow_log",
+      "purpose": "Writes a line in the flow log, for whoever tests or maintains the agent.",
+      "fields": [
+        { "name": "level", "required": true, "description": "info, warn, error or debug." },
+        { "name": "log", "required": true, "description": "The line to write. May contain {{variable}}." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after writing" }
+      ],
+      "terminal": false,
+      "rules": [
+        "It is invisible to the user: never use it to tell the user something."
+      ]
+    },
+    {
+      "type": "clear_transcript",
+      "purpose": "Clears the conversation history that ai_prompt reads when history is true.",
+      "fields": [],
+      "exits": [
+        { "name": "next", "meaning": "continues after clearing" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it only in flows with an ai_prompt whose history is true, so that the AI ignores the earlier part of the conversation."
+      ]
+    },
+    {
+      "type": "department",
+      "purpose": "Moves the conversation to a department, before handing it over to an operator.",
+      "fields": [
+        { "name": "department", "required": true, "description": "Name of a department listed in the context." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the move" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it only on the way to an agent block, optionally with ifonlineagentsv2 in between."
+      ]
+    },
+    {
+      "type": "agent",
+      "purpose": "Hands the conversation over to a human operator. The agent's part ends here.",
+      "fields": [],
+      "exits": [],
+      "terminal": true,
+      "rules": [
+        "Put a message (replyv2 or randomreply) before it that tells the user an operator is coming."
+      ]
+    },
+    {
+      "type": "move_to_unassigned",
+      "purpose": "Puts the conversation back in the queue of unassigned conversations, without an operator. The agent's part ends here.",
+      "fields": [],
+      "exits": [],
+      "terminal": true,
+      "rules": [
+        "Put a message before it that tells the user someone will reply as soon as possible.",
+        "To hand over to an available operator use agent instead."
+      ]
+    },
+    {
+      "type": "replacebotv3",
+      "purpose": "Hands the conversation over to another agent of the project. This agent's part ends here.",
+      "fields": [
+        { "name": "bot", "required": true, "description": "Name of an agent listed in the context." }
+      ],
+      "exits": [],
+      "terminal": true,
+      "rules": [
+        "Put a message before it that tells the user who will continue."
+      ]
+    },
+    {
+      "type": "close",
+      "purpose": "Formally closes the conversation.",
+      "fields": [],
+      "exits": [],
+      "terminal": true,
+      "rules": [
+        "Use it only when the brief asks to close the conversation.",
+        "Never right after a message the user must read."
+      ]
+    }
+  ]
+}

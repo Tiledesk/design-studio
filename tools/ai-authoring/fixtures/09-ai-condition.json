@@ -1,0 +1,27 @@
+{
+  "version": "blueprint-2",
+  "name": "Smistamento richieste",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": "chiedi_bisogno",
+  "notes": [],
+  "blocks": [
+    { "id": "benvenuto", "name": "Benvenuto", "type": "replyv2", "text": "Ciao! Sono l'assistente del servizio clienti.", "buttons": null, "next": "chiedi_bisogno" },
+    { "id": "chiedi_bisogno", "name": "Chiedi bisogno", "type": "ask", "text": "Scrivimi in poche parole di cosa hai bisogno.", "options": null, "saveTo": "bisogno", "next": "smista" },
+    {
+      "id": "smista", "name": "Smista richiesta", "type": "ai_condition", "instructions": "The customer wrote: {{bisogno}}",
+      "branches": [
+        { "label": "Ordini", "description": "the customer asks about an order, a shipment or a delivery", "goto": "info_ordini" },
+        { "label": "Fatture", "description": "the customer asks about invoices or payments", "goto": "info_fatture" },
+        { "label": "Reclamo", "description": "the customer complains or asks to talk to a person", "goto": "annuncio_operatore" }
+      ],
+      "exits": { "fallback": "non_capito", "error": "annuncio_operatore" }
+    },
+    { "id": "info_ordini", "name": "Info ordini", "type": "replyv2", "text": "Puoi seguire il tuo ordine dalla pagina I miei ordini del sito.", "buttons": null, "next": null },
+    { "id": "info_fatture", "name": "Info fatture", "type": "replyv2", "text": "Trovi tutte le fatture nella tua area personale, alla voce Fatture.", "buttons": null, "next": null },
+    { "id": "non_capito", "name": "Non capito", "type": "replyv2", "text": "Non sono sicuro di aver capito: puoi dirmelo con altre parole?", "buttons": null, "next": "chiedi_bisogno" },
+    { "id": "annuncio_operatore", "name": "Annuncio operatore", "type": "replyv2", "text": "Ti passo a un operatore che ti aiuterà.", "buttons": null, "next": "operatore" },
+    { "id": "operatore", "name": "Operatore", "type": "agent" }
+  ]
+}

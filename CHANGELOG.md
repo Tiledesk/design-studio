@@ -11,6 +11,8 @@
 
 # this branch 11/09/2026
 
+- **added**: il generatore di agenti conosce 15 action in più: risposta casuale, attesa, cancellazione di una variabile, azzeramento della cronologia, rimessa in coda, tag, log, aggiornamento del contatto, testo scritto dall'AI, ciclo su una lista, passaggio a un altro agente, aggiunta a una knowledge base, email, tabelle dati e smistamento con l'AI. Le action che richiedono un piano o dati assenti dal progetto non vengono proposte; l'anteprima mostra le nuove uscite
+- **changed**: il flusso generato ha una forma più compatta, con i soli campi di ogni blocco; i flussi nella forma precedente restano validi
 - **fixed**: dopo la creazione di un agente con l'AI, il DS rilegge i blocchi fino a 6 volte prima di segnalare collegamenti non conservati. Il server risponde all'import prima di averli salvati tutti, e con agenti grandi compariva un falso errore
 - **added**: l'agente creato con l'AI conserva, oltre al prompt finale, la descrizione iniziale, l'indicazione se il prompt è stato modificato, un riassunto dell'intervista, le scelte fatte dall'AI e le richieste da configurare a mano. La conversazione completa non viene salvata
 - **changed**: «Crea agente con l'AI», il selettore dell'agent e l'icona «Elimina agent» sono visibili **solo sugli agenti V3**: sui legacy l'header mostra di nuovo il solo nome e la sidebar non ha il pulsante dell'AI. Sui V3 il pulsante compare solo se il servizio di generazione è configurato, quindi per spegnere la funzione basta togliere la configurazione

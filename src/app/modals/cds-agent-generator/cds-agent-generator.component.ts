@@ -24,6 +24,11 @@ const MAX_ERROR_DETAILS = 5;
 /** Lunghezza massima del nome dell'agente accettata dal generatore. */
 const MAX_AGENT_NAME = 60;
 
+/** Etichette delle uscite con nome di un blocco, nell'anteprima. */
+const EXIT_LABEL_KEYS: { [name: string]: string } = {
+  true: 'IfTrue', false: 'IfFalse', each: 'ExitEach', done: 'ExitDone', fallback: 'ExitFallback', error: 'ExitError'
+};
+
 /**
  * Fasi della modale: descrizione → intervista → prompt finale → generazione → anteprima → creazione.
  * Dall'anteprima si torna al prompt finale, dal prompt finale alle domande.
@@ -553,22 +558,38 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
         if (button.goto) exits.push({ label: `[${button.label}]`, target: this.blockName(blueprint, button.goto) });
         else if (button.url) exits.push({ label: `[${button.label}]`, target: button.url });
       });
+      (block.branches || []).forEach(branch => {
+        if (branch?.goto) exits.push({ label: `[${branch.label}]`, target: this.blockName(blueprint, branch.goto) });
+      });
       if (block.next) exits.push({ label: label('Then'), target: this.blockName(blueprint, block.next) });
-      if (block.exits) {
-        exits.push({ label: label('IfTrue'), target: this.blockName(blueprint, block.exits.true) });
-        exits.push({ label: label('IfFalse'), target: this.blockName(blueprint, block.exits.false) });
-      }
+      const named = block.exits || {};
+      Object.keys(named).forEach(name => {
+        exits.push({ label: label(EXIT_LABEL_KEYS[name] || name), target: this.blockName(blueprint, named[name]) });
+      });
       const setValue = block.destination
         ? `${block.destination} = ${block.value ?? '{{' + block.fromVariable + '}}'}`
         : null;
       const detail = [
         block.text,
+        block.texts?.length ? block.texts.join(' / ') : null,
         block.options?.length ? block.options.join(' · ') : null,
-        block.saveTo ? `→ {{${block.saveTo}}}` : null,
-        block.when,
         block.question,
+        block.instructions,
+        block.when,
         block.department,
         block.knowledgeBase,
+        block.bot,
+        block.table ? `${block.table}: ${block.operation}` : null,
+        block.iterable ? `{{${block.iterable}}} → {{${block.itemVariable}}}` : null,
+        block.title,
+        block.content,
+        block.to ? `${block.to} — ${block.subject}` : null,
+        block.tags?.length ? `${block.target}: ${block.tags.join(', ')}` : null,
+        block.leadFields?.length ? block.leadFields.map(f => `${f.field} = ${f.value}`).join(' · ') : null,
+        block.level ? `${block.level}: ${block.log}` : null,
+        block.seconds ? `${block.seconds} s` : null,
+        block.variable ? `✕ {{${block.variable}}}` : null,
+        block.saveTo ? `→ {{${block.saveTo}}}` : null,
         setValue
       ].filter(part => !!part).join('\n');
       return {
