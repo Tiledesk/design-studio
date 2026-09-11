@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpBackend, HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, forkJoin, of, throwError } from 'rxjs';
-import { catchError, map, shareReplay, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, defer, forkJoin, of, throwError } from 'rxjs';
+import { catchError, map, retry, shareReplay, switchMap, take } from 'rxjs/operators';
 
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -9,7 +9,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { OpenaiService } from 'src/app/services/openai.service';
 import { FaqService } from 'src/app/services/faq.service';
 import {
-  CompileError, KnowledgeBaseRef, compileBlueprint
+  CompileError, GenerationInfo, KnowledgeBaseRef, compileBlueprint
 } from 'src/app/chatbot-design-studio/ai-authoring/blueprint-compiler';
 
 /** Tipo di agente da generare: determina l'entry point del flow lato server. */
@@ -76,6 +76,23 @@ export interface GenerateBrief {
   agentLanguage: string;
   agentName?: string | null;
   sections?: { [key: string]: PlanSection } | null;
+}
+
+/**
+ * Riassunto dell'intervista salvato nell'agente al posto della conversazione completa:
+ * l'engine carica l'agente intero a ogni messaggio, e la conversazione puo' contenere dati personali.
+ */
+export interface InterviewSummary {
+  /** La descrizione iniziale scritta dall'utente. */
+  initialPrompt: string;
+  /** Domande fatte dal planner. */
+  questions: number;
+  /** Il prompt finale come l'ha proposto il planner, per sapere se l'utente l'ha modificato. */
+  plannerFinalPrompt: string | null;
+  promptVersion?: string;
+  model?: string;
+  assumptions: string[];
+  unsupported: string[];
 }
 
 /** Una voce della galleria dei casi d'uso. */
@@ -176,6 +193,11 @@ const MAX_QUESTIONS = 8;
 const MAX_OPTIONS = 5;
 /** Lunghezza massima di agentName accettata dal generatore. */
 const MAX_AGENT_NAME = 60;
+/** Lunghezza massima della descrizione iniziale salvata nell'agente (come i messaggi del servizio). */
+const MAX_INITIAL_PROMPT = 4000;
+/** Riletture dei blocchi dopo l'import: il server risponde prima di averli salvati tutti. */
+const VERIFY_READS = 6;
+const VERIFY_DELAY_MS = 1000;
 
 /** Traduce un errore del generatore o della creazione dell'agente nel messaggio da mostrare. */
 export function describeGeneratorError(err: any): GeneratorFailure {
@@ -421,13 +443,14 @@ export class AgentGeneratorService {
 
   /**
    * Crea l'agente nel progetto:
-   * 1. compila il Blueprint nell'agente V3 (id reali, una action per blocco, nomi validi);
+   * 1. compila il Blueprint nell'agente V3 (id reali, una action per blocco, nomi validi), con i dati
+   *    della generazione e il riassunto dell'intervista in `attributes.aiGeneration`;
    * 2. lo importa con creazione (`/faq_kb/importjson/null/?create=true`);
    * 3. rilegge i blocchi creati e verifica che il server abbia conservato gli `intent_id`,
    *    da cui dipendono tutti i collegamenti (spike F0, controllo C3).
-   * Se la sola rilettura fallisce, l'agente e' comunque creato: lo si apre, segnato come non verificato.
+   * Se nessuna rilettura riesce, l'agente e' comunque creato: lo si apre, segnato come non verificato.
    */
-  createAgent(result: GenerateResponse, brief: GenerateBrief): Observable<CreatedAgent> {
+  createAgent(result: GenerateResponse, brief: GenerateBrief, interview?: InterviewSummary): Observable<CreatedAgent> {
     return this.projectFacts().pipe(
       map(({ catalog, knowledgeBases }) => compileBlueprint(result.blueprint, {
         name: brief.agentName || result.blueprint.name,
@@ -437,7 +460,8 @@ export class AgentGeneratorService {
           finalPrompt: brief.finalPrompt,
           model: result.model,
           promptVersion: result.promptVersion,
-          catalogVersion: catalog?.version
+          catalogVersion: catalog?.version,
+          ...this.interviewInfo(brief, interview)
         }
       })),
       switchMap(agent => {
@@ -450,15 +474,9 @@ export class AgentGeneratorService {
       switchMap(({ agent, botId }) => {
         if (!botId) return throwError(() => ({ stage: 'no_id' }));
         const created: CreatedAgent = { botId, name: agent.name, intents: agent.intents.length };
-        return this.faqService.getAllFaqByFaqKbId(botId).pipe(
-          catchError(err => {
-            this.logger.error('[AGENT-GENERATOR] createAgent: verification read failed ', err);
-            return of(null);
-          }),
-          switchMap((intents: any[] | null) => {
-            if (!intents) return of({ ...created, unverified: true });
-            const saved = new Set(intents.map(intent => intent?.intent_id));
-            const missing = agent.intents.map(intent => intent.intent_id).filter(id => !saved.has(id));
+        return this.missingIntents(botId, agent.intents.map(intent => intent.intent_id)).pipe(
+          switchMap(missing => {
+            if (missing === null) return of({ ...created, unverified: true });
             if (missing.length) {
               return throwError(() => ({ stage: 'ids', botId, agentName: agent.name, missing, total: agent.intents.length }));
             }
@@ -467,6 +485,50 @@ export class AgentGeneratorService {
         );
       })
     );
+  }
+
+  /**
+   * Gli `intent_id` compilati che il server non ha salvato. Il server risponde all'import prima di aver
+   * salvato tutti i blocchi, quindi la rilettura si ripete (fino a VERIFY_READS volte, a VERIFY_DELAY_MS
+   * di distanza) finche' ci sono tutti. Emette la lista vuota se ci sono tutti, gli id ancora mancanti
+   * dopo l'ultima rilettura, oppure null se l'ultima rilettura non e' riuscita.
+   */
+  private missingIntents(botId: string, expected: string[]): Observable<string[] | null> {
+    let reads = 0;
+    let missing: string[] = [];
+    return defer(() => {
+      reads++;
+      return this.faqService.getAllFaqByFaqKbId(botId);
+    }).pipe(
+      map((intents: any[]) => {
+        const saved = new Set((intents || []).map(intent => intent?.intent_id));
+        missing = expected.filter(id => !saved.has(id));
+        if (missing.length) throw { incomplete: true };
+        this.logger.log('[AGENT-GENERATOR] createAgent: all intents saved, reads: ', reads);
+        return missing;
+      }),
+      retry({ count: VERIFY_READS - 1, delay: VERIFY_DELAY_MS }),
+      catchError(err => {
+        if (err?.incomplete) {
+          this.logger.error('[AGENT-GENERATOR] createAgent: intents still missing after reads: ', reads, missing);
+          return of(missing);
+        }
+        this.logger.error('[AGENT-GENERATOR] createAgent: verification read failed ', err);
+        return of(null);
+      })
+    );
+  }
+
+  /** Riassunto dell'intervista per aiGeneration: niente conversazione completa. */
+  private interviewInfo(brief: GenerateBrief, interview?: InterviewSummary): GenerationInfo {
+    if (!interview) return {};
+    return {
+      initialPrompt: interview.initialPrompt.slice(0, MAX_INITIAL_PROMPT),
+      finalPromptEdited: interview.plannerFinalPrompt != null && brief.finalPrompt.trim() !== interview.plannerFinalPrompt.trim(),
+      interview: { questions: interview.questions, promptVersion: interview.promptVersion, model: interview.model },
+      assumptions: interview.assumptions,
+      unsupported: interview.unsupported
+    };
   }
 
   /** Catalogo delle action e knowledge base del progetto: servono a tutte le chiamate. */

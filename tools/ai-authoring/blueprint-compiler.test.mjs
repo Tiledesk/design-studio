@@ -245,16 +245,18 @@ test('id reali: uuid v4 per intent e action, uid di 32 caratteri esadecimali per
   for (const uid of uids) assert.match(uid, /^[0-9a-f]{32}$/);
 });
 
-test('metadati della generazione e nome scelto dall\'utente', () => {
-  const agent = compile(load('01-linear.json'), {
-    name: 'Il mio agente', description: 'Creato con l\'AI',
-    generation: { finalPrompt: 'Brief', model: 'openai:gpt-4.1', promptVersion: 'gen-v3-1+36062098', catalogVersion: 'v3-catalog-1' },
-  });
+test('metadati della generazione, riassunto dell\'intervista e nome scelto dall\'utente', () => {
+  const generation = {
+    finalPrompt: 'Brief', model: 'openai:gpt-4.1', promptVersion: 'gen-v3-1+36062098', catalogVersion: 'v3-catalog-1',
+    initialPrompt: 'Un bot che qualifica i lead', finalPromptEdited: true,
+    interview: { questions: 3, promptVersion: 'plan-v3-1+947a9e14', model: 'openai:gpt-4.1' },
+    assumptions: ['Tono cordiale'], unsupported: [],
+  };
+  const agent = compile(load('01-linear.json'), { name: 'Il mio agente', description: 'Creato con l\'AI', generation });
   assert.equal(agent.name, 'Il mio agente');
   assert.equal(agent.description, 'Creato con l\'AI');
   assert.deepEqual(agent.attributes.aiGeneration, {
-    finalPrompt: 'Brief', model: 'openai:gpt-4.1', promptVersion: 'gen-v3-1+36062098', catalogVersion: 'v3-catalog-1',
-    blueprintVersion: 'blueprint-1', notes: [], generatedAt: '2026-09-11T00:00:00.000Z',
+    ...generation, blueprintVersion: 'blueprint-1', notes: [], generatedAt: '2026-09-11T00:00:00.000Z',
   });
 });
 

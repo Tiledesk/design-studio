@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import {
   AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, CreatedAgent, GenerateBrief, GenerateResponse,
-  PLAN_SECTION_KEYS, PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
+  InterviewSummary, PLAN_SECTION_KEYS, PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
 } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -110,6 +110,10 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   canRetry: boolean = false;
   answer: string = '';
   selectedOptions: string[] = [];
+  /** Domande fatte dal planner: vanno nel riassunto salvato nell'agente. */
+  questionsAsked: number = 0;
+  /** Il prompt finale come l'ha proposto il planner, per sapere se l'utente l'ha modificato. */
+  plannerFinalPrompt: string | null = null;
 
   /** Prompt finale: lo propone il planner, l'utente puo' modificarlo. */
   finalPrompt: string = '';
@@ -244,6 +248,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.turn = null;
     this.answer = '';
     this.selectedOptions = [];
+    this.questionsAsked = 0;
+    this.plannerFinalPrompt = null;
     this.phase = PHASE.INTERVIEW;
     this.requestTurn();
   }
@@ -330,6 +336,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.turn = null;
     this.answer = '';
     this.selectedOptions = [];
+    this.questionsAsked = 0;
+    this.plannerFinalPrompt = null;
     this.canRetry = false;
     this.clearError();
     this.phase = PHASE.COMPOSE;
@@ -379,10 +387,12 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.chat.push({ role: 'assistant', message: turn.message, question });
     if (turn.status === PLAN_STATUS.READY) {
       this.finalPrompt = turn.finalPrompt || '';
+      this.plannerFinalPrompt = turn.finalPrompt;
       this.agentName = (turn.agentName || '').slice(0, MAX_AGENT_NAME);
       this.phase = PHASE.BRIEF;
       return;
     }
+    this.questionsAsked++;
     this.scrollChatToEnd();
   }
 
@@ -446,6 +456,19 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     };
   }
 
+  /** Riassunto dell'intervista da salvare nell'agente: la conversazione completa resta fuori. */
+  private interviewSummary(): InterviewSummary {
+    return {
+      initialPrompt: this.messages[0]?.content || this.draft.trim(),
+      questions: this.questionsAsked,
+      plannerFinalPrompt: this.plannerFinalPrompt,
+      promptVersion: this.turn?.promptVersion,
+      model: this.turn?.model,
+      assumptions: this.turn?.assumptions || [],
+      unsupported: this.turn?.unsupported || []
+    };
+  }
+
   // -------------------------------------------------------
   // Anteprima → creazione
   // -------------------------------------------------------
@@ -482,7 +505,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.clearError();
     this.creating = true;
     this.dialogRef.disableClose = true;
-    this.agentGeneratorService.createAgent(this.result, this.currentBrief())
+    this.agentGeneratorService.createAgent(this.result, this.currentBrief(), this.interviewSummary())
       .pipe(
         takeUntil(this.unsubscribe$),
         finalize(() => {

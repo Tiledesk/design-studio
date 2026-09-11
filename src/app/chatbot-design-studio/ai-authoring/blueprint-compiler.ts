@@ -61,6 +61,14 @@ export interface GenerationInfo {
   model?: string;
   promptVersion?: string;
   catalogVersion?: string;
+  /** Descrizione iniziale scritta dall'utente, prima dell'intervista. */
+  initialPrompt?: string;
+  /** True se l'utente ha modificato il prompt finale proposto dal planner. */
+  finalPromptEdited?: boolean;
+  /** Riassunto dell'intervista, al posto della conversazione completa: l'agente viaggia con ogni messaggio. */
+  interview?: { questions: number; promptVersion?: string; model?: string };
+  assumptions?: string[];
+  unsupported?: string[];
 }
 
 export interface CompileOptions {
