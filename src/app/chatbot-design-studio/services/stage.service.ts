@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, CDS_SIDEBAR_WIDTH, STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
+import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { ConnectorService } from './connector.service';
@@ -320,18 +320,32 @@ export class StageService {
   /**
    * setPositionActionsMenu
    * calculates the position of the "FLOAT ADD ACTION MENU" to display it on the right or left of the connector
-   * @param point 
-   * @returns 
+   * physicPointCorrector() returns a point relative to #tds_container's own
+   * top-left; the menu itself (.menu--context--add) is positioned relative
+   * to .chatboat-dashboard instead (it's a sibling of cds-canvas, not a
+   * descendant of #tds_container), so this has to convert back by adding
+   * however far #tds_container's left edge currently sits from that
+   * ancestor. That used to be the 60px rail alone (CDS_SIDEBAR_WIDTH) --
+   * true only when #tds_container started right after the rail. It no
+   * longer always does: the chat panel and the blocks sidebar are real
+   * flex siblings before it now, each independently open/closed/resizable,
+   * so the offset has to be read live rather than assumed as a constant
+   * (.chatboat-dashboard itself starts flush at the viewport's left edge,
+   * which is what makes reading the container's own viewport-relative
+   * getBoundingClientRect().left directly correct here).
+   * @param point
+   * @returns
   */
   public setPositionActionsMenu(point){
     let positionFloatMenu = this.tiledeskStage.physicPointCorrector(point);
     let pos = positionFloatMenu.x+CDS_ADD_ACTION_MENU_WIDTH;
     let cont = this.tiledeskStage.container.offsetWidth;
+    const containerLeftOffset = this.tiledeskStage.container.getBoundingClientRect().left;
     // /this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
     if(cont<pos){
-      positionFloatMenu.x = positionFloatMenu.x+CDS_SIDEBAR_WIDTH-CDS_ADD_ACTION_MENU_WIDTH;
+      positionFloatMenu.x = positionFloatMenu.x+containerLeftOffset-CDS_ADD_ACTION_MENU_WIDTH;
     } else {
-      positionFloatMenu.x = positionFloatMenu.x+CDS_SIDEBAR_WIDTH;
+      positionFloatMenu.x = positionFloatMenu.x+containerLeftOffset;
     }
     return positionFloatMenu;
   }

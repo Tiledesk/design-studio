@@ -261,6 +261,14 @@ export class IntentService {
 
 
   public setMapOfIntents(){
+    // Built from scratch, not added to. This map is the canvas's checklist of
+    // the blocks it is waiting to render, so it describes ONE flow. Adding to
+    // it was harmless only while changing flow meant reloading the page, which
+    // threw this singleton away with everything else; now that the canvas is
+    // rebuilt in place, a block left over from the previous flow never
+    // renders, the checklist never completes, and the connectors -- drawn only
+    // once every block has reported in -- are never drawn at all.
+    this.mapOfIntents = {};
     this.listOfIntents.forEach( intent => {
       const intentID = intent.intent_id;
       this.mapOfIntents[intentID] = {'shown': false };
@@ -952,13 +960,16 @@ export class IntentService {
         /// let id_faq_kb = this.dashboardService.id_faq_kb;
         /// this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         /// this.stageService.centerStageOnHorizontalPosition(startElement);
-        let left = 0;
-        const element = document.getElementById('cdsPanelIntentList');
-        if (element) {
-          left = element.offsetWidth+100;
-        }
+        // This used to nudge the centred position right by roughly
+        // #cdsPanelIntentList's (.box-left's) own width, to clear the
+        // sidebar back when #tds_container spanned underneath it and
+        // .box-left merely floated on top via z-index. #tds_container is a
+        // real flex sibling starting after .box-left (and the chat panel)
+        // now, so centring within the container's own coordinate space
+        // already lands past both -- re-adding their width here would push
+        // the 'start' block needlessly far right instead of centring it.
         let id_faq_kb = this.dashboardService.id_faq_kb;
-        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
+        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement);
       }
     }
   }
@@ -1528,7 +1539,12 @@ export class IntentService {
       this.setBehaviorUndoRedo();
       this.opsUpdate(this.payload);
     }
-    const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
+    // Optional all the way down: this is a log line, and `intentSelected` is
+    // null on a freshly rebuilt canvas (a flow switch destroys and recreates
+    // it, and nothing re-selects a block). Dereferencing it there threw --
+    // out of a public method the canvas's own Ctrl+Z and the chat panel's
+    // Undo both call -- for the sake of a message nobody reads.
+    const action = this.intentSelected?.actions?.find((obj) => obj._tdActionId === this.actionSelectedID);
     this.logger.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
   }
 

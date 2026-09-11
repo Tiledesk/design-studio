@@ -79,6 +79,19 @@
     "Maximize": "Maximize",
     "Minimize": "Minimize",
     "Advanced": "Advanced",
+    "LlmSettingsTab": "Vibe Coder",
+    "LlmSettingsTitle": "Vibe Coder",
+    "LlmSettingsProjectScope": "You are configuring this from the flow you have open, but the setting applies to the whole project: every Vibe Coder session in this project will use this model.",
+    "LlmSettingsModel": "Model",
+    "LlmSettingsDefault": "default",
+    "LlmSettingsInherited": "leave blank to use the deployment’s own setting",
+    "LlmSettingsTemperature": "Temperature",
+    "LlmSettingsMaxTokens": "Max output tokens",
+    "LlmSettingsSave": "Save",
+    "LlmSettingsSaved": "Saved. It applies from the next message.",
+    "LlmSettingsForbidden": "Only a project admin can view or change this.",
+    "LlmSettingsLoadError": "The runtime configuration could not be loaded.",
+    "LlmSettingsSaveError": "The setting could not be saved.",
     "WatchVideo": "Watch video",
     "LearnMore": "Learn more",
     "CdsOptions": {
@@ -1611,5 +1624,15 @@
     "NoReleaseHistoryAvailable": "No release history available",
     "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here",
     "FollowLog": "Follow log",
-    "DeleteLog": "Delete log"
+    "DeleteLog": "Delete log",
+    "CDS": {
+        "AgentChat": {
+            "Title": "Build with AI",
+            "Toggle": "Build this flow by describing it",
+            "LoadFailed": "The AI chat could not be loaded.",
+            "Applied": "Applied {{count}} change(s) to this flow.",
+            "Failed": "{{count}} change(s) could not be applied:",
+            "Undo": "Undo"
+        }
+    }
 }

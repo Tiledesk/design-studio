@@ -64,3 +64,6 @@ docs
 json-condition-when-grammar.md
 .superpowers/
 .connector-sdd-*.md
+
+# Scratch output from Playwright MCP browsing sessions. Never part of the repo.
+.playwright-mcp/

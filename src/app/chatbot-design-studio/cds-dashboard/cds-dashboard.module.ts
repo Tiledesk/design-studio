@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CdsDashboardComponent } from './cds-dashboard.component';
 import { CdsSidebarComponent } from './cds-sidebar/cds-sidebar.component';
 import { CdsHeaderComponent } from './cds-header/cds-header.component';
+import { CdsPanelAgentChatComponent } from './cds-canvas/cds-panel-agent-chat/cds-panel-agent-chat.component';
 
 import { MaterialModule } from 'src/app/shared/material.module';
 import { TranslateModule } from '@ngx-translate/core';
@@ -72,6 +73,9 @@ const routes: Routes = [
     CdsDashboardComponent,
     CdsSidebarComponent,
     CdsHeaderComponent,
+
+    //CDS PANEL AGENT CHAT
+    CdsPanelAgentChatComponent,
 
     //UTILS
     CdsPopupComponent,

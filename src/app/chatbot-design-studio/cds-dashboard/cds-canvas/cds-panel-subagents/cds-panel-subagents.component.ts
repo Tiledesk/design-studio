@@ -9,6 +9,7 @@ import { CdsNewSubagentDialogComponent } from './cds-new-subagent-dialog/cds-new
 import { TranslateService } from '@ngx-translate/core';
 import { DialogYesNoComponent } from 'src/app/chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { NotifyService } from 'src/app/services/notify.service';
+import { AgentChatFamilyService, sortSubagentsByName } from '../../../agent-chat/agent-chat-family.service';
 
 export interface SubagentItem {
   _id: string;
@@ -16,20 +17,11 @@ export interface SubagentItem {
 }
 
 /**
- * Ordina i subagent per nome, in ordine alfabetico.
- *
- * `localeCompare` con `sensitivity: 'base'` ignora maiuscole e accenti (cosi' "Ordini"
- * e "ordini" non finiscono in due blocchi separati) e `numeric: true` confronta i numeri
- * come numeri: "Agente 2" precede "Agente 10", che con l'ordinamento per stringa
- * finirebbe prima.
- *
- * Funzione pura ed esportata apposta per poterla testare senza montare il componente.
+ * Ordina i subagent per nome: ora vive in agent-chat-family.service.ts, che serve la
+ * stessa risposta anche alla chat AI. Re-esportata qui perche' e' cosi' che questo
+ * pannello (e i suoi test) la conoscono da sempre.
  */
-export function sortSubagentsByName(items: SubagentItem[]): SubagentItem[] {
-  return [...items].sort((a, b) =>
-    (a?.name || '').localeCompare(b?.name || '', undefined, { sensitivity: 'base', numeric: true })
-  );
-}
+export { sortSubagentsByName };
 
 /**
  * Estrae il messaggio da mostrare quando la DELETE di un subagent fallisce.
@@ -96,7 +88,8 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
     private translate: TranslateService,
-    private notify: NotifyService
+    private notify: NotifyService,
+    private family: AgentChatFamilyService
   ) { }
 
   ngOnDestroy(): void {
@@ -112,18 +105,16 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
 
   /** Determina parent e lista subagent in base al contesto (parent vs subagent). */
   private loadData(): void {
-    const current: any = this.dashboardService.selectedChatbot;
+    this.familyParentId = this.family.rootId();
     if (this.isSubagent) {
-      // Dentro un subagent: il riferimento per la lista è il parent (parent_id).
-      const parentId = current?.parent_id;
-      this.familyParentId = parentId;
-      this.loadSubagents(parentId);
-      this.loadParent(parentId);
+      this.loadSubagents(this.familyParentId);
+      this.loadParent(this.familyParentId);
     } else {
-      // Sul parent: il parent è il chatbot corrente.
-      this.familyParentId = this.currentId;
-      this.parentItem = { _id: this.currentId, name: current?.name || '' };
-      this.loadSubagents(this.currentId);
+      this.parentItem = {
+        _id: this.currentId,
+        name: (this.dashboardService.selectedChatbot as any)?.name || ''
+      };
+      this.loadSubagents(this.familyParentId);
     }
   }
 
@@ -177,22 +168,59 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     return base + '#/project/' + this.dashboardService.projectID + '/chatbot/' + id + '/blocks';
   }
 
-  /** Apre il chatbot/subagent nella stessa tab (ricarica completa). No-op se è quello già aperto. */
+  /** Apre il chatbot/subagent nella stessa tab. No-op se è quello già aperto. */
   openAgent(id: string): void {
     if (!id || id === this.currentId) { return; }
-    // Cambia solo il fragment (#): impostare href da solo non ricarica → forziamo il reload completo
-    // così la Design Studio si re-inizializza sul nuovo agent.
+    this.goToFlow(id);
+  }
+
+  /**
+   * Sposta la Design Studio su un altro flusso della famiglia.
+   *
+   * Usa il navigatore pubblicato da CdsDashboardComponent su DashboardService:
+   * la canvas viene distrutta e ricostruita senza ricaricare la pagina, così
+   * l'iframe della chat AI -- e la conversazione dentro -- sopravvive allo
+   * spostamento. Un click nel pannello e un open_flow dell'agent diventano
+   * quindi lo stesso atto.
+   *
+   * Il pannello non passa da AgentChatHostService di proposito: chiedere alla
+   * chat di navigare avrebbe la dipendenza al contrario, e il pannello
+   * smetterebbe di funzionare il giorno in cui la chat viene disabilitata.
+   *
+   * Fallback al vecchio reload quando nessuna dashboard ha pubblicato il
+   * navigatore (nessuno monta il pannello fuori dalla dashboard oggi, ma un
+   * pannello che non naviga sarebbe un guasto silenzioso).
+   */
+  private goToFlow(id: string): void {
+    if (this.dashboardService.openFlow) {
+      // La canvas viene comunque ripristinata dal navigatore anche se il caricamento
+      // fallisce: qui resta solo da non lasciare una promise rejected senza handler.
+      this.dashboardService.openFlow(id).catch((error) => {
+        this.logger.error('[CDS-PANEL-SUBAGENTS] flow switch failed:', error);
+      });
+      return;
+    }
+    // Cambia solo il fragment (#): impostare href da solo non ricarica → forziamo il reload
+    // completo così la Design Studio si re-inizializza sul nuovo agent.
     window.location.href = this.getSubagentUrl(id);
     window.location.reload();
   }
 
   /**
-   * Riporta la Design Studio sul parent ricaricandola da zero.
-   * A differenza di openAgent() non ha la guardia "stesso id": se siamo gia' sul parent
-   * l'href non cambia, ma il reload deve avvenire comunque per rileggere il flusso.
+   * Riporta la Design Studio sul parent dopo una cancellazione.
+   *
+   * A differenza di openAgent() non basta la guardia "stesso id": se siamo gia' sul
+   * parent il flusso aperto va comunque riletto, perche' puo' contenere action che
+   * puntavano al subagent appena eliminato. Da un fratello ci si sposta in place
+   * (la chat sopravvive); stando gia' sul parent l'unico modo di ricostruire la
+   * canvas sullo STESSO id resta il reload completo di sempre.
    */
   private goToParentAndReload(): void {
     const parentId = this.parentItem?._id;
+    if (parentId && parentId !== this.currentId && this.dashboardService.openFlow) {
+      this.goToFlow(parentId);
+      return;
+    }
     if (parentId) {
       window.location.href = this.getSubagentUrl(parentId);
     }
@@ -208,8 +236,9 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
 
   /**
    * Apre la modale di creazione (bloccante); a creazione riuscita la Design Studio si
-   * ricarica direttamente SUL subagent appena creato, pronto per essere modificato.
-   * Non serve aggiornare la lista in memoria: la pagina viene ricaricata da zero.
+   * sposta direttamente SUL subagent appena creato, pronto per essere modificato.
+   * Non serve aggiornare la lista in memoria: il pannello vive dentro la canvas, che
+   * lo spostamento distrugge e ricostruisce sul nuovo flusso.
    */
   onNewSubagent(): void {
     const ref = this.dialog.open(CdsNewSubagentDialogComponent, {

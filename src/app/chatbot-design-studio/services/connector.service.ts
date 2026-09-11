@@ -249,6 +249,13 @@ export class ConnectorService {
 
   public async createMapOfConnectors(intents){
     this.logger.log('[CONNECTOR-SERV] -----> createMapOfConnectors 1::: ', intents);
+    // Same reasoning as IntentService.setMapOfIntents: this describes the ONE
+    // flow the canvas is building, and its only caller is that build. Carrying
+    // the previous flow's connectors over was invisible while changing flow
+    // meant reloading the page; with the canvas rebuilt in place they are
+    // entries pointing at blocks that no longer exist on the stage.
+    this.mapOfConnectors = {};
+    this.listOfConnectors = {};
     this.existingIntentIds = new Set(intents.map((item) => item.intent_id));
     this.listOfIntents = intents;
     intents.forEach(async intent => {

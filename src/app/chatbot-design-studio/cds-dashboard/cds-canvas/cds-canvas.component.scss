@@ -16,8 +16,13 @@ $toogle-sidebar-width: 22px;
 // ============================================================
 :host {
   display: flex;
-  width: calc(100% - var(--sidebar-base-width));
   overflow: hidden;
+
+  // The dashboard's row now owns the chat panel, so :host is one item in that
+  // row rather than the row that contains it. Same rule, and the same reason,
+  // as #tds_container below: let the browser compute the width that is left.
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 // ============================================================
@@ -510,7 +515,18 @@ $toogle-sidebar-width: 22px;
   position: absolute;
 }
 
-#cds-options-panel {
+// The actions palette (Most used / AI / Flow / Integrations / Special) --
+// pinned flush to #tds_container's own left edge now that the container's
+// geometry is correct on its own (see the #tds_container flex rule below).
+// Scoped to the element tag, not the shared .cds-panel-elements class:
+// #cds-options-panel below carries that same class but anchors its own
+// bottom-right icon cluster with `right`, and a `left` here would stretch
+// it edge-to-edge instead of sizing it to its content.
+cds-panel-elements {
+  left: 0;
+}
+
+#cds-options-panel{
   bottom: 12px;
   right: 12px;
 }
@@ -518,8 +534,29 @@ $toogle-sidebar-width: 22px;
 // ============================================================
 // DRAGGABLE CONTAINER & DRAWER
 // ============================================================
+
+
+
+/*********** START Draggable  *************/
+// #tds_container is a real flex item of :host's row now, not the hard
+// calc(100% - rail) it used to be. That old width never subtracted
+// .box-left's 230px either (a pre-existing, smaller version of the same
+// bug) -- it only "worked" because nothing before it in the row consumed
+// enough of the layout to matter, and the leftover was clipped by :host's
+// overflow: hidden. With the chat panel now also a real preceding sibling
+// (up to 708px), the clipped fraction got big enough that fit-to-screen
+// (utils.ts scaleAndcenterStageOnCenterPosition, which reads this exact
+// element's getBoundingClientRect().width) started computing its scale
+// against a stage that was half off-screen. flex: 1 1 auto + min-width: 0
+// makes the browser compute the true remaining width after every real
+// sibling -- cds-panel-agent-chat AND .box-left alike -- so both cases are
+// fixed by the one rule instead of two calc() special cases.
+// The #id selector's specificity is what's needed to win over
+// .tds-drag-container's `position: absolute` below.
 #tds_container {
-  width: calc(100% - var(--sidebar-base-width));
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .tds-drag-container {
