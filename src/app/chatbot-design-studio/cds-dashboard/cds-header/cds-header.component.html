@@ -30,15 +30,17 @@
         <span class="cds-text title"> {{BRAND_BASE_INFO['META_TITLE']}}</span>    
     </div>
     <div class="header-title ellips">
-        <!-- Selettore dell'agent: cambia agent senza uscire dal Design Studio -->
-        <button type="button" class="agent-selector" [matMenuTriggerFor]="menuAgents"
+        <!-- Selettore dell'agent (solo V3): cambia agent senza uscire dal Design Studio -->
+        <button type="button" class="agent-selector" *ngIf="isV3" [matMenuTriggerFor]="menuAgents"
             [attr.aria-label]="'CDSHeader.SelectAgent' | translate">
             <span class="agent-selector__name ellips">{{ selectedChatbot?.name }}</span>
             <span class="material-icons agent-selector__caret">arrow_drop_down</span>
         </button>
+        <!-- Agent legacy: solo il nome, come prima del selettore -->
+        <ng-container *ngIf="!isV3">{{ selectedChatbot?.name }}</ng-container>
         <span class="material-icons" *ngIf="(SHARE_MENU_ITEMS | filter:{key: 'status', value: 'active' }).length > 0" [matMenuTriggerFor]="menuShare">ios_share</span>
         <span class="material-icons-outlined delete-agent-icon"
-            *ngIf="selectedChatbot?._id"
+            *ngIf="isV3 && selectedChatbot?._id"
             [class.is-disabled]="isDeletingAgent"
             matTooltip="{{ 'CDSHeader.DeleteAgent' | translate }}"
             matTooltipClass="cds-mat-tooltip"

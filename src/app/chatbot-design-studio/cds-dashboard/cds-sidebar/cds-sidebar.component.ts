@@ -74,6 +74,14 @@ export class CdsSidebarComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => this.agentGeneratorService.close());
   }
 
+  /**
+   * "Crea agente con l'AI" compare solo sugli agenti V3, e solo se il servizio di generazione e'
+   * configurato: gli agenti legacy non vi accedono, e senza configurazione la funzione e' spenta.
+   */
+  get showAgentGenerator(): boolean {
+    return this.dashboardService.isV3 && this.agentGeneratorService.isConfigured;
+  }
+
   ngOnInit(): void {
     this.projectID = this.dashboardService.projectID;
     this.user = this.tiledeskAuthService.getCurrentUser()

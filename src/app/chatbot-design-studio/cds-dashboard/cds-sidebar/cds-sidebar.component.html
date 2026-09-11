@@ -135,6 +135,7 @@
         <!-- e un separatore che la stacca dalle voci di navigazione. -->
         <!-- ------------------------------------------------------- -->
         <div id="cds-sb-agent-generator" name="agent-generator" class="section ai-generator-section"
+            *ngIf="showAgentGenerator"
             matTooltipClass="cds-mat-tooltip"
             matTooltip="{{ 'CDSAgentGenerator.SidebarTooltip' | translate }}"
             #tooltipAgentGenerator="matTooltip"

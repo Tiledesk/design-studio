@@ -171,6 +171,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Selettore dell'agent ed "Elimina agent" sono funzioni del V3: gli agent legacy mostrano solo il nome. */
+  get isV3(): boolean {
+    return this.dashboardService.isV3;
+  }
+
   /**
    * Passa a un altro agent. La rotta e' `/project/:projectid/chatbot/:faqkbid/blocks`
    * e il Design Studio si ricarica sul nuovo agent.
