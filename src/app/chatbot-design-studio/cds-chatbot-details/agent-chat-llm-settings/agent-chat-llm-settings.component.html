@@ -11,7 +11,21 @@
       </h3>
     </div>
     <div class="col-sm-10 col-md-10">
-      <div class="section-subtitle">{{ 'LlmSettingsProjectScope' | translate }}</div>
+      <!-- Blank on purpose. `.section-subtitle` is not a subtitle: it is the
+           section's horizontal rule (`height: 20px; border-top: 1px solid #ddd`
+           in assets/sass/cds/styles.scss), and every sibling leaves it empty.
+           The note that used to live here rendered *on top of* the line. -->
+      <div class="section-subtitle">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- What the user most needs to know before touching anything: the panel is
+       reached from one flow, the setting is not. Styled as the helper text in
+       detail.component.html rather than as a banner, so it reads like the rest
+       of this settings area. -->
+  <div class="row" style="margin-bottom: 16px;">
+    <div class="col-sm-10 col-md-10">
+      <span class="llm-settings-scope">{{ 'LlmSettingsProjectScope' | translate }}</span>
     </div>
   </div>
 
@@ -28,7 +42,7 @@
        all seven children into one grid row, so nothing lined up with the label
        that named it. -->
   <form *ngIf="!loading && !readOnly" (ngSubmit)="save()">
-    <div class="row">
+    <div class="row" style="margin-bottom: 16px;">
       <label for="llm-model" class="col-sm-2 cds--custom-label">
         {{ 'LlmSettingsModel' | translate }}
       </label>
@@ -46,7 +60,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" style="margin-bottom: 16px;">
       <label for="llm-temperature" class="col-sm-2 cds--custom-label">
         {{ 'LlmSettingsTemperature' | translate }}
       </label>
@@ -61,7 +75,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" style="margin-bottom: 16px;">
       <label for="llm-max-tokens" class="col-sm-2 cds--custom-label">
         {{ 'LlmSettingsMaxTokens' | translate }}
       </label>
@@ -73,8 +87,9 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-sm-10 col-md-10 llm-settings-actions">
+    <div class="row" style="margin-bottom: 16px;">
+      <label class="col-sm-2 cds--custom-label"></label>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 llm-settings-actions">
         <button type="submit" class="btn btn-primary cds-blue-button" [disabled]="saving">
           {{ 'LlmSettingsSave' | translate }}
         </button>

@@ -240,6 +240,27 @@ describe('AgentChatLlmSettingsComponent', () => {
     }
   });
 
+  // `.section-subtitle` is not a subtitle: it is the section's horizontal rule
+  // (`height: 20px; border-top: 1px solid #ddd`, assets/sass/cds/styles.scss),
+  // and every sibling section leaves it empty. The project-scope note used to
+  // live inside it, so on screen the sentence sat on top of the line. Nothing
+  // could catch that from the component instance -- only the DOM says where
+  // the text actually is.
+  it('keeps the scope note out of the section rule', async () => {
+    await setup();
+    const rule: HTMLElement =
+      fixture.nativeElement.querySelector('.section-subtitle');
+    expect(rule).withContext('the section rule is missing').not.toBeNull();
+    expect((rule.textContent || '').trim()).toBe('');
+
+    const note: HTMLElement =
+      fixture.nativeElement.querySelector('.llm-settings-scope');
+    expect(note).withContext('the scope note is missing').not.toBeNull();
+    expect(note.closest('.section-subtitle'))
+      .withContext('the scope note is inside the rule again').toBeNull();
+    expect(note.textContent).toContain('LlmSettingsProjectScope');
+  });
+
   // Fix round 3 (MINOR 8): blank does not mean "no temperature" -- agent.yaml's
   // own params are in force and merge at resolve time. An empty box with no
   // hint reads as "nothing is set", which is wrong.
