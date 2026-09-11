@@ -15,92 +15,163 @@
         <p class="agent-generator__subtitle">{{ 'CDSAgentGenerator.Subtitle' | translate }}</p>
     </div>
 
-    <!-- ── Tipo di agente ───────────────────────────────────────────── -->
-    <div class="agent-generator__bot-types" role="group"
-        [attr.aria-label]="'CDSAgentGenerator.BotType.Label' | translate">
-        <span class="agent-generator__label">{{ 'CDSAgentGenerator.BotType.Label' | translate }}</span>
-        <div class="agent-generator__bot-types-row">
-            <button type="button" class="agent-generator__bot-type"
-                *ngFor="let opt of botTypeOptions"
-                [class.is-active]="botType === opt.value"
-                [attr.aria-pressed]="botType === opt.value"
-                [disabled]="isSubmitting"
-                (click)="selectBotType(opt.value)">
-                <i class="material-icons-outlined">{{ opt.icon }}</i>
-                {{ opt.labelKey | translate }}
-            </button>
-        </div>
-    </div>
+    <!-- ══ Descrizione e attesa ═════════════════════════════════════════ -->
+    <ng-container *ngIf="phase !== PHASE.PREVIEW">
 
-    <!-- ── Prompt ───────────────────────────────────────────────────── -->
-    <div class="agent-generator__composer">
-        <textarea class="agent-generator__textarea"
-            [(ngModel)]="draft"
-            [placeholder]="'CDSAgentGenerator.TextareaPlaceholder' | translate"
-            [attr.aria-label]="'CDSAgentGenerator.TextareaPlaceholder' | translate"
-            [disabled]="isSubmitting"
-            rows="5"></textarea>
-
-        <div class="agent-generator__error" *ngIf="errorMessage">
-            <i class="material-icons-outlined agent-generator__error-icon">error_outline</i>
-            <span>{{ errorMessage }}</span>
-        </div>
-
-        <div class="agent-generator__composer-footer">
-            <span class="agent-generator__hint">
-                <ng-container *ngIf="isSubmitting">{{ 'CDSAgentGenerator.Generating' | translate }}</ng-container>
-                <ng-container *ngIf="!isSubmitting">{{ 'CDSAgentGenerator.SubmitHint' | translate }}</ng-container>
-            </span>
-            <button type="button" class="agent-generator__submit"
-                [disabled]="!canSubmit"
-                (click)="onSubmit()">
-                <span class="agent-generator__spinner" *ngIf="isSubmitting"></span>
-                <i class="material-icons-outlined" *ngIf="!isSubmitting">arrow_upward</i>
-                {{ 'CDSAgentGenerator.SubmitButton' | translate }}
-            </button>
-        </div>
-    </div>
-
-    <!-- ── Galleria dei casi d'uso ──────────────────────────────────── -->
-    <div class="agent-generator__examples" *ngIf="allCases.length > 0">
-        <div class="agent-generator__examples-head">
-            <span class="agent-generator__label">{{ 'CDSAgentGenerator.ExamplesLabel' | translate }}</span>
-            <div class="agent-generator__chips" role="group"
-                [attr.aria-label]="'CDSAgentGenerator.FilterLabel' | translate">
-                <button type="button" class="agent-generator__chip"
-                    [class.is-active]="selectedCategory === CATEGORY_ALL"
-                    [attr.aria-pressed]="selectedCategory === CATEGORY_ALL"
-                    (click)="selectCategory(CATEGORY_ALL)">
-                    {{ 'CDSAgentGenerator.Category.all' | translate }}
-                </button>
-                <button type="button" class="agent-generator__chip"
-                    *ngFor="let category of categories"
-                    [class.is-active]="selectedCategory === category"
-                    [attr.aria-pressed]="selectedCategory === category"
-                    (click)="selectCategory(category)">
-                    {{ categoryLabelKey(category) | translate }}
+        <!-- ── Tipo di agente ───────────────────────────────────────── -->
+        <div class="agent-generator__bot-types" role="group"
+            [attr.aria-label]="'CDSAgentGenerator.BotType.Label' | translate">
+            <span class="agent-generator__label">{{ 'CDSAgentGenerator.BotType.Label' | translate }}</span>
+            <div class="agent-generator__bot-types-row">
+                <button type="button" class="agent-generator__bot-type"
+                    *ngFor="let opt of botTypeOptions"
+                    [class.is-active]="botType === opt.value"
+                    [attr.aria-pressed]="botType === opt.value"
+                    [disabled]="isSubmitting || !isBotTypeAvailable(opt.value)"
+                    [attr.title]="isBotTypeAvailable(opt.value) ? null : ('CDSAgentGenerator.BotType.ComingSoon' | translate)"
+                    (click)="selectBotType(opt.value)">
+                    <i class="material-icons-outlined">{{ opt.icon }}</i>
+                    {{ opt.labelKey | translate }}
                 </button>
             </div>
         </div>
 
-        <div class="agent-generator__gallery">
-            <button type="button" class="agent-generator__case"
-                *ngFor="let useCase of visibleCases"
+        <!-- ── Prompt ───────────────────────────────────────────────── -->
+        <div class="agent-generator__composer">
+            <textarea class="agent-generator__textarea"
+                [(ngModel)]="draft"
+                [placeholder]="'CDSAgentGenerator.TextareaPlaceholder' | translate"
+                [attr.aria-label]="'CDSAgentGenerator.TextareaPlaceholder' | translate"
                 [disabled]="isSubmitting"
-                (click)="useExample(useCase)">
-                <span class="agent-generator__case-title">{{ useCase.title }}</span>
-                <span class="agent-generator__case-category">{{ categoryLabelKey(useCase.category) | translate }}</span>
-            </button>
+                rows="5"></textarea>
+
+            <div class="agent-generator__error" *ngIf="errorMessage">
+                <i class="material-icons-outlined agent-generator__error-icon">error_outline</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+            <ul class="agent-generator__error-details" *ngIf="errorDetails.length > 0">
+                <li *ngFor="let detail of errorDetails">{{ detail }}</li>
+            </ul>
+
+            <div class="agent-generator__composer-footer">
+                <span class="agent-generator__hint">
+                    <ng-container *ngIf="isSubmitting">{{ 'CDSAgentGenerator.GeneratingElapsed' | translate: { seconds: elapsedSeconds } }}</ng-container>
+                    <ng-container *ngIf="!isSubmitting">{{ 'CDSAgentGenerator.SubmitHint' | translate }}</ng-container>
+                </span>
+                <button type="button" class="agent-generator__submit"
+                    [disabled]="!canSubmit"
+                    (click)="onSubmit()">
+                    <span class="agent-generator__spinner" *ngIf="isSubmitting"></span>
+                    <i class="material-icons-outlined" *ngIf="!isSubmitting">arrow_upward</i>
+                    {{ 'CDSAgentGenerator.SubmitButton' | translate }}
+                </button>
+            </div>
         </div>
 
-        <button type="button" class="agent-generator__show-more"
-            *ngIf="hiddenCasesCount > 0 || showAllCases"
-            (click)="toggleShowAll()">
-            <ng-container *ngIf="!showAllCases">
-                {{ 'CDSAgentGenerator.ShowMore' | translate }} ({{ hiddenCasesCount }})
-            </ng-container>
-            <ng-container *ngIf="showAllCases">{{ 'CDSAgentGenerator.ShowLess' | translate }}</ng-container>
-        </button>
+        <!-- ── Galleria dei casi d'uso ──────────────────────────────── -->
+        <div class="agent-generator__examples" *ngIf="allCases.length > 0">
+            <div class="agent-generator__examples-head">
+                <span class="agent-generator__label">{{ 'CDSAgentGenerator.ExamplesLabel' | translate }}</span>
+                <div class="agent-generator__chips" role="group"
+                    [attr.aria-label]="'CDSAgentGenerator.FilterLabel' | translate">
+                    <button type="button" class="agent-generator__chip"
+                        [class.is-active]="selectedCategory === CATEGORY_ALL"
+                        [attr.aria-pressed]="selectedCategory === CATEGORY_ALL"
+                        (click)="selectCategory(CATEGORY_ALL)">
+                        {{ 'CDSAgentGenerator.Category.all' | translate }}
+                    </button>
+                    <button type="button" class="agent-generator__chip"
+                        *ngFor="let category of categories"
+                        [class.is-active]="selectedCategory === category"
+                        [attr.aria-pressed]="selectedCategory === category"
+                        (click)="selectCategory(category)">
+                        {{ categoryLabelKey(category) | translate }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="agent-generator__gallery">
+                <button type="button" class="agent-generator__case"
+                    *ngFor="let useCase of visibleCases"
+                    [disabled]="isSubmitting"
+                    (click)="useExample(useCase)">
+                    <span class="agent-generator__case-title">{{ useCase.title }}</span>
+                    <span class="agent-generator__case-category">{{ categoryLabelKey(useCase.category) | translate }}</span>
+                </button>
+            </div>
+
+            <button type="button" class="agent-generator__show-more"
+                *ngIf="hiddenCasesCount > 0 || showAllCases"
+                (click)="toggleShowAll()">
+                <ng-container *ngIf="!showAllCases">
+                    {{ 'CDSAgentGenerator.ShowMore' | translate }} ({{ hiddenCasesCount }})
+                </ng-container>
+                <ng-container *ngIf="showAllCases">{{ 'CDSAgentGenerator.ShowLess' | translate }}</ng-container>
+            </button>
+        </div>
+    </ng-container>
+
+    <!-- ══ Anteprima del Blueprint ══════════════════════════════════════ -->
+    <div class="agent-generator__preview" *ngIf="phase === PHASE.PREVIEW && result">
+        <div class="agent-generator__preview-head">
+            <h2 class="agent-generator__preview-title">{{ result.blueprint.name }}</h2>
+            <span class="agent-generator__preview-meta">
+                {{ 'CDSAgentGenerator.Preview.Meta' | translate: {
+                    blocks: result.blueprint.blocks.length, model: result.model,
+                    attempts: result.attempts, seconds: generationSeconds } }}
+            </span>
+        </div>
+
+        <div class="agent-generator__notice" *ngIf="result.notes.length > 0">
+            <span class="agent-generator__notice-title">{{ 'CDSAgentGenerator.Preview.Notes' | translate }}</span>
+            <ul><li *ngFor="let note of result.notes">{{ note }}</li></ul>
+        </div>
+        <div class="agent-generator__notice is-warning" *ngIf="result.warnings.length > 0">
+            <span class="agent-generator__notice-title">{{ 'CDSAgentGenerator.Preview.Warnings' | translate }}</span>
+            <ul><li *ngFor="let warning of result.warnings">{{ warning }}</li></ul>
+        </div>
+
+        <ol class="agent-generator__flow">
+            <li class="agent-generator__flow-block" *ngFor="let block of flow" [class.is-start]="block.isStart">
+                <div class="agent-generator__flow-head">
+                    <span class="agent-generator__flow-type">{{ block.typeLabelKey | translate }}</span>
+                    <span class="agent-generator__flow-name">{{ block.name }}</span>
+                    <span class="agent-generator__flow-start" *ngIf="block.isStart">{{ 'CDSAgentGenerator.Preview.Start' | translate }}</span>
+                </div>
+                <div class="agent-generator__flow-detail" *ngIf="block.detail">{{ block.detail }}</div>
+                <div class="agent-generator__flow-exits">
+                    <span class="agent-generator__flow-exit" *ngFor="let exit of block.exits">{{ exit.label }} → <b>{{ exit.target }}</b></span>
+                    <span class="agent-generator__flow-exit" *ngIf="block.exits.length === 0">{{ 'CDSAgentGenerator.Preview.End' | translate }}</span>
+                </div>
+            </li>
+        </ol>
+
+        <div class="agent-generator__fallback" *ngIf="result.blueprint.fallbackText || fallbackTarget">
+            {{ 'CDSAgentGenerator.Preview.Fallback' | translate }}:
+            <ng-container *ngIf="result.blueprint.fallbackText">«{{ result.blueprint.fallbackText }}»</ng-container>
+            <ng-container *ngIf="fallbackTarget"> → <b>{{ fallbackTarget }}</b></ng-container>
+        </div>
+
+        <pre class="agent-generator__json" *ngIf="showJson">{{ result.blueprint | json }}</pre>
+
+        <div class="agent-generator__preview-footer">
+            <span class="agent-generator__hint">{{ 'CDSAgentGenerator.Preview.NotCreated' | translate }}</span>
+            <div class="agent-generator__preview-actions">
+                <button type="button" class="agent-generator__secondary" (click)="toggleJson()">
+                    {{ (showJson ? 'CDSAgentGenerator.Preview.HideJson' : 'CDSAgentGenerator.Preview.ShowJson') | translate }}
+                </button>
+                <button type="button" class="agent-generator__secondary" (click)="copyJson()">
+                    {{ (copied ? 'CDSAgentGenerator.Preview.Copied' : 'CDSAgentGenerator.Preview.CopyJson') | translate }}
+                </button>
+                <button type="button" class="agent-generator__secondary" (click)="backToCompose()">
+                    {{ 'CDSAgentGenerator.Preview.Edit' | translate }}
+                </button>
+                <button type="button" class="agent-generator__submit" (click)="regenerate()">
+                    <i class="material-icons-outlined">refresh</i>
+                    {{ 'CDSAgentGenerator.Preview.Regenerate' | translate }}
+                </button>
+            </div>
+        </div>
     </div>
 
 </div>

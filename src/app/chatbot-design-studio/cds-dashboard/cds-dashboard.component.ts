@@ -192,7 +192,10 @@ export class CdsDashboardComponent implements OnInit {
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
-    this.agentGeneratorService.initialize(serverBaseURL, this.project._id)
+    this.agentGeneratorService.initialize(serverBaseURL, this.project._id, {
+      url: this.appConfigService.getConfig().aiAgentGeneratorUrl,
+      key: this.appConfigService.getConfig().aiAgentGeneratorKey
+    })
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
     this.uploadService.initialize(this.project._id);

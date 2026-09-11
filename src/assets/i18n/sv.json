@@ -2741,7 +2741,8 @@
             "Label": "Agent type",
             "Chat": "Chat",
             "Webhook": "Webhook",
-            "Copilot": "Copilot"
+            "Copilot": "Copilot",
+            "ComingSoon": "Coming soon"
         },
         "TextareaPlaceholder": "E.g. A support bot that answers product questions and hands over to an operator when needed…",
         "SubmitHint": "The AI generates an initial flow that you can refine.",
@@ -2760,6 +2761,45 @@
             "support": "Support"
         },
         "ErrorEndpointMissing": "The generation service is not available yet on this server.",
-        "ErrorGeneric": "The agent could not be generated. Try again."
+        "ErrorGeneric": "The agent could not be generated. Try again.",
+        "GeneratingElapsed": "Generating the agent… {{seconds}} s",
+        "ErrorNotConfigured": "The agent generator is not configured (aiAgentGeneratorUrl and aiAgentGeneratorKey).",
+        "ErrorUnreachable": "The agent generator can't be reached. If it was asleep, try again in a minute.",
+        "ErrorUnauthorized": "The agent generator rejected the key (aiAgentGeneratorKey).",
+        "ErrorBadRequest": "The agent generator rejected the request.",
+        "ErrorModelNotAllowed": "The requested AI model is not available.",
+        "ErrorInvalidBlueprint": "The AI couldn't produce a valid agent. Try describing it in more detail.",
+        "ErrorRateLimited": "Too many generations in the last hour. Try again later.",
+        "ErrorLlm": "The AI provider returned an error. Try again later.",
+        "Preview": {
+            "Meta": "{{blocks}} blocks · {{model}} · {{attempts}} attempt(s) · {{seconds}} s",
+            "NotCreated": "Preview only: the agent has not been created yet.",
+            "Start": "start",
+            "End": "end of the conversation",
+            "Then": "then",
+            "IfTrue": "if yes",
+            "IfFalse": "if no",
+            "Fallback": "When the agent doesn't understand",
+            "Notes": "To complete by hand",
+            "Warnings": "Warnings",
+            "ShowJson": "Show JSON",
+            "HideJson": "Hide JSON",
+            "CopyJson": "Copy JSON",
+            "Copied": "Copied",
+            "Edit": "Edit description",
+            "Regenerate": "Generate again",
+            "Type": {
+                "replyv2": "Message",
+                "ask": "Question",
+                "setattribute-v2": "Set variable",
+                "jsoncondition2": "Condition",
+                "ifopenhours": "Opening hours",
+                "ifonlineagentsv2": "Operators online",
+                "askgptv2": "Knowledge base",
+                "department": "Department",
+                "agent": "Operator",
+                "close": "Close"
+            }
+        }
     }
 }

@@ -1,0 +1,153 @@
+{
+  "version": "v3-catalog-1",
+  "types": [
+    {
+      "type": "replyv2",
+      "purpose": "Sends a message to the user, optionally with buttons.",
+      "fields": [
+        { "name": "text", "required": true, "description": "The message. May contain {{variable}}. At most 300 characters." },
+        { "name": "buttons", "required": false, "description": "Up to 6 buttons: {label, goto} leads to a block, {label, url} opens a web page." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues right after the message is sent" },
+        { "name": "goto", "meaning": "the block reached when the user clicks that button" }
+      ],
+      "terminal": false,
+      "rules": [
+        "With at least one goto button it is a menu: next must be null.",
+        "It never stores what the user writes: use ask for questions.",
+        "Without next and without goto buttons it ends the conversation with that message."
+      ]
+    },
+    {
+      "type": "ask",
+      "purpose": "Asks the user a question and saves the answer in a variable.",
+      "fields": [
+        { "name": "text", "required": true, "description": "The question, about one thing only." },
+        { "name": "options", "required": false, "description": "Up to 6 quick replies; the chosen text is saved as the answer." },
+        { "name": "saveTo", "required": true, "description": "snake_case variable that stores the answer." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the user has answered" }
+      ],
+      "terminal": false,
+      "rules": [
+        "next is mandatory.",
+        "To branch on the answer, put a jsoncondition2 right after it and compare with the exact option text."
+      ]
+    },
+    {
+      "type": "setattribute-v2",
+      "purpose": "Sets a variable to a constant value or to the value of another variable.",
+      "fields": [
+        { "name": "destination", "required": true, "description": "snake_case variable to set." },
+        { "name": "value", "required": false, "description": "Constant value. Exactly one of value and fromVariable." },
+        { "name": "fromVariable", "required": false, "description": "Variable to copy. Exactly one of value and fromVariable." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the variable is set" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it to record a value that a later block or the human operator needs, e.g. why the conversation was handed over."
+      ]
+    },
+    {
+      "type": "jsoncondition2",
+      "purpose": "Checks a condition on variables and continues on one of two branches.",
+      "fields": [
+        { "name": "when", "required": true, "description": "The condition, in the when grammar." }
+      ],
+      "exits": [
+        { "name": "true", "meaning": "the condition is met" },
+        { "name": "false", "meaning": "the condition is not met" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Both exits are mandatory.",
+        "Every variable in when is set earlier in the flow."
+      ]
+    },
+    {
+      "type": "ifopenhours",
+      "purpose": "Checks whether the business is open now, according to the hours configured in Tiledesk.",
+      "fields": [],
+      "exits": [
+        { "name": "true", "meaning": "open" },
+        { "name": "false", "meaning": "closed" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Both exits are mandatory.",
+        "The closed branch says so and offers an alternative."
+      ]
+    },
+    {
+      "type": "ifonlineagentsv2",
+      "purpose": "Checks whether a human operator is available now.",
+      "fields": [],
+      "exits": [
+        { "name": "true", "meaning": "at least one operator is available" },
+        { "name": "false", "meaning": "no operator is available" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Both exits are mandatory.",
+        "The false branch offers an alternative, such as leaving a contact."
+      ]
+    },
+    {
+      "type": "askgptv2",
+      "purpose": "Searches a knowledge base for the answer to the user's question and saves it in kb_reply.",
+      "fields": [
+        { "name": "knowledgeBase", "required": true, "description": "Name of a knowledge base listed in the context." },
+        { "name": "question", "required": false, "description": "Question to search, may contain {{variable}}; null means the user's last message." }
+      ],
+      "exits": [
+        { "name": "true", "meaning": "an answer was found, in kb_reply" },
+        { "name": "false", "meaning": "no answer was found" }
+      ],
+      "terminal": false,
+      "rules": [
+        "It does not show the answer: its true exit leads to a replyv2 whose text contains {{kb_reply}}.",
+        "Its false exit leads to an alternative: a handoff or a helpful message.",
+        "Both exits are mandatory."
+      ]
+    },
+    {
+      "type": "department",
+      "purpose": "Moves the conversation to a department, before handing it over to an operator.",
+      "fields": [
+        { "name": "department", "required": true, "description": "Name of a department listed in the context." }
+      ],
+      "exits": [
+        { "name": "next", "meaning": "continues after the move" }
+      ],
+      "terminal": false,
+      "rules": [
+        "Use it only on the way to an agent block, optionally with ifonlineagentsv2 in between."
+      ]
+    },
+    {
+      "type": "agent",
+      "purpose": "Hands the conversation over to a human operator. The agent's part ends here.",
+      "fields": [],
+      "exits": [],
+      "terminal": true,
+      "rules": [
+        "Put a replyv2 before it that tells the user an operator is coming."
+      ]
+    },
+    {
+      "type": "close",
+      "purpose": "Formally closes the conversation.",
+      "fields": [],
+      "exits": [],
+      "terminal": true,
+      "rules": [
+        "Use it only when the brief asks to close the conversation.",
+        "Never right after a message the user must read."
+      ]
+    }
+  ]
+}

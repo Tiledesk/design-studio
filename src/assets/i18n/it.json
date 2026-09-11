@@ -313,7 +313,8 @@
             "Label": "Tipo di agente",
             "Chat": "Chat",
             "Webhook": "Webhook",
-            "Copilot": "Copilot"
+            "Copilot": "Copilot",
+            "ComingSoon": "Presto disponibile"
         },
         "TextareaPlaceholder": "Es. Un bot di supporto che risponde alle domande sul prodotto e passa a un operatore quando serve…",
         "SubmitHint": "L'AI genera un flow iniziale che potrai perfezionare.",
@@ -332,7 +333,46 @@
             "support": "Supporto"
         },
         "ErrorEndpointMissing": "Il servizio di generazione non è ancora disponibile su questo server.",
-        "ErrorGeneric": "Non sono riuscito a generare l'agente. Riprova."
+        "ErrorGeneric": "Non sono riuscito a generare l'agente. Riprova.",
+        "GeneratingElapsed": "Sto generando l'agente… {{seconds}} s",
+        "ErrorNotConfigured": "Il generatore di agenti non è configurato (aiAgentGeneratorUrl e aiAgentGeneratorKey).",
+        "ErrorUnreachable": "Il generatore di agenti non è raggiungibile. Se era in pausa, riprova tra un minuto.",
+        "ErrorUnauthorized": "Il generatore di agenti ha rifiutato la chiave (aiAgentGeneratorKey).",
+        "ErrorBadRequest": "Il generatore di agenti ha rifiutato la richiesta.",
+        "ErrorModelNotAllowed": "Il modello AI richiesto non è disponibile.",
+        "ErrorInvalidBlueprint": "L'AI non è riuscita a produrre un agente valido. Prova a descriverlo meglio.",
+        "ErrorRateLimited": "Troppe generazioni nell'ultima ora. Riprova più tardi.",
+        "ErrorLlm": "Il provider AI ha restituito un errore. Riprova più tardi.",
+        "Preview": {
+            "Meta": "{{blocks}} blocchi · {{model}} · tentativi: {{attempts}} · {{seconds}} s",
+            "NotCreated": "È solo un'anteprima: l'agente non è ancora stato creato.",
+            "Start": "inizio",
+            "End": "fine della conversazione",
+            "Then": "poi",
+            "IfTrue": "se sì",
+            "IfFalse": "se no",
+            "Fallback": "Quando l'agente non capisce",
+            "Notes": "Da completare a mano",
+            "Warnings": "Avvisi",
+            "ShowJson": "Mostra JSON",
+            "HideJson": "Nascondi JSON",
+            "CopyJson": "Copia JSON",
+            "Copied": "Copiato",
+            "Edit": "Modifica la descrizione",
+            "Regenerate": "Rigenera",
+            "Type": {
+                "replyv2": "Messaggio",
+                "ask": "Domanda",
+                "setattribute-v2": "Imposta variabile",
+                "jsoncondition2": "Condizione",
+                "ifopenhours": "Orari di apertura",
+                "ifonlineagentsv2": "Operatori disponibili",
+                "askgptv2": "Knowledge base",
+                "department": "Dipartimento",
+                "agent": "Operatore",
+                "close": "Chiusura"
+            }
+        }
     },
     "CDSHeader": {
         "SelectAgent": "Seleziona agente",

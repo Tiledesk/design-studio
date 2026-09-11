@@ -285,9 +285,161 @@
     &:hover { text-decoration: underline; }
 }
 
+/* ── Dettagli d'errore del servizio ───────────────────────────────── */
+.agent-generator__error-details {
+    margin: 6px 0 0 24px;
+    padding: 0;
+    font-size: 12.5px;
+    color: var(--ag-text-muted);
+}
+
+/* ── Anteprima del Blueprint ──────────────────────────────────────── */
+.agent-generator__preview-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.agent-generator__preview-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.agent-generator__preview-meta {
+    font-size: 12.5px;
+    color: var(--ag-text-muted);
+    white-space: nowrap;
+}
+
+.agent-generator__notice {
+    margin: 10px 0;
+    padding: 10px 12px;
+    font-size: 13px;
+    background: var(--ag-bg-soft);
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+
+    ul { margin: 6px 0 0; padding-left: 18px; }
+
+    &.is-warning {
+        background: #fff8e6;
+        border-color: #f3d58a;
+    }
+}
+
+.agent-generator__notice-title { font-weight: 500; }
+
+.agent-generator__flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 46vh;
+    overflow-y: auto;
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+}
+
+.agent-generator__flow-block {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ag-border);
+
+    &:last-child { border-bottom: 0; }
+    &.is-start { background: #f4f8ff; }
+}
+
+.agent-generator__flow-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.agent-generator__flow-type {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    font-size: 11.5px;
+    color: var(--ag-accent);
+    background: #eef3fc;
+    border-radius: 999px;
+}
+
+.agent-generator__flow-name { font-weight: 500; }
+
+.agent-generator__flow-start {
+    font-size: 11.5px;
+    color: var(--ag-text-muted);
+}
+
+.agent-generator__flow-detail {
+    margin-top: 4px;
+    font-size: 13px;
+    white-space: pre-line;
+}
+
+.agent-generator__flow-exits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--ag-text-muted);
+
+    b { color: var(--ag-text); font-weight: 500; }
+}
+
+.agent-generator__fallback {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ag-text-muted);
+
+    b { color: var(--ag-text); font-weight: 500; }
+}
+
+.agent-generator__json {
+    margin: 10px 0 0;
+    max-height: 30vh;
+    overflow: auto;
+    padding: 12px;
+    font-size: 12px;
+    background: var(--ag-bg-soft);
+    border-radius: 8px;
+}
+
+.agent-generator__preview-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.agent-generator__preview-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.agent-generator__secondary {
+    padding: 9px 14px;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--ag-text);
+    background: #ffffff;
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover { border-color: #c9cfda; }
+}
+
 /* ── Schermi stretti ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
     .agent-generator { padding: 26px 20px 22px; }
+    .agent-generator__preview-head { flex-direction: column; gap: 4px; }
     .agent-generator__gallery { grid-template-columns: 1fr; }
     .agent-generator__examples-head { flex-direction: column; align-items: flex-start; }
 }
