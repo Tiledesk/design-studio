@@ -317,7 +317,7 @@
             "ComingSoon": "Presto disponibile"
         },
         "TextareaPlaceholder": "Es. Un bot di supporto che risponde alle domande sul prodotto e passa a un operatore quando serve…",
-        "SubmitHint": "L'AI genera un flow iniziale che potrai perfezionare.",
+        "SubmitHint": "L'AI ti fa qualche domanda per completare la descrizione, poi genera il flow.",
         "SubmitButton": "Crea agente",
         "Generating": "Sto generando il flow…",
         "ExamplesLabel": "Prova un esempio",
@@ -358,7 +358,7 @@
             "HideJson": "Nascondi JSON",
             "CopyJson": "Copia JSON",
             "Copied": "Copiato",
-            "Edit": "Modifica la descrizione",
+            "Edit": "Modifica il prompt",
             "Regenerate": "Rigenera",
             "Type": {
                 "replyv2": "Messaggio",
@@ -372,6 +372,49 @@
                 "agent": "Operatore",
                 "close": "Chiusura"
             }
+        },
+        "Plan": {
+            "Title": "Completiamo la descrizione",
+            "Restart": "Ricomincia",
+            "SectionsLabel": "Brief",
+            "Section": {
+                "goal": "Obiettivo",
+                "language_tone": "Lingua e tono",
+                "opening": "Apertura",
+                "main_path": "Percorso",
+                "data_to_collect": "Dati da raccogliere",
+                "branching": "Ramificazioni",
+                "handoff": "Passaggio a operatore",
+                "business_hours": "Orari",
+                "knowledge_base": "Knowledge base",
+                "fallback": "Fallback",
+                "closing": "Chiusura"
+            },
+            "State": {
+                "defined": "Definito",
+                "unclear": "Da chiarire",
+                "assumed": "Scelto dall'AI",
+                "not_needed": "Non serve"
+            },
+            "Thinking": "Sto pensando alla prossima domanda…",
+            "Retry": "Riprova",
+            "MultiHint": "Puoi scegliere più opzioni, poi premi Invia",
+            "AnswerPlaceholder": "Scrivi la tua risposta…",
+            "Proceed": "Genera comunque",
+            "ProceedTooltip": "L'AI completa da sola le parti mancanti",
+            "ProceedMessage": "Procedi pure: completa tu le parti mancanti con scelte ragionevoli.",
+            "OpenBrief": "Vai al prompt finale",
+            "Send": "Invia"
+        },
+        "Brief": {
+            "Title": "Il prompt finale è pronto",
+            "Hint": "Controllalo e, se serve, modificalo: l'agente verrà generato da questo testo.",
+            "AgentName": "Nome dell'agente",
+            "PromptLabel": "Prompt finale",
+            "Assumptions": "Scelte fatte dall'AI",
+            "Unsupported": "Da configurare a mano dopo la creazione",
+            "BackToQuestions": "Torna alle domande",
+            "Generate": "Genera l'agente"
         }
     },
     "CDSHeader": {

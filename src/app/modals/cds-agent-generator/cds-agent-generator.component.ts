@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subject, Subscription, interval } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 import {
-  AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, GenerateResponse, UseCase, describeGeneratorError
+  AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, GenerateBrief, GenerateResponse, PLAN_SECTION_KEYS,
+  PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
 } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -19,11 +20,27 @@ const CATEGORY_ALL = 'all';
 /** Quanti dettagli d'errore del servizio si mostrano sotto il messaggio. */
 const MAX_ERROR_DETAILS = 5;
 
-/** Fasi della modale: descrizione, attesa della generazione, anteprima del Blueprint. */
+/** Lunghezza massima del nome dell'agente accettata dal generatore. */
+const MAX_AGENT_NAME = 60;
+
+/**
+ * Fasi della modale: descrizione → intervista → prompt finale → generazione → anteprima.
+ * Dall'anteprima si torna al prompt finale, dal prompt finale alle domande.
+ */
 export enum PHASE {
   COMPOSE    = 'compose',
+  INTERVIEW  = 'interview',
+  BRIEF      = 'brief',
   GENERATING = 'generating',
   PREVIEW    = 'preview'
+}
+
+/** Un messaggio della chat dell'intervista, come lo mostra la UI. */
+interface ChatEntry {
+  role: 'user' | 'assistant';
+  message: string;
+  /** Solo per l'assistente: la domanda, evidenziata sotto il messaggio. */
+  question: string;
 }
 
 /** Un'uscita di un blocco nell'anteprima: etichetta ("poi", "se sì", "[Bottone]") e destinazione. */
@@ -49,9 +66,14 @@ interface PreviewBlock {
 })
 export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
 
+  @ViewChild('chatLog') chatLog?: ElementRef<HTMLElement>;
+
   BOT_TYPE = BOT_TYPE;
   CATEGORY_ALL = CATEGORY_ALL;
   PHASE = PHASE;
+  PLAN_STATUS = PLAN_STATUS;
+  SECTION_KEYS = PLAN_SECTION_KEYS;
+  MAX_AGENT_NAME = MAX_AGENT_NAME;
 
   /** Tipo di agente: determina l'entry point del flow generato. */
   botType: BOT_TYPE = BOT_TYPE.CHAT;
@@ -61,7 +83,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     { value: BOT_TYPE.COPILOT, labelKey: 'CDSAgentGenerator.BotType.Copilot', icon: 'add_box' }
   ];
 
-  /** Il testo scritto dall'utente. */
+  /** La descrizione iniziale scritta dall'utente. */
   draft: string = '';
 
   /** Galleria dei casi d'uso. */
@@ -76,6 +98,21 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   errorDetails: string[] = [];
   /** Secondi dall'invio: la generazione dura da qualche secondo a un paio di minuti. */
   elapsedSeconds: number = 0;
+
+  /** Intervista: la cronologia per il servizio e la chat per la UI. */
+  messages: PlanMessage[] = [];
+  chat: ChatEntry[] = [];
+  /** L'ultimo turno del planner. */
+  turn: PlanTurn | null = null;
+  planning: boolean = false;
+  /** Turno fallito: si puo' solo ripetere o ricominciare, cosi' la cronologia resta alternata. */
+  canRetry: boolean = false;
+  answer: string = '';
+  selectedOptions: string[] = [];
+
+  /** Prompt finale: lo propone il planner, l'utente puo' modificarlo. */
+  finalPrompt: string = '';
+  agentName: string = '';
 
   /** Anteprima. */
   result: GenerateResponse | null = null;
@@ -125,6 +162,11 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     return this.phase === PHASE.GENERATING;
   }
 
+  /** Lingua dell'interfaccia: le domande e il prompt finale arrivano in questa lingua. */
+  private get uiLanguage(): string {
+    return this.translate.currentLang || this.translate.getDefaultLang() || 'en';
+  }
+
   // -------------------------------------------------------
   // Tipo di agente
   // -------------------------------------------------------
@@ -134,7 +176,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   }
 
   selectBotType(value: BOT_TYPE): void {
-    if (this.isSubmitting || !this.isBotTypeAvailable(value)) return;
+    if (!this.isBotTypeAvailable(value)) return;
     this.botType = value;
   }
 
@@ -149,7 +191,6 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
 
   /** Il click su una card inietta il meta-prompt nella textarea. */
   useExample(useCase: UseCase): void {
-    if (this.isSubmitting) return;
     this.draft = useCase.prompt;
     this.clearError();
   }
@@ -178,12 +219,13 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   }
 
   // -------------------------------------------------------
-  // Generazione
+  // Descrizione → intervista
   // -------------------------------------------------------
   get canSubmit(): boolean {
-    return !this.isSubmitting && this.draft.trim().length > 0;
+    return !this.planning && this.draft.trim().length > 0;
   }
 
+  /** La descrizione iniziale apre l'intervista: e' il primo messaggio della conversazione. */
   onSubmit(): void {
     if (!this.canSubmit) return;
     this.clearError();
@@ -191,13 +233,190 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
       this.errorMessage = this.translate.instant('CDSAgentGenerator.ErrorNotConfigured');
       return;
     }
+    const description = this.draft.trim();
+    this.messages = [{ role: 'user', content: description }];
+    this.chat = [{ role: 'user', message: description, question: '' }];
+    this.turn = null;
+    this.answer = '';
+    this.selectedOptions = [];
+    this.phase = PHASE.INTERVIEW;
+    this.requestTurn();
+  }
+
+  // -------------------------------------------------------
+  // Intervista
+  // -------------------------------------------------------
+  /** Si risponde solo a un turno arrivato, e non durante l'attesa o dopo un errore. */
+  get canAnswer(): boolean {
+    return !this.planning && !this.canRetry && !!this.turn;
+  }
+
+  get canSendAnswer(): boolean {
+    return this.canAnswer && (this.answer.trim().length > 0 || this.selectedOptions.length > 0);
+  }
+
+  get showOptions(): boolean {
+    return this.canAnswer && !!this.turn?.question?.options?.length;
+  }
+
+  /** Sezioni gia' risolte: definite, assunte dall'AI o non necessarie. */
+  get resolvedSections(): number {
+    return this.SECTION_KEYS.filter(key => this.sectionState(key) !== 'unclear').length;
+  }
+
+  sectionState(key: string): string {
+    return this.turn?.sections?.[key]?.state || 'unclear';
+  }
+
+  sectionTooltip(key: string): string {
+    const state = this.translate.instant('CDSAgentGenerator.Plan.State.' + this.sectionState(key));
+    const text = this.turn?.sections?.[key]?.text;
+    return text ? state + ' — ' + text : state;
+  }
+
+  isOptionSelected(option: string): boolean {
+    return this.selectedOptions.includes(option);
+  }
+
+  /** Scelta singola: il click sull'opzione e' la risposta. Scelta multipla: la seleziona. */
+  pickOption(option: string): void {
+    if (!this.canAnswer || !this.turn?.question) return;
+    if (!this.turn.question.multi) {
+      this.reply(option);
+      return;
+    }
+    const index = this.selectedOptions.indexOf(option);
+    if (index >= 0) this.selectedOptions.splice(index, 1);
+    else this.selectedOptions.push(option);
+  }
+
+  /** Invia le opzioni scelte e il testo libero, uniti da ", ". */
+  sendAnswer(): void {
+    if (!this.canSendAnswer) return;
+    const content = [...this.selectedOptions, this.answer.trim()].filter(part => !!part).join(', ');
+    this.answer = '';
+    this.reply(content);
+  }
+
+  /** Invio con Enter; Shift+Enter va a capo. */
+  onAnswerKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      this.sendAnswer();
+    }
+  }
+
+  /** "Genera comunque": il planner completa da solo le parti mancanti e chiude con il prompt finale. */
+  proceedAnyway(): void {
+    if (!this.canAnswer) return;
+    this.reply(this.translate.instant('CDSAgentGenerator.Plan.ProceedMessage'));
+  }
+
+  retry(): void {
+    if (this.planning) return;
+    this.requestTurn();
+  }
+
+  /** Torna alla descrizione iniziale, che resta modificabile; la conversazione si azzera. */
+  restart(): void {
+    if (this.planning) return;
+    this.messages = [];
+    this.chat = [];
+    this.turn = null;
+    this.answer = '';
+    this.selectedOptions = [];
+    this.canRetry = false;
+    this.clearError();
+    this.phase = PHASE.COMPOSE;
+  }
+
+  /** Dopo un "ready" si puo' tornare alle domande e poi di nuovo al prompt finale, senza perdere le modifiche. */
+  openBrief(): void {
+    this.clearError();
+    this.phase = PHASE.BRIEF;
+  }
+
+  private reply(content: string): void {
+    if (!this.turn) return;
+    this.messages.push({ role: 'assistant', content: planTurnToMessage(this.turn) }, { role: 'user', content });
+    this.chat.push({ role: 'user', message: content, question: '' });
+    this.selectedOptions = [];
+    this.phase = PHASE.INTERVIEW;
+    this.requestTurn();
+  }
+
+  private requestTurn(): void {
+    this.planning = true;
+    this.canRetry = false;
+    this.clearError();
+    this.scrollChatToEnd();
+    this.agentGeneratorService.planTurn(this.messages, this.botType, this.uiLanguage)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        finalize(() => this.planning = false)
+      )
+      .subscribe({
+        next: (turn: PlanTurn) => {
+          this.logger.log('[CDS-AGENT-GENERATOR] plan turn: ', turn);
+          this.onTurn(turn);
+        },
+        error: (err: any) => {
+          this.logger.error('[CDS-AGENT-GENERATOR] plan error: ', err);
+          this.showError(err);
+          this.canRetry = true;
+        }
+      });
+  }
+
+  private onTurn(turn: PlanTurn): void {
+    this.turn = turn;
+    const question = turn.question && turn.question.text !== turn.message ? turn.question.text : '';
+    this.chat.push({ role: 'assistant', message: turn.message, question });
+    if (turn.status === PLAN_STATUS.READY) {
+      this.finalPrompt = turn.finalPrompt || '';
+      this.agentName = (turn.agentName || '').slice(0, MAX_AGENT_NAME);
+      this.phase = PHASE.BRIEF;
+      return;
+    }
+    this.scrollChatToEnd();
+  }
+
+  private scrollChatToEnd(): void {
+    setTimeout(() => {
+      const el = this.chatLog?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }
+
+  // -------------------------------------------------------
+  // Prompt finale → generazione
+  // -------------------------------------------------------
+  get canGenerate(): boolean {
+    return !this.isSubmitting && this.finalPrompt.trim().length > 0;
+  }
+
+  backToQuestions(): void {
+    if (this.isSubmitting) return;
+    this.clearError();
+    this.phase = PHASE.INTERVIEW;
+    this.scrollChatToEnd();
+  }
+
+  generateAgent(): void {
+    if (!this.canGenerate) return;
+    this.clearError();
     this.phase = PHASE.GENERATING;
     // Durante l'attesa un click sul backdrop non deve chiudere la modale.
     this.dialogRef.disableClose = true;
     this.startTimer();
-    const language = this.translate.currentLang || this.translate.getDefaultLang() || 'en';
+    const brief: GenerateBrief = {
+      finalPrompt: this.finalPrompt.trim(),
+      agentLanguage: this.turn?.agentLanguage || this.uiLanguage,
+      agentName: this.agentName.trim() || null,
+      sections: this.turn?.sections || null
+    };
 
-    this.agentGeneratorService.generate(this.draft.trim(), this.botType, language)
+    this.agentGeneratorService.generate(brief, this.botType)
       .pipe(
         takeUntil(this.unsubscribe$),
         finalize(() => {
@@ -212,10 +431,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           this.logger.error('[CDS-AGENT-GENERATOR] generate error: ', err);
-          const failure = describeGeneratorError(err);
-          this.phase = PHASE.COMPOSE;
-          this.errorMessage = this.translate.instant(failure.messageKey);
-          this.errorDetails = failure.details.slice(0, MAX_ERROR_DETAILS);
+          this.phase = PHASE.BRIEF;
+          this.showError(err);
         }
       });
   }
@@ -223,16 +440,16 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   // -------------------------------------------------------
   // Anteprima
   // -------------------------------------------------------
-  backToCompose(): void {
-    this.phase = PHASE.COMPOSE;
+  backToBrief(): void {
+    this.phase = PHASE.BRIEF;
     this.result = null;
     this.flow = [];
     this.showJson = false;
   }
 
   regenerate(): void {
-    this.backToCompose();
-    this.onSubmit();
+    this.backToBrief();
+    this.generateAgent();
   }
 
   toggleJson(): void {
@@ -303,6 +520,12 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   // -------------------------------------------------------
   // Utilita'
   // -------------------------------------------------------
+  private showError(err: any): void {
+    const failure = describeGeneratorError(err);
+    this.errorMessage = this.translate.instant(failure.messageKey);
+    this.errorDetails = failure.details.slice(0, MAX_ERROR_DETAILS);
+  }
+
   private clearError(): void {
     this.errorMessage = '';
     this.errorDetails = [];

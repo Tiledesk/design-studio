@@ -2745,7 +2745,7 @@
             "ComingSoon": "Coming soon"
         },
         "TextareaPlaceholder": "E.g. A support bot that answers product questions and hands over to an operator when needed…",
-        "SubmitHint": "The AI generates an initial flow that you can refine.",
+        "SubmitHint": "The AI asks a few questions to complete the description, then generates the flow.",
         "SubmitButton": "Create agent",
         "Generating": "Generating the flow…",
         "ExamplesLabel": "Try an example",
@@ -2786,7 +2786,7 @@
             "HideJson": "Hide JSON",
             "CopyJson": "Copy JSON",
             "Copied": "Copied",
-            "Edit": "Edit description",
+            "Edit": "Edit the prompt",
             "Regenerate": "Generate again",
             "Type": {
                 "replyv2": "Message",
@@ -2800,6 +2800,49 @@
                 "agent": "Operator",
                 "close": "Close"
             }
+        },
+        "Plan": {
+            "Title": "Let's complete the description",
+            "Restart": "Start over",
+            "SectionsLabel": "Brief",
+            "Section": {
+                "goal": "Goal",
+                "language_tone": "Language and tone",
+                "opening": "Opening",
+                "main_path": "Main path",
+                "data_to_collect": "Data to collect",
+                "branching": "Branching",
+                "handoff": "Handoff to an operator",
+                "business_hours": "Business hours",
+                "knowledge_base": "Knowledge base",
+                "fallback": "Fallback",
+                "closing": "Closing"
+            },
+            "State": {
+                "defined": "Defined",
+                "unclear": "To clarify",
+                "assumed": "Assumed by the AI",
+                "not_needed": "Not needed"
+            },
+            "Thinking": "Thinking about the next question…",
+            "Retry": "Retry",
+            "MultiHint": "You can pick more than one option, then press Send",
+            "AnswerPlaceholder": "Type your answer…",
+            "Proceed": "Generate anyway",
+            "ProceedTooltip": "The AI fills in the missing parts on its own",
+            "ProceedMessage": "Go ahead: fill in the missing parts yourself with reasonable choices.",
+            "OpenBrief": "Go to the final prompt",
+            "Send": "Send"
+        },
+        "Brief": {
+            "Title": "The final prompt is ready",
+            "Hint": "Check it and edit it if needed: the agent will be generated from this text.",
+            "AgentName": "Agent name",
+            "PromptLabel": "Final prompt",
+            "Assumptions": "Choices made by the AI",
+            "Unsupported": "To configure by hand after creation",
+            "BackToQuestions": "Back to the questions",
+            "Generate": "Generate the agent"
         }
     }
 }

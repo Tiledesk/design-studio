@@ -192,7 +192,7 @@ export class CdsDashboardComponent implements OnInit {
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
-    this.agentGeneratorService.initialize(serverBaseURL, this.project._id, {
+    this.agentGeneratorService.initialize(this.project._id, {
       url: this.appConfigService.getConfig().aiAgentGeneratorUrl,
       key: this.appConfigService.getConfig().aiAgentGeneratorKey
     })
