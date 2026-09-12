@@ -86,6 +86,35 @@
     gap: 12px;
 }
 
+.agent-generator__model {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+
+    .agent-generator__label { margin: 0; white-space: nowrap; }
+
+    &.is-compact {
+        margin: 10px 0 0;
+        font-size: 13px;
+    }
+}
+
+.agent-generator__select {
+    flex: 1;
+    max-width: 360px;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ag-text);
+    background: #ffffff;
+    border: 1px solid var(--ag-border);
+    border-radius: 8px;
+
+    &:disabled { color: var(--ag-text-muted); background: var(--ag-bg-soft); cursor: default; }
+    &:focus-visible { outline: 2px solid var(--ag-accent); outline-offset: 1px; }
+}
+
 .agent-generator__bot-type {
     display: flex;
     align-items: center;

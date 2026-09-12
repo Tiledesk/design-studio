@@ -316,6 +316,11 @@
             "Copilot": "Copilot",
             "ComingSoon": "Presto disponibile"
         },
+        "Model": {
+            "Label": "Modello AI",
+            "Recommended": "consigliato",
+            "ServiceDefault": "modello del servizio"
+        },
         "TextareaPlaceholder": "Es. Un bot di supporto che risponde alle domande sul prodotto e passa a un operatore quando serve…",
         "SubmitHint": "L'AI ti fa qualche domanda per completare la descrizione, poi genera il flow.",
         "SubmitButton": "Crea agente",

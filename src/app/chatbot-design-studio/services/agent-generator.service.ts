@@ -242,6 +242,25 @@ export interface AgentGeneratorConfig {
   key?: string;
 }
 
+/** Un modello LLM che il servizio dichiara disponibile (GET /health). */
+export interface ServiceModel {
+  /** `llm:model`, per esempio `openai:gpt-4.1`. */
+  id: string;
+  llm: string;
+  model: string;
+  label: string;
+  reasoning: boolean;
+  /** Quanto e' potente: piu' alto, piu' potente. Decide il consigliato. */
+  rank: number;
+}
+
+/** Lo stato del servizio: i modelli disponibili, quello di default e il piu' potente. */
+export interface ServiceHealth {
+  models: ServiceModel[];
+  default: string | null;
+  recommended: string | null;
+}
+
 /** I dati del progetto che il generatore conosce: il catalogo che puo' usare e i nomi reali. */
 interface ProjectFacts {
   catalog: any;
@@ -376,6 +395,8 @@ export class AgentGeneratorService {
   private catalogCache$: Observable<any>;
   /** Dati del progetto: letti una volta per ogni apertura della modale. */
   private factsCache$: Observable<ProjectFacts> | null = null;
+  /** Stato del servizio (modelli): letto una volta per ogni apertura della modale. */
+  private healthCache$: Observable<ServiceHealth | null> | null = null;
 
   /** Client senza interceptor: le chiamate al generatore non devono portare credenziali Tiledesk. */
   private readonly externalHttp: HttpClient;
@@ -418,20 +439,46 @@ export class AgentGeneratorService {
   open(): void {
     this.logger.log('[AGENT-GENERATOR] open');
     this.factsCache$ = null;
+    this.healthCache$ = null;
     this._isOpen$.next(true);
-    this.warmUp();
+    // Sveglia il servizio mentre l'utente scrive: sul piano Free di Render si addormenta e la prima
+    // chiamata puo' aspettare fino a un minuto. La stessa lettura porta i modelli per il selettore.
+    this.health().pipe(take(1)).subscribe();
   }
 
   /**
-   * Sveglia il servizio mentre l'utente scrive la descrizione: sul piano Free di Render il servizio si
-   * addormenta e la prima chiamata puo' aspettare fino a un minuto. GET /health non richiede la chiave.
+   * Lo stato del servizio: i modelli disponibili, quello di default e il piu' potente (`recommended`).
+   * GET /health non richiede la chiave. In errore emette null, senza tenerlo in cache: la lettura
+   * successiva riprova.
    */
-  private warmUp(): void {
-    if (!this.generatorUrl) return;
-    this.externalHttp.get(this.generatorUrl + '/health').pipe(take(1)).subscribe({
-      next: () => this.logger.log('[AGENT-GENERATOR] service awake'),
-      error: (err: any) => this.logger.log('[AGENT-GENERATOR] warm-up failed: ', err?.status)
-    });
+  health(): Observable<ServiceHealth | null> {
+    if (!this.generatorUrl) return of(null);
+    if (!this.healthCache$) {
+      this.healthCache$ = this.externalHttp.get<any>(this.generatorUrl + '/health').pipe(
+        map(res => ({
+          models: (Array.isArray(res?.models) ? res.models : [])
+            .filter((m: any) => !!m?.id)
+            .map((m: any) => ({ id: m.id, llm: m.llm, model: m.model, label: m.label || m.model, reasoning: !!m.reasoning, rank: Number(m.rank) || 0 })),
+          default: res?.default || null,
+          recommended: res?.recommended || null
+        }) as ServiceHealth),
+        catchError(err => {
+          this.logger.log('[AGENT-GENERATOR] health failed: ', err?.status);
+          this.healthCache$ = null;
+          return of(null);
+        }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    }
+    return this.healthCache$;
+  }
+
+  /** `llm` e `model` per il body, dall'id `llm:model` scelto nella modale; niente se non c'e' una scelta. */
+  private modelFields(model?: string | null): { llm?: string; model?: string } {
+    if (!model) return {};
+    const separator = model.indexOf(':');
+    if (separator < 1) return {};
+    return { llm: model.slice(0, separator), model: model.slice(separator + 1) };
   }
 
   close(): void {
@@ -467,7 +514,7 @@ export class AgentGeneratorService {
    *
    * POST {aiAgentGeneratorUrl}/plan
    */
-  planTurn(messages: PlanMessage[], botType: BOT_TYPE, uiLanguage: string): Observable<PlanTurn> {
+  planTurn(messages: PlanMessage[], botType: BOT_TYPE, uiLanguage: string, model?: string | null): Observable<PlanTurn> {
     if (!this.isConfigured) {
       return throwError(() => ({ notConfigured: true }));
     }
@@ -476,6 +523,7 @@ export class AgentGeneratorService {
         const body = {
           projectId: this.project_id,
           botType,
+          ...this.modelFields(model),
           uiLanguage,
           messages,
           context: {
@@ -497,7 +545,7 @@ export class AgentGeneratorService {
    *
    * POST {aiAgentGeneratorUrl}/generate
    */
-  generate(brief: GenerateBrief, botType: BOT_TYPE): Observable<GenerateResponse> {
+  generate(brief: GenerateBrief, botType: BOT_TYPE, model?: string | null): Observable<GenerateResponse> {
     if (!this.isConfigured) {
       return throwError(() => ({ notConfigured: true }));
     }
@@ -506,6 +554,7 @@ export class AgentGeneratorService {
         const body = {
           projectId: this.project_id,
           botType,
+          ...this.modelFields(model),
           agentLanguage: brief.agentLanguage,
           agentName: brief.agentName ? brief.agentName.slice(0, MAX_AGENT_NAME) : undefined,
           finalPrompt: brief.finalPrompt,

@@ -2707,6 +2707,11 @@
             "Copilot": "Copilot",
             "ComingSoon": "Coming soon"
         },
+        "Model": {
+            "Label": "AI model",
+            "Recommended": "recommended",
+            "ServiceDefault": "service default model"
+        },
         "TextareaPlaceholder": "E.g. A support bot that answers product questions and hands over to an operator when needed…",
         "SubmitHint": "The AI asks a few questions to complete the description, then generates the flow.",
         "SubmitButton": "Create agent",

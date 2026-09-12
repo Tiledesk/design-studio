@@ -11,6 +11,7 @@
 
 # this branch 12/09/2026
 
+- **added**: nella modale «Crea agente con l'AI» si sceglie il modello AI, fra quelli che il servizio dichiara disponibili; è preselezionato il più potente, e l'ultima scelta viene ricordata. La scelta vale per le domande e per la generazione. Il servizio concede più tempo alle generazioni con i modelli che ragionano
 - **added**: il generatore di agenti usa come riferimento fino a tre agenti verificati simili alla richiesta, e l'anteprima lo dice («Ispirato ad agenti verificati»); nell'anteprima si può votare il flusso con un pollice, e il DS comunica al servizio se l'agente è stato creato, rigenerato o scartato, senza mai inviare la conversazione
 - **changed**: il blocco defaultFallback, quando è vuoto, non accetta più action: non se ne possono trascinare dentro, il pulsante «Add action» e il segnaposto non compaiono, e nemmeno il menu delle action o lo spostamento da un altro blocco lo riempiono. I chatbot che hanno ancora una risposta dentro il defaultFallback restano modificabili (regola riportata dal branch ds-generic-bug-fix-39)
 - **changed**: il pulsante «Crea agente con l'AI» compare su tutti gli agenti, anche quelli precedenti al V3: crea sempre un agente nuovo e non modifica quello aperto. Resta nascosto solo se il servizio di generazione non è configurato

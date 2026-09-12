@@ -9,6 +9,17 @@
     </button>
 
     <!-- Errore del servizio: lo stesso riquadro in ogni fase -->
+    <!-- Selettore del modello AI, usato nella descrizione e nel prompt finale: i modelli dichiarati dal servizio,
+         il piu' potente segnato come consigliato; disabilitato finche' il servizio non risponde. -->
+    <ng-template #modelSelect let-id="id">
+        <select [id]="id" class="agent-generator__select" [disabled]="!modelsReady || isSubmitting"
+            [ngModel]="selectedModel" (ngModelChange)="selectModel($event)"
+            [attr.aria-label]="'CDSAgentGenerator.Model.Label' | translate">
+            <option *ngIf="!modelsReady" [ngValue]="null">{{ 'CDSAgentGenerator.Model.ServiceDefault' | translate }}</option>
+            <option *ngFor="let m of models" [ngValue]="m.id">{{ m.label }}{{ m.id === recommendedModel ? (' · ' + ('CDSAgentGenerator.Model.Recommended' | translate)) : '' }}</option>
+        </select>
+    </ng-template>
+
     <ng-template #errorBox>
         <div class="agent-generator__error" *ngIf="errorMessage">
             <i class="material-icons-outlined agent-generator__error-icon">error_outline</i>
@@ -44,6 +55,12 @@
                     {{ opt.labelKey | translate }}
                 </button>
             </div>
+        </div>
+
+        <!-- ── Modello AI: quelli dichiarati dal servizio, di default il piu' potente ── -->
+        <div class="agent-generator__model">
+            <label class="agent-generator__label" for="agent-generator-model">{{ 'CDSAgentGenerator.Model.Label' | translate }}</label>
+            <ng-container *ngTemplateOutlet="modelSelect; context: { id: 'agent-generator-model' }"></ng-container>
         </div>
 
         <!-- ── Prompt ───────────────────────────────────────────────── -->
@@ -210,6 +227,11 @@
             [(ngModel)]="agentName"
             [attr.maxlength]="MAX_AGENT_NAME"
             [disabled]="isSubmitting">
+
+        <div class="agent-generator__model is-compact">
+            <label class="agent-generator__label" for="agent-generator-model-brief">{{ 'CDSAgentGenerator.Model.Label' | translate }}</label>
+            <ng-container *ngTemplateOutlet="modelSelect; context: { id: 'agent-generator-model-brief' }"></ng-container>
+        </div>
 
         <label class="agent-generator__label" for="agent-generator-prompt">{{ 'CDSAgentGenerator.Brief.PromptLabel' | translate }}</label>
         <textarea id="agent-generator-prompt" class="agent-generator__textarea is-brief" rows="12"

@@ -7,7 +7,8 @@ import { TranslateService } from '@ngx-translate/core';
 
 import {
   AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, CreatedAgent, FeedbackOutcome, GenerateBrief, GenerateResponse,
-  InterviewSummary, PLAN_SECTION_KEYS, PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
+  InterviewSummary, PLAN_SECTION_KEYS, PLAN_STATUS, PlanMessage, PlanTurn, ServiceHealth, ServiceModel, UseCase,
+  describeGeneratorError, planTurnToMessage
 } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -35,10 +36,13 @@ const EXIT_LABEL_KEYS: { [name: string]: string } = {
  */
 const DRAFT_KEY = 'cds-agent-generator-draft';
 const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+/** Il modello scelto l'ultima volta, ricordato nel browser: vale finche' il servizio lo dichiara disponibile. */
+const MODEL_PREFERENCE_KEY = 'cds-agent-generator-model';
 
 interface Draft {
   projectId: string;
   botType: BOT_TYPE;
+  selectedModel: string | null;
   phase: PHASE;
   draft: string;
   messages: PlanMessage[];
@@ -113,6 +117,13 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     { value: BOT_TYPE.COPILOT, labelKey: 'CDSAgentGenerator.BotType.Copilot', icon: 'add_box' }
   ];
 
+  /** Modelli dichiarati dal servizio; il selezionato va in ogni chiamata; di default il piu' potente. */
+  models: ServiceModel[] = [];
+  recommendedModel: string | null = null;
+  selectedModel: string | null = null;
+  /** True quando il servizio ha risposto a /health: prima il selettore e' disabilitato. */
+  modelsReady: boolean = false;
+
   /** La descrizione iniziale scritta dall'utente. */
   draft: string = '';
 
@@ -180,6 +191,53 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
         this.categories = gallery.categories ?? [];
         this.applyFilter();
       });
+    this.agentGeneratorService.health()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(health => this.onHealth(health));
+  }
+
+  // -------------------------------------------------------
+  // Modello AI
+  // -------------------------------------------------------
+  /**
+   * I modelli disponibili dal servizio. Il selezionato resta se e' ancora disponibile; altrimenti vale
+   * la preferenza ricordata nel browser, e in mancanza il piu' potente dichiarato dal servizio.
+   */
+  private onHealth(health: ServiceHealth | null): void {
+    this.models = health?.models || [];
+    this.recommendedModel = health?.recommended || null;
+    this.modelsReady = !!health && this.models.length > 0;
+    if (!this.modelsReady) return;
+    const available = (id: string | null) => !!id && this.models.some(m => m.id === id);
+    if (!available(this.selectedModel)) {
+      const preferred = this.readModelPreference();
+      this.selectedModel = available(preferred) ? preferred : (available(this.recommendedModel) ? this.recommendedModel : this.models[0].id);
+    }
+    this.logger.log('[CDS-AGENT-GENERATOR] models: ', this.models.map(m => m.id), 'selected:', this.selectedModel);
+  }
+
+  selectModel(id: string | null): void {
+    if (!id || !this.models.some(m => m.id === id)) return;
+    this.selectedModel = id;
+    try {
+      localStorage.setItem(MODEL_PREFERENCE_KEY, id);
+    } catch (err) {
+      this.logger.log('[CDS-AGENT-GENERATOR] model preference not saved: ', err);
+    }
+    this.saveDraft(this.planning);
+  }
+
+  /** Etichetta di un modello, per l'anteprima e il prompt finale. */
+  modelLabel(id: string | null): string {
+    return this.models.find(m => m.id === id)?.label || id || '';
+  }
+
+  private readModelPreference(): string | null {
+    try {
+      return localStorage.getItem(MODEL_PREFERENCE_KEY);
+    } catch (err) {
+      return null;
+    }
   }
 
   ngOnDestroy(): void {
@@ -402,7 +460,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.canRetry = false;
     this.clearError();
     this.scrollChatToEnd();
-    this.agentGeneratorService.planTurn(this.messages, this.botType, this.uiLanguage)
+    this.agentGeneratorService.planTurn(this.messages, this.botType, this.uiLanguage, this.selectedModel)
       .pipe(
         takeUntil(this.unsubscribe$),
         finalize(() => this.planning = false)
@@ -469,7 +527,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.dialogRef.disableClose = true;
     this.startTimer();
 
-    this.agentGeneratorService.generate(this.currentBrief(), this.botType)
+    this.agentGeneratorService.generate(this.currentBrief(), this.botType, this.selectedModel)
       .pipe(
         takeUntil(this.unsubscribe$),
         finalize(() => {
@@ -687,6 +745,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     const draft: Draft = {
       projectId: this.agentGeneratorService.projectId,
       botType: this.botType,
+      selectedModel: this.selectedModel,
       phase,
       draft: this.draft,
       messages: this.messages,
@@ -717,6 +776,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     if (!saved || saved.projectId !== this.agentGeneratorService.projectId || Date.now() - (saved.savedAt || 0) > DRAFT_MAX_AGE_MS) return;
     this.logger.log('[CDS-AGENT-GENERATOR] draft restored: ', saved.phase, saved.messages?.length);
     this.botType = saved.botType || BOT_TYPE.CHAT;
+    this.selectedModel = saved.selectedModel || null;
     this.draft = saved.draft || '';
     this.messages = Array.isArray(saved.messages) ? saved.messages : [];
     this.chat = Array.isArray(saved.chat) ? saved.chat : [];
