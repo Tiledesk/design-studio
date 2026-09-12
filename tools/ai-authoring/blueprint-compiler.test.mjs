@@ -250,7 +250,7 @@ for (const file of FIXTURE_FILES) {
     const bp = load(file);
     const agent = compile(bp);
     const asks = bp.blocks.filter((b) => b.type === 'ask').length;
-    assert.equal(agent.intents.length, bp.blocks.length + asks + 2);
+    assert.equal(agent.intents.length, bp.blocks.length + asks + 2 + (bp.fallbackText ? 1 : 0));
     assert.deepEqual([agent.type, agent.subtype, agent.language, agent.webhook_enabled], ['tilebot', 'chatbot', bp.language, false]);
     assert.equal(agent.attributes.aiGeneration.blueprintVersion, bp.version);
 
@@ -259,11 +259,23 @@ for (const file of FIXTURE_FILES) {
     assert.deepEqual([starts[0].question, starts[0].attributes.readonly], ['\\start', true]);
     assert.deepEqual(starts[0].actions.map((a) => [a._tdActionType, a.intentName]), [['intent', refTo(agent, bp, bp.start)]]);
 
+    // Regola V3: defaultFallback sempre presente, vuoto, senza collegamenti in ingresso, collegato al messaggio di fallback.
     const fallbacks = agent.intents.filter((i) => i.intent_display_name === 'defaultFallback');
     assert.equal(fallbacks.length, 1);
     assert.equal(fallbacks[0].attributes.readonly, true);
-    assert.equal(fallbacks[0].attributes.nextBlockAction.intentName, bp.fallbackNext ? refTo(agent, bp, bp.fallbackNext) : '');
-    assert.equal(fallbacks[0].actions[0]?.attributes.commands[1].message.text, bp.fallbackText ?? undefined);
+    assert.deepEqual(fallbacks[0].actions, []);
+    const fallbackNextRef = bp.fallbackNext ? refTo(agent, bp, bp.fallbackNext) : '';
+    if (bp.fallbackText) {
+      const fallbackMessage = byRef(agent, fallbacks[0].attributes.nextBlockAction.intentName);
+      assert.equal(fallbackMessage.intent_display_name, 'Fallback');
+      assert.equal(fallbackMessage.actions[0].attributes.commands[1].message.text, bp.fallbackText);
+      assert.equal(fallbackMessage.attributes.nextBlockAction.intentName, fallbackNextRef);
+    } else {
+      assert.equal(fallbacks[0].attributes.nextBlockAction.intentName, fallbackNextRef);
+    }
+    for (const reserved of [...starts, ...fallbacks]) {
+      assert.ok(!references(agent).includes(`#${reserved.intent_id}`), `${reserved.intent_display_name}: nessun collegamento in ingresso`);
+    }
 
     const others = agent.intents.filter((i) => !['start', 'defaultFallback'].includes(i.intent_display_name));
     for (const intent of others) {
@@ -338,11 +350,24 @@ test('senza elenco dei dipartimenti il nome non si verifica', () => {
   assert.equal(compile(bp, { departments: undefined }).intents[1].actions[0].depName, 'Marketing');
 });
 
-test('fallback senza testo: nessuna action, solo il collegamento', () => {
+test('fallback senza testo: il defaultFallback vuoto si collega direttamente a fallbackNext', () => {
   const bp = tiny([{ id: 'a', name: 'A', type: 'close' }], { fallbackText: null, fallbackNext: 'a' });
-  const fallback = byName(compile(bp), 'defaultFallback');
+  const agent = compile(bp);
+  const fallback = byName(agent, 'defaultFallback');
   assert.deepEqual(fallback.actions, []);
-  assert.ok(fallback.attributes.nextBlockAction.intentName.startsWith('#'));
+  assert.equal(fallback.attributes.nextBlockAction.intentName, refTo(agent, bp, 'a'));
+  assert.equal(byName(agent, 'Fallback'), undefined);
+});
+
+test('un blocco chiamato Fallback dal Blueprint non entra in conflitto con il blocco del messaggio di fallback', () => {
+  const bp = tiny([{ id: 'f', name: 'Fallback', type: 'replyv2', text: 'Ciao' }], { fallbackText: 'Non ho capito.', fallbackNext: 'f' });
+  const agent = compile(bp);
+  const names = agent.intents.map((i) => i.intent_display_name);
+  assert.ok(names.includes('Fallback') && names.includes('Fallback 2'), names.join(', '));
+  const fallback = byName(agent, 'defaultFallback');
+  const message = byRef(agent, fallback.attributes.nextBlockAction.intentName);
+  assert.equal(message.actions[0].attributes.commands[1].message.text, 'Non ho capito.');
+  assert.equal(message.attributes.nextBlockAction.intentName, refTo(agent, bp, 'f'));
 });
 
 test('macro ask con reply v1, se lo spike lo richiede', () => {

@@ -30,6 +30,30 @@ const EXIT_LABEL_KEYS: { [name: string]: string } = {
 };
 
 /**
+ * Bozza della modale in sessionStorage: chiudere la modale o ricaricare la pagina (il DS lo fa cambiando
+ * agente) non perde l'intervista. Vive nella scheda del browser, per progetto, al massimo un giorno.
+ */
+const DRAFT_KEY = 'cds-agent-generator-draft';
+const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+interface Draft {
+  projectId: string;
+  botType: BOT_TYPE;
+  phase: PHASE;
+  draft: string;
+  messages: PlanMessage[];
+  chat: ChatEntry[];
+  turn: PlanTurn | null;
+  /** True se si stava aspettando un turno del planner: alla ripresa si offre «Riprova». */
+  awaitingTurn: boolean;
+  questionsAsked: number;
+  plannerFinalPrompt: string | null;
+  finalPrompt: string;
+  agentName: string;
+  savedAt: number;
+}
+
+/**
  * Fasi della modale: descrizione → intervista → prompt finale → generazione → anteprima → creazione.
  * Dall'anteprima si torna al prompt finale, dal prompt finale alle domande.
  */
@@ -146,6 +170,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.restoreDraft();
     this.agentGeneratorService.gallery()
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(gallery => {
@@ -156,6 +181,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.saveDraft(this.planning);
     this.stopTimer();
     this.unsubscribe$.next(null);
     this.unsubscribe$.complete();
@@ -257,6 +283,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.plannerFinalPrompt = null;
     this.phase = PHASE.INTERVIEW;
     this.requestTurn();
+    this.saveDraft(true);
   }
 
   // -------------------------------------------------------
@@ -346,12 +373,14 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.canRetry = false;
     this.clearError();
     this.phase = PHASE.COMPOSE;
+    this.clearDraft();
   }
 
   /** Dopo un "ready" si puo' tornare alle domande e poi di nuovo al prompt finale, senza perdere le modifiche. */
   openBrief(): void {
     this.clearError();
     this.phase = PHASE.BRIEF;
+    this.saveDraft();
   }
 
   private reply(content: string): void {
@@ -361,6 +390,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.selectedOptions = [];
     this.phase = PHASE.INTERVIEW;
     this.requestTurn();
+    this.saveDraft(true);
   }
 
   private requestTurn(): void {
@@ -382,6 +412,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
           this.logger.error('[CDS-AGENT-GENERATOR] plan error: ', err);
           this.showError(err);
           this.canRetry = true;
+          this.saveDraft(true);
         }
       });
   }
@@ -395,10 +426,12 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
       this.plannerFinalPrompt = turn.finalPrompt;
       this.agentName = (turn.agentName || '').slice(0, MAX_AGENT_NAME);
       this.phase = PHASE.BRIEF;
+      this.saveDraft();
       return;
     }
     this.questionsAsked++;
     this.scrollChatToEnd();
+    this.saveDraft();
   }
 
   private scrollChatToEnd(): void {
@@ -420,11 +453,13 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.clearError();
     this.phase = PHASE.INTERVIEW;
     this.scrollChatToEnd();
+    this.saveDraft();
   }
 
   generateAgent(): void {
     if (!this.canGenerate) return;
     this.clearError();
+    this.saveDraft();
     this.phase = PHASE.GENERATING;
     // Durante l'attesa un click sul backdrop non deve chiudere la modale.
     this.dialogRef.disableClose = true;
@@ -535,6 +570,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
    * una volta sola, quindi dopo la navigazione la pagina si ricarica.
    */
   private openCreatedAgent(botId: string): void {
+    this.clearDraft();
     this.dialogRef.close();
     this.router.navigate(['/project', this.agentGeneratorService.projectId, 'chatbot', botId, 'blocks'])
       .then(() => window.location.reload());
@@ -607,6 +643,81 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     if (!id) return '';
     const block = (blueprint.blocks || []).find(b => b.id === id);
     return block?.name || id;
+  }
+
+  // -------------------------------------------------------
+  // Bozza in sessionStorage
+  // -------------------------------------------------------
+  /**
+   * Salva lo stato della modale. Le fasi di generazione e anteprima si salvano come prompt finale:
+   * alla ripresa l'utente rigenera. Con `awaitingTurn` la ripresa offre «Riprova» invece di una domanda vecchia.
+   */
+  private saveDraft(awaitingTurn: boolean = false): void {
+    const phase = this.phase === PHASE.GENERATING || this.phase === PHASE.PREVIEW ? PHASE.BRIEF : this.phase;
+    if (phase === PHASE.COMPOSE && !this.draft.trim()) {
+      this.clearDraft();
+      return;
+    }
+    const draft: Draft = {
+      projectId: this.agentGeneratorService.projectId,
+      botType: this.botType,
+      phase,
+      draft: this.draft,
+      messages: this.messages,
+      chat: this.chat,
+      turn: this.turn,
+      awaitingTurn,
+      questionsAsked: this.questionsAsked,
+      plannerFinalPrompt: this.plannerFinalPrompt,
+      finalPrompt: this.finalPrompt,
+      agentName: this.agentName,
+      savedAt: Date.now()
+    };
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch (err) {
+      this.logger.log('[CDS-AGENT-GENERATOR] draft not saved: ', err);
+    }
+  }
+
+  private restoreDraft(): void {
+    let saved: Draft | null = null;
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      saved = raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      saved = null;
+    }
+    if (!saved || saved.projectId !== this.agentGeneratorService.projectId || Date.now() - (saved.savedAt || 0) > DRAFT_MAX_AGE_MS) return;
+    this.logger.log('[CDS-AGENT-GENERATOR] draft restored: ', saved.phase, saved.messages?.length);
+    this.botType = saved.botType || BOT_TYPE.CHAT;
+    this.draft = saved.draft || '';
+    this.messages = Array.isArray(saved.messages) ? saved.messages : [];
+    this.chat = Array.isArray(saved.chat) ? saved.chat : [];
+    this.turn = saved.turn || null;
+    this.questionsAsked = saved.questionsAsked || 0;
+    this.plannerFinalPrompt = saved.plannerFinalPrompt ?? null;
+    this.finalPrompt = saved.finalPrompt || '';
+    this.agentName = saved.agentName || '';
+    if (saved.phase === PHASE.BRIEF && this.finalPrompt.trim()) {
+      this.phase = PHASE.BRIEF;
+    } else if (saved.phase === PHASE.INTERVIEW && this.messages.length) {
+      this.phase = PHASE.INTERVIEW;
+      if (saved.awaitingTurn || !this.turn) {
+        // La risposta del planner non era arrivata: la cronologia resta, si puo' solo riprovare o ricominciare.
+        this.turn = null;
+        this.canRetry = true;
+      }
+      this.scrollChatToEnd();
+    }
+  }
+
+  private clearDraft(): void {
+    try {
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch (err) {
+      this.logger.log('[CDS-AGENT-GENERATOR] draft not cleared: ', err);
+    }
   }
 
   // -------------------------------------------------------

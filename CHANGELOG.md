@@ -9,6 +9,13 @@
 
 
 
+# this branch 12/09/2026
+
+- **changed**: negli agenti creati con l'AI il blocco defaultFallback è sempre presente, vuoto e senza collegamenti in ingresso: il messaggio di fallback sta in un blocco «Fallback» a sé, che poi prosegue dove indicato
+- **added**: la modale «Crea agente con l'AI» conserva l'intervista nella scheda del browser: chiuderla o cambiare agente non la perde, e alla riapertura si riprende dalla domanda o dal prompt finale; «Ricomincia» e la creazione dell'agente la cancellano
+- **changed**: all'apertura della modale il DS sveglia il servizio di generazione, che sul piano gratuito si addormenta dopo una pausa
+- **added**: messaggio dedicato quando il progetto non è abilitato al generatore di agenti
+
 # this branch 11/09/2026
 
 - **added**: il generatore di agenti conosce 15 action in più: risposta casuale, attesa, cancellazione di una variabile, azzeramento della cronologia, rimessa in coda, tag, log, aggiornamento del contatto, testo scritto dall'AI, ciclo su una lista, passaggio a un altro agente, aggiunta a una knowledge base, email, tabelle dati e smistamento con l'AI. Le action che richiedono un piano o dati assenti dal progetto non vengono proposte; l'anteprima mostra le nuove uscite

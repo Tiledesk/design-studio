@@ -195,6 +195,8 @@ const RESERVED_NAMES = ['start', 'defaultfallback', 'webhook', 'close'];
 const SPECIAL_LETTERS: { [letter: string]: string } = {
   'ß': 'ss', 'æ': 'ae', 'Æ': 'AE', 'ø': 'o', 'Ø': 'O', 'œ': 'oe', 'Œ': 'OE', 'đ': 'd', 'Đ': 'D', 'ł': 'l', 'Ł': 'L', 'ı': 'i'
 };
+/** Nome del blocco con il messaggio di fallback, a cui si collega il `defaultFallback` vuoto. */
+const FALLBACK_NAME = 'Fallback';
 /** Suffisso del blocco di capture della macro `ask`, nella lingua dell'agente. */
 const REPLY_SUFFIX: { [language: string]: string } = {
   it: 'risposta', en: 'reply', es: 'respuesta', fr: 'reponse', de: 'Antwort', pt: 'resposta'
@@ -489,6 +491,8 @@ function layout(blueprint: CompilableBlueprint, byId: Map<string, CompilableBloc
 export function verifyAgent(agent: CompiledAgent): string[] {
   const problems: string[] = [];
   const intentIds = new Set(agent.intents.map(intent => intent.intent_id));
+  /** Gli intent riservati sono solo-uscita: nessun riferimento deve puntare a loro (R4). */
+  const reservedIds = new Set(agent.intents.filter(intent => ['start', 'defaultFallback'].includes(intent.intent_display_name)).map(intent => intent.intent_id));
   const names = new Set<string>();
   let starts = 0;
   let fallbacks = 0;
@@ -505,7 +509,13 @@ export function verifyAgent(agent: CompiledAgent): string[] {
     if (names.has(name.toLowerCase())) problems.push(`${at}: nome duplicato`);
     names.add(name.toLowerCase());
     const count = Array.isArray(intent.actions) ? intent.actions.length : 0;
-    if (name === 'defaultFallback' ? count > 1 : count !== 1) problems.push(`${at}: ${count} action, ne serve una`);
+    // Il defaultFallback resta vuoto: il messaggio di fallback sta nel blocco a cui si collega.
+    if (name === 'defaultFallback') {
+      if (count !== 0) problems.push(`${at}: ${count} action, deve essere vuoto`);
+      if (!intent.attributes?.nextBlockAction?.intentName) problems.push(`${at}: non è collegato a nessun blocco`);
+    } else if (count !== 1) {
+      problems.push(`${at}: ${count} action, ne serve una`);
+    }
   });
   if (starts !== 1) problems.push(`${starts} blocchi start, ne serve uno`);
   if (fallbacks !== 1) problems.push(`${fallbacks} blocchi defaultFallback, ne serve uno`);
@@ -521,6 +531,7 @@ export function verifyAgent(agent: CompiledAgent): string[] {
       if (key.startsWith('__') || key === 'createdAt') problems.push(`${path}.${key}: campo non ammesso`);
       if (REFERENCE_FIELDS.includes(key) && typeof value === 'string') {
         if (value && !(value.startsWith('#') && intentIds.has(value.slice(1)))) problems.push(`${path}.${key}: riferimento pendente "${value}"`);
+        else if (value && reservedIds.has(value.slice(1))) problems.push(`${path}.${key}: riferimento a un blocco riservato "${value}"`);
       } else {
         walk(value, `${path}.${key}`);
       }
@@ -811,10 +822,20 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
     }
   });
 
+  // Regola V3 sul fallback: `defaultFallback` c'è sempre, resta vuoto e nessuno vi punta; si collega a un blocco
+  // «Fallback» che porta il messaggio (poi `fallbackNext`), oppure direttamente a `fallbackNext` se il messaggio manca.
+  let fallbackTarget = ref(blueprint.fallbackNext);
+  if (blueprint.fallbackText) {
+    const fallbackId = ids.uuid();
+    intents.push(makeIntent({
+      id: fallbackId, name: register(FALLBACK_NAME), position: { x: X0, y: Y0 + 2 * ROW },
+      action: message('replyv2', blueprint.fallbackText, []),
+      next: ref(blueprint.fallbackNext)
+    }));
+    fallbackTarget = '#' + fallbackId;
+  }
   intents.push(makeIntent({
-    id: ids.uuid(), name: 'defaultFallback', readonly: true, position: { x: X0, y: Y0 + ROW },
-    action: blueprint.fallbackText ? message('replyv2', blueprint.fallbackText, []) : null,
-    next: ref(blueprint.fallbackNext)
+    id: ids.uuid(), name: 'defaultFallback', readonly: true, position: { x: X0, y: Y0 + ROW }, action: null, next: fallbackTarget
   }));
 
   const agent: CompiledAgent = {

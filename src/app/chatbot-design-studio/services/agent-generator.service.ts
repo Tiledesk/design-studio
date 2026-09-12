@@ -266,6 +266,7 @@ export function describeGeneratorError(err: any): GeneratorFailure {
   let key = 'ErrorGeneric';
   if (status === 0) key = 'ErrorUnreachable';
   else if (status === 401) key = 'ErrorUnauthorized';
+  else if (status === 403) key = 'ErrorForbiddenProject';
   else if (status === 400 && body?.error === 'model_not_allowed') key = 'ErrorModelNotAllowed';
   else if (status === 400) key = 'ErrorBadRequest';
   else if (status === 422) key = 'ErrorInvalidBlueprint';
@@ -397,6 +398,19 @@ export class AgentGeneratorService {
     this.logger.log('[AGENT-GENERATOR] open');
     this.factsCache$ = null;
     this._isOpen$.next(true);
+    this.warmUp();
+  }
+
+  /**
+   * Sveglia il servizio mentre l'utente scrive la descrizione: sul piano Free di Render il servizio si
+   * addormenta e la prima chiamata puo' aspettare fino a un minuto. GET /health non richiede la chiave.
+   */
+  private warmUp(): void {
+    if (!this.generatorUrl) return;
+    this.externalHttp.get(this.generatorUrl + '/health').pipe(take(1)).subscribe({
+      next: () => this.logger.log('[AGENT-GENERATOR] service awake'),
+      error: (err: any) => this.logger.log('[AGENT-GENERATOR] warm-up failed: ', err?.status)
+    });
   }
 
   close(): void {

@@ -2632,6 +2632,7 @@
         "ErrorNotConfigured": "The agent generator is not configured (aiAgentGeneratorUrl and aiAgentGeneratorKey).",
         "ErrorUnreachable": "The agent generator can't be reached. If it was asleep, try again in a minute.",
         "ErrorUnauthorized": "The agent generator rejected the key (aiAgentGeneratorKey).",
+        "ErrorForbiddenProject": "This project is not enabled for the agent generator.",
         "ErrorBadRequest": "The agent generator rejected the request.",
         "ErrorModelNotAllowed": "The requested AI model is not available.",
         "ErrorInvalidBlueprint": "The AI couldn't produce a valid agent. Try describing it in more detail.",
