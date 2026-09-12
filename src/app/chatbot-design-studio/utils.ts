@@ -640,6 +640,22 @@ export function checkInternalIntent(intent: Intent): boolean {
 }
 
 
+/** isDefaultFallbackWithoutActions
+ * True SOLO per un blocco defaultFallback che non contiene alcuna action.
+ * I chatbot nuovi nascono con defaultFallback vuoto (actions: []) e collegano
+ * la reply a un blocco separato tramite attributes.nextBlockAction: in quello
+ * stato il blocco e' chiuso e non deve accettare nuove action, in nessun modo.
+ * Un defaultFallback legacy (actions.length > 0) NON e' bloccato.
+ * Regola riportata dal branch features-2026/ds-generic-bug-fix-39 (278c658b).
+ */
+export function isDefaultFallbackWithoutActions(intent: any): boolean {
+    if (!intent) { return false; }
+    const name = intent.intent_display_name;
+    if (typeof name !== 'string' || name.trim() !== TYPE_INTENT_NAME.DEFAULT_FALLBACK) { return false; }
+    return !(intent.actions?.length > 0);
+}
+
+
 export function findFreeId (array, key) {
     const sortedArray = array
       .map((item) => +item[key]) // tranform string to number

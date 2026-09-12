@@ -3,7 +3,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL, isDefaultFallbackWithoutActions } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
@@ -216,6 +216,11 @@ export class IntentService {
 
   public addActionToIntentSelected(action){
     if(this.intentSelected){
+      // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta, da nessuna via
+      if (isDefaultFallbackWithoutActions(this.intentSelected)) {
+        this.logger.log('[INTENT SERVICE] addActionToIntentSelected: impedito - defaultFallback vuota (bloccata)');
+        return;
+      }
       this.intentSelected.actions.push(action);
       this.updateIntent(this.intentSelected);
     }
@@ -690,6 +695,11 @@ export class IntentService {
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta, da nessuna via
+    if (isDefaultFallbackWithoutActions(currentIntent)) {
+      this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent: impedito - defaultFallback vuota (bloccata)');
+      return null;
+    }
     currentIntent.actions.splice(currentActionIndex, 0, newAction);
     this.behaviorIntent.next(currentIntent);
     // this.connectorService.updateConnector(currentIntent.intent_id);
@@ -718,6 +728,11 @@ export class IntentService {
     let previousIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === that.previousIntentId;
     });
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere spostata al suo interno
+    if (isDefaultFallbackWithoutActions(currentIntent)) {
+      this.logger.log('[INTENT-SERVICE] moveActionBetweenDifferentIntents: impedito - defaultFallback vuota (bloccata)');
+      return;
+    }
     // this.logger.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);

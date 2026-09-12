@@ -6,7 +6,7 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 import {
-  AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, CreatedAgent, GenerateBrief, GenerateResponse,
+  AgentGeneratorService, BOT_TYPE, Blueprint, BlueprintBlock, CreatedAgent, FeedbackOutcome, GenerateBrief, GenerateResponse,
   InterviewSummary, PLAN_SECTION_KEYS, PLAN_STATUS, PlanMessage, PlanTurn, UseCase, describeGeneratorError, planTurnToMessage
 } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -155,6 +155,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   generationSeconds: number = 0;
   showJson: boolean = false;
   copied: boolean = false;
+  /** Voto dato al flusso nell'anteprima: 5 = pollice su, 1 = pollice giu'; null se non ancora votato. */
+  rating: number | null = null;
   /** Creazione dell'agente in corso, dall'anteprima. */
   creating: boolean = false;
 
@@ -181,6 +183,8 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Chiudere la modale dall'anteprima senza creare l'agente e' un esito: serve alla libreria degli esempi.
+    if (this.phase === PHASE.PREVIEW && this.result) this.agentGeneratorService.feedback(this.result, { outcome: 'discarded' });
     this.saveDraft(this.planning);
     this.stopTimer();
     this.unsubscribe$.next(null);
@@ -514,6 +518,18 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   // -------------------------------------------------------
   backToBrief(): void {
     if (this.creating) return;
+    this.leavePreview('discarded');
+  }
+
+  regenerate(): void {
+    if (this.creating) return;
+    this.leavePreview('regenerated');
+    this.generateAgent();
+  }
+
+  /** Lascia l'anteprima senza creare l'agente: manda l'esito alla libreria degli esempi e torna al prompt finale. */
+  private leavePreview(outcome: FeedbackOutcome): void {
+    if (this.result) this.agentGeneratorService.feedback(this.result, { outcome });
     this.clearError();
     this.phase = PHASE.BRIEF;
     this.result = null;
@@ -521,10 +537,16 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.showJson = false;
   }
 
-  regenerate(): void {
-    if (this.creating) return;
-    this.backToBrief();
-    this.generateAgent();
+  /** Pollice su (5) o giu' (1) sul flusso generato: si vota una volta sola per anteprima. */
+  rate(value: number): void {
+    if (!this.result || this.rating || this.creating) return;
+    this.rating = value;
+    this.agentGeneratorService.feedback(this.result, { outcome: 'rated', rating: value });
+  }
+
+  /** I titoli degli agenti validati usati come esempio, per l'anteprima. */
+  get inspiredBy(): string {
+    return (this.result?.examples || []).map(example => example.title).join(' · ');
   }
 
   toggleJson(): void {
@@ -556,6 +578,9 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (created: CreatedAgent) => {
           this.logger.log('[CDS-AGENT-GENERATOR] agent created: ', created);
+          this.agentGeneratorService.feedback(this.result, { outcome: 'created' });
+          // L'anteprima e' diventata un agente: chiudendo la modale non e' piu' un esito da registrare.
+          this.result = null;
           this.openCreatedAgent(created.botId);
         },
         error: (err: any) => {
@@ -582,6 +607,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.flow = this.buildFlow(res.blueprint);
     this.fallbackTarget = this.blockName(res.blueprint, res.blueprint.fallbackNext);
     this.showJson = false;
+    this.rating = null;
     this.phase = PHASE.PREVIEW;
   }
 

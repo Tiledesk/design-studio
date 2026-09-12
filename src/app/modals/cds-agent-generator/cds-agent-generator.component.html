@@ -285,6 +285,27 @@
             <ng-container *ngIf="fallbackTarget"> → <b>{{ fallbackTarget }}</b></ng-container>
         </div>
 
+        <div class="agent-generator__inspired" *ngIf="inspiredBy">
+            <i class="material-icons-outlined">verified</i>
+            <span>{{ 'CDSAgentGenerator.Preview.InspiredBy' | translate }}: {{ inspiredBy }}</span>
+        </div>
+
+        <div class="agent-generator__rating" role="group" [attr.aria-label]="'CDSAgentGenerator.Preview.RateLabel' | translate">
+            <span class="agent-generator__rating-label">
+                {{ (rating ? 'CDSAgentGenerator.Preview.RateThanks' : 'CDSAgentGenerator.Preview.RateLabel') | translate }}
+            </span>
+            <button type="button" class="agent-generator__rating-btn" [class.is-active]="rating === 5" [disabled]="creating || !!rating"
+                [attr.title]="'CDSAgentGenerator.Preview.RateUp' | translate" [attr.aria-label]="'CDSAgentGenerator.Preview.RateUp' | translate"
+                (click)="rate(5)">
+                <i class="material-icons-outlined">thumb_up</i>
+            </button>
+            <button type="button" class="agent-generator__rating-btn" [class.is-active]="rating === 1" [disabled]="creating || !!rating"
+                [attr.title]="'CDSAgentGenerator.Preview.RateDown' | translate" [attr.aria-label]="'CDSAgentGenerator.Preview.RateDown' | translate"
+                (click)="rate(1)">
+                <i class="material-icons-outlined">thumb_down</i>
+            </button>
+        </div>
+
         <pre class="agent-generator__json" *ngIf="showJson">{{ result.blueprint | json }}</pre>
 
         <ng-container *ngTemplateOutlet="errorBox"></ng-container>

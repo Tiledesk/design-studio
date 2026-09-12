@@ -75,11 +75,12 @@ export class CdsSidebarComponent implements OnInit {
   }
 
   /**
-   * "Crea agente con l'AI" compare solo sugli agenti V3, e solo se il servizio di generazione e'
-   * configurato: gli agenti legacy non vi accedono, e senza configurazione la funzione e' spenta.
+   * "Crea agente con l'AI" e' una funzione del Design Studio, non del solo V3: compare su ogni agente,
+   * legacy compreso, perche' crea sempre un agente nuovo (V3) e non tocca quello aperto. Compare solo se
+   * il servizio di generazione e' configurato: senza configurazione la funzione e' spenta.
    */
   get showAgentGenerator(): boolean {
-    return this.dashboardService.isV3 && this.agentGeneratorService.isConfigured;
+    return this.agentGeneratorService.isConfigured;
   }
 
   ngOnInit(): void {

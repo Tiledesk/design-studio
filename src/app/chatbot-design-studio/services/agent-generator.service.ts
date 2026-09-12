@@ -189,6 +189,13 @@ export interface Blueprint {
   blocks: BlueprintBlock[];
 }
 
+/** Un agente validato della libreria del servizio, usato come esempio per la generazione. */
+export interface GenerationExample {
+  id: string;
+  title: string;
+  score: number;
+}
+
 /** Risposta di POST /generate del generatore. */
 export interface GenerateResponse {
   blueprint: Blueprint;
@@ -197,7 +204,21 @@ export interface GenerateResponse {
   attempts: number;
   model: string;
   promptVersion: string;
+  examplesMode?: string;
+  examples?: GenerationExample[];
   usage?: { inputTokens: number; outputTokens: number; cachedTokens: number };
+}
+
+/** L'esito di una generazione, per la libreria del servizio (endpoint-contract.md §6.6). */
+export type FeedbackOutcome = 'created' | 'regenerated' | 'discarded' | 'published' | 'tested' | 'rated';
+
+export interface GenerationFeedback {
+  outcome: FeedbackOutcome;
+  /** Da 1 a 5: pollice su = 5, pollice giu' = 1. */
+  rating?: number;
+  examples?: string[];
+  promptVersion?: string;
+  model?: string;
 }
 
 /** Agente creato nel progetto. */
@@ -499,9 +520,32 @@ export class AgentGeneratorService {
       map(res => ({
         ...res,
         notes: Array.isArray(res?.notes) ? res.notes : [],
-        warnings: Array.isArray(res?.warnings) ? res.warnings : []
+        warnings: Array.isArray(res?.warnings) ? res.warnings : [],
+        examples: Array.isArray(res?.examples) ? res.examples : []
       }))
     );
+  }
+
+  /**
+   * L'esito di una generazione, per il miglioramento della libreria degli esempi del servizio:
+   * pochi byte, mai contenuti della conversazione. Senza attesa: un errore non blocca niente.
+   *
+   * POST {aiAgentGeneratorUrl}/feedback
+   */
+  feedback(result: GenerateResponse | null, feedback: GenerationFeedback): void {
+    if (!this.isConfigured) return;
+    const body = {
+      projectId: this.project_id,
+      outcome: feedback.outcome,
+      ...(feedback.rating ? { rating: feedback.rating } : {}),
+      examples: (result?.examples || []).map(example => example.id),
+      promptVersion: result?.promptVersion || feedback.promptVersion,
+      model: result?.model || feedback.model
+    };
+    this.logger.log('[AGENT-GENERATOR] feedback: ', body);
+    this.post<any>('/feedback', body).pipe(take(1)).subscribe({
+      error: (err: any) => this.logger.log('[AGENT-GENERATOR] feedback not sent: ', err?.status)
+    });
   }
 
   /**

@@ -3,8 +3,9 @@
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
-    [class.isStart]="isStart" 
+    [class.isStart]="isStart"
     [class.tds-v3-intent]="isV3"
+    [class.cds-fallback-locked]="isDefaultFallbackLocked"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
@@ -71,16 +72,18 @@
     </div>
 
     <div *ngIf="!isStart" class="actions-list-wpr"
+        [class.cds-fallback-locked]="isDefaultFallbackLocked"
         cdkDropList
         [cdkDropListData]="listOfActions"
-        [cdkDropListDisabled]="isV3"
+        [cdkDropListDisabled]="isV3 || isDefaultFallbackLocked"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
+        <!-- defaultFallback vuota: bloccata, niente segnaposto ne' pulsante "Add action"                                                -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0" 
+        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked"
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isV3">
             <!-- add-action-placeholder  -->

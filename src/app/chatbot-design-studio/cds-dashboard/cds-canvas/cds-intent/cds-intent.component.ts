@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, ACTIONS_WITH_OWN_OUTPUTS } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -71,6 +71,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
+
+  /** isDefaultFallbackLocked
+   * true SOLO se il blocco e' la defaultFallback e non contiene alcuna action
+   * (perche' nasce vuota nei chatbot nuovi, o perche' l'unica action e' stata
+   * cancellata/spostata). In questo stato il blocco e' chiuso: niente drop,
+   * niente pulsante "Add action", niente placeholder di blocco vuoto.
+   * Una defaultFallback legacy (con action al suo interno) NON e' bloccata.
+   * E' un getter e non un campo: lo spostamento di una action verso un altro
+   * blocco muta l'array in place senza emettere behaviorIntent, quindi un
+   * valore memorizzato resterebbe stale. */
+  public get isDefaultFallbackLocked(): boolean {
+    return this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
+  }
 
   startAction: any;
   isDragging: boolean = false;
@@ -954,6 +967,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Predicate function that only allows type='intent' to be dropped into a list. */
   canEnterDropList(action: any) {
     return (item: CdkDrag<any>) => {
+      // defaultFallback vuota: blocco chiuso, nessun drop consentito al suo interno
+      if (this.isDefaultFallbackLocked) {
+        return false;
+      }
       // In V3 il blocco accetta una sola action: se ne ha già una, nega il drop
       if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
         return false;
@@ -975,7 +992,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
-    
+
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta
+    if (this.isDefaultFallbackLocked) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - defaultFallback vuota (bloccata)');
+      return;
+    }
+
     // In V3 il blocco accetta una sola action: se ne ha già una, il drop non passa
     if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
       this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot V3 e c\'è già un\'action nell\'intent');
@@ -1072,6 +1095,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   openActionMenu(intent: any, calleBy: string) {
     this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent)
     this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy)
+    // defaultFallback vuota, o nessun pulsante "Add action" renderizzato: niente da aprire
+    if (this.isDefaultFallbackLocked || !this.openActionMenuBtnRef) {
+      return;
+    }
     const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect()
     let xOffSet = openActionMenuElm.width + 10 // offset = element width + padding 
     if (calleBy === 'add-action-placeholder') {

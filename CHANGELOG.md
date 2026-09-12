@@ -11,6 +11,9 @@
 
 # this branch 12/09/2026
 
+- **added**: il generatore di agenti usa come riferimento fino a tre agenti verificati simili alla richiesta, e l'anteprima lo dice («Ispirato ad agenti verificati»); nell'anteprima si può votare il flusso con un pollice, e il DS comunica al servizio se l'agente è stato creato, rigenerato o scartato, senza mai inviare la conversazione
+- **changed**: il blocco defaultFallback, quando è vuoto, non accetta più action: non se ne possono trascinare dentro, il pulsante «Add action» e il segnaposto non compaiono, e nemmeno il menu delle action o lo spostamento da un altro blocco lo riempiono. I chatbot che hanno ancora una risposta dentro il defaultFallback restano modificabili (regola riportata dal branch ds-generic-bug-fix-39)
+- **changed**: il pulsante «Crea agente con l'AI» compare su tutti gli agenti, anche quelli precedenti al V3: crea sempre un agente nuovo e non modifica quello aperto. Resta nascosto solo se il servizio di generazione non è configurato
 - **changed**: negli agenti creati con l'AI il blocco defaultFallback è sempre presente, vuoto e senza collegamenti in ingresso: il messaggio di fallback sta in un blocco «Fallback» a sé, che poi prosegue dove indicato
 - **added**: la modale «Crea agente con l'AI» conserva l'intervista nella scheda del browser: chiuderla o cambiare agente non la perde, e alla riapertura si riprende dalla domanda o dal prompt finale; «Ricomincia» e la creazione dell'agente la cancellano
 - **changed**: all'apertura della modale il DS sveglia il servizio di generazione, che sul piano gratuito si addormenta dopo una pausa
