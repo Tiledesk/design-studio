@@ -26,14 +26,17 @@
              and rebuild the canvas without taking the iframe -- and the
              conversation inside it -- with it. Still before the outlet in this
              flex row, so it opens as a column rather than an overlay.
-             Gated to the blocks section (same condition cds-header uses for
-             its own toggle button) so it still disappears when the user
-             leaves blocks entirely -- a flow switch never does that, so this
-             cannot flicker the iframe out from under an active conversation. -->
-        <cds-panel-agent-chat *ngIf="isBlockSectionActive"
-            [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT"
-            [class.isHidden]="!IS_OPEN_PANEL_AGENT_CHAT"
-            [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT">
+             Hidden outside the blocks section, never removed. It used to be
+             `*ngIf="isBlockSectionActive"`, which destroyed the panel -- and
+             the iframe, and the conversation in it -- the moment the user
+             opened Settings or Knowledge base, and rebuilt an empty one on
+             the way back. Nothing on screen said why. `isHidden` is a width
+             of 0 (see the panel's own SCSS), so the frame stays loaded and
+             the chat is still there when the user returns. -->
+        <cds-panel-agent-chat
+            [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive"
+            [class.isHidden]="!(IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive)"
+            [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive">
         </cds-panel-agent-chat>
 
         <!-- The outlet ALONE. cds-panel-agent-chat above is deliberately its
