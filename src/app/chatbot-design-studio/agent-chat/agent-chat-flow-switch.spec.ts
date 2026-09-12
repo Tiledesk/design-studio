@@ -39,11 +39,16 @@ class FakePanelComponent implements OnDestroy {
 }
 
 /** The shape of cds-dashboard.component.html that matters here: the panel is
- *  the outlet's SIBLING, and only the outlet sits inside the toggled region. */
+ *  the outlet's SIBLING, only the outlet sits inside the toggled region, and
+ *  the section gate is a CLASS on the panel rather than an *ngIf around it.
+ *
+ *  This is a replica, so it can drift: if the real template goes back to
+ *  gating the panel with *ngIf, these tests keep passing and the iframe is
+ *  torn down in the app anyway. Keep the two in step by hand. */
 @Component({
   selector: 'flow-switch-host',
   template: `
-    <flow-switch-panel *ngIf="isBlockSectionActive"></flow-switch-panel>
+    <flow-switch-panel [class.isHidden]="!isBlockSectionActive"></flow-switch-panel>
     <ng-container *ngIf="flowVisible">
       <router-outlet></router-outlet>
     </ng-container>`
@@ -123,6 +128,27 @@ describe('flow switch: the canvas is destroyed and rebuilt, the chat panel is no
     expect(FakePanelComponent.destroyed).toBe(0);
     // Same DOM node, so the iframe inside it was never re-created either.
     expect(fixture.nativeElement.querySelector('flow-switch-panel')).toBe(panel);
+  }));
+
+  // Leaving the blocks section and coming back must not tear the panel down.
+  // The conversation lives in an iframe inside it, and a destroyed iframe is
+  // a lost conversation with nothing on screen to say so -- the panel simply
+  // comes back empty. Hiding it is a width, not an *ngIf.
+  it('keeps the chat panel mounted across a section change and back', fakeAsync(() => {
+    const fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+    const before = fixture.nativeElement.querySelector('flow-switch-panel');
+    expect(before).withContext('panel present in the blocks section').toBeTruthy();
+
+    fixture.componentInstance.isBlockSectionActive = false;
+    fixture.detectChanges();
+    expect(FakePanelComponent.destroyed)
+      .withContext('leaving blocks must not destroy the panel').toBe(0);
+
+    fixture.componentInstance.isBlockSectionActive = true;
+    fixture.detectChanges();
+    // The same node, so the iframe inside it was never re-created.
+    expect(fixture.nativeElement.querySelector('flow-switch-panel')).toBe(before);
   }));
 
   // A flow switch does raise router events -- openFlow() navigates the
