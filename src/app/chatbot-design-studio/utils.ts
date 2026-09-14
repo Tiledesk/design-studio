@@ -10,9 +10,10 @@ export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
  * ISO string format, compared lexicographically against `createdAt` (also ISO).
  * Resolved once per chatbot in DashboardService.resolveDsVersion().
  *
- * Since the server labels every chatbot it creates (see DS_VERSION_V3), this is
- * the fallback for the ones created before that, and its reach only shrinks over
- * time. It still must stay in the FUTURE until release: an unlabelled chatbot
+ * Since the Design Studio declares its own version on every agent it creates
+ * (see DS_VERSION_V3), this is the fallback for the ones built before that, and
+ * its reach only shrinks over time. It still must stay in the FUTURE until
+ * release: an unlabelled chatbot
  * built with the legacy editor that falls after the cutoff would lose inline
  * action editing, reordering and "+ Add action". Erring late is safe (the agent
  * stays on the proven editor), erring early is not. Align this with the actual
