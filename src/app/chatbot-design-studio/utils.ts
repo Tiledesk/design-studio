@@ -5,10 +5,17 @@ import { v4 as uuidv4 } from 'uuid';
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
 /**
- * Cutoff date used to determine whether a chatbot is considered "new".
+ * Cutoff date that discriminates the Design Studio version of a chatbot:
+ * created on or after this date -> V3, before -> legacy.
  * ISO string format, compared lexicographically against `createdAt` (also ISO).
+ * Resolved once per chatbot in DashboardService.resolveDsVersion().
+ *
+ * Must stay in the FUTURE until release: a chatbot built with the legacy editor
+ * that falls after the cutoff would lose inline action editing, reordering and
+ * "+ Add action". Erring late is safe (the agent stays on the proven editor),
+ * erring early is not. Align this with the actual release date.
  */
-export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+export const DATE_NEW_CHATBOT = '2026-09-07T00:00:00.000Z';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
@@ -631,6 +638,22 @@ export function deleteItemInArrayForKey(key, array, item) {
 
 export function checkInternalIntent(intent: Intent): boolean {
     return (Object.values(TYPE_INTENT_NAME)as string[]).includes(intent.intent_display_name);
+}
+
+
+/** isDefaultFallbackWithoutActions
+ * True SOLO per un blocco defaultFallback che non contiene alcuna action.
+ * I chatbot nuovi nascono con defaultFallback vuoto (actions: []) e collegano
+ * la reply a un blocco separato tramite attributes.nextBlockAction: in quello
+ * stato il blocco e' chiuso e non deve accettare nuove action, in nessun modo.
+ * Un defaultFallback legacy (actions.length > 0) NON e' bloccato.
+ * Regola riportata dal branch features-2026/ds-generic-bug-fix-39 (278c658b).
+ */
+export function isDefaultFallbackWithoutActions(intent: any): boolean {
+    if (!intent) { return false; }
+    const name = intent.intent_display_name;
+    if (typeof name !== 'string' || name.trim() !== TYPE_INTENT_NAME.DEFAULT_FALLBACK) { return false; }
+    return !(intent.actions?.length > 0);
 }
 
 

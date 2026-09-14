@@ -79,3 +79,21 @@
 .ql-bg-003700 { background-color: #003700; }
 .ql-bg-002966 { background-color: #002966; }
 .ql-bg-3d1466 { background-color: #3d1466; }
+
+/* -------------------------------------------------------------------------- */
+/* Modale "Crea agente con l'AI"                                              */
+/* Il padding lo mette il componente; qui solo la forma della card e il        */
+/* backdrop, che e' cio' che blocca l'interfaccia sottostante.                 */
+/* -------------------------------------------------------------------------- */
+.cds-agent-generator-dialog {
+    .mat-dialog-container {
+        padding: 0;
+        border-radius: 14px;
+        overflow-y: auto;
+        box-shadow: 0 18px 48px rgba(16, 24, 40, .18);
+    }
+}
+
+.cds-agent-generator-backdrop {
+    background: rgba(16, 24, 40, .45);
+}

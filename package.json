@@ -14,7 +14,8 @@
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:agent-chat": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-agent-chat.ts --ts-config=tsconfig.spec.agent-chat.json"
+    "test:agent-chat": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-agent-chat.ts --ts-config=tsconfig.spec.agent-chat.json",
+    "test:ai-authoring": "node --import ./tools/ai-authoring/ts-resolve-register.mjs --test tools/ai-authoring/blueprint-compiler.test.mjs tools/ai-authoring/blueprint-decompiler.test.mjs tools/ai-authoring/blueprint-operations.test.mjs"
   },
   "private": false,
   "dependencies": {

@@ -202,6 +202,14 @@
     justify-content: flex-end;
   }
 
+  /* defaultFallback vuota e quindi bloccata: il corpo del blocco non viene
+     renderizzato, quindi l'header non ha bisogno di spaziatura in basso. */
+  &.cds-fallback-locked {
+    .pic-header {
+      padding: 0;
+    }
+  }
+
   .agents-available {
     margin-top: -70px;
     margin-left: -10px;
@@ -341,6 +349,14 @@
   // border: 1px solid #ccc;
   //padding: 10px;
   padding-top: 0px;
+}
+
+/* defaultFallback vuota e quindi bloccata: il contenitore delle action non
+   viene mostrato affatto (non c'e' nulla da renderizzare e nulla puo' essere
+   aggiunto). Come effetto collaterale il drop target ha client rect nullo,
+   quindi il CDK non lo considera piu' ricevibile. */
+.actions-list-wpr.cds-fallback-locked {
+  display: none;
 }
 
 .box-action {
@@ -828,8 +844,8 @@ cds-panel-intent-header.isStart ::ng-deep{
   }
 }
 
-/** SLIM INTENT **/
-.tds-slim-intent {
+/** V3 INTENT - blocco a una sola action, senza controlli inline **/
+.tds-v3-intent {
   padding: 2px;
   .pic-header {
     padding: 0px;
@@ -837,9 +853,33 @@ cds-panel-intent-header.isStart ::ng-deep{
   .pic-title-text {
     padding: 4px 8px 10px;
   }
+  /* In V3 il footer resta nel DOM ma non contiene nulla di cliccabile:
+     niente altezza residua, niente margine negativo, niente cursore da bottone. */
   .footer-intent{
     min-height: 0px;
     margin: 0;
+    cursor: default;
+  }
+  /* Il blocco ospita una sola action: il gap pensato per la colonna non serve. */
+  .actions-list-wpr {
+    gap: 0;
+  }
+  /* In V3 l'header dell'action e' la maniglia con cui si sposta il blocco:
+     porta tds_draggable_deep, che nel motore di drag abilita la risalita dal
+     target del mousedown. Il cursore va esteso ai figli con ::ng-deep perche'
+     appartengono alla view di cds-action-description: qui e' nidificato sotto
+     i selettori del blocco, quindi resta delimitato e non diventa globale. */
+  .header-action {
+    cursor: grab;
+    ::ng-deep * {
+      cursor: inherit;
+    }
+  }
+  /* L'action riempie il blocco: senza bordo bianco si evita la doppia cornice
+     con il padding del blocco. Cambia solo il colore, non lo spessore, cosi'
+     il layout non si sposta. */
+  .box-action {
+    border-color: transparent;
   }
   .tds-drop-element {
     width: calc(100% - 4px);

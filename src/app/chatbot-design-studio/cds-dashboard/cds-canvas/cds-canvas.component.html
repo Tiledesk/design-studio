@@ -190,6 +190,14 @@
     [projectID]= "projectID">
 </cds-panel-publish>
 
+<cds-panel-ai *ngIf="IS_OPEN_PANEL_AI"
+    id="ai-panel"
+    class="cds-generic-panel"
+    [selectedChatbot]="selectedChatbot"
+    [projectID]="projectID"
+    (closePanel)="closeAllPanels()">
+</cds-panel-ai>
+
 <cds-panel-action-detail *ngIf="IS_OPEN_PANEL_ACTION_DETAIL"
     id="action-detail" 
     class="cds-generic-panel"

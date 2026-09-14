@@ -255,3 +255,39 @@ li > a {
         padding: 0 !important;
     }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Voce "Crea agente con l'AI"                                                */
+/* Vive nel rail visibile (.content > .section), non nella vecchia            */
+/* ul.settings-sidebar, che e' markup legacy con display:none.                */
+/* E' un'azione e non una destinazione: colore d'accento e un separatore che   */
+/* la stacca dalle voci di navigazione.                                       */
+/* -------------------------------------------------------------------------- */
+.section.ai-generator-section {
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 22px;
+        height: 1px;
+        background-color: var(--gray-light-02);
+    }
+
+    .item-icon {
+        color: #2264d1;
+        fill: #2264d1;
+    }
+
+    &:hover .item-icon {
+        color: white;
+        fill: white;
+    }
+}
+
+.content.is_opened .section.ai-generator-section::after {
+    width: calc(100% - 24px);
+}

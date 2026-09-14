@@ -11,7 +11,9 @@ import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
+import { AgentGeneratorService } from '../../services/agent-generator.service';
 import { NoteResizeStateService } from './note-resize-state.service';
+import { AI_PANEL_REOPEN_KEY } from './cds-panel-ai/cds-panel-ai.component';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -173,7 +175,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // @ Toggle Publish Panel 
   // ---------------------------------------------------
   private subscriptionTogglePublishPanelState: Subscription;
+  private subscriptionToggleAiPanelState: Subscription;
   IS_OPEN_PUBLISH_PANEL: boolean = false;
+  IS_OPEN_PANEL_AI: boolean = false;
 
 
   chatbotSubtype: string;
@@ -197,7 +201,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    private readonly agentGeneratorService: AgentGeneratorService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -255,6 +260,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.subscriptionUndoRedo.unsubscribe();
     }
 
+    if (this.subscriptionToggleAiPanelState) {
+      this.subscriptionToggleAiPanelState.unsubscribe();
+    }
     if (this.subscriptionTogglePublishPanelState) {
       this.subscriptionTogglePublishPanelState.unsubscribe();
     }
@@ -598,12 +606,25 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           this.IS_OPEN_PUBLISH_PANEL = false;
         }
       });
+
+    // Pannello AI a destra: un solo pannello alla volta, come il publish
+    this.subscriptionToggleAiPanelState = this.controllerService.isOpenAiPanel$.subscribe((open: boolean) => {
+      if (open) {
+        this.closeAllPanels();
+        this.closeActionDetailPanel();
+        this.removeConnectorDraftAndCloseFloatMenu();
+        setTimeout(() => { this.IS_OPEN_PANEL_AI = true; }, 0);
+      } else {
+        this.IS_OPEN_PANEL_AI = false;
+      }
+    });
   }
 
    /** initialize */
    private async initialize(){
     this.selectedChatbot = this.dashboardService.selectedChatbot;
     this.projectID = this.dashboardService.projectID;
+    this.reopenAiPanelAfterReload();
     // console.log('[CDS-CANVAS] selectedChatbot ::', this.selectedChatbot);
     // console.log('[CDS-CANVAS] projectID ::', this.projectID);
     this.id_faq_kb = this.dashboardService.id_faq_kb;
@@ -665,6 +686,23 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
 
+  /**
+   * Dopo un ripristino o una modifica via prompt la pagina si ricarica: se il pannello AI era aperto
+   * su questo agente, si riapre da solo (flag lasciato dal pannello in sessionStorage).
+   */
+  private reopenAiPanelAfterReload(){
+    try {
+      const botId = sessionStorage.getItem(AI_PANEL_REOPEN_KEY);
+      if (!botId) return;
+      sessionStorage.removeItem(AI_PANEL_REOPEN_KEY);
+      // authoring AI spento (switch in ai-authoring.config.ts): il pannello non si riapre mai
+      if (!this.agentGeneratorService.isConfigured) return;
+      if (botId === this.selectedChatbot?._id) {
+        setTimeout(() => this.controllerService.openAiPanel(), 600);
+      }
+    } catch (e) { /* sessionStorage non disponibile: nessuna riapertura */ }
+  }
+
   /** closeAllPanels */
   private closeAllPanels(){
     if(this.IS_OPEN_PANEL_WIDGET){
@@ -680,6 +718,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.IS_OPEN_COLOR_MENU = false;
     this.IS_OPEN_PANEL_WIDGET = false;
     this.IS_OPEN_PUBLISH_PANEL = false;
+    if (this.IS_OPEN_PANEL_AI) {
+      this.IS_OPEN_PANEL_AI = false;
+      this.controllerService.markAiPanelClosed();
+    }
     // // this.intentService.inactiveIntent();
   }
 
@@ -936,6 +978,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     */
     this.listnerKeydown = (e) => {
     this.logger.log('[CDS-CANVAS]  keydown ', e);
+    // Modale "Crea agente" aperta: l'interfaccia sotto e' bloccata, il canvas
+    // non deve reagire ai tasti digitati nella modale.
+    if (this.agentGeneratorService.isOpen) {
+      return;
+    }
     var focusedElement = document.activeElement;
     if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
       return;
@@ -977,6 +1024,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
     this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target, event);
+    if (this.agentGeneratorService.isOpen) {
+      return;
+    }
     if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
       this.controllerService.stopTestItOut();
@@ -992,6 +1042,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   */
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
+    if (this.agentGeneratorService.isOpen) {
+      return;
+    }
     // event.key === 'Backspace' ||
     if (event.key === 'Escape' || event.key === 'Canc' && !this.hasClickedAddAction) {
       if (!this.hasClickedAddAction) {

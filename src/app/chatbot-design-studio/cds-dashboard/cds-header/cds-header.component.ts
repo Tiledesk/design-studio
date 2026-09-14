@@ -6,6 +6,8 @@ import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { AgentRevisionsService } from 'src/app/chatbot-design-studio/services/agent-revisions.service';
+import { AgentGeneratorService } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -57,6 +59,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   //selectedChatbot: Chatbot;
 
 
+  /** Gli agent del progetto, per il selettore in header. */
+  agents: Chatbot[] = [];
+  /** True mentre l'eliminazione dell'agent e' in volo. */
+  isDeletingAgent: boolean = false;
+
   isBetaUrl: boolean = false;
   popup_visibility: string = 'none';
   TRY_ON_WA: boolean;
@@ -102,7 +109,9 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
-    private agentChatHostService: AgentChatHostService
+    private agentChatHostService: AgentChatHostService,
+    private readonly agentRevisionsService: AgentRevisionsService,
+    private readonly agentGeneratorService: AgentGeneratorService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -146,6 +155,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.selectedChatbot = this.dashboardService.selectedChatbot;
     // this.IS_CHATBOT_MODIFIED = this.selectedChatbot?.modified || false;
     this.logger.log('[CdsHeaderComponent] selectedChatbot::: ', this.selectedChatbot);
+    this.loadAgents();
     if(this.dashboardService.selectedChatbot.subtype === 'webhook' || this.dashboardService.selectedChatbot.subtype === 'copilot'){
       this.isWebhook = true;
       this.initializeWebhook();
@@ -156,6 +166,102 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     if(this.router.url.includes('beta')){
       this.isBetaUrl = true;
     }
+  }
+
+  // -------------------------------------------------------
+  // @ Selettore degli agent
+  // -------------------------------------------------------
+
+  /** Carica gli agent del progetto per il menu a tendina in header. */
+  private loadAgents(): void {
+    this.faqKbService.getFaqKbByProjectId().subscribe({
+      next: (agents: Chatbot[]) => {
+        this.agents = agents ? agents : [];
+        this.logger.log('[CdsHeaderComponent] loadAgents: ', this.agents.length);
+      },
+      error: (error) => {
+        // Il selettore resta vuoto ma l'header continua a funzionare.
+        this.logger.error('[CdsHeaderComponent] loadAgents ERROR: ', error);
+        this.agents = [];
+      }
+    });
+  }
+
+  /** Selettore dell'agent ed "Elimina agent" sono funzioni del V3: gli agent legacy mostrano solo il nome. */
+  get isV3(): boolean {
+    return this.dashboardService.isV3;
+  }
+
+  /**
+   * Passa a un altro agent. La rotta e' `/project/:projectid/chatbot/:faqkbid/blocks`
+   * e il Design Studio si ricarica sul nuovo agent.
+   */
+  onSelectAgent(agent: Chatbot): void {
+    if (!agent || !agent._id || agent._id === this.id_faq_kb) return;
+    this.logger.log('[CdsHeaderComponent] onSelectAgent: ', agent._id);
+    this.openAgent(agent._id);
+  }
+
+  /**
+   * Apre un agent con un caricamento completo della pagina.
+   *
+   * Il Design Studio si inizializza una volta sola in `CdsDashboardComponent.ngOnInit`
+   * (traduzioni, parametri, progetto, bot, dipartimenti), poi inizializza i servizi
+   * con quell'`id_faq_kb` e costruisce stage e connettori. Una `router.navigate`
+   * cambia solo il parametro di rotta: il componente viene riusato e resterebbe
+   * agganciato all'agent precedente. Finche' il boot non e' reattivo al cambio di
+   * parametro, il modo corretto di cambiare agent e' ricaricare, esattamente come
+   * quando si entra nel DS dalla dashboard.
+   */
+  private openAgent(botId: string): void {
+    this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks'])
+      .then(() => window.location.reload());
+  }
+
+  /**
+   * Elimina l'intero agent, previa conferma. L'operazione e' irreversibile:
+   * il server rimuove il chatbot e i suoi blocchi. A eliminazione avvenuta si
+   * passa al primo agent rimasto, o si torna alla dashboard se non ne restano.
+   */
+  onDeleteAgent(): void {
+    if (this.isDeletingAgent || !this.selectedChatbot?._id) return;
+    const name = this.selectedChatbot.name;
+    swal({
+      title: this.translate.instant('CDSHeader.DeleteAgentTitle'),
+      text: this.translate.instant('CDSHeader.DeleteAgentText', { name: name }),
+      icon: 'warning',
+      buttons: [this.translate.instant('Cancel'), this.translate.instant('Delete')],
+      dangerMode: true
+    }).then((willDelete: boolean) => {
+      if (!willDelete) return;
+      this.isDeletingAgent = true;
+      const botId = this.selectedChatbot._id;
+      this.faqKbService.deleteBot(botId).subscribe({
+        next: () => {
+          this.isDeletingAgent = false;
+          // La storia dell'agente si cancella con lui (mai bloccante)
+          this.agentRevisionsService.deleteHistoryQuietly(botId);
+          const remaining = this.agents.filter(a => a._id !== botId);
+          this.agents = remaining;
+          if (remaining.length > 0) {
+            this.openAgent(remaining[0]._id);
+          } else {
+            this.goToDashboardChatbots();
+          }
+        },
+        error: (error) => {
+          this.logger.error('[CdsHeaderComponent] onDeleteAgent ERROR: ', error);
+          this.isDeletingAgent = false;
+          this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.DeleteAgentError'), 4, 'report_problem');
+        }
+      });
+    });
+  }
+
+  /** Torna all'elenco degli agent nella dashboard esterna. */
+  private goToDashboardChatbots(): void {
+    const dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.projectID + '/bots/my-chatbots/all';
+    window.open(dashbordBaseUrl, '_self');
   }
 
   ngOnDestroy() {
@@ -252,6 +358,19 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   isOpenDropdown(_is0penDropDown) {
     this.is0penDropDown = _is0penDropDown
     // this.logger.log('[WS-REQUESTS-MSGS] this.is0penDropDown ',this.is0penDropDown)  
+  }
+
+  /**
+   * Pannello AI a destra: storia dei prompt, versioni, ripristino e modifica via prompt.
+   * Solo su agenti V3 con il servizio di generazione configurato. Se il server non ha il modulo delle
+   * revisioni, il pannello si apre lo stesso e lo dice: cosi' si capisce perche' la storia non c'e'.
+   */
+  get showAiPanelButton(): boolean {
+    return this.isV3 && !!this.selectedChatbot?._id && this.agentGeneratorService.isConfigured;
+  }
+
+  onClickAiPanel(){
+    this.controllerService.toggleAiPanel();
   }
 
   onClickPublish(){

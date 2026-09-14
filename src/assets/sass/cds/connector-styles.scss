@@ -81,6 +81,16 @@ cds-connector.connector-isLast {
     }
 }
 
+/* V3 - il pallino di uscita del blocco entra NEL blocco, ancorato in basso a
+   destra sul bordo, invece di pendere fuori (right:-32px della regola base).
+   Delimitato da .tds-v3-intent, che e' presente solo sui blocchi V3: i chatbot
+   delle versioni precedenti conservano la posizione originale. */
+.tds-v3-intent cds-connector.connector-isLast {
+    right: -10px;
+    top: auto;
+    bottom: 0px;
+}
+
 
 cds-connector.button-connector {
     position: absolute;

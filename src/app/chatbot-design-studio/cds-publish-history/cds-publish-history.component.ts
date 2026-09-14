@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } fro
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { AgentRevisionsService } from 'src/app/chatbot-design-studio/services/agent-revisions.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 const swal = require('sweetalert');
@@ -63,7 +64,8 @@ export class CdsPublishHistoryComponent implements OnInit {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
     public appConfigService: AppConfigService,
-     private translate: TranslateService
+     private translate: TranslateService,
+    private agentRevisionsService: AgentRevisionsService
   ) { }
 
   ngOnInit(): void {
@@ -223,6 +225,8 @@ export class CdsPublishHistoryComponent implements OnInit {
           this.faqKbService.publish(this.selectedChatbot, release._id, null).subscribe({
             next: (data) => {
               this.logger.log('[CDS DSBRD] publish  - RES ', data)
+              // La ripubblicazione crea una release nuova: si collega alla storia (mai bloccante)
+              this.agentRevisionsService.linkReleaseQuietly(this.selectedChatbot?._id, data && data['bot_id']);
             },
             error: (error) => {
 

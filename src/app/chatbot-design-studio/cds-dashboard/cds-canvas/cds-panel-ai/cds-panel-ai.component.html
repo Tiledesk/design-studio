@@ -1,0 +1,229 @@
+<div class="ai-panel">
+
+  <!-- Testata -->
+  <div class="ai-panel__header">
+    <span class="material-icons ai-panel__header-icon">auto_awesome</span>
+    <span class="ai-panel__header-title">{{ 'CDSAiPanel.Title' | translate }}</span>
+    <span class="ai-panel__header-spacer"></span>
+    <button type="button" class="ai-panel__icon-btn" [disabled]="isBusy" [title]="'CDSAiPanel.Close' | translate" (click)="onClose()">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <!-- Schede -->
+  <div class="ai-panel__tabs">
+    <button type="button" class="ai-panel__tab" [class.is-active]="tab === 'chat'" (click)="tab = 'chat'">
+      {{ 'CDSAiPanel.TabChat' | translate }}
+    </button>
+    <button type="button" class="ai-panel__tab" [class.is-active]="tab === 'versions'" (click)="tab = 'versions'">
+      {{ 'CDSAiPanel.TabVersions' | translate }} <span class="ai-panel__tab-count" *ngIf="total">{{ total }}</span>
+    </button>
+  </div>
+
+  <!-- Il server non ha il modulo delle revisioni -->
+  <div class="ai-panel__notice ai-panel__notice--off" *ngIf="!moduleEnabled">
+    <span class="material-icons">cloud_off</span>
+    <span>{{ 'CDSAiPanel.ModuleOff' | translate }}</span>
+  </div>
+
+  <!-- Modifiche a mano dopo l'ultima versione -->
+  <div class="ai-panel__notice" *ngIf="modified">
+    <span class="material-icons">edit_note</span>
+    <span>{{ 'CDSAiPanel.ModifiedSince' | translate: { seq: lastSeq } }}</span>
+    <button type="button" class="ai-panel__link-btn" [disabled]="isBusy" (click)="saveVersion()">{{ 'CDSAiPanel.SaveVersion' | translate }}</button>
+  </div>
+
+  <!-- Errore -->
+  <div class="ai-panel__error" *ngIf="errorMessage">
+    <span class="material-icons">error_outline</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Contenuto -->
+  <div class="ai-panel__body">
+
+    <!-- ============ Chat: la storia dei prompt ============ -->
+    <ng-container *ngIf="tab === 'chat'">
+      <div class="ai-panel__empty" *ngIf="!chatItems.length && busy !== 'loading'">
+        <span class="material-icons ai-panel__empty-icon">auto_awesome</span>
+        <p class="ai-panel__empty-title">{{ 'CDSAiPanel.EmptyChatTitle' | translate }}</p>
+        <p class="ai-panel__empty-text">{{ 'CDSAiPanel.EmptyChatText' | translate }}</p>
+      </div>
+
+      <ng-container *ngFor="let item of chatItems; trackBy: trackByItem">
+
+        <!-- Ripristino: riga di sistema -->
+        <p class="ai-panel__system-row" *ngIf="item.kind === 'restore'">
+          <span class="material-icons">undo</span>
+          <span *ngIf="item.restoredTo !== null">{{ 'CDSAiPanel.RestoredTo' | translate: { seq: item.restoredTo, date: (item.at | date: 'short') } }}</span>
+          <span *ngIf="item.restoredTo === null">{{ 'CDSAiPanel.Restored' | translate: { date: (item.at | date: 'short') } }}</span>
+        </p>
+
+        <!-- Creazione e modifiche -->
+        <div class="ai-panel__turn" [class.is-undone]="item.undone" *ngIf="item.kind !== 'restore'">
+          <div class="ai-panel__bubble ai-panel__bubble--user">
+            <span class="material-icons ai-panel__avatar">{{ item.kind === 'creation' ? 'auto_awesome' : 'person' }}</span>
+            <p class="ai-panel__bubble-text">{{ item.text || ('CDSAiPanel.NoPrompt' | translate) }}</p>
+          </div>
+          <div class="ai-panel__turn-meta">
+            <span class="ai-panel__badge ai-panel__badge--creation" *ngIf="item.kind === 'creation'">{{ 'CDSAiPanel.Creation' | translate }}</span>
+            <span class="ai-panel__badge ai-panel__badge--edit" *ngIf="item.kind === 'edit'">{{ 'CDSAiPanel.EditBadge' | translate }}</span>
+            <span class="ai-panel__badge ai-panel__badge--undone" *ngIf="item.undone">{{ 'CDSAiPanel.Undone' | translate }}</span>
+            <span class="ai-panel__meta-text">#{{ item.seq }} · {{ item.at | date: 'short' }}<ng-container *ngIf="item.model"> · {{ item.model }}</ng-container><ng-container *ngIf="item.isMine"> · {{ 'CDSAiPanel.You' | translate }}</ng-container></span>
+          </div>
+          <div class="ai-panel__bubble ai-panel__bubble--ai" *ngIf="item.explanation || item.changes">
+            <span class="material-icons ai-panel__avatar">smart_toy</span>
+            <div class="ai-panel__bubble-text">
+              <p *ngIf="item.explanation">{{ item.explanation }}</p>
+              <p class="ai-panel__changes" *ngIf="item.changes">
+                <span *ngIf="item.changes.added">+{{ item.changes.added }} {{ 'CDSAiPanel.Added' | translate }}</span>
+                <span *ngIf="item.changes.updated">~{{ item.changes.updated }} {{ 'CDSAiPanel.Updated' | translate }}</span>
+                <span *ngIf="item.changes.removed">−{{ item.changes.removed }} {{ 'CDSAiPanel.Removed' | translate }}</span>
+              </p>
+            </div>
+          </div>
+          <div class="ai-panel__turn-actions">
+            <button type="button" class="ai-panel__link-btn" *ngIf="canEdit && item.text" [disabled]="isBusy || !!proposal" (click)="reuseInstruction(item)">
+              <span class="material-icons">history</span>{{ 'CDSAiPanel.ReuseInstruction' | translate }}
+            </button>
+            <button type="button" class="ai-panel__link-btn" *ngIf="item.kind === 'edit' && item.restoreTarget" [disabled]="isBusy" (click)="restoreBeforeEdit(item)">
+              <span class="material-icons">undo</span>{{ 'CDSAiPanel.RestoreBefore' | translate }}
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Turno in corso: istruzione inviata, proposta in attesa di «Applica» -->
+      <div class="ai-panel__turn ai-panel__turn--pending" *ngIf="pendingInstruction">
+        <div class="ai-panel__bubble ai-panel__bubble--user">
+          <span class="material-icons ai-panel__avatar">person</span>
+          <p class="ai-panel__bubble-text">{{ pendingInstruction }}</p>
+        </div>
+        <div class="ai-panel__turn-meta"><span class="ai-panel__badge ai-panel__badge--pending">{{ 'CDSAiPanel.NotApplied' | translate }}</span></div>
+        <div class="ai-panel__bubble ai-panel__bubble--ai" *ngIf="proposal?.response?.explanation">
+          <span class="material-icons ai-panel__avatar">smart_toy</span>
+          <p class="ai-panel__bubble-text">{{ proposal.response.explanation }}</p>
+        </div>
+      </div>
+
+      <!-- Anteprima della proposta -->
+      <div class="ai-panel__proposal" *ngIf="proposal && proposalSummary as summary">
+        <p class="ai-panel__proposal-title">{{ 'CDSAiPanel.ProposalTitle' | translate }}</p>
+        <ul class="ai-panel__proposal-list">
+          <li *ngFor="let b of summary.added" class="ai-panel__proposal-item ai-panel__proposal-item--add"><span class="material-icons">add_circle</span><span class="ai-panel__badge ai-panel__badge--add">{{ 'CDSAiPanel.ProposalAdd' | translate }}</span>{{ b.name }} <em>({{ b.type }})</em></li>
+          <li *ngFor="let b of summary.updated" class="ai-panel__proposal-item ai-panel__proposal-item--update"><span class="material-icons">edit</span><span class="ai-panel__badge ai-panel__badge--update">{{ 'CDSAiPanel.ProposalUpdate' | translate }}</span>{{ b.name }} <em>({{ b.type }})</em></li>
+          <li *ngFor="let b of summary.removed" class="ai-panel__proposal-item ai-panel__proposal-item--remove"><span class="material-icons">remove_circle</span><span class="ai-panel__badge ai-panel__badge--remove">{{ 'CDSAiPanel.ProposalRemove' | translate }}</span>{{ b.name }} <em>({{ b.type }})</em></li>
+          <li *ngIf="summary.connections" class="ai-panel__proposal-item"><span class="material-icons">link</span>{{ 'CDSAiPanel.ProposalConnections' | translate: { count: summary.connections } }}</li>
+          <li *ngIf="!summary.added.length && !summary.updated.length && !summary.removed.length && !summary.connections" class="ai-panel__proposal-item"><span class="material-icons">info</span>{{ 'CDSAiPanel.ProposalNothing' | translate }}</li>
+        </ul>
+        <p class="ai-panel__meta-text" *ngFor="let w of summary.warnings">⚠ {{ w }}</p>
+        <p class="ai-panel__meta-text" *ngFor="let w of proposal.response.warnings">⚠ {{ w }}</p>
+        <p class="ai-panel__meta-text" *ngIf="!moduleEnabled">{{ 'CDSAiPanel.ApplyNeedsModule' | translate }}</p>
+        <div class="ai-panel__proposal-actions">
+          <button type="button" class="btn btn-primary cds-blue-button ai-panel__primary-btn" [disabled]="!canApply" [title]="!moduleEnabled ? ('CDSAiPanel.ApplyNeedsModule' | translate) : ''" (click)="applyProposal()">
+            <span class="material-icons">check</span>{{ 'CDSAiPanel.Apply' | translate }}
+          </button>
+          <button type="button" class="ai-panel__link-btn" [disabled]="isBusy" (click)="discardProposal()">{{ 'CDSAiPanel.Discard' | translate }}</button>
+        </div>
+      </div>
+      <ul class="ai-panel__problems" *ngIf="compileProblems.length">
+        <li *ngFor="let p of compileProblems">{{ p }}</li>
+      </ul>
+
+      <div class="ai-panel__more" *ngIf="hasMore">
+        <button type="button" class="ai-panel__link-btn" [disabled]="isBusy" (click)="loadMore()">{{ 'CDSAiPanel.LoadMore' | translate }}</button>
+      </div>
+    </ng-container>
+
+    <!-- ============ Versioni ============ -->
+    <ng-container *ngIf="tab === 'versions'">
+      <div class="ai-panel__toolbar">
+        <button type="button" class="btn btn-primary cds-blue-button ai-panel__primary-btn" [disabled]="isBusy" (click)="saveVersion()">
+          <span class="material-icons">bookmark_add</span>{{ 'CDSAiPanel.SaveVersion' | translate }}
+        </button>
+      </div>
+
+      <div class="ai-panel__empty" *ngIf="!versionItems.length && busy !== 'loading'">
+        <span class="material-icons ai-panel__empty-icon">history</span>
+        <p class="ai-panel__empty-title">{{ 'CDSAiPanel.EmptyVersionsTitle' | translate }}</p>
+        <p class="ai-panel__empty-text">{{ 'CDSAiPanel.EmptyVersionsText' | translate }}</p>
+      </div>
+
+      <div class="ai-panel__version" *ngFor="let rev of versionItems; trackBy: trackByRevision" [class.is-current]="rev.seq === lastSeq && !modified">
+        <div class="ai-panel__version-head">
+          <span class="ai-panel__badge" [ngClass]="'ai-panel__badge--' + rev.kind">{{ kindLabel(rev.kind) | translate }}</span>
+          <span class="ai-panel__meta-text">#{{ rev.seq }} · {{ rev.createdAt | date: 'short' }}<ng-container *ngIf="isMine(rev)"> · {{ 'CDSAiPanel.You' | translate }}</ng-container></span>
+        </div>
+        <p class="ai-panel__version-note" *ngIf="rev.note || rev.reason">
+          <ng-container *ngIf="rev.reason">{{ reasonLabel(rev) | translate }}<ng-container *ngIf="rev.note"> · </ng-container></ng-container>{{ rev.note }}
+        </p>
+        <p class="ai-panel__meta-text" *ngIf="rev.snapshot?.intents || rev.ai?.result?.model">
+          <ng-container *ngIf="rev.snapshot?.intents">{{ 'CDSAiPanel.Blocks' | translate: { count: rev.snapshot.intents } }}</ng-container>
+          <ng-container *ngIf="rev.snapshot?.intents && rev.ai?.result?.model"> · </ng-container>
+          <ng-container *ngIf="rev.ai?.result?.model">{{ rev.ai.result.model }}</ng-container>
+        </p>
+
+        <!-- Prompt aperto -->
+        <div class="ai-panel__prompt" *ngIf="isPromptOpen(rev)">
+          <pre class="ai-panel__prompt-text">{{ promptOf(rev) }}</pre>
+          <ng-container *ngIf="openPrompts[rev.revision_id]?.ai?.request as req">
+            <p class="ai-panel__meta-text" *ngIf="req.assumptions?.length">{{ 'CDSAiPanel.Assumptions' | translate }}: {{ req.assumptions.join('; ') }}</p>
+            <p class="ai-panel__meta-text" *ngIf="req.unsupported?.length">{{ 'CDSAiPanel.Unsupported' | translate }}: {{ req.unsupported.join('; ') }}</p>
+          </ng-container>
+          <div class="ai-panel__turn-actions">
+            <button type="button" class="ai-panel__link-btn" (click)="copyPrompt(rev)">
+              <span class="material-icons">content_copy</span>{{ (copiedId === rev.revision_id ? 'CDSAiPanel.Copied' : 'CDSAiPanel.CopyPrompt') | translate }}
+            </button>
+            <button type="button" class="ai-panel__link-btn" *ngIf="rev.kind === 'ai_create'" [disabled]="isBusy" (click)="reuseInGenerator(rev)">
+              <span class="material-icons">replay</span>{{ 'CDSAiPanel.Reuse' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <div class="ai-panel__turn-actions">
+          <button type="button" class="ai-panel__link-btn" *ngIf="canRestore(rev)" [disabled]="isBusy" (click)="restoreRevision(rev)">
+            <span class="material-icons">restore</span>{{ (rev.kind === 'release' ? 'CDSAiPanel.RestoreFromRelease' : 'CDSAiPanel.RestoreHere') | translate }}
+          </button>
+          <button type="button" class="ai-panel__link-btn" *ngIf="canRestore(rev)" [disabled]="isBusy" (click)="createCopy(rev)">
+            <span class="material-icons">content_copy</span>{{ 'CDSAiPanel.CreateCopy' | translate }}
+          </button>
+          <button type="button" class="ai-panel__link-btn" *ngIf="hasPrompt(rev)" [disabled]="isBusy && !isPromptOpen(rev)" (click)="togglePrompt(rev)">
+            <span class="material-icons">{{ isPromptOpen(rev) ? 'expand_less' : 'notes' }}</span>{{ (isPromptOpen(rev) ? 'CDSAiPanel.HidePrompt' : 'CDSAiPanel.ViewPrompt') | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-panel__more" *ngIf="hasMore">
+        <button type="button" class="ai-panel__link-btn" [disabled]="isBusy" (click)="loadMore()">{{ 'CDSAiPanel.LoadMore' | translate }}</button>
+      </div>
+    </ng-container>
+
+    <!-- Stato in corso -->
+    <div class="ai-panel__busy" *ngIf="isBusy">
+      <span class="cds-btn-spinner"></span>
+      <span>{{ ('CDSAiPanel.Busy.' + busy) | translate }}</span>
+    </div>
+  </div>
+
+  <!-- Compositore della modifica via prompt -->
+  <div class="ai-panel__composer" *ngIf="tab === 'chat' && canEdit">
+    <textarea class="ai-panel__textarea" rows="3"
+      [(ngModel)]="draft"
+      [disabled]="isBusy || !!proposal"
+      [placeholder]="'CDSAiPanel.ComposerPlaceholder' | translate"
+      (keydown)="onComposerKeydown($event)"></textarea>
+    <div class="ai-panel__composer-row">
+      <select class="ai-panel__select" [disabled]="!models.length || isBusy || !!proposal" [ngModel]="selectedModel" (ngModelChange)="selectModel($event)">
+        <option *ngIf="!models.length" [ngValue]="null">{{ 'CDSAgentGenerator.Model.ServiceDefault' | translate }}</option>
+        <option *ngFor="let m of models" [ngValue]="m.id">{{ m.label }}{{ m.id === recommendedModel ? (' · ' + ('CDSAgentGenerator.Model.Recommended' | translate)) : '' }}</option>
+      </select>
+      <span class="ai-panel__header-spacer"></span>
+      <button type="button" class="btn btn-primary cds-blue-button ai-panel__primary-btn" [disabled]="!canSubmit" (click)="submitInstruction()">
+        <span class="material-icons">send</span>{{ 'CDSAiPanel.Send' | translate }}
+      </button>
+    </div>
+  </div>
+  <div class="ai-panel__composer" *ngIf="tab === 'chat' && !canEdit">
+    <p class="ai-panel__meta-text">{{ 'CDSAiPanel.ComposerUnavailable' | translate }}</p>
+  </div>
+</div>
