@@ -1,0 +1,148 @@
+// MCP TOOLS PREVIEW --- start **************** //
+.mcp-tools-preview-container {
+    padding: 8px 0px;
+    margin-top: 8px;
+}
+
+.mcp-tools-header {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray);
+    text-transform: uppercase;
+}
+
+.mcp-tools-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mcp-tool-tag {
+    background-color: #e8f4ff;
+    color: var(--blu-02);
+    padding: 0px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: var(--font-family-poppins);
+    white-space: nowrap;
+    display: inline-block;
+}
+// MCP TOOLS PREVIEW --- end **************** //
+
+// MCP SERVERS SECTION --- start **************** //
+.mcp-servers-section {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+// Header row: label on the left, "Manage MCP tools" button on the right.
+.mcp-servers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    // override locale della .title-label globale (styles.scss:127): piu piccola e non in grassetto
+    .title-label {
+        margin: 0;
+        font-size: 12px;
+        font-weight: 400;
+    }
+}
+
+// La regola globale `.btn.btn-primary.cds-blue-button` (styles.scss:295) ha specificita' 0,3,0 e
+// imporrebbe font-size 14px / padding 6px 12px: questa, con le stesse 3 classi piu' la nostra, vale
+// 0,4,0 e vince sempre senza ricorrere a !important.
+.btn.btn-primary.cds-blue-button.mcp-manage-btn {
+    font-size: 11px;
+    padding: 5px 12px;
+}
+
+// I due pulsanti dell'header condividono la stessa metrica: cambia solo la pelle.
+.mcp-manage-btn {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+// Variante "nessun tool agganciato": call to action tratteggiata.
+.mcp-select-btn {
+    gap: 4px;
+    background-color: transparent;
+    border: 1px dashed var(--blu-light-02);
+    border-radius: var(--button-border-radius-base);
+    color: var(--blu-02);
+    font-family: var(--font-family-poppins);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .mcp-select-btn__icon {
+        font-size: 14px;
+    }
+
+    &:hover {
+        background-color: #e8f4ff;
+        border-color: var(--blu-02);
+    }
+}
+
+.mcp-servers-grid {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.mcp-server-button {
+    background-color: #ffffff;
+    border: 0px solid var(--blu-02);
+    border-radius: 4px;
+    padding: 0px 10px;
+    font-size: 12px;
+    font-family: var(--font-family-poppins);
+    color: var(--blu-02);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    position: relative;
+
+    &:hover {
+        background-color: #e8f4ff;
+        border-color: var(--blu);
+        color: var(--blu);
+    }
+
+    &.selected {
+        background-color: #e8f4ff;
+        border-color: var(--blu-02);
+        padding-right: 30px;
+        justify-content: flex-start;
+        cursor: default;
+        .remove-icon {
+            position: absolute;
+            right: 4px;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+            padding: 2px;
+            &:hover {
+                background-color: rgba(255, 0, 0, 0.1);
+                color: #ff0000;
+            }
+        }
+    }
+
+}
+// MCP SERVERS SECTION --- end **************** //

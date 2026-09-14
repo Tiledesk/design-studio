@@ -944,7 +944,7 @@ export const OPENAI_MODEL: Array<{ name: string, value: string, description:stri
 ]
 
 
-export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, vllmServer?: string}> = [
+export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive", min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, server?: string}> = [
   {
     name: "ollama_1",
     value: "ollama_1",
@@ -959,6 +959,11 @@ export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string
 export var VLLM_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
+// Gemini Agent Platform: come vLLM, i modelli arrivano solo dall'integration di progetto
+// (GET /integration/name/agentplatform -> value.servers[].models), mai da questa lista.
+export var AGENTPLATFORM_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+]
+
 
 
 export const LLM_MODEL: Array<{name: string, value: string, description: string, src: string, status: "active" | "inactive", models: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> }> = [
@@ -970,6 +975,7 @@ export const LLM_MODEL: Array<{name: string, value: string, description: string,
   { name: "Ollama",         value: "ollama",            description: "",      src:"assets/images/icons/ai_prompt/ollama.svg",      status: "active",   models: OLLAMA_MODEL        },
   { name: "vLLM",           value: "vllm",              description: "",      src:"assets/images/icons/ai_prompt/vllm.svg",        status: "active",   models: VLLM_MODEL          },
   { name: "OpenAI",         value: "openai",            description: "",      src:"assets/images/icons/ai_prompt/openai.svg",      status: "active",   models: OPENAI_MODEL        },
+  { name: "Gemini Agent Platform", value: "agentplatform", description: "",   src:"assets/images/icons/ai_prompt/google.svg",      status: "active",   models: AGENTPLATFORM_MODEL },
  ]
 
 export const DEFAULT_MODEL: { name: string, value: string, description:string, status: "active" | "inactive", min_tokens: number, max_output_tokens: number, reasoning: boolean} = OPENAI_MODEL.find(model => model.value === "gpt-4o")!
@@ -979,13 +985,21 @@ export const DEFAULT_MODEL: { name: string, value: string, description:string, s
 * Changes name format to "Provider - ModelName" and value format to "provider-modelname"
 * Adds description and src for each record
 */
-export function generateLlmModelsFlat(): Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, vllmServer?: string}> {
-  let llm_models_flat: Array<{modelName: string, llm: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, vllmServer?: string}> = [];
+export function generateLlmModelsFlat(): Array<{uid: string, modelName: string, llm: string, llmLabel: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, server?: string}> {
+  let llm_models_flat: Array<{uid: string, modelName: string, llm: string, llmLabel: string, model: string, description: string, src: string, status: "active" | "inactive", configured: boolean, min_tokens?: number, max_output_tokens?: number, reasoning?: boolean, server?: string}> = [];
   LLM_MODEL.forEach(provider => {
     provider.models.forEach(model => {
+      const server = (model as any).server;
       llm_models_flat.push({
+        // Chiave univoca per la select: lo stesso model id può arrivare da più provider
+        // (es. "gemini-2.5-flash" statico di Google e via Agent Platform) o da più server
+        // della stessa integration. Senza uid ng-select aggancerebbe la prima voce trovata.
+        uid: `${provider.value}::${server ?? ''}::${model.value}`,
         modelName: model.name,
         llm: provider.value,
+        // Etichetta del gruppo nella select: il nome leggibile del provider
+        // ("Gemini Agent Platform"), non il value tecnico salvato su action.llm.
+        llmLabel: provider.name,
         model: model.value,
         description: model.description,
         src: provider.src,
@@ -994,7 +1008,7 @@ export function generateLlmModelsFlat(): Array<{modelName: string, llm: string, 
         min_tokens: (model as any).min_tokens || 1,
         max_output_tokens: (model as any).max_output_tokens || 128000,
         reasoning: (model as any).reasoning ?? false,
-        vllmServer: (model as any).vllmServer
+        server: server
       });
     });
   });
