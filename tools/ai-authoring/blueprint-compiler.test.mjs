@@ -31,7 +31,7 @@ function sequentialIds() {
 }
 const compile = (blueprint, extra = {}) => compileBlueprint(blueprint, {
   departments: DEPARTMENTS, namespaces: NAMESPACES, chatbots: CHATBOTS, dataTables: DATA_TABLES,
-  ids: sequentialIds(), now: () => '2026-09-11T00:00:00.000Z', ...extra,
+  ids: sequentialIds(), ...extra,
 });
 const tiny = (blocks, extra = {}) => ({
   version: 'blueprint-2', name: 'Prova', language: 'it', start: blocks[0].id,
@@ -252,7 +252,10 @@ for (const file of FIXTURE_FILES) {
     const asks = bp.blocks.filter((b) => b.type === 'ask').length;
     assert.equal(agent.intents.length, bp.blocks.length + asks + 2 + (bp.fallbackText ? 1 : 0));
     assert.deepEqual([agent.type, agent.subtype, agent.language, agent.webhook_enabled], ['tilebot', 'chatbot', bp.language, false]);
-    assert.equal(agent.attributes.aiGeneration.blueprintVersion, bp.version);
+    assert.equal(agent.attributes.aiGeneration, undefined);
+    // idMap: ogni blocco del Blueprint ha il suo intent, e nient'altro
+    assert.deepEqual(Object.keys(agent.idMap).sort(), bp.blocks.map((b) => b.id).sort());
+    for (const block of bp.blocks) assert.equal(agent.idMap[block.id], intentOf(agent, bp, block.id).intent_id);
 
     const starts = agent.intents.filter((i) => i.intent_display_name === 'start');
     assert.equal(starts.length, 1);
@@ -414,19 +417,14 @@ test('id reali: uuid v4 per intent e action, uid di 32 caratteri esadecimali per
   for (const label of labels) assert.match(label, /^[0-9a-f]{32}$/);
 });
 
-test('metadati della generazione, riassunto dell\'intervista e nome scelto dall\'utente', () => {
-  const generation = {
-    finalPrompt: 'Brief', model: 'openai:gpt-4.1', promptVersion: 'gen-v3-2+36062098', catalogVersion: 'v3-catalog-2',
-    initialPrompt: 'Un bot che qualifica i lead', finalPromptEdited: true,
-    interview: { questions: 3, promptVersion: 'plan-v3-2+947a9e14', model: 'openai:gpt-4.1' },
-    assumptions: ['Tono cordiale'], unsupported: [],
-  };
-  const agent = compile(load('01-linear.json'), { name: 'Il mio agente', description: 'Creato con l\'AI', generation });
+test('nome e descrizione scelti dall\'utente; nessun dato della generazione nell\'agente', () => {
+  const agent = compile(load('01-linear.json'), { name: 'Il mio agente', description: 'Creato con l\'AI' });
   assert.equal(agent.name, 'Il mio agente');
   assert.equal(agent.description, 'Creato con l\'AI');
-  assert.deepEqual(agent.attributes.aiGeneration, {
-    ...generation, blueprintVersion: 'blueprint-1', notes: [], generatedAt: '2026-09-11T00:00:00.000Z',
-  });
+  assert.deepEqual(Object.keys(agent.attributes), ['variables']);
+  // Gli stessi id per lo stesso Blueprint, se il generatore di id è lo stesso: la base della modifica via prompt
+  const again = compile(load('01-linear.json'), { name: 'Il mio agente' });
+  assert.deepEqual(again.idMap, agent.idMap);
 });
 
 test('layout: start a sinistra, primo blocco nella colonna successiva; i rami di ai_condition e le uscite each/done sono raggiunti', () => {

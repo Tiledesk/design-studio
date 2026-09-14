@@ -10,6 +10,9 @@ import { OpenaiService } from 'src/app/services/openai.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DataTableService } from 'src/app/services/data-table.service';
+import { AgentRevisionsService, RevisionAi } from './agent-revisions.service';
+import { DecompiledAgent, compactView, decompileAgent } from 'src/app/chatbot-design-studio/ai-authoring/blueprint-decompiler';
+import { CompiledOperations, EditOperation, compileOperations } from 'src/app/chatbot-design-studio/ai-authoring/blueprint-operations';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
 import {
@@ -36,6 +39,9 @@ export enum PLAN_STATUS {
 }
 
 /** Le 11 sezioni del brief, nell'ordine in cui la UI le mostra (endpoint-contract.md §5). */
+/** Versione del compilatore Blueprint -> V3 salvata nelle revisioni: si alza quando cambia l'output compilato. */
+export const COMPILER_VERSION = '2026-09-13';
+
 export const PLAN_SECTION_KEYS: string[] = [
   'goal', 'language_tone', 'opening', 'main_path', 'data_to_collect', 'branching',
   'handoff', 'business_hours', 'knowledge_base', 'fallback', 'closing'
@@ -210,10 +216,12 @@ export interface GenerateResponse {
 }
 
 /** L'esito di una generazione, per la libreria del servizio (endpoint-contract.md §6.6). */
-export type FeedbackOutcome = 'created' | 'regenerated' | 'discarded' | 'published' | 'tested' | 'rated';
+export type FeedbackOutcome = 'created' | 'regenerated' | 'discarded' | 'published' | 'tested' | 'rated' | 'applied';
 
 export interface GenerationFeedback {
   outcome: FeedbackOutcome;
+  /** 'create' (default) per le generazioni, 'edit' per le modifiche via prompt. */
+  phase?: 'create' | 'edit';
   /** Da 1 a 5: pollice su = 5, pollice giu' = 1. */
   rating?: number;
   examples?: string[];
@@ -228,6 +236,31 @@ export interface CreatedAgent {
   intents: number;
   /** True se la lettura di controllo degli intent non e' riuscita: l'agente e' creato ma non verificato. */
   unverified?: boolean;
+  /** Numero della revisione registrata dal server (creazione atomica); assente con l'import. */
+  revision?: number;
+}
+
+/** Una modifica proposta dal servizio per un agente esistente (POST /edit). */
+export interface EditResponse {
+  explanation: string;
+  operations: EditOperation[];
+  warnings: string[];
+  attempts: number;
+  model: string;
+  promptVersion: string;
+  blueprintVersion: string;
+  usage?: { inputTokens: number; outputTokens: number; cachedTokens: number };
+}
+
+/** Un'istruzione gia' applicata, come contesto per la prossima (solo testo). */
+export interface EditHistoryEntry { instruction: string; explanation?: string; }
+
+/** La proposta pronta per l'anteprima e per il server: risposta del servizio + operazioni V3 compilate. */
+export interface EditProposal {
+  response: EditResponse;
+  compiled: CompiledOperations;
+  /** La vista decompilata su cui il servizio ha lavorato. */
+  view: DecompiledAgent;
 }
 
 /** Errore del generatore, pronto per la UI: chiave i18n del messaggio e dettagli. */
@@ -297,6 +330,17 @@ export function describeGeneratorError(err: any): GeneratorFailure {
     return { messageKey: prefix + 'ErrorCreate', details: [`HTTP ${cause.status ?? 0}${text ? ': ' + text : ''}`] };
   }
   if (err?.stage === 'no_id') return { messageKey: prefix + 'ErrorNoAgentId', details: [] };
+  if (err?.stage === 'create') {
+    const cause = err.cause || {};
+    const blocks = Array.isArray(cause.details?.blocks) ? cause.details.blocks : [];
+    if (cause.status === 422 && blocks.length) {
+      return { messageKey: prefix + 'ErrorCreateBlocks', details: blocks.map((b: any) => `${b.intent_display_name || b.index}: ${b.message || ''}`.trim()) };
+    }
+    if (cause.status === 400) {
+      return { messageKey: prefix + 'ErrorCreateInvalid', details: [cause.message].filter(Boolean) };
+    }
+    return { messageKey: prefix + 'ErrorCreate', details: [`HTTP ${cause.status ?? 0}${cause.message ? ': ' + cause.message : ''}`] };
+  }
   if (err?.stage === 'ids') {
     return { messageKey: prefix + 'ErrorIdsNotPreserved', details: [`${err.agentName}: ${err.missing.length}/${err.total}`] };
   }
@@ -380,6 +424,12 @@ export function planTurnToMessage(turn: PlanTurn): string {
  * Il servizio di generazione non riceve mai il token Tiledesk: le sue chiamate usano un client HTTP
  * senza interceptor. Contratto: docs/V3/ai-authoring/endpoint-contract.md.
  */
+/** I campi del blocco che vanno al servizio e al server: senza quelli assegnati dal database. */
+function stripIntent(intent: any): any {
+  const { _id, id, createdAt, updatedAt, __v, id_project, id_faq_kb, createdBy, ...rest } = intent || {};
+  return JSON.parse(JSON.stringify(rest));
+}
+
 @Injectable({ providedIn: 'root' })
 export class AgentGeneratorService {
 
@@ -411,6 +461,7 @@ export class AgentGeneratorService {
     private faqService: FaqService,
     private faqKbService: FaqKbService,
     private dataTableService: DataTableService,
+    private agentRevisionsService: AgentRevisionsService,
     private injector: Injector
   ) {
     this.externalHttp = new HttpClient(httpBackend);
@@ -576,6 +627,45 @@ export class AgentGeneratorService {
   }
 
   /**
+   * Chiede al servizio una modifica dell'agente aperto: decompila i blocchi correnti nella vista compatta,
+   * manda istruzione, catalogo e contesto del progetto, e compila le operazioni ricevute in operazioni V3
+   * (post/put/delete) per la rotta `edit` del server. Nessuna scrittura: la proposta si applica su «Applica».
+   *
+   * POST {aiAgentGeneratorUrl}/edit
+   */
+  edit(instruction: string, intents: any[], meta: { name?: string; language?: string }, model?: string | null, history: EditHistoryEntry[] = []): Observable<EditProposal> {
+    if (!this.isConfigured) {
+      return throwError(() => ({ notConfigured: true }));
+    }
+    const clean = (intents || []).map(intent => stripIntent(intent));
+    return this.projectFacts().pipe(
+      switchMap(facts => {
+        const refs = { namespaces: facts.knowledgeBases, chatbots: facts.chatbots, dataTables: facts.dataTables };
+        const view = decompileAgent(clean, meta, refs);
+        const body = {
+          projectId: this.project_id,
+          botType: BOT_TYPE.CHAT,
+          ...this.modelFields(model),
+          agentLanguage: view.language || meta.language || 'en',
+          instruction,
+          agent: compactView(view),
+          catalog: facts.catalog,
+          context: this.contextNames(facts),
+          history: history.slice(-5)
+        };
+        this.logger.log('[AGENT-GENERATOR] edit: ', this.generatorUrl, { blocks: view.blocks.length, opaque: view.opaque.length, catalog: facts.catalog?.version });
+        return this.post<EditResponse>('/edit', body).pipe(
+          map(res => {
+            const response: EditResponse = { ...res, operations: Array.isArray(res?.operations) ? res.operations : [], warnings: Array.isArray(res?.warnings) ? res.warnings : [] };
+            const compiled = compileOperations(clean, response.operations, { ...refs, decompiled: view, language: view.language });
+            return { response, compiled, view } as EditProposal;
+          })
+        );
+      })
+    );
+  }
+
+  /**
    * L'esito di una generazione, per il miglioramento della libreria degli esempi del servizio:
    * pochi byte, mai contenuti della conversazione. Senza attesa: un errore non blocca niente.
    *
@@ -583,7 +673,7 @@ export class AgentGeneratorService {
    */
   feedback(result: GenerateResponse | null, feedback: GenerationFeedback): void {
     if (!this.isConfigured) return;
-    const body = {
+    const body: any = {
       projectId: this.project_id,
       outcome: feedback.outcome,
       ...(feedback.rating ? { rating: feedback.rating } : {}),
@@ -591,6 +681,7 @@ export class AgentGeneratorService {
       promptVersion: result?.promptVersion || feedback.promptVersion,
       model: result?.model || feedback.model
     };
+    if (feedback.phase) body.phase = feedback.phase;
     this.logger.log('[AGENT-GENERATOR] feedback: ', body);
     this.post<any>('/feedback', body).pipe(take(1)).subscribe({
       error: (err: any) => this.logger.log('[AGENT-GENERATOR] feedback not sent: ', err?.status)
@@ -599,40 +690,74 @@ export class AgentGeneratorService {
 
   /**
    * Crea l'agente nel progetto:
-   * 1. compila il Blueprint nell'agente V3 (id reali, una action per blocco, nomi validi), con i dati
-   *    della generazione e il riassunto dell'intervista in `attributes.aiGeneration`;
-   * 2. lo importa con creazione (`/faq_kb/importjson/null/?create=true`);
-   * 3. rilegge i blocchi creati e verifica che il server abbia conservato gli `intent_id`,
-   *    da cui dipendono tutti i collegamenti (spike F0, controllo C3).
+   * 1. compila il Blueprint nell'agente V3 (id reali, una action per blocco, nomi validi);
+   * 2. costruisce il blocco `ai` della revisione: prompt, riassunto dell'intervista, scelte, Blueprint,
+   *    mappa degli id e versioni. Nell'agente non resta nulla della generazione;
+   * 3. se il modulo delle revisioni del server e' acceso, crea l'agente con la sua rotta atomica, che
+   *    risponde dopo aver salvato i blocchi e registra la revisione 1;
+   * 4. altrimenti importa con creazione (`/faq_kb/importjson/null/?create=true`) e rilegge i blocchi
+   *    per verificare che il server abbia conservato gli `intent_id` (spike F0, controllo C3). In questo
+   *    caso il blocco `ai` non viene salvato da nessuna parte.
    * Se nessuna rilettura riesce, l'agente e' comunque creato: lo si apre, segnato come non verificato.
    */
   createAgent(result: GenerateResponse, brief: GenerateBrief, interview?: InterviewSummary): Observable<CreatedAgent> {
     return this.projectFacts().pipe(
-      map(facts => compileBlueprint(result.blueprint, {
-        name: brief.agentName || result.blueprint.name,
-        departments: this.departmentNames(),
-        namespaces: facts.knowledgeBases,
-        chatbots: facts.chatbots,
-        dataTables: facts.dataTables,
-        generation: {
-          finalPrompt: brief.finalPrompt,
-          model: result.model,
-          promptVersion: result.promptVersion,
-          catalogVersion: facts.catalog?.version,
-          ...this.interviewInfo(brief, interview)
-        }
-      })),
-      switchMap(agent => {
-        this.logger.log('[AGENT-GENERATOR] createAgent: import ', { name: agent.name, intents: agent.intents.length });
-        return this.faqService.importChatbotFromJSONFromScratch(agent).pipe(
-          catchError(cause => throwError(() => ({ stage: 'import', cause }))),
-          map((res: any) => ({ agent, botId: res?._id || res?.id || res?.bot?._id }))
-        );
+      map(facts => {
+        const compiled = compileBlueprint(result.blueprint, {
+          name: brief.agentName || result.blueprint.name,
+          departments: this.departmentNames(),
+          namespaces: facts.knowledgeBases,
+          chatbots: facts.chatbots,
+          dataTables: facts.dataTables
+        });
+        const { idMap, ...agent } = compiled;
+        const ai: RevisionAi = {
+          request: {
+            finalPrompt: brief.finalPrompt,
+            ...this.interviewInfo(brief, interview)
+          },
+          result: {
+            blueprint: result.blueprint,
+            blueprintVersion: result.blueprint.version,
+            idMap,
+            notes: Array.isArray(result.notes) ? result.notes : [],
+            warnings: Array.isArray(result.warnings) ? result.warnings : [],
+            model: result.model,
+            promptVersion: result.promptVersion,
+            catalogVersion: facts.catalog?.version,
+            compilerVersion: COMPILER_VERSION
+          }
+        };
+        return { agent, ai };
       }),
+      switchMap(({ agent, ai }) => (this.agentRevisionsService.enabled
+        ? this.createAtomically(agent, ai)
+        : this.createWithImport(agent)))
+    );
+  }
+
+  /** Creazione con la rotta atomica del modulo delle revisioni: niente riletture. */
+  private createAtomically(agent: any, ai: RevisionAi): Observable<CreatedAgent> {
+    this.logger.log('[AGENT-GENERATOR] createAgent: atomic ', { name: agent.name, intents: agent.intents.length });
+    return this.agentRevisionsService.createAgent(agent, ai).pipe(
+      catchError(cause => throwError(() => ({ stage: 'create', cause }))),
+      map(res => {
+        if (!res?.bot_id) throw { stage: 'no_id' };
+        return { botId: res.bot_id, name: agent.name, intents: agent.intents.length, revision: res.revision?.seq } as CreatedAgent;
+      })
+    );
+  }
+
+  /** Creazione con l'import di sempre, quando il modulo delle revisioni non c'e'. */
+  private createWithImport(agent: any): Observable<CreatedAgent> {
+    this.logger.log('[AGENT-GENERATOR] createAgent: import ', { name: agent.name, intents: agent.intents.length });
+    return this.faqService.importChatbotFromJSONFromScratch(agent).pipe(
+      catchError(cause => throwError(() => ({ stage: 'import', cause }))),
+      map((res: any) => ({ agent, botId: res?._id || res?.id || res?.bot?._id })),
       switchMap(({ agent, botId }) => {
         if (!botId) return throwError(() => ({ stage: 'no_id' }));
         const created: CreatedAgent = { botId, name: agent.name, intents: agent.intents.length };
-        return this.missingIntents(botId, agent.intents.map(intent => intent.intent_id)).pipe(
+        return this.missingIntents(botId, agent.intents.map((intent: any) => intent.intent_id)).pipe(
           switchMap(missing => {
             if (missing === null) return of({ ...created, unverified: true });
             if (missing.length) {

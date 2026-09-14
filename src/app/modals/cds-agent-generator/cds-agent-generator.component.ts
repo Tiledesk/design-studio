@@ -93,6 +93,32 @@ interface PreviewBlock {
   isStart: boolean;
 }
 
+/**
+ * Prepara la bozza della modale con un prompt finale gia' scritto (per esempio riusato dalla storia di un
+ * agente): alla prossima apertura la modale riparte dal prompt finale, pronta da generare.
+ */
+export function seedGeneratorDraft(projectId: string, finalPrompt: string, agentName: string, initialPrompt: string = ''): void {
+  const draft: Draft = {
+    projectId,
+    botType: BOT_TYPE.CHAT,
+    selectedModel: null,
+    phase: PHASE.BRIEF,
+    draft: initialPrompt || finalPrompt,
+    messages: [],
+    chat: [],
+    turn: null,
+    awaitingTurn: false,
+    questionsAsked: 0,
+    plannerFinalPrompt: null,
+    finalPrompt,
+    agentName,
+    savedAt: Date.now()
+  };
+  try {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  } catch (err) { /* sessionStorage non disponibile: la modale parte vuota */ }
+}
+
 @Component({
   selector: 'cds-agent-generator',
   templateUrl: './cds-agent-generator.component.html',
@@ -425,6 +451,18 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
   /** Torna alla descrizione iniziale, che resta modificabile; la conversazione si azzera. */
   restart(): void {
     if (this.planning) return;
+    const draft = this.draft;
+    this.resetState();
+    this.draft = draft;
+    this.clearDraft();
+  }
+
+  /**
+   * Riporta la modale allo stato iniziale: conversazione, turno, prompt finale, nome, anteprima, voto
+   * ed errori azzerati. Non tocca la bozza nella scheda: chi chiama decide se cancellarla.
+   */
+  private resetState(): void {
+    this.draft = '';
     this.messages = [];
     this.chat = [];
     this.turn = null;
@@ -432,10 +470,17 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     this.selectedOptions = [];
     this.questionsAsked = 0;
     this.plannerFinalPrompt = null;
+    this.finalPrompt = '';
+    this.agentName = '';
     this.canRetry = false;
+    this.result = null;
+    this.flow = null;
+    this.fallbackTarget = '';
+    this.showJson = false;
+    this.rating = null;
+    this.generationSeconds = 0;
     this.clearError();
     this.phase = PHASE.COMPOSE;
-    this.clearDraft();
   }
 
   /** Dopo un "ready" si puo' tornare alle domande e poi di nuovo al prompt finale, senza perdere le modifiche. */
@@ -619,10 +664,15 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Crea l'agente dall'anteprima e lo apre. */
+  /**
+   * Crea l'agente dall'anteprima e lo apre. La bozza (prompt finale, nome, modello, intervista) viene
+   * salvata nella scheda PRIMA della chiamata: se la pagina si ricarica durante la creazione, alla
+   * riapertura si riparte dal prompt finale. A creazione riuscita la bozza si svuota e la modale si azzera.
+   */
   createAgent(): void {
     if (!this.result || this.creating) return;
     this.clearError();
+    this.saveDraft();
     this.creating = true;
     this.dialogRef.disableClose = true;
     this.agentGeneratorService.createAgent(this.result, this.currentBrief(), this.interviewSummary())
@@ -654,6 +704,7 @@ export class CdsAgentGeneratorComponent implements OnInit, OnDestroy {
    */
   private openCreatedAgent(botId: string): void {
     this.clearDraft();
+    this.resetState();
     this.dialogRef.close();
     this.router.navigate(['/project', this.agentGeneratorService.projectId, 'chatbot', botId, 'blocks'])
       .then(() => window.location.reload());

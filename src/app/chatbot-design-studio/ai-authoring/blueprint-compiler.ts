@@ -120,7 +120,10 @@ export interface DataTableRef {
   columns: string[];
 }
 
-/** Metadati della generazione, salvati nell'agente in attributes.aiGeneration. */
+/**
+ * Metadati della generazione. Non stanno nell'agente: il DS li manda al server nel blocco `ai.request`
+ * della revisione (modulo aiGenerations), fuori dal percorso dei messaggi.
+ */
 export interface GenerationInfo {
   finalPrompt?: string;
   model?: string;
@@ -150,11 +153,8 @@ export interface CompileOptions {
   dataTables?: DataTableRef[];
   /** Action del messaggio della macro `ask`: 'replyv2' (default) oppure 'reply' (v1), secondo lo spike (C9, C11). */
   askMessageType?: 'replyv2' | 'reply';
-  generation?: GenerationInfo;
   /** Generatori di id; nei test sono deterministici. */
   ids?: { uuid: () => string; uid: () => string };
-  /** Data della generazione in formato ISO; nei test è fissa. */
-  now?: () => string;
 }
 
 export interface CompiledAgent {
@@ -166,9 +166,14 @@ export interface CompiledAgent {
   webhook_enabled: false;
   attributes: {
     variables: { [name: string]: string };
-    aiGeneration: GenerationInfo & { blueprintVersion: string; notes: string[]; generatedAt: string };
   };
   intents: any[];
+  /**
+   * Id del blocco nel Blueprint → `intent_id` dell'intent d'ingresso. Non fa parte dell'agente da importare:
+   * il servizio lo toglie dal body e lo salva nella revisione (`ai.result.idMap`), così una ricompilazione
+   * dello stesso Blueprint può riprodurre gli stessi id.
+   */
+  idMap: { [blockId: string]: string };
 }
 
 /** Blueprint non compilabile, oppure agente che non rispetta le garanzie: `problems` dice perché. */
@@ -182,16 +187,16 @@ export class CompileError extends Error {
   }
 }
 
-interface Position {
+export interface Position {
   x: number;
   y: number;
 }
 
 /** Regex dei nomi di blocco dell'editor V3 (panel-intent-header.component.ts). */
 export const BLOCK_NAME_REGEX = /^[ _0-9a-zA-Z]+$/;
-const NAME_MAX = 50;
+export const NAME_MAX = 50;
 /** RESERVED_INTENT_NAMES di utils.ts, confrontati senza distinguere maiuscole e minuscole. */
-const RESERVED_NAMES = ['start', 'defaultfallback', 'webhook', 'close'];
+export const RESERVED_NAMES = ['start', 'defaultfallback', 'webhook', 'close'];
 const SPECIAL_LETTERS: { [letter: string]: string } = {
   'ß': 'ss', 'æ': 'ae', 'Æ': 'AE', 'ø': 'o', 'Ø': 'O', 'œ': 'oe', 'Œ': 'OE', 'đ': 'd', 'Đ': 'D', 'ł': 'l', 'Ł': 'L', 'ı': 'i'
 };
@@ -205,12 +210,12 @@ const KB_VARIABLES = ['kb_reply', 'kb_json_sources', 'kb_chunks'];
 const BLOCK_COLOR = '156,163,205';
 const X0 = 100;
 const Y0 = 100;
-const COLUMN = 420;
-const ROW = 320;
+export const COLUMN = 420;
+export const ROW = 320;
 /** Chiave del blocco di capture di una `ask` nel grafo del layout (gli id del Blueprint sono snake_case). */
 const CAPTURE_KEY = '>capture';
 /** Campi che contengono un riferimento `#<intent_id>`. */
-const REFERENCE_FIELDS = ['intentName', 'trueIntent', 'falseIntent', 'goToIntent', 'action', 'fallbackIntent', 'errorIntent', 'conditionIntentId'];
+export const REFERENCE_FIELDS = ['intentName', 'trueIntent', 'falseIntent', 'goToIntent', 'action', 'fallbackIntent', 'errorIntent', 'conditionIntentId'];
 /** Campi del contatto che l'editor di leadupdate offre (utils-variables.ts). */
 const LEAD_FIELDS = ['email', 'fullname', 'phone', 'company', 'streetAddress', 'city', 'region', 'zipcode', 'country'];
 const TAG_TARGETS = ['request', 'lead'];
@@ -545,12 +550,292 @@ export function verifyAgent(agent: CompiledAgent): string[] {
  * Compila il Blueprint nell'agente V3 da importare.
  * @throws CompileError se il Blueprint non è compilabile o l'agente non rispetta le garanzie
  */
+/** Contesto con cui un blocco del Blueprint diventa uno o due intent V3. */
+export interface BlockContext {
+  ids: { uuid: () => string; uid: () => string };
+  language: string;
+  askMessageType: 'replyv2' | 'reply';
+  /** `#<intent_id>` del blocco, oppure stringa vuota se manca. */
+  ref: (blockId: string | null | undefined) => string;
+  /** L'intent_id d'ingresso del blocco. */
+  entryId: (blockId: string) => string;
+  /** L'intent_id della capture di una `ask`. */
+  captureId: (blockId: string) => string;
+  name: (blockId: string) => string;
+  captureName: (blockId: string) => string;
+  position: (blockId: string) => Position;
+  capturePosition: (blockId: string) => Position;
+  knowledgeBaseIds: Map<string, string>;
+  chatbotIds: Map<string, string>;
+  tablesByName: Map<string, DataTableRef>;
+  /** Registra una variabile dell'agente. */
+  declare: (name: string) => void;
+}
+
+function makeButton(ids: BlockContext['ids'], type: 'action' | 'url' | 'text', value: string, target: { link?: string; action?: string } = {}) {
+  return { uid: ids.uid(), type, value, link: target.link || '', target: 'blank', action: target.action || '', attributes: '', show_echo: true };
+}
+
+function makeMessage(ids: BlockContext['ids'], type: 'replyv2' | 'reply', text: string, buttons: any[]) {
+  const payload: any = { type: 'text', text };
+  if (buttons.length) payload.attributes = { attachment: { type: 'template', buttons } };
+  const attributes = { disableInputMessage: false, commands: [{ type: 'wait', time: 500 }, { type: 'message', message: payload }] };
+  return type === 'reply'
+    ? { _tdActionType: 'reply', _tdActionTitle: '', _tdActionId: ids.uuid(), text, attributes }
+    : { _tdActionType: 'replyv2', _tdActionTitle: '', _tdActionId: ids.uuid(), noInputTimeout: 10000, attributes };
+}
+
+function makeSimple(ids: BlockContext['ids'], type: string, fields: any = {}) {
+  return { _tdActionType: type, _tdActionTitle: '', _tdActionId: ids.uuid(), ...fields };
+}
+
+function makeBranches(ctx: BlockContext, block: CompilableBlock) {
+  return {
+    trueIntent: ctx.ref(block.exits?.true),
+    falseIntent: ctx.ref(block.exits?.false),
+    trueIntentAttributes: '',
+    falseIntentAttributes: '',
+    stopOnConditionMet: true
+  };
+}
+
+/** Un intent V3 con una sola action (o nessuna, per il defaultFallback). */
+export function makeIntent(ids: BlockContext['ids'], language: string, spec: { id: string; name: string; action: any; position: Position; next?: string; readonly?: boolean; question?: string }): any {
+  const intent: any = { webhook_enabled: false, enabled: true, intent_id: spec.id, intent_display_name: spec.name };
+  if (spec.question) intent.question = spec.question;
+  intent.language = language;
+  intent.actions = spec.action ? [spec.action] : [];
+  intent.attributes = {
+    position: spec.position,
+    readonly: !!spec.readonly,
+    color: BLOCK_COLOR,
+    nextBlockAction: { _tdActionTitle: '', _tdActionId: ids.uuid(), _tdActionType: 'intent', intentName: spec.next || '' },
+    connectors: {}
+  };
+  intent.agents_available = false;
+  return intent;
+}
+
+/**
+ * Compila un blocco del Blueprint negli intent V3 che lo rappresentano: uno per quasi tutti i tipi,
+ * due per la macro `ask` (domanda + capture). Il contesto fornisce id, nomi, posizioni e riferimenti.
+ */
+export function compileBlock(block: CompilableBlock, ctx: BlockContext): any[] {
+  const { ids, language } = ctx;
+  const ref = ctx.ref;
+  const id = ctx.entryId(block.id);
+  const name = ctx.name(block.id);
+  const position = ctx.position(block.id);
+  const intents: any[] = [];
+  const add = (action: any, next?: string) => intents.push(makeIntent(ids, language, { id, name, position, action, next }));
+  const button = (type: 'action' | 'url' | 'text', value: string, target: { link?: string; action?: string } = {}) => makeButton(ids, type, value, target);
+  const message = (type: 'replyv2' | 'reply', text: string, buttons: any[]) => makeMessage(ids, type, text, buttons);
+  const simple = (type: string, fields: any = {}) => makeSimple(ids, type, fields);
+  const branches = (b: CompilableBlock) => makeBranches(ctx, b);
+  const declare = ctx.declare;
+
+  switch (block.type) {
+    case 'replyv2': {
+      const buttons = (block.buttons || []).map(b => (b.goto
+        ? button('action', b.label, { action: ref(b.goto) })
+        : button('url', b.label, { link: b.url || '' })));
+      add(message('replyv2', block.text as string, buttons), ref(block.next));
+      break;
+    }
+    case 'randomreply': {
+      // Coppie attesa + messaggio, una per variante: l'engine ne sceglie una a caso e vuole un numero pari di comandi.
+      const commands: any[] = [];
+      (block.texts || []).filter(nonEmpty).forEach(text => {
+        commands.push({ type: 'wait', time: 500 }, { type: 'message', message: { type: 'text', text } });
+      });
+      add(simple('randomreply', { attributes: { disableInputMessage: false, commands } }), ref(block.next));
+      break;
+    }
+    case 'ask': {
+      const captureId = ctx.captureId(block.id);
+      const buttons = (block.options || []).map(option => button('text', option));
+      add(message(ctx.askMessageType, block.text as string, buttons), '#' + captureId);
+      intents.push(makeIntent(ids, language, {
+        id: captureId,
+        name: ctx.captureName(block.id),
+        position: ctx.capturePosition(block.id),
+        action: simple('capture_user_reply', { assignResultTo: block.saveTo, goToIntent: ref(block.next) })
+      }));
+      declare(block.saveTo as string);
+      break;
+    }
+    case 'setattribute-v2': {
+      const operand = block.fromVariable != null
+        ? { value: block.fromVariable, isVariable: true }
+        : { value: String(block.value), isVariable: false };
+      add(simple('setattribute-v2', { destination: block.destination, operation: { operands: [operand], operators: [] } }), ref(block.next));
+      declare(block.destination as string);
+      break;
+    }
+    case 'delete':
+      add(simple('delete', { variableName: block.variable }), ref(block.next));
+      break;
+    case 'jsoncondition2':
+      // groups vuoto: con il default [new Expression()] l'editor non ricostruisce i gruppi e al primo salvataggio svuota `when`.
+      add(simple('jsoncondition2', { ...branches(block), groups: [], when: block.when }));
+      break;
+    case 'ai_condition':
+      // Etichette come quelle dell'editor (uid): il componente ne ricava i connettori. L'engine sostituisce
+      // le variabili solo nelle istruzioni, non nei prompt dei rami.
+      add(simple('ai_condition', {
+        ...AI_MODEL,
+        max_tokens: 256,
+        temperature: 0.7,
+        instructions: block.instructions || AI_CONDITION_INSTRUCTIONS,
+        intents: (block.branches || []).map(branch => ({ label: ids.uid(), prompt: branch.description, conditionIntentId: ref(branch.goto) })),
+        fallbackIntent: ref(block.exits?.fallback),
+        errorIntent: ref(block.exits?.error),
+        assignReplyTo: 'ai_condition',
+        preview: []
+      }));
+      break;
+    case 'ifopenhours':
+      add(simple('ifopenhours', branches(block)));
+      break;
+    case 'ifonlineagentsv2':
+      add(simple('ifonlineagentsv2', { ...branches(block), selectedOption: 'all', ignoreOperatingHours: false }));
+      break;
+    case 'askgptv2':
+      // I default di createNewAction, più llm/model/modelName che nel canvas imposterebbe il componente al primo render.
+      add(simple('askgptv2', {
+        question: block.question || '{{lastUserText}}',
+        assignReplyTo: 'kb_reply',
+        assignJsonSourcesTo: 'kb_json_sources',
+        assignChunksTo: 'kb_chunks',
+        max_tokens: 10000,
+        temperature: 0.7,
+        top_k: 5,
+        alpha: 0.5,
+        ...AI_MODEL,
+        preview: [],
+        history: false,
+        citations: false,
+        reranking: false,
+        reranking_multiplier: 2,
+        namespace: ctx.knowledgeBaseIds.get(block.knowledgeBase as string),
+        namespaceAsName: false,
+        ...branches(block)
+      }));
+      KB_VARIABLES.forEach(declare);
+      break;
+    case 'ai_prompt':
+      // I default di createNewAction, con il modello che il componente riconosce al primo render.
+      add(simple('ai_prompt', {
+        question: block.question,
+        ...(block.instructions ? { context: block.instructions } : {}),
+        ...AI_MODEL,
+        max_tokens: 256,
+        temperature: 0.7,
+        history: block.history === true,
+        assignReplyTo: block.saveTo,
+        preview: [],
+        formatType: 'none',
+        ...branches(block)
+      }));
+      declare(block.saveTo as string);
+      break;
+    case 'add_kb_content':
+      // L'engine legge `content`: l'editor lo ricompone da titolo e testo solo all'uscita dal campo.
+      add(simple('add_kb_content', {
+        type: 'faq',
+        name: block.title,
+        source: block.content,
+        content: `${block.title}\n${block.content}`,
+        namespace: ctx.knowledgeBaseIds.get(block.knowledgeBase as string),
+        namespaceAsName: false,
+        tags: []
+      }), ref(block.next));
+      break;
+    case 'data_table': {
+      // Senza condizioni per insert, con la mappa colonna → valore: così il componente non le riscrive all'apertura.
+      const table = ctx.tablesByName.get(block.table as string) as DataTableRef;
+      const errorTo = `${block.saveTo}_error`;
+      const data: { [column: string]: string } = {};
+      (block.data || []).forEach(d => { data[d.column] = d.value; });
+      add(simple('data_table', {
+        tableId: table.id,
+        tableName: table.name,
+        operation: block.operation,
+        must_match: block.match || 'all',
+        conditions: (block.conditions || []).map(c => ({ column: c.column, operator: c.operator, value: c.value == null ? '' : c.value })),
+        data,
+        assignResultTo: block.saveTo,
+        assignErrorTo: errorTo,
+        ...branches(block)
+      }));
+      declare(block.saveTo as string);
+      declare(errorTo);
+      break;
+    }
+    case 'iteration':
+      // Il corpo (each) torna al blocco dell'iterazione; finita la lista l'engine prosegue con nextBlockAction (done).
+      add(simple('iteration', { iterable: block.iterable, assignOutputTo: block.itemVariable, goToIntent: ref(block.exits?.each) }), ref(block.exits?.done));
+      declare(block.itemVariable as string);
+      break;
+    case 'wait':
+      add(simple('wait', { millis: Math.round(Number(block.seconds) * 1000) }), ref(block.next));
+      break;
+    case 'add_tags':
+      // Una stringa separata da virgole: con un array il canvas (split) e l'engine si bloccano.
+      add(simple('add_tags', {
+        tags: (block.tags || []).filter(nonEmpty).map(tag => tag.trim()).join(','),
+        target: block.target,
+        pushToList: false
+      }), ref(block.next));
+      break;
+    case 'leadupdate': {
+      const update: { [field: string]: string } = {};
+      (block.leadFields || []).forEach(f => { update[f.field] = f.value; });
+      add(simple('leadupdate', { update }), ref(block.next));
+      break;
+    }
+    case 'email':
+      add(simple('email', {
+        to: block.to,
+        subject: block.subject,
+        text: block.body,
+        ...(block.replyTo ? { replyto: block.replyTo } : {})
+      }), ref(block.next));
+      break;
+    case 'flow_log':
+      add(simple('flow_log', { level: block.level, log: block.log }), ref(block.next));
+      break;
+    case 'clear_transcript':
+      add(simple('clear_transcript'), ref(block.next));
+      break;
+    case 'department':
+      // triggerBot false: con true partirebbe il bot del dipartimento.
+      add(simple('department', { depName: block.department, triggerBot: false }), ref(block.next));
+      break;
+    case 'replacebotv3':
+      // Per id (useSlug false). Terminale: dopo il cambio la conversazione è dell'altro agente.
+      add(simple('replacebotv3', { botId: ctx.chatbotIds.get(block.bot as string), useSlug: false, blockName: '' }));
+      break;
+    case 'agent':
+    case 'move_to_unassigned':
+    case 'close':
+      add(simple(block.type));
+      break;
+  }
+  return intents;
+}
+
+/** Il nome della capture di una `ask`, nella lingua dell'agente. */
+export function captureNameOf(base: string, language: string): string {
+  const suffix = REPLY_SUFFIX[language.slice(0, 2).toLowerCase()] || 'reply';
+  return base.slice(0, NAME_MAX - suffix.length - 1).trim() + ' ' + suffix;
+}
+
 export function compileBlueprint(blueprint: CompilableBlueprint, options: CompileOptions = {}): CompiledAgent {
   const problems = checkBlueprint(blueprint, options);
   if (problems.length) throw new CompileError(problems);
 
   const ids = options.ids || { uuid: defaultUuid, uid: () => defaultUuid().replace(/-/g, '') };
-  const now = options.now || (() => new Date().toISOString());
   const askMessageType = options.askMessageType || 'replyv2';
   const language = String(blueprint.language || 'en');
   const blocks = blueprint.blocks;
@@ -573,268 +858,49 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
   const register = createNameRegistry();
   const names = new Map<string, string>();
   const captureNames = new Map<string, string>();
-  const suffix = REPLY_SUFFIX[language.slice(0, 2).toLowerCase()] || 'reply';
   blocks.forEach(block => {
     const base = toBlockName(block.name, block.id);
     names.set(block.id, register(base));
-    if (block.type === 'ask') {
-      captureNames.set(block.id, register(base.slice(0, NAME_MAX - suffix.length - 1).trim() + ' ' + suffix));
-    }
+    if (block.type === 'ask') captureNames.set(block.id, register(captureNameOf(base, language)));
   });
 
   const positions = layout(blueprint, byId);
   const variables: string[] = [];
   const declare = (name: string) => { if (name && !variables.includes(name)) variables.push(name); };
 
-  const button = (type: 'action' | 'url' | 'text', value: string, target: { link?: string; action?: string } = {}) => ({
-    uid: ids.uid(), type, value, link: target.link || '', target: 'blank', action: target.action || '', attributes: '', show_echo: true
-  });
-  const message = (type: 'replyv2' | 'reply', text: string, buttons: any[]) => {
-    const payload: any = { type: 'text', text };
-    if (buttons.length) payload.attributes = { attachment: { type: 'template', buttons } };
-    const attributes = { disableInputMessage: false, commands: [{ type: 'wait', time: 500 }, { type: 'message', message: payload }] };
-    return type === 'reply'
-      ? { _tdActionType: 'reply', _tdActionTitle: '', _tdActionId: ids.uuid(), text, attributes }
-      : { _tdActionType: 'replyv2', _tdActionTitle: '', _tdActionId: ids.uuid(), noInputTimeout: 10000, attributes };
+  const ctx: BlockContext = {
+    ids, language, askMessageType, ref,
+    entryId: blockId => entry.get(blockId) as string,
+    captureId: blockId => capture.get(blockId) as string,
+    name: blockId => names.get(blockId) as string,
+    captureName: blockId => captureNames.get(blockId) as string,
+    position: blockId => positions.get(blockId) as Position,
+    capturePosition: blockId => positions.get(blockId + CAPTURE_KEY) as Position,
+    knowledgeBaseIds, chatbotIds, tablesByName, declare
   };
-  const simple = (type: string, fields: any = {}) => ({ _tdActionType: type, _tdActionTitle: '', _tdActionId: ids.uuid(), ...fields });
-  const branches = (block: CompilableBlock) => ({
-    trueIntent: ref(block.exits?.true),
-    falseIntent: ref(block.exits?.false),
-    trueIntentAttributes: '',
-    falseIntentAttributes: '',
-    stopOnConditionMet: true
-  });
-  const makeIntent = (spec: { id: string; name: string; action: any; position: Position; next?: string; readonly?: boolean; question?: string }) => {
-    const intent: any = { webhook_enabled: false, enabled: true, intent_id: spec.id, intent_display_name: spec.name };
-    if (spec.question) intent.question = spec.question;
-    intent.language = language;
-    intent.actions = spec.action ? [spec.action] : [];
-    intent.attributes = {
-      position: spec.position,
-      readonly: !!spec.readonly,
-      color: BLOCK_COLOR,
-      nextBlockAction: { _tdActionTitle: '', _tdActionId: ids.uuid(), _tdActionType: 'intent', intentName: spec.next || '' },
-      connectors: {}
-    };
-    intent.agents_available = false;
-    return intent;
-  };
+  const message = (type: 'replyv2' | 'reply', text: string, buttons: any[]) => makeMessage(ids, type, text, buttons);
 
   const intents: any[] = [];
-  intents.push(makeIntent({
+  intents.push(makeIntent(ids, language, {
     id: ids.uuid(), name: 'start', question: '\\start', readonly: true, position: { x: X0, y: Y0 },
     action: { _tdActionType: 'intent', _tdActionId: ids.uuid(), intentName: ref(blueprint.start) }
   }));
 
-  blocks.forEach(block => {
-    const id = entry.get(block.id) as string;
-    const name = names.get(block.id) as string;
-    const position = positions.get(block.id) as Position;
-    const add = (action: any, next?: string) => intents.push(makeIntent({ id, name, position, action, next }));
-    switch (block.type) {
-      case 'replyv2': {
-        const buttons = (block.buttons || []).map(b => (b.goto
-          ? button('action', b.label, { action: ref(b.goto) })
-          : button('url', b.label, { link: b.url || '' })));
-        add(message('replyv2', block.text as string, buttons), ref(block.next));
-        break;
-      }
-      case 'randomreply': {
-        // Coppie attesa + messaggio, una per variante: l'engine ne sceglie una a caso e vuole un numero pari di comandi.
-        const commands: any[] = [];
-        (block.texts || []).filter(nonEmpty).forEach(text => {
-          commands.push({ type: 'wait', time: 500 }, { type: 'message', message: { type: 'text', text } });
-        });
-        add(simple('randomreply', { attributes: { disableInputMessage: false, commands } }), ref(block.next));
-        break;
-      }
-      case 'ask': {
-        const captureId = capture.get(block.id) as string;
-        const buttons = (block.options || []).map(option => button('text', option));
-        add(message(askMessageType, block.text as string, buttons), '#' + captureId);
-        intents.push(makeIntent({
-          id: captureId,
-          name: captureNames.get(block.id) as string,
-          position: positions.get(block.id + CAPTURE_KEY) as Position,
-          action: simple('capture_user_reply', { assignResultTo: block.saveTo, goToIntent: ref(block.next) })
-        }));
-        declare(block.saveTo as string);
-        break;
-      }
-      case 'setattribute-v2': {
-        const operand = block.fromVariable != null
-          ? { value: block.fromVariable, isVariable: true }
-          : { value: String(block.value), isVariable: false };
-        add(simple('setattribute-v2', { destination: block.destination, operation: { operands: [operand], operators: [] } }), ref(block.next));
-        declare(block.destination as string);
-        break;
-      }
-      case 'delete':
-        add(simple('delete', { variableName: block.variable }), ref(block.next));
-        break;
-      case 'jsoncondition2':
-        // groups vuoto: con il default [new Expression()] l'editor non ricostruisce i gruppi e al primo salvataggio svuota `when`.
-        add(simple('jsoncondition2', { ...branches(block), groups: [], when: block.when }));
-        break;
-      case 'ai_condition':
-        // Etichette come quelle dell'editor (uid): il componente ne ricava i connettori. L'engine sostituisce
-        // le variabili solo nelle istruzioni, non nei prompt dei rami.
-        add(simple('ai_condition', {
-          ...AI_MODEL,
-          max_tokens: 256,
-          temperature: 0.7,
-          instructions: block.instructions || AI_CONDITION_INSTRUCTIONS,
-          intents: (block.branches || []).map(branch => ({ label: ids.uid(), prompt: branch.description, conditionIntentId: ref(branch.goto) })),
-          fallbackIntent: ref(block.exits?.fallback),
-          errorIntent: ref(block.exits?.error),
-          assignReplyTo: 'ai_condition',
-          preview: []
-        }));
-        break;
-      case 'ifopenhours':
-        add(simple('ifopenhours', branches(block)));
-        break;
-      case 'ifonlineagentsv2':
-        add(simple('ifonlineagentsv2', { ...branches(block), selectedOption: 'all', ignoreOperatingHours: false }));
-        break;
-      case 'askgptv2':
-        // I default di createNewAction, più llm/model/modelName che nel canvas imposterebbe il componente al primo render.
-        add(simple('askgptv2', {
-          question: block.question || '{{lastUserText}}',
-          assignReplyTo: 'kb_reply',
-          assignJsonSourcesTo: 'kb_json_sources',
-          assignChunksTo: 'kb_chunks',
-          max_tokens: 10000,
-          temperature: 0.7,
-          top_k: 5,
-          alpha: 0.5,
-          ...AI_MODEL,
-          preview: [],
-          history: false,
-          citations: false,
-          reranking: false,
-          reranking_multiplier: 2,
-          namespace: knowledgeBaseIds.get(block.knowledgeBase as string),
-          namespaceAsName: false,
-          ...branches(block)
-        }));
-        KB_VARIABLES.forEach(declare);
-        break;
-      case 'ai_prompt':
-        // I default di createNewAction, con il modello che il componente riconosce al primo render.
-        add(simple('ai_prompt', {
-          question: block.question,
-          ...(block.instructions ? { context: block.instructions } : {}),
-          ...AI_MODEL,
-          max_tokens: 256,
-          temperature: 0.7,
-          history: block.history === true,
-          assignReplyTo: block.saveTo,
-          preview: [],
-          formatType: 'none',
-          ...branches(block)
-        }));
-        declare(block.saveTo as string);
-        break;
-      case 'add_kb_content':
-        // L'engine legge `content`: l'editor lo ricompone da titolo e testo solo all'uscita dal campo.
-        add(simple('add_kb_content', {
-          type: 'faq',
-          name: block.title,
-          source: block.content,
-          content: `${block.title}\n${block.content}`,
-          namespace: knowledgeBaseIds.get(block.knowledgeBase as string),
-          namespaceAsName: false,
-          tags: []
-        }), ref(block.next));
-        break;
-      case 'data_table': {
-        // Senza condizioni per insert, con la mappa colonna → valore: così il componente non le riscrive all'apertura.
-        const table = tablesByName.get(block.table as string) as DataTableRef;
-        const errorTo = `${block.saveTo}_error`;
-        const data: { [column: string]: string } = {};
-        (block.data || []).forEach(d => { data[d.column] = d.value; });
-        add(simple('data_table', {
-          tableId: table.id,
-          tableName: table.name,
-          operation: block.operation,
-          must_match: block.match || 'all',
-          conditions: (block.conditions || []).map(c => ({ column: c.column, operator: c.operator, value: c.value == null ? '' : c.value })),
-          data,
-          assignResultTo: block.saveTo,
-          assignErrorTo: errorTo,
-          ...branches(block)
-        }));
-        declare(block.saveTo as string);
-        declare(errorTo);
-        break;
-      }
-      case 'iteration':
-        // Il corpo (each) torna al blocco dell'iterazione; finita la lista l'engine prosegue con nextBlockAction (done).
-        add(simple('iteration', { iterable: block.iterable, assignOutputTo: block.itemVariable, goToIntent: ref(block.exits?.each) }), ref(block.exits?.done));
-        declare(block.itemVariable as string);
-        break;
-      case 'wait':
-        add(simple('wait', { millis: Math.round(Number(block.seconds) * 1000) }), ref(block.next));
-        break;
-      case 'add_tags':
-        // Una stringa separata da virgole: con un array il canvas (split) e l'engine si bloccano.
-        add(simple('add_tags', {
-          tags: (block.tags || []).filter(nonEmpty).map(tag => tag.trim()).join(','),
-          target: block.target,
-          pushToList: false
-        }), ref(block.next));
-        break;
-      case 'leadupdate': {
-        const update: { [field: string]: string } = {};
-        (block.leadFields || []).forEach(f => { update[f.field] = f.value; });
-        add(simple('leadupdate', { update }), ref(block.next));
-        break;
-      }
-      case 'email':
-        add(simple('email', {
-          to: block.to,
-          subject: block.subject,
-          text: block.body,
-          ...(block.replyTo ? { replyto: block.replyTo } : {})
-        }), ref(block.next));
-        break;
-      case 'flow_log':
-        add(simple('flow_log', { level: block.level, log: block.log }), ref(block.next));
-        break;
-      case 'clear_transcript':
-        add(simple('clear_transcript'), ref(block.next));
-        break;
-      case 'department':
-        // triggerBot false: con true partirebbe il bot del dipartimento.
-        add(simple('department', { depName: block.department, triggerBot: false }), ref(block.next));
-        break;
-      case 'replacebotv3':
-        // Per id (useSlug false). Terminale: dopo il cambio la conversazione è dell'altro agente.
-        add(simple('replacebotv3', { botId: chatbotIds.get(block.bot as string), useSlug: false, blockName: '' }));
-        break;
-      case 'agent':
-      case 'move_to_unassigned':
-      case 'close':
-        add(simple(block.type));
-        break;
-    }
-  });
+  blocks.forEach(block => compileBlock(block, ctx).forEach(intent => intents.push(intent)));
 
   // Regola V3 sul fallback: `defaultFallback` c'è sempre, resta vuoto e nessuno vi punta; si collega a un blocco
   // «Fallback» che porta il messaggio (poi `fallbackNext`), oppure direttamente a `fallbackNext` se il messaggio manca.
   let fallbackTarget = ref(blueprint.fallbackNext);
   if (blueprint.fallbackText) {
     const fallbackId = ids.uuid();
-    intents.push(makeIntent({
+    intents.push(makeIntent(ids, language, {
       id: fallbackId, name: register(FALLBACK_NAME), position: { x: X0, y: Y0 + 2 * ROW },
       action: message('replyv2', blueprint.fallbackText, []),
       next: ref(blueprint.fallbackNext)
     }));
     fallbackTarget = '#' + fallbackId;
   }
-  intents.push(makeIntent({
+  intents.push(makeIntent(ids, language, {
     id: ids.uuid(), name: 'defaultFallback', readonly: true, position: { x: X0, y: Y0 + ROW }, action: null, next: fallbackTarget
   }));
 
@@ -846,15 +912,10 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
     language,
     webhook_enabled: false,
     attributes: {
-      variables: variables.reduce((map, v) => { map[v] = v; return map; }, {} as { [name: string]: string }),
-      aiGeneration: {
-        ...(options.generation || {}),
-        blueprintVersion: blueprint.version,
-        notes: Array.isArray(blueprint.notes) ? blueprint.notes : [],
-        generatedAt: now()
-      }
+      variables: variables.reduce((map, v) => { map[v] = v; return map; }, {} as { [name: string]: string })
     },
-    intents
+    intents,
+    idMap: Array.from(entry.entries()).reduce((map, [blockId, intentId]) => { map[blockId] = intentId; return map; }, {} as { [blockId: string]: string })
   };
 
   const broken = verifyAgent(agent);

@@ -7,7 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 14/09/2026
 
+# this branch 13/09/2026
+
+- **added**: dentro ogni agente V3, un pulsante «AI» nell'header apre un pannello a destra con la storia dell'agente. La scheda «Prompt» mostra il prompt di creazione, le modifiche fatte con l'AI e i ripristini, e permette di chiedere una modifica in linguaggio naturale: l'AI propone i cambiamenti, il DS li mostra in anteprima (blocchi aggiunti, modificati, rimossi, collegamenti) e li applica solo su «Applica». La scheda «Versioni» elenca tutte le versioni e le release, con «Salva versione», «Ripristina qui», «Crea copia», «Vedi prompt» e «Riusa nel generatore». Il pulsante compare su ogni agente V3 con il servizio di generazione configurato; se il server non ha ancora il modulo delle revisioni, il pannello si apre e lo dice
+- **added**: ogni ripristino è preceduto da un salvataggio automatico della versione corrente, quindi è reversibile; prima di confermare, il DS avvisa se la versione usa dipartimenti, knowledge base, tabelle o agenti che nel progetto non esistono più. La versione pubblicata non cambia: per portare online un ripristino si pubblica di nuovo
+- **changed**: l'agente creato con l'AI non porta più i dati della generazione nei suoi attributi: prompt, intervista e flusso generato stanno nella storia dell'agente sul server, fuori dal percorso dei messaggi. Con il modulo del server acceso la creazione avviene in una sola chiamata atomica, senza riletture dei blocchi; con il modulo spento la creazione funziona come prima e la storia non viene salvata
+- **changed**: la modale «Crea agente con l'AI» salva la bozza nella scheda prima di creare l'agente; a creazione riuscita la svuota e si azzera del tutto; se la creazione fallisce, bozza e anteprima restano. Errori più precisi quando il server rifiuta dei blocchi
+- **added**: ogni pubblicazione e ripubblicazione collega la release alla storia dell'agente; la cancellazione di un agente cancella la sua storia. Se queste chiamate falliscono, l'utente non viene bloccato
+- **added**: nel pannello si può chiedere una modifica e vederne l'anteprima anche quando il server non ha il modulo delle revisioni; in quel caso resta disabilitato solo «Applica», e il pannello spiega perché. Le nuove etichette sono tradotte nelle 15 lingue
 
 # this branch 12/09/2026
 
