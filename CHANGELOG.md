@@ -9,6 +9,9 @@
 
 # this branch 14/09/2026
 
+- **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
+- **changed**: all'apertura di un agente la versione dell'editor si legge da quel dato invece di dedurla dalla data di creazione: un agente costruito con il V3 resta sul V3 anche se la data di taglio viene spostata. Gli agenti che non la portano, cioe' tutti quelli creati finora, restano decisi dalla data esattamente come prima
+
 # this branch 13/09/2026
 
 - **added**: dentro ogni agente V3, un pulsante «AI» nell'header apre un pannello a destra con la storia dell'agente. La scheda «Prompt» mostra il prompt di creazione, le modifiche fatte con l'AI e i ripristini, e permette di chiedere una modifica in linguaggio naturale: l'AI propone i cambiamenti, il DS li mostra in anteprima (blocchi aggiunti, modificati, rimossi, collegamenti) e li applica solo su «Applica». La scheda «Versioni» elenca tutte le versioni e le release, con «Salva versione», «Ripristina qui», «Crea copia», «Vedi prompt» e «Riusa nel generatore». Il pulsante compare su ogni agente V3 con il servizio di generazione configurato; se il server non ha ancora il modulo delle revisioni, il pannello si apre e lo dice
