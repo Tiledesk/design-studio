@@ -102,12 +102,14 @@ export class DashboardService {
   /**
    * Resolves whether the chatbot must be edited with the V3 Design Studio.
    *
-   * The label written by the server on every chatbot it creates
-   * (`attributes.dsVersion`) wins. It is what keeps a chatbot on the editor it
-   * was built for: the cutoff date below lives in this bundle, so moving it
-   * would otherwise reclassify existing chatbots on the next deploy.
+   * The label declared by whoever built the flow (`attributes.dsVersion`) wins:
+   * only the tool that built it knows which editor it was built with, so the
+   * server stores what it receives and never invents one. It is what keeps a
+   * chatbot on the editor it was built for: the cutoff date below lives in this
+   * bundle, so moving it would otherwise reclassify existing chatbots on the
+   * next deploy.
    *
-   * Chatbots created before the server started writing the label carry none, and
+   * Chatbots built before the Design Studio started declaring it carry none, and
    * only for those the creation date decides: a chatbot is V3 when it was created
    * on or after DATE_NEW_CHATBOT. Both dates are ISO strings, so the comparison is
    * lexicographic.
