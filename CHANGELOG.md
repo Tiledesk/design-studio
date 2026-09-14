@@ -9,6 +9,8 @@
 
 # this branch 14/09/2026
 
+- **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
+- **changed**: all'apertura di un agente la versione dell'editor si legge da quel dato invece di dedurla dalla data di creazione: un agente costruito con il V3 resta sul V3 anche se la data di taglio viene spostata. Gli agenti che non la portano, cioe' tutti quelli creati finora, restano decisi dalla data esattamente come prima
 - **changed**: this branch now carries the V3 work (the V3 look of the blocks, the «Create agent with AI» modal and the AI panel with the agent history), the agent chat (vibe coder) and the whole 1.40.14-rc13 line of master-pre. The V3 AI authoring stays inactive behind a single switch, off by default: no «Create agent with AI» button in the sidebar, no «AI» button in the header, no history probe on the server. Nothing is removed; a single environment can turn it on from the remote config with `aiAgentGeneratorEnabled: true`. The agent chat stays active as before
 
 # this branch 13/09/2026
