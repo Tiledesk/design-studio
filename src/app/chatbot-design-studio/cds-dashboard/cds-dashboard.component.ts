@@ -39,7 +39,6 @@ import { StageService } from 'src/app/chatbot-design-studio/services/stage.servi
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
-import { AGENT_CHAT_FEATURE_ENABLED } from '../agent-chat/agent-chat.config';
 import { IntentService } from '../services/intent.service';
 
 
@@ -61,8 +60,8 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
    *  canvas rebuild on flow switch; see cds-dashboard.component.html. */
   private subscriptionAgentChatPanel: Subscription;
   IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
-  /** Feature «vibe coder» accesa: con false il pannello dell'agent chat non viene montato. */
-  readonly agentChatFeatureEnabled = AGENT_CHAT_FEATURE_ENABLED;
+  /** Feature «vibe coder» accesa (codice o remote config): con false il pannello dell'agent chat non viene montato. */
+  get agentChatFeatureEnabled(): boolean { return this.agentChatHostService.isFeatureEnabled(); }
 
   /** Gates the chat panel to the blocks section. It reads only the URL's last
    *  segment, which a flow switch leaves as 'blocks', so it cannot flicker

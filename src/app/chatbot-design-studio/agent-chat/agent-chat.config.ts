@@ -16,7 +16,8 @@ export interface AgentChatConfig {
  * Interruttore della feature «vibe coder» (agent chat, generazione e modifica dell'agente da prompt).
  * Con `false` tutto resta nel codice ma non compare: niente pulsante nell'header, niente pannello,
  * niente scheda «Vibe Coder» nelle impostazioni. La lettura di `agentChatUrl` resta com'è: l'interruttore agisce
- * solo sulle superfici visibili (header, dashboard, impostazioni). Per riattivare basta rimettere `true`.
+ * solo sulle superfici visibili (header, dashboard, impostazioni). Per riattivare basta rimettere `true`,
+ * oppure, per un solo ambiente o una sola macchina, mettere `agentChatEnabled: true` nella remote config.
  */
 export const AGENT_CHAT_FEATURE_ENABLED = false;
 

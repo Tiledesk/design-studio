@@ -33,7 +33,6 @@ import { ConnectorTriggerService } from '../../connector/connector-trigger.servi
 import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
-import { AGENT_CHAT_FEATURE_ENABLED } from 'src/app/chatbot-design-studio/agent-chat/agent-chat.config';
 
 const swal = require('sweetalert');
 
@@ -119,7 +118,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
    *  connector base URLs gate the connector catalogue. */
   get isAgentChatAvailable(): boolean {
     // Interruttore della feature «vibe coder»: spento, il pulsante non compare anche se l'host e' configurato
-    return AGENT_CHAT_FEATURE_ENABLED && this.agentChatHostService.isConfigured();
+    return this.agentChatHostService.isFeatureEnabled() && this.agentChatHostService.isConfigured();
   }
 
   onToggleAgentChat(){

@@ -6,7 +6,7 @@ import { IntentService } from '../services/intent.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { FlowOpsService } from './flow-ops.service';
 import { FlowOp, FlowOpsReport } from './flow-ops.model';
-import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
+import { AGENT_CHAT_FEATURE_ENABLED, AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
@@ -84,6 +84,15 @@ export class AgentChatHostService {
     this.dashboardService.selectedChatbot$.subscribe(() => this.setContext());
     // Both are no-ops while nothing is attached. This service is root-scoped
     // and lives as long as the app, so neither subscription outlives anything.
+  }
+
+  /**
+   * La feature «vibe coder» e' accesa: dal codice (`AGENT_CHAT_FEATURE_ENABLED`) oppure, per un
+   * ambiente o una macchina, dalla remote config con `agentChatEnabled: true`. Spenta, pulsante,
+   * pannello e scheda delle impostazioni non compaiono anche se `agentChatUrl` e' configurato.
+   */
+  public isFeatureEnabled(): boolean {
+    return AGENT_CHAT_FEATURE_ENABLED || this.appConfigService.getConfig()?.agentChatEnabled === true;
   }
 
   public isConfigured(): boolean {
