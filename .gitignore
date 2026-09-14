@@ -59,5 +59,12 @@ Thumbs.db
 settings.json
 docs
 .claude
+.superpowers/
+.connector-sdd-*.md
 json-condition-when-grammar.md
 proxy.conf.json
+.superpowers/
+.connector-sdd-*.md
+
+# Scratch output from Playwright MCP browsing sessions. Never part of the repo.
+.playwright-mcp/

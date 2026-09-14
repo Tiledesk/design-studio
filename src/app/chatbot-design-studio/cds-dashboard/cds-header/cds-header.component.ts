@@ -31,6 +31,10 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
+import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
+import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
 
 const swal = require('sweetalert');
 
@@ -108,11 +112,25 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
+    private readonly triggerService: ConnectorTriggerService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
+    private readonly projectService: ProjectService,
+    private agentChatHostService: AgentChatHostService,
     private readonly agentRevisionsService: AgentRevisionsService,
     private readonly agentGeneratorService: AgentGeneratorService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
+  }
+
+  /** The button exists only where the feature is configured, exactly as
+   *  connector base URLs gate the connector catalogue. */
+  get isAgentChatAvailable(): boolean {
+    return this.agentChatHostService.isConfigured();
+  }
+
+  onToggleAgentChat(){
+    this.controllerService.toggleAgentChatPanel();
   }
 
   manageRouteChanges(){
@@ -509,12 +527,36 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
 
+  /** Arm/disarm connector dev-mirroring for the current chatbot webhook across every
+   *  configured/installed connector, so Test-It-Out also delivers trigger events to the
+   *  draft (/dev) bot. Best-effort — never blocks the test session. */
+  private async setConnectorsDebug(arm: boolean): Promise<void> {
+    if (!this.webhookId) { return; }
+    const conns: Array<{ baseUrl: string; apiKey?: string }> = [];
+    ((environment as any).connectorBaseUrls || []).forEach((b: string) => { if (b) { conns.push({ baseUrl: b }); } });
+    try {
+      const integrations: any = await firstValueFrom((this.projectService as any).getIntegrations(this.projectID));
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl, apiKey }) => {
+        if (!conns.find(c => c.baseUrl === baseUrl)) {
+          conns.push({ baseUrl, apiKey });
+        }
+      });
+    } catch { /* ignore — dev path still arms via connectorBaseUrls */ }
+    conns.forEach(c => {
+      const call$ = arm
+        ? this.triggerService.armDebug(c.baseUrl, c.apiKey || '', this.webhookId, 3600)
+        : this.triggerService.disarmDebug(c.baseUrl, c.apiKey || '', this.webhookId);
+      call$.subscribe({ error: (e: any) => this.logger.error('[triggers] ' + (arm ? 'armDebug' : 'disarmDebug') + ' failed', e) });
+    });
+  }
+
   async onOpenTestItOut(){
     let request_id: string | Promise<void>;
-    this.logService.initialize(null); 
+    this.logService.initialize(null);
     if(this.isWebhook){
       this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
       request_id = await this.webhookStarterLog();
+      this.setConnectorsDebug(true);
     } else {
       request_id = this.logService.request_id;
     }
@@ -526,6 +568,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     const mqtt_token = tokenResp.token || null;
     request_id = tokenResp.request_id || null;
     this.logService.starterLog(mqtt_token, request_id);
+
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
@@ -535,6 +578,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   onCloseTestItOut(){
     if(this.isWebhook){
       this.stopWebhook();
+      this.setConnectorsDebug(false);
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;

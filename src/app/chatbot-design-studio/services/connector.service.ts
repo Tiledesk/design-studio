@@ -5,7 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 import { Setting } from 'src/app/models/action-model';
-import { TYPE_ACTION, TYPE_ACTION_VXML } from '../utils-actions';
+import { TYPE_ACTION, TYPE_ACTION_VXML, isReturnStackIntent } from '../utils-actions';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { filter, map, shareReplay } from 'rxjs/operators';
 
@@ -44,6 +44,7 @@ export class ConnectorService {
   mapOfConnectors: any = {};
   scale: number = 1;
   existingIntentIds: any;
+
   
   // Coda per connettori che hanno fallito il rendering
   private failedConnectorsQueue: Array<{intent: any, fromId: string, toId: string, attributes: any, retryCount: number}> = [];
@@ -248,6 +249,13 @@ export class ConnectorService {
 
   public async createMapOfConnectors(intents){
     this.logger.log('[CONNECTOR-SERV] -----> createMapOfConnectors 1::: ', intents);
+    // Same reasoning as IntentService.setMapOfIntents: this describes the ONE
+    // flow the canvas is building, and its only caller is that build. Carrying
+    // the previous flow's connectors over was invisible while changing flow
+    // meant reloading the page; with the canvas rebuilt in place they are
+    // entries pointing at blocks that no longer exist on the stage.
+    this.mapOfConnectors = {};
+    this.listOfConnectors = {};
     this.existingIntentIds = new Set(intents.map((item) => item.intent_id));
     this.listOfIntents = intents;
     intents.forEach(async intent => {
@@ -356,7 +364,9 @@ export class ConnectorService {
    * create connectors from Intent
    */
   public async createConnectorsOfIntent(intent:any){
-    if(intent.attributes?.nextBlockAction){
+    // i nodi "Return to parent agent" sono terminali: nessun connettore in uscita,
+    // anche se su blocchi legacy è rimasto salvato un nextBlockAction.intentName stantio
+    if(intent.attributes?.nextBlockAction && !isReturnStackIntent(intent)){
       let idConnectorFrom = null;
       let idConnectorTo = null;
       let nextBlockAction = intent.attributes.nextBlockAction;
@@ -599,6 +609,32 @@ export class ConnectorService {
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorFrom', idConnectorFrom);
             this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION ACTION -> idConnectorTo', idConnectorTo);
             // this.createConnectorFromId(idConnectorFrom, idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
+        /**  SUB-AGENT (INVOKE_SUB_AGENT) — connettori Success/Else, stessa logica di JSON_CONDITION */
+        if(action._tdActionType === TYPE_ACTION.INVOKE_SUB_AGENT){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - INVOKE_SUB_AGENT ACTION -> idConnectorTo', idConnectorTo);
             this.createConnector(intent, idConnectorFrom, idConnectorTo);
           }
         }
@@ -1330,15 +1366,23 @@ export class ConnectorService {
    * 
    */
   public deleteConnector(intent, idConnection, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
-    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
-    if(idConnector && intent.attributes?.connectors[idConnector]){
-      delete intent.attributes.connectors[idConnector];
+    try {
+      this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+      if (!intent || !idConnection) return;
+      if (!intent.attributes) intent.attributes = {};
+      if (!intent.attributes.connectors) intent.attributes.connectors = {};
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
+      if(idConnector && intent.attributes.connectors[idConnector]){
+        delete intent.attributes.connectors[idConnector];
+      }
+      this.hideContractConnector(idConnection);
+      if (this.tiledeskConnectors && typeof this.tiledeskConnectors.deleteConnector === 'function') {
+        this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+      }
+    } catch (err) {
+      this.logger.error('[CONNECTOR-SERV] deleteConnector error:', err);
     }
-    this.hideContractConnector(idConnection);
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  intent ', intent);
-    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -1377,7 +1421,7 @@ export class ConnectorService {
         return filteredMap;
       }, {});
       for (const [key, connector] of Object.entries(listOfConnectors)) {
-        this.logger.log('delete connector :: ', key );
+        this.logger.log('[CONNECTOR-SERV] delete connector :: ', key );
         const intentId = connectorID.split('/')[0];
         const intent = this.listOfIntents.find((intent) => intent.intent_id === intentId);
         this.deleteConnector(intent, key, save, notify);
@@ -1728,6 +1772,9 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:true};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    
+    // Notifica gli observer del cambiamento
+    this.notifyConnectorsChanged(idConnection);
   }
 
   showContractConnector(idConnection: string){
@@ -1737,6 +1784,24 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:false};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    
+    // Notifica gli observer del cambiamento
+    this.notifyConnectorsChanged(idConnection);
+  }
+
+  /**
+   * Notifica gli observer quando cambiano gli attributi di un connettore.
+   * Estrae l'ID dell'intent di destinazione e notifica solo quell'intent.
+   */
+  private notifyConnectorsChanged(connectorId: string): void {
+    const segments = connectorId.split('/');
+    const toIntentId = segments[segments.length - 1];
+    if (toIntentId) {
+      // Notifica gli observer (ricarica sempre i connettori freschi)
+      const connectors = this.getConnectorsInByIntent(toIntentId);
+      this.connectorsInChangedSubject.next({ intentId: toIntentId, connectors });
+      this.logger.log(`[CONNECTORS] Notificato cambiamento attributi connettore per blocco ${toIntentId}: ${connectors.length} connettori totali`);
+    }
   }
 
 

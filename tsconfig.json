@@ -22,7 +22,8 @@
     "target": "es2020",
     "module": "es2020",
     "types": [
-      "node"
+      "node",
+      "jasmine"
     ],
     "typeRoots": [
       "node_modules/@types"

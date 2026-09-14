@@ -1,0 +1,126 @@
+// In-flow column between the 60px menu rail and the blocks sidebar (see
+// cds-canvas.component.html / .scss), not an overlay over the canvas.
+// Opening and closing is a width change rather than a translate, so it has
+// to be a real flex item -- flex: 0 0 auto keeps its own width in control
+// rather than letting the row stretch or shrink it.
+:host {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  width: var(--agent-chat-width);
+  overflow: hidden;
+  z-index: 10;
+  background: #ffffff;
+  border-right: 1px solid var(--gray-light-02);
+  // Flanked by the rail and the blocks sidebar now instead of floating over
+  // the canvas, so the shadow only needs to read on the one edge that still
+  // borders open canvas space.
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+  transition: width 0.2s ease-in-out;
+}
+
+:host(.isHidden) {
+  width: 0;
+  border-right: none;
+  box-shadow: none;
+}
+:host(.isVisible) { width: var(--agent-chat-width); }
+
+// Suspended for the duration of an active drag (see onResizeStart /
+// handleDragEnd): with the transition still running, the edge would ease
+// toward each new width on a 0.2s curve instead of tracking the cursor.
+:host(.is-resizing) { transition: none; }
+
+.agent-chat-panel, .agent-chat-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.agent-chat-panel {
+  position: relative;
+}
+
+.agent-chat-frame--hidden {
+  display: none;
+}
+
+.agent-chat-frame.has-applied-row { height: calc(100% - 37px); }
+
+.agent-chat-error {
+  padding: 24px;
+  font-size: 14px;
+
+  pre {
+    white-space: pre-wrap;
+    font-size: 12px;
+    opacity: 0.75;
+  }
+}
+
+.agent-chat-applied {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  background: #f4f6f8;
+  border-top: 1px solid #e2e6ea;
+
+  button {
+    border: 0;
+    background: none;
+    color: #1f6feb;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .agent-chat-failed {
+    color: #b42318;
+    min-width: 0;
+  }
+
+  // The error text is whatever the operation said; it must not push the Undo
+  // button off the row.
+  .agent-chat-failed-reason {
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    max-width: 220px;
+    vertical-align: bottom;
+  }
+}
+
+.agent-chat-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 6;
+
+  &:hover {
+    background: rgba(0, 108, 255, 0.15);
+  }
+}
+
+// Nothing to grab when the panel is collapsed.
+:host(.isHidden) .agent-chat-resize-handle {
+  display: none;
+}
+
+// Covers the whole viewport -- not just the frame -- for the duration of a
+// drag, so a fast mouse move that overshoots past the iframe's own bounds
+// still lands on this mask rather than skipping straight onto the iframe.
+.agent-chat-drag-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  cursor: col-resize;
+}
