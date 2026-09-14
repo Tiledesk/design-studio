@@ -26,5 +26,6 @@ export const environment = {
     messagingSenderId: 'CHANGEIT',
     appId: 'CHANGEIT',
     vapidKey: 'CHANGEIT'
-  }
+  },
+  connectorBaseUrls: []
 };

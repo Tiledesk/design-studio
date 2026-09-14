@@ -24,7 +24,7 @@ import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, getIntegrationModels, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 import { environment } from 'src/environments/environment';
 
@@ -130,10 +130,8 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.project_id = this.dashboardService.projectID
     this.logger.log("[ACTION-ASKGPTV2] action detail action: ", this.action);
-    // aggiorno llm_model con i modelli dell'integration
-    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'ollama');
-    await getIntegrationModels(this.projectService, this.dashboardService, this.logger, this.llm_model, 'vllm');
-    
+    // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
+
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
       this.logger.debug('[ACTION-ASKGPTV2] isChangedConnector -->', connector);
       this.connector = connector;
@@ -214,9 +212,13 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     const actionModel = (this.action?.model ?? '').trim();
     if (actionModel && this.llm_models_flat?.length) {
       const actionLlm = (this.action?.llm ?? '').trim().toLowerCase();
+      // Con i provider multi-server lo stesso model id esiste su più server:
+      // se l'action ne ha salvato uno, va usato per disambiguare.
+      const actionServer = (this.action?.vllmServer ?? this.action?.agentPlatformServer ?? '').trim();
       const match = this.llm_models_flat.find(m => {
         const sameModel = (m?.model ?? '') === actionModel;
         if (!sameModel) return false;
+        if (actionServer && (m?.server ?? '') !== actionServer) return false;
         if (!actionLlm) return true;
         return (m?.llm ?? '').toLowerCase() === actionLlm;
       });
@@ -254,12 +256,7 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     this.action.llm = result?.llm ? result.llm : '';
     this.action.model = result?.model ? result.model : '';
     this.action.modelName = result?.modelName ? result.modelName : '';
-    // vLLM: persist the endpoint url on the action; clear it for any other provider.
-    if (result?.llm === 'vllm' && result?.vllmServer) {
-      this.action.vllmServer = result.vllmServer;
-    } else {
-      delete this.action.vllmServer;
-    }
+    applySelectedServerToAction(this.action, result);
     this.logger.log("[ACTION ASKGPTV2] action: ", this.action);
     if (result) {
       this.ai_setting['max_tokens'].max = result.max_output_tokens;
@@ -647,11 +644,8 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
     //   data['search_type'] = 'chunks';
     // }
 
-    // vLLM: the preview API needs the target server to route the request.
-    // Without it the backend responds: "vllmServer attribute is undefined".
-    if (this.action.llm === 'vllm' && this.action.vllmServer) {
-      data.vllmServer = this.action.vllmServer;
-    }
+    // vLLM / Agent Platform: la preview API ha bisogno del server per instradare la richiesta.
+    appendSelectedServerToPayload(this.action, data);
 
     if(this.action.namespaceAsName){
       data.namespace = await this.nameToId(namespace)

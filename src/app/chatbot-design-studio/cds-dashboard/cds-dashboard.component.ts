@@ -9,6 +9,7 @@ import { filter } from 'rxjs/operators';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { AiService } from 'src/app/services/ai.service';
 import { ControllerService } from '../services/controller.service';
 
 // MODEL //
@@ -42,6 +43,7 @@ import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
 import { IntentService } from '../services/intent.service';
+
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -116,6 +118,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly agentChatHostService: AgentChatHostService,
     private readonly intentService: IntentService,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private aiService: AiService,
     // In coda di proposito: agent-chat-flow-switch.spec.ts costruisce il componente a mano con
     // argomenti posizionali, quindi i servizi aggiunti dopo vanno appesi qui e non in mezzo.
     private agentGeneratorService: AgentGeneratorService,
@@ -402,6 +405,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.aiService.initialize(serverBaseURL, this.project._id)
     // Authoring AI del V3 (modale «Crea agente con l'AI», pannello AI, storia sul server): su questo
     // branch è spento dallo switch in ai-authoring.config.ts; senza URL e chiave il generatore non è
     // configurato e ogni pulsante resta nascosto. Il vibe coder attivo qui è la chat in iframe.
