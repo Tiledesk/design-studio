@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# 1.40.14-V3
+# 1.40.15-V3
 # this branch 14/09/2026
 
 - **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
