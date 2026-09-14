@@ -73,6 +73,8 @@
 - **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
 - **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
 - **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
+- **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
+- **changed**: all'apertura di un agente la versione dell'editor si legge da quel dato invece di dedurla dalla data di creazione: un agente costruito con il V3 resta sul V3 anche se la data di taglio viene spostata. Gli agenti che non la portano, cioe' tutti quelli creati finora, restano decisi dalla data esattamente come prima
 
 # this branch 13/09/2026
 

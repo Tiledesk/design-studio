@@ -157,6 +157,14 @@ export interface CompileOptions {
   ids?: { uuid: () => string; uid: () => string };
 }
 
+/**
+ * Versione corrente del Design Studio, dichiarata al server su ogni agente che il DS
+ * crea, in `attributes.dsVersion`. Vive qui, e non in utils.ts, perche' questo file non
+ * ha import: i test lo eseguono con Node togliendo solo i tipi. utils.ts la riespone
+ * come `DS_VERSION_V3` per chi la deve rileggere, cosi' il valore e' scritto una volta sola.
+ */
+export const DS_VERSION_V3 = 'v3';
+
 export interface CompiledAgent {
   name: string;
   description: string;
@@ -166,6 +174,8 @@ export interface CompiledAgent {
   webhook_enabled: false;
   attributes: {
     variables: { [name: string]: string };
+    /** Versione del Design Studio con cui questo agente e' stato costruito. */
+    dsVersion: string;
   };
   intents: any[];
   /**
@@ -912,7 +922,11 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
     language,
     webhook_enabled: false,
     attributes: {
-      variables: variables.reduce((map, v) => { map[v] = v; return map; }, {} as { [name: string]: string })
+      variables: variables.reduce((map, v) => { map[v] = v; return map; }, {} as { [name: string]: string }),
+      // La versione la dichiara chi costruisce il flusso, non chi lo salva: il server
+      // memorizza questo valore cosi' com'e' e l'editor lo rilegge all'apertura, cosi'
+      // l'agente resta sull'editor per cui e' stato generato.
+      dsVersion: DS_VERSION_V3
     },
     intents,
     idMap: Array.from(entry.entries()).reduce((map, [blockId, intentId]) => { map[blockId] = intentId; return map; }, {} as { [blockId: string]: string })

@@ -253,6 +253,8 @@ for (const file of FIXTURE_FILES) {
     assert.equal(agent.intents.length, bp.blocks.length + asks + 2 + (bp.fallbackText ? 1 : 0));
     assert.deepEqual([agent.type, agent.subtype, agent.language, agent.webhook_enabled], ['tilebot', 'chatbot', bp.language, false]);
     assert.equal(agent.attributes.aiGeneration, undefined);
+    // l'agente dichiara la versione dell'editor con cui e' stato costruito
+    assert.equal(agent.attributes.dsVersion, 'v3');
     // idMap: ogni blocco del Blueprint ha il suo intent, e nient'altro
     assert.deepEqual(Object.keys(agent.idMap).sort(), bp.blocks.map((b) => b.id).sort());
     for (const block of bp.blocks) assert.equal(agent.idMap[block.id], intentOf(agent, bp, block.id).intent_id);
@@ -421,7 +423,8 @@ test('nome e descrizione scelti dall\'utente; nessun dato della generazione nell
   const agent = compile(load('01-linear.json'), { name: 'Il mio agente', description: 'Creato con l\'AI' });
   assert.equal(agent.name, 'Il mio agente');
   assert.equal(agent.description, 'Creato con l\'AI');
-  assert.deepEqual(Object.keys(agent.attributes), ['variables']);
+  // solo le variabili e la versione dell'editor: niente prompt, intervista o Blueprint
+  assert.deepEqual(Object.keys(agent.attributes), ['variables', 'dsVersion']);
   // Gli stessi id per lo stesso Blueprint, se il generatore di id è lo stesso: la base della modifica via prompt
   const again = compile(load('01-linear.json'), { name: 'Il mio agente' });
   assert.deepEqual(again.idMap, agent.idMap);

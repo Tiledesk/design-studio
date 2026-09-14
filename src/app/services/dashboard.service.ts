@@ -13,7 +13,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Department } from 'src/app/models/department-model';
 // UTILS //
-import { convertJsonToArray, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { convertJsonToArray, DATE_NEW_CHATBOT, DS_VERSION_V3 } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -110,23 +110,40 @@ export class DashboardService {
   // ----------------------------------------------------------
   /**
    * Resolves whether the chatbot must be edited with the V3 Design Studio.
-   * A chatbot is V3 when it was created on or after DATE_NEW_CHATBOT; both dates
-   * are ISO strings, so the comparison is lexicographic.
-   * When `createdAt` is missing we fall back to LEGACY on purpose: it is the
-   * long-standing behaviour, so an incomplete payload never silently switches editor.
+   *
+   * The label written by the server on every chatbot it creates
+   * (`attributes.dsVersion`) wins. It is what keeps a chatbot on the editor it
+   * was built for: the cutoff date below lives in this bundle, so moving it
+   * would otherwise reclassify existing chatbots on the next deploy.
+   *
+   * Chatbots created before the server started writing the label carry none, and
+   * only for those the creation date decides: a chatbot is V3 when it was created
+   * on or after DATE_NEW_CHATBOT. Both dates are ISO strings, so the comparison is
+   * lexicographic.
+   *
+   * Anything else (no label, no `createdAt`, an unknown label) falls back to
+   * LEGACY on purpose: it is the long-standing behaviour, so an incomplete or
+   * unexpected payload never silently switches editor.
    */
   private resolveDsVersion(chatbot: Chatbot): void {
     let isV3 = false;
+    let source: 'label' | 'date' = 'date';
     try {
-      const createdAt = chatbot?.createdAt;
-      isV3 = !!createdAt && createdAt >= DATE_NEW_CHATBOT;
+      const label = chatbot?.attributes?.dsVersion;
+      if (typeof label === 'string' && label.trim()) {
+        source = 'label';
+        isV3 = label.trim().toLowerCase() === DS_VERSION_V3;
+      } else {
+        const createdAt = chatbot?.createdAt;
+        isV3 = !!createdAt && createdAt >= DATE_NEW_CHATBOT;
+      }
     } catch (error) {
       this.logger.error('[ DSHBRD-SERVICE ] resolveDsVersion ERROR: ', error);
       isV3 = false;
     }
     this.isV3 = isV3;
     this.isV3$.next(isV3);
-    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { createdAt: chatbot?.createdAt, cutoff: DATE_NEW_CHATBOT, isV3 });
+    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { source, label: chatbot?.attributes?.dsVersion, createdAt: chatbot?.createdAt, cutoff: DATE_NEW_CHATBOT, isV3 });
   }
 
   // ----------------------------------------------------------
