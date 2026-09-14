@@ -33,7 +33,7 @@
              the way back. Nothing on screen said why. `isHidden` is a width
              of 0 (see the panel's own SCSS), so the frame stays loaded and
              the chat is still there when the user returns. -->
-        <cds-panel-agent-chat
+        <cds-panel-agent-chat *ngIf="agentChatFeatureEnabled"
             [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive"
             [class.isHidden]="!(IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive)"
             [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive">

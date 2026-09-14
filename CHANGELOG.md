@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+# this branch 14 set 2026
+- **changed**: the "vibe coder" (the AI agent chat that builds and edits an agent from a prompt) is hidden behind a single switch, off by default: no button in the header, no panel, no "Vibe Coder" tab in the agent settings. Nothing is removed: turning the switch back on restores everything
 
 # 1.40.14-rc13
 - **fixed**: an agent imported from an older version with a "JSON Condition" block whose operator is no longer among the known ones broke the canvas on every redraw ("Cannot read properties of undefined (reading 'name')"). The block now shows the saved operator as it is, so it can be corrected by hand, and conditions without a second operand no longer break the rendering

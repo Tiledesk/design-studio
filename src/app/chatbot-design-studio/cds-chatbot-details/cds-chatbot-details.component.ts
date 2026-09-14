@@ -15,6 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { IntegrationService } from 'src/app/services/integration.service';
 import { AgentChatSettingsService } from '../agent-chat/agent-chat-settings.service';
+import { AGENT_CHAT_FEATURE_ENABLED } from '../agent-chat/agent-chat.config';
 const swal = require('sweetalert');
 
 @Component({
@@ -64,7 +65,8 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
     // this.getParamsBotIdAndThenInit();
     this.getOSCODE();
-    this.llmSettingsAvailable = this.settingsService.isAvailable();
+    // La scheda «Vibe Coder» segue l'interruttore della feature: spento, non compare
+    this.llmSettingsAvailable = AGENT_CHAT_FEATURE_ENABLED && this.settingsService.isAvailable();
     this.project = this.projectService.getCurrentProject()
     this.integrationService.initialize(this.appConfigService.getConfig().serverBaseUrl, this.project._id)
     this.getTranslations();
