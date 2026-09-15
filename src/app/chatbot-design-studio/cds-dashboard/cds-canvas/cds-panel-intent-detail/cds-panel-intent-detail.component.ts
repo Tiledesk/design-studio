@@ -175,6 +175,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       ? this.webhookService.createStartWebhook(this.chatbot_id, this.intent.intent_id)
       : this.webhookService.updateWebhookSettings(this.chatbot_id, request.patch);
     call$.subscribe({ next: (resp: any) => {
+      if (!enable) {
+        this.stopWebhookStartTest();
+      }
       this.applyStartWebhook(resp);
     }, error: (error) => {
       this.logger.error("[CdsPanelIntentDetailComponent] start webhook toggle error: ", error);
@@ -274,6 +277,13 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   }
 
 
+  /** A running "Test webhook start" is bound to the current webhook id and preload: end it when that webhook changes */
+  private stopWebhookStartTest(){
+    if (this.intentService.webhookStartTest) {
+      this.controllerService.stopTestItOut();
+    }
+  }
+
   onTestStartWebhook(){
     this.controllerService.requestWebhookStartTest();
   }
@@ -300,6 +310,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.webhookService.regenerateWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] regenerateWebhook : ", resp);
       if (this.isChatbotStart) {
+        this.stopWebhookStartTest();
         this.applyStartWebhook(resp);
         return;
       }
