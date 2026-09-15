@@ -47,7 +47,7 @@ test('add: un blocco nuovo compilato, piazzato accanto ad `after` e agganciato a
   assert.ok(newId);
   const post = res.faqOperations.find((o) => o.type === 'post');
   assert.equal(post.intent.intent_id, newId);
-  assert.equal(post.intent.actions[0]._tdActionType, 'replyv2');
+  assert.equal(post.intent.actions[0]._tdActionType, 'reply');
   assert.deepEqual(post.intent.attributes.position, { x: before.attributes.position.x + 420, y: before.attributes.position.y });
   if (!hadNext) {
     const put = res.faqOperations.find((o) => o.type === 'put' && o.intent.intent_id === afterId);

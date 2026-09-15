@@ -11,7 +11,7 @@ import { ControllerService } from '../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, ACTIONS_WITH_OWN_OUTPUTS } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, ACTIONS_WITH_OWN_OUTPUTS, actionEndsTheFlow } from 'src/app/chatbot-design-studio/utils-actions';
 import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -595,8 +595,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * V3 — decide se nascondere il pallino di uscita del blocco.
    * Il pallino e' l'uscita di riserva del blocco: serve solo alle action che non
-   * hanno connettori propri. Dove l'action espone gia' le sue uscite (Success/Else,
-   * bottoni, ecc.) il pallino e' ridondante e va nascosto.
+   * hanno connettori propri. Si nasconde in due casi:
+   * - l'action espone gia' le sue uscite (Success/Else, bottoni, ecc.) e il pallino
+   *   sarebbe ridondante;
+   * - l'action chiude il flusso (Close, Agent handoff, Move to unassigned, Replace
+   *   AI Agent, Change Department che avvia il bot del dipartimento) e il pallino
+   *   non avrebbe destinazione.
    *
    * Due vincoli:
    * - vale SOLO in V3: sui chatbot legacy il pallino resta sempre visibile;
@@ -610,7 +614,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
     const alreadyConnected = !!(fromId && toId);
     this.hideBlockConnector = !alreadyConnected
-      && !!this.intent?.actions?.some(action => this.actionHasOwnOutputs(action));
+      && !!this.intent?.actions?.some(action => this.actionHasOwnOutputs(action) || actionEndsTheFlow(action));
     this.logger.log('[CDS-INTENT] updateHideBlockConnector:', { alreadyConnected, hide: this.hideBlockConnector });
   }
 

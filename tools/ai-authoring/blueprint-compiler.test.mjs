@@ -65,7 +65,9 @@ function checkBlock(agent, bp, block) {
   const optionalNext = () => assert.equal(next, block.next ? refTo(agent, bp, block.next) : '');
   switch (block.type) {
     case 'replyv2': {
-      assert.equal(action._tdActionType, 'replyv2');
+      // Il tipo Blueprint dice "manda un messaggio": l'action e' la Reply di sempre (v1).
+      assert.equal(action._tdActionType, 'reply');
+      assert.equal(action.text, block.text);
       assert.equal(action.attributes.commands[1].message.text, block.text);
       const buttons = buttonsOf(action);
       assert.equal(buttons.length, (block.buttons || []).length);
@@ -89,7 +91,8 @@ function checkBlock(agent, bp, block) {
       break;
     }
     case 'ask': {
-      assert.equal(action._tdActionType, 'replyv2');
+      assert.equal(action._tdActionType, 'reply');
+      assert.equal(action.text, block.text);
       assert.equal(action.attributes.commands[1].message.text, block.text);
       assert.deepEqual(buttonsOf(action).map((b) => [b.type, b.value, b.action]), (block.options || []).map((o) => ['text', o, '']));
       const captureIntent = byRef(agent, next);
@@ -375,10 +378,29 @@ test('un blocco chiamato Fallback dal Blueprint non entra in conflitto con il bl
   assert.equal(message.attributes.nextBlockAction.intentName, refTo(agent, bp, 'f'));
 });
 
-test('macro ask con reply v1, se lo spike lo richiede', () => {
+test('i messaggi sono reply v1 di default, anche con i bottoni', () => {
+  const bp = tiny([
+    { id: 'm', name: 'Menu', type: 'replyv2', text: 'Cosa ti serve?', buttons: [{ label: 'Orari', goto: 'f' }], next: null },
+    { id: 'f', name: 'Fine', type: 'close' },
+  ]);
+  const action = byName(compile(bp), 'Menu').actions[0];
+  assert.equal(action._tdActionType, 'reply');
+  assert.equal(action.text, 'Cosa ti serve?');
+  assert.equal(action.noInputTimeout, undefined, 'la v1 non ha il timeout della v2');
+  const buttons = action.attributes.commands[1].message.attributes.attachment.buttons;
+  assert.deepEqual([buttons.length, buttons[0].type, buttons[0].value], [1, 'action', 'Orari']);
+});
+
+test('macro ask: la domanda usa reply v1', () => {
   const bp = tiny([{ id: 'q', name: 'Chiedi email', type: 'ask', text: 'Email?', saveTo: 'user_email', next: 'f' }, { id: 'f', name: 'Fine', type: 'close' }]);
-  const action = byName(compile(bp, { askMessageType: 'reply' }), 'Chiedi email').actions[0];
+  const action = byName(compile(bp), 'Chiedi email').actions[0];
   assert.deepEqual([action._tdActionType, action.text, action.attributes.commands[1].message.text], ['reply', 'Email?', 'Email?']);
+});
+
+test('messageType replyv2 riporta i messaggi alla Advanced reply', () => {
+  const bp = tiny([{ id: 'q', name: 'Chiedi email', type: 'ask', text: 'Email?', saveTo: 'user_email', next: 'f' }, { id: 'f', name: 'Fine', type: 'close' }]);
+  const action = byName(compile(bp, { messageType: 'replyv2' }), 'Chiedi email').actions[0];
+  assert.deepEqual([action._tdActionType, action.text, action.noInputTimeout], ['replyv2', undefined, 10000]);
 });
 
 test('ai_prompt senza istruzioni e senza history: nessun context, history false; il ramo true segue exits', () => {

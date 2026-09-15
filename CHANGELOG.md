@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 15/09/2026
+
+- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
+- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
+- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
+- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla. Ora il punto di uscita c'e' sempre, e la destinazione si puo' scegliere anche dal pannello di dettaglio
+
 # this branch 14/09/2026
 
 - **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro

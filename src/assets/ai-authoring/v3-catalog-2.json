@@ -49,7 +49,7 @@
       "terminal": false,
       "rules": [
         "next is mandatory.",
-        "To branch on the answer, put a jsoncondition2 right after it and compare with the exact option text."
+        "To branch on the answer: jsoncondition2 right after it when the answer is a quick reply or another exact value, compared with the exact option text; ai_condition when the answer is free text and the branch depends on its meaning."
       ]
     },
     {
