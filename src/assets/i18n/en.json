@@ -628,6 +628,7 @@
         "StartWebhookSwitchConfirm": "Switch",
         "StartWebhookSwitchCancel": "Cancel",
         "StartWebhookError": "Unable to update the webhook",
+        "StartWebhookLoadError": "Unable to load the webhook settings",
         "Copy": "Copy",
         "TextCopied": "Text copied successfully!",
         "TextErrorCopied": "Error copying text",

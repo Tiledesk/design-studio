@@ -124,9 +124,14 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
       this.applyStartWebhook(resp);
     }, error: (error) => {
-      // 404 when the chatbot has no webhook yet
-      this.logger.log("[CdsPanelIntentDetailComponent] loadStartWebhook: no webhook ", error);
       this.applyStartWebhook(null);
+      if (error?.status === 404) {
+        // the chatbot has no webhook yet
+        this.logger.log("[CdsPanelIntentDetailComponent] loadStartWebhook: no webhook ", error);
+        return;
+      }
+      this.logger.error("[CdsPanelIntentDetailComponent] loadStartWebhook error: ", error);
+      this.showMessage(this.translate.instant('CDSCanvas.StartWebhookLoadError'));
     }});
   }
 
