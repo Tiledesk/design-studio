@@ -1536,7 +1536,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log('[CDS-CANVAS] onTestItOut intent ', intent);
     }
     const subtype = this.dashboardService.selectedChatbot.subtype;
-    if(subtype !== TYPE_CHATBOT.WEBHOOK && subtype != TYPE_CHATBOT.COPILOT){
+    if(subtype !== TYPE_CHATBOT.WEBHOOK && subtype != TYPE_CHATBOT.COPILOT && !this.intentService.webhookStartTest){
       setTimeout(() => {
         this.controllerService.playTestItOut();
         this.IS_OPEN_PANEL_WIDGET = true;

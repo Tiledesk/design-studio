@@ -16,6 +16,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 import { Department } from 'src/app/models/department-model';
 import { isStartWebhookActive, needsSwitchConfirmation, startWebhookToggleRequest } from 'src/app/chatbot-design-studio/utils-webhook';
+import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 
 const swal = require('sweetalert');
 
@@ -68,8 +69,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     private readonly translate: TranslateService,
     private readonly stageService: StageService,
     private readonly intentService: IntentService,
-    private readonly connectorService: ConnectorService
-  ) { 
+    private readonly connectorService: ConnectorService,
+    private readonly controllerService: ControllerService
+  ) {
   }
 
   ngOnInit(): void {
@@ -271,6 +273,10 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     }});
   }
 
+
+  onTestStartWebhook(){
+    this.controllerService.requestWebhookStartTest();
+  }
 
   onRegenerateWebhook(){
     swal({

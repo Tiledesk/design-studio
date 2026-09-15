@@ -30,6 +30,13 @@ export class ControllerService {
   private testItOutPlaying = new Subject<any>();
   public isTestItOutPlaying$ = this.testItOutPlaying.asObservable();
 
+  private webhookStartTestSource = new Subject<void>();
+  public webhookStartTestRequested$ = this.webhookStartTestSource.asObservable();
+
+  public requestWebhookStartTest(){
+    this.webhookStartTestSource.next();
+  }
+
   private publishPanelStatusSubject = new Subject<any>();
   public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
 

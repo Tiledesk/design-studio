@@ -35,6 +35,7 @@ export class IntentService {
   liveActiveIntent = new BehaviorSubject<{ intent: Intent; logAnimationType: boolean; scale: number|null }>(null);
   testIntent = new BehaviorSubject<Intent>(null);
   BSTestItOut = new BehaviorSubject<Intent>(null);
+  webhookStartTest: boolean = false;
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
 

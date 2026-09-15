@@ -193,9 +193,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
-            if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            if(intent && intent.intent_id !== this.intent?.intent_id && this.isLiveStartBlock()){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-            } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            } else if(!intent && this.isLiveStartBlock()){
               const stageElement = document.getElementById(this.intent.intent_id);
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
               this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
@@ -215,7 +215,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
               }, 500);
             }
           } else {
-            if(this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            if(this.isLiveStartBlock()){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             }
             this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
@@ -535,6 +535,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     this.setIntentAttributes();
   }
 
+
+  /** Blocks that get the "live start" highlight: the webhook block, or the start block during a webhook start test */
+  private isLiveStartBlock(): boolean {
+    const name = this.intent?.intent_display_name;
+    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && name === TYPE_INTENT_NAME.START);
+  }
 
   ngOnDestroy() {
     this.unsubscribe();
