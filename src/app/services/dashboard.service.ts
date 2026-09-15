@@ -13,7 +13,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Department } from 'src/app/models/department-model';
 // UTILS //
-import { convertJsonToArray, DATE_NEW_CHATBOT, DS_VERSION_V3 } from 'src/app/chatbot-design-studio/utils';
+import { convertJsonToArray, DS_VERSION_V3 } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -38,8 +38,8 @@ export class DashboardService {
 
   /**
    * Design Studio version of the selected chatbot: true = V3, false = legacy.
-   * Discriminated by creation date (see DATE_NEW_CHATBOT). Single source of truth:
-   * computed once per chatbot here, never recomputed by the components.
+   * Read from the label the chatbot carries (see resolveDsVersion). Single source
+   * of truth: computed once per chatbot here, never recomputed by the components.
    */
   isV3: boolean = false;
   /** Reactive counterpart of `isV3`, for components that render before the chatbot is loaded. */
@@ -111,41 +111,32 @@ export class DashboardService {
   /**
    * Resolves whether the chatbot must be edited with the V3 Design Studio.
    *
-   * The label declared by whoever built the flow (`attributes.dsVersion`) wins:
-   * only the tool that built it knows which editor it was built with, so the
-   * server stores what it receives and never invents one. It is what keeps a
-   * chatbot on the editor it was built for: the cutoff date below lives in this
-   * bundle, so moving it would otherwise reclassify existing chatbots on the
-   * next deploy.
+   * The ONLY source of truth is the label the chatbot carries in
+   * `attributes.dsVersion`, declared by whoever created it: only the tool that
+   * built it knows which editor it was built with, so the server stores what it
+   * receives and never invents one.
    *
-   * Chatbots built before the Design Studio started declaring it carry none, and
-   * only for those the creation date decides: a chatbot is V3 when it was created
-   * on or after DATE_NEW_CHATBOT. Both dates are ISO strings, so the comparison is
-   * lexicographic.
+   * There is no date fallback any more: a creation date lives in the bundle of
+   * whoever compares it, so it would reclassify existing chatbots on every
+   * deploy that moved it, which is exactly what the label is here to prevent.
    *
-   * Anything else (no label, no `createdAt`, an unknown label) falls back to
-   * LEGACY on purpose: it is the long-standing behaviour, so an incomplete or
-   * unexpected payload never silently switches editor.
+   * Anything that is not the V3 label - no label at all, which is the case of
+   * every chatbot created so far, or an unknown one - is LEGACY on purpose: it
+   * is the long-standing behaviour, so an incomplete or unexpected payload never
+   * silently switches editor.
    */
   private resolveDsVersion(chatbot: Chatbot): void {
     let isV3 = false;
-    let source: 'label' | 'date' = 'date';
     try {
       const label = chatbot?.attributes?.dsVersion;
-      if (typeof label === 'string' && label.trim()) {
-        source = 'label';
-        isV3 = label.trim().toLowerCase() === DS_VERSION_V3;
-      } else {
-        const createdAt = chatbot?.createdAt;
-        isV3 = !!createdAt && createdAt >= DATE_NEW_CHATBOT;
-      }
+      isV3 = typeof label === 'string' && label.trim().toLowerCase() === DS_VERSION_V3;
     } catch (error) {
       this.logger.error('[ DSHBRD-SERVICE ] resolveDsVersion ERROR: ', error);
       isV3 = false;
     }
     this.isV3 = isV3;
     this.isV3$.next(isV3);
-    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { source, label: chatbot?.attributes?.dsVersion, createdAt: chatbot?.createdAt, cutoff: DATE_NEW_CHATBOT, isV3 });
+    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { label: chatbot?.attributes?.dsVersion, isV3 });
   }
 
   // ----------------------------------------------------------
