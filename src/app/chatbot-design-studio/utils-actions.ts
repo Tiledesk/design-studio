@@ -339,3 +339,50 @@ export const ACTIONS_WITH_OWN_OUTPUTS: Array<TYPE_ACTION> = [
     TYPE_ACTION.QAPLA,
     TYPE_ACTION.ITERATION,
 ];
+
+/**
+ * Action che CHIUDONO il flusso: dopo di esse il controllo non torna all'agente
+ * corrente, quindi in V3 il pallino di uscita del blocco non avrebbe destinazione
+ * e va nascosto. Non e' una questione grafica: un collegamento partito da qui non
+ * verrebbe mai percorso a runtime.
+ *
+ * - close: chiude la conversazione;
+ * - agent: passa a un operatore (se non ce ne sono, la chat finisce in unassigned);
+ * - move_to_unassigned: mette la chat in coda, variante dell'handoff;
+ * - replacebot / replacebotv2 / replacebotv3: subentra un altro agente AI, che da
+ *   quel momento possiede la conversazione.
+ *
+ * Change Department NON e' in elenco perche' dipende dal contenuto: vedi
+ * actionEndsTheFlow().
+ *
+ * Restano FUORI, con il pallino visibile, le action che sembrano finali ma non lo
+ * sono: clear_transcript (ripulisce la trascrizione e il flusso prosegue) e
+ * web_response (scrive la risposta HTTP nei bot webhook, senza chiudere il flusso).
+ * Vale la regola di prudenza: un pallino di troppo e' innocuo, uno mancante lascia
+ * il blocco senza via d'uscita.
+ */
+export const ACTIONS_WITHOUT_EXIT: Array<TYPE_ACTION> = [
+    TYPE_ACTION.CLOSE,
+    TYPE_ACTION.AGENT,
+    TYPE_ACTION.MOVE_TO_UNASSIGNED,
+    TYPE_ACTION.REPLACE_BOT,
+    TYPE_ACTION.REPLACE_BOTV2,
+    TYPE_ACTION.REPLACE_BOTV3,
+];
+
+/**
+ * True se l'action chiude il flusso dell'agente corrente.
+ *
+ * Il caso a parte e' Change Department: cede il controllo solo quando fa partire il
+ * bot del dipartimento di destinazione (`triggerBot`). Creata dal menu del Design
+ * Studio nasce con `triggerBot: true`, quindi e' terminale; l'authoring AI la emette
+ * invece con `triggerBot: false` proprio per spostare il dipartimento e proseguire.
+ * Con `triggerBot` assente si assume il comportamento del menu, che e' il caso
+ * storico di tutti gli agenti creati a mano.
+ */
+export function actionEndsTheFlow(action: any): boolean {
+    const type = action?._tdActionType;
+    if (!type) return false;
+    if (ACTIONS_WITHOUT_EXIT.includes(type)) return true;
+    return type === TYPE_ACTION.CHANGE_DEPARTMENT && action?.triggerBot !== false;
+}

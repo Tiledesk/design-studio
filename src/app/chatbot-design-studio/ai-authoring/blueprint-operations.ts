@@ -45,7 +45,7 @@ export interface CompiledOperations {
   idMap: { [placeholder: string]: string };
 }
 
-export interface OperationsOptions extends Pick<CompileOptions, 'namespaces' | 'chatbots' | 'dataTables' | 'askMessageType' | 'ids'> {
+export interface OperationsOptions extends Pick<CompileOptions, 'namespaces' | 'chatbots' | 'dataTables' | 'messageType' | 'askMessageType' | 'ids'> {
   /** La vista decompilata, se già calcolata. */
   decompiled?: DecompiledAgent;
   language?: string;
@@ -158,7 +158,7 @@ export function compileOperations(intents: any[], operations: EditOperation[], o
 
   const context = (entry: (blockId: string) => string, name: (blockId: string) => string, captureId: (blockId: string) => string,
     position: (blockId: string) => any): BlockContext => ({
-    ids, language, askMessageType: options.askMessageType || 'replyv2', ref,
+    ids, language, messageType: options.messageType || options.askMessageType || 'reply', ref,
     entryId: entry, captureId,
     name, captureName: blockId => uniqueName(captureNameOf(toBlockName(name(blockId), blockId), language), blockId),
     position, capturePosition: blockId => { const p = position(blockId); return { x: p.x + COLUMN, y: p.y }; },

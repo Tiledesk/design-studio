@@ -4,26 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
-/**
- * Cutoff date that discriminates the Design Studio version of a chatbot that
- * carries NO version label: created on or after this date -> V3, before -> legacy.
- * ISO string format, compared lexicographically against `createdAt` (also ISO).
- * Resolved once per chatbot in DashboardService.resolveDsVersion().
- *
- * Since the server labels every chatbot it creates (see DS_VERSION_V3), this is
- * the fallback for the ones created before that, and its reach only shrinks over
- * time. It still must stay in the FUTURE until release: an unlabelled chatbot
- * built with the legacy editor that falls after the cutoff would lose inline
- * action editing, reordering and "+ Add action". Erring late is safe (the agent
- * stays on the proven editor), erring early is not. Align this with the actual
- * release date.
- */
-export const DATE_NEW_CHATBOT = '2026-09-07T00:00:00.000Z';
-
-/** Versione corrente del Design Studio, e valore dell'etichetta `attributes.dsVersion`
- *  che il DS dichiara al server su ogni agente che crea. E' l'indicazione che vince
- *  sulla data di creazione: un agente etichettato resta sull'editor per cui e' stato
- *  costruito anche se DATE_NEW_CHATBOT viene spostata. Confronto in minuscolo.
+/** Valore dell'etichetta `attributes.dsVersion` che identifica un agente da aprire
+ *  con il Design Studio V3. E' l'unica cosa che decide quale editor si apre: chi crea
+ *  l'agente la dichiara (nel DS il valore arriva da `CHATBOT_VERSION` dell'environment),
+ *  chi lo apre la rilegge. Senza etichetta l'agente e' legacy. Confronto in minuscolo.
  *  Definita nel compilatore, che e' chi la scrive, e riesposta qui per chi la rilegge:
  *  un valore solo, nessuna possibilita' che scrittura e lettura divergano. */
 export { DS_VERSION_V3 } from './ai-authoring/blueprint-compiler';

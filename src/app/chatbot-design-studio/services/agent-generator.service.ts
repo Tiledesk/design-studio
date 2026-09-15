@@ -15,6 +15,7 @@ import { DecompiledAgent, compactView, decompileAgent } from 'src/app/chatbot-de
 import { CompiledOperations, EditOperation, compileOperations } from 'src/app/chatbot-design-studio/ai-authoring/blueprint-operations';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST } from 'src/app/chatbot-design-studio/utils-actions';
+import { environment } from 'src/environments/environment';
 import {
   ChatbotRef, CompileError, DataTableRef, GenerationInfo, KnowledgeBaseRef, compileBlueprint
 } from 'src/app/chatbot-design-studio/ai-authoring/blueprint-compiler';
@@ -708,7 +709,10 @@ export class AgentGeneratorService {
           departments: this.departmentNames(),
           namespaces: facts.knowledgeBases,
           chatbots: facts.chatbots,
-          dataTables: facts.dataTables
+          dataTables: facts.dataTables,
+          // Versione dell'editor dichiarata al server: decide quale Design Studio
+          // si aprira' su questo agente.
+          dsVersion: environment.CHATBOT_VERSION
         });
         const { idMap, ...agent } = compiled;
         const ai: RevisionAi = {
