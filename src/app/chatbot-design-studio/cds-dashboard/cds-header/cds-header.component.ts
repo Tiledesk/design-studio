@@ -71,6 +71,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   isPlaying:boolean = false;
   isWebhookStartTest: boolean = false;
   private subscriptionWebhookStartTest: Subscription;
+  private webhookStartTestStarting: boolean = false;
   /** true appena parte un salvataggio: disabilita il pulsante Publish */
   isSaving: boolean = false;
   /** true solo se il salvataggio supera i 300ms: mostra spinner + "Saving..." */
@@ -436,11 +437,15 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   }
 
   async onOpenWebhookStartTest(){
+    if (this.webhookStartTestStarting) {
+      return;
+    }
     if (this.isPlaying) {
       this.onCloseTestItOut();
     }
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     const chatbot_id = this.dashboardService.id_faq_kb;
+    this.webhookStartTestStarting = true;
     try {
       const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
       if (!isStartWebhookActive(webhook)) {
@@ -466,6 +471,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.isPlaying = true;
     } catch (error) {
       this.logger.error("[CDS-header] onOpenWebhookStartTest error:", error);
+    } finally {
+      this.webhookStartTestStarting = false;
     }
   }
 
