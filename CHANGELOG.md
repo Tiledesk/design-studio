@@ -8,14 +8,20 @@
 *Tiledesk SRL*
 
 
-# 1.40.15-V3
-# this branch 14/09/2026
+# this branch 15/09/2026
+- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
+- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
+- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede. La chiusura resta solo dopo un'attivita' lunga che si e' conclusa, oppure quando e' l'utente a sceglierla con un pulsante
+- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
+- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
+- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
+- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla. Ora il punto di uscita c'e' sempre, e la destinazione si puo' scegliere anche dal pannello di dettaglio
 
+# this branch 14/09/2026
 - **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
 - **changed**: all'apertura di un agente la versione dell'editor si legge da quel dato invece di dedurla dalla data di creazione: un agente costruito con il V3 resta sul V3 anche se la data di taglio viene spostata. Gli agenti che non la portano, cioe' tutti quelli creati finora, restano decisi dalla data esattamente come prima
 
 # this branch 13/09/2026
-
 - **added**: dentro ogni agente V3, un pulsante «AI» nell'header apre un pannello a destra con la storia dell'agente. La scheda «Prompt» mostra il prompt di creazione, le modifiche fatte con l'AI e i ripristini, e permette di chiedere una modifica in linguaggio naturale: l'AI propone i cambiamenti, il DS li mostra in anteprima (blocchi aggiunti, modificati, rimossi, collegamenti) e li applica solo su «Applica». La scheda «Versioni» elenca tutte le versioni e le release, con «Salva versione», «Ripristina qui», «Crea copia», «Vedi prompt» e «Riusa nel generatore». Il pulsante compare su ogni agente V3 con il servizio di generazione configurato; se il server non ha ancora il modulo delle revisioni, il pannello si apre e lo dice
 - **added**: ogni ripristino è preceduto da un salvataggio automatico della versione corrente, quindi è reversibile; prima di confermare, il DS avvisa se la versione usa dipartimenti, knowledge base, tabelle o agenti che nel progetto non esistono più. La versione pubblicata non cambia: per portare online un ripristino si pubblica di nuovo
 - **changed**: l'agente creato con l'AI non porta più i dati della generazione nei suoi attributi: prompt, intervista e flusso generato stanno nella storia dell'agente sul server, fuori dal percorso dei messaggi. Con il modulo del server acceso la creazione avviene in una sola chiamata atomica, senza riletture dei blocchi; con il modulo spento la creazione funziona come prima e la storia non viene salvata
@@ -24,7 +30,6 @@
 - **added**: nel pannello si può chiedere una modifica e vederne l'anteprima anche quando il server non ha il modulo delle revisioni; in quel caso resta disabilitato solo «Applica», e il pannello spiega perché. Le nuove etichette sono tradotte nelle 15 lingue
 
 # this branch 12/09/2026
-
 - **added**: nella modale «Crea agente con l'AI» si sceglie il modello AI, fra quelli che il servizio dichiara disponibili; è preselezionato il più potente, e l'ultima scelta viene ricordata. La scelta vale per le domande e per la generazione. Il servizio concede più tempo alle generazioni con i modelli che ragionano
 - **added**: il generatore di agenti usa come riferimento fino a tre agenti verificati simili alla richiesta, e l'anteprima lo dice («Ispirato ad agenti verificati»); nell'anteprima si può votare il flusso con un pollice, e il DS comunica al servizio se l'agente è stato creato, rigenerato o scartato, senza mai inviare la conversazione
 - **changed**: il blocco defaultFallback, quando è vuoto, non accetta più action: non se ne possono trascinare dentro, il pulsante «Add action» e il segnaposto non compaiono, e nemmeno il menu delle action o lo spostamento da un altro blocco lo riempiono. I chatbot che hanno ancora una risposta dentro il defaultFallback restano modificabili (regola riportata dal branch ds-generic-bug-fix-39)
@@ -35,7 +40,6 @@
 - **added**: messaggio dedicato quando il progetto non è abilitato al generatore di agenti
 
 # this branch 11/09/2026
-
 - **added**: il generatore di agenti conosce 15 action in più: risposta casuale, attesa, cancellazione di una variabile, azzeramento della cronologia, rimessa in coda, tag, log, aggiornamento del contatto, testo scritto dall'AI, ciclo su una lista, passaggio a un altro agente, aggiunta a una knowledge base, email, tabelle dati e smistamento con l'AI. Le action che richiedono un piano o dati assenti dal progetto non vengono proposte; l'anteprima mostra le nuove uscite
 - **changed**: il flusso generato ha una forma più compatta, con i soli campi di ogni blocco; i flussi nella forma precedente restano validi
 - **fixed**: dopo la creazione di un agente con l'AI, il DS rilegge i blocchi fino a 6 volte prima di segnalare collegamenti non conservati. Il server risponde all'import prima di averli salvati tutti, e con agenti grandi compariva un falso errore
@@ -47,12 +51,10 @@
 - **added**: la modale **"Crea agente con l'AI"** usa il **servizio di generazione esterno**, indicato nella configurazione, e mostra l'**anteprima** dell'agente: blocchi, collegamenti, note e avvisi, con il JSON da copiare. Le chiamate al servizio non portano le credenziali Tiledesk. Errori distinti per servizio non configurato o non raggiungibile, chiave rifiutata, troppe richieste, errore del provider. Webhook e Copilot restano «Presto disponibili»
 
 # this branch 08/09/2026
-
 - **added**: **selettore dell'agent nell'header** — il nome del bot e' ora un menu a tendina con tutti gli agent del progetto: si passa da un agent all'altro senza uscire dal Design Studio. Accanto, l'icona **Elimina agent** con tooltip, coerente con le altre icone dell'header, e conferma esplicita prima di cancellare; a eliminazione avvenuta si apre il primo agent rimasto, o si torna alla dashboard se non ne restano. Aggiunto `deleteBot()` a `faq-kb.service.ts` (`DELETE /faq_kb/{botId}`, endpoint gia' presente sul server e riservato ai ruoli admin/owner — gli stessi che possono entrare nel DS). Il pannello dell'elenco non riusa la classe `menuElement` degli altri menu dell'header, che ha `overflow: hidden` e un posizionamento assoluto: e' scrollabile, contenuto in altezza e ancorato al pulsante. Il cambio di agent avviene con un caricamento completo della pagina: il DS si inizializza una volta sola in `ngOnInit` e una semplice `router.navigate` cambierebbe solo l'URL lasciando l'editor agganciato all'agent precedente
 - **added**: pulsante **"Crea agente con l'AI"** in cima alla sidebar del Design Studio: apre una modale in cui descrivere l'agente da generare (tipo Chat/Webhook/Copilot, prompt libero, galleria di 21 casi d'uso filtrabili per categoria). Mentre la modale e' aperta l'interfaccia sottostante e' **bloccata**: il backdrop ferma il puntatore, e gli ascoltatori da tastiera del canvas — che sono su `document` e riceverebbero comunque i tasti digitati nella modale — sono disattivati. La generazione chiama `POST /chatbots/generate`, **endpoint non ancora disponibile su questo server**: finche' manca, la modale mostra l'errore. Nessun impatto sui flussi esistenti
 
 # this branch 07/09/2026
-
 - **changed**: in V3 il pallino di uscita del blocco e' posizionato **dentro** il blocco, in basso a destra sul bordo, invece di pendere fuori; la regola base resta invariata e l'override e' delimitato da `.tds-v3-intent`, quindi i chatbot legacy non cambiano
 - **added**: in V3 il pallino di uscita del blocco viene **nascosto quando l'action ha gia' connettori propri** (Success/Else, bottoni, noInput/noMatch...) e mostrato solo dove sarebbe l'unica via d'uscita; la famiglia Reply (reply, replyv2, randomreply) lo mostra **sempre**, con o senza bottoni, perche' il flusso deve poter proseguire di default; un pallino gia' collegato non viene mai nascosto, le action voice restano fuori dalla regola e i chatbot legacy sono esclusi. L'elenco delle action con uscite proprie e' dichiarato in `ACTIONS_WITH_OWN_OUTPUTS` (`utils-actions.ts`)
 - **changed**: il trascinamento **dall'header dell'action** parte solo dopo ~4px di movimento, cosi' un click impreciso non sposta il blocco; maniglie storiche e note restano immediate, quindi i chatbot legacy sono invariati

@@ -151,15 +151,30 @@ export interface CompileOptions {
   chatbots?: ChatbotRef[];
   /** Tabelle del progetto, per tradurre il nome in id (data_table). */
   dataTables?: DataTableRef[];
-  /** Action del messaggio della macro `ask`: 'replyv2' (default) oppure 'reply' (v1), secondo lo spike (C9, C11). */
+  /**
+   * Action con cui si realizza un messaggio: 'reply' (default, la Reply di sempre) oppure
+   * 'replyv2' (Advanced reply). Vale per i messaggi e per la domanda della macro `ask`.
+   * Il default e' la v1 per scelta di prodotto: e' l'action piu' semplice e la sola provata
+   * come domanda di una `ask` (spike C11), dove la v2 rischia di attendere lei la risposta
+   * e far perdere alla capture la prima battuta (C9).
+   */
+  messageType?: 'reply' | 'replyv2';
+  /** @deprecated nome precedente di `messageType`, quando valeva solo per la `ask`. */
   askMessageType?: 'replyv2' | 'reply';
+  /**
+   * Versione dell'editor dichiarata sull'agente creato (`attributes.dsVersion`).
+   * La passa il chiamante leggendola dall'environment (`CHATBOT_VERSION`), perche'
+   * questo file non ha import; senza, resta il valore corrente del Design Studio.
+   */
+  dsVersion?: string;
   /** Generatori di id; nei test sono deterministici. */
   ids?: { uuid: () => string; uid: () => string };
 }
 
 /**
- * Versione corrente del Design Studio, dichiarata al server su ogni agente che il DS
- * crea, in `attributes.dsVersion`. Vive qui, e non in utils.ts, perche' questo file non
+ * Versione corrente del Design Studio: e' il valore di riserva dell'etichetta
+ * `attributes.dsVersion` quando il chiamante non passa `dsVersion`, e il valore che
+ * la lettura riconosce come V3. Vive qui, e non in utils.ts, perche' questo file non
  * ha import: i test lo eseguono con Node togliendo solo i tipi. utils.ts la riespone
  * come `DS_VERSION_V3` per chi la deve rileggere, cosi' il valore e' scritto una volta sola.
  */
@@ -564,7 +579,7 @@ export function verifyAgent(agent: CompiledAgent): string[] {
 export interface BlockContext {
   ids: { uuid: () => string; uid: () => string };
   language: string;
-  askMessageType: 'replyv2' | 'reply';
+  messageType: 'reply' | 'replyv2';
   /** `#<intent_id>` del blocco, oppure stringa vuota se manca. */
   ref: (blockId: string | null | undefined) => string;
   /** L'intent_id d'ingresso del blocco. */
@@ -586,7 +601,7 @@ function makeButton(ids: BlockContext['ids'], type: 'action' | 'url' | 'text', v
   return { uid: ids.uid(), type, value, link: target.link || '', target: 'blank', action: target.action || '', attributes: '', show_echo: true };
 }
 
-function makeMessage(ids: BlockContext['ids'], type: 'replyv2' | 'reply', text: string, buttons: any[]) {
+function makeMessage(ids: BlockContext['ids'], type: 'reply' | 'replyv2', text: string, buttons: any[]) {
   const payload: any = { type: 'text', text };
   if (buttons.length) payload.attributes = { attachment: { type: 'template', buttons } };
   const attributes = { disableInputMessage: false, commands: [{ type: 'wait', time: 500 }, { type: 'message', message: payload }] };
@@ -649,7 +664,7 @@ export function compileBlock(block: CompilableBlock, ctx: BlockContext): any[] {
       const buttons = (block.buttons || []).map(b => (b.goto
         ? button('action', b.label, { action: ref(b.goto) })
         : button('url', b.label, { link: b.url || '' })));
-      add(message('replyv2', block.text as string, buttons), ref(block.next));
+      add(message(ctx.messageType, block.text as string, buttons), ref(block.next));
       break;
     }
     case 'randomreply': {
@@ -664,7 +679,7 @@ export function compileBlock(block: CompilableBlock, ctx: BlockContext): any[] {
     case 'ask': {
       const captureId = ctx.captureId(block.id);
       const buttons = (block.options || []).map(option => button('text', option));
-      add(message(ctx.askMessageType, block.text as string, buttons), '#' + captureId);
+      add(message(ctx.messageType, block.text as string, buttons), '#' + captureId);
       intents.push(makeIntent(ids, language, {
         id: captureId,
         name: ctx.captureName(block.id),
@@ -846,7 +861,7 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
   if (problems.length) throw new CompileError(problems);
 
   const ids = options.ids || { uuid: defaultUuid, uid: () => defaultUuid().replace(/-/g, '') };
-  const askMessageType = options.askMessageType || 'replyv2';
+  const messageType = options.messageType || options.askMessageType || 'reply';
   const language = String(blueprint.language || 'en');
   const blocks = blueprint.blocks;
   const byId = new Map<string, CompilableBlock>();
@@ -879,7 +894,7 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
   const declare = (name: string) => { if (name && !variables.includes(name)) variables.push(name); };
 
   const ctx: BlockContext = {
-    ids, language, askMessageType, ref,
+    ids, language, messageType, ref,
     entryId: blockId => entry.get(blockId) as string,
     captureId: blockId => capture.get(blockId) as string,
     name: blockId => names.get(blockId) as string,
@@ -926,7 +941,7 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
       // La versione la dichiara chi costruisce il flusso, non chi lo salva: il server
       // memorizza questo valore cosi' com'e' e l'editor lo rilegge all'apertura, cosi'
       // l'agente resta sull'editor per cui e' stato generato.
-      dsVersion: DS_VERSION_V3
+      dsVersion: (options.dsVersion || '').trim() || DS_VERSION_V3
     },
     intents,
     idMap: Array.from(entry.entries()).reduce((map, [blockId, intentId]) => { map[blockId] = intentId; return map; }, {} as { [blockId: string]: string })

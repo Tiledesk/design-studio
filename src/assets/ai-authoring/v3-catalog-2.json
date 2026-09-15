@@ -49,7 +49,7 @@
       "terminal": false,
       "rules": [
         "next is mandatory.",
-        "To branch on the answer, put a jsoncondition2 right after it and compare with the exact option text."
+        "To branch on the answer: jsoncondition2 right after it when the answer is a quick reply or another exact value, compared with the exact option text; ai_condition when the answer is free text and the branch depends on its meaning."
       ]
     },
     {
@@ -384,7 +384,8 @@
       "exits": [],
       "terminal": true,
       "rules": [
-        "Use it only when the brief asks to close the conversation.",
+        "It shuts the conversation down at once and hides the outcome: it is not how a flow ends.",
+        "Use it only after a long activity that is finished, or when the user has just chosen to close the chat with a button or a quick reply.",
         "Never right after a message the user must read."
       ]
     }
