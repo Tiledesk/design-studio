@@ -637,6 +637,7 @@
         "StartWebhookError": "Unable to update the webhook",
         "StartWebhookTest": "Test webhook start",
         "StartWebhookLoadError": "Unable to load the webhook settings",
+        "InfoStartWebhookDevSingleUse": "Each development call uses one test run: click Test webhook start again before the next call.",
         "Copy": "Copy",
         "TextCopied": "Text copied successfully!",
         "TextErrorCopied": "Error copying text",
