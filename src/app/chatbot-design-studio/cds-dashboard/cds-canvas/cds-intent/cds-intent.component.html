@@ -216,6 +216,13 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-online-agents-v2>
+
+                    <cds-action-invite-human *ngSwitchCase="TYPE_ACTION.INVITE_HUMAN"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-invite-human>
     
                     <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS" 
                         class="panel-response"

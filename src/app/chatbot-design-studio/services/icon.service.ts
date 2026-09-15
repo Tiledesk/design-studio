@@ -231,6 +231,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/online_agents.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/invite_human.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/invite_human.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions/open_hours.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/open_hours.svg')
     );

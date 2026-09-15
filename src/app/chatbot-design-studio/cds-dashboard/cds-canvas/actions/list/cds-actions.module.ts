@@ -76,6 +76,7 @@ import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-da
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
+import { CdsActionInviteHumanComponent } from './cds-action-invite-human/cds-action-invite-human.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
 import { CdsActionDataTableComponent } from './cds-action-data-table/cds-action-data-table.component';
@@ -118,6 +119,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
     CdsActionOnlineAgentsV2Component,
+    CdsActionInviteHumanComponent,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
@@ -240,6 +242,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
     CdsActionOnlineAgentsV2Component,
+    CdsActionInviteHumanComponent,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
