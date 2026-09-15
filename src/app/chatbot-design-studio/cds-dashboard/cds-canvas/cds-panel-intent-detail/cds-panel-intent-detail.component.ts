@@ -182,7 +182,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     }, error: (error) => {
       this.logger.error("[CdsPanelIntentDetailComponent] start webhook toggle error: ", error);
       this.startWebhookActive = isStartWebhookActive(this.startWebhook);
-      this.showMessage(this.translate.instant('CDSCanvas.StartWebhookError'));
+      this.showMessage(this.startWebhookErrorMessage(error));
     }});
   }
 
@@ -206,8 +206,14 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       this.applyStartWebhook(resp);
     }, error: (error) => {
       this.logger.error("[CdsPanelIntentDetailComponent] updateStartWebhookSettings error: ", error);
-      this.showMessage(this.translate.instant('CDSCanvas.StartWebhookError'));
+      this.showMessage(this.startWebhookErrorMessage(error));
     }});
+  }
+
+  /** Server validation errors come as { success: false, error: "<reason>" } */
+  private startWebhookErrorMessage(error: any): string {
+    const reason = error?.error?.error;
+    return (typeof reason === 'string' && reason.trim() !== '') ? reason : this.translate.instant('CDSCanvas.StartWebhookError');
   }
 
   onCopyStartUrl(value: string){
