@@ -384,7 +384,8 @@
       "exits": [],
       "terminal": true,
       "rules": [
-        "Use it only when the brief asks to close the conversation.",
+        "It shuts the conversation down at once and hides the outcome: it is not how a flow ends.",
+        "Use it only after a long activity that is finished, or when the user has just chosen to close the chat with a button or a quick reply.",
         "Never right after a message the user must read."
       ]
     }

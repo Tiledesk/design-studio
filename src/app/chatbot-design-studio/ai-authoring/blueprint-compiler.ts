@@ -161,13 +161,20 @@ export interface CompileOptions {
   messageType?: 'reply' | 'replyv2';
   /** @deprecated nome precedente di `messageType`, quando valeva solo per la `ask`. */
   askMessageType?: 'replyv2' | 'reply';
+  /**
+   * Versione dell'editor dichiarata sull'agente creato (`attributes.dsVersion`).
+   * La passa il chiamante leggendola dall'environment (`CHATBOT_VERSION`), perche'
+   * questo file non ha import; senza, resta il valore corrente del Design Studio.
+   */
+  dsVersion?: string;
   /** Generatori di id; nei test sono deterministici. */
   ids?: { uuid: () => string; uid: () => string };
 }
 
 /**
- * Versione corrente del Design Studio, dichiarata al server su ogni agente che il DS
- * crea, in `attributes.dsVersion`. Vive qui, e non in utils.ts, perche' questo file non
+ * Versione corrente del Design Studio: e' il valore di riserva dell'etichetta
+ * `attributes.dsVersion` quando il chiamante non passa `dsVersion`, e il valore che
+ * la lettura riconosce come V3. Vive qui, e non in utils.ts, perche' questo file non
  * ha import: i test lo eseguono con Node togliendo solo i tipi. utils.ts la riespone
  * come `DS_VERSION_V3` per chi la deve rileggere, cosi' il valore e' scritto una volta sola.
  */
@@ -934,7 +941,7 @@ export function compileBlueprint(blueprint: CompilableBlueprint, options: Compil
       // La versione la dichiara chi costruisce il flusso, non chi lo salva: il server
       // memorizza questo valore cosi' com'e' e l'editor lo rilegge all'apertura, cosi'
       // l'agente resta sull'editor per cui e' stato generato.
-      dsVersion: DS_VERSION_V3
+      dsVersion: (options.dsVersion || '').trim() || DS_VERSION_V3
     },
     intents,
     idMap: Array.from(entry.entries()).reduce((map, [blockId, intentId]) => { map[blockId] = intentId; return map; }, {} as { [blockId: string]: string })

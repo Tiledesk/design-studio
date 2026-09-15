@@ -9,6 +9,9 @@
 
 # this branch 15/09/2026
 
+- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
+- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
+- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede. La chiusura resta solo dopo un'attivita' lunga che si e' conclusa, oppure quando e' l'utente a sceglierla con un pulsante
 - **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
 - **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
 - **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti

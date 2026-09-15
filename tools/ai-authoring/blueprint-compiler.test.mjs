@@ -397,6 +397,13 @@ test('macro ask: la domanda usa reply v1', () => {
   assert.deepEqual([action._tdActionType, action.text, action.attributes.commands[1].message.text], ['reply', 'Email?', 'Email?']);
 });
 
+test("la versione dell'editor arriva dal chiamante, con il valore corrente come riserva", () => {
+  const bp = tiny([{ id: 'm', name: 'Messaggio', type: 'replyv2', text: 'Ciao', buttons: null, next: null }]);
+  assert.equal(compile(bp).attributes.dsVersion, 'v3', 'senza dsVersion resta la versione corrente del DS');
+  assert.equal(compile(bp, { dsVersion: 'v4' }).attributes.dsVersion, 'v4', 'il valore passato vince');
+  assert.equal(compile(bp, { dsVersion: '  ' }).attributes.dsVersion, 'v3', 'un valore vuoto non sovrascrive');
+});
+
 test('messageType replyv2 riporta i messaggi alla Advanced reply', () => {
   const bp = tiny([{ id: 'q', name: 'Chiedi email', type: 'ask', text: 'Email?', saveTo: 'user_email', next: 'f' }, { id: 'f', name: 'Fine', type: 'close' }]);
   const action = byName(compile(bp, { messageType: 'replyv2' }), 'Chiedi email').actions[0];
