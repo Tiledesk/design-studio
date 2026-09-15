@@ -5,6 +5,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_ACTION } from '../utils-actions';
 import { IntentService } from './intent.service';
+import { WEBHOOK_MODE_CONVERSATION } from '../utils-webhook';
 
 @Injectable({
   providedIn: 'root'
@@ -183,6 +184,35 @@ export class WebhookService {
     let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
+  }
+
+  createStartWebhook(chatbot_id: string, block_id: string, opts: { department_id?: string, source_name?: string } = {}){
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.logger.log('[WEBHOOK_URL.SERV] createStartWebhook');
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const body = Object.assign({ chatbot_id: chatbot_id, block_id: block_id, mode: WEBHOOK_MODE_CONVERSATION }, opts);
+    const url = this.WEBHOOK_URL + '/webhooks/';
+    return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
+  }
+
+  updateWebhookSettings(chatbot_id: string, patch: { enabled?: boolean, mode?: string, block_id?: string, department_id?: string | null, source_name?: string }){
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.logger.log('[WEBHOOK_URL.SERV] updateWebhookSettings', patch);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
+    return this._httpClient.put<any>(url, JSON.stringify(patch), httpOptions);
   }
 
   preloadWebhook(webhook_id: string){
