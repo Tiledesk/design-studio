@@ -36,6 +36,73 @@
    
         </div>
 
+        <!-- ---------------------------------------------------------- -->
+        <!-- start webhook (conversational chatbots) -->
+        <!-- ---------------------------------------------------------- -->
+        <div *ngIf="isStart && isChatbotStart" class="row start-webhook">
+
+            <div class="nw-onoffswitch-wrapper">
+                <div class="nw-onoffswitch">
+                    <label class="nw-onoffswitch-label" for="start_webhook_switch" [class.checked]="startWebhookActive">
+                        <input type="checkbox" name="start_webhook_switch"
+                        class="nw-onoffswitch-checkbox" id="start_webhook_switch"
+                        [(ngModel)]="startWebhookActive"
+                        (change)="onStartWebhookToggle($event.target.checked)" />
+                    </label>
+                </div>
+                <span class="checkmark">{{ 'CDSCanvas.StartWebhook' | translate }}</span>
+            </div>
+            <span class="nw-onoffswitch-wrapper info">{{ 'CDSCanvas.InfoStartWebhook' | translate }}</span>
+
+            <ng-container *ngIf="startWebhookActive && webhookUrl">
+                <div>
+                    <div>{{ 'CDSCanvas.ProductionUrl' | translate }}</div>
+                    <div class="webhook-block">
+                        <input #startCopyInput class="webhook-link" type="text" readonly [value]="webhookUrl">
+                        <div class="webhook-icon end" (click)="onCopyStartUrl(startCopyInput.value)">
+                            <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div>{{ 'CDSCanvas.DevelopmentUrl' | translate }}</div>
+                    <div class="webhook-block">
+                        <input #startCopyInputDev class="webhook-link" type="text" readonly [value]="webhookUrlDev">
+                        <div class="webhook-icon end" (click)="onCopyStartUrl(startCopyInputDev.value)">
+                            <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.StartWebhookDepartment' | translate }}</label>
+                    <cds-select id="start-webhook-department"
+                        [items]="departments"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'_id'"
+                        [itemSelected]="startWebhookDepartmentId"
+                        [placeholder]="'CDSCanvas.SelectADepartment' | translate"
+                        [clearable]="true"
+                        (onSelected)="onStartWebhookDepartmentChange($event)"
+                        (onReset)="onStartWebhookDepartmentReset()">
+                    </cds-select>
+                </div>
+
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.StartWebhookSourceName' | translate }}</label>
+                    <input class="webhook-link" type="text" [(ngModel)]="startWebhookSourceName" (change)="onStartWebhookSourceNameSave()">
+                </div>
+
+                <span class="nw-onoffswitch-wrapper info">{{ 'CDSCanvas.InfoStartWebhookBranch' | translate }}</span>
+
+                <div class="webhook-buttons">
+                    <button type="button" class="btn btn-primary cds-blue-button" (click)="onRegenerateWebhook()">{{ 'Regenerate' | translate }}</button>
+                </div>
+
+                <p *ngIf="messageText" class="webhook-message fade-in-out">{{ messageText }}</p>
+            </ng-container>
+        </div>
 
         <!-- ---------------------------------------------------------- -->
         <!-- webhook -->
