@@ -156,6 +156,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.subscriptionIsSaving?.unsubscribe();
     this.subscriptionIsSavingVisible?.unsubscribe();
     this.subscriptionWebhookStartTest?.unsubscribe();
+    this.intentService.webhookStartTest = false;
   }
 
 
@@ -426,11 +427,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     if(this.isWebhook || this.isWebhookStartTest){
       this.stopWebhook();
     }
-    this.isWebhookStartTest = false;
-    this.intentService.webhookStartTest = false;
     this.intentService.closeTestItOut();
     this.isPlaying = false;
     this.intentService.resetLiveActiveIntent();
+    this.isWebhookStartTest = false;
+    this.intentService.webhookStartTest = false;
     this.logService.closeLog();
   }
 
