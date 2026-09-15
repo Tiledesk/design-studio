@@ -8,17 +8,13 @@
 *Tiledesk SRL*
 
 
-# this branch 15/09/2026
-- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
-- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
-- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede. La chiusura resta solo dopo un'attivita' lunga che si e' conclusa, oppure quando e' l'utente a sceglierla con un pulsante
-- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
-- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
-- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
-- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla. Ora il punto di uscita c'e' sempre, e la destinazione si puo' scegliere anche dal pannello di dettaglio
-# this branch 14/09/2026
-
-- **changed**: merged branch V3/master-V3 (the V3 look of the blocks, the «Create agent with AI» modal and the AI panel with the agent history) into the agent chat branch. On this branch the V3 AI authoring stays inactive behind a single switch, off by default: no «Create agent with AI» button in the sidebar, no «AI» button in the header, no history probe on the server. Nothing is removed; a single environment can turn it on from the remote config with `aiAgentGeneratorEnabled: true`. The agent chat (vibe coder) of this branch stays active as before
+# 1.40.15-rc1
+- **changed**: which Design Studio opens on an agent is decided **only** by the version the agent carries, declared by whoever creates it: the creation date is no longer taken into account. Agents without it, which is every agent created so far, open in the previous editor. The declared version is set per environment, separately from the product version
+- **changed**: agents created and edited with AI come out more compact and lean on the AI blocks: one knowledge base search instead of a block per question, one AI routing instead of a tree of conditions, an open question instead of a deep menu
+- **changed**: messages in agents created with AI use the simple reply instead of the advanced one, questions and button menus included; and the conversation is no longer closed at the end of a path, so the last message stays readable. The chat is closed only after a long activity that is finished, or when the user chooses to close it
+- **changed**: in V3 agents the blocks that end the conversation no longer show the block's outgoing dot: close, handoff to an operator, back to the queue, hand over to another agent, and change department when it starts the department's bot. Existing agents and connections already made are untouched
+- **fixed**: in V3 agents a block that asks the user for a reply had no outgoing point at all and could not be connected to anything. The outgoing point is now always there, and its destination can also be chosen from the detail panel
+- **changed**: on the agent chat branch the V3 AI authoring stays inactive behind a single switch, off by default: nothing is removed, and one environment can turn it on from the remote config. The agent chat stays active as before
 
 # 1.40.14-V3
 - **added**: **Design Studio V3** — agents created from 07/09/2026 open in a simplified editor: one action per block, no action dragging and no inline controls, "Add action" only where it belongs, and the block is moved by grabbing the action's header. The block's outgoing dot is shown only where it really is the block's only way out. Agents created earlier are left exactly as they were
