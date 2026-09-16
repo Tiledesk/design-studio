@@ -27,7 +27,7 @@
             <span *ngIf="action?.assignResultTo">{{ action?.assignResultTo }}</span>
         </label>
 
-        <cds-connector class="connector"
+        <cds-connector *ngIf="action?.goToIntent" class="connector"
             [idConnector] = "idConnector"
             [idConnection] = "idConnection"
             [isConnected] = "isConnected">
@@ -58,7 +58,7 @@
     </div>
 
 
-    <div class="field-box">
+    <div class="field-box" *ngIf="action?.goToIntent">
         <div class="condition-container">
             <div class="icon-action">
                 <img class="active-icon" src="assets/images/actions/connect_intent.svg">

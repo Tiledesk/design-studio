@@ -20,6 +20,19 @@
 - **changed**: an **empty defaultFallback block** no longer accepts actions, by any route: nothing can be dropped into it and neither the "Add action" button nor the placeholder are shown. Agents that still hold a reply inside it stay editable, and in the agents created with AI the fallback message lives in a block of its own
 - **fixed**: a block asking the user for a reply had no outgoing point at all and could not be connected to anything; and after a large agent is created with AI the Design Studio re-reads its blocks before reporting connections it could not keep, so a false error no longer appears
 
+# this branch 16/09/2026
+- **changed**: negli agenti creati con l'AI la chiusura della conversazione non compare piu' dentro il flusso: c'e' soltanto se l'utente la sceglie premendo un pulsante, ad esempio "non ho altre domande, chiudi la chat", e dopo quella scelta non segue nient'altro
+- **changed**: negli agenti V3 il blocco che chiede una risposta all'utente usa lo stesso punto di uscita di tutti gli altri blocchi, quello sul bordo in basso a destra, invece di un secondo pallino appeso di lato alla action: si collega come ogni altro blocco e la destinazione si sceglie dal pannello del blocco. Gli agenti creati con le versioni precedenti restano come sono
+
+# this branch 15/09/2026
+- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
+- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
+- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede
+- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
+- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
+- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
+- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla
+
 # 1.40.14
 - **added**: the management of MCP servers and tools has been extracted from the AI Prompt action into a reusable section, so the other LLM actions can adopt it as it is
 - **added**: a Native Tools catalog listing the MCP servers provided by Tiledesk, each one showing its description and the tools currently active on it

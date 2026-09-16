@@ -244,6 +244,9 @@ export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
  *   su scelta dell'utente e noInput/noMatch sono percorsi d'errore, ma il flusso
  *   deve poter proseguire di default dopo la risposta. Mostrano quindi SEMPRE il
  *   pallino del blocco, con o senza bottoni configurati.
+ * - CAPTURE_USER_REPLY: il suo <cds-connector> compare solo su una capture che
+ *   porta ancora la vecchia destinazione in goToIntent; l'uscita e' il pallino del
+ *   blocco, che il CSS V3 porta sul bordo in basso a destra accanto alla action.
  * - le action voice (TYPE_ACTION_VXML): montano i connettori tramite elementi
  *   condivisi ma non tutte hanno un ramo nel connector service.
  *
@@ -253,7 +256,6 @@ export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
 export const ACTIONS_WITH_OWN_OUTPUTS: Array<TYPE_ACTION> = [
     TYPE_ACTION.INTENT,
     TYPE_ACTION.CONNECT_BLOCK,
-    TYPE_ACTION.CAPTURE_USER_REPLY,
     TYPE_ACTION.ONLINE_AGENTS,
     TYPE_ACTION.ONLINE_AGENTSV2,
     TYPE_ACTION.OPEN_HOURS,
