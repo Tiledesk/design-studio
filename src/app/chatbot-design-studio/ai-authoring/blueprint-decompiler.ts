@@ -209,7 +209,8 @@ function readBlock(action: any, intent: any, next: string | null, ctx: ReadConte
         const captureAction = actionOf(ctx.capture);
         return {
           type: 'ask', text: texts[0], options: buttons.length ? buttons.map(b => String(b.value ?? b.label ?? '')) : null,
-          saveTo: str(captureAction.assignResultTo), next: id(captureAction.goToIntent)
+          // La destinazione della capture sta sul blocco; goToIntent resta come ripiego per gli agenti compilati prima.
+          saveTo: str(captureAction.assignResultTo), next: nextOf(ctx.capture) || id(captureAction.goToIntent)
         };
       }
       const mapped: any[] = [];

@@ -264,7 +264,10 @@ export function compileOperations(intents: any[], operations: EditOperation[], o
       case 'capture': {
         const capture = captures[block.id] ? working.get(captures[block.id]) : null;
         if (!capture) { problems.push(`connect: la domanda "${block.name}" non ha la capture`); return false; }
-        done = set(capture.actions[0], 'goToIntent');
+        // La capture esce dal pallino del blocco, come il ramo 'next': la destinazione sta in nextBlockAction.
+        capture.attributes = capture.attributes || {};
+        capture.attributes.nextBlockAction = capture.attributes.nextBlockAction || { _tdActionTitle: '', _tdActionId: ids.uuid(), _tdActionType: 'intent', intentName: '' };
+        done = set(capture.attributes.nextBlockAction, 'intentName');
         if (done) touched.add(capture.intent_id);
         return done;
       }
