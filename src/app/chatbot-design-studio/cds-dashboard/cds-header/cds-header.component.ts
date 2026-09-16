@@ -350,11 +350,13 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
   /**
    * Pannello AI a destra: storia dei prompt, versioni, ripristino e modifica via prompt.
-   * Solo su agenti V3 con il servizio di generazione configurato. Se il server non ha il modulo delle
-   * revisioni, il pannello si apre lo stesso e lo dice: cosi' si capisce perche' la storia non c'e'.
+   * Su OGNI agente, V3 o precedente: la modifica via prompt e' una funzione dell'editor, non una
+   * caratteristica dell'agente, quindi non e' legata alla versione con cui e' stato costruito.
+   * L'unica condizione resta il servizio di generazione configurato. Se il server non ha il modulo
+   * delle revisioni, il pannello si apre lo stesso e lo dice: cosi' si capisce perche' la storia non c'e'.
    */
   get showAiPanelButton(): boolean {
-    return this.isV3 && !!this.selectedChatbot?._id && this.agentGeneratorService.isConfigured;
+    return !!this.selectedChatbot?._id && this.agentGeneratorService.isConfigured;
   }
 
   onClickAiPanel(){
