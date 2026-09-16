@@ -117,6 +117,20 @@ test('una capture puntata da due blocchi non e\' una ask: resta opaca', () => {
   assert.equal(Object.values(view.captures).includes(capture.intent_id), false);
 });
 
+test('capture di un agente vecchio: la destinazione si legge ancora da goToIntent', () => {
+  const agent = compile(load('03-ask-condition.json'));
+  const intents = JSON.parse(JSON.stringify(agent.intents));
+  const capture = intents.find((i) => i.actions[0]?._tdActionType === 'capture_user_reply');
+  const destination = capture.attributes.nextBlockAction.intentName;
+  assert.ok(destination, 'la capture compilata porta la destinazione sul blocco');
+  // Come la compilava il Design Studio prima che la capture passasse al pallino del blocco
+  capture.attributes.nextBlockAction.intentName = '';
+  capture.actions[0].goToIntent = destination;
+  const view = decompileAgent(intents, {}, REFS);
+  const ask = view.blocks.find((b) => b.type === 'ask');
+  assert.equal(ask.next, destination.slice(1));
+});
+
 test('start e defaultFallback sono riservati e portano la loro uscita', () => {
   const bp = load('01-linear.json');
   const agent = compile(bp);
