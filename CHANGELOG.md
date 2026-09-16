@@ -7,22 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 16/09/2026
-- **changed**: negli agenti creati con l'AI la chiusura della conversazione non compare piu' dentro il flusso: c'e' soltanto se l'utente la sceglie premendo un pulsante, ad esempio "non ho altre domande, chiudi la chat", e dopo quella scelta non segue nient'altro
-- **changed**: negli agenti V3 il blocco che chiede una risposta all'utente usa lo stesso punto di uscita di tutti gli altri blocchi, quello sul bordo in basso a destra, invece di un secondo pallino appeso di lato alla action: si collega come ogni altro blocco e la destinazione si sceglie dal pannello del blocco. Gli agenti creati con le versioni precedenti restano come sono
-
-# this branch 15/09/2026
-- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
-- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
-- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede
-- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
-- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
-- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
-- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla. Ora il punto di uscita c'e' sempre, e la destinazione si puo' scegliere anche dal pannello di dettaglio
-- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla
-
-# this branch 14/09/2026
-- **changed**: merged branch V3/master-V3 (the V3 look of the blocks, the «Create agent with AI» modal and the AI panel with the agent history) into the agent chat branch. On this branch the V3 AI authoring stays inactive behind a single switch, off by default: no «Create agent with AI» button in the sidebar, no «AI» button in the header, no history probe on the server. Nothing is removed; a single environment can turn it on from the remote config with `aiAgentGeneratorEnabled: true`. The agent chat (vibe coder) of this branch stays active as before
+# 1.40.15-rc2
+- **changed**: in agents created with AI the conversation is never closed by the flow itself. A close is there only when the user asks for it by pressing a button ("nothing else, close the chat"), and nothing follows that choice. This replaces the earlier rule, which also allowed a close after a long activity that was finished
+- **changed**: in V3 agents the block that asks the user for a reply uses the same outgoing point as every other block, the one on the bottom-right edge, instead of a second dot hanging beside the action: it is connected like any other block and its destination is chosen from the block's panel. Agents created with the previous editor are untouched
 
 # 1.40.15-rc1
 - **changed**: which Design Studio opens on an agent is decided **only** by the version the agent carries, declared by whoever creates it: the creation date is no longer taken into account. Agents without it, which is every agent created so far, open in the previous editor. The declared version is set per environment, separately from the product version
