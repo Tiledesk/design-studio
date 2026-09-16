@@ -15,9 +15,6 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { UserModel } from 'src/chat21-core/models/user';
 import { ProjectUser } from 'src/app/models/project-user';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { CdsAgentGeneratorComponent } from 'src/app/modals/cds-agent-generator/cds-agent-generator.component';
-import { AgentGeneratorService } from '../../services/agent-generator.service';
 
 @Component({
   selector: 'cds-sidebar',
@@ -47,41 +44,8 @@ export class CdsSidebarComponent implements OnInit {
     private el: ElementRef,
     private dashboardService: DashboardService,
     private router: Router,
-    private route: ActivatedRoute,
-    private dialog: MatDialog,
-    private agentGeneratorService: AgentGeneratorService
+    private route: ActivatedRoute
   ) { }
-
-  /**
-   * Apre la modale "Crea agente con l'AI".
-   *
-   * Il flag sul servizio blocca l'interfaccia sottostante insieme al backdrop:
-   * il backdrop ferma il puntatore, il flag ferma gli ascoltatori da tastiera
-   * del canvas, che sono su `document` e riceverebbero comunque i tasti.
-   */
-  openAgentGenerator(): void {
-    if (this.agentGeneratorService.isOpen) return;
-    this.agentGeneratorService.open();
-    const dialogRef = this.dialog.open(CdsAgentGeneratorComponent, {
-      width: '920px',
-      maxWidth: '94vw',
-      maxHeight: '92vh',
-      autoFocus: false,
-      restoreFocus: true,
-      panelClass: 'cds-agent-generator-dialog',
-      backdropClass: 'cds-agent-generator-backdrop'
-    });
-    dialogRef.afterClosed().subscribe(() => this.agentGeneratorService.close());
-  }
-
-  /**
-   * "Crea agente con l'AI" e' una funzione del Design Studio, non del solo V3: compare su ogni agente,
-   * legacy compreso, perche' crea sempre un agente nuovo (V3) e non tocca quello aperto. Compare solo se
-   * il servizio di generazione e' configurato: senza configurazione la funzione e' spenta.
-   */
-  get showAgentGenerator(): boolean {
-    return this.agentGeneratorService.isConfigured;
-  }
 
   ngOnInit(): void {
     this.projectID = this.dashboardService.projectID;

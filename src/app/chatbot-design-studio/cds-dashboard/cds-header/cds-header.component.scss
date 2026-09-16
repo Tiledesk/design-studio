@@ -73,24 +73,6 @@
         height: 100%;
     }
 
-    .cds-ai-panel-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 34px;
-        padding: 0 12px;
-        border: 1px solid var(--blu-light-02);
-        border-radius: 6px;
-        background: var(--blu-light-03);
-        color: var(--blu);
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        .material-icons { font-size: 18px; }
-        &:hover { background: var(--blu-light-02); }
-        &__label { white-space: nowrap; }
-    }
-
     .header-go-back {
         cursor: pointer;
         position: relative;

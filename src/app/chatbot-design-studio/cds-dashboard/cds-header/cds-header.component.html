@@ -50,17 +50,6 @@
     </div>
     <div class="right-opts">
 
-        <button *ngIf="isBlockSectionActive && showAiPanelButton" id="cds-ai-panel-btn" type="button"
-            class="cds-ai-panel-btn"
-            matTooltip="{{ 'CDSAiPanel.ButtonTooltip' | translate }}"
-            matTooltipClass="cds-mat-tooltip"
-            matTooltipPosition="below"
-            matTooltipHideDelay="100"
-            (click)="onClickAiPanel()">
-            <span class="material-icons">auto_awesome</span>
-            <span class="cds-ai-panel-btn__label">{{ 'CDSAiPanel.Button' | translate }}</span>
-        </button>
-
         <div *ngIf="isBlockSectionActive" class="btn-group" id="cds-publish-btn-wrp" [ngStyle]="{'z-index':popup_visibility === 'block' ? '1051' : '1' }">
             <button *ngIf="(!isPlaying && isWebhook) || !isWebhook" id="cds-publish-btn" class="btn btn-primary cds-blue-button" type="button"
                 [disabled]="isSaving"

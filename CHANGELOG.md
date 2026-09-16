@@ -9,6 +9,7 @@
 
 # this branch 16/09/2026
 
+- **removed**: tolta la creazione di agenti con l'AI a partire da un prompt, insieme al pannello AI per modificarli e alla loro storia delle versioni: spariscono il pulsante nella sidebar e il pulsante «AI» nell'header, e il Design Studio non contatta piu' il servizio di generazione. Gli agenti gia' creati restano e si aprono come prima con l'editor V3; pubblicazione, cronologia delle release, selettore ed eliminazione degli agenti funzionano come prima
 - **changed**: negli agenti creati con l'AI la chiusura della conversazione non compare piu' dentro il flusso: c'e' soltanto se l'utente la sceglie premendo un pulsante, ad esempio "non ho altre domande, chiudi la chat", e dopo quella scelta non segue nient'altro
 - **changed**: negli agenti V3 il blocco che chiede una risposta all'utente usa lo stesso punto di uscita di tutti gli altri blocchi, quello sul bordo in basso a destra, invece di un secondo pallino appeso di lato alla action: si collega come ogni altro blocco e la destinazione si sceglie dal pannello del blocco. Gli agenti creati con le versioni precedenti restano come sono
 

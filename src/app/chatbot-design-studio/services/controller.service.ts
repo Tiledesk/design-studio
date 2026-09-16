@@ -33,11 +33,6 @@ export class ControllerService {
   private publishPanelStatusSubject = new Subject<any>();
   public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
 
-  /** Pannello AI a destra (storia, versioni, modifica via prompt): true apre, false chiude. */
-  private aiPanelStatusSubject = new Subject<boolean>();
-  public isOpenAiPanel$ = this.aiPanelStatusSubject.asObservable();
-  private aiPanelOpen = false;
-
   constructor() {
   }
 
@@ -83,25 +78,6 @@ export class ControllerService {
 
   public openPublishPanel(){
     this.publishPanelStatusSubject.next(true);  
-  }
-
-  public openAiPanel(){
-    this.aiPanelOpen = true;
-    this.aiPanelStatusSubject.next(true);
-  }
-
-  public closeAiPanel(){
-    this.aiPanelOpen = false;
-    this.aiPanelStatusSubject.next(false);
-  }
-
-  public toggleAiPanel(){
-    if (this.aiPanelOpen) this.closeAiPanel(); else this.openAiPanel();
-  }
-
-  /** Il canvas lo chiama quando chiude i pannelli per altre vie, cosi' il toggle resta coerente. */
-  public markAiPanelClosed(){
-    this.aiPanelOpen = false;
   }
 
   public closeAllPanels(){
