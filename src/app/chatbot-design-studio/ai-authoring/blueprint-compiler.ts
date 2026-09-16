@@ -684,7 +684,9 @@ export function compileBlock(block: CompilableBlock, ctx: BlockContext): any[] {
         id: captureId,
         name: ctx.captureName(block.id),
         position: ctx.capturePosition(block.id),
-        action: simple('capture_user_reply', { assignResultTo: block.saveTo, goToIntent: ref(block.next) })
+        // La destinazione sta sul blocco: la capture non ha un connettore proprio, esce dal pallino del blocco.
+        action: simple('capture_user_reply', { assignResultTo: block.saveTo }),
+        next: ref(block.next)
       }));
       declare(block.saveTo as string);
       break;

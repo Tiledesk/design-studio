@@ -99,7 +99,8 @@ function checkBlock(agent, bp, block) {
       assert.equal(captureIntent.intent_display_name, `${intent.intent_display_name} ${bp.language === 'it' ? 'risposta' : 'reply'}`);
       assert.equal(captureIntent.actions[0]._tdActionType, 'capture_user_reply');
       assert.equal(captureIntent.actions[0].assignResultTo, block.saveTo);
-      assert.equal(captureIntent.actions[0].goToIntent, refTo(agent, bp, block.next));
+      assert.equal(captureIntent.attributes.nextBlockAction.intentName, refTo(agent, bp, block.next));
+      assert.equal(captureIntent.actions[0].goToIntent, undefined);
       assert.equal(variables[block.saveTo], block.saveTo);
       break;
     }

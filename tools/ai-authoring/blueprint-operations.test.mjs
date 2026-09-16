@@ -122,7 +122,7 @@ test('connect con le uscite con nome: true/false, pulsante, ramo AI, capture di 
   const view = decompileAgent(intents, {}, REFS);
   const capturePut = res.faqOperations.find((o) => o.type === 'put' && o.intent.intent_id === view.captures[idOf(ask.id)]);
   assert.ok(capturePut, 'la capture della ask va aggiornata');
-  assert.equal(capturePut.intent.actions[0].goToIntent, '#' + idOf(target.id));
+  assert.equal(capturePut.intent.attributes.nextBlockAction.intentName, '#' + idOf(target.id));
 
   const menu = setup('02-menu.json');
   const menuBlock = menu.bp.blocks.find((b) => b.buttons?.some((x) => x.goto));
@@ -183,7 +183,7 @@ test('add di una ask crea domanda e capture; update da ask a replyv2 toglie la c
   const posts = res.faqOperations.filter((o) => o.type === 'post');
   assert.equal(posts.length, 2);
   assert.equal(posts[1].intent.actions[0]._tdActionType, 'capture_user_reply');
-  assert.equal(posts[1].intent.actions[0].goToIntent, '#' + after);
+  assert.equal(posts[1].intent.attributes.nextBlockAction.intentName, '#' + after);
   assert.equal(posts[0].intent.attributes.nextBlockAction.intentName, '#' + posts[1].intent.intent_id);
 
   const askFixture = setup('03-ask-condition.json');
