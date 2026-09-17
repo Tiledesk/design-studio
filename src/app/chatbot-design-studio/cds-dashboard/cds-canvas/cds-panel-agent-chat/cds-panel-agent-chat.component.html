@@ -1,0 +1,47 @@
+<div class="agent-chat-panel">
+  <div class="agent-chat-error" *ngIf="error">
+    <span class="material-icons">error_outline</span>
+    <p>{{ 'CDS.AgentChat.LoadFailed' | translate }}</p>
+    <pre>{{ error }}</pre>
+  </div>
+
+  <!-- Kept mounted even during an error (hidden via CSS, not *ngIf): removing
+       it from the DOM would drop the #agentChatIframe ViewChild, so a retry
+       after a failed attach() would wire up a detached placeholder instead of
+       this real element. -->
+  <iframe #agentChatIframe
+    class="agent-chat-frame"
+    [class.agent-chat-frame--hidden]="error"
+    [class.has-applied-row]="appliedCount > 0 || failedCount > 0"
+    [src]="safeIframeSrc"
+    title="{{ 'CDS.AgentChat.Title' | translate }}">
+  </iframe>
+
+  <div class="agent-chat-applied" *ngIf="appliedCount > 0 || failedCount > 0">
+    <span *ngIf="appliedCount > 0">{{ 'CDS.AgentChat.Applied' | translate:{count: appliedCount} }}</span>
+    <!-- A refusal that renders nothing is indistinguishable from the agent
+         having done nothing at all, which is the failure this feature exists
+         to avoid. The report carries the reason; say it. -->
+    <span class="agent-chat-failed" *ngIf="failedCount > 0">
+      {{ 'CDS.AgentChat.Failed' | translate:{count: failedCount} }}
+      <span class="agent-chat-failed-reason" *ngIf="firstError">{{ firstError }}</span>
+    </span>
+    <button type="button" *ngIf="canUndo" (click)="onUndo()">
+      {{ 'CDS.AgentChat.Undo' | translate }}
+    </button>
+  </div>
+</div>
+
+<div class="agent-chat-resize-handle"
+  role="separator"
+  aria-orientation="vertical"
+  (mousedown)="onResizeStart($event)"
+  (dblclick)="onResizeReset()">
+</div>
+
+<!-- The chat frame is on another origin: while dragging, any mousemove that
+     crosses over it would be swallowed by the iframe's own document instead
+     of reaching ours, and the drag would stick. This mask sits above
+     everything only for the duration of the gesture so the move/up listeners
+     on the parent document keep receiving events. -->
+<div class="agent-chat-drag-mask" *ngIf="resizing"></div>

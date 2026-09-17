@@ -46,6 +46,8 @@ import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-
 import { CdsActionQaplaComponent } from './cds-action-qapla/cds-action-qapla.component';
 import { CdsActionReplaceBotV2Component } from './cds-action-replace-bot/cds-action-replace-bot-v2/cds-action-replace-bot-v2.component';
 import { CdsActionReplaceBotV3Component } from './cds-action-replace-bot/cds-action-replace-bot-v3/cds-action-replace-bot-v3.component';
+import { CdsActionReplaceBotV4Component } from './cds-action-replace-bot/cds-action-replace-bot-v4/cds-action-replace-bot-v4.component';
+import { CdsActionReturnStackComponent } from './cds-action-return-stack/cds-action-return-stack.component';
 import { CdsActionReplaceBotComponent } from './cds-action-replace-bot/cds-action-replace-bot-v1/cds-action-replace-bot.component';
 import { CdsActionReplyComponent } from './cds-action-reply/cds-action-reply-v1/cds-action-reply.component';
 import { CdsActionReplyButtonComponent } from './cds-action-reply/elements/cds-action-reply-button/cds-action-reply-button.component';
@@ -93,6 +95,8 @@ import { CdsActionWebResponseComponent } from './cds-action-web-response/cds-act
 import { CdsActionReplyJsonbuttonsComponent } from './cds-action-reply/elements/cds-action-reply-jsonbuttons/cds-action-reply-jsonbuttons.component';
 import { CdsActionAddKbContentComponent } from './cds-action-add-kb-content/cds-action-add-kb-content.component';
 import { CdsActionFlowLogComponent } from './cds-action-flow-log/cds-action-flow-log.component';
+import { CdsActionSubAgentComponent } from './cds-action-sub-agent/cds-action-sub-agent.component';
+import { CdsActionReturnComponent } from './cds-action-return/cds-action-return.component';
 import { CdsActionAiConditionComponent } from './cds-action-ai-condition/cds-action-ai-condition.component';
 import { AttributesDialogAiConditionComponent } from './cds-action-ai-condition/attributes-dialog/attributes-dialog.component';
 import { AiConditionComponent } from './cds-action-ai-condition/ai-condition/ai-condition.component';
@@ -126,6 +130,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
     CdsActionReplaceBotV3Component,
+    CdsActionReplaceBotV4Component,
+    CdsActionReturnStackComponent,
     CdsActionAssignVariableComponent,
     CdsActionAssignVariableV2Component,
     CdsActionHideMessageComponent,
@@ -207,7 +213,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     VariableCssClassPipe,
     CdsActionReplyJsonbuttonsComponent,
     CdsActionAddKbContentComponent,
-    CdsActionFlowLogComponent
+    CdsActionFlowLogComponent,
+    CdsActionSubAgentComponent,
+    CdsActionReturnComponent
     
   ],
   imports: [
@@ -245,6 +253,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
     CdsActionReplaceBotV3Component,
+    CdsActionReplaceBotV4Component,
+    CdsActionReturnStackComponent,
     CdsActionAssignVariableComponent,
     CdsActionAssignVariableV2Component,
     CdsActionHideMessageComponent,
@@ -322,7 +332,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     GetVariableNamePipe,
     VariableCssClassPipe,
     CdsActionAddKbContentComponent,
-    CdsActionFlowLogComponent
+    CdsActionFlowLogComponent,
+    CdsActionSubAgentComponent,
+    CdsActionReturnComponent
   ]
 })
 export class CdsActionsModule { }

@@ -111,7 +111,8 @@ export enum SETTINGS_SECTION {
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
-    ADVANCED        = 'advanced'
+    ADVANCED        = 'advanced',
+    LLM_SETTINGS    = 'llm_settings',
 }
 
 export enum EXTERNAL_URL {

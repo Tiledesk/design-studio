@@ -1,13 +1,13 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn, ActionReplaceBotV4, ActionReturnStack } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL, isDefaultFallbackWithoutActions } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
-import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT } from '../utils-actions';
+import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
 
@@ -200,6 +200,14 @@ export class IntentService {
 
 
   public setMapOfIntents(){
+    // Built from scratch, not added to. This map is the canvas's checklist of
+    // the blocks it is waiting to render, so it describes ONE flow. Adding to
+    // it was harmless only while changing flow meant reloading the page, which
+    // threw this singleton away with everything else; now that the canvas is
+    // rebuilt in place, a block left over from the previous flow never
+    // renders, the checklist never completes, and the connectors -- drawn only
+    // once every block has reported in -- are never drawn at all.
+    this.mapOfIntents = {};
     this.listOfIntents.forEach( intent => {
       const intentID = intent.intent_id;
       this.mapOfIntents[intentID] = {'shown': false };
@@ -737,6 +745,10 @@ export class IntentService {
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
 
+    // updateIntent in coda fa refreshIntent solo sull'intent di destinazione:
+    // notifico esplicitamente anche il blocco sorgente, che deve ri-renderizzarsi
+    // (es. se resta con la sola azione "Return to parent agent" diventa una pastiglia)
+    this.behaviorIntent.next(previousIntent);
     this.updateIntent(currentIntent, previousIntent);
     return;
     // this.connectorService.updateConnector(currentIntent.intent_id);
@@ -884,7 +896,7 @@ export class IntentService {
   public async setStartIntent(){
     this.intentSelectedID = null;
     this.intentActive = false;
-    const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    const subtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
     let startingName = STARTING_NAMES[subtype];
     this.logger.log('[CDS-INTENT] startingName: ', startingName);
     this.intentSelected = this.listOfIntents.find((intent) => intent.intent_display_name === startingName);
@@ -897,13 +909,16 @@ export class IntentService {
         /// let id_faq_kb = this.dashboardService.id_faq_kb;
         /// this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         /// this.stageService.centerStageOnHorizontalPosition(startElement);
-        let left = 0;
-        const element = document.getElementById('cdsPanelIntentList');
-        if (element) {
-          left = element.offsetWidth+100;
-        }
+        // This used to nudge the centred position right by roughly
+        // #cdsPanelIntentList's (.box-left's) own width, to clear the
+        // sidebar back when #tds_container spanned underneath it and
+        // .box-left merely floated on top via z-index. #tds_container is a
+        // real flex sibling starting after .box-left (and the chat panel)
+        // now, so centring within the container's own coordinate space
+        // already lands past both -- re-adding their width here would push
+        // the 'start' block needlessly far right instead of centring it.
         let id_faq_kb = this.dashboardService.id_faq_kb;
-        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
+        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement);
       }
     }
   }
@@ -1053,6 +1068,13 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.REPLACE_BOTV3){
       action = new  ActionReplaceBotV3();
       action.useSlug = false;
+    }
+    if(typeAction === TYPE_ACTION.REPLACE_BOTV4){
+      action = new  ActionReplaceBotV4();
+      action.useSlug = false;
+    }
+    if(typeAction === TYPE_ACTION.RETURN_STACK){
+      action = new ActionReturnStack();
     }
     if(typeAction === TYPE_ACTION.CHANGE_DEPARTMENT) {
       action = new  ActionChangeDepartment();
@@ -1213,6 +1235,19 @@ export class IntentService {
 
     if(typeAction === TYPE_ACTION.FLOW_LOG){
       action = new ActionFlowLog();
+    }
+
+    if(typeAction === TYPE_ACTION.INVOKE_SUB_AGENT){
+      action = new ActionSubAgent();
+      action.mode = 'fire_and_continue';
+      action.assignStatusTo = 'subagent_status';
+      action.assignErrorTo = 'subagent_error';
+      action.assignRunIdTo = 'subAgentRunId';
+      action.assignResultTo = 'subagent_result';
+    }
+
+    if(typeAction === TYPE_ACTION.RETURN){
+      action = new ActionReturn();
     }
 
 
@@ -1442,7 +1477,12 @@ export class IntentService {
       this.setBehaviorUndoRedo();
       this.opsUpdate(this.payload);
     }
-    const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
+    // Optional all the way down: this is a log line, and `intentSelected` is
+    // null on a freshly rebuilt canvas (a flow switch destroys and recreates
+    // it, and nothing re-selects a block). Dereferencing it there threw --
+    // out of a public method the canvas's own Ctrl+Z and the chat panel's
+    // Undo both call -- for the sake of a message nobody reads.
+    const action = this.intentSelected?.actions?.find((obj) => obj._tdActionId === this.actionSelectedID);
     this.logger.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
   }
 
