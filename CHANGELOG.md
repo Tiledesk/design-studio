@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch 17/09/2026
+
+- **fixed**: all'apertura di un agente la chat AI, ora aperta di default, restava bianca e non si avviava; ora si carica subito
 - **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso
 - **changed**: quando la chat AI finisce di aggiungere, eliminare o ricollegare blocchi, tutto il flusso viene riordinato da sinistra a destra: un passo per colonna, i rami uno sotto l'altro senza sovrapposizioni, il fallback e i blocchi scollegati in fondo. I collegamenti seguono i blocchi e la vista si adatta all'intero flusso. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
 - **fixed**: quando la chat AI finisce di modificare il flusso, il Design Studio controlla che tutti i collegamenti previsti siano disegnati sullo stage e completa quelli mancanti. Prima alcuni collegamenti comparivano solo ricaricando la pagina
