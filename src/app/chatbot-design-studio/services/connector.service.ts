@@ -1674,6 +1674,98 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
 
 
 
+  /** The DOM id of the connector a destination field draws: `<from>/<to>`, where `<from>` is the
+   *  anchor of the action port the field belongs to. '' for a field that draws no connector. */
+  private connectorIdFor(intent_id: string, tdActionId: string, key: string, obj: any, idConnectorTo: string): string {
+    if(key === 'intentName'){
+      return intent_id+'/'+tdActionId+'/'+idConnectorTo;
+    } else if(key === 'trueIntent'){
+      return intent_id+'/'+tdActionId+'/true/'+idConnectorTo;
+    } else if(key === 'falseIntent'){
+      return intent_id+'/'+tdActionId+'/false/'+idConnectorTo;
+    } else if(key === 'noInputIntent'){
+      return intent_id+'/'+tdActionId+'/noInput/'+idConnectorTo;
+    } else if(key === 'noMatchIntent'){
+      return intent_id+'/'+tdActionId+'/noMatch/'+idConnectorTo;
+    } else if(obj.uid && obj.type === 'action'){
+      return intent_id+"/"+tdActionId+"/"+obj.uid+'/'+idConnectorTo;
+    } else if(key === 'conditionIntentId' && obj.label){
+      return intent_id+"/"+tdActionId+"/"+obj.label+'/true/'+idConnectorTo;
+    } else if(key === 'fallbackIntent'){
+      return intent_id+"/"+tdActionId+'/fallback/'+idConnectorTo;
+    } else if(key === 'errorIntent'){
+      return intent_id+"/"+tdActionId+'/error/'+idConnectorTo;
+    } else if(key === 'goToIntent'){
+      return intent_id+"/"+tdActionId+'/goto/'+idConnectorTo;
+    }
+    return '';
+  }
+
+  /** The ids of the connectors a block's data asks for, towards blocks that exist -- the same
+   *  derivation as createListOfConnectorsByIntent2, without touching the maps. A "Return to
+   *  parent agent" block draws no connector out of its block dot, so that one is not expected. */
+  public expectedConnectorIds(intent: any): string[] {
+    const ids: string[] = [];
+    if (!intent?.intent_id) { return ids; }
+    const known = new Set((this.listOfIntents || []).map((item: any) => item?.intent_id));
+    const skipBlockDot = isReturnStackIntent(intent);
+    let tdActionId = '';
+    const explore = (obj: any) => {
+      if (typeof obj !== 'object' || obj === null) { return; }
+      if (skipBlockDot && obj === intent.attributes?.nextBlockAction) { return; }
+      if (obj._tdActionId) { tdActionId = obj._tdActionId; }
+      for (const key in obj) {
+        const value = obj[key];
+        if (typeof value === 'string' && value.startsWith('#') && value !== '#') {
+          const to = value.replace('#', '');
+          const id = this.connectorIdFor(intent.intent_id, tdActionId, key, obj, to);
+          if (id && known.has(to)) { ids.push(id); }
+        }
+        explore(value);
+      }
+    };
+    explore(intent);
+    return ids;
+  }
+
+  /** Connectors the data asks for that are not on the stage. */
+  public missingConnectorIds(intents: any[]): string[] {
+    this.syncIntents(intents);
+    const missing: string[] = [];
+    for (const intent of intents || []) {
+      for (const id of this.expectedConnectorIds(intent)) {
+        if (!document.getElementById(id)) { missing.push(id); }
+      }
+    }
+    return missing;
+  }
+
+  /** Draws every connector the flow's data asks for that is not on the stage.
+   *
+   *  A connector is drawn once its two ends are rendered; when they appear later than the wait
+   *  and the retry queue allow -- a big batch from the AI chat, say -- it is given up silently and
+   *  only a page reload brought it back. This compares the expected connectors with the stage and
+   *  redraws the blocks that miss one. `createConnectorsOfIntent` updates an existing connector
+   *  instead of duplicating it, so a block is only ever completed. Connectors on the stage that
+   *  the data no longer asks for are left alone. */
+  public async ensureConnectorsDrawn(intents: any[]): Promise<{ missing: string[]; redrawnBlocks: number }> {
+    this.syncIntents(intents);
+    const missing: string[] = [];
+    let redrawnBlocks = 0;
+    for (const intent of intents || []) {
+      const absent = this.expectedConnectorIds(intent).filter(id => !document.getElementById(id));
+      if (absent.length === 0) { continue; }
+      missing.push(...absent);
+      try {
+        await this.createConnectorsOfIntent(intent);
+        redrawnBlocks++;
+      } catch (error) {
+        this.logger.error('[CONNECTOR-SERV] ensureConnectorsDrawn: redraw failed', intent?.intent_id, error);
+      }
+    }
+    return { missing, redrawnBlocks };
+  }
+
   createListOfConnectorsByIntent2(json: any): void {
     let intent_id = json.intent_id;
     let tdActionId = '';
@@ -1686,28 +1778,7 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
         for (const key in obj) {
           if (typeof obj[key] === 'string' && obj[key].startsWith('#') && obj[key] !== '#') {
             const idConnectorTo = obj[key].replace('#', '');
-            let connectorID = '';
-            if(key === 'intentName'){
-              connectorID = intent_id+'/'+tdActionId+'/'+idConnectorTo;
-            } else if(key === 'trueIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/true/'+idConnectorTo;
-            } else if(key === 'falseIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/false/'+idConnectorTo;
-            } else if(key === 'noInputIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/noInput/'+idConnectorTo;
-            } else if(key === 'noMatchIntent'){
-              connectorID = intent_id+'/'+tdActionId+'/noMatch/'+idConnectorTo;
-            } else if(obj.uid && obj.type === 'action'){
-              connectorID = intent_id+"/"+tdActionId+"/"+obj.uid+'/'+idConnectorTo;
-            } else if(key === 'conditionIntentId' && obj.label){ 
-              connectorID = intent_id+"/"+tdActionId+"/"+obj.label+'/true/'+idConnectorTo;
-            } else if(key === 'fallbackIntent'){ 
-              connectorID = intent_id+"/"+tdActionId+'/fallback/'+idConnectorTo;
-            } else if(key === 'errorIntent'){ 
-              connectorID = intent_id+"/"+tdActionId+'/error/'+idConnectorTo;
-            } else if(key === 'goToIntent'){ 
-              connectorID = intent_id+"/"+tdActionId+'/goto/'+idConnectorTo;
-            } 
+            let connectorID = this.connectorIdFor(intent_id, tdActionId, key, obj, idConnectorTo);
 
             let shown = 'false';
             const objectExists = this.existingIntentIds.has(idConnectorTo);

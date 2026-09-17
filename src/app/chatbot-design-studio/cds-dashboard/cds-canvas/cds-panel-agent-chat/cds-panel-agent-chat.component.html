@@ -1,4 +1,13 @@
-<div class="agent-chat-panel">
+<div class="agent-chat-panel" [class.has-toolbar]="showCloseButton">
+  <div class="agent-chat-toolbar" *ngIf="showCloseButton">
+    <span class="agent-chat-toolbar__title">{{ 'CDS.AgentChat.Title' | translate }}</span>
+    <button type="button" class="agent-chat-toolbar__close"
+      [title]="'CDS.AgentChat.Hide' | translate"
+      [attr.aria-label]="'CDS.AgentChat.Hide' | translate"
+      (click)="closePanel.emit()">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
   <div class="agent-chat-error" *ngIf="error">
     <span class="material-icons">error_outline</span>
     <p>{{ 'CDS.AgentChat.LoadFailed' | translate }}</p>

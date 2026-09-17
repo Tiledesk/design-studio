@@ -446,4 +446,22 @@ describe('CdsPanelAgentChatComponent', () => {
       expect(currentWidthVar()).toBe('500px'); // restored from the same unmodified preferred value
     });
   });
+
+  describe('close button', () => {
+    it('is not shown by default', () => {
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('.agent-chat-toolbar__close')).toBeNull();
+    });
+
+    it('is shown when asked, and asks the host to close the panel', () => {
+      component.showCloseButton = true;
+      const closed = jasmine.createSpy('closed');
+      component.closePanel.subscribe(closed);
+      fixture.detectChanges();
+      const button: HTMLButtonElement = fixture.nativeElement.querySelector('.agent-chat-toolbar__close');
+      expect(button).not.toBeNull();
+      button.click();
+      expect(closed).toHaveBeenCalledTimes(1);
+    });
+  });
 });

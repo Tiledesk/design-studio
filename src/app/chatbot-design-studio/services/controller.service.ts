@@ -98,6 +98,15 @@ export class ControllerService {
     this.agentChatPanelSource.next(this.agentChatPanelOpen);
   }
 
+  public get isAgentChatPanelOpen(): boolean {
+    return this.agentChatPanelOpen;
+  }
+
+  public openAgentChatPanel(){
+    this.agentChatPanelOpen = true;
+    this.agentChatPanelSource.next(true);
+  }
+
   public closeAgentChatPanel(){
     this.agentChatPanelOpen = false;
     this.agentChatPanelSource.next(false);

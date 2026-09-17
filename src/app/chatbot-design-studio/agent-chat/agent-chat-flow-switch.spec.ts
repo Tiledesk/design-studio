@@ -247,7 +247,7 @@ function makeDashboard(parts: any): any {
     { getItem: () => null, setItem: () => {} },
     parts.dashboardService ?? {},
     {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
-    parts.controllerService ?? { isOpenAgentChatPanel$: new Subject() },
+    parts.controllerService ?? { isOpenAgentChatPanel$: new Subject(), openAgentChatPanel: () => {} },
     agentChatHostService,
     intentService,
     parts.changeDetectorRef ?? { detectChanges: () => {} }
@@ -692,5 +692,55 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
     dashboardService.getBotById = () => Promise.reject(false);
     await expectAsync(registered['open_flow']({ faq_kb_id: 'sub1' }))
       .toBeRejectedWithError(/do not patch anything[\s\S]*open_flow/i);
+  });
+});
+
+describe('CdsDashboardComponent — the AI chat is open whenever an agent is opened', () => {
+
+  function build(isV3: boolean, configured = true) {
+    const controllerService: any = {
+      isOpenAgentChatPanel$: new Subject(),
+      openAgentChatPanel: jasmine.createSpy('openAgentChatPanel')
+    };
+    const dashboardService: any = {
+      projectID: 'p1',
+      id_faq_kb: 'kb1',
+      isV3,
+      selectedChatbot: { _id: 'kb1', name: 'Parent' },
+      getBotById: () => Promise.resolve(true)
+    };
+    const component = makeDashboard({
+      dashboardService,
+      controllerService,
+      agentChatHostService: { setFlowNavigator: () => {}, isConfigured: () => configured },
+      intentService: { getAllIntents: () => Promise.resolve(true) },
+      router: {
+        url: '/project/p1/chatbot/kb1/blocks',
+        events: new Subject(),
+        navigate: (commands: any[]) => {
+          dashboardService.id_faq_kb = commands[3];
+          return Promise.resolve(true);
+        }
+      }
+    });
+    return { component, controllerService };
+  }
+
+  it('opens the chat when switching to a V3 agent', async () => {
+    const { component, controllerService } = build(true);
+    await component.openFlow('kb2');
+    expect(controllerService.openAgentChatPanel).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens the chat when switching to a legacy agent too', async () => {
+    const { component, controllerService } = build(false);
+    await component.openFlow('kb2');
+    expect(controllerService.openAgentChatPanel).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not open a chat that is not configured', async () => {
+    const { component, controllerService } = build(true, false);
+    await component.openFlow('kb2');
+    expect(controllerService.openAgentChatPanel).not.toHaveBeenCalled();
   });
 });

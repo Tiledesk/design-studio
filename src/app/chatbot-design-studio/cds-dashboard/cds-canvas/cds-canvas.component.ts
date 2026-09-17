@@ -12,6 +12,7 @@ import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
+import { FlowOpsService } from '../../agent-chat/flow-ops.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -74,6 +75,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   TYPE_INTENT_NAME = TYPE_INTENT_NAME;
 
   private subscriptionListOfIntents: Subscription;
+  private subscriptionLayoutApplied: Subscription;
   listOfIntents: Array<Intent> = [];
   listOfEvents: Array<Intent> = [];
   listOfNotes: Array<Note> = [];
@@ -94,6 +96,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   private newIntentIds: string[] = [];
   private newIntentTimer: any = null;
   private newIntentConnectorsTimer: any = null;
+  private layoutConnectorsTimer: any = null;
   LOGOS_ITEMS = LOGOS_ITEMS;
   loadingProgress = 0;
   mapOfConnectors = [];
@@ -204,7 +207,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    private readonly flowOpsService: FlowOpsService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -214,6 +218,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
     this.resolveActiveLeftPanel();
+    // V3: closed from the first render, not closed by an animation after it.
+    if (this.dashboardService.isV3) { this.IS_OPEN_INTENTS_LIST = false; }
     this.initialize();
   }
 
@@ -224,6 +230,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.connectorService.clearRetryQueue();
     clearTimeout(this.newIntentTimer);
     clearTimeout(this.newIntentConnectorsTimer);
+    clearTimeout(this.layoutConnectorsTimer);
 
     // Cancella il timer del debounce se è ancora attivo
     if (this.saveNoteDetailTimer) {
@@ -241,6 +248,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     }
     if (this.subscriptionListOfIntents) {
       this.subscriptionListOfIntents.unsubscribe();
+    }
+    if (this.subscriptionLayoutApplied) {
+      this.subscriptionLayoutApplied.unsubscribe();
     }
     if (this.subscriptionOpenDetailPanel) {
       this.subscriptionOpenDetailPanel.unsubscribe();
@@ -288,7 +298,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
-    if(this.stageService.settings?.open_intent_list_state != null){
+    if(this.dashboardService.isV3){
+      // V3: the blocks sidebar is closed whenever an agent is opened, the AI chat is open instead.
+      this.IS_OPEN_INTENTS_LIST = false;
+    } else if(this.stageService.settings?.open_intent_list_state != null){
       this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
     }
     // this.stageService.initStageSettings(this.id_faq_kb);
@@ -395,6 +408,38 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         }
       });
     }, 400);
+  }
+
+  /** The AI chat has finished editing and the flow has been laid out again: once the blocks
+   *  are at their new place, the connectors follow them and the view fits the whole flow.
+   *
+   *  Every block's connectors are updated, not only the moved ones: the update recomputes the
+   *  connectors LEAVING a block, so a connector entering a moved block from a block that stayed
+   *  put would keep pointing at the old place. A second pass once the fit animation is over
+   *  catches the connectors the connector check drew while the stage was still moving. */
+  private onFlowLaidOut(layout: { faqKbId: string, movedIds: string[] }) {
+    if (layout.faqKbId !== this.id_faq_kb) { return; }
+    clearTimeout(this.layoutConnectorsTimer);
+    requestAnimationFrame(async () => {
+      if (layout.faqKbId !== this.id_faq_kb) { return; }
+      if (layout.movedIds.length > 0) {
+        await this.updateAllConnectors();
+      }
+      await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
+      this.layoutConnectorsTimer = setTimeout(() => {
+        if (layout.faqKbId === this.id_faq_kb) { this.updateAllConnectors(); }
+      }, 400);
+    });
+  }
+
+  private async updateAllConnectors() {
+    for (const intent of this.listOfIntents || []) {
+      try {
+        await this.connectorService.updateConnector(intent.intent_id);
+      } catch (error) {
+        this.logger.error('[CDS-CANVAS] update connectors of a laid out block failed', intent?.intent_id, error);
+      }
+    }
   }
 
   /** The pulse the widget simulation puts on the active block, removed once it has played. */
@@ -512,6 +557,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- //
   
   private setSubscriptions(){
+    this.subscriptionLayoutApplied = this.flowOpsService.layoutApplied$.subscribe(layout => this.onFlowLaidOut(layout));
 
     this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
         this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);

@@ -1653,6 +1653,31 @@ export class IntentService {
     this.opsUpdate(this.payload); 
   }
 
+  /** Moves several blocks at once, as ONE step of undo and ONE save.
+   *  Used by the automatic layout of the flow: updateIntent() per block would push one
+   *  undo entry and one save per block. The undo copy is the block as it is now, just
+   *  before the move. Returns the ids actually moved. */
+  public updateIntentPositions(moves: Array<{ intent_id: string, position: { x: number, y: number } }>): string[] {
+    const undo = [];
+    const redo = [];
+    let idFaqKb = null;
+    for (const move of moves || []) {
+      const intent = this.listOfIntents.find((obj) => obj.intent_id === move.intent_id);
+      if (!intent) { continue; }
+      undo.push({ type: "put", intent: JSON.parse(JSON.stringify(intent)) });
+      intent.attributes = intent.attributes || {};
+      intent.attributes.position = { x: move.position.x, y: move.position.y };
+      redo.push({ type: "put", intent: JSON.parse(JSON.stringify(intent)) });
+      idFaqKb = intent.id_faq_kb;
+    }
+    if (redo.length === 0) { return []; }
+    this.arrayUNDO.push({ undo: undo, redo: redo });
+    this.arrayREDO = [];
+    this.setBehaviorUndoRedo();
+    this.opsUpdate({ id_faq_kb: idFaqKb, operations: redo }).catch(() => {});
+    return redo.map(op => op.intent.intent_id);
+  }
+
   /** */
   public async saveNewIntent(intent: Intent, nowIntent: Intent, prevIntent:Intent){
     this.logger.log('[INTENT SERVICE] -> addIntentNew, ', intent, nowIntent, prevIntent);

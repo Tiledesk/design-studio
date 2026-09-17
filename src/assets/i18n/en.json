@@ -1567,6 +1567,8 @@
         "AgentChat": {
             "Title": "Build with AI",
             "Toggle": "Build this flow by describing it",
+            "Show": "Show chat",
+            "Hide": "Hide chat",
             "LoadFailed": "The AI chat could not be loaded.",
             "Applied": "Applied {{count}} change(s) to this flow.",
             "Failed": "{{count}} change(s) could not be applied:",

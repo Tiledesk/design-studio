@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
@@ -3943,4 +3943,280 @@ describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () =>
     expect(report.ok).toBe(true);
     expect(intentService.getIntentFromId('welcome').actions.length).toBe(2);
   });
+});
+
+describe('ConnectorService.ensureConnectorsDrawn — no connector left undrawn, real DOM', () => {
+  let elements: HTMLElement[];
+  let connectors: ConnectorService;
+  let intents: Intent[];
+
+  function add(id: string, isBlock = false) {
+    const el = document.createElement('div');
+    el.id = id;
+    if (isBlock) { el.classList.add('tds_input_block'); }
+    document.body.appendChild(el);
+    elements.push(el);
+  }
+
+  function withNext(intentId: string, actionId: string, to: string): Intent {
+    const intent = anIntent(intentId, intentId);
+    (intent.attributes as any).nextBlockAction = { _tdActionId: actionId, _tdActionType: 'intent', intentName: to };
+    return intent;
+  }
+
+  beforeEach(() => {
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+    elements = [];
+    add('tds_drawer');
+    add('A', true); add('A/nba-a');
+    add('N', true); add('N/nba-n');
+    add('B', true);
+    intents = [withNext('A', 'nba-a', '#N'), withNext('N', 'nba-n', '#B'), anIntent('B', 'B')];
+    connectors = new ConnectorService();
+    connectors.initializeConnectors();
+    connectors.syncIntents(intents);
+  });
+
+  afterEach(() => {
+    elements.forEach(el => el.remove());
+    document.querySelectorAll('[id^="A/"], [id^="N/"]').forEach(el => el.remove());
+  });
+
+  it('derives the connectors a block asks for from its data', () => {
+    expect(connectors.expectedConnectorIds(intents[0])).toEqual(['A/nba-a/N']);
+    expect(connectors.expectedConnectorIds(intents[2])).toEqual([]);
+  });
+
+  it('does not expect a connector towards a block that does not exist', () => {
+    const ghost = withNext('G', 'nba-g', '#missing');
+    expect(connectors.expectedConnectorIds(ghost)).toEqual([]);
+  });
+
+  it('draws the connectors that were never drawn', async () => {
+    expect(connectors.missingConnectorIds(intents)).toEqual(['A/nba-a/N', 'N/nba-n/B']);
+    const result = await connectors.ensureConnectorsDrawn(intents);
+    expect(result.missing).toEqual(['A/nba-a/N', 'N/nba-n/B']);
+    expect(result.redrawnBlocks).toBe(2);
+    expect(countDistinctEdges('A/nba-a')).toBe(1);
+    expect(countDistinctEdges('N/nba-n')).toBe(1);
+    expect(connectors.missingConnectorIds(intents)).toEqual([]);
+  });
+
+  it('leaves a complete stage alone: nothing duplicated, no block redrawn', async () => {
+    await connectors.ensureConnectorsDrawn(intents);
+    const spy = spyOn(connectors, 'createConnectorsOfIntent').and.callThrough();
+    const result = await connectors.ensureConnectorsDrawn(intents);
+    expect(result).toEqual({ missing: [], redrawnBlocks: 0 });
+    expect(spy).not.toHaveBeenCalled();
+    expect(countDistinctEdges('A/nba-a')).toBe(1);
+  });
+
+  it('completes only the block that misses a connector', async () => {
+    await connectors.ensureConnectorsDrawn(intents);
+    document.querySelectorAll('[id^="N/nba-n/"]').forEach(el => el.remove());
+    const spy = spyOn(connectors, 'createConnectorsOfIntent').and.callThrough();
+    const result = await connectors.ensureConnectorsDrawn(intents);
+    expect(result.missing).toEqual(['N/nba-n/B']);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.calls.mostRecent().args[0].intent_id).toBe('N');
+  });
+});
+
+describe('FlowOpsService — connector check after the AI chat stops editing', () => {
+  let service: FlowOpsService;
+  let connectorService: any;
+  let dashboardService: any;
+
+  beforeEach(() => {
+    const intentService: any = {
+      listOfIntents: [anIntent('i1', 'welcome')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+    connectorService.ensureConnectorsDrawn = jasmine.createSpy('ensureConnectorsDrawn')
+      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0 }));
+    connectorService.missingConnectorIds = jasmine.createSpy('missingConnectorIds').and.returnValue([]);
+    dashboardService = { id_faq_kb: 'kb1' };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  const rename = (name: string) => [{ op: 'update_intent', intent_id: 'i1', intent_display_name: name } as any];
+
+  it('checks the connectors once the chat has paused, and again after the retries', fakeAsync(() => {
+    service.apply(rename('one'));
+    flushMicrotasks();
+    tick(999);
+    expect(connectorService.ensureConnectorsDrawn).not.toHaveBeenCalled();
+    tick(1);
+    expect(connectorService.ensureConnectorsDrawn).toHaveBeenCalledTimes(1);
+    tick(2000);
+    expect(connectorService.ensureConnectorsDrawn).toHaveBeenCalledTimes(2);
+    tick(1500);
+    expect(connectorService.missingConnectorIds).toHaveBeenCalledTimes(1);
+  }));
+
+  it('restarts the wait at every batch, so the check follows the LAST one', fakeAsync(() => {
+    service.apply(rename('one'));
+    flushMicrotasks();
+    tick(800);
+    service.apply(rename('two'));
+    flushMicrotasks();
+    tick(800);
+    expect(connectorService.ensureConnectorsDrawn).not.toHaveBeenCalled();
+    tick(200);
+    expect(connectorService.ensureConnectorsDrawn).toHaveBeenCalledTimes(1);
+    tick(5000);
+  }));
+
+  it('does not check a flow the canvas has left', fakeAsync(() => {
+    service.apply(rename('one'));
+    flushMicrotasks();
+    dashboardService.id_faq_kb = 'kb2';
+    tick(5000);
+    expect(connectorService.ensureConnectorsDrawn).not.toHaveBeenCalled();
+    expect(connectorService.missingConnectorIds).not.toHaveBeenCalled();
+  }));
+});
+
+describe('FlowOpsService — the flow is laid out again once the chat stops changing its structure', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+  let connectorService: any;
+  let dashboardService: any;
+  let laidOut: Array<{ faqKbId: string, movedIds: string[] }>;
+
+  beforeEach(() => {
+    const start = anIntent('s', 'start');
+    start.attributes = { position: { x: 10, y: 20 }, nextBlockAction: { intentName: '#a' } } as any;
+    const a = anIntent('a', 'welcome');
+    a.attributes = { position: { x: 900, y: 500 } } as any;
+    const old = anIntent('old', 'old');
+    old.attributes = { position: { x: 300, y: 900 } } as any;
+    const undoStack: any[] = [];
+    intentService = {
+      listOfIntents: [start, a, old],
+      arrayUNDO: undoStack,
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      updateIntent: recordingUndo('updateIntent', undoStack),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.callFake((intent: Intent) => {
+        intentService.listOfIntents = intentService.listOfIntents.filter((i: Intent) => i !== intent);
+        undoStack.push({ undo: [], redo: [] });
+        return Promise.resolve(true);
+      }),
+      updateIntentPositions: jasmine.createSpy('updateIntentPositions').and.callFake((moves: any[]) => {
+        moves.forEach(move => intentService.getIntentFromId(move.intent_id).attributes.position = move.position);
+        undoStack.push({ undo: [], redo: [] });
+        return moves.map(move => move.intent_id);
+      }),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+    connectorService.ensureConnectorsDrawn = jasmine.createSpy('ensureConnectorsDrawn')
+      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0 }));
+    connectorService.missingConnectorIds = jasmine.createSpy('missingConnectorIds').and.returnValue([]);
+    dashboardService = { id_faq_kb: 'kb1' };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+    laidOut = [];
+    service.layoutApplied$.subscribe(layout => laidOut.push(layout));
+  });
+
+  const deleteOld = () => [{ op: 'delete_intent', intent_id: 'old' } as any];
+  const rename = () => [{ op: 'update_intent', intent_id: 'a', intent_display_name: 'hello' } as any];
+
+  it('moves every block that is out of place in one save, once the chat has paused, before the connector check', fakeAsync(() => {
+    service.apply(deleteOld());
+    flushMicrotasks();
+    tick(999);
+    expect(intentService.updateIntentPositions).not.toHaveBeenCalled();
+    tick(1);
+    expect(intentService.updateIntentPositions).toHaveBeenCalledTimes(1);
+    expect(intentService.updateIntentPositions).toHaveBeenCalledWith([{ intent_id: 'a', position: { x: 334, y: 20 } }]);
+    expect(laidOut).toEqual([{ faqKbId: 'kb1', movedIds: ['a'] }]);
+    expect(connectorService.ensureConnectorsDrawn).not.toHaveBeenCalled();
+    tick(50);
+    expect(connectorService.ensureConnectorsDrawn).toHaveBeenCalledTimes(1);
+    tick(5000);
+    expect(intentService.updateIntentPositions).toHaveBeenCalledTimes(1);
+  }));
+
+  it('lets the chat\'s Undo take the layout back together with the batch', fakeAsync(() => {
+    service.apply(deleteOld());
+    flushMicrotasks();
+    tick(5000);
+    expect(service.undoLast()).toBeTrue();
+    expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(2);
+  }));
+
+  it('does not lay out a flow whose blocks and connections did not change', fakeAsync(() => {
+    service.apply(rename());
+    flushMicrotasks();
+    tick(5000);
+    expect(intentService.updateIntentPositions).not.toHaveBeenCalled();
+    expect(laidOut).toEqual([]);
+    expect(connectorService.ensureConnectorsDrawn).toHaveBeenCalledTimes(2);
+  }));
+
+  it('lays out once, after the LAST batch, even when only an earlier one changed the structure', fakeAsync(() => {
+    service.apply(deleteOld());
+    flushMicrotasks();
+    tick(800);
+    service.apply(rename());
+    flushMicrotasks();
+    tick(800);
+    expect(intentService.updateIntentPositions).not.toHaveBeenCalled();
+    tick(200);
+    expect(intentService.updateIntentPositions).toHaveBeenCalledTimes(1);
+    tick(5000);
+  }));
+
+  it('does not lay out a flow the canvas has left', fakeAsync(() => {
+    service.apply(deleteOld());
+    flushMicrotasks();
+    dashboardService.id_faq_kb = 'kb2';
+    tick(5000);
+    expect(intentService.updateIntentPositions).not.toHaveBeenCalled();
+    expect(laidOut).toEqual([]);
+  }));
+
+  it('announces the layout even when every block is already in place, so the view still fits the flow', fakeAsync(() => {
+    intentService.getIntentFromId('a').attributes.position = { x: 334, y: 20 };
+    service.apply(deleteOld());
+    flushMicrotasks();
+    tick(5000);
+    expect(intentService.updateIntentPositions).not.toHaveBeenCalled();
+    expect(laidOut).toEqual([{ faqKbId: 'kb1', movedIds: [] }]);
+  }));
 });

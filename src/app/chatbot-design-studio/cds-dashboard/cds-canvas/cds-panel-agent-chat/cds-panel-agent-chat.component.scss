@@ -41,6 +41,55 @@
   position: relative;
 }
 
+$agent-chat-toolbar-height: 40px;
+
+.agent-chat-toolbar {
+  height: $agent-chat-toolbar-height;
+  padding: 0 8px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gray-light-02);
+  background: #ffffff;
+  font-family: var(--font-family-poppins);
+
+  &__title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blu);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__close {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--button-border-radius-base);
+    background: transparent;
+    color: var(--gray-02);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    .material-icons { font-size: 20px; }
+
+    &:hover {
+      background: var(--blu-light-04);
+      color: var(--blu);
+    }
+  }
+}
+
+.agent-chat-panel.has-toolbar {
+  .agent-chat-frame { height: calc(100% - #{$agent-chat-toolbar-height}); }
+  .agent-chat-frame.has-applied-row { height: calc(100% - #{$agent-chat-toolbar-height} - 37px); }
+}
+
 .agent-chat-frame--hidden {
   display: none;
 }

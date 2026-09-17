@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnChanges, Output, OnDestroy, OnInit, SimpleChanges, ViewChild
 } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
@@ -16,6 +16,10 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
 
   @ViewChild('agentChatIframe') agentChatIframe: ElementRef<HTMLIFrameElement>;
   @Input() isPanelVisible: boolean = false;
+  /** The panel carries its own close button, because the header button that opens it is
+   *  hidden while it is open. */
+  @Input() showCloseButton: boolean = false;
+  @Output() closePanel = new EventEmitter<void>();
 
   /** localStorage key the resized width is persisted under, so it survives a
    *  reload. Scoped to this panel specifically (not reused by any other

@@ -321,6 +321,8 @@
       "AgentChat": {
         "Title": "Costruisci con l'AI",
         "Toggle": "Costruisci questo flusso descrivendolo",
+        "Show": "Mostra chat",
+        "Hide": "Nascondi chat",
         "LoadFailed": "Non è stato possibile caricare la chat AI.",
         "Applied": "Applicate {{count}} modifiche a questo flusso.",
         "Failed": "{{count}} modifiche non sono state applicate:",

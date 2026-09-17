@@ -36,7 +36,9 @@
         <cds-panel-agent-chat
             [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive"
             [class.isHidden]="!(IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive)"
-            [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive">
+            [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive"
+            [showCloseButton]="true"
+            (closePanel)="onCloseAgentChat()">
         </cds-panel-agent-chat>
 
         <!-- The outlet ALONE. cds-panel-agent-chat above is deliberately its

@@ -192,6 +192,21 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** The AI chat is open whenever an agent is opened, V3 or legacy: at the first load and at
+   *  every switch. The user can still close it from the panel. */
+  private openAgentChatByDefault(): void {
+    try {
+      if (!this.agentChatHostService.isConfigured?.()) { return; }
+      this.controllerService.openAgentChatPanel();
+    } catch (error) {
+      this.logger.error('[CDS DSHBRD] could not open the AI chat', error);
+    }
+  }
+
+  onCloseAgentChat(): void {
+    this.controllerService.closeAgentChatPanel();
+  }
+
   /** Open another flow of this family without reloading the page.
    *
    *  The canvas is destroyed and rebuilt rather than re-initialised in place.
@@ -298,6 +313,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.flowVisible = true;
       this.changeDetectorRef.detectChanges();
     }
+    // After the load, never inside it: a failure here must not be reported as a flow that
+    // could not be opened.
+    this.openAgentChatByDefault();
   }
 
   /** Reloads the open flow in place -- its blocks, its attributes -- as a page
@@ -373,6 +391,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
+      this.openAgentChatByDefault();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
       this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);

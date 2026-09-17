@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { firstValueFrom, Subject } from 'rxjs';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -10,12 +10,25 @@ import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION, actionEndsTheFlow } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
+import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
 
 /** How long the canvas animates the stage onto a new block (0.3s in tiledesk-stage.js),
  *  plus a margin. Connectors are measured against the stage's current transform, so
  *  moved blocks are only redrawn once it has settled. */
 const STAGE_FOCUS_ANIMATION_MS = 400;
+
+/** When the stage is checked for connectors that were never drawn, counted from the last batch
+ *  of the AI chat: once it has paused (the first pass), and again after the connector service's
+ *  own retry queue (500ms x 5) has given up on anything still pending (the second pass). */
+const CONNECTOR_CHECK_DELAYS_MS = [1000, 3000];
+/** After the second pass: anything still missing is logged, to find the anchor that never renders. */
+const CONNECTOR_CHECK_REPORT_DELAY_MS = 1500;
+
+/** Operations that change which blocks exist or how they are connected: after one of
+ *  them the flow is laid out again once the chat pauses. `update_action` counts only
+ *  when it writes a destination (see `batchChangesStructure`). */
+const STRUCTURAL_OPS = ['add_intent', 'delete_intent', 'add_action', 'delete_action', 'connect'];
 
 const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
@@ -89,7 +102,7 @@ const RESERVED_NAMES: string[] = Object.values(RESERVED_INTENT_NAMES);
  *  something the agent can read and correct, while an exception just ends the
  *  turn with the user none the wiser. */
 @Injectable({ providedIn: 'root' })
-export class FlowOpsService {
+export class FlowOpsService implements OnDestroy {
 
   /** How many entries the last applied batch pushed onto the studio's undo
    *  stack. `restoreLastUNDO()` pops exactly one, so undoing a batch of N
@@ -114,6 +127,15 @@ export class FlowOpsService {
    *  So the depth is only ever spent on the flow that earned it. null means
    *  there is nothing to undo. */
   private lastBatchFaqKbId: string | null = null;
+  /** Timers of the connector check scheduled after the last batch; reset by every new batch. */
+  private connectorCheckTimers: any[] = [];
+
+  /** The flow whose structure the chat changed since it was last laid out, or null. */
+  private layoutPendingFaqKbId: string | null = null;
+
+  /** Emitted after the automatic layout of a flow, with the blocks it moved (possibly
+   *  none): the canvas redraws their connectors and fits the view to the whole flow. */
+  public readonly layoutApplied$ = new Subject<{ faqKbId: string, movedIds: string[] }>();
 
   /** Where this service put each block it positioned itself, keyed by
    *  intent_id -- the blocks it is allowed to move again later.
@@ -193,6 +215,9 @@ export class FlowOpsService {
     // "what this batch put on the stack" is the stack's own growth, which
     // stays right if an operation ever pushes none or two.
     const undoDepthBefore = this.undoStackDepth();
+    // Read before applying: an update_action is structural when it writes a
+    // destination of its action, whose type is known only while it exists.
+    const structural = this.batchChangesStructure(ops);
     const results: FlowOpResult[] = [];
     // Blocks whose actions this batch actually wrote a destination field onto
     // -- collected as operations apply, redrawn once each after the batch is
@@ -239,8 +264,22 @@ export class FlowOpsService {
     // (CdsCanvasComponent.onNewIntentRendered); what is left here is the blocks
     // relayoutBranches moved, whose connectors were measured at the old place.
     const createdAny = results.some(r => r.op === 'add_intent' && r.ok);
+    if (structural && results.some(r => r.ok)) {
+      this.layoutPendingFaqKbId = this.dashboardService.id_faq_kb;
+    }
     this.redrawMovedAfterRender(movedIds, createdAny, this.dashboardService.id_faq_kb);
+    this.scheduleConnectorCheck(this.dashboardService.id_faq_kb);
     return { ok, rejected_before_applying: false, results };
+  }
+
+  /** Whether the batch adds, removes or reconnects blocks. */
+  private batchChangesStructure(ops: FlowOp[]): boolean {
+    return ops.some(op => {
+      if (STRUCTURAL_OPS.indexOf(op.op) !== -1) { return true; }
+      if (op.op !== 'update_action') { return false; }
+      const action = this.targetActionOf(op);
+      return !!action && this.actionTouchesConnectors(action._tdActionType, op.fields);
+    });
   }
 
   private undoStackDepth(): number {
@@ -1904,11 +1943,82 @@ export class FlowOpsService {
     }
   }
 
-  /** Redraw every block in `intentIds`, each independently best-effort: one
-   *  block's redraw throwing (synchronously or via its settled promise) must
-   *  not stop the others from being asked, the same "drawing never blocks or
-   *  fails the operation" guarantee `redrawBlockConnectors` itself already
-   *  gives for a single block. */
+  /** Makes sure every connector the flow asks for is on the stage once the AI chat stops editing.
+   *
+   *  The design studio gets no "run finished" event from the chat, but every change to the flow
+   *  goes through apply(): so the check is counted from the last batch. Each batch restarts the
+   *  timers; the checks run once the chat has paused, and a check that runs while the chat is
+   *  still working is harmless -- it only completes blocks, and the next batch schedules another.
+   *  It stops if the canvas moves to another flow. */
+  ngOnDestroy(): void {
+    this.connectorCheckTimers.forEach(timer => clearTimeout(timer));
+    this.connectorCheckTimers = [];
+  }
+
+  /** The same pause also lays the flow out, when the chat changed its structure: on the
+   *  first pass, before the connectors are checked against the new positions. */
+  private scheduleConnectorCheck(faqKbId: string): void {
+    this.connectorCheckTimers.forEach(timer => clearTimeout(timer));
+    this.connectorCheckTimers = CONNECTOR_CHECK_DELAYS_MS.map((delay, pass) => setTimeout(async () => {
+      if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+      try {
+        if (pass === 0 && this.layoutFlow(faqKbId)) {
+          // Let Angular move the blocks before measuring anything on the stage.
+          await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
+          if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+        }
+        await this.connectorService.ensureConnectorsDrawn?.(this.intentService.listOfIntents || []);
+      } catch (error) {
+        // Best-effort: the flow is saved either way.
+      }
+    }, delay));
+    const lastDelay = CONNECTOR_CHECK_DELAYS_MS[CONNECTOR_CHECK_DELAYS_MS.length - 1];
+    this.connectorCheckTimers.push(setTimeout(() => {
+      if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+      try {
+        const missing = this.connectorService.missingConnectorIds?.(this.intentService.listOfIntents || []) || [];
+        if (missing.length) {
+          console.warn('[FLOW-OPS] connectors still not drawn after the checks:', missing);
+        }
+      } catch (error) {
+        // Diagnostics only.
+      }
+    }, lastDelay + CONNECTOR_CHECK_REPORT_DELAY_MS));
+  }
+
+  /** Lays the whole flow out again, if the chat changed its structure since the last time.
+   *
+   *  Every block moves, including the ones placed by hand: the layout is always automatic.
+   *  All the moves are one step of undo and one save; when they follow a batch of the chat
+   *  on the same flow, the chat's Undo takes them back together with that batch. Notes are
+   *  not blocks and stay where they are. Returns whether the layout ran. */
+  private layoutFlow(faqKbId: string): boolean {
+    if (this.layoutPendingFaqKbId !== faqKbId) { return false; }
+    this.layoutPendingFaqKbId = null;
+    const intents: any[] = (this.intentService.listOfIntents || []).filter(intent => !!intent?.intent_id);
+    const nodes = intents.map(intent => ({
+      id: intent.intent_id,
+      height: this.blockHeightPx(intent.intent_id),
+      position: this.positionOf(intent)
+    }));
+    const edges = new Map<string, string[]>(intents.map(intent => [intent.intent_id, this.outgoingTargets(intent)]));
+    const roots = [RESERVED_INTENT_NAMES.START, RESERVED_INTENT_NAMES.WEBHOOK, RESERVED_INTENT_NAMES.DEFAULT_FALLBACK]
+      .map(name => intents.find(intent => intent.intent_display_name === name)?.intent_id)
+      .filter(id => !!id);
+    const changed = computeFlowLayout(nodes, edges, roots, {
+      columnStep: NEW_BLOCK_HORIZONTAL_STEP_PX,
+      verticalGap: CANVAS_BLOCK_VERTICAL_GAP_PX
+    });
+    const movedIds = changed.size === 0 ? [] : this.intentService.updateIntentPositions(
+      Array.from(changed.entries()).map(([intent_id, position]) => ({ intent_id, position })));
+    movedIds.forEach(id => this.autoPlacedPositions.set(id, changed.get(id)));
+    if (movedIds.length > 0 && this.lastBatchUndoDepth > 0 && this.lastBatchFaqKbId === faqKbId) {
+      this.lastBatchUndoDepth++;
+    }
+    this.layoutApplied$.next({ faqKbId, movedIds });
+    return true;
+  }
+
   /** Redraws the connectors of the blocks `relayoutBranches` moved, once they are on
    *  the stage at their new place.
    *
@@ -1938,6 +2048,11 @@ export class FlowOpsService {
     }
   }
 
+  /** Redraw every block in `intentIds`, each independently best-effort: one
+   *  block's redraw throwing (synchronously or via its settled promise) must
+   *  not stop the others from being asked, the same "drawing never blocks or
+   *  fails the operation" guarantee `redrawBlockConnectors` itself already
+   *  gives for a single block. */
   private redrawBlocks(intentIds: Set<string>): void {
     intentIds.forEach(intentId => this.redrawBlockConnectors(intentId));
   }

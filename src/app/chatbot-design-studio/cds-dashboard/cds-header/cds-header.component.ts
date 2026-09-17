@@ -120,6 +120,10 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     return this.agentChatHostService.isConfigured();
   }
 
+  get isAgentChatPanelOpen(): boolean {
+    return this.controllerService.isAgentChatPanelOpen;
+  }
+
   onToggleAgentChat(){
     this.controllerService.toggleAgentChatPanel();
   }
