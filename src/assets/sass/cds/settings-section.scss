@@ -1,5 +1,13 @@
 
-input[type="text"] {
+// `select` and `input[type="number"]` are here so this section's controls are
+// not the only ones in the settings panel rendered as raw browser defaults.
+// The rule list below is keyed on `input[type="text"]`, which was every control
+// any importer of this sheet had until the LLM section arrived with a dropdown
+// and two number boxes; unstyled, they inherited no height, border, radius or
+// width and sat visibly apart from their styled siblings.
+input[type="text"],
+input[type="number"],
+select {
     // min-width: 307px !important;
     height: 36px;
     font-size: 14px;
@@ -37,7 +45,9 @@ textarea[type="text"] {
     color:#808080;
 }
 
-input[type="text"]:disabled {
+input[type="text"]:disabled,
+input[type="number"]:disabled,
+select:disabled {
     background-color: var(--input-disabled) !important;
     // cursor: not-allowed;
 }
@@ -47,6 +57,13 @@ textarea[type="text"]:disabled {
     // cursor: not-allowed;
 }
 
+// Deliberately NOT extended to `input[type="number"]`, unlike the two rules
+// above. This one paints the placeholder in the disabled *background* colour,
+// i.e. hides it -- and the LLM section's number fields are disabled in exactly
+// the state their placeholder exists to explain ("blank means the deployment's
+// own setting", with agent.yaml's params in force). It is inert either way,
+// since the generic `::placeholder` rule below carries `!important` and beats
+// it whatever the specificity, but it must not read as the intent here.
 input[type="text"]:disabled::placeholder {
     color: var(--input-disabled);
     // font-size: 1.2em;

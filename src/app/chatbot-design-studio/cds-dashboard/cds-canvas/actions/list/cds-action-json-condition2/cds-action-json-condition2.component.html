@@ -6,8 +6,8 @@
         </div>
 
 
-        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length === 0" [ngTemplateOutlet]="placeholder"></ng-container>
-        <ng-container *ngIf="action?.groups.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length > 0" [ngTemplateOutlet]="conditions"></ng-container>
+        <ng-container *ngIf="action?.groups?.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length === 0" [ngTemplateOutlet]="placeholder"></ng-container>
+        <ng-container *ngIf="action?.groups?.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length > 0" [ngTemplateOutlet]="conditions"></ng-container>
         
         <cds-connector class="connector-true"
             [idConnector] = "idConnectorTrue"
