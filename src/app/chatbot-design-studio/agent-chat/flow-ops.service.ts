@@ -8,7 +8,8 @@ import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
-import { TYPE_ACTION } from '../utils-actions';
+import { TYPE_ACTION, actionEndsTheFlow } from '../utils-actions';
+import { v3RuleError } from './v3-flow-rules';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
 
 /** How long the canvas animates the stage onto a new block (0.3s in tiledesk-stage.js),
@@ -173,6 +174,12 @@ export class FlowOpsService {
     }
     this.subagentBlocks = subagentFetch.blocks;
     const validation = ops.map(op => this.validate(op));
+    // V3 agents only: a legacy flow is validated exactly as before.
+    if (this.dashboardService.isV3 && validation.every(r => r.ok)) {
+      this.validateV3Batch(ops).forEach((error, i) => {
+        if (error) { validation[i] = { op: ops[i].op, ok: false, error }; }
+      });
+    }
     if (validation.some(r => !r.ok)) {
       // Nothing was applied, so nothing from this batch is on the undo stack.
       // Leaving a previous batch's depth in place would make the next Undo
@@ -375,6 +382,122 @@ export class FlowOpsService {
     if (op?.op !== 'update_action') { return null; }
     const intent = this.intentService.getIntentFromId(op.intent_id);
     return (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id) ?? null;
+  }
+
+  /** The V3 rules (`v3-flow-rules.ts`) checked against the whole batch, one
+   *  entry per operation: `null` when the operation keeps the flow V3, the
+   *  refusal otherwise.
+   *
+   *  "One action per block" is counted over the batch, not per operation:
+   *  two `add_action` on the same block are each fine alone and wrong
+   *  together, and a `delete_action` earlier in the batch frees the slot a
+   *  later `add_action` fills. Only blocks already on the canvas can be
+   *  counted this way -- a block this batch creates has no `intent_id` yet
+   *  for another operation to name, so its count is its own `actions[]`. */
+  private validateV3Batch(ops: FlowOp[]): Array<string | null> {
+    const counts = new Map<string, number>();
+    const countOf = (intentId: string): number => {
+      if (!counts.has(intentId)) {
+        counts.set(intentId, (this.intentService.getIntentFromId(intentId)?.actions || []).length);
+      }
+      return counts.get(intentId);
+    };
+    const nameOf = (intentId: string): string =>
+      this.intentService.getIntentFromId(intentId)?.intent_display_name;
+    const isReserved = (intentId: string): boolean => {
+      const name = nameOf(intentId);
+      return name === RESERVED_INTENT_NAMES.START || name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK;
+    };
+    const isCloseBlock = (intentId: string): boolean =>
+      (this.intentService.getIntentFromId(intentId)?.actions || [])
+        .some((action: any) => action?._tdActionType === TYPE_ACTION.CLOSE);
+    const oneActionError = (block: string): string => v3RuleError('V3-S1',
+      `${block} can hold only one action. Create a new block for the next action and \`connect\` ` +
+      `the two blocks. To ask a question, put the \`reply\` in one block and the ` +
+      `\`capture_user_reply\` in the block it connects to (V3-D1).`);
+    const captureError = (): string => v3RuleError('V3-U5',
+      `\`capture_user_reply\` has no connector of its own: leave \`goToIntent\` empty and ` +
+      `\`connect\` the capture BLOCK to the next block.`);
+    const closeError = (block: string): string => v3RuleError('V3-T3',
+      `${block} holds \`close\`, which can only be reached from a button the user presses to end ` +
+      `the conversation. End the flow on its last message instead, without a close block; or put ` +
+      `the close block behind a button such as "Yes, close the conversation".`);
+    const capturesWithDestination = (type: string, fields?: Record<string, any>): boolean =>
+      type === TYPE_ACTION.CAPTURE_USER_REPLY
+      && typeof fields?.['goToIntent'] === 'string' && fields['goToIntent'].trim() !== '';
+    /** A destination to a close block outside `attributes` -- where reply buttons live. */
+    const routesToClose = (fields?: Record<string, any>): string | null => {
+      if (!fields) { return null; }
+      const found: string[] = [];
+      const walk = (value: any) => {
+        if (typeof value === 'string') {
+          const id = value.startsWith('#') ? value.slice(1) : value;
+          if (id && isCloseBlock(id)) { found.push(id); }
+        } else if (Array.isArray(value)) {
+          value.forEach(walk);
+        } else if (value && typeof value === 'object') {
+          Object.values(value).forEach(walk);
+        }
+      };
+      Object.keys(fields).filter(key => key !== 'attributes').forEach(key => walk(fields[key]));
+      return found.length ? found[0] : null;
+    };
+
+    return ops.map((op): string | null => {
+      switch (op.op) {
+        case 'add_intent': {
+          const actions = op.actions ?? [];
+          if (actions.length > 1) { return oneActionError('A new block'); }
+          const inline = actions[0];
+          if (inline && capturesWithDestination(inline.type, inline.fields)) { return captureError(); }
+          const closeTarget = inline ? routesToClose(inline.fields) : null;
+          return closeTarget ? closeError(`"${nameOf(closeTarget)}"`) : null;
+        }
+        case 'add_action': {
+          if (nameOf(op.intent_id) === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
+            return v3RuleError('V3-S3', `defaultFallback stays empty. Put the fallback message in ` +
+              `its own block and \`connect\` defaultFallback to it.`);
+          }
+          if (capturesWithDestination(op.type, op.fields)) { return captureError(); }
+          const closeTarget = routesToClose(op.fields);
+          if (closeTarget) { return closeError(`"${nameOf(closeTarget)}"`); }
+          const next = countOf(op.intent_id) + 1;
+          counts.set(op.intent_id, next);
+          return next > 1 ? oneActionError(`"${nameOf(op.intent_id)}"`) : null;
+        }
+        case 'update_action': {
+          const action = (this.intentService.getIntentFromId(op.intent_id)?.actions || [])
+            .find((a: any) => a?._tdActionId === op.action_id);
+          if (action && capturesWithDestination(action._tdActionType, op.fields)) { return captureError(); }
+          const closeTarget = routesToClose(op.fields);
+          return closeTarget ? closeError(`"${nameOf(closeTarget)}"`) : null;
+        }
+        case 'delete_action':
+          counts.set(op.intent_id, Math.max(0, countOf(op.intent_id) - 1));
+          return null;
+        case 'delete_intent':
+          return isReserved(op.intent_id)
+            ? v3RuleError('V3-S4', `"${nameOf(op.intent_id)}" is part of every V3 agent and cannot be deleted.`)
+            : null;
+        case 'connect': {
+          if (isReserved(op.to_intent_id)) {
+            return v3RuleError('V3-S4', `nothing connects to "${nameOf(op.to_intent_id)}". ` +
+              `Connect to the block that should run instead.`);
+          }
+          if (isCloseBlock(op.to_intent_id)) {
+            return closeError(`"${nameOf(op.to_intent_id)}"`);
+          }
+          const actions = this.intentService.getIntentFromId(op.from_intent_id)?.actions || [];
+          const ending = actions.find((action: any) => actionEndsTheFlow(action));
+          return ending
+            ? v3RuleError('V3-U3', `"${nameOf(op.from_intent_id)}" ends the flow with ` +
+              `\`${ending._tdActionType}\` and has no exit. Connect the block that comes before it instead.`)
+            : null;
+        }
+        default:
+          return null;
+      }
+    });
   }
 
   private validate(op: FlowOp): FlowOpResult {

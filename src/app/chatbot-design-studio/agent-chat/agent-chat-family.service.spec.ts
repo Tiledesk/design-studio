@@ -3,6 +3,7 @@ import { of, throwError } from 'rxjs';
 import { AgentChatFamilyService } from './agent-chat-family.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { environment } from 'src/environments/environment';
 
 describe('AgentChatFamilyService', () => {
   let dashboardService: any;
@@ -78,6 +79,18 @@ describe('AgentChatFamilyService', () => {
     expect(faqKbService.createFaqKb).toHaveBeenCalledWith({
       id_project: 'proj1', language: 'en', name: 'Nuovo', subtype: 'subagent',
       template: 'blank', type: 'tilebot', parent_id: 'parent1'
+    });
+  });
+
+  // A subagent of a V3 agent must open in the V3 editor too.
+  it('labels a subagent of a V3 agent as V3', async () => {
+    dashboardService.isV3 = true;
+    build();
+    await service.createSubagent('Nuovo');
+    expect(faqKbService.createFaqKb).toHaveBeenCalledWith({
+      id_project: 'proj1', language: 'en', name: 'Nuovo', subtype: 'subagent',
+      template: 'blank', type: 'tilebot', parent_id: 'parent1',
+      attributes: { dsVersion: environment.CHATBOT_VERSION }
     });
   });
 

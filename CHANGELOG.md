@@ -9,6 +9,8 @@
 
 # this branch 17/09/2026
 
+- **changed**: sugli agenti V3 la chat AI riceve le regole dell'editor V3 e le sue modifiche vengono controllate: una sola action per blocco, domanda e risposta in due blocchi, risposta dell'utente che prosegue dal collegamento del blocco, fallback senza action, avvio e fallback non eliminabili ne' collegabili come destinazione, nessun collegamento dopo un blocco che chiude la conversazione, chiusura della conversazione solo dietro un pulsante. Una modifica che viola una regola viene rifiutata per intero indicando la regola, e la chat la corregge. Sugli agenti precedenti la chat funziona come prima
+- **changed**: i sub agent creati da un agente V3, dal pannello o dalla chat AI, nascono V3
 - **changed**: ogni volta che un nuovo blocco compare sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) viene evidenziato e lo stage si centra su di lui, con la stessa animazione della simulazione con il widget. Se ne arrivano piu' insieme, lo stage si centra sull'ultimo
 - **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
 - **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { environment } from 'src/environments/environment';
 
 export interface FamilyMember { _id: string; name: string; }
 
@@ -85,7 +86,9 @@ export class AgentChatFamilyService {
       subtype: 'subagent',
       template: 'blank',
       type: 'tilebot',
-      parent_id: this.rootId()
+      parent_id: this.rootId(),
+      // A subagent of a V3 agent is a V3 agent too; a legacy family is unchanged.
+      ...(this.dashboardService.isV3 ? { attributes: { dsVersion: environment.CHATBOT_VERSION } } : {})
     };
     try {
       const created: any = await firstValueFrom(this.faqKbService.createFaqKb(payload as any));

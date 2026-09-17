@@ -3753,3 +3753,194 @@ describe('ConnectorService.refreshConnectorsAroundIntent — every edge from and
     expect(connectors.listOfIntents).toBe(intents);
   });
 });
+
+describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+  let dashboardService: any;
+
+  function withActions(intentId: string, name: string, ...types: string[]): Intent {
+    const intent = anIntent(intentId, name);
+    intent.actions = types.map((type, i) => ({ _tdActionId: `${intentId}-a${i}`, _tdActionType: type } as any));
+    return intent;
+  }
+
+  beforeEach(() => {
+    intentService = {
+      listOfIntents: [
+        withActions('start', 'start', 'intent'),
+        anIntent('fallback', 'defaultFallback'),
+        withActions('welcome', 'welcome', 'reply'),
+        withActions('bye', 'bye', 'close'),
+        withActions('ask', 'ask', 'capture_user_reply'),
+        withActions('cond', 'cond', 'jsoncondition2'),
+        anIntent('empty', 'empty')
+      ],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
+        ({ _tdActionId: 'generated', _tdActionType: type })),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      createNewIntent: jasmine.createSpy('createNewIntent'),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    dashboardService = { id_faq_kb: 'kb1', isV3: true };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  });
+
+  function expectV3Refusal(report: any, index: number) {
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[index].ok).toBe(false);
+    expect(report.results[index].error).toContain('V3 rule V3-');
+    expect(intentService.updateIntent).not.toHaveBeenCalled();
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+    expect(intentService.deleteIntentNew).not.toHaveBeenCalled();
+  }
+
+  it('refuses a second action on a block that already has one', async () => {
+    const report = await service.apply([{ op: 'add_action', intent_id: 'welcome', type: 'reply' }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('capture_user_reply');
+  });
+
+  it('counts the whole batch: two actions added to an empty block are refused together', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'empty', type: 'reply' },
+      { op: 'add_action', intent_id: 'empty', type: 'capture_user_reply' }
+    ]);
+    expectV3Refusal(report, 1);
+    expect(report.results[0].ok).toBe(true);
+    expect(intentService.getIntentFromId('empty').actions.length).toBe(0);
+  });
+
+  it('lets a batch replace the only action of a block', async () => {
+    const report = await service.apply([
+      { op: 'delete_action', intent_id: 'welcome', action_id: 'welcome-a0' },
+      { op: 'add_action', intent_id: 'welcome', type: 'reply' }
+    ]);
+    expect(report.ok).toBe(true);
+    expect(intentService.getIntentFromId('welcome').actions.length).toBe(1);
+  });
+
+  it('accepts one action on an empty block', async () => {
+    const report = await service.apply([{ op: 'add_action', intent_id: 'empty', type: 'reply' }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('refuses a new block created with more than one action', async () => {
+    const report = await service.apply([{
+      op: 'add_intent', intent_display_name: 'ask_name',
+      actions: [{ type: 'reply' }, { type: 'capture_user_reply' }]
+    }]);
+    expectV3Refusal(report, 0);
+  });
+
+  it('keeps defaultFallback empty', async () => {
+    const report = await service.apply([{ op: 'add_action', intent_id: 'fallback', type: 'reply' }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('defaultFallback');
+  });
+
+  it('never deletes start or defaultFallback', async () => {
+    expectV3Refusal(await service.apply([{ op: 'delete_intent', intent_id: 'start' }]), 0);
+    expectV3Refusal(await service.apply([{ op: 'delete_intent', intent_id: 'fallback' }]), 0);
+  });
+
+  it('refuses a connection into start or defaultFallback', async () => {
+    expectV3Refusal(await service.apply([
+      { op: 'connect', from_intent_id: 'welcome', to_intent_id: 'start' }]), 0);
+    expectV3Refusal(await service.apply([
+      { op: 'connect', from_intent_id: 'welcome', to_intent_id: 'fallback' }]), 0);
+  });
+
+  it('refuses a connection out of a block that ends the flow', async () => {
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'bye', to_intent_id: 'welcome' }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('close');
+  });
+
+  it('names the rule it enforces', async () => {
+    const report = await service.apply([{ op: 'add_action', intent_id: 'welcome', type: 'reply' }]);
+    expect(report.results[0].error).toContain('V3 rule V3-S1:');
+  });
+
+  // V3-U5: the capture continues from the block connector, never from goToIntent.
+  it('refuses a capture_user_reply created with goToIntent', async () => {
+    const report = await service.apply([{
+      op: 'add_intent', intent_display_name: 'ask_name',
+      actions: [{ type: 'capture_user_reply', fields: { goToIntent: '#welcome' } }]
+    }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('V3-U5');
+  });
+
+  it('refuses setting goToIntent on an existing capture_user_reply', async () => {
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'ask', action_id: 'ask-a0', fields: { goToIntent: '#welcome' }
+    }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('V3-U5');
+  });
+
+  // V3-T3: a close block is reached only from a button the user presses.
+  it('refuses a connection into a close block', async () => {
+    const report = await service.apply([{ op: 'connect', from_intent_id: 'welcome', to_intent_id: 'bye' }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('V3-T3');
+  });
+
+  it('refuses a destination field pointing at a close block', async () => {
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'cond', action_id: 'cond-a0', fields: { trueIntent: '#bye' }
+    }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('V3-T3');
+  });
+
+  it('does not treat a reply button to a close block as a V3-T3 violation', async () => {
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'welcome', action_id: 'welcome-a0',
+      fields: { attributes: { commands: [{ type: 'message', message: { type: 'text', text: 'Close?',
+        attributes: { attachment: { buttons: [{ type: 'action', value: 'Yes, close', action: '#bye' }] } } } }] } }
+    }]);
+    expect((report.results[0].error || '')).not.toContain('V3-T3');
+  });
+
+  it('applies the V3 checks to a legacy agent never', async () => {
+    dashboardService.isV3 = false;
+    const batches: any[] = [
+      [{ op: 'add_intent', intent_display_name: 'two', actions: [{ type: 'reply' }, { type: 'capture_user_reply' }] }],
+      [{ op: 'add_intent', intent_display_name: 'cap', actions: [{ type: 'capture_user_reply', fields: { goToIntent: '#welcome' } }] }],
+      [{ op: 'update_action', intent_id: 'cond', action_id: 'cond-a0', fields: { trueIntent: '#bye' } }],
+      [{ op: 'add_action', intent_id: 'fallback', type: 'reply' }]
+    ];
+    for (const batch of batches) {
+      const report = await service.apply(batch);
+      report.results.forEach((r: any) => expect(r.error || '').not.toContain('V3 rule'));
+    }
+  });
+
+  it('leaves a legacy agent exactly as before', async () => {
+    dashboardService.isV3 = false;
+    const report = await service.apply([{ op: 'add_action', intent_id: 'welcome', type: 'reply' }]);
+    expect(report.ok).toBe(true);
+    expect(intentService.getIntentFromId('welcome').actions.length).toBe(2);
+  });
+});

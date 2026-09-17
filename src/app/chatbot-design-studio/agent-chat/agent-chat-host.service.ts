@@ -10,6 +10,15 @@ import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { V3_FLOW_RULES } from './v3-flow-rules';
+
+/** The client tools this host registers on the chat. A session opened on the
+ *  runtime by the studio itself (see AgentFromPromptService) must declare the
+ *  same list the chat declares when it attaches, or the runtime would offer
+ *  the model a tool nobody answers. The host spec keeps the two in step. */
+export const AGENT_CHAT_CLIENT_TOOLS: string[] = [
+  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent'
+];
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -145,7 +154,15 @@ export class AgentChatHostService {
       } catch (error) {
         this.logger.error('[AGENT-CHAT-HOST] get_flow: family read failed:', error);
       }
-      return { ...this.flowOps.readFlow(), family };
+      // The rules travel with the flow: the runtime's prompt describes the
+      // legacy editor, and only the studio knows which editor this agent uses.
+      const isV3 = !!this.dashboardService.isV3;
+      return {
+        ...this.flowOps.readFlow(),
+        family,
+        ds_version: isV3 ? 'v3' : 'legacy',
+        ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {})
+      };
     });
 
     this.host.registerTool('get_canvas_selection', async () => {

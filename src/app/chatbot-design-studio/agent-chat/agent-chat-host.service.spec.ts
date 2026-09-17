@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { AgentChatHostService } from './agent-chat-host.service';
+import { AgentChatHostService, AGENT_CHAT_CLIENT_TOOLS } from './agent-chat-host.service';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -7,6 +7,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { V3_FLOW_RULES } from './v3-flow-rules';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BehaviorSubject, Subject } from 'rxjs';
 
@@ -146,6 +147,13 @@ describe('AgentChatHostService', () => {
                 'open_flow']);
   });
 
+  // A session the studio opens by itself declares AGENT_CHAT_CLIENT_TOOLS:
+  // it must be exactly what the host registers.
+  it('declares the same tools it registers', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect([...AGENT_CHAT_CLIENT_TOOLS].sort()).toEqual(Object.keys(registered).sort());
+  });
+
   it('answers get_flow from the canvas', async () => {
     await service.attach(document.createElement('iframe'));
     const result = await registered['get_flow']({});
@@ -155,8 +163,24 @@ describe('AgentChatHostService', () => {
       family: {
         root_id: 'parent1', root_name: 'Parent', is_subagent: false,
         subagents: [{ _id: 'sub1', name: 'Alfa' }]
-      }
+      },
+      ds_version: 'legacy'
     });
+  });
+
+  // The runtime's prompt describes the legacy editor: on a V3 agent the rules
+  // of the V3 editor have to reach the agent with the flow it is about to edit.
+  it('adds the V3 rules to get_flow only on a V3 agent', async () => {
+    await service.attach(document.createElement('iframe'));
+    const legacy = await registered['get_flow']({});
+    expect(legacy.ds_version).toBe('legacy');
+    expect(legacy.v3_rules).toBeUndefined();
+
+    dashboardService.isV3 = true;
+    const v3 = await registered['get_flow']({});
+    expect(v3.ds_version).toBe('v3');
+    expect(v3.v3_rules).toEqual(V3_FLOW_RULES);
+    expect(v3.intents).toEqual([]);
   });
 
   // Without this the agent cannot tell a parent from a subagent, and would
