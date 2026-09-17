@@ -9,18 +9,18 @@
 
 # this branch 17/09/2026
 
-- **fixed**: all'apertura di un agente la chat AI, ora aperta di default, restava bianca e non si avviava; ora si carica subito
-- **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso
-- **changed**: quando la chat AI finisce di aggiungere, eliminare o ricollegare blocchi, tutto il flusso viene riordinato da sinistra a destra: un passo per colonna, i rami uno sotto l'altro senza sovrapposizioni, il fallback e i blocchi scollegati in fondo. I collegamenti seguono i blocchi e la vista si adatta all'intero flusso. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
-- **fixed**: quando la chat AI finisce di modificare il flusso, il Design Studio controlla che tutti i collegamenti previsti siano disegnati sullo stage e completa quelli mancanti. Prima alcuni collegamenti comparivano solo ricaricando la pagina
-- **changed**: sugli agenti V3 la chat AI riceve le regole dell'editor V3 e le sue modifiche vengono controllate: una sola action per blocco, domanda e risposta in due blocchi, risposta dell'utente che prosegue dal collegamento del blocco, fallback senza action, avvio e fallback non eliminabili ne' collegabili come destinazione, nessun collegamento dopo un blocco che chiude la conversazione, chiusura della conversazione solo dietro un pulsante. Una modifica che viola una regola viene rifiutata per intero indicando la regola, e la chat la corregge. Sugli agenti precedenti la chat funziona come prima
-- **changed**: i sub agent creati da un agente V3, dal pannello o dalla chat AI, nascono V3
-- **changed**: ogni volta che un nuovo blocco compare sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) viene evidenziato e lo stage si centra su di lui, con la stessa animazione della simulazione con il widget. Se ne arrivano piu' insieme, lo stage si centra sull'ultimo
-- **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
-- **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
+- **fixed**: the AI chat, now open by default, stayed blank when an agent was opened
+- **changed**: the AI chat opens by default when an agent is opened (V3 and legacy). The header button is shown only while the chat is closed, with a new icon and a "Show chat" tooltip; the chat closes from its own top bar. On V3 agents the blocks/sub agents side panel starts closed
+- **changed**: when the AI chat finishes adding, deleting or reconnecting blocks, the whole flow is laid out again left to right, without overlaps, and the view fits the flow. One undo step reverts it, together with the chat's last change; text-only edits move nothing
+- **fixed**: when the AI chat finishes editing, missing connectors are drawn instead of appearing only after a page reload
+- **changed**: on V3 agents the AI chat follows the V3 editor rules (one action per block, question and answer in separate blocks, empty fallback, protected start and fallback, conversation closed only from a button); a change breaking a rule is rejected with the rule name. Legacy agents are unchanged
+- **changed**: sub agents created from a V3 agent are V3
+- **changed**: every new block on the stage is highlighted and centred, as in the widget simulation
+- **fixed**: all incoming and outgoing connectors of a new block are drawn; connectors to blocks created after a deletion were being cleared
+- **changed**: switching or deleting an agent or sub agent no longer reloads the page: the canvas refreshes in place and the AI chat stays open
 
 # unreleased
-- **removed**: tolta la creazione di agenti con l'AI a partire da un prompt, insieme al pannello AI per modificarli e alla loro storia delle versioni, che erano gia' spenti e non comparivano: il Design Studio non contiene piu' la modale, il pannello, i servizi collegati e le relative impostazioni. Gli agenti gia' creati restano e si aprono come prima con l'editor V3; la chat AI integrata (Flow Builder), pubblicazione, cronologia delle release, selettore ed eliminazione degli agenti funzionano come prima
+- **removed**: the old AI agent generator (create from prompt, AI edit panel, version history), already disabled. Existing agents still open with the V3 editor; the integrated AI chat (Flow Builder), publishing and agent selector are unaffected
 
 # 1.40.15-rc2
 - **changed**: in agents created with AI the conversation is never closed by the flow itself. A close is there only when the user asks for it by pressing a button ("nothing else, close the chat"), and nothing follows that choice. This replaces the earlier rule, which also allowed a close after a long activity that was finished
