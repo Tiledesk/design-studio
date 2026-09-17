@@ -104,8 +104,12 @@
                     </div>
                     <div class="restore-release" style="padding-left: 12px; padding-right: 6px;">
                         <div class="restore-btn-wpr">
-                            <button type="button" class="restore-btn" (click)="restoreRelease(release)">
-                                {{'Restore' | translate}}
+                            <button type="button" class="restore-btn" (click)="restoreRelease(release)"
+                                [matTooltip]="'RepublishReleaseTooltip' | translate"
+                                matTooltipClass="cds-mat-tooltip cds-mat-tooltip-multiline"
+                                matTooltipPosition="above"
+                                matTooltipHideDelay="100">
+                                {{'Republish' | translate}}
                             </button>
                         </div>
                     </div>
