@@ -187,9 +187,9 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
    * chat di navigare avrebbe la dipendenza al contrario, e il pannello
    * smetterebbe di funzionare il giorno in cui la chat viene disabilitata.
    *
-   * Fallback al vecchio reload quando nessuna dashboard ha pubblicato il
-   * navigatore (nessuno monta il pannello fuori dalla dashboard oggi, ma un
-   * pannello che non naviga sarebbe un guasto silenzioso).
+   * Quando nessuna dashboard ha pubblicato il navigatore (nessuno monta il
+   * pannello fuori dalla dashboard oggi) si cambia solo l'URL: la pagina non si
+   * ricarica mai.
    */
   private goToFlow(id: string): void {
     if (this.dashboardService.openFlow) {
@@ -200,31 +200,33 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    // Cambia solo il fragment (#): impostare href da solo non ricarica → forziamo il reload
-    // completo così la Design Studio si re-inizializza sul nuovo agent.
+    this.logger.error('[CDS-PANEL-SUBAGENTS] no flow navigator: only the URL changes');
     window.location.href = this.getSubagentUrl(id);
-    window.location.reload();
   }
 
   /**
-   * Riporta la Design Studio sul parent dopo una cancellazione.
+   * Riporta la Design Studio sul parent dopo una cancellazione, senza ricaricare la pagina.
    *
    * A differenza di openAgent() non basta la guardia "stesso id": se siamo gia' sul
    * parent il flusso aperto va comunque riletto, perche' puo' contenere action che
-   * puntavano al subagent appena eliminato. Da un fratello ci si sposta in place
-   * (la chat sopravvive); stando gia' sul parent l'unico modo di ricostruire la
-   * canvas sullo STESSO id resta il reload completo di sempre.
+   * puntavano al subagent appena eliminato. Da un fratello ci si sposta in place con
+   * openFlow; stando gia' sul parent la canvas si ricostruisce sullo stesso id con
+   * refreshFlow. In entrambi i casi la chat AI sopravvive.
    */
-  private goToParentAndReload(): void {
+  private goToParent(): void {
     const parentId = this.parentItem?._id;
-    if (parentId && parentId !== this.currentId && this.dashboardService.openFlow) {
+    if (parentId && parentId !== this.currentId) {
       this.goToFlow(parentId);
       return;
     }
-    if (parentId) {
-      window.location.href = this.getSubagentUrl(parentId);
+    if (this.dashboardService.refreshFlow) {
+      this.dashboardService.refreshFlow().catch((error) => {
+        this.logger.error('[CDS-PANEL-SUBAGENTS] flow refresh failed:', error);
+        this.isDeleting = false;
+      });
+      return;
     }
-    window.location.reload();
+    this.isDeleting = false;
   }
 
   private applyFilter(): void {
@@ -315,8 +317,8 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Elimina il subagent. A cancellazione riuscita la Design Studio viene SEMPRE ricaricata
-   * sul parent: non basta togliere la riga dalla lista, perche' il flusso aperto puo'
+   * Elimina il subagent. A cancellazione riuscita la Design Studio torna SEMPRE sul parent,
+   * con il flusso riletto: non basta togliere la riga dalla lista, perche' il flusso aperto puo'
    * contenere action (Invoke Subagent / Sub Agent) che puntavano al subagent eliminato.
    * In errore non si naviga: la riga resta al suo posto.
    */
@@ -324,9 +326,10 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     this.isDeleting = true;
     this.faqKbService.deleteFaqKb(sa._id).subscribe({
       next: () => {
-        // isDeleting resta true: la pagina sta per ricaricarsi, nessun altro click nel frattempo
+        // isDeleting resta true: la canvas (e questo pannello) sta per essere ricostruita,
+        // nessun altro click nel frattempo
         this.logger.log('[CDS-PANEL-SUBAGENTS] subagent deleted:', sa._id);
-        this.goToParentAndReload();
+        this.goToParent();
       },
       error: (error) => {
         this.isDeleting = false;

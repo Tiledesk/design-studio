@@ -87,6 +87,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   countRenderedElements = 0;
   renderedAllIntents = false;
   renderedAllElements = false;
+
+  /** Blocks already rendered on this stage: anything rendered after the first build and
+   *  not in here is a block that has just been added (by hand, paste, undo or the AI chat). */
+  private renderedIntentIds = new Set<string>();
+  private newIntentIds: string[] = [];
+  private newIntentTimer: any = null;
+  private newIntentConnectorsTimer: any = null;
   LOGOS_ITEMS = LOGOS_ITEMS;
   loadingProgress = 0;
   mapOfConnectors = [];
@@ -215,6 +222,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnDestroy() {
     // Pulisci la coda di retry dei connettori
     this.connectorService.clearRetryQueue();
+    clearTimeout(this.newIntentTimer);
+    clearTimeout(this.newIntentConnectorsTimer);
 
     // Cancella il timer del debounce se è ancora attivo
     if (this.saveNoteDetailTimer) {
@@ -326,6 +335,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * @param intentID 
    */
   onIntentRendered(intentID) {
+    if (this.renderedAllIntents === true && intentID && !this.renderedIntentIds.has(intentID)) {
+      this.onNewIntentRendered(intentID);
+      return;
+    }
+    if (intentID) {
+      this.renderedIntentIds.add(intentID);
+    }
     if(this.stageService.loaded === false && this.renderedAllElements === false){
       this.labelInfoLoading = 'CDSCanvas.intentsProgress';
       if(this.mapOfIntents[intentID]) { //&& this.mapOfIntents[intentID].shown === false
@@ -339,6 +355,57 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.onAllIntentsRendered();
       }
     }
+  }
+
+  /** A block added after the stage was built has just been rendered.
+   *
+   *  Collected for a moment, because the AI chat adds several blocks at once. Then every
+   *  new block is highlighted and the stage is centred on the LAST one -- the same class
+   *  and the same centring the widget simulation uses (cds-intent, liveActiveIntent) --
+   *  and, once the stage has stopped moving, every connector from and to each new block
+   *  is redrawn: they were first attempted before the block's element existed. */
+  private onNewIntentRendered(intentID: string) {
+    this.renderedIntentIds.add(intentID);
+    this.newIntentIds.push(intentID);
+    clearTimeout(this.newIntentTimer);
+    this.newIntentTimer = setTimeout(() => this.showNewIntents(), 80);
+  }
+
+  private showNewIntents() {
+    const ids = this.newIntentIds.filter(id => !!this.listOfIntents?.find(intent => intent.intent_id === id));
+    this.newIntentIds = [];
+    if (ids.length === 0) { return; }
+
+    ids.forEach(id => this.highlightNewIntent(id));
+    const lastElement = document.getElementById(ids[ids.length - 1]);
+    if (lastElement) {
+      this.stageService.centerStageOnTopPosition(this.id_faq_kb, lastElement, null);
+    }
+
+    // The stage animates for 0.3s: connectors measured meanwhile would be misplaced.
+    clearTimeout(this.newIntentConnectorsTimer);
+    this.newIntentConnectorsTimer = setTimeout(() => {
+      requestAnimationFrame(async () => {
+        for (const id of ids) {
+          try {
+            await this.connectorService.refreshConnectorsAroundIntent(id, this.listOfIntents);
+          } catch (error) {
+            this.logger.error('[CDS-CANVAS] refresh connectors of new block failed', id, error);
+          }
+        }
+      });
+    }, 400);
+  }
+
+  /** The pulse the widget simulation puts on the active block, removed once it has played. */
+  private highlightNewIntent(intentID: string) {
+    const card = document.querySelector('#intent-content-' + CSS.escape(intentID));
+    if (!card) { return; }
+    card.classList.remove('live-active-intent-pulse');
+    // Restart the animation even if the class was just removed.
+    void (card as HTMLElement).offsetWidth;
+    card.classList.add('live-active-intent-pulse');
+    setTimeout(() => card.classList.remove('live-active-intent-pulse'), 2200);
   }
 
   async onAllIntentsRendered() {
@@ -482,6 +549,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
       if(intents.length>0){
           this.listOfIntents = intents;
+          // Il connector service controlla le destinazioni su questa lista: va tenuta
+          // allineata anche dopo una cancellazione, che sostituisce l'array.
+          this.connectorService.syncIntents(intents);
         // const chatbot_id = this.dashboardService.id_faq_kb;
         // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
         // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);

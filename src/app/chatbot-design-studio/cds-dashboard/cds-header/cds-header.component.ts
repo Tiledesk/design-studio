@@ -50,6 +50,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
    private subscriptionTestItOutPlayed: Subscription;
    private subscriptionIsSaving: Subscription;
    private subscriptionIsSavingVisible: Subscription;
+   private subscriptionSelectedChatbot: Subscription;
 
   id_faq_kb: string;
   projectID: string;
@@ -156,6 +157,15 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.isWebhook = true;
       this.initializeWebhook();
     }
+    // The studio can now move to another agent without a page reload
+    // (CdsDashboardComponent.openFlow), and this header is not rebuilt when it
+    // does: everything above that was read once must follow the agent.
+    this.subscriptionSelectedChatbot = this.dashboardService.selectedChatbot$
+      .subscribe((chatbot: Chatbot | null) => {
+        if (chatbot?._id && chatbot._id !== this.id_faq_kb) {
+          this.onAgentChanged(chatbot);
+        }
+      });
     this.getOSCODE();
     this.getTranslations()
     this.isBetaUrl = false;
@@ -190,7 +200,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
   /**
    * Passa a un altro agent. La rotta e' `/project/:projectid/chatbot/:faqkbid/blocks`
-   * e il Design Studio si ricarica sul nuovo agent.
+   * e il canvas si ricostruisce sul nuovo agent, senza ricaricare la pagina.
    */
   onSelectAgent(agent: Chatbot): void {
     if (!agent || !agent._id || agent._id === this.id_faq_kb) return;
@@ -199,19 +209,38 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Apre un agent con un caricamento completo della pagina.
-   *
-   * Il Design Studio si inizializza una volta sola in `CdsDashboardComponent.ngOnInit`
-   * (traduzioni, parametri, progetto, bot, dipartimenti), poi inizializza i servizi
-   * con quell'`id_faq_kb` e costruisce stage e connettori. Una `router.navigate`
-   * cambia solo il parametro di rotta: il componente viene riusato e resterebbe
-   * agganciato all'agent precedente. Finche' il boot non e' reattivo al cambio di
-   * parametro, il modo corretto di cambiare agent e' ricaricare, esattamente come
-   * quando si entra nel DS dalla dashboard.
+   * Apre un agent senza ricaricare la pagina: `dashboardService.openFlow` naviga, azzera
+   * undo/redo, ricarica bot e blocchi e ricostruisce il canvas. L'header si riallinea da
+   * solo tramite `selectedChatbot$` (vedi `onAgentChanged`). I servizi inizializzati nel
+   * boot sono legati al progetto, non all'agent, quindi restano validi.
    */
-  private openAgent(botId: string): void {
-    this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks'])
-      .then(() => window.location.reload());
+  private async openAgent(botId: string): Promise<void> {
+    if (!this.dashboardService.openFlow) {
+      // Nessun dashboard montato: si cambia solo la rotta, mai un reload.
+      this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks']);
+      return;
+    }
+    try {
+      await this.dashboardService.openFlow(botId);
+    } catch (error) {
+      this.logger.error('[CdsHeaderComponent] openAgent ERROR: ', error);
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.OpenAgentError'), 4, 'report_problem');
+    }
+  }
+
+  /** Riallinea l'header all'agent aperto, quando cambia senza ricaricare la pagina. */
+  private onAgentChanged(chatbot: Chatbot): void {
+    // Prima di cambiare `isWebhook`: la chiusura del test usa lo stato dell'agent precedente.
+    if (this.isPlaying) {
+      this.onCloseTestItOut();
+    }
+    this.id_faq_kb = chatbot._id;
+    this.selectedChatbot = chatbot;
+    this.isWebhook = chatbot.subtype === 'webhook' || chatbot.subtype === 'copilot';
+    if (this.isWebhook) {
+      this.initializeWebhook();
+    }
+    this.loadAgents();
   }
 
   /**
@@ -262,6 +291,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     if (this.subscriptionTestItOutPlayed) {
       this.subscriptionTestItOutPlayed.unsubscribe();
     }
+    this.subscriptionSelectedChatbot?.unsubscribe();
     this.subscriptionIsSaving?.unsubscribe();
     this.subscriptionIsSavingVisible?.unsubscribe();
   }

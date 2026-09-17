@@ -9,7 +9,12 @@ import { Intent } from 'src/app/models/intent-model';
 import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION } from '../utils-actions';
-import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID } from '../utils';
+import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
+
+/** How long the canvas animates the stage onto a new block (0.3s in tiledesk-stage.js),
+ *  plus a margin. Connectors are measured against the stage's current transform, so
+ *  moved blocks are only redrawn once it has settled. */
+const STAGE_FOCUS_ANIMATION_MS = 400;
 
 const KNOWN_OPS = [
   'add_intent', 'update_intent', 'delete_intent', 'move',
@@ -212,7 +217,8 @@ export class FlowOpsService {
     // Before the undo depth is taken, so a single Undo takes the layout back
     // with the operations that caused it -- moving the blocks is part of
     // applying the batch, not a separate thing done to the flow afterwards.
-    for (const movedId of await this.relayoutBranches(blocksToRedraw)) {
+    const movedIds = await this.relayoutBranches(blocksToRedraw);
+    for (const movedId of movedIds) {
       blocksToRedraw.add(movedId);
     }
     this.lastBatchUndoDepth = Math.max(this.undoStackDepth() - undoDepthBefore, 0);
@@ -221,6 +227,12 @@ export class FlowOpsService {
     this.lastBatchFaqKbId = this.lastBatchUndoDepth > 0
       ? this.dashboardService.id_faq_kb : null;
     this.redrawBlocks(blocksToRedraw);
+    // Not awaited: the agent gets its answer now. New blocks are highlighted,
+    // centred and connected by the canvas as soon as they render
+    // (CdsCanvasComponent.onNewIntentRendered); what is left here is the blocks
+    // relayoutBranches moved, whose connectors were measured at the old place.
+    const createdAny = results.some(r => r.op === 'add_intent' && r.ok);
+    this.redrawMovedAfterRender(movedIds, createdAny, this.dashboardService.id_faq_kb);
     return { ok, rejected_before_applying: false, results };
   }
 
@@ -1774,6 +1786,35 @@ export class FlowOpsService {
    *  not stop the others from being asked, the same "drawing never blocks or
    *  fails the operation" guarantee `redrawBlockConnectors` itself already
    *  gives for a single block. */
+  /** Redraws the connectors of the blocks `relayoutBranches` moved, once they are on
+   *  the stage at their new place.
+   *
+   *  `redrawBlocks` runs as soon as the batch is applied, before Angular has moved the
+   *  elements, so the edges it measures for a moved block point at the old place. When
+   *  the batch also created blocks the canvas is centring the stage on them, so this
+   *  waits for that animation too. Best-effort and silent; it stops if the canvas moves
+   *  to another flow meanwhile. */
+  private async redrawMovedAfterRender(movedIds: Set<string>, stageAnimating: boolean,
+                                       faqKbId: string): Promise<void> {
+    if (movedIds.size === 0) { return; }
+    try {
+      const rendered = await Promise.all(
+        Array.from(movedIds).map(async id => (await isElementOnTheStage(id)) ? id : null));
+      await new Promise(resolve => requestAnimationFrame(() => resolve(null)));
+      if (stageAnimating) {
+        await new Promise(resolve => setTimeout(resolve, STAGE_FOCUS_ANIMATION_MS));
+      }
+      if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+      for (const id of rendered) {
+        if (!id) { continue; }
+        this.redrawBlockConnectors(id);
+        Promise.resolve(this.connectorService.updateConnector?.(id)).catch(() => {});
+      }
+    } catch (error) {
+      // Nothing to report: the batch has been applied and saved.
+    }
+  }
+
   private redrawBlocks(intentIds: Set<string>): void {
     intentIds.forEach(intentId => this.redrawBlockConnectors(intentId));
   }

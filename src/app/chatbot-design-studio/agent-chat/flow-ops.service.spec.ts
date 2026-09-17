@@ -3680,3 +3680,76 @@ describe('FlowOpsService — the call to a subagent', () => {
     expect(faqService.getAllFaqByFaqKbId).not.toHaveBeenCalled();
   });
 });
+
+describe('ConnectorService.refreshConnectorsAroundIntent — every edge from and to a new block, real DOM', () => {
+  // A block added after the stage was built: its connectors were attempted
+  // before its element existed. The canvas calls this once the block is on the
+  // stage; it has to draw the block's own edges AND the edges of the blocks
+  // pointing at it -- also when the service's intent list went stale after a
+  // delete, which used to wipe the destination instead of drawing it.
+  let elements: HTMLElement[];
+  let connectors: ConnectorService;
+  let intents: Intent[];
+
+  function add(id: string, isBlock = false) {
+    const el = document.createElement('div');
+    el.id = id;
+    if (isBlock) { el.classList.add('tds_input_block'); }
+    document.body.appendChild(el);
+    elements.push(el);
+  }
+
+  function withNext(intentId: string, actionId: string, to: string): Intent {
+    const intent = anIntent(intentId, intentId);
+    (intent.attributes as any).nextBlockAction = { _tdActionId: actionId, _tdActionType: 'intent', intentName: to };
+    return intent;
+  }
+
+  beforeEach(() => {
+    LoggerInstance.setInstance({
+      log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
+    } as any);
+    elements = [];
+    add('tds_drawer');
+    add('A', true); add('A/nba-a');
+    add('N', true); add('N/nba-n');
+    add('B', true);
+    intents = [withNext('A', 'nba-a', '#N'), withNext('N', 'nba-n', '#B'), anIntent('B', 'B')];
+    connectors = new ConnectorService();
+    connectors.initializeConnectors();
+  });
+
+  afterEach(() => {
+    elements.forEach(el => el.remove());
+    document.querySelectorAll('[id^="A/"], [id^="N/"]').forEach(el => el.remove());
+  });
+
+  it('draws the edge into the new block and the edge out of it', async () => {
+    connectors.listOfIntents = intents;
+    await connectors.refreshConnectorsAroundIntent('N', intents);
+    expect(countDistinctEdges('A/nba-a')).toBe(1);
+    expect(countDistinctEdges('N/nba-n')).toBe(1);
+  });
+
+  it('does not wipe the destination to the new block when its intent list is stale', async () => {
+    // What IntentService leaves behind after a delete: the service still holds the old array.
+    connectors.listOfIntents = [intents[0], intents[2]];
+    await connectors.refreshConnectorsAroundIntent('N', intents);
+    expect((intents[0].attributes as any).nextBlockAction.intentName).toBe('#N');
+    expect(countDistinctEdges('A/nba-a')).toBe(1);
+  });
+
+  it('does not duplicate edges when called twice', async () => {
+    await connectors.refreshConnectorsAroundIntent('N', intents);
+    await connectors.refreshConnectorsAroundIntent('N', intents);
+    expect(countDistinctEdges('A/nba-a')).toBe(1);
+    expect(countDistinctEdges('N/nba-n')).toBe(1);
+  });
+
+  it('keeps the list in step with the canvas', () => {
+    connectors.syncIntents(intents);
+    expect(connectors.listOfIntents).toBe(intents);
+    connectors.syncIntents(null as any);
+    expect(connectors.listOfIntents).toBe(intents);
+  });
+});

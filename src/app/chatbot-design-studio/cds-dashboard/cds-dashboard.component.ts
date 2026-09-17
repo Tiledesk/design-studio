@@ -164,6 +164,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // to navigate would stop working the day the chat is disabled.
     this.agentChatHostService.setFlowNavigator((faqKbId) => this.openFlow(faqKbId));
     this.dashboardService.openFlow = (faqKbId) => this.openFlow(faqKbId);
+    this.dashboardService.refreshFlow = () => this.refreshFlow();
     this.hideShowWidget('hide');
 
     /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
@@ -176,6 +177,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // left behind, it would navigate through a destroyed component's router
     // and change detector.
     this.dashboardService.openFlow = null;
+    this.dashboardService.refreshFlow = null;
     // The same withdrawal, for the same reason, from the other service this
     // component published a navigator on: it closes over this component's
     // router and change detector, and this component is going away. Harmless
@@ -217,6 +219,13 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
         `Could not open "${faqKbId}": the studio refused to navigate to it. `
         + `The open flow is still "${this.dashboardService.id_faq_kb}".`);
     }
+    await this.rebuildFlow(faqKbId);
+  }
+
+  /** Rebuilds the canvas on the flow the route now names, without a page
+   *  reload: what openFlow() does after navigating, and what refreshFlow()
+   *  does on the flow already open. */
+  private async rebuildFlow(faqKbId: string): Promise<void> {
     // The canvas has moved, so nothing on the studio's undo stack belongs to
     // the flow now open. Left in place, the canvas's own Ctrl+Z (and the
     // toolbar control driven by behaviorUndoRedo) would pop an entry holding
@@ -289,6 +298,15 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.flowVisible = true;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  /** Reloads the open flow in place -- its blocks, its attributes -- as a page
+   *  reload would, without one. For changes made outside the canvas that the
+   *  canvas must reflect, e.g. a subagent deleted while its parent is open. */
+  public async refreshFlow(): Promise<void> {
+    const faqKbId = this.dashboardService.id_faq_kb;
+    if (!faqKbId) { return; }
+    await this.rebuildFlow(faqKbId);
   }
 
   onSwipe(event: WheelEvent){

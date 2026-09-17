@@ -62,6 +62,10 @@ export class DashboardService {
    *  dashboard is mounted -- callers fall back to their old navigation. */
   public openFlow: ((faqKbId: string) => Promise<void>) | null = null;
 
+  /** Set by CdsDashboardComponent: reloads the open flow in place, without a
+   *  page reload. Null while no dashboard is mounted. */
+  public refreshFlow: (() => Promise<void>) | null = null;
+
   private logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(

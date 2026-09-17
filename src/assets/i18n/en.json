@@ -1541,6 +1541,7 @@
         "DeleteAgentText": "The agent \"{{name}}\" and all its blocks will be permanently deleted. This cannot be undone.",
         "DeleteAgentError": "The agent could not be deleted. Try again.",
         "NoAgents": "No agents in this project",
+        "OpenAgentError": "The agent could not be opened. Try again.",
         "LinkCopiedToClipboard": "Link copied to clipboard",
         "ThereAreUnpublishedChanges": "There are unpublished changes"
     },

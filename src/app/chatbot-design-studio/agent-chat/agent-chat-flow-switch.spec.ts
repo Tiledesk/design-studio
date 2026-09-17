@@ -409,6 +409,30 @@ describe('CdsDashboardComponent.openFlow', () => {
     expect(order).toEqual([]);
   });
 
+  // refreshFlow is openFlow without the navigation: the same rebuild, on the
+  // flow already open -- what used to need a page reload.
+  it('refreshFlow rebuilds the open flow in place, without navigating', async () => {
+    const { component, order } = build();
+    await component.refreshFlow();
+    expect(order).toEqual([
+      'detectChanges:flowVisible=false',
+      'getBotById',
+      'getAllIntents:kb1',
+      'detectChanges:flowVisible=true'
+    ]);
+    expect(component.flowVisible).toBe(true);
+  });
+
+  it('publishes refreshFlow on DashboardService and withdraws it on destroy', () => {
+    const { component, dashboardService } = build();
+    (component as any).agentChatHostService =
+      { setFlowNavigator: () => {}, clearFlowNavigator: () => {} };
+    component.ngOnInit();
+    expect(typeof dashboardService.refreshFlow).toBe('function');
+    component.ngOnDestroy();
+    expect(dashboardService.refreshFlow).toBeNull();
+  });
+
   // Both the agent and the Subagents panel must reach the same method; the
   // panel finds it on DashboardService, which it already depends on.
   it('publishes the same navigator to the chat host and to DashboardService', () => {

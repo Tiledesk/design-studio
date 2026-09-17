@@ -333,6 +333,7 @@
         "DeleteAgentTitle": "Elimina agent",
         "DeleteAgentText": "L'agente \"{{name}}\" e tutti i suoi blocchi verranno eliminati definitivamente. L'operazione non è reversibile.",
         "DeleteAgentError": "Non sono riuscito a eliminare l'agente. Riprova.",
-        "NoAgents": "Nessun agente in questo progetto"
+        "NoAgents": "Nessun agente in questo progetto",
+        "OpenAgentError": "Non è stato possibile aprire l'agente. Riprova."
     }
 }

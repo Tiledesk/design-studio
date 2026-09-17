@@ -1431,6 +1431,43 @@ export class ConnectorService {
    * updateConnector
    * @param elementID 
    */
+  /** Keeps the list `intentExists()` checks in step with the canvas.
+   *
+   *  `listOfIntents` was only assigned by `createConnectors` / `createMapOfConnectors`,
+   *  on the flow's first build. IntentService replaces its array on a delete (a
+   *  `filter`), so after one this service kept checking destinations against the old
+   *  array: a block created afterwards did not "exist" here, and `createConnectorsOfIntent`
+   *  wiped the destination pointing at it instead of drawing the edge. */
+  public syncIntents(intents: any[]): void {
+    if (Array.isArray(intents)) {
+      this.listOfIntents = intents;
+    }
+  }
+
+  /** Draws or updates every connector from and to one block: its own outgoing edges,
+   *  the edges of every block pointing at it, and the position of the edges the library
+   *  already has for it. For a block that has just appeared on the stage, whose
+   *  connectors were attempted before its element existed.
+   *
+   *  `createConnectorsOfIntent` is idempotent (an existing edge is updated, not
+   *  duplicated), so redrawing a source that points at this block is safe. */
+  public async refreshConnectorsAroundIntent(intentId: string, intents: any[]): Promise<void> {
+    this.syncIntents(intents);
+    const list = Array.isArray(intents) ? intents : [];
+    const target = list.find(intent => intent?.intent_id === intentId);
+    if (!target) { return; }
+    await this.createConnectorsOfIntent(target);
+    const reference = '#' + intentId;
+    for (const source of list) {
+      if (!source || source.intent_id === intentId) { continue; }
+      const destinations = JSON.stringify([source.actions ?? [], source.attributes?.nextBlockAction ?? null]);
+      if (destinations.includes(reference)) {
+        await this.createConnectorsOfIntent(source);
+      }
+    }
+    await this.updateConnector(intentId);
+  }
+
   public async updateConnector(elementID){
     this.logger.log('[CONNECTOR-SERV] movedConnector elementID ' ,elementID )
     const elem = await isElementOnTheStage(elementID); // chiamata sincrona

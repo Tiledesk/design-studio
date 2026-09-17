@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 17/09/2026
+
+- **changed**: ogni volta che un nuovo blocco compare sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) viene evidenziato e lo stage si centra su di lui, con la stessa animazione della simulazione con il widget. Se ne arrivano piu' insieme, lo stage si centra sull'ultimo
+- **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
+- **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
+
 # this branch 16/09/2026
 
 - **changed**: unito il Design Studio V3 con la chat AI integrata: su questo branch gli agenti V3 si creano e si modificano descrivendoli a parole nella chat AI dentro il Design Studio, insieme ai sub agent e alle impostazioni del modello della chat. La vecchia modale «Crea agente con l'AI» e il pannello AI con la storia delle versioni non ci sono
