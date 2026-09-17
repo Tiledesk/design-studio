@@ -7,8 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 17/09/2026
-
+# 1.40.15-rc3
 - **fixed**: the AI chat, now open by default, stayed blank when an agent was opened
 - **changed**: the AI chat opens by default when an agent is opened (V3 and legacy). The header button is shown only while the chat is closed, with a new icon and a "Show chat" tooltip; the chat closes from its own top bar. On V3 agents the blocks/sub agents side panel starts closed
 - **changed**: when the AI chat finishes adding, deleting or reconnecting blocks, the whole flow is laid out again left to right, without overlaps, and the view fits the flow. One undo step reverts it, together with the chat's last change; text-only edits move nothing
@@ -18,8 +17,6 @@
 - **changed**: every new block on the stage is highlighted and centred, as in the widget simulation
 - **fixed**: all incoming and outgoing connectors of a new block are drawn; connectors to blocks created after a deletion were being cleared
 - **changed**: switching or deleting an agent or sub agent no longer reloads the page: the canvas refreshes in place and the AI chat stays open
-
-# unreleased
 - **removed**: the old AI agent generator (create from prompt, AI edit panel, version history), already disabled. Existing agents still open with the V3 editor; the integrated AI chat (Flow Builder), publishing and agent selector are unaffected
 
 # 1.40.15-rc2
