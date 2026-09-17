@@ -27,7 +27,8 @@ describe('per-flow state does not survive a flow switch', () => {
   });
 
   const intentService = () => new IntentService(
-    {} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
+    {} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any,
+    {} as any);
 
   it('setMapOfIntents describes the flow now open, not the one before it', () => {
     const service = intentService();

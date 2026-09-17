@@ -54,7 +54,7 @@ export class CdsActionDescriptionComponent implements OnInit {
           this.element = Object.values(INTENT_ELEMENT).find(el => el.type === this.elementType)
           break;
         case 'jsoncondition':
-          this.element = ACTIONS_LIST.JSON_CONDITION 
+          this.element = ACTIONS_LIST.JSON_CONDITION
           if('noelse' in this.actionSelected) {
             this.element = ACTIONS_LIST.CONDITION
           }
@@ -67,6 +67,17 @@ export class CdsActionDescriptionComponent implements OnInit {
       this.logger.log('[ActionDescriptionComponent] action:: ', this.element);
     } catch (error) {
       this.logger.log("[ActionDescriptionComponent] error ", error);
+    }
+
+    if (this.actionSelected && (this.actionSelected as any)._tdConnectorRef) {
+      const meta = (this.actionSelected as any)._tdConnectorMeta;
+      this.element = {
+        ...(this.element || {}),
+        name: (meta && meta.name) || (this.actionSelected as any)._tdConnectorRef,
+        src: (meta && meta.icon) || 'assets/images/actions/web_request.svg',
+        badge: undefined,
+        doc: undefined,
+      } as any;
     }
   }
 

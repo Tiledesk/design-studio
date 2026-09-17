@@ -8,7 +8,6 @@
 *Tiledesk SRL*
 
 # this branch 17/09/2026
-
 - **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso
 - **changed**: quando la chat AI finisce di aggiungere, eliminare o ricollegare blocchi, tutto il flusso viene riordinato da sinistra a destra: un passo per colonna, i rami uno sotto l'altro senza sovrapposizioni, il fallback e i blocchi scollegati in fondo. I collegamenti seguono i blocchi e la vista si adatta all'intero flusso. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
 - **fixed**: quando la chat AI finisce di modificare il flusso, il Design Studio controlla che tutti i collegamenti previsti siano disegnati sullo stage e completa quelli mancanti. Prima alcuni collegamenti comparivano solo ricaricando la pagina
@@ -18,46 +17,79 @@
 - **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
 - **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
 
-# this branch 16/09/2026
+# unreleased
+- **removed**: tolta la creazione di agenti con l'AI a partire da un prompt, insieme al pannello AI per modificarli e alla loro storia delle versioni, che erano gia' spenti e non comparivano: il Design Studio non contiene piu' la modale, il pannello, i servizi collegati e le relative impostazioni. Gli agenti gia' creati restano e si aprono come prima con l'editor V3; la chat AI integrata (Flow Builder), pubblicazione, cronologia delle release, selettore ed eliminazione degli agenti funzionano come prima
 
-- **changed**: unito il Design Studio V3 con la chat AI integrata: su questo branch gli agenti V3 si creano e si modificano descrivendoli a parole nella chat AI dentro il Design Studio, insieme ai sub agent e alle impostazioni del modello della chat. La vecchia modale «Crea agente con l'AI» e il pannello AI con la storia delle versioni non ci sono
-- **removed**: tolta la creazione di agenti con l'AI a partire da un prompt, insieme al pannello AI per modificarli e alla loro storia delle versioni: spariscono il pulsante nella sidebar e il pulsante «AI» nell'header, e il Design Studio non contatta piu' il servizio di generazione. Gli agenti gia' creati restano e si aprono come prima con l'editor V3; pubblicazione, cronologia delle release, selettore ed eliminazione degli agenti funzionano come prima
-- **changed**: negli agenti creati con l'AI la chiusura della conversazione non compare piu' dentro il flusso: c'e' soltanto se l'utente la sceglie premendo un pulsante, ad esempio "non ho altre domande, chiudi la chat", e dopo quella scelta non segue nient'altro
-- **changed**: negli agenti V3 il blocco che chiede una risposta all'utente usa lo stesso punto di uscita di tutti gli altri blocchi, quello sul bordo in basso a destra, invece di un secondo pallino appeso di lato alla action: si collega come ogni altro blocco e la destinazione si sceglie dal pannello del blocco. Gli agenti creati con le versioni precedenti restano come sono
+# 1.40.15-rc2
+- **changed**: in agents created with AI the conversation is never closed by the flow itself. A close is there only when the user asks for it by pressing a button ("nothing else, close the chat"), and nothing follows that choice. This replaces the earlier rule, which also allowed a close after a long activity that was finished
+- **changed**: in V3 agents the block that asks the user for a reply uses the same outgoing point as every other block, the one on the bottom-right edge, instead of a second dot hanging beside the action: it is connected like any other block and its destination is chosen from the block's panel. Agents created with the previous editor are untouched
 
-# this branch 15/09/2026
+# 1.40.15-rc1
+- **changed**: which Design Studio opens on an agent is decided **only** by the version the agent carries, declared by whoever creates it: the creation date is no longer taken into account. Agents without it, which is every agent created so far, open in the previous editor. The declared version is set per environment, separately from the product version
+- **changed**: agents created and edited with AI come out more compact and lean on the AI blocks: one knowledge base search instead of a block per question, one AI routing instead of a tree of conditions, an open question instead of a deep menu
+- **changed**: messages in agents created with AI use the simple reply instead of the advanced one, questions and button menus included; and the conversation is no longer closed at the end of a path, so the last message stays readable. The chat is closed only after a long activity that is finished, or when the user chooses to close it
+- **changed**: in V3 agents the blocks that end the conversation no longer show the block's outgoing dot: close, handoff to an operator, back to the queue, hand over to another agent, and change department when it starts the department's bot. Existing agents and connections already made are untouched
+- **fixed**: in V3 agents a block that asks the user for a reply had no outgoing point at all and could not be connected to anything. The outgoing point is now always there, and its destination can also be chosen from the detail panel
+- **changed**: on the agent chat branch the V3 AI authoring stays inactive behind a single switch, off by default: nothing is removed, and one environment can turn it on from the remote config. The agent chat stays active as before
 
-- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
-- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
-- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede
-- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
-- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
-- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
-- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla
+# 1.40.14-V3
+- **added**: **Design Studio V3** — agents created from 07/09/2026 open in a simplified editor: one action per block, no action dragging and no inline controls, "Add action" only where it belongs, and the block is moved by grabbing the action's header. The block's outgoing dot is shown only where it really is the block's only way out. Agents created earlier are left exactly as they were
+- **added**: the editor version is **declared by the agent itself** when it is created and read back when it is opened, so an agent built with V3 stays on V3 even if the cutoff date is moved. Agents that carry no version, which is every agent created so far, are still decided by their creation date
+- **added**: **create an agent with AI** — a dialog where the agent is described, with a gallery of examples, a choice of model among those available, and an interview that fills in the request one question at a time. It ends with an editable final prompt and a preview of the flow; the agent it produces is always a new one and never touches the open agent. The interview survives in the browser tab until the agent is created
+- **added**: **the agent's AI panel** — inside every V3 agent a right-hand panel shows the agent's history and takes a change request in plain language, previews it and applies it only on confirmation. It lists versions and releases, with manual save, restore, copy, and reuse of the prompt in the generator
+- **added**: every restore is preceded by an automatic save, so it can be undone, and before confirming it warns when that version uses departments, knowledge bases, tables or agents the project no longer has. What is online does not change until it is published again
+- **changed**: an agent created with AI no longer carries the generation data in its own attributes: prompt, interview and generated flow live in the agent's history on the server, off the message path
+- **added**: an **agent selector in the header** to move between agents without leaving the editor, and **delete agent** with an explicit confirmation. On V3 agents only
+- **changed**: an **empty defaultFallback block** no longer accepts actions, by any route: nothing can be dropped into it, and neither the "Add action" button nor the placeholder are shown. Agents that still hold a reply inside it stay editable
+- **changed**: on this branch the **V3 AI authoring**, meaning the create dialog and the AI panel, is **off** behind a single switch: nothing is removed and one environment can turn it back on from the remote config. The agent chat stays active
+- **fixed**: after an agent is created with AI the Design Studio re-reads the blocks several times before reporting connections it could not keep, so large agents no longer show a false error
 
-# this branch 14/09/2026
+# 1.40.14-rc13
+- **fixed**: an agent imported from an older version with a "JSON Condition" block whose operator is no longer among the known ones broke the canvas on every redraw ("Cannot read properties of undefined (reading 'name')"). The block now shows the saved operator as it is, so it can be corrected by hand, and conditions without a second operand no longer break the rendering
 
-- **changed**: merged branch V3/master-V3 (the V3 look of the blocks, the «Create agent with AI» modal and the AI panel with the agent history) into the agent chat branch. On this branch the V3 AI authoring stays inactive behind a single switch, off by default: no «Create agent with AI» button in the sidebar, no «AI» button in the header, no history probe on the server. Nothing is removed; a single environment can turn it on from the remote config with `aiAgentGeneratorEnabled: true`. The agent chat (vibe coder) of this branch stays active as before
+# 1.40.14-rc12
+- **added**: in the Native Tools dialog every Tiledesk server now shows its active tools, and the dialog has a "Close" button in the footer like the MCP servers one
+- **added**: the tool selection modal has a "Close" button in its footer too
 
-# this branch 09/09/2026
+# 1.40.14-rc11
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it, and both the "Add action" button and the empty-block message are hidden. Chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history, the "Restore" button is now "Re-publish" and carries a tooltip explaining that it puts that version back online without changing the chatbot you are currently editing
 
-- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+# 1.40.14-rc10
+- **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
+- **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
+- **changed**: the edit icon is shown only on the servers already added to the prompt
+- **changed**: native servers are marked with an outlined shield and show their description instead of the URL
+- **added**: in the action, when no MCP tool is attached yet the section shows a dashed "Select MCP tools" call to action, which turns into "Manage MCP tools" as soon as a server is attached
+- **added**: tooltips on every button of the MCP interface, both in the action and in the dialogs
+- **changed**: smaller and lighter "Use tools to complete the operation" label
+- **bug fix**: the "Manage MCP tools" button ignored its own size and was rendered bigger than intended
+- **bug fix**: missing italian translations in the MCP interface
 
-# this branch 08/09/2026
+# 1.40.14-rc9
+- **fixed**: when attempting to delete a subagent that is still in use by another agent, the error message returned by the service is now displayed, instead of the operation appearing to have no visible outcome.
 
-- **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
-- **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
-- **changed**: nel pannello Subagents la **casella di ricerca** "Search a subagent" e il **badge `parent`** sono nascosti: rimosso il markup, conservati stili e logica di filtro (`onSearch`/`applyFilter`), cosi' ripristinarli e' questione di poche righe
-- **changed**: il **parent** usa ora l'icona di gruppo e ogni **subagent** un **omino blu a mezzo busto** — nuova icona `person` registrata in `IconService`, ricavata dai tracciati gia' presenti in `actions/online_agents.svg` (testa e spalle, senza le onde del segnale) e ricentrata con una `translate`, per non alterare i numeri originali
-- **changed**: icone delle righe del pannello da 18 a 20px e grigio piu' carico (`#5a6672`): l'icona di gruppo e' fitta e alla dimensione precedente si leggeva male. L'omino dei **subagent** e' disegnato piu' piccolo (svg 12x12) ma il suo box resta 20px, cosi' i nomi restano allineati fra riga del parent e righe dei subagent
-- **fixed**: nel pannello Subagents la dimensione dell'icona era applicata solo alla riga **attiva**, quindi tutte le altre rendevano alla misura di default di `mat-icon` (24px) invece che a quella prevista
-- **fixed**: l'icona della tab **Blocks** non e' piu' bianca — `search.svg` porta `fill="#FFFFFF"` nell'asset e l'attributo sull'elemento vince sul colore ereditato; ora l'icona segue il colore della tab (grigio, blu quando attiva) come tutte le altre
-- **changed**: il pulsante **New subagent** e' visibile anche **dentro un subagent**. Il nuovo agent viene creato sotto il **parent della famiglia**, non sotto il subagent aperto: si ottiene un fratello, non un annidamento. L'id del parent lo decide il pannello e viaggia nei `data` della modale, che prima lo ricavava da se' con `id_faq_kb`; il pulsante non compare se quell'id non e' risolvibile
-- **changed**: la tab **Blocks** e' ora un pulsante quadrato con la sola icona a **lente**, che dice a colpo d'occhio che da li' si cerca un blocco; l'etichetta e' passata nel tooltip e la tab **Subagents** occupa tutta la larghezza rimanente
-- **changed**: rinominate tre action — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. Il nuovo nome e' allineato ovunque compaia: menu delle action, etichetta sul blocco nel canvas e titolo nella documentazione del pannello
-- **changed**: pannello **Subagents** — la tab passa al primo posto (Blocks seconda) ed e' quella aperta di default **quando l'agente non ha ancora una preferenza salvata**: se l'utente ne sceglie una, vince la sua (`getActiveLeftPanel` ora distingue "nessuna preferenza" da "Blocks", prima erano lo stesso valore). Entrambe le tab hanno un'icona; la risoluzione della tab si e' spostata in `ngOnInit`, cosi' il pannello Blocks non viene piu' montato e subito distrutto a ogni apertura. Il pulsante **New subagent** e' ora un footer ancorato in fondo al pannello invece che sopra l'elenco, quindi resta raggiungibile anche con la lista lunga. Icone dei subagent sostituite con SVG registrati in `IconService`, in linea con le altre del DS. L'elenco dei subagent e' ordinato **alfabeticamente** (case e accenti ignorati, numeri confrontati come numeri: "Agente 2" prima di "Agente 10"); il parent resta sempre primo
-- **added**: primi test unitari sul pannello Subagents — l'ordinamento alfabetico (estratto in `sortSubagentsByName`, funzione pura: maiuscole, accenti, numeri, lista vuota) e `getActiveLeftPanel` (preferenza assente, salvata, famiglie separate). ⚠️ **Non sono eseguibili**: l'harness Karma del repo non esegue alcun test (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — guasto preesistente, indipendente da queste modifiche
-# this branch gio 27 ago 2026
+# 1.40.14-rc8
+- **added**: new **Gemini Agent Platform** provider in the AI model selector of the Ask KB, AI Prompt and AI Condition actions. Its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
+- **bug fix**: when the same model was offered by more than one provider or server (for example Gemini 2.5 Flash, available both from Google and from Agent Platform), the selector showed the wrong entry
+- **changed**: opening an AI action is faster — the model list is now loaded in one go for every provider instead of one provider at a time
+- **changed**: in the model selector the providers are grouped under their full name (OpenAI, Anthropic, Gemini Agent Platform, …) instead of their lowercase internal name
+
+# 1.40.14-rc7
+- **changed**: The left panel tabs return to **both with icon + label** and take up **half the width** — replacing the square button with just the magnifying glass introduced just below. The 12px font and padding have been reduced so that "Subagents" can be read in full in the remaining ~103px per tab; Tab icons from 16 to 18px
+- **changed**: The **New subagent** button moves to the bottom of the list, immediately below the last subagent, and scrolls with it — it replaces the anchored footer introduced just below.
+- **changed**: In the Subagents panel, the **search box** "Search a subagent" and the **parent` badge** are hidden: the markup has been removed, while the styles and filter logic (`onSearch`/`applyFilter`) have been preserved, so restoring them is a matter of a few lines.
+- **changed**: The **parent` now uses the group icon, and each **subagent** uses a **little blue half-length person`. — A new `person` icon registered in `IconService`, derived from the paths already present in `actions/online_agents.svg` (head and shoulders, without the signal waves) and re-centered with a `translate` to avoid altering the original numbers.
+- **changed**: icons panel rows from 18 to 20px and darker gray (`#5a6672`): the group icon is crowded and was difficult to read at the previous size. The **subagent** icon is drawn smaller (12x12 svg), but its box remains 20px, so the names remain aligned between the parent row and the subagent rows.
+- **fixed**: In the Subagents panel, the icon size was applied only to the **active** row, so all the others rendered at the default `mat-icon` size (24px) instead of the expected one.
+- **fixed**: the **Blocks** tab icon is no longer white — `search.svg` brings `fill="#FFFFFF"` into the asset, and the on-element attribute overrides the inherited color; The icon now follows the tab's color (gray, blue when active) like all the others.
+- **changed**: The **New subagent** button is also visible **within a subagent**. The new agent is created under the **family parent**, not under the open subagent: it creates a sibling, not a nested subagent. The parent's ID is determined by the panel and stored in the modal's `data`, which previously derived it automatically with `id_faq_kb`; the button doesn't appear if that ID isn't resolvable.
+- **changed**: The **Blocks** tab is now a square button with only the **magnifying glass** icon, which indicates at a glance that a block is being searched for from there. The label has moved to the tooltip, and the **Subagents** tab now occupies the entire remaining width.
+- **changed**: Renamed three actions — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. The new name is aligned everywhere it appears: in the action menu, the block label in the canvas, and the title in the panel documentation.
+- **changed**: **Subagents** panel — the tab moves to first place (Blocks second) and is the default open tab **when the agent doesn't yet have a saved preference**: if the user chooses one, their preference wins (`getActiveLeftPanel` now distinguishes "no preference" from "Blocks," previously they were the same value). Both tabs have an icon; the tab resolution has moved to `ngOnInit`, so the Blocks panel is no longer mounted and immediately destroyed every time it's opened. The **New subagent** button is now a footer anchored to the bottom of the panel instead of above the list, so it remains accessible even when the list is long. Subagent icons have been replaced with SVGs registered in `IconService`, in line with the other DS icons. The subagent list is sorted **alphabetically** (cases and accents are ignored, numbers are compared as numbers: "Agent 2" before "Agent 10"); the parent always comes first.
+- **added**: First unit tests on the Subagents panel — alphabetical sorting (extracted in `sortSubagentsByName`, pure function: uppercase, accents, numbers, empty list) and `getActiveLeftPanel` (preference absent, saved, separate families). ⚠️ **Not executable**: The repo's Karma harness doesn't run any tests (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — pre-existing break, independent of these changes
+
+# 1.40.14-rc4
 - **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
 - **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
 - **changed**: the **Return** action is available again in the menu, with its original name "Return"
@@ -65,7 +97,8 @@
 - **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
 - **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
 
-# this branch 
+
+# 1.40.14-rc3 
 - **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
 - **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
 - **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
@@ -78,11 +111,85 @@
 - **added**: the Blocks/Subagents tab is kept across reloads and parent/subagent navigation
 - **added**: delete a subagent from the Subagents panel (hover menu + confirmation modal)
 - **changed**: after creating a subagent the Design Studio reloads on the new subagent; after deleting one it reloads on the parent
+
+# 1.40.14
+- **added**: connector plugin pattern — an installed connector microservice's catalog (`GET /api/manifest`) now drives the flow-builder action palette. A connector action is authored as a normal block but **persists as an ordinary `webrequestv2` action plus a `_tdConnectorRef` marker**, so the chatbot runtime executes it with zero core changes; adding a new connector needs no further design-studio work — it only has to be installed (an integration record with a `baseUrl`) and serve a valid manifest
+- **added**: per-connector palette grouping — each installed connector gets an expandable palette row opening a flyout, split into per-service sections driven by the manifest `groups[]` table (display name, icon and sort order resolved from the manifest; unknown group ids fall back to a title-cased label and the connector icon). A failed manifest fetch is skipped and never breaks the palette
+- **added**: connector triggers configured from the webhook detail sidebar — explicit select + "Add" button, per-service option groups, the connected account shown with a "Change account" action, and a dedicated OAuth authentication row (`cds-connector-auth-row`)
+- **added**: connector `/dev` mirroring for triggers, armed and disarmed when Test It Out is opened and closed
+- **added**: isolated Karma test setup for the connector folder and for unit specs (`ng test --configuration connector`), with `src/test.connector.ts`, `src/test.units.ts` and dedicated tsconfigs, so these specs run independently of the pre-existing broken ones
+- **changed**: `cds-action-description` now receives the whole action (`[actionSelected]`), so a connector block renders the connector's own name and icon instead of the generic web-request label
+- **changed**: a `webrequestv2` block carrying a `_tdConnectorRef` renders the connector's required-input summary (`cds-action-connector`) instead of the generic web-request preview
+
+
+# 1.40.13
+- **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
+- **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
+
+# 1.40.12
+- **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
+- **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
+- **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
+- **changed**: the AI actions no longer re-fetch the same data per instance — the `integration`, `integration/name/ollama`, `integration/name/vllm` and `kb/namespace/all` GETs are now cached in `ProjectService`/`OpenaiService` through a new `HttpMemoCache` (in-flight dedup + short TTL, invalidated on `saveIntegration` and on project change). A canvas with N Ask KB / AI Prompt / AI Condition actions now issues 1 request per endpoint instead of N
+- **changed**: removed the duplicated `/integration` GET in the AI Prompt action and the dead `getIntegrationByName`/`getIntegrations` copies in AI Prompt and AI Condition, now using the shared util
+- **bug fix**: the MCP servers array is copied instead of referenced, so the MCP dialogs can no longer mutate the shared integration payload
+- **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
+- **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
+- **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
+- **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
+- **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
+- **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
+- **added**: Web Request action — Postman-like body editor: first selector (none / form-data / raw) and, when raw, a second selector for the sub-type (text / JavaScript / JSON / HTML / XML)
+- **added**: live body validator per raw sub-type (JSON, XML, JavaScript) with a discreet, non-blocking inline alert that ignores `{{...}}` placeholders
+- **bug-fix**: the body validation alert now shows for invalid raw bodies (previously hidden by a wrong template guard)
+- **changed**: additive & backward-compatible model — new optional `rawType` field and `raw` value for `bodyType`; existing web request actions (none/json/form-data) are read and saved unchanged. New `raw` actions require matching engine support in DirWebRequestV2
+
+# 1.40.11
+- **added**: added new google models
+
+# 1.40.10
+- **added**: added documentation image and guide link to the Data Table action tooltip
+- **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
+- **changed**: cds-config-*.json assets are now published under /environments/real_data
+
+# 1.40.9
+- **added**: reusable `cds-mcp-tools` component + shared `McpService` and canonical MCP model (`mcp.model.ts`) — MCP servers/tools management extracted from the AI Prompt action and importable by other LLM actions
+- **added**: "more" popup listing ALL of a server's tools (descending order) with select/deselect-all
+- **changed**: MCP dialogs restyled and aligned to one frame — "Server MCP" and "Native Tools" (ex "Tiledesk Tools") with title + subtitle, status/native badges turned into icons, standardized header/footer, "Manage MCP tools" button moved into the section header
+- **changed**: MCP tool selection is saved ONLY on the action (`action.servers[]`) and never modifies the MCP integration; adding a server pre-selects no tools
+- **changed**: persisted `action.servers[]` normalized — `native` always present, `id` only for native servers, `tools` as an array of names
+- **bug fix**: custom headers are now forwarded to the `/mcp/tools` discovery call, so the backend can authenticate during the tool scan
+- **bug fix**: reactivated the Custom Headers section in the Add/Edit MCP Server dialog (was hidden)
+- **added**: native Tiledesk MCP servers (catalog `/mcp/native`) + OAuth 2.0 config for MCP servers in the AI Prompt action
+- **changed**: MCP tools handled as `string[]` with name normalization (legacy `{ name }[]` still supported)
+- **changed**: hidden the legacy **Condition** and **Condition w/ else** actions from the menu (`status: 'inactive'`) — not addable to new flows, existing agents keep working
+
+# 1.40.8
+- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
+- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
+- **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
+- **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
+- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
+- **added**: multi-line tooltip for the "Attribute name" syntax help
+- **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
+
+# 1.40.7
+- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
+
+# 1.40.6
+- **bug fix**: change env
+
+# 1.40.3-rc15
 - **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
 - **changed**: subagents and the parent chatbot open in the same browser tab
 - **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
 - **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+
+# 1.40.3-rc14
+- **changed**: inside a subagent the Subagents side panel (and its Blocks/Subagents tabs) is hidden, along with the Sub Agent action
 - **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+
+# 1.40.3-rc13 
 - **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
 - **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
 - **changed**: the Sub Agent action is not available inside a subagent
@@ -93,117 +200,78 @@
 - **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
 - **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
 
+# 1.40.3-rc12
+- **added**: ability to select a department after agent Handoff
 
-# this branch
-- **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
-- **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
-- **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
-- **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
-- **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
-- **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
-- **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
-- **changed**: all'apertura di un agente la versione dell'editor si legge da quel dato invece di dedurla dalla data di creazione: un agente costruito con il V3 resta sul V3 anche se la data di taglio viene spostata. Gli agenti che non la portano, cioe' tutti quelli creati finora, restano decisi dalla data esattamente come prima
+# 1.40.3-rc11
+- **bug fix**: restore customHeaders
 
-# this branch 13/09/2026
+# 1.40.3-rc10
+- **added**: added server mcp native tiledesk
 
-- **added**: dentro ogni agente V3, un pulsante «AI» nell'header apre un pannello a destra con la storia dell'agente. La scheda «Prompt» mostra il prompt di creazione, le modifiche fatte con l'AI e i ripristini, e permette di chiedere una modifica in linguaggio naturale: l'AI propone i cambiamenti, il DS li mostra in anteprima (blocchi aggiunti, modificati, rimossi, collegamenti) e li applica solo su «Applica». La scheda «Versioni» elenca tutte le versioni e le release, con «Salva versione», «Ripristina qui», «Crea copia», «Vedi prompt» e «Riusa nel generatore». Il pulsante compare su ogni agente V3 con il servizio di generazione configurato; se il server non ha ancora il modulo delle revisioni, il pannello si apre e lo dice
-- **added**: ogni ripristino è preceduto da un salvataggio automatico della versione corrente, quindi è reversibile; prima di confermare, il DS avvisa se la versione usa dipartimenti, knowledge base, tabelle o agenti che nel progetto non esistono più. La versione pubblicata non cambia: per portare online un ripristino si pubblica di nuovo
-- **changed**: l'agente creato con l'AI non porta più i dati della generazione nei suoi attributi: prompt, intervista e flusso generato stanno nella storia dell'agente sul server, fuori dal percorso dei messaggi. Con il modulo del server acceso la creazione avviene in una sola chiamata atomica, senza riletture dei blocchi; con il modulo spento la creazione funziona come prima e la storia non viene salvata
-- **changed**: la modale «Crea agente con l'AI» salva la bozza nella scheda prima di creare l'agente; a creazione riuscita la svuota e si azzera del tutto; se la creazione fallisce, bozza e anteprima restano. Errori più precisi quando il server rifiuta dei blocchi
-- **added**: ogni pubblicazione e ripubblicazione collega la release alla storia dell'agente; la cancellazione di un agente cancella la sua storia. Se queste chiamate falliscono, l'utente non viene bloccato
-- **added**: nel pannello si può chiedere una modifica e vederne l'anteprima anche quando il server non ha il modulo delle revisioni; in quel caso resta disabilitato solo «Applica», e il pannello spiega perché. Le nuove etichette sono tradotte nelle 15 lingue
+# 1.40.3-rc9
+- **changed**: actions are reordered only by dragging the drag handle; dragging anywhere else on an action moves the whole block
 
-# this branch 12/09/2026
+# 1.40.3-rc8
+- **changed**: no operator preset when opening a Custom Attribute condition; "Apply Condition" stays disabled until an operator is selected
+- **added**: info icon next to "Attribute name" with a tooltip explaining the attribute syntax (array indexes, nested properties)
+- **added**: "Learn more" link to the JSON Condition guide in the Condition and Condition w/ else action info popups
+- **added**: JSON Condition action documentation page
 
-- **added**: nella modale «Crea agente con l'AI» si sceglie il modello AI, fra quelli che il servizio dichiara disponibili; è preselezionato il più potente, e l'ultima scelta viene ricordata. La scelta vale per le domande e per la generazione. Il servizio concede più tempo alle generazioni con i modelli che ragionano
-- **added**: il generatore di agenti usa come riferimento fino a tre agenti verificati simili alla richiesta, e l'anteprima lo dice («Ispirato ad agenti verificati»); nell'anteprima si può votare il flusso con un pollice, e il DS comunica al servizio se l'agente è stato creato, rigenerato o scartato, senza mai inviare la conversazione
-- **changed**: il blocco defaultFallback, quando è vuoto, non accetta più action: non se ne possono trascinare dentro, il pulsante «Add action» e il segnaposto non compaiono, e nemmeno il menu delle action o lo spostamento da un altro blocco lo riempiono. I chatbot che hanno ancora una risposta dentro il defaultFallback restano modificabili (regola riportata dal branch ds-generic-bug-fix-39)
-- **changed**: il pulsante «Crea agente con l'AI» compare su tutti gli agenti, anche quelli precedenti al V3: crea sempre un agente nuovo e non modifica quello aperto. Resta nascosto solo se il servizio di generazione non è configurato
-- **changed**: negli agenti creati con l'AI il blocco defaultFallback è sempre presente, vuoto e senza collegamenti in ingresso: il messaggio di fallback sta in un blocco «Fallback» a sé, che poi prosegue dove indicato
-- **added**: la modale «Crea agente con l'AI» conserva l'intervista nella scheda del browser: chiuderla o cambiare agente non la perde, e alla riapertura si riprende dalla domanda o dal prompt finale; «Ricomincia» e la creazione dell'agente la cancellano
-- **changed**: all'apertura della modale il DS sveglia il servizio di generazione, che sul piano gratuito si addormenta dopo una pausa
-- **added**: messaggio dedicato quando il progetto non è abilitato al generatore di agenti
+# 1.40.3-rc7
+- **added**: json condition "when" grammar reference doc (for chatbot prompt)
+- **bug fix**: json condition crash with legacy/new action format (safe operator & operand render)
+- **bug fix**: avoid page-reload dialog while the widget test simulator is open
+- **bug fix**: keep the widget iframe alive on tab inactivity (prevent Chrome freeze/discard reload)
 
-# this branch 11/09/2026
+# 1.40.3-rc6
+- **changed**: refatoring action conditions
 
-- **added**: il generatore di agenti conosce 15 action in più: risposta casuale, attesa, cancellazione di una variabile, azzeramento della cronologia, rimessa in coda, tag, log, aggiornamento del contatto, testo scritto dall'AI, ciclo su una lista, passaggio a un altro agente, aggiunta a una knowledge base, email, tabelle dati e smistamento con l'AI. Le action che richiedono un piano o dati assenti dal progetto non vengono proposte; l'anteprima mostra le nuove uscite
-- **changed**: il flusso generato ha una forma più compatta, con i soli campi di ogni blocco; i flussi nella forma precedente restano validi
-- **fixed**: dopo la creazione di un agente con l'AI, il DS rilegge i blocchi fino a 6 volte prima di segnalare collegamenti non conservati. Il server risponde all'import prima di averli salvati tutti, e con agenti grandi compariva un falso errore
-- **added**: l'agente creato con l'AI conserva, oltre al prompt finale, la descrizione iniziale, l'indicazione se il prompt è stato modificato, un riassunto dell'intervista, le scelte fatte dall'AI e le richieste da configurare a mano. La conversazione completa non viene salvata
-- **changed**: «Crea agente con l'AI», il selettore dell'agent e l'icona «Elimina agent» sono visibili **solo sugli agenti V3**: sui legacy l'header mostra di nuovo il solo nome e la sidebar non ha il pulsante dell'AI. Sui V3 il pulsante compare solo se il servizio di generazione è configurato, quindi per spegnere la funzione basta togliere la configurazione
-- **added**: **creazione dell'agente con l'AI**: dall'anteprima, «Crea l'agente» trasforma il flusso generato in un nuovo agente V3 del progetto e lo apre nel Design Studio. Prima di aprirlo verifica che il server abbia conservato i collegamenti fra i blocchi; se non li ha conservati lo segnala e non lo apre. Nell'agente restano il prompt finale, il modello e la versione del prompt usati per generarlo
-- **added**: **compilatore del flusso generato**: una sola action per blocco, la domanda con risposta divisa in messaggio e cattura della risposta, collegamenti verso i blocchi reali, blocchi di avvio e di fallback, nomi validi e unici per l'editor, disposizione sul canvas per livelli, variabili dichiarate. Usa i dipartimenti e le knowledge base reali del progetto. Un flusso incompleto dà un errore esplicito, senza creare nulla. Test senza browser su 6 flussi di prova
-- **added**: **intervista prima della generazione**: l'AI pone una domanda alla volta, con opzioni cliccabili o risposta libera, e mostra lo stato delle 11 sezioni del brief; «Genera comunque» le fa completare da sola le parti mancanti. Alla fine propone il **prompt finale**, modificabile insieme al nome dell'agente, con le scelte fatte dall'AI e le richieste da configurare a mano
-- **added**: la modale **"Crea agente con l'AI"** usa il **servizio di generazione esterno**, indicato nella configurazione, e mostra l'**anteprima** dell'agente: blocchi, collegamenti, note e avvisi, con il JSON da copiare. Le chiamate al servizio non portano le credenziali Tiledesk. Errori distinti per servizio non configurato o non raggiungibile, chiave rifiutata, troppe richieste, errore del provider. Webhook e Copilot restano «Presto disponibili»
+# 1.40.3-rc5
+- **bug fix**: bug fix env
 
-# this branch 08/09/2026
-
-- **added**: **selettore dell'agent nell'header** — il nome del bot e' ora un menu a tendina con tutti gli agent del progetto: si passa da un agent all'altro senza uscire dal Design Studio. Accanto, l'icona **Elimina agent** con tooltip, coerente con le altre icone dell'header, e conferma esplicita prima di cancellare; a eliminazione avvenuta si apre il primo agent rimasto, o si torna alla dashboard se non ne restano. Aggiunto `deleteBot()` a `faq-kb.service.ts` (`DELETE /faq_kb/{botId}`, endpoint gia' presente sul server e riservato ai ruoli admin/owner — gli stessi che possono entrare nel DS). Il pannello dell'elenco non riusa la classe `menuElement` degli altri menu dell'header, che ha `overflow: hidden` e un posizionamento assoluto: e' scrollabile, contenuto in altezza e ancorato al pulsante. Il cambio di agent avviene con un caricamento completo della pagina: il DS si inizializza una volta sola in `ngOnInit` e una semplice `router.navigate` cambierebbe solo l'URL lasciando l'editor agganciato all'agent precedente
-- **added**: pulsante **"Crea agente con l'AI"** in cima alla sidebar del Design Studio: apre una modale in cui descrivere l'agente da generare (tipo Chat/Webhook/Copilot, prompt libero, galleria di 21 casi d'uso filtrabili per categoria). Mentre la modale e' aperta l'interfaccia sottostante e' **bloccata**: il backdrop ferma il puntatore, e gli ascoltatori da tastiera del canvas — che sono su `document` e riceverebbero comunque i tasti digitati nella modale — sono disattivati. La generazione chiama `POST /chatbots/generate`, **endpoint non ancora disponibile su questo server**: finche' manca, la modale mostra l'errore. Nessun impatto sui flussi esistenti
-
-# this branch 07/09/2026
-
-- **changed**: in V3 il pallino di uscita del blocco e' posizionato **dentro** il blocco, in basso a destra sul bordo, invece di pendere fuori; la regola base resta invariata e l'override e' delimitato da `.tds-v3-intent`, quindi i chatbot legacy non cambiano
-- **added**: in V3 il pallino di uscita del blocco viene **nascosto quando l'action ha gia' connettori propri** (Success/Else, bottoni, noInput/noMatch...) e mostrato solo dove sarebbe l'unica via d'uscita; la famiglia Reply (reply, replyv2, randomreply) lo mostra **sempre**, con o senza bottoni, perche' il flusso deve poter proseguire di default; un pallino gia' collegato non viene mai nascosto, le action voice restano fuori dalla regola e i chatbot legacy sono esclusi. L'elenco delle action con uscite proprie e' dichiarato in `ACTIONS_WITH_OWN_OUTPUTS` (`utils-actions.ts`)
-- **changed**: il trascinamento **dall'header dell'action** parte solo dopo ~4px di movimento, cosi' un click impreciso non sposta il blocco; maniglie storiche e note restano immediate, quindi i chatbot legacy sono invariati
-- **added**: in V3 il blocco si sposta sul canvas afferrando l'**header dell'action**, che ne diventa la maniglia per ogni tipo di action; il motore di drag ha ora una risalita opt-in (`tds_draggable_deep`) che si attiva solo dove il markup la dichiara, quindi i blocchi legacy sono invariati
-- **changed**: restyle del blocco V3 (`.tds-slim-intent` → `.tds-v3-intent`) — rimossi lo spazio morto e il cursore da bottone sul footer vuoto, il gap tra action e la doppia cornice attorno all'unica action
-- **changed**: un chatbot **senza** `createdAt` è ora trattato come legacy (prima come V3), così un payload incompleto non cambia editor
-- **changed**: la versione è risolta una volta sola per chatbot in `DashboardService` (`isV3`/`isV3$`) invece di essere ricalcolata da ogni blocco; `isNewChatbot` rinominato `isV3`
-- **added**: Design Studio **V3** — i chatbot creati dal 07/09/2026 aprono l'editor semplificato (una sola action per blocco, drag delle action disabilitato, niente menu inline edit/copy/delete, niente "+ Add action" sui blocchi pieni); la versione si ricava da `createdAt` confrontato con `DATE_NEW_CHATBOT` (**data da allineare al rilascio effettivo**: deve restare nel futuro, altrimenti agenti gia' creati col DS vecchio passerebbero a V3)
-
-# 1.40.13
-- **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
-- **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
-
-# 1.40.12
-- **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
-- **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
-- **changed**: the AI actions no longer re-fetch the same data per instance — the `integration`, `integration/name/ollama`, `integration/name/vllm` and `kb/namespace/all` GETs are now cached in `ProjectService`/`OpenaiService` through a new `HttpMemoCache` (in-flight dedup + short TTL, invalidated on `saveIntegration` and on project change). A canvas with N Ask KB / AI Prompt / AI Condition actions now issues 1 request per endpoint instead of N
-- **changed**: removed the duplicated `/integration` GET in the AI Prompt action and the dead `getIntegrationByName`/`getIntegrations` copies in AI Prompt and AI Condition, now using the shared util
-- **bug fix**: the MCP servers array is copied instead of referenced, so the MCP dialogs can no longer mutate the shared integration payload
-- **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
-
-# 1.40.11
-- **added**: added new google models
-
-# 1.40.10 
-- **added**: added documentation image and guide link to the Data Table action tooltip
-- **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
-- **changed**: cds-config-*.json assets are now published under /environments/real_data
-
-# 1.40.9 
-- **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
-
-# 1.40.8 
-- **changed**: JSON Condition **V2** action now persists ONLY the `when` expression (the `groups` AST is emptied in the saved payload); on open, the editor rebuilds the AST from `when` via a new `when → groups` parser. V1 keeps persisting only `groups` — the two versions stay fully distinct and V1 backward-compatible
-- **added**: `when → groups` parser (`parseWhenToGroups`, inverse of the serializer) in utils-condition, with round-trip tests (serialize∘parse preserves `when`); reply V2 filters instead keep both `conditions` + `when` (direct round-trip, no reconstruction)
-- **added**: new JSON Condition **V2** action (`jsoncondition2`) as a separate action with its own editor (`base-filter2`/`base-condition-row2`) and a dedicated V2 operator catalog; the legacy JSON Condition (V1) is left completely unchanged for full backward compatibility
-- **added**: new V2 filter editor (`filter2`) in the reply actions — applied only to NEW filters; existing (legacy) filters keep the old editor (`appdashboard-filter`) via `isLegacyFilter` routing, so agents already created with V1 conditions/filters keep working unchanged
-- **added**: serialization of the condition `groups` AST into a single LLM-friendly `when` expression string (utils-condition)
-- **added**: multi-line tooltip for the "Attribute name" syntax help
-- **changed**: action model with `ActionJsonCondition2` and optional `when`/`version` markers on `Expression` (never set for legacy → V1 payloads byte-identical)
-
-
-# 1.40.7
-- **bug fix**: Ask KB with "Use Knowledge Base name": editing the KB name / inserting a parameter no longer saves "[object FocusEvent]"
-
-# 1.40.6
-- **bug fix**: change env
-
-# 1.40.4
+# 1.40.3-rc4
 - **bug fix**: bug fix on preview ai prompt and ask kb with vllm model set
 
-# 1.40.3
-- **changed**: vllm list
-- **bug fix**: drag intent when connector is contract
+# 1.40.3-rc3
+- **bug fix**: integrate customHeaders and auth in "tools" paylosd
 
-# 1.40.2
-- **changed**: refactor(voice-settings): streamline voice and model retrieval from ElevenLabs API; update angular.json for environment asset handling
+# 1.40.3-rc2
+- **bug fix**: vllmServer
 
-# 1.40.1
+# 1.40.3-rc1
+- **bug fix**: added vllm url in vllm models
+
+# 1.40.1-rc9
+- **changed**: filter voice provider list based on chatbot subtype (chatbot: elevenlabs only, voice twilio: twilio and openai only)
+- **bug fix**: voice settings initialization - removed duplicated logic
+
+# 1.40.1-rc8
 - **changed**: set parameters to hide favicon and site URL in  action reply URL preview
 - **changed**: action preview in reply url preview
+- **bug fix**: vllm list
+- **bug fix**: drag intent when connector is contract
+
+# 1.40.1-rc7
+- **added**: OAuth 2.0 Flow in MCP server authentication (Client ID, Client Secret, Redirect URL, Scope)
+
+# 1.40.1-rc6
+- **bug fix**: retrocompatibility jsonCondition
+
+# 1.40.1-rc5
+- **changed**: refactoring jsonCondition. added "when"
+
+# 1.40.1-rc4
+- **changed**: display Custom Headers in MCP server
+
+# 1.40.1-rc3
+- **changed**: added tag "BETA"
+
+# 1.40.1-rc2
+- **bug fix**: bug fix css panel detail action data table
+
+# 1.40.1-rc1
+- **added**: added action "data-table"
 
 # 1.40.0
 - **added**: added voice reply and settings in chatbot to allow voice conversational experience 
@@ -231,38 +299,93 @@
 - **bug-fix**: set minimum tokens when unchecking "Get contents sources"
 - **changed**: updated ai_models
 
+# 1.39.39-rc2
+- **added**: added PINECONE_RERANKING in environment to set reranking
+
+# 1.39.39-rc1
+- **bug-fix**: set minimum tokens when unchecking "Get contents sources"
+- **changed**: updated ai_models
+
 # 1.39.38 
 - **bug fix**: change setModel in ai-condition and ai-prompt actions to keep maxtoken value set as it was initially
 
+# 1.39.38-rc1 
+- **bug-fix**: changed setModel in the ai-condition and ai-prompt actions to retain the maxtoken value
+
 # 1.39.37  
+
+# 1.39.37-rc1 
 - **changed**: In the "Flow log" action, sort error types with icons and colors in the select box.
 - **changed**: Removed the "Chatgpt task" action from the list of actions. If already used, add the "deprecated" tag.
 - **bug-fix**: Modified the ability to drag an action outside the intent block.
 - **bug-fix**: Modified CSS for actions with AI Settings.
 
 # 1.39.36 
+
+# 1.39.36-rc1
+- **added**: added parameter to enable/disable rules management 
+
+# 1.39.35-rc1 
 - **changed**: hide the "rules" button if there are no "rules" set
 - **changed**: updated AI models
 
 # 1.39.35
+
+# 1.39.34-rc2 
 - **bug-fix**: Removed "manage kb" from webhook detail panel
 - **bug-fix**: in action Ask KB shows the selected template's default value and max-token
 - **bug-fix**: when I change the text of an ask kb action I lose the value of the selected kb
 
-# 1.39.34
+# 1.39.34-rc1
 - **bug-fix**: action blind trasfer not display voice commands
 
-# 1.39.33
-- **Added**: Added the ability to insert tags into the KB ask action and the KB create action
+# 1.39.33-rc4
+- **bug-fix**: renamed onClickControl to onActionControl in intent.component
 
-# 1.39.32 
+# 1.39.33-rc3
+- **bug-fix**: The action detail panel closes when an action is modified
+
+# 1.39.33-rc2
+- **changed**: replaced "Tag" with "Label"
+
+# 1.39.33-rc1
+- **changed**: update and refactoring cds-action-json-condition
+
+# 1.39.33
+
+# 1.39.32-rc1
 - **bug-fix**: GptTask Preview broken
 - **bug-fix**: Condition blocks not saved when changing Boolean operators
 - **bug-fix**: OpenAI models present in the select even if they are missing from the environment variable
 
-# 1.39.31
-- **bug-fix**: bug fixed in selecting and refreshing MCP server tools.
+# 1.39.32
+
+# 1.39.29-rc9
+- **bug-fix**: Bug fixed in selecting and refreshing MCP server tools.
 - **bug-fix**: Css changes to the preview of selected tools.
+
+# 1.39.29-rc8
+- **changed**: Updated and refactored the cds-intent and cds-connector-in components to improve performance
+
+# 1.39.29-rc7
+- **bug-fix**: Set retro compatibility between onActionUpdate and onUpdateAndSaveAction in CdsIntentComponent
+
+# 1.39.29-rc6
+- **changed**: Updated and refactored the cds-intent and cds-connector components to improve performance
+
+# 1.39.29-rc5
+- - **added**: added tag to action ask kb and action create kb
+
+# 1.39.29-rc4
+- **bug-fix**: eliminated AAAAAA
+
+# 1.39.29-rc3
+- **changed**: changed the position of the cds-note-controls panel
+
+
+# 1.39.29-rc2
+- **Added**: aggiunta la possibilità di inserire tag nella action ask KB e nella action create KB
+
 
 # 1.39.30
 - **Modified**: Changed the position of the cds-note-controls panel
@@ -277,64 +400,251 @@
 - **changed**: change the color of the badges in the list models
 - **changed**: change the cursor to the selected MCP tools, and the text from "Chose..." to "Manage MCP Tools"
 
-# 1.39.29
+# 1.39.29-rc1
 - **bug-fix**: Fixed bug with Knowledge Base selection with "use KB name" checked
 
-# 1.39.28
-- **added**: added tools MCP server
+# 1.39.28-rc4
+- **bug-fixed**: Fixed image loading bug with new API
+
+# 1.39.28-rc3
+- **added**: Added a note title to the note rectangle
+- **changed**: Removed the note border in rectangle notes
+- **changed**: Disabled the maximum height on rectangles and set a minimum size
+- **bug-fixed**: Fixed the issue with resizing rectangle notes. The corner opposite the one being dragged now remains locked.
+- **bug-fixed**: Fixed the horizontal resizing of text notes; eliminated flickering.
+
+
+# 1.39.28-rc2 
+- **bug-fix**: filtered LLM templates based on those present in the environment file
+- **bug-fix**: fixed bug on GptTask action in prompt preview
+- **bug-fix**: enabled saving when changing the "OR / AND" operator filter
+
+# 1.39.28-rc1
+- **changed**: refactoring of cds-canvas and cds-intent components
 
 # 1.39.27
 - **changed**: API for upload a file/images
 
+
+# 1.39.27-rc1
+- **added**: added reasoning in AI Prompt action
+
 # 1.39.26
 - **added**: added iteration action
 
-# 1.39.25
+# 1.39.26-rc1
+- **bug-fix**: sort attribute list in Variable List Component
+- **bug-fix**: change the "use kb name" field to 2 lines
+- **bug-fix**: the selected model is red even when the api is set
+- **changed**: change the AI ​​settings preview
+
+# 1.39.25-rc2
 - **bug-fix**: Fixed a filter error when selecting a KB.
 - **bug-fix**: Fixed an error when setting the re-ranking multiplier when setting "use KB name."
 - **changed**: Set the "Max chunks for re-ranking" to 100.
 
-# 1.39.24
-- **bug-fixed**: note - video note resizing is not smooth
-- **bug-fixed**: note - fixed max_output_tokens error
-- **changed**: note - handles have been added to the rectangle note vertices
-- **bug-fixed**: note - disabled the 100x100px non-clickable stage area (tds-drag-drawer).
-- **bug-fixed**: note - disabled the note-controls menu when it is transparent
-- **changed**: note - restored the note detail panel opening when clicking on the note, except for the video note
-- **bug-fixed**: note - when change the color, the note detail panel closes
-- **changed**: note - change default colors
-- **changed**: note - store the last colors in the LS
-- **added**: note - add the same intent menu to notebooks
-- **changed**: note - limit uploads to images and GIFs only
-- **added**: note - allow uploading videos from links
-- **added**: Add the text: Total retrieved chunks for re-ranking: 
-- **changed**: Combine chunk limit, re-ranking, and multiplier into a single block, so pay attention to the spacing.
-- **changed**: In the settings, I replace the token icon and add badges in place of the pipe.
-- **changed**: Add the type (H/S) hybrid or semantic, next to the name.
+# 1.39.25-rc1
+- **changed**: updated MCP server, added "tools" selection for each server
+
+# 1.39.25
+
+# 1.39.24-rc11
+- **changed**: minor updates on API for upload a file/chatbot avatar
+
+# 1.39.24-rc10
+- **added**: added tools MCP server
+
+# 1.39.24-rc9
+- **changed**: API for upload a file/chatbot avatar
+
+# 1.39.24-rc8
+- **added**: Add text: Total retrieved chunks for re-ranking: x
+- **changed**: Merge chunk limit, re-ranking, and multiplier into a single block
+- **changed**: In the settings, replace the token icon and add badges in place of the pipe
+- **changed**: Add the type (H/S) hybrid or semantic, next to the name
+
+# 1.39.24-rc7
+- **bug-fixed**: fix regression in action menu that doesn't allow deleting an action
+
+# 1.39.24-rc6
+- **bug-fixed**: Fixed max_output_tokens error
+- **bug-fixed**: Handles have been added to the vertices of the rectangle note
+- **changed**: Disabled the 100x100px non-clickable stage area (tds-drag-drawer).
+- **bug-fixed**: Disabled the note-controls menu when it is transparent
+- **bug-fixed**: Restored the ability to open the note detail when clicking on the note, except for the video note
+- **changed**: When I try to change the color, the note detail panel closes
+- **bug-fixed**: The video note resize is not smooth
+
+# 1.39.24-rc5
 - **changed**: Updated format-number with browser language formatting
 - **changed**: Edit AI preview settings: replace text with icons
+
+# 1.39.24-rc4
 - **changed**: Set the default max-token value to 10000
 - **added**: Added reranking multiplier
+
+# 1.39.24-rc3
 - **added**: Intercepted Chrome background throttling / standby to refresh the page
 - **bug-fix**: The textarea does not save text if the length is zero. so, it does not save empty text.
 - **bug-fix**: After hiding a connector I change the recipient (the block at the top) the connector reappears.
+
+# 1.39.24-rc2
+- **changed**: note: change default colors
+- **changed**: note: store the last colors in the LS
+- **added**: note: add the same intent menu to notebooks
+- **changed**: note: limit uploads to images and GIFs only
+- **added**: note: allow uploading videos from links
+
+# 1.39.24-rc1
+
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
 - **bug-fix**: the red dot remains but the publish button disappears if it is a webhook
 - **changed**: added text and links in reranking: Improve the accuracy of your answers
 - **changed**: web Request does not show output attributes in the stage preview
 - **changed**: change attribute preview in the AI ​​settings panel
 - **bug-fix**: show and save system context textarea in askgpt-v2
 - **changed**: 10K token minimo (dipende dai modelli)
+
+# 1.39.23
+
+# 1.39.23-rc7
+- **changed**: Refactored state management for expansion panels in cds-action-askgpt-v2 component. Introduced separate states for chunks and AI settings panels to improve UI responsiveness and maintainability
+- **changed**: Updated ACTIONS_LIST in utils-actions.ts to ensure consistent formatting and include additional chatbot types for FLOW_LOG action
+
+# 1.39.23-rc6
+- **added**: Support rectangle
+- **bug-fix**: Support border thickness
+- **bug-fix**: Fix the bug that prevents text color from being saved
+- **added**: Add submenus with various note types
+- **added**: Drag-and-drop insertion
+- **added**: Support image type
+- **added**: Support video type
+- **bug-fix**: As soon as the text note is inserted, it should immediately allow you to write with focus on the text
+- **bug-fix**: Centering doesn't work in the block
+
+# 1.39.23-rc5
 - **added**: added sortedItems in selection intent
+
+# 1.39.23-rc4
+- **added**: showed connectors-in only if they are contract connectors
+
+# 1.39.23-rc3
+- **changed**: changed connector-in to only display the list of contracted connector-in to the input
 - **added**: added go to block in panel intent detail;
 - **added**: added multi rows in url iframe;
-- **added**: showed connectors-in only if they are contract connectors
+
+# 1.39.23-rc1
 - **added**: added connector-in-menu to display the list of blocks connected to the input
 - **added**: added menu on contract-connector to reset connector and move on connector
+
+# 1.39.23
+- **bug-fix**: deleted duplicate AI model chatGPT 5.2
+
+# 1.39.22
+- **changed**: sorted the list of Intents in alphabetical order
+- **added**: added the LLM model gpt-5.2
+- **bug-fix**: Fixed bug when changing the height of iframe
+
+# 1.39.21
+- **added**: added the LLM model gpt-5.2
+
+# 1.39.20
+- **bug-fix**: sorted the list of intents in the intent selection select
+
+# 1.39.19
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc12 
+- **added**: added tag-replyto in mode preview ai condition and ask kb
+- **bug-fix**: change link "learn more" ai condition
+
+
+# 1.39.19-rc10 
 - **changed**: Intent block title hidden if "untitled"
 - **changed**: Form button and question button hidden if empty
 - **changed**: Block style changed if the chatbot is new after December 19, 2025 (while maintaining backwards compatibility)
 - **changed**: If the chatbot is new, only one action per intent
 
+# 1.39.19-rc9
+- **bug-fix**: sorted the listOfIntents in the intent selection select
+
+# 1.39.19-rc8
+- **bug-fix**: do not automatically set TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+- **bug-fix**: reset STT_MODEL and TTS_MODEL while switching from/to elevenlabs/openai for voiceSettings
+
+# 1.39.19-rc6
+- **bug-fix**: minor fix on TTS_VOICE_LANGUAGE for elevenlabs voiceProvider
+
+# 1.39.19-rc5
+- **bug-fix**: "TTS_VOICE_LANGUAGE" while selecting TTS_VOICE_NAME for elevenlabs voiceProvider
+
+# 1.39.19-rc4
+- **bug-fix**: bug fix for PDF template selection in WhatsApp send action
+
+# 1.39.19-rc3
+- **added**: added settings summary in AI action templates and all actions with AISEttings
+- **added**: added tag-replyto in mode preview
+- **added**: added badge on publish button
+
+# 1.39.19-rc2
+- **added**: Added badge to count messages arriving in the widget-loq when the panel is closed
+- **changed**: intent block title hidden if "untitled"
+- **changed**: hidden form button and question button if they are empty 
+- **added**: added badge to count messages arriving in the widget-loq when the panel is closed
+
+# 1.39.19-rc1
+- **added**: description on elevenlabs voices 
+
+# 1.39.18
+- **bug-fix**: Fixed display of iframe URL in action playback
+
+# 1.39.18-rc2
+- **bug-fix**: css bug fix content-frame
+
+# 1.39.18-rc1
+- **bug-fix**: fixed handling of iframe URL in action replay
+
+# 1.39.17
+- **added**: added the ability to put notes on the stage
+
+# 1.39.16
+- **added**: pipe find to show namespace name in action ask-kb-v2
+- **bug-fix**: show 'Re-ranking' option in action ask-kb-v2
+
+# 1.39.15
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.15-rc3
+- **bug-fix**: update resizing note
+
+# 1.39.15-rc2
+- **bug-fix**: cannot update the key or delete an item in action lead_update
+
+# 1.39.15-rc1
+- **bug-fix**: cannot able to update key or value in action lead_update
+
+# 1.39.14
+
+# 1.39.14-rc5
+- **added**: added gemini-3-pro-preview, claude-sonnet-4-5, claude-haiku-4-5, claude-opus-4-5, claude-opus-4-1
+
+# 1.39.14-rc4
+- **changed**: added rotation and horizontal scaling to the notes component
+
+# 1.39.14-rc3
+- **added**: added notes component
+
+# 1.39.14-rc2
+- **bug-fix**: added the "globals" variables created in the DS to the variable list
+- **changed**: open the Intent panel details by clicking on "start intent"
+- **bug-fix**: drag intent "start action"
+- **added**: added ai-modules gpt-5.1, gemini-3-pro-preview, gemini-3-pro-image-preview
+- **bug-fix**: fixed an error when searching for parameters for "voice" chatbot_type
+- **bug-fix**: changed knwoledge to knowledge 
+
+# 1.39.14-rc1
+- **bug-fix**: Text correction on replace AI agent
+- **bug-fix**: Fixed error on fallback contract connector in connection creation, and error on contract error connector in connection creation in action AI condition
 - **added**: Supportare rettangolo
 - **bug-fixed**: Supportare spessore bordo
 - **bug-fixed**: correggere il bug che non permette di salvare il colore del testo
@@ -358,6 +668,78 @@
 # 1.39.11
 
 # 1.39.10
+- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
+- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+
+# 1.39.9-rc16:
+- **bug-fix**: Updated MCP tools in the ai-prompt action when another ai-prompt action is selected
+
+# 1.39.9-rc15:
+- **bug-fix**: The contracted connector was not defined and the empty connector was not visible in the AI-prompt, ai-condition, askgpt-v2 action.
+- **bug-fix**: Dragging issue with the "start" intent.
+- **bug-fix**: The namespace or action ID is now displayed correctly based on the namespaceAsName flag (true/false).
+- **bug-fix**: Ctr-z is enabled in the text area when creating a new MCP server.
+
+# 1.39.9-rc14:
+- **bug-fix**: contract connector undefined and connector empty hidden on action ai prompt
+- **bug-fix**: drag on start intent
+- **bug-fix**: show namespace or id action if namespaceAsName is true or false
+- **bug-fix**: set focus on textarea when create new server MCP
+
+# 1.39.9-rc13:
+- **bug-fix**: bug-fix css in mcp-servers-grid 
+
+# 1.39.9-rc12:
+- **bug-fix**: renamed "selected Mcp Servers"
+
+# 1.39.9-rc11:
+- **changed** updated css mcp servers
+
+# 1.39.9-rc10:
+- **changed** updated mcp servers in action ai-prompt
+
+# 1.39.9-rc9:
+- **added**: added mcp servers in action ai-prompt
+- **added**: added Save/Update MCP Server in integration
+- **added**: retry system for rendering connectors with slow connections
+
+
+# 1.39.9-rc8:
+- **bug-fix**: renamed function onUpdateAndSaveAction in onActionUpdate
+- **bug-fix**: added check on intent undefined
+
+# 1.39.9-rc7:
+- **added**: added action iteration in webhook
+
+# 1.39.9-rc6:
+- **bug-fix**: bug fix changed name attributes assignOutputTo
+- **bug-fix**: bug fix css on block-connector and start-content
+
+# 1.39.9-rc5:
+- **changed**: added "item" attribute
+- **bug-fix**: css bug fixed
+
+# 1.39.9-rc4:
+- **added**: added interation action
+
+# 1.39.9-rc3:
+- **bug-fix**: set result.hybrid on undefined
+- **bug-fix**: bug fix overflow preview-container-extended
+- **bug-fix**: set generate with llm_model_selected.modelName
+- **bug-fix**: undefined.url
+- **bug-fix**: on preview ask kb
+- **bug-fix**: max-height text area
+- **changed**: changed max_tokens_context in max_output_tokens and update openai values
+
+# 1.39.9-rc2:
+- **added**: set default model
+- **changed**: replaced the textarea with a select in the model selection
+- **changed**: changed token display by adding k for thousands
+- **changed**: editable max token field
+- **added**: added max_token and min_token parameters for each model
+
+# 1.39.9-rc1:
+- **added**: added vLLM model integration
 - **bug-fixed**: The contracted connector was not defined and the empty connector was not visible in the askgpt-v2 action.
 - **bug-fixed**: Ctr-z is enabled in the text area when creating a new MCP server.
 
@@ -365,10 +747,19 @@
 
 # 1.39.8
 
+# 1.39.8-rc1:
+- **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
+- **added**: added css for temperature disabled when gpt-5 is the selected model 
+- **added**: set max_token when change model
+
 # 1.39.7
 - **changed**: set max_tokens from 8192 to 100000 only for gpt-5 model
 - **added**: added css for temperature disabled when gpt-5 is the selected model 
 - **added**: set max_token when change model
+
+
+# 1.39.6
+- **changed**: set max_tokens from 8192 to 100000
 
 # 1.39.6
 - **changed**: set max_tokens from 8192 to 100000
@@ -381,6 +772,17 @@
 
 # 1.39.3
 - **bug-fixed**: added filter status "active" in generateLlmModels
+
+# 1.39.3-rc1
+- **bug-fix**: added filter status "active" in generateLlmModels
+
+# 1.39.2-rc3
+- **changed**: changed select llm model in askgpt-v2
+- **changed**: moved common functions between ai-prompt, ai-condition and askgpt-v2 actions in utils-llm-model
+- **added**: skip_unanswered and reranking in AskKbv2 
+
+# 1.39.2-rc2
+- **bug-fix**: bug fix ai-condition and ai-prompt
 
 # 1.39.2
 
@@ -470,7 +872,6 @@
 # 1.39.0-rc1
 - **changed**: added scroll button left and right on image gallery
 
-
 # 1.38.5
 - **changed**: update ai models
 
@@ -484,13 +885,20 @@
 # 1.38.2
 - **changed**: ai models upgraded
 
+# 1.38.2
+- **changed**: ai models upgraded
+
 # 1.38.1
 - **changed**: Changed connector-width in 2px
 
 # 1.38.0
 
+
 # 1.38.0-rc20
 - **added**: ability to manage Share_Items from BrandSrc
+
+# 1.37.5
+- **bug-fixed**: Voice menu compatibility patch if there is no subtype
 
 # 1.38.0-rc19
 - **bug-fixed**: Voice menu compatibility patch if there is no subtype
@@ -509,6 +917,7 @@
 # 1.38.0-rc15
 - **changed**:: change textarea limitCharsText (from 10.000 to 100.000) in system context cds-action-ai-prompt, system context cds-action-askgpt-v2, prompt cds-action-gpt-assistant, prompt cds-action-gpt-task;
 - **changed**:: enabled hundreds separator for numeric characters in textarea.component
+
 
 # 1.38.0-rc14
 - **added**: Open KNB link in new tab in intent detail panel
@@ -558,12 +967,6 @@
 # 1.38.0-rc1
 - **bug-fixed**: broken connector and full dot when deleting a connector in an action reply
 
-# 1.37.6
-- **added**: ability to manage Share_Items from BrandSrc
-
-# 1.37.5
-- **bug-fixed**: Voice menu compatibility patch if there is no subtype
-
 # 1.37.4
 - **bug-fixed**: added models in json-gallery
 
@@ -575,6 +978,9 @@
 
 # 1.37.1
 
+# 1.37.0-rc3
+- **bug-fixed**: delete webhook only when it is stopped
+
 # 1.37.0-rc2
 - **bug-fixed**: widget-log: disabled collapse row; stop webhook log when click on the stage
 
@@ -583,6 +989,30 @@
 
 # 1.36.1
 - **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc7
+- **bug-fixed**: css bug fixed in widget-log 
+
+# 1.36.0-rc6
+- **bug-fixed**: added width and height to previewModel images in action reply gallery
+- **bug-fixed**: in widget-log added ellips on the row, row opening, fixed display for very long texts, added selectable text, graphic adjustments
+
+# 1.36.0-rc5
+- **changed**: added ellips in log lines in ds-widget-logs.component
+
+# 1.36.0-rc4
+- **bug-fixed**: all actions that contain block selection on true/false do not display connector on stage when create via action detail panel
+- **bug-fixed**: about corrupted connectors with full dot but no connector on the stage
+- **bug-fixed**: the webhook opens the detail also on drag, it should open it only on click
+
+# 1.36.0-rc3
+- **bug-fixed**: updated textarea value in action AI prompt
+
+# 1.36.0-rc2
+- **added**: voice preview player for elevenlabs voices for voice_twilio chatbot type
+
+# 1.36.0-rc1
+- **added**: support for elevenLabs voices for voice_twilio chatbot 
 
 # 1.36.0
 - **bug-fixed**: added width and height to previewModel images in action reply gallery
@@ -2022,4 +2452,3 @@ delete an action (delete all outgoing connectors)
 
 # 0.0.1
  first deploy<br>
-
