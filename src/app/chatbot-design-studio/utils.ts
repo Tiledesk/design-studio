@@ -6,11 +6,9 @@ export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
 /** Valore dell'etichetta `attributes.dsVersion` che identifica un agente da aprire
  *  con il Design Studio V3. E' l'unica cosa che decide quale editor si apre: chi crea
- *  l'agente la dichiara (nel DS il valore arriva da `CHATBOT_VERSION` dell'environment),
- *  chi lo apre la rilegge. Senza etichetta l'agente e' legacy. Confronto in minuscolo.
- *  Definita nel compilatore, che e' chi la scrive, e riesposta qui per chi la rilegge:
- *  un valore solo, nessuna possibilita' che scrittura e lettura divergano. */
-export { DS_VERSION_V3 } from './ai-authoring/blueprint-compiler';
+ *  l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
+ *  Confronto in minuscolo. */
+export const DS_VERSION_V3 = 'v3';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 

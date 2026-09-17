@@ -6,8 +6,6 @@ import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { AgentRevisionsService } from 'src/app/chatbot-design-studio/services/agent-revisions.service';
-import { AgentGeneratorService } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -116,8 +114,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
     private agentChatHostService: AgentChatHostService,
-    private readonly agentRevisionsService: AgentRevisionsService,
-    private readonly agentGeneratorService: AgentGeneratorService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -245,8 +241,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.faqKbService.deleteBot(botId).subscribe({
         next: () => {
           this.isDeletingAgent = false;
-          // La storia dell'agente si cancella con lui (mai bloccante)
-          this.agentRevisionsService.deleteHistoryQuietly(botId);
           const remaining = this.agents.filter(a => a._id !== botId);
           this.agents = remaining;
           if (remaining.length > 0) {
@@ -364,19 +358,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   isOpenDropdown(_is0penDropDown) {
     this.is0penDropDown = _is0penDropDown
     // this.logger.log('[WS-REQUESTS-MSGS] this.is0penDropDown ',this.is0penDropDown)  
-  }
-
-  /**
-   * Pannello AI a destra: storia dei prompt, versioni, ripristino e modifica via prompt.
-   * Solo su agenti V3 con il servizio di generazione configurato. Se il server non ha il modulo delle
-   * revisioni, il pannello si apre lo stesso e lo dice: cosi' si capisce perche' la storia non c'e'.
-   */
-  get showAiPanelButton(): boolean {
-    return this.isV3 && !!this.selectedChatbot?._id && this.agentGeneratorService.isConfigured;
-  }
-
-  onClickAiPanel(){
-    this.controllerService.toggleAiPanel();
   }
 
   onClickPublish(){

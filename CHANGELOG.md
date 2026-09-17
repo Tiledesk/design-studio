@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# unreleased
+- **removed**: tolta la creazione di agenti con l'AI a partire da un prompt, insieme al pannello AI per modificarli e alla loro storia delle versioni, che erano gia' spenti e non comparivano: il Design Studio non contiene piu' la modale, il pannello, i servizi collegati e le relative impostazioni. Gli agenti gia' creati restano e si aprono come prima con l'editor V3; la chat AI integrata (Flow Builder), pubblicazione, cronologia delle release, selettore ed eliminazione degli agenti funzionano come prima
+
 # 1.40.15-rc2
 - **changed**: in agents created with AI the conversation is never closed by the flow itself. A close is there only when the user asks for it by pressing a button ("nothing else, close the chat"), and nothing follows that choice. This replaces the earlier rule, which also allowed a close after a long activity that was finished
 - **changed**: in V3 agents the block that asks the user for a reply uses the same outgoing point as every other block, the one on the bottom-right edge, instead of a second dot hanging beside the action: it is connected like any other block and its destination is chosen from the block's panel. Agents created with the previous editor are untouched

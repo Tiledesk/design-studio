@@ -42,7 +42,6 @@ import { CdsConnectorInComponent } from './base-elements/cds-connector-in/cds-co
 import { CdsWidgetLogsComponent } from './base-elements/cds-widget-logs/cds-widget-logs.component';
 import { ChangeAlphaColorComponent } from 'src/app/modals/change-alpha-color/change-alpha-color.component';
 import { CdsPanelPublishComponent } from './cds-panel-publish/cds-panel-publish.component';
-import { CdsPanelAiComponent } from './cds-panel-ai/cds-panel-ai.component';
 import { CdsNotesComponent } from './cds-notes/cds-notes.component';
 import { CdsPanelNoteDetailComponent } from './cds-panel-note-detail/cds-panel-note-detail.component';
 import { NoteControlsComponent } from './cds-notes/note-controls/note-controls.component';
@@ -98,7 +97,6 @@ const routes: Routes = [
     //CDS PANEL CONNECTOR MENU
     CdsPanelConnectorMenuComponent,
     CdsPanelPublishComponent,
-    CdsPanelAiComponent,
 
     //CDS OPTIONS
     CdsOptionsComponent,

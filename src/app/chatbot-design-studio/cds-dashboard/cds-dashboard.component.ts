@@ -26,9 +26,6 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { KnowledgeBaseService } from 'src/app/services/knowledge-base.service';
 import { DataTableService } from 'src/app/services/data-table.service';
 import { OpenaiService } from 'src/app/services/openai.service';
-import { AgentGeneratorService } from '../services/agent-generator.service';
-import { AgentRevisionsService } from '../services/agent-revisions.service';
-import { isAiAgentGeneratorEnabled } from '../ai-authoring/ai-authoring.config';
 import { WhatsappService } from 'src/app/services/whatsapp.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DepartmentService } from 'src/app/services/department.service';
@@ -118,11 +115,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly agentChatHostService: AgentChatHostService,
     private readonly intentService: IntentService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private aiService: AiService,
     // In coda di proposito: agent-chat-flow-switch.spec.ts costruisce il componente a mano con
     // argomenti posizionali, quindi i servizi aggiunti dopo vanno appesi qui e non in mezzo.
-    private agentGeneratorService: AgentGeneratorService,
-    private agentRevisionsService: AgentRevisionsService
+    private aiService: AiService
   ) {
     this.manageRouteChanges();
   }
@@ -406,19 +401,6 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
     this.aiService.initialize(serverBaseURL, this.project._id)
-    // Authoring AI del V3 (modale «Crea agente con l'AI», pannello AI, storia sul server): su questo
-    // branch è spento dallo switch in ai-authoring.config.ts; senza URL e chiave il generatore non è
-    // configurato e ogni pulsante resta nascosto. Il vibe coder attivo qui è la chat in iframe.
-    const aiAuthoringEnabled = isAiAgentGeneratorEnabled(this.appConfigService.getConfig());
-    this.agentGeneratorService.initialize(this.project._id, aiAuthoringEnabled ? {
-      url: this.appConfigService.getConfig().aiAgentGeneratorUrl,
-      key: this.appConfigService.getConfig().aiAgentGeneratorKey
-    } : {})
-    // Storia e ripristino degli agenti: il modulo del server si scopre con un probe, una volta per progetto.
-    this.agentRevisionsService.initialize(serverBaseURL, this.project._id, aiAuthoringEnabled && this.appConfigService.getConfig().aiRevisionsEnabled !== false);
-    if (aiAuthoringEnabled) {
-      this.agentRevisionsService.probe().subscribe();
-    }
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
     this.uploadService.initialize(this.project._id);
