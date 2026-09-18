@@ -9,9 +9,9 @@
 
 # this branch 18/09/2026
 
+- **changed**: quando la chat AI finisce di lavorare il flusso viene riordinato da sinistra a destra, un passo per colonna e i rami uno sotto l'altro senza sovrapposizioni, e la vista si adatta all'intero flusso. I collegamenti seguono i blocchi, compresi quelli che la chat ha spostato lei stessa. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
 - **fixed**: all'apertura di un agente la chat AI, che ora si apre da sola, restava bianca e non partiva; ora si carica subito
 - **fixed**: quando la chat AI sposta i blocchi sulla canvas, i collegamenti li seguono. Prima restavano disegnati dov'erano i blocchi prima e si sistemavano solo ricaricando la pagina
-- **changed**: la chat AI non riordina piu' il flusso quando ha finito di lavorare. I blocchi restano dove sono stati creati e dove sono stati trascinati a mano, e la vista resta dove l'hai lasciata. L'unico spostamento automatico che resta e' l'allineamento in colonna dei rami che partono da un blocco appena biforcato
 
 # this branch 17/09/2026
 

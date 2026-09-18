@@ -4097,9 +4097,7 @@ describe('FlowOpsService — connector check after the AI chat stops editing', (
   }));
 });
 
-// Switched off together with the call to layoutFlow in `scheduleConnectorCheck`: these
-// describe the automatic layout, which no longer runs. Drop the `x` when it comes back.
-xdescribe('FlowOpsService — the flow is laid out again once the chat stops changing its structure', () => {
+describe('FlowOpsService — the flow is laid out again once the chat stops changing its structure', () => {
   let service: FlowOpsService;
   let intentService: any;
   let connectorService: any;

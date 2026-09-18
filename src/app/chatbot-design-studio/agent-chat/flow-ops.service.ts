@@ -1976,14 +1976,16 @@ export class FlowOpsService implements OnDestroy {
     this.connectorCheckTimers = CONNECTOR_CHECK_DELAYS_MS.map((delay, pass) => setTimeout(async () => {
       if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
       try {
-        // The automatic layout is switched off: the blocks stay where the chat put them and
-        // where the user dragged them, and the view is left alone. Uncomment to bring it back.
-        // if (pass === 0 && this.layoutFlow(faqKbId)) {
-        //   // Let Angular move the blocks before measuring anything on the stage.
-        //   await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
-        //   if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
-        // }
-        if (pass === 0) { this.announceBlocksMovedByChat(faqKbId); }
+        if (pass === 0 && this.layoutFlow(faqKbId)) {
+          // Let Angular move the blocks before measuring anything on the stage.
+          await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
+          if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+        } else if (pass === 0) {
+          // No layout to run -- the batch changed no structure -- but the agent may
+          // still have moved blocks with `move`, and their connectors are drawn where
+          // those blocks used to be. The layout, when it runs, carries them itself.
+          this.announceBlocksMovedByChat(faqKbId);
+        }
         await this.connectorService.ensureConnectorsDrawn?.(this.intentService.listOfIntents || []);
       } catch (error) {
         // Best-effort: the flow is saved either way.
@@ -2045,7 +2047,12 @@ export class FlowOpsService implements OnDestroy {
     if (movedIds.length > 0 && this.lastBatchUndoDepth > 0 && this.lastBatchFaqKbId === faqKbId) {
       this.lastBatchUndoDepth++;
     }
-    this.layoutApplied$.next({ faqKbId, movedIds });
+    // The blocks the agent moved itself ride along: the layout may well have left one
+    // of them exactly where the agent put it, and then nothing else would redraw the
+    // connectors that are still attached to where it was before the batch.
+    const redrawIds = Array.from(new Set([...movedIds, ...Array.from(this.movedByChat)]));
+    this.movedByChat.clear();
+    this.layoutApplied$.next({ faqKbId, movedIds: redrawIds });
     return true;
   }
 
