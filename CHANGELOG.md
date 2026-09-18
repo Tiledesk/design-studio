@@ -24,6 +24,9 @@
 - **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
 - **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
 
+# 1.40.15-rc4
+- **fixed**: when the AI chat moves blocks on the canvas, the connectors follow them straight away; before, they only settled after a page reload
+- **changed**: the AI chat no longer lays the flow out when it finishes: blocks stay where they were created or dragged by hand, and the view does not move. The only automatic placement left is the branches of a newly forked block, stacked in a column
 
 # 1.40.15-rc3
 - **fixed**: the AI chat, now open by default, stayed blank when an agent was opened
