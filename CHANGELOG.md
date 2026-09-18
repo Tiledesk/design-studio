@@ -7,23 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 18/09/2026
-
-- **fixed**: quando la chat AI sposta i blocchi sulla canvas, i collegamenti li seguono. Prima restavano disegnati dov'erano i blocchi prima e si sistemavano solo ricaricando la pagina
-- **changed**: la chat AI non riordina piu' il flusso quando ha finito di lavorare. I blocchi restano dove sono stati creati e dove sono stati trascinati a mano, e la vista resta dove l'hai lasciata. L'unico spostamento automatico che resta e' l'allineamento in colonna dei rami che partono da un blocco appena biforcato
-
-# this branch 17/09/2026
-
-- **fixed**: all'apertura di un agente la chat AI, ora aperta di default, restava bianca e non si avviava; ora si carica subito
-- **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso
-- **changed**: quando la chat AI finisce di aggiungere, eliminare o ricollegare blocchi, tutto il flusso viene riordinato da sinistra a destra: un passo per colonna, i rami uno sotto l'altro senza sovrapposizioni, il fallback e i blocchi scollegati in fondo. I collegamenti seguono i blocchi e la vista si adatta all'intero flusso. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
-- **fixed**: quando la chat AI finisce di modificare il flusso, il Design Studio controlla che tutti i collegamenti previsti siano disegnati sullo stage e completa quelli mancanti. Prima alcuni collegamenti comparivano solo ricaricando la pagina
-- **changed**: sugli agenti V3 la chat AI riceve le regole dell'editor V3 e le sue modifiche vengono controllate: una sola action per blocco, domanda e risposta in due blocchi, risposta dell'utente che prosegue dal collegamento del blocco, fallback senza action, avvio e fallback non eliminabili ne' collegabili come destinazione, nessun collegamento dopo un blocco che chiude la conversazione, chiusura della conversazione solo dietro un pulsante. Una modifica che viola una regola viene rifiutata per intero indicando la regola, e la chat la corregge. Sugli agenti precedenti la chat funziona come prima
-- **changed**: i sub agent creati da un agente V3, dal pannello o dalla chat AI, nascono V3
-- **changed**: ogni volta che un nuovo blocco compare sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) viene evidenziato e lo stage si centra su di lui, con la stessa animazione della simulazione con il widget. Se ne arrivano piu' insieme, lo stage si centra sull'ultimo
-- **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
-- **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
-
+# 1.40.15-rc4
+- **fixed**: when the AI chat moves blocks on the canvas, the connectors follow them straight away; before, they only settled after a page reload
+- **changed**: the AI chat no longer lays the flow out when it finishes: blocks stay where they were created or dragged by hand, and the view does not move. The only automatic placement left is the branches of a newly forked block, stacked in a column
 
 # 1.40.15-rc3
 - **fixed**: the AI chat, now open by default, stayed blank when an agent was opened
