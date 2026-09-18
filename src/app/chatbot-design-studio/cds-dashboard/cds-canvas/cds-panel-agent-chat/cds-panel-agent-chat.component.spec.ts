@@ -464,4 +464,13 @@ describe('CdsPanelAgentChatComponent', () => {
       expect(closed).toHaveBeenCalledTimes(1);
     });
   });
+
+  it('attaches the real iframe when the panel is created already visible', async () => {
+    component.isPanelVisible = true;
+    // Before any change detection, as when the dashboard mounts the panel already open.
+    component.ngOnChanges({ isPanelVisible: { currentValue: true, previousValue: undefined, firstChange: true, isFirstChange: () => true } as any });
+    await fixture.whenStable();
+    expect(hostService.attach).toHaveBeenCalledTimes(1);
+    expect(hostService.attach.calls.mostRecent().args[0]).toBe(component.agentChatIframe.nativeElement);
+  });
 });

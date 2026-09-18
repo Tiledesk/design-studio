@@ -14,7 +14,12 @@ import { FlowOpsReport } from 'src/app/chatbot-design-studio/agent-chat/flow-ops
 })
 export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy {
 
-  @ViewChild('agentChatIframe') agentChatIframe: ElementRef<HTMLIFrameElement>;
+  /** Static: the panel can be created already visible -- the chat opens by default when an
+   *  agent is opened, before the dashboard mounts this panel -- and ngOnChanges then runs
+   *  before a dynamic query is resolved. The host was wired to a detached placeholder while
+   *  the chat loaded in the real frame, so its `ready` went unanswered and the panel stayed
+   *  blank. The iframe is never inside a structural directive, so a static query is safe. */
+  @ViewChild('agentChatIframe', { static: true }) agentChatIframe: ElementRef<HTMLIFrameElement>;
   @Input() isPanelVisible: boolean = false;
   /** The panel carries its own close button, because the header button that opens it is
    *  hidden while it is open. */
