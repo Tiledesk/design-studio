@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 18/09/2026
+
+- **fixed**: quando la chat AI sposta i blocchi sulla canvas, i collegamenti li seguono. Prima restavano disegnati dov'erano i blocchi prima e si sistemavano solo ricaricando la pagina
+- **changed**: la chat AI non riordina piu' il flusso quando ha finito di lavorare. I blocchi restano dove sono stati creati e dove sono stati trascinati a mano, e la vista resta dove l'hai lasciata. L'unico spostamento automatico che resta e' l'allineamento in colonna dei rami che partono da un blocco appena biforcato
+
 # this branch 17/09/2026
 
 - **fixed**: all'apertura di un agente la chat AI, ora aperta di default, restava bianca e non si avviava; ora si carica subito

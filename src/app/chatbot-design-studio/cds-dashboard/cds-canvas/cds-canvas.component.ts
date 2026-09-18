@@ -573,7 +573,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
    *  connectors LEAVING a block, so a connector entering a moved block from a block that stayed
    *  put would keep pointing at the old place. A second pass once the fit animation is over
    *  catches the connectors the connector check drew while the stage was still moving. */
-  private onFlowLaidOut(layout: { faqKbId: string, movedIds: string[] }) {
+  private onFlowLaidOut(layout: { faqKbId: string, movedIds: string[], fitView?: boolean }) {
     if (layout.faqKbId !== this.id_faq_kb) { return; }
     clearTimeout(this.layoutConnectorsTimer);
     requestAnimationFrame(async () => {
@@ -581,7 +581,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       if (layout.movedIds.length > 0) {
         await this.updateAllConnectors();
       }
-      await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
+      // Blocks the AI chat moved leave the viewport alone: it is the user's, and
+      // nothing asked for it to change. Only a whole-flow layout fits the view.
+      if (layout.fitView !== false) {
+        await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
+      }
       this.layoutConnectorsTimer = setTimeout(() => {
         if (layout.faqKbId === this.id_faq_kb) { this.updateAllConnectors(); }
       }, 400);

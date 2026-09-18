@@ -4097,7 +4097,9 @@ describe('FlowOpsService — connector check after the AI chat stops editing', (
   }));
 });
 
-describe('FlowOpsService — the flow is laid out again once the chat stops changing its structure', () => {
+// Switched off together with the call to layoutFlow in `scheduleConnectorCheck`: these
+// describe the automatic layout, which no longer runs. Drop the `x` when it comes back.
+xdescribe('FlowOpsService — the flow is laid out again once the chat stops changing its structure', () => {
   let service: FlowOpsService;
   let intentService: any;
   let connectorService: any;
@@ -4218,5 +4220,95 @@ describe('FlowOpsService — the flow is laid out again once the chat stops chan
     tick(5000);
     expect(intentService.updateIntentPositions).not.toHaveBeenCalled();
     expect(laidOut).toEqual([{ faqKbId: 'kb1', movedIds: [] }]);
+  }));
+});
+
+describe('FlowOpsService — the connectors follow a block the agent moves', () => {
+  // `move` is the one operation that reaches applyOne without `blocksToRedraw`, so
+  // nothing in the batch redrew the block it moved. Redrawing it there would not work
+  // anyway: the card is placed by the canvas template, so it only leaves its old spot
+  // once Angular has run change detection. The canvas is told instead, once the chat
+  // has paused, and it is the canvas that redraws -- the same path the whole-flow
+  // layout used to take, minus the fit of the view.
+  let service: FlowOpsService;
+  let intentService: any;
+  let connectorService: any;
+  let laidOut: Array<{ faqKbId: string, movedIds: string[], fitView?: boolean }>;
+
+  beforeEach(() => {
+    const source = anIntent('src', 'asks');
+    source.attributes = { position: { x: 0, y: 0 }, nextBlockAction: { intentName: '#moved' } } as any;
+    const moved = anIntent('moved', 'answers');
+    moved.attributes = { position: { x: 500, y: 500 } } as any;
+    intentService = {
+      listOfIntents: [source, moved],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+    connectorService.ensureConnectorsDrawn = jasmine.createSpy('ensureConnectorsDrawn')
+      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0 }));
+    connectorService.missingConnectorIds = jasmine.createSpy('missingConnectorIds').and.returnValue([]);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1' } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+    laidOut = [];
+    service.layoutApplied$.subscribe(layout => laidOut.push(layout));
+  });
+
+  const moveIt = () => [{ op: 'move', intent_id: 'moved', position: { x: 900, y: 40 } } as any];
+
+  it('asks the canvas to redraw the moved block once the chat has paused, leaving the view alone', fakeAsync(() => {
+    service.apply(moveIt());
+    flushMicrotasks();
+    expect(intentService.getIntentFromId('moved').attributes.position).toEqual({ x: 900, y: 40 });
+    tick(999);
+    expect(laidOut).toEqual([]);
+    tick(1);
+    expect(laidOut).toEqual([{ faqKbId: 'kb1', movedIds: ['moved'], fitView: false }]);
+    tick(5000);
+    expect(laidOut.length).toBe(1);
+  }));
+
+  it('gathers the blocks of every batch and announces them once, after the last one', fakeAsync(() => {
+    service.apply(moveIt());
+    flushMicrotasks();
+    tick(800);
+    service.apply([{ op: 'move', intent_id: 'src', position: { x: 10, y: 10 } } as any]);
+    flushMicrotasks();
+    tick(800);
+    expect(laidOut).toEqual([]);
+    tick(200);
+    expect(laidOut).toEqual([{ faqKbId: 'kb1', movedIds: ['moved', 'src'], fitView: false }]);
+    tick(5000);
+  }));
+
+  it('says nothing when the move was refused', fakeAsync(() => {
+    const report = service.apply([{ op: 'move', intent_id: 'nowhere', position: { x: 1, y: 2 } } as any]);
+    flushMicrotasks();
+    tick(5000);
+    expect(laidOut).toEqual([]);
+    report.then(r => expect(r.ok).toBe(false));
+  }));
+
+  it('says nothing when the batch moved no block', fakeAsync(() => {
+    service.apply([{ op: 'update_intent', intent_id: 'moved', intent_display_name: 'hello' } as any]);
+    flushMicrotasks();
+    tick(5000);
+    expect(laidOut).toEqual([]);
   }));
 });
