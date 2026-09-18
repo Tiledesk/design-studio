@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 18/09/2026
+
+- **fixed**: quando la chat AI sposta i blocchi sulla canvas, i collegamenti li seguono. Prima restavano disegnati dov'erano i blocchi prima e si sistemavano solo ricaricando la pagina
+- **changed**: la chat AI non riordina piu' il flusso quando ha finito di lavorare. I blocchi restano dove sono stati creati e dove sono stati trascinati a mano, e la vista resta dove l'hai lasciata. L'unico spostamento automatico che resta e' l'allineamento in colonna dei rami che partono da un blocco appena biforcato
+
 # this branch 17/09/2026
 
 - **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso

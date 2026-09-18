@@ -135,7 +135,14 @@ export class FlowOpsService implements OnDestroy {
 
   /** Emitted after the automatic layout of a flow, with the blocks it moved (possibly
    *  none): the canvas redraws their connectors and fits the view to the whole flow. */
-  public readonly layoutApplied$ = new Subject<{ faqKbId: string, movedIds: string[] }>();
+  /** Blocks the canvas has to redraw the connectors of, and whether it should also fit
+   *  the view to the flow. `fitView` is false when nothing but the agent moved the
+   *  blocks: the view belongs to the user then, only the edges are out of date. */
+  public readonly layoutApplied$ = new Subject<{ faqKbId: string, movedIds: string[], fitView?: boolean }>();
+
+  /** Blocks moved by the agent's own `move` operations since the last redraw, waiting
+   *  for the chat to pause -- and for Angular to have actually placed their cards. */
+  private movedByChat = new Set<string>();
 
   /** Where this service put each block it positioned itself, keyed by
    *  intent_id -- the blocks it is allowed to move again later.
@@ -259,6 +266,13 @@ export class FlowOpsService implements OnDestroy {
     this.lastBatchFaqKbId = this.lastBatchUndoDepth > 0
       ? this.dashboardService.id_faq_kb : null;
     this.redrawBlocks(blocksToRedraw);
+    // A block the agent moved cannot be redrawn here: `move` only writes
+    // `attributes.position`, and the card is placed by the canvas template
+    // ([style.left.px]), so it does not leave its old spot until Angular has
+    // run change detection. Measuring it now reads the position it is moving
+    // away from. It is noted instead, and redrawn once the chat has paused.
+    results.filter(r => r.op === 'move' && r.ok && r.intent_id)
+      .forEach(r => this.movedByChat.add(r.intent_id));
     // Not awaited: the agent gets its answer now. New blocks are highlighted,
     // centred and connected by the canvas as soon as they render
     // (CdsCanvasComponent.onNewIntentRendered); what is left here is the blocks
@@ -1962,11 +1976,14 @@ export class FlowOpsService implements OnDestroy {
     this.connectorCheckTimers = CONNECTOR_CHECK_DELAYS_MS.map((delay, pass) => setTimeout(async () => {
       if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
       try {
-        if (pass === 0 && this.layoutFlow(faqKbId)) {
-          // Let Angular move the blocks before measuring anything on the stage.
-          await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
-          if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
-        }
+        // The automatic layout is switched off: the blocks stay where the chat put them and
+        // where the user dragged them, and the view is left alone. Uncomment to bring it back.
+        // if (pass === 0 && this.layoutFlow(faqKbId)) {
+        //   // Let Angular move the blocks before measuring anything on the stage.
+        //   await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
+        //   if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+        // }
+        if (pass === 0) { this.announceBlocksMovedByChat(faqKbId); }
         await this.connectorService.ensureConnectorsDrawn?.(this.intentService.listOfIntents || []);
       } catch (error) {
         // Best-effort: the flow is saved either way.
@@ -1984,6 +2001,19 @@ export class FlowOpsService implements OnDestroy {
         // Diagnostics only.
       }
     }, lastDelay + CONNECTOR_CHECK_REPORT_DELAY_MS));
+  }
+
+  /** Hands the canvas the blocks the agent moved, once the chat has paused.
+   *
+   *  The redraw belongs there and not here: the canvas owns the change detection that
+   *  puts the cards at their new coordinates in the first place, and its handler already
+   *  redraws every edge and then goes over them again once the stage has settled. The
+   *  view is not touched -- the blocks moved, the user's viewport did not. */
+  private announceBlocksMovedByChat(faqKbId: string): void {
+    if (this.movedByChat.size === 0) { return; }
+    const movedIds = Array.from(this.movedByChat);
+    this.movedByChat.clear();
+    this.layoutApplied$.next({ faqKbId, movedIds, fitView: false });
   }
 
   /** Lays the whole flow out again, if the chat changed its structure since the last time.
