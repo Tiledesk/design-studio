@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+#  this branch 21 set
+- **changed**: AI actions on Gemini Agent Platform models pass the server to the backend under its new field name; agents saved before the change keep working and realign themselves the first time the model is changed
 
 # 1.40.14
 - **added**: the management of MCP servers and tools has been extracted from the AI Prompt action into a reusable section, so the other LLM actions can adopt it as it is
