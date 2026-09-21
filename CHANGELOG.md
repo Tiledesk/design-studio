@@ -7,6 +7,17 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+
+# this branch 21/09/2026
+
+- **changed**: le tendine di scelta si chiudono da sole appena si scorre la pagina o un pannello: prima restavano aperte, staccate dal campo a cui appartengono. Scorrendo dentro l'elenco delle opzioni la tendina resta aperta
+- **changed**: nell'intestazione delle impostazioni AI l'anteprima si vede sempre per intero, aperta o chiusa, e il system context sta in fondo su una riga sola che finisce con i puntini, senza l'etichetta davanti. Il titolo non viene piu' coperto quando le opzioni sono tante
+- **changed**: negli agenti V3 il blocco del fallback vuoto e' piu' stretto e il suo titolo e' centrato nella pastiglia, e l'icona del blocco di avvio e' bianca con il contorno verde
+- **changed**: negli agenti V3 il punto di uscita dei blocchi prende la grafica del ramo "vero" delle condizioni: pallino grande e verde, sia quando e' libero sia quando e' collegato, al posto di quello piccolo e bianco
+- **changed**: negli agenti V3 il blocco del fallback, finche' resta vuoto come nasce, si presenta come il blocco di avvio: forma a pastiglia invece della scheda degli altri blocchi, e il suo punto di uscita resta grigio, dentro al blocco sul lato destro. Se al fallback viene aggiunta un'action torna un blocco come gli altri, punto di uscita verde compreso
+- **changed**: negli agenti V3 il blocco di avvio e' piu' compatto: sotto il titolo non resta piu' lo spazio che negli altri blocchi separa il titolo dall'action
+
+
 # this branch 18/09/2026
 
 - **changed**: quando la chat AI finisce di lavorare il flusso viene riordinato da sinistra a destra, un passo per colonna e i rami uno sotto l'altro senza sovrapposizioni, e la vista si adatta all'intero flusso. I collegamenti seguono i blocchi, compresi quelli che la chat ha spostato lei stessa. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla

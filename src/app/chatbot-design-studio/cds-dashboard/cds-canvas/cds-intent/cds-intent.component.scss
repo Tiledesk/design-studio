@@ -847,11 +847,43 @@ cds-panel-intent-header.isStart ::ng-deep{
 /** V3 INTENT - blocco a una sola action, senza controlli inline **/
 .tds-v3-intent {
   padding: 2px;
+  /* La defaultFallback vuota e' una pastiglia, come lo start e come il ritorno
+     all'agente padre: non ha contenuto sotto il titolo, quindi non ha la forma
+     di una scheda. Il padding in cima la centra dentro la pastiglia. */
+  &.cds-fallback-locked {
+    padding: 0px;
+    border-radius: 22px;
+    width: 200px;
+    /* Il fondo bianco del blocco e' uno span a tutta area con gli angoli vivi,
+       e l'ombra e' uno pseudo-elemento arrotondato a 10px: senza questi due,
+       la pastiglia mostra quattro angoli quadrati che le spuntano da sotto.
+       E' lo stesso inciampo annotato su .isReturnStack, che la' si risolve
+       nascondendo l'overlay -- qui il fondo bianco serve, quindi si arrotonda. */
+    .intent-background-overlay {
+      border-radius: 22px;
+    }
+    &::before {
+      border-radius: 22px;
+    }
+    .pic-title-text {
+      padding: 9px;
+      /* Il padding in cima del titolo non si puo' dettare da qui: quel div e'
+         contenuto di cds-panel-intent-header, che lo stile di questo componente
+         non raggiunge. Sta in panel-intent-header.component.scss. */
+    }
+    
+  }
   .pic-header {
     padding: 0px;
   }
   .pic-title-text {
     padding: 4px 8px 10px;
+  }
+  /* Lo start e' una pastiglia col solo titolo dentro: i 10px di coda qui sopra
+     servono a staccare il titolo dall'action che lo segue, e dove non c'e'
+     nessuna action sbilanciano il blocco verso il basso. */
+  .pic-title-text.isStart {
+    padding: 4px 8px 4px;
   }
   /* In V3 il footer resta nel DOM ma non contiene nulla di cliccabile:
      niente altezza residua, niente margine negativo, niente cursore da bottone. */
