@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.40.15-rc7
 
 - **changed**: dropdowns close by themselves as soon as the page or a panel is scrolled: before they stayed open, detached from the field they belong to. Scrolling inside the options list keeps the dropdown open
 - **changed**: in the AI settings header the preview is always shown in full, open or closed, and the system context sits on the last line, on a single line ending with an ellipsis and with no label in front. The title is no longer pushed out of view when there are many options
