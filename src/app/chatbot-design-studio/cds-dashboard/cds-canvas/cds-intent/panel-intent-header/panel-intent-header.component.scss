@@ -2,6 +2,16 @@
   --width-title: 80%;
 }
 
+/* V3 - nella defaultFallback vuota il titolo e' tutto il contenuto del blocco,
+   che e' una pastiglia bassa: i 6px in cima lo spingono in basso e lo scentrano.
+   Scritta qui e con :host-context perche' la condizione sta sul blocco che ci
+   contiene, mentre questo div e' contenuto di questo componente -- una regola
+   scritta in cds-intent.component.scss non lo raggiunge, la view encapsulation
+   la limita agli elementi di quel template. */
+:host-context(.tds-v3-intent.cds-fallback-locked) .header {
+    padding-top: 2px;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -325,7 +335,9 @@ $circle-size: 40px;
   top: 0;
 
   span.rocket {
-    color: var(--color-green-hex);
+    /* Bianco pieno con il profilo verde: il razzo sta su una pastiglia scura,
+       dove il verde pieno si chiude e perde la forma. */
+    color: #ffffff;
   }
 
   span.undo,
