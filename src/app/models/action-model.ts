@@ -470,6 +470,9 @@ export class ActionAskGPTV2 extends Action {
     /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
     /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    llmServer?: string;
+    /** @deprecated Nome precedente di `llmServer`. Le action salvate prima del
+     *  rename lo portano ancora: si legge, non si scrive piu'. */
     agentPlatformServer?: string;
     assignReplyTo: string;
     assignSourceTo: string;
@@ -553,6 +556,9 @@ export class ActionAiPrompt extends Action {
     /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
     /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    llmServer?: string;
+    /** @deprecated Nome precedente di `llmServer`. Le action salvate prima del
+     *  rename lo portano ancora: si legge, non si scrive piu'. */
     agentPlatformServer?: string;
     preview?: Array<any>;
     trueIntent: string;
@@ -575,6 +581,9 @@ export class ActionAiCondition extends Action {
     /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
     /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    llmServer?: string;
+    /** @deprecated Nome precedente di `llmServer`. Le action salvate prima del
+     *  rename lo portano ancora: si legge, non si scrive piu'. */
     agentPlatformServer?: string;
     max_tokens: number;
     temperature: number;

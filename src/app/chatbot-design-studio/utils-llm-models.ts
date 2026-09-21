@@ -332,6 +332,10 @@ export function setModel(
 export interface ActionWithServer {
   llm?: string;
   vllmServer?: string;
+  llmServer?: string;
+  /** @deprecated Nome precedente di `llmServer`, ancora presente sulle action
+   *  salvate prima del rename: si legge per non perderne il server, e viene
+   *  rimosso al primo salvataggio che passa di qui. */
   agentPlatformServer?: string;
 }
 
@@ -342,6 +346,9 @@ export interface ActionWithServer {
  */
 export function applySelectedServerToAction(action: ActionWithServer, model: LlmModel | undefined): void {
   delete action.vllmServer;
+  delete action.llmServer;
+  // Anche il nome vecchio, o su un'action salvata prima del rename resterebbe
+  // accanto a quello nuovo e il backend leggerebbe due server diversi.
   delete action.agentPlatformServer;
   if (!model?.server) {
     return;
@@ -349,7 +356,7 @@ export function applySelectedServerToAction(action: ActionWithServer, model: Llm
   if (model.llm === 'vllm') {
     action.vllmServer = model.server;
   } else if (model.llm === 'agentplatform') {
-    action.agentPlatformServer = model.server;
+    action.llmServer = model.server;
   }
 }
 
@@ -360,8 +367,14 @@ export function applySelectedServerToAction(action: ActionWithServer, model: Llm
 export function appendSelectedServerToPayload(action: ActionWithServer, data: any): void {
   if (action?.llm === 'vllm' && action.vllmServer) {
     data.vllmServer = action.vllmServer;
-  } else if (action?.llm === 'agentplatform' && action.agentPlatformServer) {
-    data.agentPlatformServer = action.agentPlatformServer;
+  } else if (action?.llm === 'agentplatform') {
+    // `agentPlatformServer` e' il nome che l'action portava prima del rename:
+    // un agente salvato allora deve continuare a funzionare senza essere
+    // riaperto e risalvato.
+    const server = action.llmServer ?? action.agentPlatformServer;
+    if (server) {
+      data.llmServer = server;
+    }
   }
 }
 

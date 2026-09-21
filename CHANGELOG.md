@@ -8,32 +8,22 @@
 *Tiledesk SRL*
 
 
-# this branch 21/09/2026
+# this branch
 
-- **changed**: le tendine di scelta si chiudono da sole appena si scorre la pagina o un pannello: prima restavano aperte, staccate dal campo a cui appartengono. Scorrendo dentro l'elenco delle opzioni la tendina resta aperta
-- **changed**: nell'intestazione delle impostazioni AI l'anteprima si vede sempre per intero, aperta o chiusa, e il system context sta in fondo su una riga sola che finisce con i puntini, senza l'etichetta davanti. Il titolo non viene piu' coperto quando le opzioni sono tante
-- **changed**: negli agenti V3 il blocco del fallback vuoto e' piu' stretto e il suo titolo e' centrato nella pastiglia, e l'icona del blocco di avvio e' bianca con il contorno verde
-- **changed**: negli agenti V3 il punto di uscita dei blocchi prende la grafica del ramo "vero" delle condizioni: pallino grande e verde, sia quando e' libero sia quando e' collegato, al posto di quello piccolo e bianco
-- **changed**: negli agenti V3 il blocco del fallback, finche' resta vuoto come nasce, si presenta come il blocco di avvio: forma a pastiglia invece della scheda degli altri blocchi, e il suo punto di uscita resta grigio, dentro al blocco sul lato destro. Se al fallback viene aggiunta un'action torna un blocco come gli altri, punto di uscita verde compreso
-- **changed**: negli agenti V3 il blocco di avvio e' piu' compatto: sotto il titolo non resta piu' lo spazio che negli altri blocchi separa il titolo dall'action
+- **changed**: dropdowns close by themselves as soon as the page or a panel is scrolled: before they stayed open, detached from the field they belong to. Scrolling inside the options list keeps the dropdown open
+- **changed**: in the AI settings header the preview is always shown in full, open or closed, and the system context sits on the last line, on a single line ending with an ellipsis and with no label in front. The title is no longer pushed out of view when there are many options
+- **changed**: on V3 agents the empty fallback block is narrower and its title is centred in the pill, and the start block's icon is white with a green outline
+- **changed**: on V3 agents a block's outgoing point takes the look of a condition's "true" branch: a large green dot, both when it is free and when it is connected, instead of the small white one
+- **changed**: on V3 agents the fallback block, as long as it stays empty as it is created, looks like the start block: a pill instead of the card the other blocks have, and its outgoing point stays grey, inside the block on the right-hand side. If an action is added to the fallback it goes back to being a block like the others, green outgoing point included
+- **changed**: on V3 agents the start block is more compact: below the title there is no longer the gap that on the other blocks separates the title from the action
 
 
-# this branch 18/09/2026
+# 1.40.15-rc6
+- **Change**: AI actions on Gemini Agent Platform models now transmit the server to the backend using the new field name instead of `agentPlatformServer`; agents saved prior to the change continue to function and realign upon the first model modification.
 
-- **changed**: quando la chat AI finisce di lavorare il flusso viene riordinato da sinistra a destra, un passo per colonna e i rami uno sotto l'altro senza sovrapposizioni, e la vista si adatta all'intero flusso. I collegamenti seguono i blocchi, compresi quelli che la chat ha spostato lei stessa. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
-- **fixed**: quando la chat AI sposta i blocchi sulla canvas, i collegamenti li seguono. Prima restavano disegnati dov'erano i blocchi prima e si sistemavano solo ricaricando la pagina
-
-# this branch 17/09/2026
-
-- **fixed**: all'apertura di un agente la chat AI, ora aperta di default, restava bianca e non si avviava; ora si carica subito
-- **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso
-- **changed**: quando la chat AI finisce di aggiungere, eliminare o ricollegare blocchi, tutto il flusso viene riordinato da sinistra a destra: un passo per colonna, i rami uno sotto l'altro senza sovrapposizioni, il fallback e i blocchi scollegati in fondo. I collegamenti seguono i blocchi e la vista si adatta all'intero flusso. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
-- **fixed**: quando la chat AI finisce di modificare il flusso, il Design Studio controlla che tutti i collegamenti previsti siano disegnati sullo stage e completa quelli mancanti. Prima alcuni collegamenti comparivano solo ricaricando la pagina
-- **changed**: sugli agenti V3 la chat AI riceve le regole dell'editor V3 e le sue modifiche vengono controllate: una sola action per blocco, domanda e risposta in due blocchi, risposta dell'utente che prosegue dal collegamento del blocco, fallback senza action, avvio e fallback non eliminabili ne' collegabili come destinazione, nessun collegamento dopo un blocco che chiude la conversazione, chiusura della conversazione solo dietro un pulsante. Una modifica che viola una regola viene rifiutata per intero indicando la regola, e la chat la corregge. Sugli agenti precedenti la chat funziona come prima
-- **changed**: i sub agent creati da un agente V3, dal pannello o dalla chat AI, nascono V3
-- **changed**: ogni volta che un nuovo blocco compare sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) viene evidenziato e lo stage si centra su di lui, con la stessa animazione della simulazione con il widget. Se ne arrivano piu' insieme, lo stage si centra sull'ultimo
-- **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
-- **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
+# 1.40.15-rc5
+- **changed**: when the AI chat finishes working, the flow is laid out again left to right, one step per column and branches stacked without overlaps, and the view fits the whole flow. Connectors follow the blocks, including the ones the chat moved itself. One undo step reverts the layout together with the chat's last change; text-only edits move nothing
+- **added**: while the AI chat is working it says so: a progress bar under its header, the "Working" state lit, and a line at the foot of the conversation naming what it is doing and for how long. All of it goes quiet as soon as the chat is done
 
 # 1.40.15-rc4
 - **fixed**: when the AI chat moves blocks on the canvas, the connectors follow them straight away; before, they only settled after a page reload
