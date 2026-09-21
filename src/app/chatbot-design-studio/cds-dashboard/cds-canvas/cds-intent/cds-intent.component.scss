@@ -766,6 +766,7 @@ cds-panel-intent-header.isStart ::ng-deep{
   &.cds-fallback-locked {
     padding: 0px;
     border-radius: 22px;
+    width: 200px;
     /* Il fondo bianco del blocco e' uno span a tutta area con gli angoli vivi,
        e l'ombra e' uno pseudo-elemento arrotondato a 10px: senza questi due,
        la pastiglia mostra quattro angoli quadrati che le spuntano da sotto.
@@ -779,9 +780,9 @@ cds-panel-intent-header.isStart ::ng-deep{
     }
     .pic-title-text {
       padding: 9px;
-      .header {
-        padding-top: 2px;
-      }
+      /* Il padding in cima del titolo non si puo' dettare da qui: quel div e'
+         contenuto di cds-panel-intent-header, che lo stile di questo componente
+         non raggiunge. Sta in panel-intent-header.component.scss. */
     }
     
   }

@@ -240,6 +240,7 @@
                         <div class="title-and-parameters-container">
                             <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                             <div class="parameters-preview">
+                                <div class="preview-badges">
                                 <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
                                     <span class="preview-badge-text">{{ action?.modelName || llm_model_selected?.modelName }}</span>
                                 </span>
@@ -257,7 +258,6 @@
                                     <span class="preview-badge-text">{{action.top_k | formatNumber}}</span>
                                 </span>
 
-                                <span *ngIf="action?.context">system context: {{action.context}}</span>
                                 <span *ngIf="KB_HYBRID && action?.alpha !== undefined" class="preview-badge">
                                     <mat-icon class="preview-icon" aria-label="search type" title="search type">manage_search</mat-icon>
                                     <span class="preview-badge-text">{{action.alpha | formatNumber}}</span>
@@ -287,6 +287,8 @@
                                 <span *ngIf="action?.use_cache" class="preview-flag">
                                     <span class="label">{{"CDSCanvas.UseCache" | translate}}</span>
                                 </span>
+                                </div>
+                                <span *ngIf="action?.context" class="preview-context">{{action.context}}</span>
                             </div>
                             
                         </div>
