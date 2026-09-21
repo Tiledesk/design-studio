@@ -8,8 +8,8 @@
 *Tiledesk SRL*
 
 
-#  this branch 21 set
-- **changed**: AI actions on Gemini Agent Platform models pass the server to the backend under its new field name; agents saved before the change keep working and realign themselves the first time the model is changed
+# 1.40.15-rc6
+- **Change**: AI actions on Gemini Agent Platform models now transmit the server to the backend using the new field name instead of `agentPlatformServer`; agents saved prior to the change continue to function and realign upon the first model modification.
 
 # 1.40.15-rc5
 - **changed**: when the AI chat finishes working, the flow is laid out again left to right, one step per column and branches stacked without overlaps, and the view fits the whole flow. Connectors follow the blocks, including the ones the chat moved itself. One undo step reverts the layout together with the chat's last change; text-only edits move nothing
