@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 import { TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
 import { ControllerService } from '../../../../services/controller.service';
@@ -8,6 +8,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+import { ConnectorGroup, ConnectorSubgroup } from '../../../../connector/connector-catalog.service';
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -17,19 +18,27 @@ import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 })
 export class CdsPanelActionsComponent implements OnInit {
   @ViewChild('action_list_drop_connect') actionListDropConnect: CdkDropList;
+  @ViewChild('panel_actions_div') panelDiv: ElementRef;
 
   @Input() actionsList: Array<any>;
   @Input() menuType: string;
   @Input() menuCategory: string;
   @Input() pos: any;
+  @Input() connectorGroups: ConnectorGroup[] = [];
   @Output() isDraggingMenuElement = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
-  
+
   menuItemsList: any;
+  groupRows: Array<{ group: ConnectorGroup; items: any[] }> = [];
+  activeGroup: ConnectorGroup | null = null;
+  activeItems: any[] = [];
+  activeSubgroups: Array<{ id: string; name: string; icon: string; items: any[] }> = [];
+  activeGroupPos: any = { x: 200, y: 0 };
+  isOverNested = false;
   isDragging: any = false;
   indexDrag: number;
 
@@ -119,6 +128,18 @@ export class CdsPanelActionsComponent implements OnInit {
       this.pos = {'x': 0, 'y':0};
     }
 
+    this.groupRows = (this.connectorGroups || []).map(group => ({
+      group,
+      items: (group.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true }))
+    }));
+
+    if (this.menuType !== TYPE_OF_MENU.ACTION) {
+      this.activeGroup = null;
+      this.activeItems = [];
+      this.activeSubgroups = [];
+      this.isOverNested = false;
+    }
+
   }
 
 
@@ -163,6 +184,43 @@ export class CdsPanelActionsComponent implements OnInit {
     setTimeout(() => {this.isOpen = false;},0)
     this.hoveredElement = null;
   }
+
+  onChildDragging(isDragging: boolean) {
+    this.isDragging = isDragging;
+    if (isDragging) { this.isOpen = false; }
+    this.isDraggingMenuElement.emit(isDragging);
+  }
+
+  openGroup(rowEl: HTMLElement, row: { group: ConnectorGroup; items: any[] }) {
+    this.activeGroup = row.group;
+    this.activeItems = row.items;
+    this.activeSubgroups = (row.group.subgroups || []).map(sg => ({
+      id: sg.id,
+      name: sg.name,
+      icon: sg.icon,
+      items: (sg.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true })),
+    }));
+    // A connector can expose many actions, so the nested flyout's (max-height-capped,
+    // scrollable) box can be tall. Anchor it to the hovered row, but shift it up if it would
+    // run past the bottom of the viewport — otherwise the scrollable box opens off-screen and
+    // feels unscrollable. Must match the .action-list max-height: min(70vh, 560px).
+    const margin = 8;
+    const maxFlyoutH = Math.min(window.innerHeight * 0.7, 560);
+    const panelTop = this.panelDiv ? this.panelDiv.nativeElement.getBoundingClientRect().top : 0;
+    let screenTop = rowEl.getBoundingClientRect().top;
+    if (screenTop + maxFlyoutH > window.innerHeight - margin) {
+      screenTop = Math.max(margin, window.innerHeight - margin - maxFlyoutH);
+    }
+    this.activeGroupPos = { x: 200, y: Math.max(0, Math.round(screenTop - panelTop)) };
+  }
+
+  closeGroup() {
+    setTimeout(() => { if (!this.isOverNested) { this.activeGroup = null; } }, 0);
+  }
+
+  onOverNested() { this.isOverNested = true; }
+
+  onLeaveNested() { this.isOverNested = false; this.closeGroup(); }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);

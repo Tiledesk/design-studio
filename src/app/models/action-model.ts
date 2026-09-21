@@ -191,6 +191,8 @@ export class ActionWebRequestV2 extends Action {
     jsonBody: string;
     formData: Array<FormData>;
     bodyType: string;
+    /** Raw body sub-type when bodyType === 'raw'. Optional/additive: absent on actions created before this feature. */
+    rawType?: 'text' | 'javascript' | 'json' | 'html' | 'xml';
     assignResultTo: string;
     assignStatusTo: string;
     assignErrorTo: string;
@@ -270,6 +272,24 @@ export class ActionReplaceBotV3 extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.REPLACE_BOTV3;
+    }
+}
+
+export class ActionReplaceBotV4 extends Action {
+    botId: string;
+    botSlug: string;
+    useSlug: boolean;
+    blockName: string;
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.REPLACE_BOTV4;
+    }
+}
+
+export class ActionReturnStack extends Action {
+    constructor(){
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN_STACK;
     }
 }
 
@@ -388,6 +408,7 @@ export class ActionSendWhatsapp extends Action {
 }
 
 export class ActionAgent extends Action{
+    depName?: string;
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AGENT;
@@ -516,11 +537,16 @@ export class ActionGPTAssistant extends Action {
     }
 }
 
+/** Livello di reasoning: low | medium | high */
+export type ReasoningLevel = 'low' | 'medium' | 'high';
+
 export class ActionAiPrompt extends Action {
     question: string;
     assignReplyTo: string;
     context: string;
     history: boolean;
+    reasoning?: boolean;
+    reasoningLevel?: ReasoningLevel;
     max_tokens: number;
     temperature: number;
     labelModel: string;
@@ -981,6 +1007,43 @@ export class ActionMoveToUnassigned extends Action {
     constructor(){
         super();
         this._tdActionType = TYPE_ACTION.MOVE_TO_UNASSIGNED;
+    }
+}
+
+export class ActionReturn extends Action {
+    payload: string;
+    status: string | number;
+    bodyType: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.RETURN;
+        this.payload = JSON.stringify({});
+        this.bodyType = 'json';
+        this.status = '200';
+    }
+}
+
+export class ActionSubAgent extends Action {
+    subagent_id: string;
+    intentName: string;
+    mode: 'fire_and_continue' | 'wait_result';
+    input: { [key: string]: string };
+    awaitWebhookPublish: boolean;
+    assignRunIdTo: string;
+    assignSubRequestIdTo: string;
+    assignStatusTo: string;
+    assignErrorTo: string;
+    assignResultTo: string;
+    trueIntent: string;
+    falseIntent: string;
+    timeoutMs: number;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.INVOKE_SUB_AGENT;
+        this.mode = 'fire_and_continue';
+        this.input = {};
+        this.awaitWebhookPublish = false;
+        this.assignResultTo = 'subagent_result';
     }
 }
 

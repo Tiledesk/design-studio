@@ -20,7 +20,17 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
+                <cds-action-connector *ngIf="elementSelected._tdConnectorRef"
+                    class="panel-response"
+                    [intentSelected]="intentSelected"
+                    [action]="elementSelected"
+                    [previewMode]="false"
+                    (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                    (updateAndSaveAction)="onSaveIntent($event)">
+                </cds-action-connector>
+
+                <div [ngSwitch]="elementSelected._tdActionType"
+                     *ngIf="!elementSelected._tdConnectorRef && canShowActionByPlan.enabled">
 
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY"
                         class="panel-response"
@@ -102,7 +112,8 @@
                     <cds-action-agent *ngSwitchCase="TYPE_ACTION.AGENT"
                         class="panel-response"    
                         [action]="elementSelected"
-                        [previewMode]="false">
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-agent>
 
                     <cds-action-wait *ngSwitchCase="TYPE_ACTION.WAIT"
@@ -163,6 +174,19 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-replace-bot-v3>
+
+                    <cds-action-replace-bot-v4 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV4" 
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-replace-bot-v4>
+
+                    <cds-action-return-stack *ngSwitchCase="TYPE_ACTION.RETURN_STACK" 
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-return-stack>
 
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE"
                         class="panel-response"
@@ -485,6 +509,23 @@
                         [previewMode]="false"
                         (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-flow-log>
+
+                    <cds-action-sub-agent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-sub-agent>
+
+                    <cds-action-return *ngSwitchCase="TYPE_ACTION.RETURN"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
+                    </cds-action-return>
 
                     <!-- <cds-action-assign-function *ngSwitchCase="TYPE_ACTION.ASSIGN_FUNCTION"
                         [action]="elementSelected">

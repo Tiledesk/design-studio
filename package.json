@@ -1,7 +1,7 @@
 {
   "name": "@tiledesk/cds",
   "author": "Tiledesk SRL",
-  "version": "1.40.14",
+  "version": "1.40.15-rc5",
   "license": "MIT",
   "homepage": "https://www.tiledesk.com",
   "repository": {
@@ -13,7 +13,8 @@
     "start": "ng serve",
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:agent-chat": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-agent-chat.ts --ts-config=tsconfig.spec.agent-chat.json"
   },
   "private": false,
   "dependencies": {

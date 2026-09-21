@@ -212,17 +212,14 @@
             </mat-expansion-panel-header>
             <div>
 
-                <!-- // model select                          [bindLabelSelect]="'name'" 
-                        [bindValueSelect]="'value'" [optionalBindDescription]="'description'"-->
+                <!-- // model select  -->
                 <div class="field-box">
                     <cds-select id="model-condition"
                         [items]="model_list" 
                         [itemSelected]="action.model"
-
                         [bindLabelSelect]="'name'" 
                         [bindValueSelect]="'value'"
                         [optionalBindAdditionalText]="'multiplier'"
-                        
                         (onSelected)="onChangeSelect($event, 'model')">
                     </cds-select>
                 </div>
@@ -264,7 +261,8 @@
                                     class="wait-slider" thumbLabel
                                     [step]="ai_setting['temperature'].step"  
                                     [min]="ai_setting['temperature'].min"
-                                    [max]="ai_setting['temperature'].max" 
+                                    [max]="ai_setting['temperature'].max"
+                                    [disabled]="ai_setting['temperature'].disabled"
                                     [(ngModel)]="action.temperature"
                                     (change)="updateSliderValue($event.value, 'temperature')" aria-label="units">
                                 </mat-slider>
@@ -282,6 +280,7 @@
                     <label class="title-label">{{'CDSCanvas.SystemContext' | translate }}</label>
                     <cds-textarea id="context"
                         [emojiPikerBtn]="false" 
+                        [isLiquidjs]="false"
                         [limitCharsText]="100000"
                         [minRow]="1" [maxRow]="5" 
                         [text]="action.context" 
