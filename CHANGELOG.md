@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 21/09/2026
+
+- **changed**: negli agenti V3 il punto di uscita dei blocchi prende la grafica del ramo "vero" delle condizioni: pallino grande e verde, sia quando e' libero sia quando e' collegato, al posto di quello piccolo e bianco
+- **changed**: negli agenti V3 il blocco del fallback, finche' resta vuoto come nasce, si presenta come il blocco di avvio: forma a pastiglia invece della scheda degli altri blocchi, e il suo punto di uscita resta grigio, dentro al blocco sul lato destro. Se al fallback viene aggiunta un'action torna un blocco come gli altri, punto di uscita verde compreso
+- **changed**: negli agenti V3 il blocco di avvio e' piu' compatto: sotto il titolo non resta piu' lo spazio che negli altri blocchi separa il titolo dall'action
+
 # this branch 16/09/2026
 
 - **changed**: negli agenti creati con l'AI la chiusura della conversazione non compare piu' dentro il flusso: c'e' soltanto se l'utente la sceglie premendo un pulsante, ad esempio "non ho altre domande, chiudi la chat", e dopo quella scelta non segue nient'altro
