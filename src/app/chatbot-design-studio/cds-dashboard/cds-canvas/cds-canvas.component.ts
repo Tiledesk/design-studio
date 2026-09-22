@@ -124,7 +124,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   private renderedIntentIds = new Set<string>();
   private newIntentIds: string[] = [];
   private newIntentTimer: any = null;
-  private newIntentConnectorsTimer: any = null;
   private layoutConnectorsTimer: any = null;
 
   // ============================================================
@@ -248,7 +247,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.unsubscribe();
     this.connectorService.clearRetryQueue();
     clearTimeout(this.newIntentTimer);
-    clearTimeout(this.newIntentConnectorsTimer);
     clearTimeout(this.layoutConnectorsTimer);
 
     if (this.saveNoteDetailTimer) {
@@ -529,10 +527,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   /** A block added after the stage was built has just been rendered.
    *
    *  Collected for a moment, because the AI chat adds several blocks at once. Then every
-   *  new block is highlighted and the stage is centred on the LAST one -- the same class
-   *  and the same centring the widget simulation uses (cds-intent, liveActiveIntent) --
-   *  and, once the stage has stopped moving, every connector from and to each new block
-   *  is redrawn: they were first attempted before the block's element existed. */
+   *  connector from and to each new block is redrawn: they were first attempted before
+   *  the block's element existed. The stage is left where the user put it. */
   private onNewIntentRendered(intentID: string) {
     this.renderedIntentIds.add(intentID);
     this.newIntentIds.push(intentID);
@@ -545,25 +541,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.newIntentIds = [];
     if (ids.length === 0) { return; }
 
-    ids.forEach(id => this.highlightNewIntent(id));
-    const lastElement = document.getElementById(ids[ids.length - 1]);
-    if (lastElement) {
-      this.stageService.centerStageOnTopPosition(this.id_faq_kb, lastElement, null);
-    }
-
-    // The stage animates for 0.3s: connectors measured meanwhile would be misplaced.
-    clearTimeout(this.newIntentConnectorsTimer);
-    this.newIntentConnectorsTimer = setTimeout(() => {
-      requestAnimationFrame(async () => {
-        for (const id of ids) {
-          try {
-            await this.connectorService.refreshConnectorsAroundIntent(id, this.listOfIntents);
-          } catch (error) {
-            this.logger.error('[CDS-CANVAS] refresh connectors of new block failed', id, error);
-          }
+    requestAnimationFrame(async () => {
+      for (const id of ids) {
+        try {
+          await this.connectorService.refreshConnectorsAroundIntent(id, this.listOfIntents);
+        } catch (error) {
+          this.logger.error('[CDS-CANVAS] refresh connectors of new block failed', id, error);
         }
-      });
-    }, 400);
+      }
+    });
   }
 
   /** The AI chat has finished editing and the flow has been laid out again: once the blocks
@@ -600,17 +586,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
         this.logger.error('[CDS-CANVAS] update connectors of a laid out block failed', intent?.intent_id, error);
       }
     }
-  }
-
-  /** The pulse the widget simulation puts on the active block, removed once it has played. */
-  private highlightNewIntent(intentID: string) {
-    const card = document.querySelector('#intent-content-' + CSS.escape(intentID));
-    if (!card) { return; }
-    card.classList.remove('live-active-intent-pulse');
-    // Restart the animation even if the class was just removed.
-    void (card as HTMLElement).offsetWidth;
-    card.classList.add('live-active-intent-pulse');
-    setTimeout(() => card.classList.remove('live-active-intent-pulse'), 2200);
   }
 
   async onAllIntentsRendered() {

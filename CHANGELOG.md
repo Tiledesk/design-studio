@@ -10,6 +10,7 @@
 
 # this branch
 
+- **changed**: when a new block appears on the stage (created by hand, pasted, dragged out of a connector or added by the AI chat) the view stays where you left it: the block no longer pulses and the stage no longer moves to centre on it. Its connectors are still drawn straight away
 - **changed**: dropdowns close by themselves as soon as the page or a panel is scrolled: before they stayed open, detached from the field they belong to. Scrolling inside the options list keeps the dropdown open
 - **changed**: in the AI settings header the preview is always shown in full, open or closed, and the system context sits on the last line, on a single line ending with an ellipsis and with no label in front. The title is no longer pushed out of view when there are many options
 - **changed**: on V3 agents the empty fallback block is narrower and its title is centred in the pill, and the start block's icon is white with a green outline

@@ -13,11 +13,6 @@ import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
 
-/** How long the canvas animates the stage onto a new block (0.3s in tiledesk-stage.js),
- *  plus a margin. Connectors are measured against the stage's current transform, so
- *  moved blocks are only redrawn once it has settled. */
-const STAGE_FOCUS_ANIMATION_MS = 400;
-
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
  *  of the AI chat: once it has paused (the first pass), and again after the connector service's
  *  own retry queue (500ms x 5) has given up on anything still pending (the second pass). */
@@ -273,15 +268,14 @@ export class FlowOpsService implements OnDestroy {
     // away from. It is noted instead, and redrawn once the chat has paused.
     results.filter(r => r.op === 'move' && r.ok && r.intent_id)
       .forEach(r => this.movedByChat.add(r.intent_id));
-    // Not awaited: the agent gets its answer now. New blocks are highlighted,
-    // centred and connected by the canvas as soon as they render
-    // (CdsCanvasComponent.onNewIntentRendered); what is left here is the blocks
-    // relayoutBranches moved, whose connectors were measured at the old place.
-    const createdAny = results.some(r => r.op === 'add_intent' && r.ok);
+    // Not awaited: the agent gets its answer now. New blocks are connected by
+    // the canvas as soon as they render (CdsCanvasComponent.onNewIntentRendered);
+    // what is left here is the blocks relayoutBranches moved, whose connectors
+    // were measured at the old place.
     if (structural && results.some(r => r.ok)) {
       this.layoutPendingFaqKbId = this.dashboardService.id_faq_kb;
     }
-    this.redrawMovedAfterRender(movedIds, createdAny, this.dashboardService.id_faq_kb);
+    this.redrawMovedAfterRender(movedIds, this.dashboardService.id_faq_kb);
     this.scheduleConnectorCheck(this.dashboardService.id_faq_kb);
     return { ok, rejected_before_applying: false, results };
   }
@@ -2060,20 +2054,14 @@ export class FlowOpsService implements OnDestroy {
    *  the stage at their new place.
    *
    *  `redrawBlocks` runs as soon as the batch is applied, before Angular has moved the
-   *  elements, so the edges it measures for a moved block point at the old place. When
-   *  the batch also created blocks the canvas is centring the stage on them, so this
-   *  waits for that animation too. Best-effort and silent; it stops if the canvas moves
-   *  to another flow meanwhile. */
-  private async redrawMovedAfterRender(movedIds: Set<string>, stageAnimating: boolean,
-                                       faqKbId: string): Promise<void> {
+   *  elements, so the edges it measures for a moved block point at the old place.
+   *  Best-effort and silent; it stops if the canvas moves to another flow meanwhile. */
+  private async redrawMovedAfterRender(movedIds: Set<string>, faqKbId: string): Promise<void> {
     if (movedIds.size === 0) { return; }
     try {
       const rendered = await Promise.all(
         Array.from(movedIds).map(async id => (await isElementOnTheStage(id)) ? id : null));
       await new Promise(resolve => requestAnimationFrame(() => resolve(null)));
-      if (stageAnimating) {
-        await new Promise(resolve => setTimeout(resolve, STAGE_FOCUS_ANIMATION_MS));
-      }
       if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
       for (const id of rendered) {
         if (!id) { continue; }
