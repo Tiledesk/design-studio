@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+# this branch 22/09/2026
+
+- **changed**: quando compare un nuovo blocco sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) la vista resta dove l'hai lasciata: il blocco non lampeggia piu' e lo stage non si sposta per centrarsi su di lui. I suoi collegamenti vengono comunque disegnati subito
+
+
 # this branch 21/09/2026
 
 - **changed**: le tendine di scelta si chiudono da sole appena si scorre la pagina o un pannello: prima restavano aperte, staccate dal campo a cui appartengono. Scorrendo dentro l'elenco delle opzioni la tendina resta aperta
