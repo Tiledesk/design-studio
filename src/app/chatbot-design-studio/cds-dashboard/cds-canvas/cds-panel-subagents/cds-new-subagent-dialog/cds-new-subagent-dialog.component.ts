@@ -4,7 +4,7 @@ import { Inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { environment } from 'src/environments/environment';
+import { AppConfigService } from 'src/app/services/app-config';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -31,7 +31,8 @@ export class CdsNewSubagentDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<CdsNewSubagentDialogComponent>,
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
-    @Inject(MAT_DIALOG_DATA) public data: { parentId?: string }
+    @Inject(MAT_DIALOG_DATA) public data: { parentId?: string },
+    private appConfigService: AppConfigService
   ) { }
 
   ngOnInit(): void { }
@@ -68,7 +69,7 @@ export class CdsNewSubagentDialogComponent implements OnInit {
       // Fallback al chatbot corrente per sicurezza se il dato non arriva.
       parent_id: this.data?.parentId || this.dashboardService.id_faq_kb,
       // Un subagent di un agente V3 e' anch'esso V3; nelle famiglie legacy non cambia nulla.
-      ...(this.dashboardService.isV3 ? { attributes: { dsVersion: environment.CHATBOT_VERSION } } : {})
+      ...(this.dashboardService.isV3 ? { attributes: { dsVersion: this.appConfigService.getChatbotVersion() } } : {})
     };
 
     try {

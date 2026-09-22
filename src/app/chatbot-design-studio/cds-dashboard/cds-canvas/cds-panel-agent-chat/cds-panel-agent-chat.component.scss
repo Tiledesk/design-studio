@@ -70,17 +70,17 @@ $agent-chat-toolbar-height: 40px;
     border: 0;
     border-radius: var(--button-border-radius-base);
     background: transparent;
-    color: var(--gray-02);
+    // Same blue as the title: --gray-02, used before, was almost white on white.
+    color: var(--blu);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 
-    .material-icons { font-size: 20px; }
+    .material-icons { font-size: 22px; }
 
     &:hover {
       background: var(--blu-light-04);
-      color: var(--blu);
     }
   }
 }

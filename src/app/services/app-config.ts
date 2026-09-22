@@ -115,5 +115,15 @@ export class AppConfigService {
     return this.appConfig;
   }
 
+  /** The editor version a chatbot created from here is born with (`attributes.dsVersion`).
+   *  Set per deploy through CHATBOT_VERSION; when the deploy leaves it unset -- empty, still
+   *  the `${CHATBOT_VERSION}` placeholder, or CHANGEIT -- the build's own value applies. */
+  getChatbotVersion(): string {
+    const value = this.appConfig?.CHATBOT_VERSION;
+    const unset = typeof value !== 'string' || value.trim() === '' ||
+      value.startsWith('${') || value === 'CHANGEIT';
+    return unset ? environment.CHATBOT_VERSION : value.trim();
+  }
+
 
 }

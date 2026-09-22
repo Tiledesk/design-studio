@@ -3,6 +3,7 @@ import { of, throwError } from 'rxjs';
 import { AgentChatFamilyService } from './agent-chat-family.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { AppConfigService } from 'src/app/services/app-config';
 import { environment } from 'src/environments/environment';
 
 describe('AgentChatFamilyService', () => {
@@ -16,7 +17,8 @@ describe('AgentChatFamilyService', () => {
       providers: [
         AgentChatFamilyService,
         { provide: DashboardService, useValue: dashboardService },
-        { provide: FaqKbService, useValue: faqKbService }
+        { provide: FaqKbService, useValue: faqKbService },
+        { provide: AppConfigService, useValue: { getChatbotVersion: () => 'v3-from-config' } }
       ]
     });
     service = TestBed.inject(AgentChatFamilyService);
@@ -82,7 +84,7 @@ describe('AgentChatFamilyService', () => {
     });
   });
 
-  // A subagent of a V3 agent must open in the V3 editor too.
+  // A subagent of a V3 agent must open in the V3 editor too, with the version the deploy set.
   it('labels a subagent of a V3 agent as V3', async () => {
     dashboardService.isV3 = true;
     build();
@@ -90,7 +92,7 @@ describe('AgentChatFamilyService', () => {
     expect(faqKbService.createFaqKb).toHaveBeenCalledWith({
       id_project: 'proj1', language: 'en', name: 'Nuovo', subtype: 'subagent',
       template: 'blank', type: 'tilebot', parent_id: 'parent1',
-      attributes: { dsVersion: environment.CHATBOT_VERSION }
+      attributes: { dsVersion: 'v3-from-config' }
     });
   });
 
@@ -101,5 +103,26 @@ describe('AgentChatFamilyService', () => {
       throwError(() => ({ error: { msg: 'name already taken' } })));
     await expectAsync(service.createSubagent('Nuovo'))
       .toBeRejectedWithError('name already taken');
+  });
+});
+
+// The version subagents (and the chat's subagents) are born with comes from the deploy's
+// CHATBOT_VERSION; a deploy that does not set it keeps the build's value.
+describe('AppConfigService.getChatbotVersion', () => {
+  const withConfig = (config: any) => {
+    const service = new AppConfigService(null as any);
+    (service as any).appConfig = config;
+    return service;
+  };
+
+  it('uses the value the deploy set', () => {
+    expect(withConfig({ CHATBOT_VERSION: ' v4 ' }).getChatbotVersion()).toBe('v4');
+  });
+
+  it('falls back to the build value when the deploy left it unset', () => {
+    for (const value of [undefined, '', '   ', '${CHATBOT_VERSION}', 'CHANGEIT', 3]) {
+      expect(withConfig({ CHATBOT_VERSION: value }).getChatbotVersion())
+        .toBe(environment.CHATBOT_VERSION);
+    }
   });
 });

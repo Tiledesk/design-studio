@@ -190,6 +190,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   /** rAF throttle for moved-and-scaled: at most one Angular update per frame */
   private _movedAndScaledRafId: number | null = null;
   private _movedAndScaledPendingDetail: { scale: number; x: number; y: number } | null = null;
+  /** Publishes this canvas' own width as --canvas-width (see observeHostWidth). */
+  private hostResizeObserver: ResizeObserver | null = null;
 
   // ============================================================
   // CONSTRUCTOR & LIFECYCLE
@@ -209,7 +211,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     private readonly noteService: NoteService,
     private readonly ngZone: NgZone,
     public noteResizeState: NoteResizeStateService,
-    private readonly flowOpsService: FlowOpsService
+    private readonly flowOpsService: FlowOpsService,
+    private readonly hostElement: ElementRef<HTMLElement>
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -227,6 +230,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
+    this.observeHostWidth();
     if (this.dashboardService.isV3) {
       // V3: the blocks sidebar is closed whenever an agent is opened, the AI chat is open instead.
       this.IS_OPEN_INTENTS_LIST = false;
@@ -248,6 +252,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.connectorService.clearRetryQueue();
     clearTimeout(this.newIntentTimer);
     clearTimeout(this.layoutConnectorsTimer);
+    this.hostResizeObserver?.disconnect();
 
     if (this.saveNoteDetailTimer) {
       clearTimeout(this.saveNoteDetailTimer);
@@ -282,6 +287,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   private unsubscribe(): void {
     this.unsubscribe$.next(null);
     this.unsubscribe$.complete();
+  }
+
+  /** The widget log is positioned against the dashboard, not against this canvas, yet
+   *  starts at the canvas' left edge: sized on the dashboard it ran under the widget
+   *  preview whenever the AI chat panel took space on the left. The canvas' real width,
+   *  kept up to date as the chat opens, closes or is resized, is what it sizes on. */
+  private observeHostWidth() {
+    if (typeof ResizeObserver === 'undefined') { return; }
+    const host = this.hostElement.nativeElement;
+    this.hostResizeObserver = new ResizeObserver(() => {
+      host.style.setProperty('--canvas-width', `${host.clientWidth}px`);
+    });
+    this.hostResizeObserver.observe(host);
   }
 
   private getParamsFromURL() {
