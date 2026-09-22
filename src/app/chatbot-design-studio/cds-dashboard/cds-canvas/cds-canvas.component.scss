@@ -572,7 +572,9 @@ svg:not(:root) {
 }
 
 cds-widget-logs {
-  width: calc(100% - 60px);
+  // --canvas-width: set by CdsCanvasComponent.observeHostWidth, so the AI chat
+  // panel on the left is accounted for. The fallback is the width without it.
+  width: var(--canvas-width, calc(100% - 60px));
   position: absolute;
   bottom: 0;
   -webkit-user-select: none;
@@ -581,6 +583,7 @@ cds-widget-logs {
   user-select: none;
 
   &.small{
-    width: calc(100% - 460px);
+    // minus the widget preview (400px, cds-panel-widget)
+    width: calc(var(--canvas-width, calc(100% - 60px)) - 400px);
   }
 }

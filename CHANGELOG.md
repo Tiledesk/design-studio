@@ -10,6 +10,9 @@
 
 # this branch 22/09/2026
 
+- **changed**: la versione con cui nascono i sub agent degli agenti V3, creati dal pannello o dalla chat AI, si imposta per deploy con la variabile CHATBOT_VERSION, senza ricompilare. Se il deploy non la imposta resta il valore di sempre
+- **changed**: nell'intestazione della chat AI il pulsante di chiusura si vede bene: prima era grigio chiarissimo su bianco, ora ha il blu del titolo ed e' un po' piu' grande
+- **fixed**: con la chat AI aperta il pannello dei log non finisce piu' sotto l'anteprima del widget: la sua larghezza segue lo spazio rimasto, anche quando la chat si apre, si chiude o viene ridimensionata
 - **changed**: quando compare un nuovo blocco sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) la vista resta dove l'hai lasciata: il blocco non lampeggia piu' e lo stage non si sposta per centrarsi su di lui. I suoi collegamenti vengono comunque disegnati subito
 
 

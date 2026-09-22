@@ -16,6 +16,7 @@
   "aiModels":"${AI_MODELS}",
   "storage_prefix": "cds_sv5",
   "pineconeReranking": "${PINECONE_RERANKING}",
+  "CHATBOT_VERSION": "${CHATBOT_VERSION}",
   "phoneNumber":"${PHONE_NUMBER}",
   "authPersistence": "${AUTH_PERSISTENCE}",
   "firebase": {
