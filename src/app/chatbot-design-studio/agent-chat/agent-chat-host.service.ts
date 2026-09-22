@@ -130,17 +130,27 @@ export class AgentChatHostService {
     this.host = adapter.createAgentChatHost({
       iframe,
       chatOrigin: this.config.chatOrigin,
-      getConfig: (): HostConfig => ({
-        // The chat's own mount point: it proxies /v1/ to the runtime, which is
-        // why design-studio never learns the runtime's address.
-        baseUrl: this.config.chatUrl,
-        token: this.storedToken(),
-        projectId: this.dashboardService.projectID,
-        flowId: this.family.rootId()
-      })
+      // Called by the adapter only when the chat's `ready` arrives, so it is
+      // also the one place the studio can see that the frame is alive.
+      getConfig: (): HostConfig => {
+        this.logger.log('[AGENT-CHAT-HOST] ready received from the chat, sending hello');
+        return {
+          // The chat's own mount point: it proxies /v1/ to the runtime, which is
+          // why design-studio never learns the runtime's address.
+          baseUrl: this.config.chatUrl,
+          token: this.storedToken(),
+          projectId: this.dashboardService.projectID,
+          flowId: this.family.rootId()
+        };
+      }
     });
 
     this.host.registerTool('get_flow', async () => {
+      // RICEVUTO: la richiesta del vibe coder. Da qui al log di risposta il run
+      // e' fermo sul runtime e sta lavorando solo il Design Studio.
+      this.logger.log('[AGENT-CHAT-HOST] ddp <<< RICEVUTO get_flow - agent aperto:',
+        this.dashboardService.id_faq_kb,
+        '| V3:', !!this.dashboardService.isV3);
       // readFlow() is synchronous and cannot fail; family.read() awaits up to
       // two HTTP calls and can. Losing id_faq_kb and intents -- the flow the
       // agent could always read -- to a transient family lookup failure would
@@ -152,27 +162,43 @@ export class AgentChatHostService {
       try {
         family = await this.family.read();
       } catch (error) {
-        this.logger.error('[AGENT-CHAT-HOST] get_flow: family read failed:', error);
+        this.logger.error('[AGENT-CHAT-HOST] ddp get_flow: family read failed:', error);
       }
       // The rules travel with the flow: the runtime's prompt describes the
       // legacy editor, and only the studio knows which editor this agent uses.
       const isV3 = !!this.dashboardService.isV3;
-      return {
+      const snapshot = {
         ...this.flowOps.readFlow(),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {})
       };
+      // INVIATO: cosa esce davvero verso il vibe coder, voce per voce.
+      this.logger.log('[AGENT-CHAT-HOST] ddp >>> INVIATO get_flow',
+        '\n   agent    :', snapshot.id_faq_kb,
+        '\n   blocchi  :', snapshot.intents?.length ?? 0,
+          '(' + (snapshot.intents || []).map((i: any) => i?.intent_display_name).join(', ') + ')',
+        '\n   famiglia :', snapshot.family
+          ? `root ${snapshot.family.root_name}, ${snapshot.family.subagents?.length ?? 0} sub agent`
+            + (snapshot.family.is_subagent ? ' (siamo dentro un sub agent)' : '')
+          : 'assente (lettura fallita)',
+        '\n   versione :', snapshot.ds_version,
+        '\n   regole V3:', snapshot.ds_version === 'v3' ? `${V3_FLOW_RULES.length} regole` : 'non inviate (legacy)');
+      this.logger.log('[AGENT-CHAT-HOST] ddp >>> payload completo:', snapshot);
+      return snapshot;
     });
 
     this.host.registerTool('get_canvas_selection', async () => {
       const selected = this.intentService.intentSelected;
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- get_canvas_selection:', selected?.intent_id ?? 'nessuna');
       return { intent_ids: selected ? [selected.intent_id] : [] };
     });
 
     this.host.registerTool('apply_flow_patch', async (args) => {
       const declared = args?.['faq_kb_id'] as string | undefined;
       const open = this.dashboardService.id_faq_kb;
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- apply_flow_patch su', declared, ':',
+        ((args?.['operations'] ?? []) as FlowOp[]).map(o => o?.op).join(', '));
       // The canvas can now move under a running turn -- the agent opens a
       // subagent, or the user picks a sibling from the panel while the agent
       // is thinking. A refusal is something the agent reads and recovers
@@ -193,12 +219,17 @@ export class AgentChatHostService {
         } as FlowOpsReport;
       }
       const report = await this.flowOps.apply((args?.['operations'] ?? []) as FlowOp[]);
+      this.logger.log('[AGENT-CHAT-HOST] ddp -> apply_flow_patch:',
+        report.ok ? 'applicato' : (report.rejected_before_applying ? 'RIFIUTATO in validazione' : 'FALLITO a meta'),
+        '-', report.results.filter(r => r.ok).length, 'ok,',
+        report.results.filter(r => !r.ok).map(r => r.error).join(' | '));
       this.appliedSource.next(report);
       return report;
     });
 
     this.host.registerTool('open_flow', async (args) => {
       const id = String(args?.['faq_kb_id'] ?? '');
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- open_flow:', id);
       // The agent is a way to build one family, not a way to walk the
       // project: anything outside it is refused before the studio moves.
       //
@@ -236,6 +267,7 @@ export class AgentChatHostService {
 
     this.host.registerTool('create_subagent', async (args) => {
       const name = String(args?.['name'] ?? '').trim();
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- create_subagent:', name);
       // Thrown, not returned as a refusal report: the adapter turns a throw
       // into a `handler_error` tool result the agent reads. There is no
       // partial success to describe here.
