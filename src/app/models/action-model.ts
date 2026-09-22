@@ -3,6 +3,7 @@ import { TYPE_ATTACHMENT, TYPE_COMMAND, TYPE_MATH_OPERATOR, TYPE_OPERATOR } from
 import { BRAND_BASE_INFO } from '../chatbot-design-studio/utils-resources';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from '../chatbot-design-studio/utils-actions';
 import { TYPE_METHOD_REQUEST } from '../chatbot-design-studio/utils-request';
+import { McpSelectedServer } from './mcp.model';
 
 export class Action {
     _tdActionType: string;
@@ -445,8 +446,10 @@ export class ActionAskGPTV2 extends Action {
     model: string;
     llm: string;
     modelName: string;
-    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
+    /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    agentPlatformServer?: string;
     assignReplyTo: string;
     assignSourceTo: string;
     assignJsonSourcesTo: string;
@@ -521,11 +524,15 @@ export class ActionAiPrompt extends Action {
     llm: string;
     modelName: string;
     model: string;
-    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
+    /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    agentPlatformServer?: string;
     preview?: Array<any>;
     trueIntent: string;
     falseIntent: string;
+    /** Selected MCP servers/tools for this action (managed by the shared cds-mcp-tools component). */
+    servers?: McpSelectedServer[];
     constructor() {
         super();
         this._tdActionType = TYPE_ACTION.AI_PROMPT
@@ -539,8 +546,10 @@ export class ActionAiCondition extends Action {
     llm: string;
     modelName: string;
     model: string;
-    /** vLLM endpoint url for the selected model. Set only when llm === 'vllm'. */
+    /** vLLM server name for the selected model. Set only when llm === 'vllm'. */
     vllmServer?: string;
+    /** Gemini Agent Platform server name. Set only when llm === 'agentplatform'. */
+    agentPlatformServer?: string;
     max_tokens: number;
     temperature: number;
     labelModel: string;

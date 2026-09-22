@@ -75,7 +75,7 @@ describe('getIntegrationModels', () => {
     expect(models.length).toBe(1);
     expect(models[0].name).toBe('gpu-box ・ qwen3');
     expect(models[0].value).toBe('qwen3');
-    expect(models[0].vllmServer).toBe('gpu-box');
+    expect(models[0].server).toBe('gpu-box');
   });
 
   it('leaves the list untouched when the integration has no models', async () => {

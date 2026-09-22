@@ -9,6 +9,20 @@
 
 
 
+# 1.40.14
+- **added**: the management of MCP servers and tools has been extracted from the AI Prompt action into a reusable section, so the other LLM actions can adopt it as it is
+- **added**: a Native Tools catalog listing the MCP servers provided by Tiledesk, each one showing its description and the tools currently active on it
+- **changed**: the MCP dialogs have been redesigned around a single consistent frame, with tooltips on every button and a Close button in the footer; a server is now attached to the prompt with an explicit button that becomes "Detach tools" once added, and it can be edited only once attached
+- **added**: a popup listing all the tools of a server with select and deselect all, reachable both from the servers list and from the server detail, where the selected ones are also summarised at a glance
+- **changed**: the tool selection is saved only on the action and never alters the shared MCP integration, and it is remembered per action and per server: detaching and re-attaching a server, closing the dialog or reloading the page no longer loses the chosen tools
+- **bug fix**: several fixes to the MCP interface — authentication is now honoured while discovering the tools of a server, the custom headers section is reachable again, some sizing glitches have been corrected and the missing italian translations have been added
+- **added**: new Gemini Agent Platform provider in the model selector of the Ask KB, AI Prompt and AI Condition actions; its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
+- **changed**: the model selector is faster and more accurate — every provider is loaded in one go instead of one at a time, providers are grouped under their full name instead of their internal one, and a model offered by more than one provider no longer selects the wrong entry
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it and both the "Add action" button and the empty-block message are hidden; chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history the "Restore" button is now "Re-publish", with a tooltip clarifying that it puts that version back online without changing the chatbot you are currently editing
+- **added**: a reference document describing the condition grammar the Design Studio emits, for the runtime and the LLM that have to evaluate it
+- **changed**: authentication persistence setting added to the design studio configuration, and the application startup no longer loads unused interface components
+
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
 - **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
