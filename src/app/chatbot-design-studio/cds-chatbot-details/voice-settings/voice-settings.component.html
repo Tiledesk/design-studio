@@ -114,6 +114,21 @@
             </div>
         </div>
 
+        <!--Barge-in (web-widget chatbots, via speech proxy) -->
+        <div *ngIf="showBargeIn" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+                {{ 'CDSSetting.BargeIn' | translate }}
+            </label>
+            <cds-toogle id="bargeIn"
+                [checked]="bargeIn"
+                [disabled]="false"
+                (onChangeToggle)="onChangeBargeIn($event)">
+            </cds-toogle>
+            <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                {{ 'CDSSetting.BargeInDescription' | translate }}
+            </span>
+        </div>
+
     </div>
 
 </div>

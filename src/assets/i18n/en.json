@@ -265,7 +265,9 @@
         "SelectProvider":"Select provider",
         "SelectAnOption":"Select an option",
         "TextToSpeechModelDescription": "Generates audio from the input text.",
-        "SpeechToTextModelDescription":"Transcribes audio into the input language."
+        "SpeechToTextModelDescription":"Transcribes audio into the input language.",
+        "BargeIn": "Barge-in",
+        "BargeInDescription": "Let users interrupt the bot while it is speaking. Works best with headphones: on loudspeakers the bot may hear itself."
     },
     "VoiceSettings":"Voice settings",
     "BotDetails": "Bot details",

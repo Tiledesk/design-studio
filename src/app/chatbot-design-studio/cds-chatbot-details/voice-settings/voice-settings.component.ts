@@ -40,6 +40,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
   stt_model: string;
   voice_name: string;
   voice_language: string;
+  bargeIn: boolean;
 
 
   //PLAYER audio (elevenlabs)
@@ -76,6 +77,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value
+    this.bargeIn = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'BARGE_IN')?.value === 'true'
     this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
     this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
@@ -187,6 +189,18 @@ export class CDSVoiceSettingsComponent implements OnInit {
         break;
       }
     }
+    this.saveAttributes();
+  }
+
+  /** Barge-in is handled by the speech proxy, which serves only web-widget chatbots. */
+  get showBargeIn(): boolean {
+    return this.selectedChatbot?.subtype === TYPE_CHATBOT.CHATBOT;
+  }
+
+  onChangeBargeIn(checked: boolean) {
+    this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] onChangeBargeIn ', checked)
+    this.bargeIn = checked;
+    this.findAndUpdateProperty('BARGE_IN', checked ? 'true' : 'false');
     this.saveAttributes();
   }
 
