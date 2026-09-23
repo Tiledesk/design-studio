@@ -8,8 +8,12 @@
 *Tiledesk SRL*
 
 
-# 1.40.15-rc7
 
+# this branch 23/09/2026
+- **fixed**: nelle conversazioni lunghe con la chat AI le regole degli agenti V3 non si perdono piu'. La versione dell'agente accompagna ogni risposta che il Design Studio da' alla chat, quindi anche dopo molti scambi le modifiche continuano a seguire le regole giuste. Prima la versione veniva comunicata una volta sola, all'inizio, e in una conversazione molto lunga la chat poteva tornare a costruire con le regole degli agenti precedenti
+
+
+# 1.40.15-rc7
 - **changed**: the editor version that subagents of V3 agents are born with, whether created from the panel or by the AI chat, is set per deploy through the CHATBOT_VERSION variable, with no rebuild. When the deploy does not set it, the usual value applies
 - **changed**: the close button in the AI chat header is easy to see: it used to be very light grey on white, now it takes the title's blue and is a little larger
 - **fixed**: with the AI chat open, the log panel no longer runs under the widget preview: its width follows the space that is left, also when the chat is opened, closed or resized
