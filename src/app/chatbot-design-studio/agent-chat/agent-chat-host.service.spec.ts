@@ -183,6 +183,37 @@ describe('AgentChatHostService', () => {
     expect(v3.intents).toEqual([]);
   });
 
+  // The version decides which rules the agent builds by, and it reaches the
+  // model only inside a tool result. Sent once, in the first get_flow, it is a
+  // fact the model has to remember -- and the runtime summarises old messages
+  // away, so a long conversation can lose the only copy of it and carry on
+  // under the legacy rules of the system prompt. Every answer carries it
+  // instead, which is what makes it unforgettable rather than remembered.
+  it('stamps the editor version on every tool answer', async () => {
+    await service.attach({} as any);
+    service.setFlowNavigator(async (id: string) => {
+      dashboardService.id_faq_kb = id;
+      dashboardService.selectedChatbot =
+        { _id: id, name: 'Alfa', subtype: 'subagent', parent_id: 'parent1' };
+    });
+    dashboardService.isV3 = true;
+
+    const answers = [
+      await registered['get_flow']({}),
+      await registered['get_canvas_selection']({}),
+      await registered['apply_flow_patch']({ faq_kb_id: 'kb1', operations: [] }),
+      await registered['create_subagent']({ name: 'Rimborsi' }),
+      await registered['open_flow']({ faq_kb_id: 'sub1' })
+    ];
+    for (const answer of answers) {
+      expect(answer.ds_version).toBe('v3');
+    }
+    // Only the version rides along: the rule list is long, and get_flow is
+    // where it is worth paying for it.
+    expect(answers[1].v3_rules).toBeUndefined();
+    expect(answers[2].v3_rules).toBeUndefined();
+  });
+
   // Without this the agent cannot tell a parent from a subagent, and would
   // guess from names.
   it('reports the family alongside the open flow', async () => {
@@ -209,7 +240,7 @@ describe('AgentChatHostService', () => {
   it('answers get_canvas_selection with the selected intent id', async () => {
     await service.attach(document.createElement('iframe'));
     expect(await registered['get_canvas_selection']({}))
-      .toEqual({ intent_ids: ['i1'] });
+      .toEqual({ intent_ids: ['i1'], ds_version: 'legacy' });
   });
 
   it('passes apply_flow_patch operations to FlowOpsService', async () => {
@@ -371,7 +402,7 @@ describe('AgentChatHostService', () => {
   it('creates a subagent and returns its id', async () => {
     await service.attach({} as any);
     const created = await registered['create_subagent']({ name: 'Rimborsi' });
-    expect(created).toEqual({ faq_kb_id: 'new1', name: 'Rimborsi' });
+    expect(created).toEqual({ faq_kb_id: 'new1', name: 'Rimborsi', ds_version: 'legacy' });
   });
 
   it('refuses a subagent with no name, without calling the server', async () => {
@@ -395,7 +426,8 @@ describe('AgentChatHostService', () => {
     });
     const opened = await registered['open_flow']({ faq_kb_id: 'sub1' });
     expect(order).toEqual(['navigated:sub1']);
-    expect(opened).toEqual({ faq_kb_id: 'sub1', name: 'Alfa', is_subagent: true });
+    expect(opened).toEqual(
+      { faq_kb_id: 'sub1', name: 'Alfa', is_subagent: true, ds_version: 'legacy' });
   });
 
   // The agent is a way to build a family, not a way to walk the project.

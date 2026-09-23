@@ -140,7 +140,7 @@ export class AgentChatHostService {
       })
     });
 
-    this.host.registerTool('get_flow', async () => {
+    this.registerTool('get_flow', async () => {
       // readFlow() is synchronous and cannot fail; family.read() awaits up to
       // two HTTP calls and can. Losing id_faq_kb and intents -- the flow the
       // agent could always read -- to a transient family lookup failure would
@@ -165,12 +165,12 @@ export class AgentChatHostService {
       };
     });
 
-    this.host.registerTool('get_canvas_selection', async () => {
+    this.registerTool('get_canvas_selection', async () => {
       const selected = this.intentService.intentSelected;
       return { intent_ids: selected ? [selected.intent_id] : [] };
     });
 
-    this.host.registerTool('apply_flow_patch', async (args) => {
+    this.registerTool('apply_flow_patch', async (args) => {
       const declared = args?.['faq_kb_id'] as string | undefined;
       const open = this.dashboardService.id_faq_kb;
       // The canvas can now move under a running turn -- the agent opens a
@@ -197,7 +197,7 @@ export class AgentChatHostService {
       return report;
     });
 
-    this.host.registerTool('open_flow', async (args) => {
+    this.registerTool('open_flow', async (args) => {
       const id = String(args?.['faq_kb_id'] ?? '');
       // The agent is a way to build one family, not a way to walk the
       // project: anything outside it is refused before the studio moves.
@@ -234,7 +234,7 @@ export class AgentChatHostService {
       };
     });
 
-    this.host.registerTool('create_subagent', async (args) => {
+    this.registerTool('create_subagent', async (args) => {
       const name = String(args?.['name'] ?? '').trim();
       // Thrown, not returned as a refusal report: the adapter turns a throw
       // into a `handler_error` tool result the agent reads. There is no
@@ -242,6 +242,37 @@ export class AgentChatHostService {
       if (!name) { throw new Error('A subagent needs a name.'); }
       const created = await this.family.createSubagent(name);
       return { faq_kb_id: created._id, name: created.name };
+    });
+  }
+
+  /** Registers a tool and stamps `ds_version` onto whatever it answers.
+   *
+   *  The editor version decides which rules the agent has to build by, and it
+   *  reaches the model only inside a tool result -- `hello` carries the base
+   *  URL, the token and the ids, and the runtime's session knows nothing about
+   *  it. Sent once, in the first `get_flow`, it is a fact the model has to
+   *  REMEMBER, and the runtime's summarisation drops old messages by design:
+   *  a long conversation can lose the only copy of it while the system prompt,
+   *  which describes the legacy editor, stays. Half a flow then gets built to
+   *  the wrong rules.
+   *
+   *  So it rides on every answer instead. `keep_last_messages` guarantees the
+   *  recent turns survive compaction, and any tool call at all now re-states
+   *  the version -- there is nothing to remember and nothing to lose. Only the
+   *  version travels this way, never `v3_rules`: the rule list is long enough
+   *  to be worth paying for once, in `get_flow`, which the agent calls before
+   *  it builds anyway.
+   *
+   *  A handler that throws is answered as an error, with no object to stamp;
+   *  that is fine, since a failed call is not one the agent builds from. */
+  private registerTool(name: string, handler: (args: Record<string, unknown>) => Promise<unknown>): void {
+    this.host.registerTool(name, async (args) => {
+      const result = await handler(args);
+      // Spread first, so a handler that sets `ds_version` itself (get_flow
+      // does) is not fighting this one: both write the same value.
+      return (result && typeof result === 'object' && !Array.isArray(result))
+        ? { ...(result as Record<string, unknown>), ds_version: this.dashboardService.isV3 ? 'v3' : 'legacy' }
+        : result;
     });
   }
 

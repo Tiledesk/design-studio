@@ -8,6 +8,11 @@
 *Tiledesk SRL*
 
 
+# this branch 23/09/2026
+
+- **fixed**: nelle conversazioni lunghe con la chat AI le regole degli agenti V3 non si perdono piu'. La versione dell'agente accompagna ogni risposta che il Design Studio da' alla chat, quindi anche dopo molti scambi le modifiche continuano a seguire le regole giuste. Prima la versione veniva comunicata una volta sola, all'inizio, e in una conversazione molto lunga la chat poteva tornare a costruire con le regole degli agenti precedenti
+
+
 # this branch 22/09/2026
 
 - **changed**: la versione con cui nascono i sub agent degli agenti V3, creati dal pannello o dalla chat AI, si imposta per deploy con la variabile CHATBOT_VERSION, senza ricompilare. Se il deploy non la imposta resta il valore di sempre
