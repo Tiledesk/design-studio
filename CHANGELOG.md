@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.40.15-rc9
+- **added**: in the chatbot's Voice settings, a "Barge-in" switch lets users interrupt the bot while it is speaking in a web-widget voice conversation. Off by default; it is saved with the other voice settings and needs the speech proxy with barge-in support. Shown for web-widget chatbots only
+
 # 1.40.15-rc8
 - **changed**: the editor version that subagents of V3 agents are born with, whether created from the panel or by the AI chat, is set per deploy through the CHATBOT_VERSION variable, with no rebuild. When the deploy does not set it, the usual value applies
 - **changed**: the close button in the AI chat header is easy to see: it used to be very light grey on white, now it takes the title's blue and is a little larger
