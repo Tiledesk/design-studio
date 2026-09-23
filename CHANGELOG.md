@@ -12,12 +12,16 @@
 # this branch 23/09/2026
 - **fixed**: nelle conversazioni lunghe con la chat AI le regole degli agenti V3 non si perdono piu'. La versione dell'agente accompagna ogni risposta che il Design Studio da' alla chat, quindi anche dopo molti scambi le modifiche continuano a seguire le regole giuste. Prima la versione veniva comunicata una volta sola, all'inizio, e in una conversazione molto lunga la chat poteva tornare a costruire con le regole degli agenti precedenti
 
+# 1.40.15-rc9
+- **added**: in the chatbot's Voice settings, a "Barge-in" switch lets users interrupt the bot while it is speaking in a web-widget voice conversation. Off by default; it is saved with the other voice settings and needs the speech proxy with barge-in support. Shown for web-widget chatbots only
 
-# 1.40.15-rc7
+# 1.40.15-rc8
 - **changed**: the editor version that subagents of V3 agents are born with, whether created from the panel or by the AI chat, is set per deploy through the CHATBOT_VERSION variable, with no rebuild. When the deploy does not set it, the usual value applies
 - **changed**: the close button in the AI chat header is easy to see: it used to be very light grey on white, now it takes the title's blue and is a little larger
 - **fixed**: with the AI chat open, the log panel no longer runs under the widget preview: its width follows the space that is left, also when the chat is opened, closed or resized
 - **changed**: when a new block appears on the stage (created by hand, pasted, dragged out of a connector or added by the AI chat) the view stays where you left it: the block no longer pulses and the stage no longer moves to centre on it. Its connectors are still drawn straight away
+
+# 1.40.15-rc7
 - **changed**: dropdowns close by themselves as soon as the page or a panel is scrolled: before they stayed open, detached from the field they belong to. Scrolling inside the options list keeps the dropdown open
 - **changed**: in the AI settings header the preview is always shown in full, open or closed, and the system context sits on the last line, on a single line ending with an ellipsis and with no label in front. The title is no longer pushed out of view when there are many options
 - **changed**: on V3 agents the empty fallback block is narrower and its title is centred in the pill, and the start block's icon is white with a green outline
