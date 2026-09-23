@@ -1965,26 +1965,57 @@ export class FlowOpsService implements OnDestroy {
 
   /** The same pause also lays the flow out, when the chat changed its structure: on the
    *  first pass, before the connectors are checked against the new positions. */
+  /** Lay the flow out if the chat changed its structure, then draw whatever
+   *  connectors are missing. The work itself, with no opinion about when.
+   *
+   *  `firstPass` is what decides whether the layout runs: the timed checks call
+   *  it twice, and laying out twice would move blocks under a user who has just
+   *  started dragging them. */
+  private async redrawFlow(faqKbId: string, firstPass: boolean): Promise<void> {
+    if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+    try {
+      if (firstPass && this.layoutFlow(faqKbId)) {
+        // Let Angular move the blocks before measuring anything on the stage.
+        await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
+        if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
+      } else if (firstPass) {
+        // No layout to run -- the batch changed no structure -- but the agent may
+        // still have moved blocks with `move`, and their connectors are drawn where
+        // those blocks used to be. The layout, when it runs, carries them itself.
+        this.announceBlocksMovedByChat(faqKbId);
+      }
+      await this.connectorService.ensureConnectorsDrawn?.(this.intentService.listOfIntents || []);
+    } catch (error) {
+      // Best-effort: the flow is saved either way.
+    }
+  }
+
+  /** The chat has stopped working: redraw now, on a fact.
+   *
+   *  The timed checks below stay, and are the fallback rather than the plan:
+   *  they run 1s and 3s after the last patch, which is a guess at when the
+   *  agent has finished, and a turn that keeps going past 3s leaves blocks on
+   *  screen whose connectors were never drawn. The chat knows exactly when it
+   *  came to rest and now says so (`onStatus` on the host adapter), so this
+   *  runs at that moment. A chat too old to send it falls back to the timers,
+   *  which is why they are not being removed.
+   *
+   *  Called for every turn that ends, including a failed or cancelled one:
+   *  whatever was applied before it ended is on the canvas, and has to be
+   *  drawn correctly. */
+  public async redrawAfterRun(): Promise<void> {
+    const faqKbId = this.dashboardService.id_faq_kb;
+    if (!faqKbId) { return; }
+    // Angular may still be rendering the cards of the last batch; measuring the
+    // stage before it has placed them finds anchors that are not there yet.
+    await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
+    await this.redrawFlow(faqKbId, true);
+  }
+
   private scheduleConnectorCheck(faqKbId: string): void {
     this.connectorCheckTimers.forEach(timer => clearTimeout(timer));
-    this.connectorCheckTimers = CONNECTOR_CHECK_DELAYS_MS.map((delay, pass) => setTimeout(async () => {
-      if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
-      try {
-        if (pass === 0 && this.layoutFlow(faqKbId)) {
-          // Let Angular move the blocks before measuring anything on the stage.
-          await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
-          if (this.dashboardService.id_faq_kb !== faqKbId) { return; }
-        } else if (pass === 0) {
-          // No layout to run -- the batch changed no structure -- but the agent may
-          // still have moved blocks with `move`, and their connectors are drawn where
-          // those blocks used to be. The layout, when it runs, carries them itself.
-          this.announceBlocksMovedByChat(faqKbId);
-        }
-        await this.connectorService.ensureConnectorsDrawn?.(this.intentService.listOfIntents || []);
-      } catch (error) {
-        // Best-effort: the flow is saved either way.
-      }
-    }, delay));
+    this.connectorCheckTimers = CONNECTOR_CHECK_DELAYS_MS.map((delay, pass) => setTimeout(
+      () => void this.redrawFlow(faqKbId, pass === 0), delay));
     const lastDelay = CONNECTOR_CHECK_DELAYS_MS[CONNECTOR_CHECK_DELAYS_MS.length - 1];
     this.connectorCheckTimers.push(setTimeout(() => {
       if (this.dashboardService.id_faq_kb !== faqKbId) { return; }

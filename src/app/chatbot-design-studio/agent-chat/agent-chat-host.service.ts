@@ -140,6 +140,16 @@ export class AgentChatHostService {
       })
     });
 
+    // The chat now says when a turn has finished, so the canvas is redrawn on
+    // that instead of on FlowOpsService's timers -- which fire 1s and 3s after
+    // the last patch and miss a turn that runs longer, leaving blocks whose
+    // connectors were never drawn. Optional call: an older chat sends nothing
+    // and the timers stay in charge.
+    this.host.onStatus?.((state) => {
+      this.logger.log('[AGENT-CHAT-HOST] stato della chat:', state);
+      if (state === 'idle') { void this.flowOps.redrawAfterRun(); }
+    });
+
     this.registerTool('get_flow', async () => {
       // readFlow() is synchronous and cannot fail; family.read() awaits up to
       // two HTTP calls and can. Losing id_faq_kb and intents -- the flow the

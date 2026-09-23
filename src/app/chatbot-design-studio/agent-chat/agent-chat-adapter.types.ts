@@ -27,6 +27,12 @@ export interface AgentChatHost {
   registerTool(name: string, handler: ToolHandler): void;
   setContext(ctx: { projectId: string; flowId: string }): void;
   setToken(token: string): void;
+  /** Told when the chat starts working and when it has come to rest.
+   *
+   *  Optional because the chat is deployed on its own: a studio pointed at an
+   *  older chat gets no `onStatus` at all, and must keep working from the
+   *  timed checks instead of failing. Call it as `host.onStatus?.(...)`. */
+  onStatus?(handler: (state: 'busy' | 'idle') => void): void;
   destroy(): void;
 }
 
