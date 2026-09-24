@@ -18,6 +18,7 @@ import { ControllerService } from '../services/controller.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
@@ -85,7 +86,8 @@ export class IntentService {
     private controllerService: ControllerService,
     private stageService: StageService,
     private dashboardService: DashboardService,
-    private tiledeskAuthService: TiledeskAuthService
+    private tiledeskAuthService: TiledeskAuthService,
+    private readonly readOnlyService: ReadOnlyService
   ) { 
 
   }
@@ -1775,7 +1777,17 @@ export class IntentService {
     }
 
     /** updateIntent */
-    private async opsUpdate(payload: any, UndoRedo=true): Promise<boolean> { 
+    private async opsUpdate(payload: any, UndoRedo=true): Promise<boolean> {
+      // Sola lettura: qui passano TUTTE le scritture del flusso -- creazione, modifica,
+      // cancellazione, undo, redo, incolla, e il salvataggio della posizione che parte a
+      // ogni mouse-up su un blocco. Fermarle qui le ferma tutte, comprese quelle che
+      // un domani arriveranno da pulsanti che oggi non esistono.
+      // Si risolve true: chi chiama si aspetta che il salvataggio sia andato, e sullo
+      // schermo la modifica resta; che non venga conservata lo dice il banner in cima.
+      if (this.readOnlyService.readOnly) {
+        this.logger.log('[INTENT SERVICE] read-only: salvataggio non inviato');
+        return true;
+      }
       // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', payload);
       payload = removeNodesStartingWith(payload, '__');
       // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`

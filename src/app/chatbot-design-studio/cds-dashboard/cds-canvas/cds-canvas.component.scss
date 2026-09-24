@@ -498,7 +498,10 @@ svg:not(:root) {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 60px;
+  /* Era 60px scritti a mano, cioe' la larghezza della sidebar duplicata qui dentro.
+     Con la variabile la maschera segue lo spazio che la sidebar occupa davvero: in
+     sola lettura, dove la sidebar non c'e', vale zero e la maschera copre tutto. */
+  left: var(--sidebar-base-width);
   right: 0;
   z-index: 999;
   pointer-events: all;
@@ -551,3 +554,4 @@ cds-widget-logs {
     width: calc(100% - 460px);
   }
 }
+

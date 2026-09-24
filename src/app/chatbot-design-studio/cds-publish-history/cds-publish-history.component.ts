@@ -9,6 +9,9 @@ import * as moment from 'moment';
 import { AppConfigService } from 'src/app/services/app-config';
 import { avatarPlaceholder, getColorBck } from 'src/chat21-core/utils/utils-user';
 import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { CdsPreviewModalComponent } from './cds-preview-modal/cds-preview-modal.component';
 
 
 
@@ -63,8 +66,46 @@ export class CdsPublishHistoryComponent implements OnInit {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
     public appConfigService: AppConfigService,
-     private translate: TranslateService
+     private translate: TranslateService,
+     private readonly router: Router,
+     private readonly dialog: MatDialog
   ) { }
+
+  /**
+   * Apre la release in sola lettura, in una modale a schermo intero.
+   *
+   * Una release pubblicata e' un chatbot vero (un fork dell'originale con i suoi
+   * intent), quindi basta puntare il design studio sul suo id: niente di nuovo lato
+   * server.
+   *
+   * La modale ospita la rotta di preview in un iframe, e non il canvas montato qui
+   * dentro: i servizi del design studio sono singleton e tengono lo stato del flusso
+   * aperto, che altrimenti verrebbe sovrascritto da quello della release. Il perche'
+   * per esteso sta in CdsPreviewModalComponent.
+   */
+  viewRelease(release: Chatbot) {
+    const projectId = this.dashboardService.projectID;
+    if (!projectId || !release?._id) {
+      this.logger.error('[CDS-PUBLISH-HISTORY] - view release: dati mancanti', projectId, release);
+      return;
+    }
+    const path = this.router.serializeUrl(
+      this.router.createUrlTree(['project', projectId, 'preview', release._id, 'blocks'])
+    );
+    // L'applicazione usa le rotte con il cancelletto: l'indirizzo assoluto e' quello
+    // corrente senza la sua parte dopo il cancelletto, piu' il percorso della preview.
+    const url = window.location.href.split('#')[0] + '#' + path;
+    this.logger.log('[CDS-PUBLISH-HISTORY] - view release', url);
+    this.dialog.open(CdsPreviewModalComponent, {
+      data: { url, title: release['formattedDate'] },
+      panelClass: 'cds-preview-dialog-container',
+      width: '100vw',
+      height: '100vh',
+      maxWidth: '100vw',
+      autoFocus: false,
+      restoreFocus: false
+    });
+  }
 
   ngOnInit(): void {
     moment.locale('en');
