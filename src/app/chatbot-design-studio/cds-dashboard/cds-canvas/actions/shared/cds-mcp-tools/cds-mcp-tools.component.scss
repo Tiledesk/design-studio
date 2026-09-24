@@ -43,12 +43,23 @@
     justify-content: space-between;
     gap: 10px;
 
+    // override locale della .title-label globale (styles.scss:127): piu piccola e non in grassetto
     .title-label {
         margin: 0;
+        font-size: 12px;
+        font-weight: 400;
     }
 }
 
-// "Manage MCP tools" — classic button (cds-blue-button), compact for the header row.
+// La regola globale `.btn.btn-primary.cds-blue-button` (styles.scss:295) ha specificita' 0,3,0 e
+// imporrebbe font-size 14px / padding 6px 12px: questa, con le stesse 3 classi piu' la nostra, vale
+// 0,4,0 e vince sempre senza ricorrere a !important.
+.btn.btn-primary.cds-blue-button.mcp-manage-btn {
+    font-size: 11px;
+    padding: 5px 12px;
+}
+
+// I due pulsanti dell'header condividono la stessa metrica: cambia solo la pelle.
 .mcp-manage-btn {
     display: inline-flex;
     align-items: center;
@@ -57,6 +68,28 @@
     font-size: 11px;
     line-height: 1;
     white-space: nowrap;
+}
+
+// Variante "nessun tool agganciato": call to action tratteggiata.
+.mcp-select-btn {
+    gap: 4px;
+    background-color: transparent;
+    border: 1px dashed var(--blu-light-02);
+    border-radius: var(--button-border-radius-base);
+    color: var(--blu-02);
+    font-family: var(--font-family-poppins);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .mcp-select-btn__icon {
+        font-size: 14px;
+    }
+
+    &:hover {
+        background-color: #e8f4ff;
+        border-color: var(--blu-02);
+    }
 }
 
 .mcp-servers-grid {

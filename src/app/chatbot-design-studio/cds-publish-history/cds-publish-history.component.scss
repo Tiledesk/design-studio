@@ -199,11 +199,8 @@
 }
 
 /* I tre pulsanti stanno su una riga sola: prima erano inline e andavano a capo appena
-   il terzo non ci stava, lasciando "Restore" spaiato sotto gli altri due. */
-.restore-release {
-  flex-shrink: 0;
-}
-
+   il terzo non ci stava, lasciando "Restore" spaiato sotto gli altri due.
+   `.restore-release` non si comprime: la regola sta piu' sotto. */
 .restore-btn-wpr {
   display: flex;
   align-items: center;
@@ -224,6 +221,12 @@
   cursor: pointer;
   /* Un'etichetta non si spezza mai a meta' */
   white-space: nowrap;
+}
+
+/* .release-item accanto occupa width: 100%, quindi senza questo il wrapper del
+   pulsante verrebbe compresso e l'etichetta andrebbe a capo sul trattino. */
+.restore-release {
+  flex-shrink: 0;
 }
 
 .clamped-wrapper {

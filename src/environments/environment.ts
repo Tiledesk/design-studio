@@ -1,15 +1,28 @@
 export const environment = {
-    production: false,
+    production: true,
     t2y12PruGU9wUtEGzBJfolMIgK: 'CHANGEIT',
     VERSION: require('../../package.json').version,
+    /** Versione dell'editor con cui nasce un chatbot creato da qui: finisce sull'agente
+     *  come `attributes.dsVersion` e all'apertura decide quale Design Studio si apre.
+     *  Nessun rapporto con VERSION, che e' la versione del pacchetto. */
+    CHATBOT_VERSION: 'v3',
     remoteConfig: true, 
     remoteConfigUrl: './design-studio-config.json',
-    //remoteConfigUrl: './environments/real_data/cds-config-aws-stage.json',
+    // remoteConfigUrl: './environments/real_data/cds-config-aws-stage.json',
     apiUrl: 'CHANGEIT',
     widgetBaseUrl: 'CHANGEIT',
     dashboardBaseUrl: 'CHANGEIT',
     whatsappTemplatesBaseUrl: 'CHANGEIT',
-    wsUrl: 'ws://localhost:3001/',
+    // The agent chat's mount point. It reverse proxies to the agent runtime,
+    // so this is the only address design-studio needs. Unset or CHANGEIT
+    // hides the feature entirely.
+    //
+    // This value is never read at run time: `remoteConfig: true` above means
+    // AppConfigService.loadAppConfig replaces this whole object with
+    // design-studio-config.json, where the key ships as CHANGEIT. Set it
+    // THERE to switch the feature on.
+    agentChatUrl: 'http://localhost:5173',
+    wsUrl: 'ws://localhost:3000/',
     uploadEngine: 'native',
     baseImageUrl: 'CHANGEIT',
     fileUploadAccept: "*/*",
@@ -29,10 +42,7 @@ export const environment = {
     },
     chat21Config: {
       appId: 'tilechat',
-      MQTTendpoint: 'ws://localhost:15675/ws', // MQTT endpoint (mqtt.js in a browser needs ws://, not mqtt://)
+      MQTTendpoint: 'mqtt://localhost:15675/ws', // MQTT endpoint
       APIendpoint: 'http://localhost:8004/api'
-    },
-    // TEMP: connectors surfaced directly from their /api/manifest until the per-project
-    // install/integration-record flow exists. Empty in prod/pre.
-    connectorBaseUrls: ['http://localhost:3000']
+    }
 };

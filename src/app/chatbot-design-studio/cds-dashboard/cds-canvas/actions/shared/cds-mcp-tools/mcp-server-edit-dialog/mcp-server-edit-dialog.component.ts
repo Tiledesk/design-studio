@@ -213,6 +213,14 @@ export class McpServerEditDialogComponent implements OnInit {
     return this.selectedToolNames.size;
   }
 
+  /**
+   * Nomi dei tool selezionati, per l'anteprima inline sotto il contatore.
+   * Nessun riordino: stessa resa dell'anteprima nella lista dei server MCP.
+   */
+  get selectedToolNamesList(): string[] {
+    return Array.from(this.selectedToolNames);
+  }
+
   isToolSelected(name: string): boolean {
     return this.selectedToolNames.has(name);
   }

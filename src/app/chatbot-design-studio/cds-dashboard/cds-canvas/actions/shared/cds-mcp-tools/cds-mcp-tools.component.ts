@@ -26,6 +26,12 @@ export class CdsMcpToolsComponent implements OnInit, OnChanges {
   @Input() servers: McpSelectedServer[] = [];
   /** Project id; falls back to DashboardService inside McpService when empty. */
   @Input() projectId: string;
+  /**
+   * Id dell'azione ospite (`action._tdActionId`). Serve a memorizzare la selezione dei tool
+   * per AZIONE: senza, la memoria dei server deselezionati e' disattivata (degrada alla sola
+   * sessione del dialog).
+   */
+  @Input() actionId: string;
   /** When true, also render the read-only tag preview of the selected servers. */
   @Input() previewMode: boolean = false;
   /** When true, disables the picker interactions. */
@@ -84,6 +90,7 @@ export class CdsMcpToolsComponent implements OnInit, OnChanges {
       data: {
         mcpServers: this.availableServers,
         selectedServers: this.servers,
+        actionId: this.actionId,
         onUpdate: (updateData: any) => this.handleMcpServersUpdate(updateData)
       }
     });

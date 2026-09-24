@@ -14,6 +14,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { FlowOpsService } from '../../agent-chat/flow-ops.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -119,6 +120,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   mapOfIntents = [];
   labelInfoLoading: string = 'Loading';
 
+  /** Blocks already rendered on this stage: anything rendered after the first build and
+   *  not in here is a block that has just been added (by hand, paste, undo or the AI chat). */
+  private renderedIntentIds = new Set<string>();
+  private newIntentIds: string[] = [];
+  private newIntentTimer: any = null;
+  private layoutConnectorsTimer: any = null;
+
   // ============================================================
   // UI PANEL STATES
   // ============================================================
@@ -172,6 +180,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   private subscriptionWidgetLoaded: Subscription;
   private subscriptionUndoRedo: Subscription;
   private subscriptionTogglePublishPanelState: Subscription;
+  private subscriptionLayoutApplied: Subscription;
 
   // ============================================================
   // PRIVATE STATE
@@ -182,6 +191,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   /** rAF throttle for moved-and-scaled: at most one Angular update per frame */
   private _movedAndScaledRafId: number | null = null;
   private _movedAndScaledPendingDetail: { scale: number; x: number; y: number } | null = null;
+  /** Publishes this canvas' own width as --canvas-width (see observeHostWidth). */
+  private hostResizeObserver: ResizeObserver | null = null;
 
   // ============================================================
   // CONSTRUCTOR & LIFECYCLE
@@ -201,6 +212,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     private readonly noteService: NoteService,
     private readonly ngZone: NgZone,
     public noteResizeState: NoteResizeStateService,
+    private readonly flowOpsService: FlowOpsService,
+    private readonly hostElement: ElementRef<HTMLElement>,
     public readonly readOnlyService: ReadOnlyService
   ) {
     this.setSubscriptions();
@@ -211,13 +224,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
     this.resolveActiveLeftPanel();
+    // V3: closed from the first render, not closed by an animation after it.
+    if (this.dashboardService.isV3) { this.IS_OPEN_INTENTS_LIST = false; }
     this.initialize();
   }
 
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
-    if (this.stageService.settings?.open_intent_list_state != null) {
+    this.observeHostWidth();
+    if (this.dashboardService.isV3) {
+      // V3: the blocks sidebar is closed whenever an agent is opened, the AI chat is open instead.
+      this.IS_OPEN_INTENTS_LIST = false;
+    } else if (this.stageService.settings?.open_intent_list_state != null) {
       this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
     }
 
@@ -233,6 +252,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   ngOnDestroy() {
     this.unsubscribe();
     this.connectorService.clearRetryQueue();
+    clearTimeout(this.newIntentTimer);
+    clearTimeout(this.layoutConnectorsTimer);
+    this.hostResizeObserver?.disconnect();
 
     if (this.saveNoteDetailTimer) {
       clearTimeout(this.saveNoteDetailTimer);
@@ -267,6 +289,19 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   private unsubscribe(): void {
     this.unsubscribe$.next(null);
     this.unsubscribe$.complete();
+  }
+
+  /** The widget log is positioned against the dashboard, not against this canvas, yet
+   *  starts at the canvas' left edge: sized on the dashboard it ran under the widget
+   *  preview whenever the AI chat panel took space on the left. The canvas' real width,
+   *  kept up to date as the chat opens, closes or is resized, is what it sizes on. */
+  private observeHostWidth() {
+    if (typeof ResizeObserver === 'undefined') { return; }
+    const host = this.hostElement.nativeElement;
+    this.hostResizeObserver = new ResizeObserver(() => {
+      host.style.setProperty('--canvas-width', `${host.clientWidth}px`);
+    });
+    this.hostResizeObserver.observe(host);
   }
 
   private getParamsFromURL() {
@@ -318,6 +353,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   }
 
   private setSubscriptions() {
+    this.subscriptionLayoutApplied = this.flowOpsService.layoutApplied$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(layout => this.onFlowLaidOut(layout));
+
     this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((connector: any) => {
@@ -339,6 +378,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
         this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
         if (intents.length > 0) {
           this.listOfIntents = intents;
+          // Il connector service controlla le destinazioni su questa lista: va tenuta
+          // allineata anche dopo una cancellazione, che sostituisce l'array.
+          this.connectorService.syncIntents(intents);
         }
       });
 
@@ -462,6 +504,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     document.addEventListener("keydown", this.listnerKeydown, false);
   }
 
+
   // ============================================================
   // LOADING & RENDERING METHODS
   // ============================================================
@@ -479,6 +522,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   }
 
   onIntentRendered(intentID) {
+    if (this.renderedAllIntents === true && intentID && !this.renderedIntentIds.has(intentID)) {
+      this.onNewIntentRendered(intentID);
+      return;
+    }
+    if (intentID) {
+      this.renderedIntentIds.add(intentID);
+    }
     if (this.stageService.loaded === false && this.renderedAllElements === false) {
       this.labelInfoLoading = 'CDSCanvas.intentsProgress';
       if (this.mapOfIntents[intentID]) {
@@ -490,6 +540,70 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       const allShownTrue = Object.values(this.mapOfIntents).every(intent => intent.shown === 'true');
       if (allShownTrue) {
         this.onAllIntentsRendered();
+      }
+    }
+  }
+
+  /** A block added after the stage was built has just been rendered.
+   *
+   *  Collected for a moment, because the AI chat adds several blocks at once. Then every
+   *  connector from and to each new block is redrawn: they were first attempted before
+   *  the block's element existed. The stage is left where the user put it. */
+  private onNewIntentRendered(intentID: string) {
+    this.renderedIntentIds.add(intentID);
+    this.newIntentIds.push(intentID);
+    clearTimeout(this.newIntentTimer);
+    this.newIntentTimer = setTimeout(() => this.showNewIntents(), 80);
+  }
+
+  private showNewIntents() {
+    const ids = this.newIntentIds.filter(id => !!this.listOfIntents?.find(intent => intent.intent_id === id));
+    this.newIntentIds = [];
+    if (ids.length === 0) { return; }
+
+    requestAnimationFrame(async () => {
+      for (const id of ids) {
+        try {
+          await this.connectorService.refreshConnectorsAroundIntent(id, this.listOfIntents);
+        } catch (error) {
+          this.logger.error('[CDS-CANVAS] refresh connectors of new block failed', id, error);
+        }
+      }
+    });
+  }
+
+  /** The AI chat has finished editing and the flow has been laid out again: once the blocks
+   *  are at their new place, the connectors follow them and the view fits the whole flow.
+   *
+   *  Every block's connectors are updated, not only the moved ones: the update recomputes the
+   *  connectors LEAVING a block, so a connector entering a moved block from a block that stayed
+   *  put would keep pointing at the old place. A second pass once the fit animation is over
+   *  catches the connectors the connector check drew while the stage was still moving. */
+  private onFlowLaidOut(layout: { faqKbId: string, movedIds: string[], fitView?: boolean }) {
+    if (layout.faqKbId !== this.id_faq_kb) { return; }
+    clearTimeout(this.layoutConnectorsTimer);
+    requestAnimationFrame(async () => {
+      if (layout.faqKbId !== this.id_faq_kb) { return; }
+      if (layout.movedIds.length > 0) {
+        await this.updateAllConnectors();
+      }
+      // Blocks the AI chat moved leave the viewport alone: it is the user's, and
+      // nothing asked for it to change. Only a whole-flow layout fits the view.
+      if (layout.fitView !== false) {
+        await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
+      }
+      this.layoutConnectorsTimer = setTimeout(() => {
+        if (layout.faqKbId === this.id_faq_kb) { this.updateAllConnectors(); }
+      }, 400);
+    });
+  }
+
+  private async updateAllConnectors() {
+    for (const intent of this.listOfIntents || []) {
+      try {
+        await this.connectorService.updateConnector(intent.intent_id);
+      } catch (error) {
+        this.logger.error('[CDS-CANVAS] update connectors of a laid out block failed', intent?.intent_id, error);
       }
     }
   }
@@ -747,6 +861,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
 
   @HostListener('document:keydown', ['$event'])
   onKeydownHandler(event: KeyboardEvent) {
+    // event.key === 'Backspace' ||
     if (event.key === 'Escape' || event.key === 'Canc' && !this.hasClickedAddAction) {
       if (!this.hasClickedAddAction) {
         this.removeConnectorDraftAndCloseFloatMenu();

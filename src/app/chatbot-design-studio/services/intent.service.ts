@@ -4,7 +4,7 @@ import { filter } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionReplaceBotV4, ActionReturnStack, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, isDefaultFallbackWithoutActions } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
@@ -263,6 +263,14 @@ export class IntentService {
 
 
   public setMapOfIntents(){
+    // Built from scratch, not added to. This map is the canvas's checklist of
+    // the blocks it is waiting to render, so it describes ONE flow. Adding to
+    // it was harmless only while changing flow meant reloading the page, which
+    // threw this singleton away with everything else; now that the canvas is
+    // rebuilt in place, a block left over from the previous flow never
+    // renders, the checklist never completes, and the connectors -- drawn only
+    // once every block has reported in -- are never drawn at all.
+    this.mapOfIntents = {};
     this.listOfIntents.forEach( intent => {
       const intentID = intent.intent_id;
       this.mapOfIntents[intentID] = {'shown': false };
@@ -279,6 +287,11 @@ export class IntentService {
 
   public addActionToIntentSelected(action){
     if(action && this.intentSelected){
+      // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta, da nessuna via
+      if (isDefaultFallbackWithoutActions(this.intentSelected)) {
+        this.logger.log('[INTENT SERVICE] addActionToIntentSelected: impedito - defaultFallback vuota (bloccata)');
+        return;
+      }
       this.intentSelected.actions.push(action);
       this.updateIntent(this.intentSelected);
     }
@@ -762,6 +775,11 @@ export class IntentService {
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta, da nessuna via
+    if (isDefaultFallbackWithoutActions(currentIntent)) {
+      this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent: impedito - defaultFallback vuota (bloccata)');
+      return null;
+    }
     currentIntent.actions.splice(currentActionIndex, 0, newAction);
     this.behaviorIntent.next(currentIntent);
     // this.connectorService.updateConnector(currentIntent.intent_id);
@@ -790,6 +808,11 @@ export class IntentService {
     let previousIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === that.previousIntentId;
     });
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere spostata al suo interno
+    if (isDefaultFallbackWithoutActions(currentIntent)) {
+      this.logger.log('[INTENT-SERVICE] moveActionBetweenDifferentIntents: impedito - defaultFallback vuota (bloccata)');
+      return;
+    }
     // this.logger.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
@@ -954,13 +977,16 @@ export class IntentService {
         /// let id_faq_kb = this.dashboardService.id_faq_kb;
         /// this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         /// this.stageService.centerStageOnHorizontalPosition(startElement);
-        let left = 0;
-        const element = document.getElementById('cdsPanelIntentList');
-        if (element) {
-          left = element.offsetWidth+100;
-        }
+        // This used to nudge the centred position right by roughly
+        // #cdsPanelIntentList's (.box-left's) own width, to clear the
+        // sidebar back when #tds_container spanned underneath it and
+        // .box-left merely floated on top via z-index. #tds_container is a
+        // real flex sibling starting after .box-left (and the chat panel)
+        // now, so centring within the container's own coordinate space
+        // already lands past both -- re-adding their width here would push
+        // the 'start' block needlessly far right instead of centring it.
         let id_faq_kb = this.dashboardService.id_faq_kb;
-        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
+        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement);
       }
     }
   }
@@ -1530,7 +1556,12 @@ export class IntentService {
       this.setBehaviorUndoRedo();
       this.opsUpdate(this.payload);
     }
-    const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
+    // Optional all the way down: this is a log line, and `intentSelected` is
+    // null on a freshly rebuilt canvas (a flow switch destroys and recreates
+    // it, and nothing re-selects a block). Dereferencing it there threw --
+    // out of a public method the canvas's own Ctrl+Z and the chat panel's
+    // Undo both call -- for the sake of a message nobody reads.
+    const action = this.intentSelected?.actions?.find((obj) => obj._tdActionId === this.actionSelectedID);
     this.logger.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
   }
 
@@ -1699,6 +1730,31 @@ export class IntentService {
       this.logger.log('[INTENT SERVICE] -> error, ', error);
     }
     this.opsUpdate(this.payload); 
+  }
+
+  /** Moves several blocks at once, as ONE step of undo and ONE save.
+   *  Used by the automatic layout of the flow: updateIntent() per block would push one
+   *  undo entry and one save per block. The undo copy is the block as it is now, just
+   *  before the move. Returns the ids actually moved. */
+  public updateIntentPositions(moves: Array<{ intent_id: string, position: { x: number, y: number } }>): string[] {
+    const undo = [];
+    const redo = [];
+    let idFaqKb = null;
+    for (const move of moves || []) {
+      const intent = this.listOfIntents.find((obj) => obj.intent_id === move.intent_id);
+      if (!intent) { continue; }
+      undo.push({ type: "put", intent: JSON.parse(JSON.stringify(intent)) });
+      intent.attributes = intent.attributes || {};
+      intent.attributes.position = { x: move.position.x, y: move.position.y };
+      redo.push({ type: "put", intent: JSON.parse(JSON.stringify(intent)) });
+      idFaqKb = intent.id_faq_kb;
+    }
+    if (redo.length === 0) { return []; }
+    this.arrayUNDO.push({ undo: undo, redo: redo });
+    this.arrayREDO = [];
+    this.setBehaviorUndoRedo();
+    this.opsUpdate({ id_faq_kb: idFaqKb, operations: redo }).catch(() => {});
+    return redo.map(op => op.intent.intent_id);
   }
 
   /** */

@@ -46,17 +46,32 @@
                     <div class="server-info">
                         <div class="server-name">
                             {{ server.name }}
-                            <span class="material-icons mcp-server__native-icon"
-                                [matTooltip]="'CDSCanvas.Native' | translate" matTooltipClass="cds-mat-tooltip">verified</span>
+                            <span class="material-icons-outlined mcp-server__native-icon"
+                                [matTooltip]="'CDSCanvas.Native' | translate" matTooltipClass="cds-mat-tooltip">shield</span>
                             <span *ngIf="isConfigured(server)" class="material-icons mcp-server__status-icon mcp-server__status-icon--active"
                                 [matTooltip]="'CDSCanvas.Active' | translate" matTooltipClass="cds-mat-tooltip">check_circle</span>
                         </div>
                         <div *ngIf="server.description" class="server-url">{{ server.description }}</div>
                         <div class="server-type">{{ server.transport }}</div>
+                        <div class="server-type mcp-server__tools-active-row">
+                            <span class="mcp-server__tools-active-label">{{'CDSCanvas.ToolsActiveLabel' | translate}}:</span>
+                            <mcp-active-tools-inline
+                                [names]="getActiveToolNames(server)"
+                                (more)="onSelectNative(server)">
+                            </mcp-active-tools-inline>
+                        </div>
                     </div>
                     <span class="material-icons">chevron_right</span>
                 </button>
             </div>
         </div>
+    </div>
+
+    <div class="tpl-modal-buttons">
+        <button id="cds-native-close-btn" class="mcp-dialog__secondary-btn" type="button"
+            [matTooltip]="'CDSCanvas.Close' | translate" matTooltipClass="cds-mat-tooltip"
+            [mat-dialog-close]="false">
+            {{'CDSCanvas.Close' | translate}}
+        </button>
     </div>
 </div>

@@ -214,7 +214,8 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
       const actionLlm = (this.action?.llm ?? '').trim().toLowerCase();
       // Con i provider multi-server lo stesso model id esiste su più server:
       // se l'action ne ha salvato uno, va usato per disambiguare.
-      const actionServer = (this.action?.vllmServer ?? this.action?.agentPlatformServer ?? '').trim();
+      const actionServer = (this.action?.vllmServer ?? this.action?.llmServer
+                            ?? this.action?.agentPlatformServer ?? '').trim();
       const match = this.llm_models_flat.find(m => {
         const sameModel = (m?.model ?? '') === actionModel;
         if (!sameModel) return false;

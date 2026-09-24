@@ -176,6 +176,15 @@
                     </button>
                 </div>
 
+                <!-- Elenco dei tool selezionati, stessa resa dell'anteprima nella lista server:
+                     riga singola con ellissi e "more.." quando i nomi non entrano. -->
+                <div *ngIf="selectedToolsCount > 0" class="tools-selected-preview">
+                    <mcp-active-tools-inline
+                        [names]="selectedToolNamesList"
+                        (more)="openToolsModal()">
+                    </mcp-active-tools-inline>
+                </div>
+
                 <!-- <div *ngIf="totalToolsCount === 0" class="readonly-field">
                     {{'CDSCanvas.NoToolsAvailable' | translate}}
                 </div> -->
@@ -244,6 +253,14 @@
                     <span *ngIf="tool.description" class="tools-modal__item-desc">{{ tool.description }}</span>
                 </div>
             </div>
+        </div>
+
+        <div class="tpl-modal-buttons">
+            <button id="cds-tools-close-btn" class="mcp-dialog__secondary-btn" type="button"
+                [matTooltip]="'CDSCanvas.Close' | translate" matTooltipClass="cds-mat-tooltip"
+                (click)="closeToolsModal()">
+                {{'CDSCanvas.Close' | translate}}
+            </button>
         </div>
     </div>
 </div>

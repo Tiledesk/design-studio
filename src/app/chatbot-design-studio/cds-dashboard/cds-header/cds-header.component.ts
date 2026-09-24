@@ -32,6 +32,7 @@ import { TYPE_CHATBOT } from '../../utils-actions';
 import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
 import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
+import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
 
 const swal = require('sweetalert');
 
@@ -52,12 +53,18 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
    private subscriptionTestItOutPlayed: Subscription;
    private subscriptionIsSaving: Subscription;
    private subscriptionIsSavingVisible: Subscription;
+   private subscriptionSelectedChatbot: Subscription;
 
   id_faq_kb: string;
   projectID: string;
   defaultDepartmentId: string;
   //selectedChatbot: Chatbot;
 
+
+  /** Gli agent del progetto, per il selettore in header. */
+  agents: Chatbot[] = [];
+  /** True mentre l'eliminazione dell'agent e' in volo. */
+  isDeletingAgent: boolean = false;
 
   isBetaUrl: boolean = false;
   popup_visibility: string = 'none';
@@ -107,9 +114,24 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly triggerService: ConnectorTriggerService,
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
+    private agentChatHostService: AgentChatHostService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
+  }
+
+  /** The button exists only where the feature is configured, exactly as
+   *  connector base URLs gate the connector catalogue. */
+  get isAgentChatAvailable(): boolean {
+    return this.agentChatHostService.isConfigured();
+  }
+
+  get isAgentChatPanelOpen(): boolean {
+    return this.controllerService.isAgentChatPanelOpen;
+  }
+
+  onToggleAgentChat(){
+    this.controllerService.toggleAgentChatPanel();
   }
 
   manageRouteChanges(){
@@ -140,10 +162,20 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.selectedChatbot = this.dashboardService.selectedChatbot;
     // this.IS_CHATBOT_MODIFIED = this.selectedChatbot?.modified || false;
     this.logger.log('[CdsHeaderComponent] selectedChatbot::: ', this.selectedChatbot);
+    this.loadAgents();
     if(this.dashboardService.selectedChatbot.subtype === 'webhook' || this.dashboardService.selectedChatbot.subtype === 'copilot'){
       this.isWebhook = true;
       this.initializeWebhook();
     }
+    // The studio can now move to another agent without a page reload
+    // (CdsDashboardComponent.openFlow), and this header is not rebuilt when it
+    // does: everything above that was read once must follow the agent.
+    this.subscriptionSelectedChatbot = this.dashboardService.selectedChatbot$
+      .subscribe((chatbot: Chatbot | null) => {
+        if (chatbot?._id && chatbot._id !== this.id_faq_kb) {
+          this.onAgentChanged(chatbot);
+        }
+      });
     this.getOSCODE();
     this.getTranslations()
     this.isBetaUrl = false;
@@ -152,10 +184,124 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+  // -------------------------------------------------------
+  // @ Selettore degli agent
+  // -------------------------------------------------------
+
+  /** Carica gli agent del progetto per il menu a tendina in header. */
+  private loadAgents(): void {
+    this.faqKbService.getFaqKbByProjectId().subscribe({
+      next: (agents: Chatbot[]) => {
+        this.agents = agents ? agents : [];
+        this.logger.log('[CdsHeaderComponent] loadAgents: ', this.agents.length);
+      },
+      error: (error) => {
+        // Il selettore resta vuoto ma l'header continua a funzionare.
+        this.logger.error('[CdsHeaderComponent] loadAgents ERROR: ', error);
+        this.agents = [];
+      }
+    });
+  }
+
+  /** Selettore dell'agent ed "Elimina agent" sono funzioni del V3: gli agent legacy mostrano solo il nome. */
+  get isV3(): boolean {
+    return this.dashboardService.isV3;
+  }
+
+  /**
+   * Passa a un altro agent. La rotta e' `/project/:projectid/chatbot/:faqkbid/blocks`
+   * e il canvas si ricostruisce sul nuovo agent, senza ricaricare la pagina.
+   */
+  onSelectAgent(agent: Chatbot): void {
+    if (!agent || !agent._id || agent._id === this.id_faq_kb) return;
+    this.logger.log('[CdsHeaderComponent] onSelectAgent: ', agent._id);
+    this.openAgent(agent._id);
+  }
+
+  /**
+   * Apre un agent senza ricaricare la pagina: `dashboardService.openFlow` naviga, azzera
+   * undo/redo, ricarica bot e blocchi e ricostruisce il canvas. L'header si riallinea da
+   * solo tramite `selectedChatbot$` (vedi `onAgentChanged`). I servizi inizializzati nel
+   * boot sono legati al progetto, non all'agent, quindi restano validi.
+   */
+  private async openAgent(botId: string): Promise<void> {
+    if (!this.dashboardService.openFlow) {
+      // Nessun dashboard montato: si cambia solo la rotta, mai un reload.
+      this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks']);
+      return;
+    }
+    try {
+      await this.dashboardService.openFlow(botId);
+    } catch (error) {
+      this.logger.error('[CdsHeaderComponent] openAgent ERROR: ', error);
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.OpenAgentError'), 4, 'report_problem');
+    }
+  }
+
+  /** Riallinea l'header all'agent aperto, quando cambia senza ricaricare la pagina. */
+  private onAgentChanged(chatbot: Chatbot): void {
+    // Prima di cambiare `isWebhook`: la chiusura del test usa lo stato dell'agent precedente.
+    if (this.isPlaying) {
+      this.onCloseTestItOut();
+    }
+    this.id_faq_kb = chatbot._id;
+    this.selectedChatbot = chatbot;
+    this.isWebhook = chatbot.subtype === 'webhook' || chatbot.subtype === 'copilot';
+    if (this.isWebhook) {
+      this.initializeWebhook();
+    }
+    this.loadAgents();
+  }
+
+  /**
+   * Elimina l'intero agent, previa conferma. L'operazione e' irreversibile:
+   * il server rimuove il chatbot e i suoi blocchi. A eliminazione avvenuta si
+   * passa al primo agent rimasto, o si torna alla dashboard se non ne restano.
+   */
+  onDeleteAgent(): void {
+    if (this.isDeletingAgent || !this.selectedChatbot?._id) return;
+    const name = this.selectedChatbot.name;
+    swal({
+      title: this.translate.instant('CDSHeader.DeleteAgentTitle'),
+      text: this.translate.instant('CDSHeader.DeleteAgentText', { name: name }),
+      icon: 'warning',
+      buttons: [this.translate.instant('Cancel'), this.translate.instant('Delete')],
+      dangerMode: true
+    }).then((willDelete: boolean) => {
+      if (!willDelete) return;
+      this.isDeletingAgent = true;
+      const botId = this.selectedChatbot._id;
+      this.faqKbService.deleteBot(botId).subscribe({
+        next: () => {
+          this.isDeletingAgent = false;
+          const remaining = this.agents.filter(a => a._id !== botId);
+          this.agents = remaining;
+          if (remaining.length > 0) {
+            this.openAgent(remaining[0]._id);
+          } else {
+            this.goToDashboardChatbots();
+          }
+        },
+        error: (error) => {
+          this.logger.error('[CdsHeaderComponent] onDeleteAgent ERROR: ', error);
+          this.isDeletingAgent = false;
+          this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.DeleteAgentError'), 4, 'report_problem');
+        }
+      });
+    });
+  }
+
+  /** Torna all'elenco degli agent nella dashboard esterna. */
+  private goToDashboardChatbots(): void {
+    const dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.projectID + '/bots/my-chatbots/all';
+    window.open(dashbordBaseUrl, '_self');
+  }
+
   ngOnDestroy() {
     if (this.subscriptionTestItOutPlayed) {
       this.subscriptionTestItOutPlayed.unsubscribe();
     }
+    this.subscriptionSelectedChatbot?.unsubscribe();
     this.subscriptionIsSaving?.unsubscribe();
     this.subscriptionIsSavingVisible?.unsubscribe();
   }

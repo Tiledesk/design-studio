@@ -295,3 +295,99 @@ export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
     { name: 'all (AND)', value: 'all' },
     { name: 'any (OR)',  value: 'any' }
 ];
+
+/**
+ * Action che espongono SEMPRE almeno un connettore di uscita proprio sul canvas
+ * (true/false, goto, fallback/error, noInput/noMatch...), indipendentemente dal
+ * loro contenuto. In V3 il pallino del blocco su di esse e' ridondante.
+ *
+ * Elenco derivato dai rami di ConnectorService.createConnectorsOfIntent() e
+ * verificato sui template che montano <cds-connector>: vedi la tabella in
+ * docs/V3/design-studio-v3-analysis.md (Parte 1-bis).
+ *
+ * ESCLUSE di proposito:
+ * - la famiglia REPLY (reply, replyv2, randomreply): i bottoni sono ramificazioni
+ *   su scelta dell'utente e noInput/noMatch sono percorsi d'errore, ma il flusso
+ *   deve poter proseguire di default dopo la risposta. Mostrano quindi SEMPRE il
+ *   pallino del blocco, con o senza bottoni configurati.
+ * - CAPTURE_USER_REPLY: il suo <cds-connector> compare solo su una capture che
+ *   porta ancora la vecchia destinazione in goToIntent; l'uscita e' il pallino del
+ *   blocco, che il CSS V3 porta sul bordo in basso a destra accanto alla action.
+ * - le action voice (TYPE_ACTION_VXML): montano i connettori tramite elementi
+ *   condivisi ma non tutte hanno un ramo nel connector service.
+ *
+ * Nel dubbio si mostra il pallino: uno in piu' e' innocuo, uno in meno lascia il
+ * blocco senza via d'uscita.
+ */
+export const ACTIONS_WITH_OWN_OUTPUTS: Array<TYPE_ACTION> = [
+    TYPE_ACTION.INTENT,
+    TYPE_ACTION.CONNECT_BLOCK,
+    TYPE_ACTION.ONLINE_AGENTS,
+    TYPE_ACTION.ONLINE_AGENTSV2,
+    TYPE_ACTION.OPEN_HOURS,
+    TYPE_ACTION.JSON_CONDITION,
+    TYPE_ACTION.JSON_CONDITION2,
+    TYPE_ACTION.ASKGPT,
+    TYPE_ACTION.ASKGPTV2,
+    TYPE_ACTION.GPT_TASK,
+    TYPE_ACTION.GPT_ASSISTANT,
+    TYPE_ACTION.AI_PROMPT,
+    TYPE_ACTION.AI_CONDITION,
+    TYPE_ACTION.WEB_REQUESTV2,
+    TYPE_ACTION.DATA_TABLE,
+    TYPE_ACTION.SEND_WHATSAPP,
+    TYPE_ACTION.MAKE,
+    TYPE_ACTION.HUBSPOT,
+    TYPE_ACTION.CUSTOMERIO,
+    TYPE_ACTION.BREVO,
+    TYPE_ACTION.N8N,
+    TYPE_ACTION.QAPLA,
+    TYPE_ACTION.ITERATION,
+];
+
+/**
+ * Action che CHIUDONO il flusso: dopo di esse il controllo non torna all'agente
+ * corrente, quindi in V3 il pallino di uscita del blocco non avrebbe destinazione
+ * e va nascosto. Non e' una questione grafica: un collegamento partito da qui non
+ * verrebbe mai percorso a runtime.
+ *
+ * - close: chiude la conversazione;
+ * - agent: passa a un operatore (se non ce ne sono, la chat finisce in unassigned);
+ * - move_to_unassigned: mette la chat in coda, variante dell'handoff;
+ * - replacebot / replacebotv2 / replacebotv3: subentra un altro agente AI, che da
+ *   quel momento possiede la conversazione.
+ *
+ * Change Department NON e' in elenco perche' dipende dal contenuto: vedi
+ * actionEndsTheFlow().
+ *
+ * Restano FUORI, con il pallino visibile, le action che sembrano finali ma non lo
+ * sono: clear_transcript (ripulisce la trascrizione e il flusso prosegue) e
+ * web_response (scrive la risposta HTTP nei bot webhook, senza chiudere il flusso).
+ * Vale la regola di prudenza: un pallino di troppo e' innocuo, uno mancante lascia
+ * il blocco senza via d'uscita.
+ */
+export const ACTIONS_WITHOUT_EXIT: Array<TYPE_ACTION> = [
+    TYPE_ACTION.CLOSE,
+    TYPE_ACTION.AGENT,
+    TYPE_ACTION.MOVE_TO_UNASSIGNED,
+    TYPE_ACTION.REPLACE_BOT,
+    TYPE_ACTION.REPLACE_BOTV2,
+    TYPE_ACTION.REPLACE_BOTV3,
+];
+
+/**
+ * True se l'action chiude il flusso dell'agente corrente.
+ *
+ * Il caso a parte e' Change Department: cede il controllo solo quando fa partire il
+ * bot del dipartimento di destinazione (`triggerBot`). Creata dal menu del Design
+ * Studio nasce con `triggerBot: true`, quindi e' terminale; l'authoring AI la emette
+ * invece con `triggerBot: false` proprio per spostare il dipartimento e proseguire.
+ * Con `triggerBot` assente si assume il comportamento del menu, che e' il caso
+ * storico di tutti gli agenti creati a mano.
+ */
+export function actionEndsTheFlow(action: any): boolean {
+    const type = action?._tdActionType;
+    if (!type) return false;
+    if (ACTIONS_WITHOUT_EXIT.includes(type)) return true;
+    return type === TYPE_ACTION.CHANGE_DEPARTMENT && action?.triggerBot !== false;
+}

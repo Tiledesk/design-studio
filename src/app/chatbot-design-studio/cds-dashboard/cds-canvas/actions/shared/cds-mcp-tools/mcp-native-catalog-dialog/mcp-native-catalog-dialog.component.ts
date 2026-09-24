@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { McpService } from 'src/app/services/mcp.service';
-import { McpServer } from 'src/app/models/mcp.model';
+import { McpServer, normalizeMcpToolNames } from 'src/app/models/mcp.model';
 import { McpServerEditDialogComponent } from '../mcp-server-edit-dialog/mcp-server-edit-dialog.component';
 
 @Component({
@@ -73,6 +73,14 @@ export class McpNativeCatalogDialogComponent implements OnInit {
   isConfigured(server: McpServer): boolean {
     return (this.data.configuredServers || []).some(c =>
       (server.id && c.id === server.id) || c.name === server.name);
+  }
+
+  /** Nomi dei tool attivi del nativo: presi dal server gia' configurato corrispondente
+   *  (stesso criterio di match di isConfigured). Vuoto se il nativo non e' ancora configurato. */
+  getActiveToolNames(server: McpServer): string[] {
+    const existing = (this.data.configuredServers || []).find(c =>
+      (server.id && c.id === server.id) || c.name === server.name);
+    return normalizeMcpToolNames(existing?.selectedTools);
   }
 
   /** Click su un server del catalogo: apre il dettaglio (edit-dialog readonly per i nativi). */

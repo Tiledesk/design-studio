@@ -20,8 +20,8 @@ import { Form, Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, isReturnStackIntent } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, isReturnStackIntent, ACTIONS_WITH_OWN_OUTPUTS, actionEndsTheFlow } from 'src/app/chatbot-design-studio/utils-actions';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
 import { IntentService } from '../../../services/intent.service';
 import { ConnectorService } from '../../../services/connector.service';
 import { StageService } from '../../../services/stage.service';
@@ -86,6 +86,19 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    *  in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita */
   isReturnStack = false;
 
+  /** isDefaultFallbackLocked
+   * true SOLO se il blocco e' la defaultFallback e non contiene alcuna action
+   * (perche' nasce vuota nei chatbot nuovi, o perche' l'unica action e' stata
+   * cancellata/spostata). In questo stato il blocco e' chiuso: niente drop,
+   * niente pulsante "Add action", niente placeholder di blocco vuoto.
+   * Una defaultFallback legacy (con action al suo interno) NON e' bloccata.
+   * E' un getter e non un campo: lo spostamento di una action verso un altro
+   * blocco muta l'array in place senza emettere behaviorIntent, quindi un
+   * valore memorizzato resterebbe stale. */
+  public get isDefaultFallbackLocked(): boolean {
+    return this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
+  }
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -105,7 +118,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   serverBaseURL: any;
   chatbot_id: string;
   isUntitledBlock: boolean = false;
-  isNewChatbot: boolean = false;
+  /** true quando il chatbot va editato con il Design Studio V3 (una action per blocco, niente drag). */
+  isV3: boolean = false;
+  /** V3: nasconde il pallino di uscita del blocco quando l'action contenuta ha gia' connettori propri. */
+  hideBlockConnector: boolean = false;
 
   intentColor: any = INTENT_COLORS.COLOR1;
 
@@ -372,14 +388,14 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
   /**
    * Chiamata da ngOnInit dopo initializeIntentType/initializeActions.
-   * Imposta flag (internal, untitled, showIntentOptions, newChatbot), registra i listener per i connettori e sincronizza il colore dell’intent.
+   * Imposta flag (internal, untitled, showIntentOptions, isV3), registra i listener per i connettori e sincronizza il colore dell’intent.
    */
   private initializeAttributes(): void {
     this.isInternalIntent = checkInternalIntent(this.intent);
     this.updateIsUntitledBlock();
     this.updateIsReturnStack();
     this.updateShowIntentOptions();
-    this.checkIfNewChatbot();
+    this.setDsVersion();
     this.addEventListener();
     this.setIntentAttributes();
   }
@@ -594,29 +610,14 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
   }
 
-  /**
-   * Chiamata da initializeAttributes in ngOnInit.
-   * Imposta isNewChatbot confrontando la data di creazione del chatbot con DATE_NEW_CHATBOT (per regole UI/UX sui chatbot “nuovi”).
+  /** setDsVersion
+   * Legge la versione del Design Studio dal DashboardService, che la calcola
+   * una volta sola quando il chatbot viene caricato (resolveDsVersion).
+   * Qui non si ricalcola nulla: il blocco è solo un consumatore del flag.
    */
-  private checkIfNewChatbot(): void {
-    const cutoffDate = DATE_NEW_CHATBOT;
-    const chatbot = this.dashboardService.selectedChatbot;
-    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot?.createdAt);
-    if (!chatbot || !chatbot.createdAt) {
-      this.isNewChatbot = true;
-      this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
-      return;
-    }
-
-    try {
-      this.isNewChatbot = chatbot.createdAt >= cutoffDate;
-      this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
-        isNewChatbot: this.isNewChatbot
-      });
-    } catch (error) {
-      this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
-      this.isNewChatbot = true;
-    }
+  private setDsVersion(): void {
+    this.isV3 = this.dashboardService.isV3;
+    this.logger.log('[CDS-INTENT] setDsVersion:', { isV3: this.isV3 });
   }
 
   /**
@@ -710,6 +711,44 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     );
   }
 
+
+  /**
+   * V3 — decide se nascondere il pallino di uscita del blocco.
+   * Il pallino e' l'uscita di riserva del blocco: serve solo alle action che non
+   * hanno connettori propri. Si nasconde in due casi:
+   * - l'action espone gia' le sue uscite (Success/Else, bottoni, ecc.) e il pallino
+   *   sarebbe ridondante;
+   * - l'action chiude il flusso (Close, Agent handoff, Move to unassigned, Replace
+   *   AI Agent, Change Department che avvia il bot del dipartimento) e il pallino
+   *   non avrebbe destinazione.
+   *
+   * Due vincoli:
+   * - vale SOLO in V3: sui chatbot legacy il pallino resta sempre visibile;
+   * - non si nasconde mai un pallino GIA' COLLEGATO, altrimenti il collegamento
+   *   diventerebbe invisibile e non piu' rimovibile dall'utente.
+   */
+  private updateHideBlockConnector(fromId: string, toId: string): void {
+    if (!this.isV3) {
+      this.hideBlockConnector = false;
+      return;
+    }
+    const alreadyConnected = !!(fromId && toId);
+    this.hideBlockConnector = !alreadyConnected
+      && !!this.intent?.actions?.some(action => this.actionHasOwnOutputs(action) || actionEndsTheFlow(action));
+    this.logger.log('[CDS-INTENT] updateHideBlockConnector:', { alreadyConnected, hide: this.hideBlockConnector });
+  }
+
+  /**
+   * True se l'action espone connettori di uscita propri sul canvas.
+   * L'elenco e le esclusioni - fra cui la famiglia Reply, che conserva sempre il
+   * pallino del blocco - sono documentati in docs/V3/design-studio-v3-analysis.md
+   * (Parte 1-bis) e dichiarati in ACTIONS_WITH_OWN_OUTPUTS.
+   */
+  private actionHasOwnOutputs(action: any): boolean {
+    const type = action?._tdActionType;
+    return !!type && ACTIONS_WITH_OWN_OUTPUTS.includes(type);
+  }
+
   /**
    * Chiamata da behaviorIntent (quando l’intent viene aggiornato), da initializeActions (setTimeout in ngOnInit) e indirettamente da onUpdateAndSaveAction.
    * Gestisce l’action “connect to block”: crea/aggiorna actionIntent e nextBlockAction, crea o rimuove il connettore verso l’altro blocco in base a isActionIntent e stageService.loaded.
@@ -734,6 +773,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
       }
       this.logger.log('[CDS-INTENT] actionIntent :: ', this.actionIntent);
       this.isActionIntent = this.intent.actions.some(obj => obj._tdActionType === TYPE_ACTION.INTENT);
+      this.updateHideBlockConnector(fromId, toId);
       if(this.isActionIntent){
         this.actionIntent = null;
         if(fromId && toId && fromId !== '' && toId !== ''){
@@ -994,10 +1034,14 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
   /**
    * Predicate stabile per [cdkDropListEnterPredicate]: stessa riferimento a ogni CD per evitare re-evaluazione inutili.
-   * Blocca l’ingresso nella lista se il chatbot è “nuovo” e l’intent ha già un’action (limite un’action per blocco).
+   * Blocca l’ingresso nella lista se il chatbot è V3 e l’intent ha già un’action (limite un’action per blocco).
    */
   readonly dropListEnterPredicate = (item: CdkDrag<any>) => {
-    if (this.isNewChatbot && this.intent?.actions?.length) {
+    // defaultFallback vuota: blocco chiuso, nessun drop consentito al suo interno
+    if (this.isDefaultFallbackLocked) {
+      return false;
+    }
+    if (this.isV3 && this.intent?.actions?.length) {
       return false;
     }
     return true;
@@ -1062,8 +1106,15 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    */
   async onDropAction(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-INTENT] onDropAction: ', event, this.intent.actions);
-    if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
+
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta
+    if (this.isDefaultFallbackLocked) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - defaultFallback vuota (bloccata)');
+      return;
+    }
+
+    if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot V3 e c\'è già un\'action nell\'intent');
       return;
     }
 
@@ -1117,6 +1168,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   openActionMenu(intent: Intent, calleBy: string): void {
     this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent);
     this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy);
+    // nessun pulsante "Add action" renderizzato (es. defaultFallback vuota): niente da aprire
+    if (this.isDefaultFallbackLocked || !this.openActionMenuBtnRef) {
+      return;
+    }
     const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect();
     let xOffSet = openActionMenuElm.width + 10;
     if (calleBy === 'add-action-placeholder') {

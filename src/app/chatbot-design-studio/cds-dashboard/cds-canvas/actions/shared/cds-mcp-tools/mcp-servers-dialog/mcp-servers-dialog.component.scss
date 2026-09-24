@@ -27,7 +27,7 @@
         align-items: center;
         display: flex;
         flex-shrink: 0;
-        justify-content: center;
+        justify-content: flex-start;
         width: 100%;
         padding: 20px 20px 10px 20px;
 
@@ -47,7 +47,7 @@
     
     .tpl-modal-header-text {
         flex-grow: 1;
-        text-align: center;
+        text-align: left;
         width: 0;
 
         .mcp-dialog__title {
@@ -76,7 +76,7 @@
         flex-shrink: 0;
     }
 
-    // Search styling shared with the native catalog dialog (same panelClass).
+    // NB: .server-count e' ancora usata dal catalogo nativi (stesso panelClass).
     .server-count {
         font-size: 14px;
         font-weight: 500;
@@ -97,7 +97,7 @@
 
     .search-input {
         width: 100%;
-        padding: 10px 40px 10px 12px;
+        padding: 10px 12px 10px 40px;
         border: 1px solid #d0d0d0;
         border-radius: 6px;
         font-size: 14px;
@@ -115,9 +115,50 @@
         }
     }
 
+    // Creation actions row, under the search bar (moved out of the footer).
+    .mcp-dialog__actions-row {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    // Pulsante secondario: stesso linguaggio del .btn dell'edit dialog MCP, ma con
+    // classe prefissata (un `.btn` nudo dentro ::ng-deep colpirebbe mezza applicazione).
+    .mcp-dialog__secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 28px;
+        padding: 0 10px;
+        background: #ffffff;
+        border: 1px solid #d4d7dd;
+        border-radius: 8px;
+        color: #0f172a;
+        font-family: var(--font-family-poppins);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 120ms ease, border-color 120ms ease;
+
+        .mcp-dialog__btn-icon {
+            font-size: 16px;
+        }
+
+        &:hover {
+            background: #f8fafc;
+            border-color: #b8bcc6;
+        }
+
+        &:active {
+            background: #f1f5f9;
+        }
+    }
+
     .search-icon {
         position: absolute;
-        right: 12px;
+        left: 12px;
         color: #999;
         font-size: 20px;
         pointer-events: none;
@@ -154,7 +195,7 @@
     .tpl-modal-buttons {
         display: flex;
         flex-shrink: 0;
-        justify-content: space-between;
+        justify-content: flex-end;
         padding: 15px 20px;
         color: #333;
         gap: 10px;
@@ -204,7 +245,6 @@
     padding: 8px 12px;
     font-size: 14px;
     font-family: var(--font-family-poppins);
-    cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
     display: flex;
@@ -215,16 +255,30 @@
     width: 100%;
     min-height: 50px;
 
-    &:hover {
-        background-color: var(--blu-light-01);
-        border-color: #b0b0b0;
-    }
-
+    // Nessun &:hover: la card non e' cliccabile, le azioni sono i controlli al suo interno.
     &.selected {
         background-color: #e8f4ff;
         border-color: var(--blu-02);
-        border-width: 2px;
+        border-width: 0px;
     }
+}
+
+/* Colonna azioni a destra della card: toggle + matita, centrati verticalmente. */
+/* Le azioni stanno DENTRO la riga del nome: solo quella riga viene ristretta,
+   url / transport / tools active usano tutta la larghezza della card. */
+.mcp-server__actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.mcp-server__added-note {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 400;
+    color: #6b7280;
 }
 
 .server-info {
@@ -237,13 +291,22 @@
 }
 
 .server-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 24px;   /* altezza del pulsante: evita che la riga "salti" quando compare */
     font-size: 14px;
     font-weight: 500;
     color: #333;
+    line-height: normal;
+}
+
+.server-name__text {
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: normal;
 }
 
 .server-url {
@@ -253,6 +316,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: normal;
+    padding-top: 5px;
 }
 
 .server-type {
@@ -262,10 +326,47 @@
     line-height: normal;
 }
 
-.checkmark-icon {
-    color: var(--blu-02);
-    font-size: 24px !important;
+/* Toggle "Add to prompt" / "Remove": sostituisce le vecchie icone di stato. */
+.mcp-server__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     flex-shrink: 0;
+    height: 24px;
+    padding: 0 10px;
+    border: 1px solid var(--blu-02);
+    border-radius: 999px;
+    background-color: var(--blu-02);
+    color: #ffffff;
+    font-family: var(--font-family-poppins);
+    font-size: 11px;
+    line-height: 18px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    .mcp-server__add-btn-icon {
+        font-size: 14px;
+    }
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
+
+    // stato "gia' nel prompt": stesso colore, invertito
+    &.mcp-server__add-btn--added {
+        background-color: transparent;
+        color: var(--blu-02);
+
+        &:hover {
+            background-color: var(--blu-light-04);
+            opacity: 1;
+        }
+    }
 }
 
 .edit-button {
@@ -281,9 +382,8 @@
     cursor: pointer;
     transition: all 0.2s ease;
     padding: 0;
-    margin-top: 4px;
     .material-icons {
-        font-size: 20px;
+        font-size: 16px;
         color: var(--blu);
     }
 
@@ -301,38 +401,14 @@
     }
 }
 
-#cds-add-server-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover:enabled {
-        opacity: .8 !important;
-    }
-}
-
 /* ---- MCP servers dialog: moved from inline styles (appended) ---- */
 ::ng-deep .custom-mcp-dialog-container .mcp-dialog__hr {
   margin-top: 3px;
   margin-bottom: 3px;
 }
 
-::ng-deep .custom-mcp-dialog-container .mcp-dialog__add-icon {
-  font-size: 18px;
-  margin-right: 6px;
-}
-
-/* Anchor absolute edit badge */
 ::ng-deep .custom-mcp-dialog-container .mcp-server-item {
   position: relative;
-}
-
-::ng-deep .custom-mcp-dialog-container .mcp-server__edit-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 2;
-  margin-top: 0 !important; /* override .edit-button margin-top */
 }
 
 ::ng-deep .custom-mcp-dialog-container .mcp-server__edit-icon {
@@ -357,9 +433,6 @@
   color: var(--blu-02);
 }
 
-::ng-deep .custom-mcp-dialog-container .mcp-server__status-icon--available {
-  color: #22c55e;
-}
 
 /* Active tools inline row: label + clipped names + "more.." */
 ::ng-deep .custom-mcp-dialog-container .mcp-server__tools-active-row {

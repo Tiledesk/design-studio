@@ -8,7 +8,6 @@
 *Tiledesk SRL*
 
 # this branch 24/09/2026
-
 - **added**: a **Restore** button brings the flow you are editing back to a published version. It is the opposite of Republish, and it is not reversible: confirming replaces what you have now, and the confirmation says so, names the date being restored, warns that subagents are not restored — this version is of this flow alone — and, when the flow has changes that were never published, says that those are what is about to be lost. Afterwards the flow is reloaded so what is on screen is what was restored
 - **changed**: the button that used to be called **Restore** in the release history is now called **Republish**, which is what it does: it puts an old version back online and leaves the flow you are editing alone. Two buttons named the same and doing opposite things is how work gets lost
 - **added**: every line of the release history has a **View** button that shows that published version full screen, without leaving the Design Studio: the blocks, the connections and the settings of each action exactly as they were when it was published. Nothing can be changed from there — a notice says so the whole time, and no edit ever reaches the server, whichever way it is attempted. The flow being worked on is untouched, and so is its view: zoom and framing used while looking at a release are not carried back
@@ -18,6 +17,102 @@
 
 # this branch 09/09/2026
 - **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+
+# this branch 23/09/2026
+- **fixed**: blocks and connectors are completed as soon as the AI chat stops working, including when the work fails or is cancelled. The check used to run on a timer and missed anything that ran longer, leaving connectors that only appeared after a page reload
+
+# 1.40.15-rc10
+- **fixed**: on V3 agents, a long AI chat conversation no longer drifts back to the rules of the older agents: the agent's version now travels with every answer the Design Studio gives the chat, instead of being sent once at the start
+
+# 1.40.15-rc9
+- **added**: in the chatbot's Voice settings, a "Barge-in" switch lets users interrupt the bot while it is speaking in a web-widget voice conversation. Off by default; it is saved with the other voice settings and needs the speech proxy with barge-in support. Shown for web-widget chatbots only
+
+# 1.40.15-rc8
+- **changed**: the editor version that subagents of V3 agents are born with, whether created from the panel or by the AI chat, is set per deploy through the CHATBOT_VERSION variable, with no rebuild. When the deploy does not set it, the usual value applies
+- **changed**: the close button in the AI chat header is easy to see: it used to be very light grey on white, now it takes the title's blue and is a little larger
+- **fixed**: with the AI chat open, the log panel no longer runs under the widget preview: its width follows the space that is left, also when the chat is opened, closed or resized
+- **changed**: when a new block appears on the stage (created by hand, pasted, dragged out of a connector or added by the AI chat) the view stays where you left it: the block no longer pulses and the stage no longer moves to centre on it. Its connectors are still drawn straight away
+
+# 1.40.15-rc7
+- **changed**: dropdowns close by themselves as soon as the page or a panel is scrolled: before they stayed open, detached from the field they belong to. Scrolling inside the options list keeps the dropdown open
+- **changed**: in the AI settings header the preview is always shown in full, open or closed, and the system context sits on the last line, on a single line ending with an ellipsis and with no label in front. The title is no longer pushed out of view when there are many options
+- **changed**: on V3 agents the empty fallback block is narrower and its title is centred in the pill, and the start block's icon is white with a green outline
+- **changed**: on V3 agents a block's outgoing point takes the look of a condition's "true" branch: a large green dot, both when it is free and when it is connected, instead of the small white one
+- **changed**: on V3 agents the fallback block, as long as it stays empty as it is created, looks like the start block: a pill instead of the card the other blocks have, and its outgoing point stays grey, inside the block on the right-hand side. If an action is added to the fallback it goes back to being a block like the others, green outgoing point included
+- **changed**: on V3 agents the start block is more compact: below the title there is no longer the gap that on the other blocks separates the title from the action
+
+
+# 1.40.15-rc6
+- **Change**: AI actions on Gemini Agent Platform models now transmit the server to the backend using the new field name instead of `agentPlatformServer`; agents saved prior to the change continue to function and realign upon the first model modification.
+
+# 1.40.15-rc5
+- **changed**: when the AI chat finishes working, the flow is laid out again left to right, one step per column and branches stacked without overlaps, and the view fits the whole flow. Connectors follow the blocks, including the ones the chat moved itself. One undo step reverts the layout together with the chat's last change; text-only edits move nothing
+- **added**: while the AI chat is working it says so: a progress bar under its header, the "Working" state lit, and a line at the foot of the conversation naming what it is doing and for how long. All of it goes quiet as soon as the chat is done
+
+# 1.40.15-rc4
+- **fixed**: when the AI chat moves blocks on the canvas, the connectors follow them straight away; before, they only settled after a page reload
+- **changed**: the AI chat no longer lays the flow out when it finishes: blocks stay where they were created or dragged by hand, and the view does not move. The only automatic placement left is the branches of a newly forked block, stacked in a column
+
+# 1.40.15-rc3
+- **fixed**: the AI chat, now open by default, stayed blank when an agent was opened
+- **changed**: the AI chat opens by default when an agent is opened (V3 and legacy). The header button is shown only while the chat is closed, with a new icon and a "Show chat" tooltip; the chat closes from its own top bar. On V3 agents the blocks/sub agents side panel starts closed
+- **changed**: when the AI chat finishes adding, deleting or reconnecting blocks, the whole flow is laid out again left to right, without overlaps, and the view fits the flow. One undo step reverts it, together with the chat's last change; text-only edits move nothing
+- **fixed**: when the AI chat finishes editing, missing connectors are drawn instead of appearing only after a page reload
+- **changed**: on V3 agents the AI chat follows the V3 editor rules (one action per block, question and answer in separate blocks, empty fallback, protected start and fallback, conversation closed only from a button); a change breaking a rule is rejected with the rule name. Legacy agents are unchanged
+- **changed**: sub agents created from a V3 agent are V3
+- **changed**: every new block on the stage is highlighted and centred, as in the widget simulation
+- **fixed**: all incoming and outgoing connectors of a new block are drawn; connectors to blocks created after a deletion were being cleared
+- **changed**: switching or deleting an agent or sub agent no longer reloads the page: the canvas refreshes in place and the AI chat stays open
+- **removed**: the old AI agent generator (create from prompt, AI edit panel, version history), already disabled. Existing agents still open with the V3 editor; the integrated AI chat (Flow Builder), publishing and agent selector are unaffected
+
+# 1.40.15-rc2
+- **changed**: in agents created with AI the conversation is never closed by the flow itself. A close is there only when the user asks for it by pressing a button ("nothing else, close the chat"), and nothing follows that choice. This replaces the earlier rule, which also allowed a close after a long activity that was finished
+- **changed**: in V3 agents the block that asks the user for a reply uses the same outgoing point as every other block, the one on the bottom-right edge, instead of a second dot hanging beside the action: it is connected like any other block and its destination is chosen from the block's panel. Agents created with the previous editor are untouched
+
+# 1.40.15-rc1
+- **changed**: which Design Studio opens on an agent is decided **only** by the version the agent carries, declared by whoever creates it: the creation date is no longer taken into account. Agents without it, which is every agent created so far, open in the previous editor. The declared version is set per environment, separately from the product version
+- **changed**: agents created and edited with AI come out more compact and lean on the AI blocks: one knowledge base search instead of a block per question, one AI routing instead of a tree of conditions, an open question instead of a deep menu
+- **changed**: messages in agents created with AI use the simple reply instead of the advanced one, questions and button menus included; and the conversation is no longer closed at the end of a path, so the last message stays readable. The chat is closed only after a long activity that is finished, or when the user chooses to close it
+- **changed**: in V3 agents the blocks that end the conversation no longer show the block's outgoing dot: close, handoff to an operator, back to the queue, hand over to another agent, and change department when it starts the department's bot. Existing agents and connections already made are untouched
+- **fixed**: in V3 agents a block that asks the user for a reply had no outgoing point at all and could not be connected to anything. The outgoing point is now always there, and its destination can also be chosen from the detail panel
+- **changed**: on the agent chat branch the V3 AI authoring stays inactive behind a single switch, off by default: nothing is removed, and one environment can turn it on from the remote config. The agent chat stays active as before
+
+# 1.40.14-V3
+- **added**: **Design Studio V3** — agents created from 07/09/2026 open in a simplified editor: one action per block, no action dragging and no inline controls, "Add action" only where it belongs, and the block is moved by grabbing the action's header. The block's outgoing dot is shown only where it really is the block's only way out. Agents created earlier are left exactly as they were
+- **added**: the editor version is **declared by the agent itself** when it is created and read back when it is opened, so an agent built with V3 stays on V3 even if the cutoff date is moved. Agents that carry no version, which is every agent created so far, are still decided by their creation date
+- **added**: **create an agent with AI** — a dialog where the agent is described, with a gallery of examples, a choice of model among those available, and an interview that fills in the request one question at a time. It ends with an editable final prompt and a preview of the flow; the agent it produces is always a new one and never touches the open agent. The interview survives in the browser tab until the agent is created
+- **added**: **the agent's AI panel** — inside every V3 agent a right-hand panel shows the agent's history and takes a change request in plain language, previews it and applies it only on confirmation. It lists versions and releases, with manual save, restore, copy, and reuse of the prompt in the generator
+- **added**: every restore is preceded by an automatic save, so it can be undone, and before confirming it warns when that version uses departments, knowledge bases, tables or agents the project no longer has. What is online does not change until it is published again
+- **changed**: an agent created with AI no longer carries the generation data in its own attributes: prompt, interview and generated flow live in the agent's history on the server, off the message path
+- **added**: an **agent selector in the header** to move between agents without leaving the editor, and **delete agent** with an explicit confirmation. On V3 agents only
+- **changed**: an **empty defaultFallback block** no longer accepts actions, by any route: nothing can be dropped into it, and neither the "Add action" button nor the placeholder are shown. Agents that still hold a reply inside it stay editable
+- **changed**: on this branch the **V3 AI authoring**, meaning the create dialog and the AI panel, is **off** behind a single switch: nothing is removed and one environment can turn it back on from the remote config. The agent chat stays active
+- **fixed**: after an agent is created with AI the Design Studio re-reads the blocks several times before reporting connections it could not keep, so large agents no longer show a false error
+
+# 1.40.14-rc13
+- **fixed**: an agent imported from an older version with a "JSON Condition" block whose operator is no longer among the known ones broke the canvas on every redraw ("Cannot read properties of undefined (reading 'name')"). The block now shows the saved operator as it is, so it can be corrected by hand, and conditions without a second operand no longer break the rendering
+
+# 1.40.14-rc12
+- **added**: in the Native Tools dialog every Tiledesk server now shows its active tools, and the dialog has a "Close" button in the footer like the MCP servers one
+- **added**: the tool selection modal has a "Close" button in its footer too
+
+# 1.40.14-rc11
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it, and both the "Add action" button and the empty-block message are hidden. Chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history, the "Restore" button is now "Re-publish" and carries a tooltip explaining that it puts that version back online without changing the chatbot you are currently editing
+
+# 1.40.14-rc10
+- **changed**: new look for the MCP servers dialog — header aligned to the left, search field with the magnifier inside it, the "New MCP server" and "Native tools" buttons right under the search bar, and a "Close" button in the footer
+- **changed**: a server is added to the prompt with an explicit button instead of by clicking its card; once added the button becomes "Detach tools" and the server is marked as added
+- **changed**: the edit icon is shown only on the servers already added to the prompt
+- **changed**: native servers are marked with an outlined shield and show their description instead of the URL
+- **added**: in the action, when no MCP tool is attached yet the section shows a dashed "Select MCP tools" call to action, which turns into "Manage MCP tools" as soon as a server is attached
+- **added**: tooltips on every button of the MCP interface, both in the action and in the dialogs
+- **changed**: smaller and lighter "Use tools to complete the operation" label
+- **bug fix**: the "Manage MCP tools" button ignored its own size and was rendered bigger than intended
+- **bug fix**: missing italian translations in the MCP interface
+
+# 1.40.14-rc9
+- **fixed**: when attempting to delete a subagent that is still in use by another agent, the error message returned by the service is now displayed, instead of the operation appearing to have no visible outcome.
 
 # 1.40.14-rc8
 - **added**: new **Gemini Agent Platform** provider in the AI model selector of the Ask KB, AI Prompt and AI Condition actions. Its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
@@ -70,6 +165,7 @@
 - **added**: isolated Karma test setup for the connector folder and for unit specs (`ng test --configuration connector`), with `src/test.connector.ts`, `src/test.units.ts` and dedicated tsconfigs, so these specs run independently of the pre-existing broken ones
 - **changed**: `cds-action-description` now receives the whole action (`[actionSelected]`), so a connector block renders the connector's own name and icon instead of the generic web-request label
 - **changed**: a `webrequestv2` block carrying a `_tdConnectorRef` renders the connector's required-input summary (`cds-action-connector`) instead of the generic web-request preview
+
 
 # 1.40.13
 - **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna

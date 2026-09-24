@@ -11,6 +11,21 @@ import { SelectComponent } from '../../cds-base-element/select/select.component'
 import { DOCS_LINK } from '../../utils';
 import { AiService } from 'src/app/services/ai.service';
 
+/** Builds the secondary label shown next to the voice name (provider · type). */
+function mapVoiceForSelect(voice: any) {
+  const parts: string[] = [];
+  if (voice?.provider) {
+    parts.push(voice.provider);
+  }
+  if (voice?.type && voice.type !== 'standard') {
+    parts.push(voice.type);
+  }
+  return {
+    ...voice,
+    type: parts.length ? ' · ' + parts.join(' · ') : ''
+  };
+}
+
 @Component({
   selector: 'cds-voice-settings',
   templateUrl: './voice-settings.component.html',
@@ -40,6 +55,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
   stt_model: string;
   voice_name: string;
   voice_language: string;
+  bargeIn: boolean;
 
 
   //PLAYER audio (elevenlabs)
@@ -76,14 +92,21 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.tts_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_MODEL')?.value
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value
+    this.bargeIn = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'BARGE_IN')?.value === 'true'
     this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
-    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+    this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(mapVoiceForSelect)
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
+
+    if (this.voiceProvider === 'twilio' && this.voice_language) {
+      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice
+        .filter(el => el.language_code === this.voice_language)
+        .map(mapVoiceForSelect)
+    }
 
     if(this.voiceProvider === 'openai' || this.voiceProvider === 'elevenlabs'){
       this.tts_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_model.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
       this.stt_model_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.stt_model.map(el => ({ ...el, type: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
-      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ? ' - ' + el.type : ''}` }))
+      this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(mapVoiceForSelect)
     }
 
     if (this.selectedChatbot?.attributes?.globals) {
@@ -107,6 +130,7 @@ export class CDSVoiceSettingsComponent implements OnInit {
               name: voice.name, 
               type: 'standard',
               status: 'active',
+              provider: 'ElevenLabs',
               description: voice.description,
               labels: { ...voice.labels }
             });
@@ -155,11 +179,10 @@ export class CDSVoiceSettingsComponent implements OnInit {
         // this.voiceLanguageSelect.onResetValue(null)
         this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
         this.voice_name_list = [];
-        // this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''} (${el.language_code})` }))
         if(event && (event.key === 'openai' || event.key === 'elevenlabs')){
           this.tts_model_list = voiceProviderList.find(el => el.key === event.key)?.tts_model.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
           this.stt_model_list = voiceProviderList.find(el => el.key === event.key)?.stt_model.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
-          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` }))
+          this.voice_name_list = voiceProviderList.find(el => el.key === event.key)?.tts_voice.map(mapVoiceForSelect)
 
           this.findAndUpdateProperty("TTS_VOICE_LANGUAGE", null)
           this.voiceLanguageSelect?.onResetValue(null)
@@ -170,7 +193,9 @@ export class CDSVoiceSettingsComponent implements OnInit {
       case 'TTS_VOICE_LANGUAGE': {
         this.findAndUpdateProperty('TTS_VOICE_LANGUAGE', event.language_code);
         this.voice_language = event.language_code;
-        this.voice_name_list = this.voiceProvider === 'twilio'? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(el => ({ ...el, type: `${el.type !== 'standard' ?  ' - ' + el.type : ''}` })) : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice
+        this.voice_name_list = this.voiceProvider === 'twilio'
+          ? voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.filter(el => el.language_code === event.language_code).map(mapVoiceForSelect)
+          : voiceProviderList.find(el => el.key === this.voiceProvider).tts_voice.map(mapVoiceForSelect)
         break;
       };
       case 'TTS_VOICE_NAME':{
@@ -187,6 +212,18 @@ export class CDSVoiceSettingsComponent implements OnInit {
         break;
       }
     }
+    this.saveAttributes();
+  }
+
+  /** Barge-in is handled by the speech proxy, which serves only web-widget chatbots. */
+  get showBargeIn(): boolean {
+    return this.selectedChatbot?.subtype === TYPE_CHATBOT.CHATBOT;
+  }
+
+  onChangeBargeIn(checked: boolean) {
+    this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] onChangeBargeIn ', checked)
+    this.bargeIn = checked;
+    this.findAndUpdateProperty('BARGE_IN', checked ? 'true' : 'false');
     this.saveAttributes();
   }
 
