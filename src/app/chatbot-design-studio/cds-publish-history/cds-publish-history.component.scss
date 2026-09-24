@@ -18,7 +18,10 @@
   gap: 16px;
   padding: 5px 0px 0px 35px;
   min-width: 350px;
-  max-width: 620px;
+  /* Era 620px, misura buona per un pulsante solo: con tre la colonna delle azioni
+     usciva dallo sfondo della riga. Si allarga il tetto invece di stringere la nota,
+     che ha una larghezza fissa su cui si basa il conteggio delle righe del "More". */
+  max-width: 720px;
 }
 
 .release-item-wpr {
@@ -195,14 +198,32 @@
   background-color: #656d75;
 }
 
+/* I tre pulsanti stanno su una riga sola: prima erano inline e andavano a capo appena
+   il terzo non ci stava, lasciando "Restore" spaiato sotto gli altri due. */
+.restore-release {
+  flex-shrink: 0;
+}
+
+.restore-btn-wpr {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
 .restore-btn {
   background: transparent;
   border: 1px solid var(--blu-02);
   font-size: 12px;
+  line-height: 18px;
+  padding: 4px 12px;
   border-radius: 9999px;
   color: var(--blu-02);
   display: none;
   cursor: pointer;
+  /* Un'etichetta non si spezza mai a meta' */
+  white-space: nowrap;
 }
 
 .clamped-wrapper {

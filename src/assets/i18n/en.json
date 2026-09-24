@@ -176,6 +176,15 @@
         "NothingToPublish": "Nothing has changed since the last publish. Tick what you want to publish again.",
         "PublishedAgents": "What was published"
     },
+    "CDSPublishHistory": {
+        "RepublishTooltip": "Put this version back online. The flow you are editing is not changed",
+        "RestoreTooltip": "Bring the flow you are editing back to this version",
+        "AreYouSureYouWantToRestoreDraft": "Bring {{release_name}} back to the version of {{release_date}}?",
+        "RestoreWarning": "The flow you are editing will be replaced by this published version, and what it contains now cannot be brought back. Subagents are not restored: this version is of this flow only.",
+        "RestoreUnpublishedWarning": "This flow has changes that were never published. Those are the changes you are about to lose.",
+        "RestoreDone": "The flow you are editing is back to the version of {{release_date}}.",
+        "RestoreError": "The flow could not be restored"
+    },
     "CDSPreview": {
         "ReadOnlyBanner": "You are viewing a published version. Nothing you change here is saved.",
         "ModalTitle": "Published version",
@@ -1526,6 +1535,7 @@
     "InstallWidget": "Install widget",
     "DoNotShowThisAgain": "Don’t show this again",
     "Restore": "Restore",
+    "Republish": "Republish",
     "View": "View",
     "Less": "less",
     "More": "more",

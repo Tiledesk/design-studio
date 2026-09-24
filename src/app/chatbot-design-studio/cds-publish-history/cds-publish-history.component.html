@@ -109,7 +109,14 @@
                                 matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
                                 {{'View' | translate}}
                             </button>
-                            <button type="button" class="restore-btn" (click)="restoreRelease(release)">
+                            <button type="button" class="restore-btn" (click)="republishRelease(release)"
+                                matTooltip="{{'CDSPublishHistory.RepublishTooltip' | translate}}"
+                                matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
+                                {{'Republish' | translate}}
+                            </button>
+                            <button type="button" class="restore-btn" (click)="restoreRelease(release)"
+                                matTooltip="{{'CDSPublishHistory.RestoreTooltip' | translate}}"
+                                matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
                                 {{'Restore' | translate}}
                             </button>
                         </div>

@@ -245,8 +245,76 @@ export class CdsPublishHistoryComponent implements OnInit {
     }
   }
   
+  /**
+   * Riporta il chatbot di sviluppo al contenuto di una versione pubblicata.
+   *
+   * E' l'opposto di `republishRelease`: qui a cambiare e' il flusso che si sta
+   * modificando, e cio' che conteneva non si recupera. Per questo la conferma nomina la
+   * data della release, avverte che i subagent restano come sono -- la release e' del
+   * solo flusso aperto -- e aggiunge una riga quando ci sono modifiche non pubblicate
+   * che si stanno per perdere.
+   *
+   * A operazione riuscita la pagina viene ricaricata: il Design Studio tiene i blocchi
+   * in memoria e dopo il ripristino non sono piu' quelli. Ricaricare e' anche il modo
+   * con meno stato da ripulire, ed e' quello che il pannello dei subagent fa gia'.
+   */
   restoreRelease(release: Chatbot) {
-    this.logger.log('[CDS-PUBLISH-HISTORY] - Restore release chatbot ', release);
+    this.logger.log('[CDS-PUBLISH-HISTORY] - Restore release ', release);
+
+    const warnings = [this.translate.instant('CDSPublishHistory.RestoreWarning')];
+    if (this.selectedChatbot?.modified) {
+      warnings.push(this.translate.instant('CDSPublishHistory.RestoreUnpublishedWarning'));
+    }
+
+    swal({
+      title: this.translate.instant('CDSPublishHistory.AreYouSureYouWantToRestoreDraft', {
+        release_name: release.name, release_date: release['formattedDate']
+      }),
+      text: warnings.join('\n\n'),
+      icon: "warning",
+      buttons: ["Cancel", 'Continue'],
+      dangerMode: true,
+      className: "swal-restore"
+    }).then((willRestore) => {
+      if (!willRestore) { return; }
+
+      this.faqKbService.restoreFromPublished(this.selectedChatbot._id, release._id).subscribe({
+        next: (data) => {
+          this.logger.log('[CDS-PUBLISH-HISTORY] restore - RES ', data);
+          swal(
+            this.translate.instant('Done'),
+            this.translate.instant('CDSPublishHistory.RestoreDone', { release_date: release['formattedDate'] }),
+            { icon: "success", className: "swal-restore" }
+          ).then(() => this.reloadStudio());
+        },
+        error: (error) => {
+          // Il servizio spiega perche' ha rifiutato (release di un altro chatbot,
+          // ripristino dentro una release): meglio dirlo che mostrare "errore".
+          const message = error?.error?.message || error?.error?.msg || '';
+          this.logger.error('[CDS-PUBLISH-HISTORY] restore ERROR ', error);
+          swal(this.translate.instant('CDSPublishHistory.RestoreError'), message, { icon: "error" });
+        }
+      });
+    });
+  }
+
+  /** Ricarica il Design Studio sul flusso di sviluppo, per rileggerne i blocchi. */
+  private reloadStudio(): void {
+    const base = window.location.href.split('#')[0];
+    window.location.href = base + '#/project/' + this.dashboardService.projectID
+      + '/chatbot/' + this.selectedChatbot._id + '/blocks';
+    window.location.reload();
+  }
+
+  /**
+   * Rimette online una vecchia release. Il chatbot di sviluppo NON viene toccato.
+   *
+   * Si chiamava `restoreRelease`, ma "ripristinare" e' un'altra operazione -- quella
+   * che riporta indietro lo sviluppo -- e avere due pulsanti con lo stesso nome che
+   * fanno cose opposte e' il modo per far perdere del lavoro a qualcuno.
+   */
+  republishRelease(release: Chatbot) {
+    this.logger.log('[CDS-PUBLISH-HISTORY] - Republish release chatbot ', release);
     this.logger.log('[CDS-PUBLISH-HISTORY] - Restore release chatbot name ', release.name);
     this.logger.log('[CDS-PUBLISH-HISTORY] - Restore release chatbot formattedDate ', release['formattedDate']);
     swal({
