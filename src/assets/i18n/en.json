@@ -176,6 +176,11 @@
         "NothingToPublish": "Nothing has changed since the last publish. Tick what you want to publish again.",
         "PublishedAgents": "What was published"
     },
+    "CDSPreview": {
+        "ReadOnlyBanner": "You are viewing a published version. Nothing you change here is saved.",
+        "ModalTitle": "Published version",
+        "ViewTooltip": "Look at this published version, read-only"
+    },
     "CDSModalMouseTrackPad": {
         "HowToMove": "How to move",
         "ClickWhellDragToMove": "Click wheel button & drag \n to move around",
@@ -1596,6 +1601,7 @@
     "InstallWidget": "Install widget",
     "DoNotShowThisAgain": "Don’t show this again",
     "Restore": "Restore",
+    "View": "View",
     "Less": "less",
     "More": "more",
     "NowThatYouHavePublishedWhCp": "Now that you've published your {{sub_type}}, use the following URL to trigger it",

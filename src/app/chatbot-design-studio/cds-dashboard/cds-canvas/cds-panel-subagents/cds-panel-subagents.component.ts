@@ -9,6 +9,7 @@ import { CdsNewSubagentDialogComponent } from './cds-new-subagent-dialog/cds-new
 import { TranslateService } from '@ngx-translate/core';
 import { DialogYesNoComponent } from 'src/app/chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { NotifyService } from 'src/app/services/notify.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 
 export interface SubagentItem {
   _id: string;
@@ -96,7 +97,8 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
     private translate: TranslateService,
-    private notify: NotifyService
+    private notify: NotifyService,
+    private readonly readOnlyService: ReadOnlyService
   ) { }
 
   ngOnDestroy(): void {
@@ -174,7 +176,11 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
    */
   getSubagentUrl(id: string): string {
     const base = window.location.href.split('#')[0];
-    return base + '#/project/' + this.dashboardService.projectID + '/chatbot/' + id + '/blocks';
+    // In sola lettura si resta in sola lettura anche cambiando flusso: la modalita' sta
+    // nell'indirizzo, quindi basta comporre quello giusto e il ricaricamento la ritrova
+    // da se'. E' il motivo per cui e' una rotta e non un flag tenuto in memoria.
+    const section = this.readOnlyService.readOnly ? '/preview/' : '/chatbot/';
+    return base + '#/project/' + this.dashboardService.projectID + section + id + '/blocks';
   }
 
   /** Apre il chatbot/subagent nella stessa tab (ricarica completa). No-op se è quello già aperto. */

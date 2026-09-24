@@ -9,6 +9,8 @@
 
 # this branch 24/09/2026
 
+- **added**: every line of the release history has a **View** button that shows that published version full screen, without leaving the Design Studio: the blocks, the connections and the settings of each action exactly as they were when it was published. Nothing can be changed from there — a notice says so the whole time, and no edit ever reaches the server, whichever way it is attempted. The flow being worked on is untouched, and so is its view: zoom and framing used while looking at a release are not carried back
+- **fixed**: **centre the flow** now fits it into the part of the stage that can actually be seen, instead of the whole area — which includes what the blocks panel covers and what runs past the edge of the window. The flow used to end up off to one side, and on a wide flow part of it stayed out of view
 - **changed**: publishing an agent now covers its subagents as well. The publish panel lists the agent and every subagent, ticks the ones that have changes waiting to be published, and publishes them all in one go. If some go through and others do not, the panel says which is which, instead of a single "an error occurred"; the ones that succeeded are unticked, so trying again only retries what failed. An agent with no subagents sees the panel exactly as before
 - **fixed**: the dot marking unpublished changes no longer goes out just because the publish panel was opened. It goes out when the flow has really been published, and only for the flows that were
 

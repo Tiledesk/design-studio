@@ -14,7 +14,8 @@
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:publish": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-publish.ts --ts-config=tsconfig.spec.publish.json"
+    "test:publish": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-publish.ts --ts-config=tsconfig.spec.publish.json",
+    "test:preview": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-preview.ts --ts-config=tsconfig.spec.preview.json"
   },
   "private": false,
   "dependencies": {

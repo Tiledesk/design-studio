@@ -18,6 +18,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { ReadOnlyService, isReadOnlyRoute } from 'src/app/services/read-only.service';
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 
@@ -55,6 +56,8 @@ export class CdsDashboardComponent implements OnInit {
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
   showChangelog: boolean = false;
+  /** Sola lettura: niente header, niente sidebar, banner sempre in vista. */
+  IS_READ_ONLY: boolean = false;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -71,10 +74,30 @@ export class CdsDashboardComponent implements OnInit {
     public faqService: FaqService,
     private openaiService: OpenaiService,
     private whatsappService: WhatsappService,
-    private stageService: StageService, 
+    private stageService: StageService,
     private readonly webhookService: WebhookService,
-    private aiService: AiService
+    private aiService: AiService,
+    private readonly readOnlyService: ReadOnlyService
   ) {}
+
+  /**
+   * Accende la sola lettura se questa e' la rotta di preview.
+   *
+   * Va fatto **prima** che il canvas carichi il flusso, e lo e': il canvas vive dentro
+   * il router-outlet di questo guscio, che lo rende solo a inizializzazione finita.
+   *
+   * La forma di `data` e' insolita -- e' un array di un oggetto, `[{ roles: [...] }]`,
+   * perche' cosi' la legge RoleGuard -- e l'ereditarieta' dei dati di rotta verso il
+   * figlio a percorso vuoto puo' consegnarla come array o come oggetto con chiave `0`.
+   * `data[0]` va bene in entrambi i casi.
+   */
+  private applyReadOnlyFromRoute(): void {
+    if (isReadOnlyRoute(this.route.snapshot.data)) {
+      this.readOnlyService.enable();
+      this.IS_READ_ONLY = true;
+      this.logger.log('[CDS DSHBRD] read-only: nessuna modifica verra\' salvata');
+    }
+  }
 
   
 
@@ -82,6 +105,7 @@ export class CdsDashboardComponent implements OnInit {
     // ---------------------------------------
     // Changelog alert
     // ---------------------------------------
+    this.applyReadOnlyFromRoute();
     this.showChangelog = this.checkForChangelogNotify();
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide');

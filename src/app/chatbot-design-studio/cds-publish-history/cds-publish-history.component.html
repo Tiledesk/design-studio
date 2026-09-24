@@ -104,6 +104,11 @@
                     </div>
                     <div class="restore-release" style="padding-left: 12px; padding-right: 6px;">
                         <div class="restore-btn-wpr">
+                            <button type="button" class="restore-btn" (click)="viewRelease(release)"
+                                matTooltip="{{'CDSPreview.ViewTooltip' | translate}}"
+                                matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
+                                {{'View' | translate}}
+                            </button>
                             <button type="button" class="restore-btn" (click)="restoreRelease(release)">
                                 {{'Restore' | translate}}
                             </button>

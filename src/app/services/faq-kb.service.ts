@@ -9,6 +9,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from './app-config';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+import { ReadOnlyService } from './read-only.service';
+import { of } from 'rxjs';
 /**
  * Il corpo della richiesta di pubblicazione multipla.
  *
@@ -47,8 +49,24 @@ export class FaqKbService {
   constructor(
     public appConfigService: AppConfigService,
     public appStorageService: AppStorageService,
-    private _httpClient: HttpClient
+    private _httpClient: HttpClient,
+    private readonly readOnlyService: ReadOnlyService
   ) {
+  }
+
+  /**
+   * Sola lettura: nessuna scrittura sul chatbot parte da questa scheda.
+   *
+   * Il pannello di pubblicazione e le impostazioni non sono nemmeno raggiungibili senza
+   * header e sidebar, ma nascondere un pulsante non e' impedire un'azione: il guard sta
+   * qui, dove l'azione accadrebbe davvero.
+   */
+  private blockedByReadOnly(what: string): boolean {
+    if (this.readOnlyService.readOnly) {
+      this.logger.log('[FAQ-KB.SERV] read-only: ' + what + ' non inviata');
+      return true;
+    }
+    return false;
   }
 
   initialize(serverBaseUrl: string, projectId: string){
@@ -167,6 +185,7 @@ export class FaqKbService {
    * payload es.: { id_project, language, name, subtype:'subagent', template:'blank', type:'tilebot', parent_id }
    */
   public createFaqKb(payload: any): Observable<Chatbot> {
+    if (this.blockedByReadOnly('createFaqKb')) { return of(null as any); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -187,6 +206,7 @@ export class FaqKbService {
    * API: DELETE {SERVER_BASE_PATH}{project_id}/faq_kb/{id}
    */
   public deleteFaqKb(id: string): Observable<any> {
+    if (this.blockedByReadOnly('deleteFaqKb')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -204,6 +224,7 @@ export class FaqKbService {
    * @param fullName
    */
   public updateFaqKb(chatbot: Chatbot) {
+    if (this.blockedByReadOnly('updateFaqKb')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -230,6 +251,7 @@ export class FaqKbService {
    * @param fullName
    */
   public updateFaqKbAgentsAvailable(id: string, agents_available: boolean) {
+    if (this.blockedByReadOnly('updateFaqKbAgentsAvailable')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -251,6 +273,7 @@ export class FaqKbService {
   // PROJECT_ID/faq_kb/FAQ_KB_ID/language/LANGUAGE
 
   updateFaqKbLanguage (id: string, chatbotlanguage: string) {
+    if (this.blockedByReadOnly('updateFaqKbLanguage')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -271,6 +294,7 @@ export class FaqKbService {
   }
 
   public updateChatbot(chatbot: Chatbot) {
+    if (this.blockedByReadOnly('updateChatbot')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -303,6 +327,7 @@ export class FaqKbService {
   // http://localhost:3000/63ea8812b48b3e22c9372f05/faq_kb/63ea8820b48b3e22c9372f83/publish
 
   public publish(chatbot: Chatbot, releaseid: string , release_note:string) {
+    if (this.blockedByReadOnly('publish')) { return of<any>(null); }
     this.logger.log(' publish BOT chatbot id ' , chatbot._id)
     this.logger.log(' publish BOT releaseid ' , releaseid)
     this.logger.log(' publish BOT release_note ' , release_note)
@@ -339,6 +364,7 @@ export class FaqKbService {
    * dopo una pubblicazione riuscita a meta' non si sa cosa sia stato pubblicato.
    */
   public publishMulti(parentId: string, chatbotIds: string[], release_note: string | null) {
+    if (this.blockedByReadOnly('publishMulti')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -367,6 +393,7 @@ export class FaqKbService {
 
 
   addNodeToChatbotAttributes(idBot: string, key:string,  json:any) {
+    if (this.blockedByReadOnly('addNodeToChatbotAttributes')) { return of<any>(null); }
     this.logger.log('[FAQ-KB.SERV] - addNodeToAttributesChatbot idBot ', idBot)
     const httpOptions = {
       headers: new HttpHeaders({
@@ -385,6 +412,7 @@ export class FaqKbService {
 
 
   addRuleToChatbot(idBot: string, rule: any[]) {
+    if (this.blockedByReadOnly('addRuleToChatbot')) { return of<any>(null); }
     this.logger.log('[FAQ-KB.SERV] - addRuleToChatbot idBot ', idBot)
     const httpOptions = {
       headers: new HttpHeaders({
@@ -403,6 +431,7 @@ export class FaqKbService {
   }
 
   public patchAttributes(id: string, attributes: any): Observable<FaqKb> {
+    if (this.blockedByReadOnly('patchAttributes')) { return of<any>(null); }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',

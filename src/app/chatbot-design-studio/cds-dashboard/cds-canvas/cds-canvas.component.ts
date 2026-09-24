@@ -13,6 +13,7 @@ import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -199,7 +200,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
     private readonly ngZone: NgZone,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    public readonly readOnlyService: ReadOnlyService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -710,6 +712,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
       return;
     }
+    // Sola lettura: annulla e ripeti non hanno senso dove non si salva, e sono le due
+    // scorciatoie che l'utente batte per istinto.
+    if (this.readOnlyService.readOnly) {
+      return;
+    }
+    // Prevent undo/redo if a detail panel is open (to allow native undo/redo in panel inputs)
     if (this.IS_OPEN_PANEL_ACTION_DETAIL || this.IS_OPEN_PANEL_INTENT_DETAIL) {
       this.logger.log('[CDS-CANVAS] Panel is open - skipping canvas undo/redo');
       return;

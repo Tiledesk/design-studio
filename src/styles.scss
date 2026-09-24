@@ -79,3 +79,13 @@
 .ql-bg-003700 { background-color: #003700; }
 .ql-bg-002966 { background-color: #002966; }
 .ql-bg-3d1466 { background-color: #3d1466; }
+
+/* Preview di una release pubblicata: modale a schermo intero, senza margini ne'
+   angoli, perche' dentro c'e' il canvas del Design Studio e deve avere tutto lo
+   spazio. La classe sta qui e non nel componente perche' il pannello della modale
+   vive fuori dalla sua vista. */
+.cds-preview-dialog-container .mat-dialog-container {
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+}

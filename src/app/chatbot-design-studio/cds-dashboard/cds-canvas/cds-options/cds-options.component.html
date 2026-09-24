@@ -1,7 +1,7 @@
 <div class="container">
 
-    <!-- NOTE (solo toggle submenu) -->
-    <div size="4" class="cds-elements" mat-button>
+    <!-- NOTE (solo toggle submenu) -- in sola lettura non si aggiungono appunti -->
+    <div size="4" class="cds-elements" mat-button *ngIf="!readOnlyService.readOnly">
         <div class="cds-element" #divNote>
             <div class="cds-button-element">
                 <div class="cds-box-button" (click)="toggleNoteTypeMenu($event)">
@@ -91,8 +91,8 @@
     </div>
 
 
-    <!-- undo/redo -->
-    <div size="4" class="cds-elements" mat-button>
+    <!-- undo/redo -- in sola lettura non c'e' niente da annullare: nulla viene salvato -->
+    <div size="4" class="cds-elements" mat-button *ngIf="!readOnlyService.readOnly">
 
         <!-- undo -->
         <div class="cds-element" (click)="onOptionClick(OPTIONS.UNDO)" #div4>
