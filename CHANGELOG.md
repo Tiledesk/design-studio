@@ -7,19 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 24/09/2026
-- **added**: a **Restore** button brings the flow you are editing back to a published version. It is the opposite of Republish, and it is not reversible: confirming replaces what you have now, and the confirmation says so, names the date being restored, warns that subagents are not restored — this version is of this flow alone — and, when the flow has changes that were never published, says that those are what is about to be lost. Afterwards the flow is reloaded so what is on screen is what was restored
-- **changed**: the button that used to be called **Restore** in the release history is now called **Republish**, which is what it does: it puts an old version back online and leaves the flow you are editing alone. Two buttons named the same and doing opposite things is how work gets lost
-- **added**: every line of the release history has a **View** button that shows that published version full screen, without leaving the Design Studio: the blocks, the connections and the settings of each action exactly as they were when it was published. Nothing can be changed from there — a notice says so the whole time, and no edit ever reaches the server, whichever way it is attempted. The flow being worked on is untouched, and so is its view: zoom and framing used while looking at a release are not carried back
-- **fixed**: **centre the flow** now fits it into the part of the stage that can actually be seen, instead of the whole area — which includes what the blocks panel covers and what runs past the edge of the window. The flow used to end up off to one side, and on a wide flow part of it stayed out of view
-- **changed**: publishing an agent now covers its subagents as well. The publish panel lists the agent and every subagent, ticks the ones that have changes waiting to be published, and publishes them all in one go. If some go through and others do not, the panel says which is which, instead of a single "an error occurred"; the ones that succeeded are unticked, so trying again only retries what failed. An agent with no subagents sees the panel exactly as before
-- **fixed**: the dot marking unpublished changes no longer goes out just because the publish panel was opened. It goes out when the flow has really been published, and only for the flows that were
+# 1.40.15-rc12
+- **added**: three actions on every release in the history. **View** shows that version full screen, read-only, without leaving the Design Studio. **Republish** puts it back online and leaves the flow you are editing alone: it is the button formerly called *Restore*. **Restore** does the opposite, cannot be undone, and says what will be lost before you confirm
+- **changed**: publishing an agent now covers its subagents. The panel lists the agent and every subagent, ticks the ones with changes waiting, and publishes them in one go; if some go through and others fail it says which is which, and trying again only retries what failed. An agent without subagents sees the panel exactly as before
+- **fixed**: the dot marking unpublished changes goes out when the flow has really been published, and only for the flows that were — not merely because the publish panel was opened
+- **fixed**: **centre the flow** fits it into the part of the stage you can actually see, instead of the whole area, which includes what the blocks panel covers and what runs past the window. The flow used to land off to one side, and part of a wide flow stayed out of view
+- **fixed**: deleting a subagent that another agent still uses now says why it cannot be deleted, instead of leaving the attempt without any visible outcome
 
-# this branch 09/09/2026
-- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
-
-# this branch 23/09/2026
-- **fixed**: blocks and connectors are completed as soon as the AI chat stops working, including when the work fails or is cancelled. The check used to run on a timer and missed anything that ran longer, leaving connectors that only appeared after a page reload
+# 1.40.15-rc11
+- **fixed**: blocks and connectors are completed as soon as the AI chat stops working, including when the work fails or is cancelled. The check used to run on a timer and missed anything longer, leaving connectors that appeared only after a page reload
 
 # 1.40.15-rc10
 - **fixed**: on V3 agents, a long AI chat conversation no longer drifts back to the rules of the older agents: the agent's version now travels with every answer the Design Studio gives the chat, instead of being sent once at the start
