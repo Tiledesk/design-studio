@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 24/09/2026
+
+- **changed**: publishing an agent now covers its subagents as well. The publish panel lists the agent and every subagent, ticks the ones that have changes waiting to be published, and publishes them all in one go. If some go through and others do not, the panel says which is which, instead of a single "an error occurred"; the ones that succeeded are unticked, so trying again only retries what failed. An agent with no subagents sees the panel exactly as before
+- **fixed**: the dot marking unpublished changes no longer goes out just because the publish panel was opened. It goes out when the flow has really been published, and only for the flows that were
+
 # this branch 09/09/2026
 - **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
 

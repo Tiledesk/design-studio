@@ -25,7 +25,7 @@ export interface SubagentItem {
  *
  * Funzione pura ed esportata apposta per poterla testare senza montare il componente.
  */
-export function sortSubagentsByName(items: SubagentItem[]): SubagentItem[] {
+export function sortSubagentsByName<T extends { name?: string }>(items: T[]): T[] {
   return [...items].sort((a, b) =>
     (a?.name || '').localeCompare(b?.name || '', undefined, { sensitivity: 'base', numeric: true })
   );

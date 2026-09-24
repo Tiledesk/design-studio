@@ -254,7 +254,9 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     if (this.isSaving) { return; }
     // this.publishPaneltoggleState = !this.publishPaneltoggleState
     this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState);
-    this.selectedChatbot.modified = false;
+    // Il flag NON si azzera qui: aprire il pannello non e' pubblicare, e il pannello ha
+    // bisogno di sapere chi ha modifiche in sospeso proprio in questo momento. Lo spegne
+    // il pannello stesso, e solo per i chatbot che sono stati pubblicati davvero.
     this.controllerService.openPublishPanel()
   }
 
