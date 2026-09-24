@@ -545,3 +545,122 @@ mat-expansion-panel ::ng-deep {
 .webhook-copy-icon-wpr:hover {
   opacity: 0.8;
 }
+/* Elenco di cio' che viene pubblicato: il parent e i suoi subagent */
+.publish-targets-box {
+  margin-bottom: 14px;
+}
+
+.publish-targets-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--grey-03, #e0e0e0);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.publish-target-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.publish-target-row.is-parent .publish-target-name {
+  font-weight: 600;
+}
+
+.publish-target-name {
+  font-size: 13px;
+}
+
+/* Lo stesso pallino che l'header mostra sul pulsante Publish */
+.publish-target-badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--blu, #2a6ef5);
+  flex-shrink: 0;
+}
+
+.publish-targets-loading,
+.publish-targets-error,
+.publish-targets-hint {
+  font-size: 12px;
+  color: var(--grey-06, #6e6e6e);
+  padding: 4px 0;
+}
+
+.publish-targets-error {
+  color: #D06079;
+}
+
+/* Esito per agent, dopo la pubblicazione.
+   Stessa scheda del riquadro "Install widget": centrata, bordata, con lo stesso
+   fondo, cosi' la schermata di risposta resta quella di prima con una sezione in piu'. */
+.publish-outcome {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 4px 20px 0;
+  box-sizing: border-box;
+}
+
+.publish-outcome-card {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  margin: 10px;
+  border: 1px solid var(--gray-light-01);
+  border-radius: 12px;
+  background-color: #191D220F;
+  text-align: left;
+}
+
+.publish-outcome-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--grey-06, #6e6e6e);
+}
+
+.publish-outcome-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.publish-outcome-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.publish-outcome-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  flex-shrink: 0;
+}
+
+.publish-outcome-row.ok .publish-outcome-icon { color: #73AF55; }
+.publish-outcome-row.ko .publish-outcome-icon { color: #D06079; }
+
+.publish-outcome-name {
+  font-size: 14px;
+  color: var(--blu);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.publish-outcome-error {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #D06079;
+  padding-left: 26px;
+}

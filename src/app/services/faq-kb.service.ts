@@ -9,6 +9,26 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppConfigService } from './app-config';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
+/**
+ * Il corpo della richiesta di pubblicazione multipla.
+ *
+ * `chatbots` deve essere un array di OGGETTI con dentro `id`: il servizio rifiuta con 400
+ * una lista di stringhe. La nota di rilascio si manda solo se c'e' -- in sua assenza il
+ * servizio scrive "No comment" da se'.
+ *
+ * Pura ed esportata apposta: e' l'unico punto in cui un errore si paga con un 400 a
+ * pubblicazione avviata, ed e' provabile senza montare nulla.
+ */
+export function buildPublishMultiBody(chatbotIds: string[], release_note: string | null): { chatbots: Array<{ id: string }>, release_note?: string } {
+  const body: { chatbots: Array<{ id: string }>, release_note?: string } = {
+    chatbots: (chatbotIds || []).map(id => ({ id }))
+  };
+  if (release_note && release_note.trim()) {
+    body.release_note = release_note;
+  }
+  return body;
+}
+
 @Injectable()
 export class FaqKbService {
 
@@ -304,6 +324,31 @@ export class FaqKbService {
       body['restore_from'] = releaseid
     }
     this.logger.log('publish BOT - URL ', body);
+    return this._httpClient.put(url, body, httpOptions)
+  }
+
+  /**
+   * Pubblica in una sola volta un agent e i suoi subagent.
+   *
+   * Il servizio pretende un array di OGGETTI con dentro `id`: una lista di stringhe
+   * viene rifiutata con 400. L'id del parent puo' stare nell'array come gli altri --
+   * il controllo di parentela lo scarta e poi lo pubblica insieme ai figli.
+   *
+   * La risposta porta l'esito di ciascuno in `results`. Se anche uno solo fallisce lo
+   * stato e' 500, ma `results` c'e' lo stesso nel corpo dell'errore: va letto, altrimenti
+   * dopo una pubblicazione riuscita a meta' non si sa cosa sia stato pubblicato.
+   */
+  public publishMulti(parentId: string, chatbotIds: string[], release_note: string | null) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    }
+    const url = this.FAQKB_URL + parentId + '/publish/multi';
+    const body = buildPublishMultiBody(chatbotIds, release_note);
+    this.logger.log('[FAQ-KB.SERV] - PUBLISH MULTI - URL', url, body);
     return this._httpClient.put(url, body, httpOptions)
   }
 

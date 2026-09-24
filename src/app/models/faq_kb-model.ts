@@ -20,6 +20,10 @@ export interface FaqKb {
     message_count?: number;
     mainCategory?: any
     language?: string;
+    /** Il server lo mette a true a ogni modifica di un intent o del chatbot, e a false
+     *  quando il chatbot viene pubblicato. Sta qui e non solo su Chatbot perche' le liste
+     *  (per esempio i subagent da pubblicare) arrivano tipizzate FaqKb. */
+    modified?: boolean;
 }
 
 export interface Chatbot extends FaqKb {
@@ -35,5 +39,4 @@ export interface Chatbot extends FaqKb {
     imageURL: string;
     agents_available?: boolean;
     subtype: string;
-    modified: boolean;
 }

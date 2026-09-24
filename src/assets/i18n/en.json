@@ -168,6 +168,14 @@
         "WellDonePublishingChatbot": "Well done! You are about to publish your Flow 🚀",
         "FollowTheseSimpleInstructions": "Follow these simple instructions to activate it on your website"
     },
+    "CDSPublishPanel": {
+        "WhatWillBePublished": "What will be published",
+        "LoadingAgents": "Loading the agent and its subagents...",
+        "CouldNotLoadAgents": "The subagents could not be loaded, so only this agent will be published. Close and reopen this panel to try again.",
+        "HasUnpublishedChanges": "There are unpublished changes",
+        "NothingToPublish": "Nothing has changed since the last publish. Tick what you want to publish again.",
+        "PublishedAgents": "What was published"
+    },
     "CDSModalMouseTrackPad": {
         "HowToMove": "How to move",
         "ClickWhellDragToMove": "Click wheel button & drag \n to move around",

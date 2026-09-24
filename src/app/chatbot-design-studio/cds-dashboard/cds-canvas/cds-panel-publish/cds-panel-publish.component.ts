@@ -18,6 +18,54 @@ import { NotifyService } from 'src/app/services/notify.service';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { sortSubagentsByName } from '../cds-panel-subagents/cds-panel-subagents.component';
+
+/** Una riga dell'elenco da pubblicare: il parent o uno dei suoi subagent. */
+export interface PublishTarget {
+  _id: string;
+  name: string;
+  /** Lo stato che dice il server, non il flag locale: vedi loadFamily(). */
+  modified: boolean;
+  isParent: boolean;
+  selected: boolean;
+  outcome?: 'success' | 'error';
+  error?: string;
+}
+
+/**
+ * Costruisce l'elenco da mostrare: il parent in testa, i subagent ordinati per nome,
+ * e la casella accesa dove ci sono modifiche non pubblicate.
+ *
+ * Pura ed esportata apposta: e' la regola di preselezione, ed e' la cosa che ha piu'
+ * senso poter provare senza montare il componente.
+ */
+export function buildPublishTargets(parent: any, subagents: any[]): PublishTarget[] {
+  const toTarget = (bot: any, isParent: boolean): PublishTarget => ({
+    _id: bot?._id,
+    name: bot?.name || '',
+    modified: bot?.modified === true,
+    isParent,
+    selected: bot?.modified === true
+  });
+  const children = sortSubagentsByName((subagents || []).filter(s => s?._id))
+    .map(s => toTarget(s, false));
+  return parent?._id ? [toTarget(parent, true), ...children] : children;
+}
+
+/**
+ * Cosa viene pubblicato alla conferma.
+ *
+ * Con dei subagent l'elenco e' visibile e vale la selezione. Senza, non c'e' elenco e non
+ * c'e' niente da scegliere: si pubblica l'agent aperto **anche se non risulta modificato**,
+ * come si e' sempre potuto fare. Legare anche quel caso alla selezione renderebbe
+ * impubblicabile un agent gia' allineato, che prima dei subagent si pubblicava e basta.
+ */
+export function resolveTargetsToPublish(targets: PublishTarget[]): PublishTarget[] {
+  const hasSubagents = (targets || []).some(t => !t.isParent);
+  return hasSubagents ? targets.filter(t => t.selected) : (targets || []);
+}
 
 @Component({
   selector: 'cds-panel-publish',
@@ -96,6 +144,12 @@ export class CdsPanelPublishComponent implements OnInit {
   panelOpenState = false;
   serverBaseURL: string;
   webhookUrl: string;
+
+  /** L'agent e i suoi subagent, con la selezione. */
+  publishTargets: PublishTarget[] = [];
+  familyParentId: string;
+  IS_LOADING_FAMILY: boolean = false;
+  HAS_SUBAGENTS_LOAD_ERROR: boolean = false;
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   constructor(
     public dashboardService: DashboardService,
@@ -127,6 +181,90 @@ export class CdsPanelPublishComponent implements OnInit {
       this.hideInstallButton = false
     }
     this.logger.log('[PUBLISH-PANEL] hideInstallButton', this.hideInstallButton)
+
+    this.loadFamily();
+  }
+
+  /**
+   * Carica l'agent e i suoi subagent per l'elenco da pubblicare.
+   *
+   * Il parent si risolve come nel pannello dei subagent: dentro un subagent il
+   * riferimento e' `parent_id`, altrimenti e' il chatbot aperto. Cosi' premendo Publish
+   * da dentro un subagent si vede e si pubblica tutta la famiglia.
+   *
+   * Il `modified` si rilegge SEMPRE dal server, anche per il chatbot aperto: quello in
+   * memoria viene azzerato dal click sul pulsante Publish, quindi nel momento in cui
+   * questo pannello si apre e' gia' falso.
+   */
+  private loadFamily(): void {
+    const current: any = this.selectedChatbot;
+    const isSubagent = current?.subtype === 'subagent';
+    this.familyParentId = isSubagent ? current?.parent_id : current?._id;
+
+    if (!this.familyParentId) {
+      // Senza un parent non c'e' famiglia da mostrare, ma il pannello deve restare
+      // utilizzabile: si ripiega sull'agent aperto, com'era prima dei subagent.
+      this.logger.error('[PUBLISH-PANEL] no parent id: falling back to the open chatbot');
+      this.familyParentId = current?._id;
+      this.publishTargets = buildPublishTargets(current, []);
+      return;
+    }
+
+    this.IS_LOADING_FAMILY = true;
+    forkJoin({
+      parent: this.faqKbService.getBotById(this.familyParentId).pipe(catchError(() => of(null))),
+      // L'errore si annota invece di essere ingoiato: una lista vuota perche' la chiamata
+      // e' fallita e' indistinguibile da un agent senza subagent, e nel secondo caso
+      // l'elenco sparisce del tutto -- l'utente crederebbe di non averne.
+      subagents: this.faqKbService.getSubagentsByFaqKbId(this.familyParentId).pipe(
+        catchError((error) => {
+          this.logger.error('[PUBLISH-PANEL] subagents load error', error);
+          this.HAS_SUBAGENTS_LOAD_ERROR = true;
+          return of([]);
+        })
+      )
+    }).subscribe(({ parent, subagents }) => {
+      const list: any[] = Array.isArray(subagents) ? subagents : ((subagents as any)?.subagents || (subagents as any)?.data || []);
+      // Il parent non risponde: si ripiega su quello che abbiamo, senza `modified`,
+      // cosi' l'elenco c'e' comunque e l'utente sceglie a mano.
+      const parentBot = parent || (isSubagent ? { _id: this.familyParentId, name: '' } : current);
+      this.publishTargets = buildPublishTargets(parentBot, list);
+      this.IS_LOADING_FAMILY = false;
+      this.logger.log('[PUBLISH-PANEL] family loaded', this.publishTargets);
+    });
+  }
+
+  toggleTarget(target: PublishTarget): void {
+    target.selected = !target.selected;
+  }
+
+  /** L'elenco si mostra solo se c'e' qualcosa da scegliere, cioe' se ci sono subagent. */
+  get HAS_SUBAGENTS(): boolean {
+    return this.publishTargets.filter(t => !t.isParent).length > 0;
+  }
+
+  /** Cosa viene pubblicato alla conferma: vedi resolveTargetsToPublish. */
+  get targetsToPublish(): PublishTarget[] {
+    return resolveTargetsToPublish(this.publishTargets);
+  }
+
+  get CAN_PUBLISH(): boolean {
+    return !this.IS_LOADING_FAMILY && this.targetsToPublish.length > 0;
+  }
+
+  /** Le righe che hanno un esito, cioe' quelle che sono state effettivamente inviate. */
+  get publishedTargets(): PublishTarget[] {
+    return this.publishTargets.filter(t => t.outcome);
+  }
+
+  /**
+   * Nessuno ha modifiche da pubblicare: lo si dice, invece di lasciare un pulsante spento
+   * e muto. Vale solo quando c'e' un elenco: senza subagent il pulsante resta attivo.
+   */
+  get HAS_NOTHING_TO_PUBLISH(): boolean {
+    return !this.IS_LOADING_FAMILY
+      && this.HAS_SUBAGENTS
+      && this.publishTargets.every(t => !t.modified);
   }
 
 
@@ -281,57 +419,69 @@ export class CdsPanelPublishComponent implements OnInit {
   }
 
   onClickPublish() {
+    if (!this.CAN_PUBLISH) { return; }
+
     this.PUBLISH_PENDING = true
     this.status = 'pending';
-    // const startTime = Date.now();
-    // this.isRocketShaking = true; // Optional: rocket shakes while waiting
-    // this.presentInstallModal()
 
-    this.faqKbService.publish(this.selectedChatbot, null, this.releaseNote).subscribe({
-      next: (data) => {
-        this.logger.log('[CDS DSBRD] publish  - RES ', data)
-        if (data) {
-          this.status = 'success';
+    const selected = this.targetsToPublish;
+    const ids = selected.map(t => t._id);
+    this.logger.log('[PUBLISH-PANEL] publishing', ids);
+
+    this.faqKbService.publishMulti(this.familyParentId, ids, this.releaseNote).subscribe({
+      next: (data: any) => {
+        this.logger.log('[PUBLISH-PANEL] publish multi - RES ', data)
+        this.applyResults(data?.results);
+        this.status = 'success';
+        this.HAS_COMPLETED_PUBLISH = true;
+        this.HAS_COMPLETED_PUBLISH_SUCCESS = true;
+      },
+      error: (error) => {
+        // Un solo fallimento vale 500, ma `results` arriva comunque: senza leggerlo
+        // l'utente vedrebbe "errore" anche quando meta' dei chatbot sono stati pubblicati.
+        this.logger.error('[PUBLISH-PANEL] publish multi ERROR ', error);
+        if (Array.isArray(error?.error?.results)) {
+          this.applyResults(error.error.results);
+        } else {
+          // Nessun esito per elemento: la richiesta non e' nemmeno arrivata al ciclo di
+          // pubblicazione (body rifiutato, rete, permessi), quindi non e' stato pubblicato
+          // niente. Dirlo su ogni riga e' piu' onesto di un elenco vuoto.
+          const message = error?.error?.message || error?.message || '';
+          this.applyResults(selected.map(t => ({ id: t._id, success: false, error: message })));
         }
-        // const elapsed = (Date.now() - startTime) / 1000;
-        // this.animationDuration = elapsed + 1; // Progress + 1s buffer
-        // this.rocketExitDelay = this.animationDuration;
-        // this.showResultDelay = this.rocketExitDelay + 1;
-
-        // Delay setting 'success' until rocket & stars are done
-        // setTimeout(() => {
-        //   this.status = 'success';
-        //   //  this.status = 'error'
-        //   this.isRocketShaking = false; // Optional: stop rocket shaking
-        // }, this.showResultDelay * 1000); // Delay in milliseconds
-
-
-      }, error: (error) => {
         this.status = 'error';
-        // const elapsed = (Date.now() - startTime) / 1000;
-        // this.animationDuration = elapsed + 1;
-        // this.rocketExitDelay = this.animationDuration;
-        // this.showResultDelay = this.rocketExitDelay + 1;
-
-        // setTimeout(() => {
-        //   this.status = 'error';
-        //   this.isRocketShaking = false;
-        // }, this.showResultDelay * 1000);
-
-
-        this.PUBLISH_PENDING = true
-        this.HAS_COMPLETED_PUBLISH = true
-        this.HAS_COMPLETED_PUBLISH_ERROR = true
-        this.logger.error('[CDS DSBRD] publish ERROR ', error);
-      }, complete: () => {
-        this.HAS_COMPLETED_PUBLISH = true
-        this.HAS_COMPLETED_PUBLISH_SUCCESS = true
-        this.logger.log('[CDS DSBRD] publish * COMPLETE *');
-        // this.animateSvg()
+        this.PUBLISH_PENDING = false;
+        this.HAS_COMPLETED_PUBLISH = true;
+        this.HAS_COMPLETED_PUBLISH_ERROR = true;
       }
     });
   }
 
+  /**
+   * Riporta sull'elenco l'esito di ciascun chatbot, e spegne il flag locale `modified`
+   * del chatbot aperto solo se e' stato pubblicato davvero.
+   */
+  private applyResults(results: any[]): void {
+    if (!Array.isArray(results)) { return; }
+    for (const result of results) {
+      const target = this.publishTargets.find(t => t._id === result?.id);
+      if (!target) { continue; }
+      target.outcome = result?.success ? 'success' : 'error';
+      target.error = result?.success ? undefined : (result?.error || '');
+      if (result?.success) {
+        target.modified = false;
+        // Tolto dalla selezione: se qualcun altro e' fallito il pannello resta aperto,
+        // e un secondo tentativo deve riguardare solo chi non e' passato.
+        target.selected = false;
+      }
+    }
+    const current = this.publishTargets.find(t => t._id === this.selectedChatbot?._id);
+    if (current?.outcome === 'success' && this.dashboardService.selectedChatbot) {
+      this.dashboardService.selectedChatbot.modified = false;
+    }
+  }
+
+  /** Il vecchio percorso a chatbot singolo, tenuto per il ripristino di una release. */
 
   presentInstallModal() {
     this.selectedChatbot = this.dashboardService.selectedChatbot;
