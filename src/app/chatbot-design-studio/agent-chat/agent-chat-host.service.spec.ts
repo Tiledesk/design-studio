@@ -19,6 +19,7 @@ describe('AgentChatHostService', () => {
   let created: any;
   let createdHosts: any[];
   let originalImport: any;
+  let statusHandler: ((state: string) => void) | null;
   let tokenChanged: Subject<string>;
   let selectedChatbot: BehaviorSubject<any>;
   let dashboardService: any;
@@ -40,10 +41,11 @@ describe('AgentChatHostService', () => {
       PROTOCOL_VERSION: 1,
       createAgentChatHost: (opts: any) => {
         created = opts;
-        const host = {
+        const host: any = {
           registerTool: (name: string, fn: Function) => { registered[name] = fn; },
           setContext: jasmine.createSpy('setContext'),
           setToken: jasmine.createSpy('setToken'),
+          onStatus: (fn: (state: string) => void) => { statusHandler = fn; },
           destroy: jasmine.createSpy('destroy')
         };
         createdHosts.push(host);
@@ -51,7 +53,9 @@ describe('AgentChatHostService', () => {
       }
     });
 
+    statusHandler = null;
     flowOps = {
+      redrawAfterRun: jasmine.createSpy('redrawAfterRun').and.returnValue(Promise.resolve()),
       readFlow: jasmine.createSpy('readFlow').and.returnValue({ id_faq_kb: 'kb1', intents: [] }),
       apply: jasmine.createSpy('apply').and.returnValue(
         Promise.resolve({ ok: true, rejected_before_applying: false, results: [] }))
@@ -212,6 +216,21 @@ describe('AgentChatHostService', () => {
     // where it is worth paying for it.
     expect(answers[1].v3_rules).toBeUndefined();
     expect(answers[2].v3_rules).toBeUndefined();
+  });
+
+  // The canvas used to be redrawn on a timer, 1s and 3s after the last patch:
+  // a guess at when the agent has finished, wrong whenever a turn runs longer,
+  // and blocks were left with connectors never drawn. The chat says when it
+  // has come to rest; this is the studio acting on it.
+  it('redraws the canvas when the chat says it has finished', async () => {
+    await service.attach({} as any);
+    expect(statusHandler).not.toBeNull();
+
+    statusHandler!('busy');
+    expect(flowOps.redrawAfterRun).not.toHaveBeenCalled();
+
+    statusHandler!('idle');
+    expect(flowOps.redrawAfterRun).toHaveBeenCalledTimes(1);
   });
 
   // Without this the agent cannot tell a parent from a subagent, and would
