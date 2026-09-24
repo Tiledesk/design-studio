@@ -11,7 +11,9 @@
 
 # this branch 23/09/2026
 - **fixed**: quando la chat AI finisce di lavorare, i blocchi e i collegamenti sullo stage vengono completati subito. Prima il controllo partiva a tempo, uno e tre secondi dopo l'ultima modifica, e se l'agente continuava a lavorare piu' a lungo restavano blocchi con i collegamenti non disegnati, che si sistemavano solo ricaricando la pagina. Ora e' la chat stessa a dire quando ha finito, e vale anche quando il lavoro finisce per un errore o viene annullato
-- **fixed**: nelle conversazioni lunghe con la chat AI le regole degli agenti V3 non si perdono piu'. La versione dell'agente accompagna ogni risposta che il Design Studio da' alla chat, quindi anche dopo molti scambi le modifiche continuano a seguire le regole giuste. Prima la versione veniva comunicata una volta sola, all'inizio, e in una conversazione molto lunga la chat poteva tornare a costruire con le regole degli agenti precedenti
+
+# 1.40.15-rc10
+- **fixed**: on V3 agents, a long AI chat conversation no longer drifts back to the rules of the older agents: the agent's version now travels with every answer the Design Studio gives the chat, instead of being sent once at the start
 
 # 1.40.15-rc9
 - **added**: in the chatbot's Voice settings, a "Barge-in" switch lets users interrupt the bot while it is speaking in a web-widget voice conversation. Off by default; it is saved with the other voice settings and needs the speech proxy with barge-in support. Shown for web-widget chatbots only
