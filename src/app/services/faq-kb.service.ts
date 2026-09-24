@@ -378,6 +378,32 @@ export class FaqKbService {
     return this._httpClient.put(url, body, httpOptions)
   }
 
+  /**
+   * Riporta il chatbot di sviluppo al contenuto di una versione pubblicata.
+   *
+   * `chatbotId` e' lo **sviluppo**, `releaseId` la release: passarli al contrario viene
+   * rifiutato dal servizio con un 400, e cosi' anche una release che non appartiene a
+   * quel chatbot.
+   *
+   * E' l'operazione distruttiva di questa schermata: i blocchi dello sviluppo vengono
+   * sovrascritti con quelli della release e non si recuperano. Sopravvivono solo le
+   * variabili globali. I subagent non vengono toccati: la release e' del solo chatbot
+   * su cui si sta lavorando.
+   */
+  public restoreFromPublished(chatbotId: string, releaseId: string) {
+    if (this.blockedByReadOnly('restoreFromPublished')) { return of<any>(null); }
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    }
+    const url = this.FAQKB_URL + chatbotId + '/restore/' + releaseId;
+    this.logger.log('[FAQ-KB.SERV] - RESTORE FROM PUBLISHED - URL', url);
+    return this._httpClient.put(url, {}, httpOptions)
+  }
+
   public getBotReleaseHistory(botid: string): Observable<FaqKb> {
     const httpOptions = {
       headers: new HttpHeaders({
