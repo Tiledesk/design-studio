@@ -414,3 +414,91 @@ describe('utils-condition · filtri reply V2', () => {
   });
 
 });
+
+/** Confronti di testo che ignorano maiuscole e minuscole.
+ *
+ *  La forma scelta abbassa di caso ENTRAMBI i lati con `lowerCase`, una funzione che il
+ *  motore gia' conosce: nessun operatore nuovo, nessuna versione del motore da attendere.
+ *  Il rischio vero non e' generare male, e' rileggere male -- il `when` e' l'unica cosa
+ *  salvata, quindi se la rilettura non riconosce la forma la casella si ripresenta spenta
+ *  e il salvataggio successivo cancella l'impostazione in silenzio. Per questo qui si
+ *  prova soprattutto l'andata e ritorno. */
+describe('utils-condition · ignora maiuscole e minuscole', () => {
+
+  function ignoring(operand1: string, operator: TYPE_OPERATOR_V2, value: string): Condition {
+    const c = cond(operand1, operator, { type: 'const', value });
+    (c as any).ignoreCase = true;
+    return c;
+  }
+
+  it('abbassa di caso entrambi i lati, non solo la variabile', () => {
+    expect(conditionToWhen(ignoring('nome', TYPE_OPERATOR_V2.contains, 'Mario')))
+      .toBe('contains(lowerCase(nome), lowerCase("Mario"))');
+  });
+
+  it('vale per ogni confronto di testo, negazioni comprese', () => {
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.equalAsStrings, 'x'))).toBe('lowerCase(a) == lowerCase("x")');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notEqualAsStrings, 'x'))).toBe('lowerCase(a) != lowerCase("x")');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notContains, 'x'))).toBe('!contains(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.startsWith, 'x'))).toBe('startsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notStartsWith, 'x'))).toBe('!startsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.endsWith, 'x'))).toBe('endsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notEndsWith, 'x'))).toBe('!endsWith(lowerCase(a), lowerCase("x"))');
+  });
+
+  it('non tocca una condizione sensibile: il when e\' quello di sempre', () => {
+    expect(conditionToWhen(cond('nome', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'Mario' })))
+      .toBe('contains(nome, "Mario")');
+  });
+
+  it('ignora il flag dove non ha senso: numeri e regex', () => {
+    // Su un numero non c'e' caso da ignorare.
+    expect(conditionToWhen(ignoring('eta', TYPE_OPERATOR_V2.greaterThan, '18'))).toBe('eta > 18');
+    // Abbassare di caso una regex la cambia: `\D` diventerebbe `\d`, il suo opposto.
+    // `escapeString` protegge la barra rovesciata: nel when arriva raddoppiata, ed e'
+    // giusto cosi'. Quel che conta qui e' che NON sia stata abbassata di caso.
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.matches, '\\D+'))).toBe('matches(a, "\\\\D+")');
+  });
+
+  it('riapre la condizione come l\'utente l\'aveva lasciata', () => {
+    const parsed: any = parseCondition('contains(lowerCase(nome), lowerCase("Mario"))');
+    expect(parsed.operator).toBe(TYPE_OPERATOR_V2.contains);
+    expect(parsed.operand1).toBe('nome');
+    expect(parsed.operand2.value).toBe('Mario');
+    expect(parsed.ignoreCase).toBeTrue();
+  });
+
+  it('riapre anche la forma con ==', () => {
+    const parsed: any = parseCondition('lowerCase(citta) == lowerCase("Roma")');
+    expect(parsed.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+    expect(parsed.operand1).toBe('citta');
+    expect(parsed.operand2.value).toBe('Roma');
+    expect(parsed.ignoreCase).toBeTrue();
+  });
+
+  it('andata e ritorno: rigenerare dopo aver riletto da lo stesso when', () => {
+    for (const when of [
+      'contains(lowerCase(nome), lowerCase("Mario"))',
+      '!contains(lowerCase(nome), lowerCase("Mario"))',
+      'lowerCase(citta) == lowerCase("Roma")',
+      'lowerCase(citta) != lowerCase("Roma")',
+      'startsWith(lowerCase(a), lowerCase("x"))',
+      'endsWith(lowerCase(a), lowerCase("x"))'
+    ]) {
+      expect(conditionToWhen(parseCondition(when) as Condition)).toBe(when);
+    }
+  });
+
+  it('una condizione sensibile non diventa insensibile riaprendola', () => {
+    const parsed: any = parseCondition('contains(nome, "Mario")');
+    expect(parsed.ignoreCase).toBeUndefined();
+  });
+
+  it('lascia stare un lowerCase scritto a mano su un lato solo', () => {
+    // Non e' la forma che generiamo: e' roba scritta da qualcuno, e va conservata
+    // com'e' invece di essere reinterpretata.
+    const parsed: any = parseCondition('contains(lowerCase(nome), "Mario")');
+    expect(parsed.ignoreCase).toBeUndefined();
+    expect(parsed.operand1).toBe('lowerCase(nome)');
+  });
+});

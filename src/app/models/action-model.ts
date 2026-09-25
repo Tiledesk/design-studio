@@ -798,6 +798,10 @@ export class Condition {
         value?: string,
         name?: string
     }
+    /** Confronto di testo che non distingue maiuscole e minuscole.
+     *  Assente o false = come si e' sempre confrontato. Vale solo per gli operatori
+     *  di testo: vedi IGNORE_CASE_OPERATORS in utils-condition.ts. */
+    ignoreCase?: boolean;
 
 }
 

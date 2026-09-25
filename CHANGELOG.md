@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 25/09/2026
+
+- **added**: a text condition can ignore uppercase and lowercase. A checkbox under the value, on text comparisons only — is equal to, contains, starts with, ends with and their negations. Off by default, so every condition already saved keeps comparing exactly as it did
+- **changed**: **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why. A condition that wants case ignored asks for it with the checkbox above
+
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
 

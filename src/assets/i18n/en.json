@@ -491,6 +491,7 @@
         "CustomAttribute": "Custom Attribute",
         "Action": "Action",
         "Condition": "Condition",
+        "IgnoreCase": "Ignore uppercase and lowercase",
         "ApplyCondition": "Apply condition",
         "AddNewCondition": "Add new condition",
         "TypeSearchValue": "Type search value",

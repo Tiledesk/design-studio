@@ -49,6 +49,43 @@ export const UNARY_OPERATORS = new Set<string>([
 ]);
 
 /** Escape per un letterale racchiuso tra doppi apici. */
+/**
+ * Gli operatori di testo su cui "ignora maiuscole e minuscole" ha senso.
+ *
+ * `matches` e `notMatches` sono deliberatamente FUORI: il loro secondo operando e'
+ * un'espressione regolare, e abbassarla di caso non la rende insensibile -- la cambia.
+ * `\D` diventerebbe `\d`, cioe' il suo opposto. Per ignorare il caso in una regex
+ * serve il flag `i`, che il motore non espone: meglio non offrire l'opzione che
+ * offrirne una che tradisce.
+ */
+export const IGNORE_CASE_OPERATORS = new Set<string>([
+  TYPE_OPERATOR_V2.equalAsStrings,
+  TYPE_OPERATOR_V2.notEqualAsStrings,
+  TYPE_OPERATOR_V2.contains,
+  TYPE_OPERATOR_V2.notContains,
+  TYPE_OPERATOR_V2.startsWith,
+  TYPE_OPERATOR_V2.notStartsWith,
+  TYPE_OPERATOR_V2.endsWith,
+  TYPE_OPERATOR_V2.notEndsWith,
+]);
+
+/** Vero se su questa condizione la casella "ignora maiuscole" va mostrata. */
+export function supportsIgnoreCase(operator: string): boolean {
+  return IGNORE_CASE_OPERATORS.has(normalizeLegacyOperator(operator));
+}
+
+/**
+ * Abbassa di caso un operando nel `when`.
+ *
+ * `lowerCase` e' una funzione che il motore gia' conosce, e le chiamate si possono
+ * annidare: `contains(lowerCase(nome), lowerCase("mario"))` e' valutabile cosi' com'e'.
+ * Da qui la scelta di NON aggiungere operatori nuovi -- un `containsIgnoreCase` avrebbe
+ * richiesto una funzione per ogni confronto, e una versione del motore che la capisse.
+ */
+function lower(operand: string): string {
+  return `lowerCase(${operand})`;
+}
+
 export function escapeString(value: string): string {
   return String(value == null ? '' : value)
     .replace(/\\/g, '\\\\')
@@ -122,6 +159,26 @@ function renderOperand2(condition: Condition): string {
   return `"${escapeString(raw)}"`; // letterale stringa
 }
 
+/**
+ * La forma `when` di un confronto di testo che ignora maiuscole e minuscole.
+ *
+ * Stessi operatori del caso sensibile, con i due operandi gia' abbassati di caso dal
+ * chiamante: cambia cosa viene confrontato, non come.
+ */
+function ignoreCaseExpression(op: string, left: string, right: string): string {
+  switch (op) {
+    case TYPE_OPERATOR_V2.equalAsStrings:     return `${left} == ${right}`;
+    case TYPE_OPERATOR_V2.notEqualAsStrings:  return `${left} != ${right}`;
+    case TYPE_OPERATOR_V2.contains:           return `contains(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notContains:        return `!contains(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.startsWith:         return `startsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notStartsWith:      return `!startsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.endsWith:           return `endsWith(${left}, ${right})`;
+    case TYPE_OPERATOR_V2.notEndsWith:        return `!endsWith(${left}, ${right})`;
+    default:                                  return '';
+  }
+}
+
 /** Traduce una singola Condition nella sua forma `when`. '' se incompleta. */
 export function conditionToWhen(condition: Condition): string {
   if (!condition || !condition.operator) return '';
@@ -141,9 +198,15 @@ export function conditionToWhen(condition: Condition): string {
     case TYPE_OPERATOR_V2.isFalse:      return `${left} == false`;
   }
 
-  const right = renderOperand2(condition);
+  let right = renderOperand2(condition);
   // RHS numerico vuoto -> condizione incompleta, da saltare
   if (right === '' && !UNARY_OPERATORS.has(op)) return '';
+
+  // Ignora maiuscole e minuscole: si abbassano di caso ENTRAMBI i lati. Farlo solo a
+  // sinistra confronterebbe un testo minuscolo con un valore scritto come capita.
+  if (condition.ignoreCase === true && IGNORE_CASE_OPERATORS.has(op)) {
+    return ignoreCaseExpression(op, lower(left), lower(right));
+  }
 
   switch (op) {
     case TYPE_OPERATOR_V2.equalAsNumbers:
@@ -328,8 +391,35 @@ function parseOperandRight(raw: string): { type: 'const' | 'var'; value?: string
   return { type: 'var', name: r };
 }
 
-function makeCondition(operand1: string, operator: string, operand2: any): Condition {
-  return { type: 'condition', operand1: (operand1 || '').trim(), operator, operand2 } as any;
+function makeCondition(operand1: string, operator: string, operand2: any, ignoreCase = false): Condition {
+  const condition: any = { type: 'condition', operand1: (operand1 || '').trim(), operator, operand2 };
+  // Solo quando e' vero: una condizione sensibile resta identica a come era prima che
+  // questo campo esistesse, e i `when` gia' salvati si rileggono invariati.
+  if (ignoreCase) { condition.ignoreCase = true; }
+  return condition as Condition;
+}
+
+/**
+ * Toglie l'involucro `lowerCase( ... )` da un operando, se c'e'.
+ *
+ * Serve alla rilettura: il `when` e' l'unica cosa salvata, quindi riaprendo una
+ * condizione insensibile bisogna riconoscerla dalla sua forma. Senza questo, la
+ * casella si ripresenterebbe spenta e il salvataggio successivo cancellerebbe
+ * l'impostazione senza dire niente.
+ */
+function unwrapLowerCase(operand: string): { value: string; wrapped: boolean } {
+  const raw = String(operand || '').trim();
+  const m = raw.match(/^lowerCase\s*\(([\s\S]*)\)$/);
+  if (!m) { return { value: raw, wrapped: false }; }
+  // La parentesi chiusa deve essere quella che chiude la chiamata, non una interna:
+  // `lowerCase(a) == lowerCase(b)` non e' un solo operando.
+  const inner = m[1];
+  let depth = 0;
+  for (const ch of inner) {
+    if (ch === '(') { depth++; }
+    else if (ch === ')') { if (depth === 0) { return { value: raw, wrapped: false }; } depth--; }
+  }
+  return { value: inner.trim(), wrapped: true };
 }
 
 /** Funzione (+ negazione) -> operatore V2. */
@@ -376,7 +466,17 @@ export function parseCondition(text: string): Condition | null {
     const args = splitArgs(funcMatch[2]);
     const op = negated && spec.neg ? spec.neg : spec.op;
     if (spec.unary) return makeCondition(args[0], op, { type: 'const', value: '' });
-    return makeCondition(args[0], op, parseOperandRight(args[1] != null ? args[1] : ''));
+    const leftArg = unwrapLowerCase(args[0]);
+    const rightArg = unwrapLowerCase(args[1] != null ? args[1] : '');
+    // Insensibile solo se ENTRAMBI i lati erano abbassati: e' la forma che generiamo.
+    // Un `lowerCase` su un lato solo e' roba scritta a mano, e va lasciata com'e'.
+    const ignoreCase = leftArg.wrapped && rightArg.wrapped;
+    return makeCondition(
+      ignoreCase ? leftArg.value : args[0],
+      op,
+      parseOperandRight(ignoreCase ? rightArg.value : (args[1] != null ? args[1] : '')),
+      ignoreCase
+    );
   }
 
   if (negated) return null; // `!` solo su forme funzione note
@@ -384,7 +484,12 @@ export function parseCondition(text: string): Condition | null {
   // confronto: left OP right
   const cmp = s.match(/^([\s\S]+?)\s*(==|!=|>=|<=|>|<)\s*([\s\S]+)$/);
   if (cmp) {
-    const left = cmp[1].trim(); const sym = cmp[2]; const rhsRaw = cmp[3].trim();
+    const leftSide = unwrapLowerCase(cmp[1]);
+    const rightSide = unwrapLowerCase(cmp[3]);
+    const ignoreCaseCmp = leftSide.wrapped && rightSide.wrapped;
+    const left = ignoreCaseCmp ? leftSide.value : cmp[1].trim();
+    const sym = cmp[2];
+    const rhsRaw = ignoreCaseCmp ? rightSide.value : cmp[3].trim();
     if (sym === '==' && rhsRaw === 'true')  return makeCondition(left, TYPE_OPERATOR_V2.isTrue,  { type: 'const', value: '' });
     if (sym === '==' && rhsRaw === 'false') return makeCondition(left, TYPE_OPERATOR_V2.isFalse, { type: 'const', value: '' });
     const rhs = parseOperandRight(rhsRaw);
@@ -398,7 +503,7 @@ export function parseCondition(text: string): Condition | null {
       case '<':  op = TYPE_OPERATOR_V2.lessThan; break;
       case '<=': op = TYPE_OPERATOR_V2.lessThanOrEqual; break;
     }
-    return op ? makeCondition(left, op, rhs) : null;
+    return op ? makeCondition(left, op, rhs, ignoreCaseCmp) : null;
   }
   return null;
 }
