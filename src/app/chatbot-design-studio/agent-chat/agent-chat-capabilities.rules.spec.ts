@@ -92,6 +92,15 @@ describe('resolveAttachedServers', () => {
     expect(error).toContain('REPLY_TO_USER');
   });
 
+  it('says a server has no tools instead of listing an empty set', () => {
+    const snap = aSnapshot({ mcp_servers: [
+      { name: 'Empty CRM', native: false, transport: 'streamable_http', tools: [] }
+    ] });
+    const error = resolveAttachedServers([{ name: 'Empty CRM', tools: ['lookup_customer'] }], snap).error;
+    expect(error).toContain('has no tools');
+    expect(error).not.toContain('Its tools are');
+  });
+
   it('refuses an empty or missing tools list', () => {
     expect(resolveAttachedServers([{ id: 'tiledesk-communicator', tools: [] }], aSnapshot()).error)
       .toContain('tools');

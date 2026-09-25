@@ -9,6 +9,7 @@
 
 # this branch 23/09/2026
 
+- **changed**: the flow the AI chat reads no longer carries the address or the headers of the project's own MCP servers, so their credentials never reach the chat or its model
 - **added**: the AI chat that builds agents asks the studio what the project can use before it builds: the actions of the element panel for this agent (the ones a plan does not unlock are reported as such) and the MCP servers an AI Prompt can call, native and the project's own, with their tools
 - **changed**: the AI chat can no longer add an action the project does not have, or attach an MCP server or tool the project does not have: the change is refused with the reason, and nothing is applied. What is stored for an attached server is built by the studio, never taken from the chat
 - **changed**: the element panel and the AI chat read the list of available actions from one place, so they cannot disagree

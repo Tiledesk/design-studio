@@ -575,7 +575,7 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
         // would reach for HttpClient, which this module does not provide.
         { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
             { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
-              customServerConfigs: {} }) } }
+              customServerConfigs: {} }), invalidate: () => {} } }
       ]
     });
     host = TestBed.inject(AgentChatHostService);

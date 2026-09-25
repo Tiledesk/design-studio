@@ -77,7 +77,7 @@ export function resolveAttachedServers(value: unknown, snapshot: CapabilitiesSna
     const unknown = tools.filter((t: string) => known.indexOf(t) === -1);
     if (unknown.length > 0) {
       return { error: `MCP server "${label}" has no tool ${unknown.map((t: string) => `"${t}"`).join(', ')}. `
-        + `Its tools are: ${known.join(', ')}.` };
+        + (known.length ? `Its tools are: ${known.join(', ')}.` : `It has no tools.`) };
     }
     // A native entry carries no url: the studio's own native catalogue dialog
     // stores none, and the engine resolves it by id (DirAiPrompt.js).

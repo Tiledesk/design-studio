@@ -35,6 +35,25 @@ function stripTokenScheme(token: string): string {
   return token.replace(/^\s*jwt\s+/i, '');
 }
 
+/** A copy of the flow without the address and headers of attached MCP
+ *  servers: for the project's own servers they are credentials, and neither
+ *  the chat nor its model needs them to read or edit the flow. */
+function withoutServerCredentials<T>(flow: T): T {
+  const copy = JSON.parse(JSON.stringify(flow));
+  for (const intent of Array.isArray(copy?.intents) ? copy.intents : []) {
+    for (const action of Array.isArray(intent?.actions) ? intent.actions : []) {
+      if (!Array.isArray(action?.servers)) { continue; }
+      for (const server of action.servers) {
+        if (server && typeof server === 'object') {
+          delete server.url;
+          delete server.customHeaders;
+        }
+      }
+    }
+  }
+  return copy;
+}
+
 /** Owns the chat iframe's host side.
  *
  *  Design-studio knows one address. The iframe's src, the postMessage target
@@ -122,6 +141,8 @@ export class AgentChatHostService {
     // is after a failure -- and a failed attach() left no host behind.
     this.host?.destroy();
     this.host = null;
+    // A new chat session reads the project's MCP servers afresh.
+    this.capabilities.invalidate();
     let adapter;
     try {
       adapter = await loadAgentChatAdapter(this.config.chatUrl);
@@ -171,7 +192,7 @@ export class AgentChatHostService {
       // legacy editor, and only the studio knows which editor this agent uses.
       const isV3 = !!this.dashboardService.isV3;
       return {
-        ...this.flowOps.readFlow(),
+        ...withoutServerCredentials(this.flowOps.readFlow()),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {})

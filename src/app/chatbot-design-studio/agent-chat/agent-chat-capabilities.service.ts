@@ -20,18 +20,34 @@ function messageOf(error: any): string {
   return String(error?.message ?? error);
 }
 
+/** How long a successful MCP answer is reused: long enough to spare a turn
+ *  that asks twice a connection per native server, short enough that a server
+ *  added or connected meanwhile shows up within the session. */
+const MCP_CACHE_MS = 60000;
+/** A native server that has not answered by then is reported, not waited for. */
+const NATIVE_CONNECT_TIMEOUT_MS = 10000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('timed out')), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 /** Answers get_project_capabilities, and gives FlowOpsService the same answer
  *  to check patches against.
  *
  *  Actions are recomputed on every call: open_flow can move the canvas into a
  *  subagent, and what a subagent may use differs. The MCP servers are read once
- *  per project, because discovering a native server's tools is a connection
- *  per server; an answer with any failure in it is not kept, so the next call
- *  tries again instead of repeating a transient error for the whole session. */
+ *  per project and kept for up to a minute, because discovering a native
+ *  server's tools is a connection per server; an answer with any failure in it
+ *  (or a load that threw) is not kept, so the next call tries again instead of
+ *  repeating a transient error for the whole session. */
 @Injectable({ providedIn: 'root' })
 export class AgentChatCapabilitiesService {
 
-  private mcpCache: { projectId: string; value: Promise<McpPart> } | null = null;
+  private mcpCache: { projectId: string; value: Promise<McpPart>; loadedAt?: number } | null = null;
 
   constructor(
     private dashboardService: DashboardService,
@@ -65,12 +81,19 @@ export class AgentChatCapabilitiesService {
 
   private mcpPart(): Promise<McpPart> {
     const projectId = this.dashboardService.projectID;
-    if (!this.mcpCache || this.mcpCache.projectId !== projectId) {
+    const stale = this.mcpCache?.loadedAt !== undefined
+      && Date.now() - this.mcpCache.loadedAt >= MCP_CACHE_MS;
+    if (!this.mcpCache || this.mcpCache.projectId !== projectId || stale) {
       const value = this.loadMcp();
-      this.mcpCache = { projectId, value };
+      const cache: { projectId: string; value: Promise<McpPart>; loadedAt?: number } = { projectId, value };
+      this.mcpCache = cache;
       value.then(part => {
+        if (this.mcpCache !== cache) { return; }
         const failed = !!part.error || part.servers.some(s => !!s.tools_error);
-        if (failed && this.mcpCache?.value === value) { this.mcpCache = null; }
+        if (failed) { this.mcpCache = null; } else { cache.loadedAt = Date.now(); }
+      }, () => {
+        // The caller gets the rejection; here it only must not stay cached.
+        if (this.mcpCache === cache) { this.mcpCache = null; }
       });
     }
     return this.mcpCache.value;
@@ -94,7 +117,7 @@ export class AgentChatCapabilitiesService {
         tools: []
       };
       try {
-        const tools = await this.mcpService.connectNativeServer(s.id);
+        const tools = await withTimeout(this.mcpService.connectNativeServer(s.id), NATIVE_CONNECT_TIMEOUT_MS);
         return { ...base, tools: tools.map(t => ({ name: t.name, ...(t.description ? { description: t.description } : {}) })) };
       } catch (e) {
         return { ...base, tools_error: `connect failed: ${messageOf(e)}` };
@@ -106,9 +129,9 @@ export class AgentChatCapabilitiesService {
     const configs: Record<string, McpServer> = {};
     const customCaps: McpServerCapability[] = customs.filter(s => !s.native).map(s => {
       configs[s.name] = s;
-      const selected = Array.isArray(s.selectedTools) && s.selectedTools.length > 0 ? s.selectedTools : null;
-      const tools = (s.tools || [])
-        .filter(t => !selected || selected.indexOf(t.name) !== -1)
+      // Every tool the integration discovered, not only its selectedTools.
+      const tools = (Array.isArray(s.tools) ? s.tools : [])
+        .filter(t => typeof t?.name === 'string')
         .map(t => ({ name: t.name, ...(t.description ? { description: t.description } : {}) }));
       return { name: s.name, native: false, transport: s.transport, tools };
     });

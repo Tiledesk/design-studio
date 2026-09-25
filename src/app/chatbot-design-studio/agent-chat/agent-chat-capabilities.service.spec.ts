@@ -84,12 +84,68 @@ describe('AgentChatCapabilitiesService', () => {
     expect(JSON.stringify(capabilities)).not.toContain('https://');
   });
 
-  it('lists custom servers restricted to selectedTools, keeping their config apart', async () => {
+  it('lists custom servers with every tool the integration discovered, keeping their config apart', async () => {
     const snap = await service.snapshot();
     const custom = snap.capabilities.mcp_servers.filter(s => !s.native);
     expect(custom).toEqual([{ name: 'Acme CRM', native: false, transport: 'streamable_http',
-      tools: [{ name: 'lookup_customer' }] }]);
+      tools: [{ name: 'lookup_customer' }, { name: 'delete_customer' }] }]);
     expect(snap.customServerConfigs['Acme CRM'].url).toBe('https://crm.example.com/mcp');
+  });
+
+  it('treats a custom server tools value that is not an array, or null entries, as no tools', async () => {
+    mcpService.loadMcpServers.and.returnValue(Promise.resolve([
+      { name: 'Broken', transport: 'streamable_http', tools: 'oops' },
+      { name: 'Holes', transport: 'streamable_http', tools: [null, { name: 'lookup_customer' }] }
+    ]));
+    const { capabilities } = await service.snapshot();
+    const custom = capabilities.mcp_servers.filter(s => !s.native);
+    expect(custom).toEqual([
+      { name: 'Broken', native: false, transport: 'streamable_http', tools: [] },
+      { name: 'Holes', native: false, transport: 'streamable_http', tools: [{ name: 'lookup_customer' }] }
+    ]);
+  });
+
+  it('retries on the next call when loading the servers threw', async () => {
+    mcpService.loadNativeServers.and.returnValue(Promise.resolve(null));
+    await expectAsync(service.snapshot()).toBeRejected();
+    mcpService.loadNativeServers.and.returnValue(Promise.resolve([]));
+    const { capabilities } = await service.snapshot();
+    expect(mcpService.loadNativeServers).toHaveBeenCalledTimes(2);
+    expect(capabilities.mcp_servers.length).toBe(1);
+  });
+
+  it('gives up on a native server that has not connected within 10 seconds', async () => {
+    jasmine.clock().install();
+    try {
+      let called: () => void;
+      const connectCalled = new Promise<void>(resolve => called = resolve);
+      mcpService.connectNativeServer.and.callFake(() => { called(); return new Promise(() => {}); });
+      const pending = service.snapshot();
+      await connectCalled;
+      jasmine.clock().tick(10000);
+      const { capabilities } = await pending;
+      const native = capabilities.mcp_servers.find(s => s.native);
+      expect(native.tools).toEqual([]);
+      expect(native.tools_error).toBe('connect failed: timed out');
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
+
+  it('keeps a successful MCP answer for 60 seconds, then reads it again', async () => {
+    jasmine.clock().install();
+    try {
+      jasmine.clock().mockDate(new Date(2026, 8, 25, 12, 0, 0));
+      await service.snapshot();
+      jasmine.clock().tick(59000);
+      await service.snapshot();
+      expect(mcpService.loadNativeServers).toHaveBeenCalledTimes(1);
+      jasmine.clock().tick(2000);
+      await service.snapshot();
+      expect(mcpService.loadNativeServers).toHaveBeenCalledTimes(2);
+    } finally {
+      jasmine.clock().uninstall();
+    }
   });
 
   it('marks a native server whose connect fails, without failing the call', async () => {

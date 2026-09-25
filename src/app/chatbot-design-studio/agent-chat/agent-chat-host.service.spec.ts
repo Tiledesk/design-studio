@@ -74,7 +74,7 @@ describe('AgentChatHostService', () => {
       capabilities: { chatbot_subtype: 'chatbot', subagent: false,
         actions: [{ type: 'reply', status: 'available' }], mcp_servers: [] },
       customServerConfigs: { 'Acme CRM': { name: 'Acme CRM', url: 'https://crm.example.com/mcp', transport: 'x' } }
-    })) };
+    })), invalidate: jasmine.createSpy('invalidate') };
 
     TestBed.configureTestingModule({
       providers: [
@@ -183,6 +183,32 @@ describe('AgentChatHostService', () => {
     const source = flowOps.setCapabilitiesSource.calls.mostRecent().args[0];
     const snapshot = await source();
     expect(snapshot.customServerConfigs['Acme CRM'].url).toBe('https://crm.example.com/mcp');
+  });
+
+  // A new chat session reads the project's MCP servers afresh: one may have
+  // been added or connected since the last session.
+  it('starts every attach with fresh capabilities', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect(capabilitiesService.invalidate).toHaveBeenCalled();
+  });
+
+  // The address and headers of the project's own MCP servers are credentials:
+  // the chat and its model never need them, and never see them.
+  it('leaves the url and headers of attached servers out of get_flow, without touching the canvas', async () => {
+    const flow = { id_faq_kb: 'kb1', intents: [{ intent_id: 'i1', actions: [{
+      _tdActionType: 'ai_prompt',
+      servers: [{ name: 'Acme CRM', native: false, transport: 'streamable_http',
+        url: 'https://crm.example.com/mcp',
+        customHeaders: [{ enabled: true, key: 'x-api-key', value: 'secret' }],
+        tools: ['lookup_customer'] }]
+    }] }] };
+    const before = JSON.stringify(flow);
+    flowOps.readFlow.and.returnValue(flow);
+    await service.attach(document.createElement('iframe'));
+    const result = await registered['get_flow']({});
+    expect(result.intents[0].actions[0].servers).toEqual([{ name: 'Acme CRM', native: false,
+      transport: 'streamable_http', tools: ['lookup_customer'] }]);
+    expect(JSON.stringify(flow)).toBe(before);
   });
 
   it('answers get_flow from the canvas', async () => {
@@ -393,7 +419,7 @@ describe('AgentChatHostService', () => {
         { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } },
         { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
             { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
-              customServerConfigs: {} }) } }
+              customServerConfigs: {} }), invalidate: () => {} } }
       ]
     });
     expect(TestBed.inject(AgentChatHostService).isConfigured()).toBe(false);
