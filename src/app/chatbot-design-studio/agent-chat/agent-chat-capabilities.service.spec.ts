@@ -45,7 +45,8 @@ describe('AgentChatCapabilitiesService', () => {
     };
     // What initLLMModels answers -- every model, configured or not, in its own
     // order (OpenAI first), as the AI action pickers show them -- and the
-    // project's integrations it read them against.
+    // current project's integration payload for each dynamic provider, as
+    // getIntegrationModels reads it (null when the project has none).
     llmLoader = { load: jasmine.createSpy('load').and.returnValue(Promise.resolve({ models: [
       { uid: 'openai::::gpt-4o', modelName: 'GPT-4o', llm: 'openai', llmLabel: 'OpenAI', model: 'gpt-4o',
         description: 'TYPE_GPT_MODEL.gpt-4o.description', src: 'x', status: 'active', configured: true,
@@ -65,9 +66,10 @@ describe('AgentChatCapabilitiesService', () => {
       { uid: 'ollama::::ollama_1', modelName: 'ollama_1', llm: 'ollama', llmLabel: 'Ollama',
         model: 'ollama_1', description: '', src: 'x', status: 'active', configured: true,
         max_output_tokens: 128000 }
-    ], integrations: [
-      { name: 'vllm', value: { servers: [{ name: 'gpu-a', url: 'https://secret.example.com/v1', models: ['llama-3'] }] } }
-    ] })) };
+    ], dynamicIntegrations: {
+      vllm: { servers: [{ name: 'gpu-a', url: 'https://secret.example.com/v1', models: ['llama-3'] }] },
+      ollama: null, agentplatform: null, openrouter: null
+    } })) };
     translate = { instant: jasmine.createSpy('instant').and.callFake((key: string) =>
       key === 'TYPE_GPT_MODEL.gpt-4o.description' ? 'Fast and capable' : key) };
     TestBed.configureTestingModule({
@@ -110,22 +112,66 @@ describe('AgentChatCapabilitiesService', () => {
       .toEqual(['openai::::gpt-4o', 'openai::::gpt-4.1-mini', 'vllm::gpu-a::llama-3']);
   });
 
-  it('leaves out a dynamic provider\'s models when the project does not have that integration', async () => {
+  /** The fixture's models plus `extra`, read against `dynamicIntegrations`. */
+  async function loadWith(dynamicIntegrations: Record<string, any>, extra: any[] = []): Promise<void> {
     const loaded = await llmLoader.load();
-    llmLoader.load.and.returnValue(Promise.resolve({ models: loaded.models, integrations: [] }));
+    llmLoader.load.and.returnValue(Promise.resolve({
+      models: [...loaded.models, ...extra], dynamicIntegrations }));
+  }
+
+  it('leaves out a dynamic provider\'s models when the project does not have that integration', async () => {
+    await loadWith({ vllm: null, ollama: null, agentplatform: null, openrouter: null });
     const snap = await service.snapshot();
     expect(snap.capabilities.llm_models.map(m => m.llm)).toEqual(['openai', 'openai']);
     expect(snap.llmModels.map(m => m.llm)).toEqual(['openai', 'openai']);
   });
 
-  it('keeps a dynamic provider\'s models when the project has that integration', async () => {
-    const loaded = await llmLoader.load();
-    llmLoader.load.and.returnValue(Promise.resolve({ models: loaded.models, integrations: [
-      { name: 'vllm', value: { servers: [] } }, { name: 'ollama', value: { models: ['ollama_1'] } }
-    ] }));
+  // getIntegrationModels leaves the shared LLM_MODEL as it was when the
+  // current project's integration lists no model, so a server another project
+  // put there earlier in the same tab is still in initLLMModels' answer.
+  it('drops a vLLM server left by another project when the current integration has no servers', async () => {
+    await loadWith({ vllm: { servers: [] }, ollama: null, agentplatform: null, openrouter: null });
     const snap = await service.snapshot();
-    expect(snap.capabilities.llm_models.map(m => m.model))
-      .toEqual(['gpt-4o', 'gpt-4.1-mini', 'llama-3', 'ollama_1']);
+    expect(snap.capabilities.llm_models.map(m => m.llm)).toEqual(['openai', 'openai']);
+  });
+
+  it('keeps only the servers and models the current vLLM / Agent Platform integration lists', async () => {
+    await loadWith({
+      vllm: { servers: [{ name: 'gpu-a', models: ['llama-3'] }, { name: 'gpu-b', models: ['mistral'] }] },
+      agentplatform: { servers: [{ name: 'eu', models: ['gemini-2.5-flash'] }] },
+      ollama: null, openrouter: null
+    }, [
+      // gpu-a exists, but not with this model; gpu-z is not a server of it at all.
+      { uid: 'vllm::gpu-a::qwen', modelName: 'gpu-a ・ qwen', llm: 'vllm', llmLabel: 'vLLM', model: 'qwen',
+        description: '', src: 'x', status: 'active', configured: true, server: 'gpu-a' },
+      { uid: 'vllm::gpu-z::llama-3', modelName: 'gpu-z ・ llama-3', llm: 'vllm', llmLabel: 'vLLM',
+        model: 'llama-3', description: '', src: 'x', status: 'active', configured: true, server: 'gpu-z' },
+      { uid: 'agentplatform::eu::gemini-2.5-flash', modelName: 'eu ・ gemini-2.5-flash', llm: 'agentplatform',
+        llmLabel: 'Gemini Agent Platform', model: 'gemini-2.5-flash', description: '', src: 'x',
+        status: 'active', configured: true, server: 'eu' },
+      { uid: 'agentplatform::us::gemini-2.5-flash', modelName: 'us ・ gemini-2.5-flash', llm: 'agentplatform',
+        llmLabel: 'Gemini Agent Platform', model: 'gemini-2.5-flash', description: '', src: 'x',
+        status: 'active', configured: true, server: 'us' }
+    ]);
+    const snap = await service.snapshot();
+    expect(snap.llmModels.map(m => m.uid)).toEqual(['openai::::gpt-4o', 'openai::::gpt-4.1-mini',
+      'vllm::gpu-a::llama-3', 'agentplatform::eu::gemini-2.5-flash']);
+  });
+
+  it('keeps only the model ids the current Ollama / OpenRouter integration lists', async () => {
+    await loadWith({
+      vllm: null, agentplatform: null,
+      ollama: { models: [' ollama_1 '] },
+      openrouter: { models: [{ id: 'meta/llama-4', name: 'Llama 4' }] }
+    }, [
+      { uid: 'openrouter::::meta/llama-4', modelName: 'Llama 4', llm: 'openrouter', llmLabel: 'OpenRouter',
+        model: 'meta/llama-4', description: '', src: 'x', status: 'active', configured: true },
+      { uid: 'openrouter::::old/model', modelName: 'Old', llm: 'openrouter', llmLabel: 'OpenRouter',
+        model: 'old/model', description: '', src: 'x', status: 'active', configured: true }
+    ]);
+    const snap = await service.snapshot();
+    expect(snap.llmModels.map(m => m.uid)).toEqual(['openai::::gpt-4o', 'openai::::gpt-4.1-mini',
+      'ollama::::ollama_1', 'openrouter::::meta/llama-4']);
   });
 
   it('never puts a model\'s key or url in what the agent is sent', async () => {
