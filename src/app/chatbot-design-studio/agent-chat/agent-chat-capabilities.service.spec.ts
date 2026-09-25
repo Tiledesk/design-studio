@@ -43,20 +43,31 @@ describe('AgentChatCapabilitiesService', () => {
       ])),
       saveMcpIntegration: jasmine.createSpy('saveMcpIntegration').and.returnValue(Promise.resolve())
     };
-    // What initLLMModels answers: every model, configured or not, in its own
-    // order (OpenAI first), as the AI action pickers show them.
-    llmLoader = { load: jasmine.createSpy('load').and.returnValue(Promise.resolve([
+    // What initLLMModels answers -- every model, configured or not, in its own
+    // order (OpenAI first), as the AI action pickers show them -- and the
+    // project's integrations it read them against.
+    llmLoader = { load: jasmine.createSpy('load').and.returnValue(Promise.resolve({ models: [
       { uid: 'openai::::gpt-4o', modelName: 'GPT-4o', llm: 'openai', llmLabel: 'OpenAI', model: 'gpt-4o',
         description: 'TYPE_GPT_MODEL.gpt-4o.description', src: 'x', status: 'active', configured: true,
         min_tokens: 1, max_output_tokens: 16384, reasoning: false, multiplier: '1 x tokens' },
+      { uid: 'openai::::gpt-4.1-mini', modelName: 'GPT-4.1 mini', llm: 'openai', llmLabel: 'OpenAI',
+        model: 'gpt-4.1-mini', description: 'TYPE_GPT_MODEL.gpt-4.1-mini.description', src: 'x',
+        status: 'active', configured: true, max_output_tokens: 32768 },
       { uid: 'anthropic::::claude-sonnet-4', modelName: 'Claude Sonnet 4', llm: 'anthropic',
         llmLabel: 'Anthropic', model: 'claude-sonnet-4', description: 'TYPE_GPT_MODEL.untranslated.description',
         src: 'x', status: 'active', configured: false, max_output_tokens: 64000 },
       { uid: 'vllm::gpu-a::llama-3', modelName: 'gpu-a ・ llama-3', llm: 'vllm', llmLabel: 'vLLM',
         model: 'llama-3', description: '', src: 'x', status: 'active', configured: true,
         max_output_tokens: 128000, reasoning: true, server: 'gpu-a',
-        url: 'https://secret.example.com/v1', apikey: 'secret' }
-    ])) };
+        url: 'https://secret.example.com/v1', apikey: 'secret' },
+      // LLM_MODEL's own placeholder, which initLLMModels marks configured
+      // whether or not the project has Ollama.
+      { uid: 'ollama::::ollama_1', modelName: 'ollama_1', llm: 'ollama', llmLabel: 'Ollama',
+        model: 'ollama_1', description: '', src: 'x', status: 'active', configured: true,
+        max_output_tokens: 128000 }
+    ], integrations: [
+      { name: 'vllm', value: { servers: [{ name: 'gpu-a', url: 'https://secret.example.com/v1', models: ['llama-3'] }] } }
+    ] })) };
     translate = { instant: jasmine.createSpy('instant').and.callFake((key: string) =>
       key === 'TYPE_GPT_MODEL.gpt-4o.description' ? 'Fast and capable' : key) };
     TestBed.configureTestingModule({
@@ -89,11 +100,32 @@ describe('AgentChatCapabilitiesService', () => {
     expect(snap.capabilities.llm_models).toEqual([
       { llm: 'openai', model: 'gpt-4o', label: 'OpenAI · GPT-4o', description: 'Fast and capable',
         cost_multiplier: '1 x tokens', max_output_tokens: 16384 },
+      // Its description key has no translation, so it has no description.
+      { llm: 'openai', model: 'gpt-4.1-mini', label: 'OpenAI · GPT-4.1 mini', max_output_tokens: 32768 },
       { llm: 'vllm', model: 'llama-3', label: 'vLLM · gpu-a ・ llama-3', server: 'gpu-a',
         reasoning: true, max_output_tokens: 128000 }
     ]);
     expect(snap.capabilities.llm_models_error).toBeUndefined();
-    expect(snap.llmModels.map(m => m.uid)).toEqual(['openai::::gpt-4o', 'vllm::gpu-a::llama-3']);
+    expect(snap.llmModels.map(m => m.uid))
+      .toEqual(['openai::::gpt-4o', 'openai::::gpt-4.1-mini', 'vllm::gpu-a::llama-3']);
+  });
+
+  it('leaves out a dynamic provider\'s models when the project does not have that integration', async () => {
+    const loaded = await llmLoader.load();
+    llmLoader.load.and.returnValue(Promise.resolve({ models: loaded.models, integrations: [] }));
+    const snap = await service.snapshot();
+    expect(snap.capabilities.llm_models.map(m => m.llm)).toEqual(['openai', 'openai']);
+    expect(snap.llmModels.map(m => m.llm)).toEqual(['openai', 'openai']);
+  });
+
+  it('keeps a dynamic provider\'s models when the project has that integration', async () => {
+    const loaded = await llmLoader.load();
+    llmLoader.load.and.returnValue(Promise.resolve({ models: loaded.models, integrations: [
+      { name: 'vllm', value: { servers: [] } }, { name: 'ollama', value: { models: ['ollama_1'] } }
+    ] }));
+    const snap = await service.snapshot();
+    expect(snap.capabilities.llm_models.map(m => m.model))
+      .toEqual(['gpt-4o', 'gpt-4.1-mini', 'llama-3', 'ollama_1']);
   });
 
   it('never puts a model\'s key or url in what the agent is sent', async () => {

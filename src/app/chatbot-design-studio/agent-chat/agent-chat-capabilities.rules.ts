@@ -113,9 +113,17 @@ const SERVER_FIELD: Record<string, keyof ActionWithServer> = {
 
 const MAX_LISTED_MODELS = 40;
 
+/** The panels' own DEFAULT_MAX_TOKENS (the same 10000 in all three). */
+const DEFAULT_MAX_TOKENS = 10000;
+
 export type LlmModelResolution =
   | { fields: Record<string, any> | undefined; error?: undefined }
   | { fields?: undefined; error: string };
+
+/** Whether `type` is an AI action whose model the project's list decides. */
+export function usesLlmModel(type: string): boolean {
+  return LLM_MODEL_ACTION_TYPES.indexOf(type) !== -1;
+}
 
 export function setsLlmModel(fields: Record<string, any> | undefined): boolean {
   return !!fields && LLM_MODEL_SELECTION_FIELDS.some(key => key in fields);
@@ -150,14 +158,60 @@ function llmModelFields(entry: LlmModel): Record<string, any> {
   };
 }
 
+/** What the same setModel() then adjusts for the picked model, given the
+ *  action as it will be (`current`: the action it lands on, with the patch's
+ *  own fields over it):
+ *  - max_tokens is kept and clamped into [min_tokens, max_output_tokens], or
+ *    set to DEFAULT_MAX_TOKENS capped by the model when there is none -- the
+ *    panel's path when it opens an action (resetMaxTokens false), which is
+ *    also what it will do to whatever is stored here the next time it opens.
+ *    askgptv2's panel raises the minimum to 1024 when citations are on.
+ *  - a model whose name starts with gpt-5 / Gpt-5 gets temperature 1, even
+ *    over an explicit one: the panel's pick does exactly that
+ *    (resetTemperature true), then disables the temperature slider, so a
+ *    person could not correct any other value. */
+function modelLimitFields(type: string, entry: LlmModel, current: Record<string, any>): Record<string, any> {
+  const citationsMin = type === TYPE_ACTION.ASKGPTV2 && current.citations ? 1024 : 0;
+  const min = Math.max(entry.min_tokens, citationsMin);
+  const max = entry.max_output_tokens;
+  const currentMaxTokens = typeof current.max_tokens === 'number' ? current.max_tokens : Number(current.max_tokens);
+  let maxTokens: number;
+  if (!Number.isFinite(currentMaxTokens)) {
+    maxTokens = Math.min(DEFAULT_MAX_TOKENS, max);
+    if (maxTokens < min) { maxTokens = min; }
+  } else {
+    maxTokens = Math.min(Math.max(currentMaxTokens, min), max);
+  }
+  const isGpt5 = entry.modelName.startsWith('gpt-5') || entry.modelName.startsWith('Gpt-5');
+  return { max_tokens: maxTokens, ...(isGpt5 ? { temperature: 1 } : {}) };
+}
+
+/** Everything a pick of `entry` stores: the model fields, then the limits. */
+function pickedModelFields(
+  type: string, entry: LlmModel, fields: Record<string, any> | undefined, base: Record<string, any> | undefined
+): Record<string, any> {
+  return {
+    ...(fields || {}),
+    ...llmModelFields(entry),
+    ...modelLimitFields(type, entry, { ...(base || {}), ...(fields || {}) })
+  };
+}
+
 /** Checks the model an AI action's `fields` pick, and returns the fields to
  *  store: the agent names a provider and a model (and, for a multi-server
  *  provider, a server); everything the panel needs besides comes from the
- *  project's own list. `fields` that pick no model come back unchanged. */
+ *  project's own list, and max_tokens / temperature are adjusted as the
+ *  panel would (modelLimitFields) against `base`, the action the fields land
+ *  on. `fields` that pick no model come back unchanged. */
 export function resolveLlmModel(
-  type: string, fields: Record<string, any> | undefined, snapshot: CapabilitiesSnapshot
+  type: string, fields: Record<string, any> | undefined, snapshot: CapabilitiesSnapshot,
+  base?: Record<string, any>
 ): LlmModelResolution {
-  if (LLM_MODEL_ACTION_TYPES.indexOf(type) === -1 || !setsLlmModel(fields)) { return { fields }; }
+  if (!usesLlmModel(type) || !setsLlmModel(fields)) { return { fields }; }
+  if (typeof fields.llm !== 'string' || typeof fields.model !== 'string') {
+    return { error: `To set the model of "${type}", give both "llm" and "model" (and, for a vllm or `
+      + `agentplatform model, its server): get_project_capabilities lists them in llm_models.` };
+  }
   const models = snapshot.llmModels;
   const serverField = SERVER_FIELD[fields.llm];
   const server = serverField ? fields[serverField] : undefined;
@@ -179,20 +233,22 @@ export function resolveLlmModel(
     return { error: `"${type}" cannot use the model "${sent}": this project does not have it. `
       + `Set llm and model (and the server, where shown after @) to one of: ${describeModels(models)}.` };
   }
-  return { fields: { ...fields, ...llmModelFields(matches[0]) } };
+  return { fields: pickedModelFields(type, matches[0], fields, base) };
 }
 
 /** `fields` for a newly added AI action that picks no model, with the default
  *  one filled in: GPT-4o, the studio's own DEFAULT_MODEL, when the project has
- *  it, otherwise the first of its models. Unchanged when the action picks its
+ *  it, otherwise the first of its models -- with max_tokens / temperature
+ *  adjusted against `base`, the new action's scaffold. Unchanged when the action picks its
  *  own model, is of another type, or the project has no model at all. */
 export function withDefaultLlmModel(
-  type: string, fields: Record<string, any> | undefined, snapshot: CapabilitiesSnapshot
+  type: string, fields: Record<string, any> | undefined, snapshot: CapabilitiesSnapshot,
+  base?: Record<string, any>
 ): Record<string, any> | undefined {
   const models = snapshot.llmModels;
-  if (LLM_MODEL_ACTION_TYPES.indexOf(type) === -1 || setsLlmModel(fields) || models.length === 0) {
+  if (!usesLlmModel(type) || setsLlmModel(fields) || models.length === 0) {
     return fields;
   }
   const entry = models.find(m => m.llm === 'openai' && m.model === DEFAULT_MODEL.value) ?? models[0];
-  return { ...(fields || {}), ...llmModelFields(entry) };
+  return pickedModelFields(type, entry, fields, base);
 }

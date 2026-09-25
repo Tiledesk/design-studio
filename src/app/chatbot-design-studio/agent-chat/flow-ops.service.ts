@@ -14,7 +14,7 @@ import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import {
-  actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, withDefaultLlmModel
+  actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, usesLlmModel, withDefaultLlmModel
 } from './agent-chat-capabilities.rules';
 
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
@@ -1061,10 +1061,13 @@ export class FlowOpsService implements OnDestroy {
       || (op?.op === 'update_action' && op.fields && ('servers' in op.fields || setsLlmModel(op.fields))));
   }
 
-  private existingActionType(op: any): string | null {
+  private existingAction(op: any): any {
     const intent = this.intentService.getIntentFromId(op.intent_id);
-    const action = (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id);
-    return action?._tdActionType ?? null;
+    return (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id);
+  }
+
+  private existingActionType(op: any): string | null {
+    return this.existingAction(op)?._tdActionType ?? null;
   }
 
   /** Refusal text for an op that breaks the project's capabilities, or null.
@@ -1148,30 +1151,39 @@ export class FlowOpsService implements OnDestroy {
    *  resolveAttachedServers built, and whose AI actions' model fields by what
    *  resolveLlmModel built -- plus, on an AI action being added that picks no
    *  model, the default one (withDefaultLlmModel), so it does not open on the
-   *  panel's GPT-4o fallback whatever the project has. Only called once
-   *  validation has passed, so every resolution here succeeds. */
+   *  panel's GPT-4o fallback whatever the project has. Picking a model also
+   *  adjusts max_tokens / temperature as the panel does, against what the
+   *  fields land on: the existing action, or a fresh createNewAction()
+   *  scaffold for one being added (the same scaffold addAction will build).
+   *  Only called once validation has passed, so every resolution here
+   *  succeeds. */
   private withResolvedCapabilities(ops: FlowOp[]): FlowOp[] {
     const snapshot = this.capabilities;
     if (!snapshot) { return ops; }
-    const resolve = (type: string, fields: Record<string, any> | undefined, adding: boolean)
+    const resolve = (type: string, fields: Record<string, any> | undefined, base: any)
       : Record<string, any> | undefined => {
-      let resolved = (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields)
+      const resolved = (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields)
         ? { ...fields, servers: resolveAttachedServers(fields.servers, snapshot).servers }
         : fields;
-      resolved = resolveLlmModel(type, resolved, snapshot).fields;
-      return adding ? withDefaultLlmModel(type, resolved, snapshot) : resolved;
+      return resolveLlmModel(type, resolved, snapshot, base).fields;
+    };
+    const scaffold = (type: string): any =>
+      usesLlmModel(type) ? this.intentService.createNewAction(type as any) : undefined;
+    const add = (type: string, fields: Record<string, any> | undefined): Record<string, any> | undefined => {
+      const base = scaffold(type);
+      return withDefaultLlmModel(type, resolve(type, fields, base), snapshot, base);
     };
     return ops.map((op): FlowOp => {
       switch (op.op) {
         case 'add_action':
-          return { ...op, fields: resolve(op.type, op.fields, true) };
+          return { ...op, fields: add(op.type, op.fields) };
         case 'add_intent':
           return op.actions
-            ? { ...op, actions: op.actions.map(a => ({ ...a, fields: resolve(a.type, a.fields, true) })) }
+            ? { ...op, actions: op.actions.map(a => ({ ...a, fields: add(a.type, a.fields) })) }
             : op;
         case 'update_action': {
           const type = this.existingActionType(op);
-          return type ? { ...op, fields: resolve(type, op.fields, false) } : op;
+          return type ? { ...op, fields: resolve(type, op.fields, this.existingAction(op)) } : op;
         }
         default:
           return op;

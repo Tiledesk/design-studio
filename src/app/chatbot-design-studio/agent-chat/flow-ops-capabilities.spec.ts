@@ -11,18 +11,22 @@ import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LlmModel } from '../utils-llm-models';
 
-function aModel(llm: string, model: string, modelName: string, server?: string): LlmModel {
+function aModel(
+  llm: string, model: string, modelName: string, server?: string, max_output_tokens = 128000
+): LlmModel {
   return {
     uid: `${llm}::${server ?? ''}::${model}`, modelName, llm, llmLabel: llm, model,
     description: '', src: '', status: 'active', configured: true,
+    min_tokens: 1, max_output_tokens,
     ...(server ? { server } : {})
   };
 }
 
 const MODELS: LlmModel[] = [
   aModel('openai', 'gpt-4.1-mini', 'GPT-4.1 mini'),
-  aModel('openai', 'gpt-4o', 'GPT-4o'),
-  aModel('anthropic', 'claude-sonnet-4', 'Claude Sonnet 4'),
+  aModel('openai', 'gpt-4o', 'GPT-4o', undefined, 16384),
+  aModel('anthropic', 'claude-sonnet-4', 'Claude Sonnet 4', undefined, 64000),
+  aModel('openai', 'gpt-5.4', 'Gpt-5.4'),
   aModel('vllm', 'llama-3', 'gpu-a ・ llama-3', 'gpu-a'),
   aModel('vllm', 'llama-3', 'gpu-b ・ llama-3', 'gpu-b')
 ];
@@ -79,13 +83,19 @@ describe('FlowOpsService — project capabilities', () => {
       { _tdActionId: 'ai1', _tdActionType: 'ai_prompt', question: 'q' } as any,
       // Saved on a model this project does not have (any more).
       { _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'q', llm: 'vllm', model: 'old',
-        modelName: 'gpu-z ・ old', vllmServer: 'gpu-z' } as any
+        modelName: 'gpu-z ・ old', vllmServer: 'gpu-z' } as any,
+      { _tdActionId: 'ai3', _tdActionType: 'ai_prompt', question: 'q', llm: 'anthropic',
+        model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4', max_tokens: 64000, temperature: 0.5 } as any
     ];
     intentService = {
       listOfIntents: [withLegacy, anIntent('i2', 'welcome')],
       getIntentFromId(id: string) { return this.listOfIntents.find((i: Intent) => i.intent_id === id); },
+      // An ai_prompt is scaffolded as intent.service's createNewAction does:
+      // with the provider value 'cohere' in `model`, max_tokens and temperature.
       createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
-        ({ _tdActionId: 'generated', _tdActionType: type })),
+        type === 'ai_prompt'
+          ? { _tdActionId: 'generated', _tdActionType: type, max_tokens: 256, temperature: 0.7, model: 'cohere' }
+          : { _tdActionId: 'generated', _tdActionType: type }),
       updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
       createNewIntent: jasmine.createSpy('createNewIntent'),
       addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
@@ -315,7 +325,8 @@ describe('FlowOpsService — project capabilities', () => {
         fields: { question: 'q', llm: 'vllm', model: 'llama-3', vllmServer: 'gpu-b', modelName: 'x' } }]);
       expect(report.ok).toBe(true);
       expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q',
-        llm: 'vllm', model: 'llama-3', modelName: 'gpu-b ・ llama-3', vllmServer: 'gpu-b' });
+        llm: 'vllm', model: 'llama-3', modelName: 'gpu-b ・ llama-3', vllmServer: 'gpu-b',
+        max_tokens: 256, temperature: 0.7 });
     });
 
     it('refuses the whole batch for a model the project does not have, applying nothing', async () => {
@@ -347,7 +358,38 @@ describe('FlowOpsService — project capabilities', () => {
       const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
         fields: { question: 'q' } }]);
       expect(report.ok).toBe(true);
-      expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q' });
+      expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q',
+        max_tokens: 256, temperature: 0.7, model: 'cohere' });
+    });
+
+    it('replaces the scaffold\'s provider value in `model` with the default model', async () => {
+      const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+        fields: { question: 'q' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q',
+        llm: 'openai', model: 'gpt-4o', modelName: 'GPT-4o', max_tokens: 256, temperature: 0.7 });
+    });
+
+    it('sets temperature 1 when a Gpt-5 model is picked, as the panel does', async () => {
+      const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+        fields: { question: 'q', llm: 'openai', model: 'gpt-5.4', temperature: 0.2 } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i2')).toEqual(jasmine.objectContaining({ modelName: 'Gpt-5.4', temperature: 1 }));
+    });
+
+    it('clamps the max_tokens of an existing action switched to a smaller model, keeping its temperature', async () => {
+      const report = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai3',
+        fields: { llm: 'openai', model: 'gpt-4o' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i1', 3)).toEqual(jasmine.objectContaining(
+        { model: 'gpt-4o', max_tokens: 16384, temperature: 0.5 }));
+    });
+
+    it('keeps an explicit max_tokens that fits the picked model', async () => {
+      const report = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai3',
+        fields: { llm: 'openai', model: 'gpt-4o', max_tokens: 3000 } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i1', 3).max_tokens).toBe(3000);
     });
 
     it('checks and fills askgptv2 inside add_intent, defaulting the one that sets no model', async () => {
@@ -379,7 +421,7 @@ describe('FlowOpsService — project capabilities', () => {
         fields: { llm: 'anthropic', model: 'claude-sonnet-4' } }]);
       expect(good.ok).toBe(true);
       expect(stored('i1', 2)).toEqual({ _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'q',
-        llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4' });
+        llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4', max_tokens: 10000 });
     });
 
     it('leaves an existing model alone, even one the project does not have, when update_action does not set it', async () => {
@@ -396,7 +438,7 @@ describe('FlowOpsService — project capabilities', () => {
         fields: { llm: 'openai', model: 'gpt-9' } }]);
       expect(report.ok).toBe(true);
       expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt',
-        llm: 'openai', model: 'gpt-9' });
+        llm: 'openai', model: 'gpt-9', max_tokens: 256, temperature: 0.7 });
     });
   });
 });

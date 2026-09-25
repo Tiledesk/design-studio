@@ -10,7 +10,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import {
   TYPE_CHATBOT, availableActionEntries, isSubagentSubtype, resolveChatbotSubtype
 } from '../utils-actions';
-import { LlmModel, initLLMModels } from '../utils-llm-models';
+import { DYNAMIC_MODEL_PROVIDERS, LlmModel, getIntegrations, initLLMModels } from '../utils-llm-models';
 import {
   ActionCapability, CapabilitiesSnapshot, LlmModelCapability, McpServerCapability
 } from './agent-chat-capabilities.model';
@@ -35,10 +35,18 @@ interface LlmPart {
   error?: string;
 }
 
+/** What AgentChatLlmModelsLoader reads: the picker's models, and the
+ *  project's integrations they were read against (null when those could not
+ *  be read). */
+export interface LoadedLlmModels {
+  models: LlmModel[];
+  integrations: any[] | null;
+}
+
 /** The models the AI actions' own picker lists -- initLLMModels, the call
- *  each of their panels makes -- behind a seam the spec can replace, since
- *  initLLMModels is a plain function reaching ProjectService, the app config
- *  and the integrations endpoint. */
+ *  each of their panels makes -- and the project's integrations, behind a
+ *  seam the spec can replace, since both are plain functions reaching
+ *  ProjectService, the app config and the integrations endpoint. */
 @Injectable({ providedIn: 'root' })
 export class AgentChatLlmModelsLoader {
   constructor(
@@ -47,14 +55,19 @@ export class AgentChatLlmModelsLoader {
     private appConfigService: AppConfigService
   ) {}
 
-  public load(): Promise<LlmModel[]> {
-    return initLLMModels({
+  public async load(): Promise<LoadedLlmModels> {
+    const logger = LoggerInstance.getInstance();
+    // The same list initLLMModels reads first -- ProjectService's 60s cache
+    // makes it one request for both.
+    const integrations = await getIntegrations(this.projectService, this.dashboardService, logger);
+    const models = await initLLMModels({
       projectService: this.projectService,
       dashboardService: this.dashboardService,
       appConfigService: this.appConfigService,
-      logger: LoggerInstance.getInstance(),
+      logger,
       componentName: 'AGENT-CHAT CAPABILITIES'
     });
+    return { models, integrations: Array.isArray(integrations) ? integrations : null };
   }
 }
 
@@ -190,13 +203,31 @@ export class AgentChatCapabilitiesService {
 
   /** The models the project has configured, in the picker's own order
    *  (OpenAI first). A failure is reported in the answer, never thrown: the
-   *  actions and MCP servers are still worth returning. */
+   *  actions and MCP servers are still worth returning.
+   *
+   *  initLLMModels marks every model of a dynamic provider (ollama, vllm,
+   *  agentplatform, openrouter) configured whether or not the project has
+   *  that integration, and fills those models into the global LLM_MODEL
+   *  only when it does -- so without one they are LLM_MODEL's placeholders
+   *  (`ollama_1`), or the servers of another project opened earlier in the
+   *  same tab. The picker shows them anyway; the agent must not pick them,
+   *  so they are kept only when the project's integrations list that
+   *  provider.
+   *
+   *  Note that getIntegrations / getIntegrationByName swallow HTTP errors
+   *  (they log and answer null), so an outage of the integrations endpoint
+   *  shows up here as fewer models -- only the always-configured OpenAI ones
+   *  -- not as llm_models_error, which only a throw from initLLMModels sets. */
   private async llmPart(): Promise<LlmPart> {
     try {
       // Resolved here for the same reason as ProjectPlanUtils in snapshot().
-      const all = await this.injector.get(AgentChatLlmModelsLoader).load();
+      const loaded = await this.injector.get(AgentChatLlmModelsLoader).load();
       const translate = this.injector.get(TranslateService);
-      const models = all.filter(m => m.configured === true);
+      const present = new Set((loaded.integrations || [])
+        .filter(i => i?.value).map(i => String(i.name)));
+      const dynamic: readonly string[] = DYNAMIC_MODEL_PROVIDERS;
+      const models = loaded.models.filter(m => m.configured === true
+        && (dynamic.indexOf(m.llm) === -1 || present.has(m.llm)));
       return { models, capabilities: models.map(m => this.llmCapability(m, translate)) };
     } catch (e) {
       return { models: [], capabilities: [], error: messageOf(e) };

@@ -135,10 +135,14 @@ describe('resolveAttachedServers', () => {
   });
 });
 
-function aModel(llm: string, model: string, modelName: string, server?: string): LlmModel {
+function aModel(
+  llm: string, model: string, modelName: string, server?: string, max_output_tokens = 128000
+): LlmModel {
   return {
     uid: `${llm}::${server ?? ''}::${model}`, modelName, llm, llmLabel: llm, model,
     description: '', src: '', status: 'active', configured: true,
+    // What generateLlmModelsFlat() fills in when a model declares none.
+    min_tokens: 1, max_output_tokens,
     ...(server ? { server } : {})
   };
 }
@@ -156,22 +160,38 @@ function withModels(models: LlmModel[], error?: string): CapabilitiesSnapshot {
 
 const MODELS: LlmModel[] = [
   aModel('openai', 'gpt-4.1-mini', 'GPT-4.1 mini'),
-  aModel('openai', 'gpt-4o', 'GPT-4o'),
-  aModel('anthropic', 'claude-sonnet-4', 'Claude Sonnet 4'),
+  aModel('openai', 'gpt-4o', 'GPT-4o', undefined, 16384),
+  aModel('anthropic', 'claude-sonnet-4', 'Claude Sonnet 4', undefined, 64000),
   aModel('vllm', 'llama-3', 'gpu-a ・ llama-3', 'gpu-a'),
   aModel('vllm', 'llama-3', 'gpu-b ・ llama-3', 'gpu-b'),
-  aModel('agentplatform', 'gemini-2.5-flash', 'eu ・ gemini-2.5-flash', 'eu')
+  aModel('agentplatform', 'gemini-2.5-flash', 'eu ・ gemini-2.5-flash', 'eu'),
+  aModel('openai', 'gpt-5.4', 'Gpt-5.4', undefined, 128000),
+  aModel('openai', 'small', 'Small', undefined, 4096)
 ];
 
-/** What the three panels' own setModel() writes for `model` -- the same four
- *  lines in cds-action-ai-prompt, cds-action-ai-condition and
- *  cds-action-askgpt-v2 -- as it is saved (undefined keys dropped). */
+/** What the three panels' own setModel() writes for `model` on an action
+ *  holding `existing` -- the same lines in cds-action-ai-prompt,
+ *  cds-action-ai-condition and cds-action-askgpt-v2, max_tokens kept and
+ *  clamped into the model's range (resetMaxTokens false) -- as it is saved
+ *  (undefined keys dropped). */
 function whatThePanelStores(model: LlmModel, existing: Record<string, any> = {}): Record<string, any> {
+  const DEFAULT_MAX_TOKENS = 10000;
   const action: any = { ...existing };
   action.llm = model?.llm ? model.llm : '';
   action.model = model?.model ? model.model : '';
   action.modelName = model?.modelName ? model.modelName : '';
   applySelectedServerToAction(action, model);
+  const min = model.min_tokens;
+  const max = model.max_output_tokens;
+  const currentMaxTokens =
+    typeof action?.max_tokens === 'number' ? action.max_tokens : Number(action?.max_tokens);
+  if (!Number.isFinite(currentMaxTokens)) {
+    let next = Math.min(DEFAULT_MAX_TOKENS, max);
+    if (next < min) next = min;
+    action.max_tokens = next;
+  } else {
+    action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
+  }
   return action;
 }
 
@@ -197,7 +217,7 @@ describe('resolveLlmModel', () => {
     it(`stores for ${type} exactly what its panel's setModel writes, keeping the other fields`, () => {
       const r = resolveLlmModel(type, { question: 'q', llm: 'anthropic', model: 'claude-sonnet-4' }, snap);
       expect(r.error).toBeUndefined();
-      expect(saved(r.fields)).toEqual({ question: 'q', ...whatThePanelStores(MODELS[2]) });
+      expect(saved(r.fields)).toEqual(whatThePanelStores(MODELS[2], { question: 'q' }));
     });
   }
 
@@ -253,8 +273,48 @@ describe('resolveLlmModel', () => {
     expect(r.error).toContain('agentplatform / gemini-2.5-flash @ eu');
   });
 
-  it('refuses a model given without its provider', () => {
-    expect(resolveLlmModel('ai_prompt', { model: 'gpt-4o' }, snap).error).toContain('gpt-4o');
+  it('refuses a model given without its provider, saying both are needed', () => {
+    const error = resolveLlmModel('ai_prompt', { model: 'gpt-4o' }, snap).error;
+    expect(error).toContain('"llm" and "model"');
+    expect(error).not.toContain('undefined');
+  });
+
+  it('clamps the max_tokens the action already has into the picked model\'s range', () => {
+    const r = resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-4o' }, snap,
+      { max_tokens: 64000, temperature: 0.2 });
+    expect(r.fields.max_tokens).toBe(16384);
+    expect('temperature' in r.fields).toBe(false);
+  });
+
+  it('keeps an explicit max_tokens inside the range, and clamps one outside it as the panel would', () => {
+    expect(resolveLlmModel('ai_condition', { llm: 'openai', model: 'gpt-4o', max_tokens: 2000 }, snap,
+      { max_tokens: 256 }).fields.max_tokens).toBe(2000);
+    expect(resolveLlmModel('ai_condition', { llm: 'openai', model: 'gpt-4o', max_tokens: 99999 }, snap)
+      .fields.max_tokens).toBe(16384);
+  });
+
+  it('gives an action with no max_tokens the panel\'s default, capped by the model', () => {
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-4o' }, snap).fields.max_tokens).toBe(10000);
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'small' }, snap).fields.max_tokens).toBe(4096);
+  });
+
+  it('raises askgptv2\'s minimum to 1024 with citations on, as its panel does', () => {
+    expect(resolveLlmModel('askgptv2', { llm: 'openai', model: 'gpt-4o', citations: true, max_tokens: 100 },
+      snap).fields.max_tokens).toBe(1024);
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-4o', citations: true, max_tokens: 100 },
+      snap).fields.max_tokens).toBe(100);
+  });
+
+  it('sets temperature 1 on a Gpt-5 model, even over an explicit one, as the panel\'s pick does', () => {
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-5.4' }, snap,
+      { temperature: 0.7 }).fields.temperature).toBe(1);
+    expect(resolveLlmModel('askgptv2', { llm: 'openai', model: 'gpt-5.4', temperature: 0.3 }, snap)
+      .fields.temperature).toBe(1);
+  });
+
+  it('keeps an explicit temperature on any other model', () => {
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-4o', temperature: 0.3 }, snap)
+      .fields.temperature).toBe(0.3);
   });
 
   it('caps the list of choices at 40', () => {
@@ -281,12 +341,18 @@ describe('resolveLlmModel', () => {
 describe('withDefaultLlmModel', () => {
   it('gives an action that sets no model the default, GPT-4o, when the project has it', () => {
     const fields = withDefaultLlmModel('ai_condition', { instructions: 'i' }, withModels(MODELS));
-    expect(saved(fields)).toEqual({ instructions: 'i', ...whatThePanelStores(MODELS[1]) });
+    expect(saved(fields)).toEqual(whatThePanelStores(MODELS[1], { instructions: 'i' }));
   });
 
   it('gives the first model when the project has no GPT-4o', () => {
     const fields = withDefaultLlmModel('ai_prompt', undefined, withModels(MODELS.slice(2)));
     expect(saved(fields)).toEqual(whatThePanelStores(MODELS[2]));
+  });
+
+  it('keeps the scaffold\'s max_tokens when it fits the default model', () => {
+    const fields = withDefaultLlmModel('ai_prompt', { question: 'q' }, withModels(MODELS),
+      { max_tokens: 256, temperature: 0.7 });
+    expect(saved(fields)).toEqual(whatThePanelStores(MODELS[1], { question: 'q', max_tokens: 256 }));
   });
 
   it('leaves an action that sets its own model, another type, or a project with no model alone', () => {
