@@ -8,8 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch 25/09/2026
-
+# 1.40.15-rc14
 - **changed**: the AI actions the AI chat builds (AI Prompt, AI Condition, Ask knowledge base) get a model the project really has — chosen by the chat for the task, and checked by the studio — instead of always falling back to GPT-4o
 - **fixed**: a Tiledesk native MCP server the AI chat attaches to an AI Prompt is also added to the project's MCP servers, as picking it from Native Tools would, so both MCP dialogs show and manage it
 - **changed**: the flow the AI chat reads no longer carries the address or the headers of the project's own MCP servers, so their credentials never reach the chat or its model
