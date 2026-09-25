@@ -6,6 +6,39 @@
 
   <div id="content-panel" class="content-panel">
 
+    <!-- L'agent e i suoi subagent: preselezionati quelli con modifiche non pubblicate.
+         Senza subagent non c'e' niente da scegliere e il pannello resta com'era. -->
+    <div class="field-box publish-targets-box" *ngIf="IS_LOADING_FAMILY || HAS_SUBAGENTS">
+      <label class="title-label">
+        {{'CDSPublishPanel.WhatWillBePublished' | translate}}
+      </label>
+
+      <div *ngIf="IS_LOADING_FAMILY" class="publish-targets-loading">
+        {{'CDSPublishPanel.LoadingAgents' | translate}}
+      </div>
+
+      <div *ngIf="!IS_LOADING_FAMILY" class="publish-targets-list">
+        <div class="publish-target-row" *ngFor="let target of publishTargets"
+          [ngClass]="{'is-parent': target.isParent}">
+          <mat-checkbox [checked]="target.selected" (change)="toggleTarget(target)">
+            <span class="publish-target-name">{{ target.name }}</span>
+          </mat-checkbox>
+          <span class="publish-target-badge" *ngIf="target.modified"
+            matTooltip="{{'CDSPublishPanel.HasUnpublishedChanges' | translate}}"
+            matTooltipClass="cds-mat-tooltip" matTooltipPosition="above"></span>
+        </div>
+      </div>
+
+      <div *ngIf="HAS_NOTHING_TO_PUBLISH" class="publish-targets-hint">
+        {{'CDSPublishPanel.NothingToPublish' | translate}}
+      </div>
+    </div>
+
+    <!-- I subagent non si sono caricati: senza questo avviso sembrerebbe un agent che non ne ha -->
+    <div *ngIf="!IS_LOADING_FAMILY && HAS_SUBAGENTS_LOAD_ERROR" class="publish-targets-error">
+      {{'CDSPublishPanel.CouldNotLoadAgents' | translate}}
+    </div>
+
     <div class="field-box" style="margin-bottom: 10px;">
       <label class="title-label">
         {{'ReleaseNotes' | translate}}
@@ -23,7 +56,7 @@
 
   <div class="publish-btn-wpr">
     <button id="cds-publish-btn" type="button" class="btn btn-primary cds-blue-button"
-      [disabled]="isSaving || PUBLISH_PENDING"
+      [disabled]="isSaving || PUBLISH_PENDING || !CAN_PUBLISH"
       (click)="onClickPublish()">
       <ng-container *ngIf="!isSavingVisible">
         <span>
@@ -212,6 +245,28 @@
     <h5 *ngIf="status === 'error'" style="color:#D06079;" class="custom-h5 error">
       {{ 'CDSModalActivateBot.AnErroOccurredWhilePublishingTheBot' | translate }}
     </h5>
+
+    <!-- Esito per ciascun agent: serve soprattutto quando la pubblicazione riesce a meta' -->
+    <div class="publish-outcome" *ngIf="status !== 'pending' && HAS_SUBAGENTS && publishedTargets.length > 0">
+      <div class="publish-outcome-card">
+        <div class="publish-outcome-title">
+          {{'CDSPublishPanel.PublishedAgents' | translate}}
+        </div>
+        <div class="publish-outcome-row" *ngFor="let target of publishedTargets"
+          [ngClass]="{'ok': target.outcome === 'success', 'ko': target.outcome === 'error'}">
+          <div class="publish-outcome-main">
+            <span class="material-icons publish-outcome-icon">
+              {{ target.outcome === 'success' ? 'check_circle' : 'cancel' }}
+            </span>
+            <span class="publish-outcome-name" [matTooltip]="target.name" matTooltipClass="cds-mat-tooltip"
+              matTooltipPosition="above">{{ target.name }}</span>
+          </div>
+          <div class="publish-outcome-error" *ngIf="target.outcome === 'error' && target.error">
+            {{ target.error }}
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="publish-result">
       <div *ngIf="status === 'pending'">

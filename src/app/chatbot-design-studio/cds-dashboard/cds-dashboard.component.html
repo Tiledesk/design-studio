@@ -1,24 +1,35 @@
 <div *ngIf="!initFinished" class="loader">
 </div>
 
-<div *ngIf="initFinished" (wheel)="onSwipe($event)">
-    <cds-header 
-        class="cds-header" 
-        [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
+<div *ngIf="initFinished" (wheel)="onSwipe($event)" [class.cds-read-only]="IS_READ_ONLY">
+
+    <!-- Sola lettura: al posto dell'header, l'avviso. Resta in vista per tutto il tempo,
+         perche' i blocchi si possono ancora trascinare sullo schermo e nulla viene
+         salvato: senza questa riga sembrerebbe un editor che funziona. -->
+    <div class="cds-read-only-banner" *ngIf="IS_READ_ONLY">
+        <span class="material-icons cds-read-only-banner__icon">visibility</span>
+        <span class="cds-read-only-banner__text">
+            {{ 'CDSPreview.ReadOnlyBanner' | translate }}
+        </span>
+    </div>
+
+    <cds-header *ngIf="!IS_READ_ONLY"
+        class="cds-header"
+        [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR"
         [selectedChatbot]="selectedChatbot"
         (goToBck)="goBack()"
         (toggleSidebarWith)="onToggleSidebarWith($event)">
     </cds-header>
 
-    <div id="chatbot--dashboard" 
-        class="chatboat-dashboard" 
+    <div id="chatbot--dashboard"
+        class="chatboat-dashboard"
         [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
 
-        <!-- <cds-changelog *ngIf="showChangelog" 
+        <!-- <cds-changelog *ngIf="showChangelog"
             (onClose)="onCloseChangelog()">
         </cds-changelog> -->
 
-        <cds-sidebar class="cds-sidebar"
+        <cds-sidebar class="cds-sidebar" *ngIf="!IS_READ_ONLY"
             [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR">
         </cds-sidebar>
 
@@ -54,6 +65,5 @@
     </div>
 
     <cds-popup></cds-popup>
-    
-</div>
 
+</div>

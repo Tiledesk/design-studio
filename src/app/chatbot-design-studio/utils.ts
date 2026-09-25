@@ -705,29 +705,78 @@ export function findFreeId (array, key) {
     return previousId + 1;
   }
 
+/**
+ * Quanto spazio dello stage si vede davvero.
+ *
+ * Il rettangolo di `tds_container` non coincide con l'area visibile per due motivi che
+ * si sommano: il pannello dei blocchi gli sta davanti a sinistra, e il contenitore e'
+ * piu' largo della finestra, quindi sfora a destra. Centrare dentro quel rettangolo
+ * significa centrare dentro un'area piu' grande di quella che l'utente vede, ed e' il
+ * motivo per cui il flusso appare spostato.
+ *
+ * Qui si misura invece la banda visibile: il contenitore intersecato con la finestra,
+ * meno l'ingombro del pannello. Si misura dal DOM e non si deduce dal CSS, cosi' vale
+ * con il pannello aperto o chiuso e non dipende da come si risolvono i `calc`.
+ *
+ * `offsetX` / `offsetY` dicono di quanto il centro di cio' che si vede e' spostato
+ * rispetto al centro del contenitore: quando non c'e' niente di coperto valgono zero e
+ * il conto torna identico a prima.
+ */
+export function getVisibleStageBox(stage: DOMRect) {
+    const panel = document.querySelector('.box-left')?.getBoundingClientRect();
+    const panelRight = panel && panel.width > 0 ? panel.right : stage.left;
+
+    const left = Math.max(stage.left, panelRight, 0);
+    const right = Math.min(stage.right, window.innerWidth);
+    const top = Math.max(stage.top, 0);
+    const bottom = Math.min(stage.bottom, window.innerHeight);
+
+    // Se le misure non hanno senso (contenitore non ancora disegnato) si ripiega sul
+    // rettangolo intero: meglio la centratura di prima che una divisione per zero.
+    const width = right - left > 1 ? right - left : stage.width;
+    const height = bottom - top > 1 ? bottom - top : stage.height;
+
+    return {
+        width,
+        height,
+        offsetX: (left + right) / 2 - (stage.left + stage.right) / 2,
+        offsetY: (top + bottom) / 2 - (stage.top + stage.bottom) / 2
+    };
+}
+
 export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let arrayCoord = [];
     listOfIntents.forEach(intent => {
         const element = document.getElementById(intent.intent_id);
+        // Un blocco non ancora disegnato non ha un rettangolo da cui leggere: si salta,
+        // invece di far fallire tutta la centratura.
+        if (!element) { return; }
         arrayCoord.push({maxX:element.offsetLeft+element.offsetWidth, minX:element.offsetLeft, maxY:element.offsetTop+element.offsetHeight, minY:element.offsetTop});
     });
+    if (arrayCoord.length === 0) { return null; }
+
     var maxX = Math.max(...arrayCoord.map(obj => obj.maxX));
     var minX = Math.min(...arrayCoord.map(obj => obj.minX));
     var maxY = Math.max(...arrayCoord.map(obj => obj.maxY));
     var minY = Math.min(...arrayCoord.map(obj => obj.minY));
-    
+
     const padding = 100
     var width = (maxX - minX)+ padding;
     var height = (maxY - minY) + padding;
+
     const stage = document.getElementById('tds_container').getBoundingClientRect()
-    var scale = Math.min(stage.width / width, stage.height / height);
-    
+    const visible = getVisibleStageBox(stage);
+    var scale = Math.min(visible.width / width, visible.height / height);
+
     width = width*scale;
     height = height*scale;
-    
-    let centerPointX = (minX + (maxX-minX)/2)*scale;
-    let centerPointY = (minY + (maxY-minY)/2)*scale;
-    
+
+    // Il centro del flusso va portato al centro di cio' che si vede, non a quello del
+    // contenitore: si chiede quindi di centrare un punto spostato dello stesso scarto,
+    // in direzione opposta.
+    let centerPointX = (minX + (maxX-minX)/2)*scale - visible.offsetX;
+    let centerPointY = (minY + (maxY-minY)/2)*scale - visible.offsetY;
+
     return { point: { x: centerPointX, y: centerPointY }, scale: scale }
 }
 

@@ -9,7 +9,6 @@
 
 
 # this branch 25/09/2026
-
 - **changed**: i pannelli di sinistra si riaprono come li hai lasciati su quell'agent: la chat AI e l'elenco dei blocchi, ciascuno per agent. Senza una scelta precedente si parte con la chat aperta e i blocchi chiusi. Prima la chat non si limitava a partire aperta, si riapriva a ogni cambio di flusso: la chiudevi, passavi a un subagent e tornava
 - **fixed**: i collegamenti disegnati in ritardo non si perdono piu'. Disegnarne uno richiede che entrambi i blocchi siano gia' sullo schermo, e con una modifica ampia della chat AI il secondo poteva non esserlo ancora: quel collegamento spariva e tornava solo ricaricando la pagina. Ora il canvas ricontrolla e completa quello che manca
 - **changed**: negli agenti V3 l'elenco dei blocchi mostra per ogni blocco l'icona della sua azione invece di un'icona uguale per tutti, e non mostra piu' il contatore delle azioni, che su questi agenti vale sempre uno
@@ -17,6 +16,16 @@
 
 # this branch 23/09/2026
 - **fixed**: quando la chat AI finisce di lavorare, i blocchi e i collegamenti sullo stage vengono completati subito. Prima il controllo partiva a tempo, uno e tre secondi dopo l'ultima modifica, e se l'agente continuava a lavorare piu' a lungo restavano blocchi con i collegamenti non disegnati, che si sistemavano solo ricaricando la pagina. Ora e' la chat stessa a dire quando ha finito, e vale anche quando il lavoro finisce per un errore o viene annullato
+
+# 1.40.15-rc12
+- **added**: three actions on every release in the history. **View** shows that version full screen, read-only, without leaving the Design Studio. **Republish** puts it back online and leaves the flow you are editing alone: it is the button formerly called *Restore*. **Restore** does the opposite, cannot be undone, and says what will be lost before you confirm
+- **changed**: publishing an agent now covers its subagents. The panel lists the agent and every subagent, ticks the ones with changes waiting, and publishes them in one go; if some go through and others fail it says which is which, and trying again only retries what failed. An agent without subagents sees the panel exactly as before
+- **fixed**: the dot marking unpublished changes goes out when the flow has really been published, and only for the flows that were — not merely because the publish panel was opened
+- **fixed**: **centre the flow** fits it into the part of the stage you can actually see, instead of the whole area, which includes what the blocks panel covers and what runs past the window. The flow used to land off to one side, and part of a wide flow stayed out of view
+- **fixed**: deleting a subagent that another agent still uses now says why it cannot be deleted, instead of leaving the attempt without any visible outcome
+
+# 1.40.15-rc11
+- **fixed**: blocks and connectors are completed as soon as the AI chat stops working, including when the work fails or is cancelled. The check used to run on a timer and missed anything longer, leaving connectors that appeared only after a page reload
 
 # 1.40.15-rc10
 - **fixed**: on V3 agents, a long AI chat conversation no longer drifts back to the rules of the older agents: the agent's version now travels with every answer the Design Studio gives the chat, instead of being sent once at the start

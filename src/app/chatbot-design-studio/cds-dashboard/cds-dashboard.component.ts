@@ -36,6 +36,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService, DEFAULT_PANELS_STATE } from 'src/app/chatbot-design-studio/services/stage.service';
+import { ReadOnlyService, isReadOnlyRoute } from 'src/app/services/read-only.service';
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
@@ -92,6 +93,8 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
   showChangelog: boolean = false;
+  /** Sola lettura: niente header, niente sidebar, banner sempre in vista. */
+  IS_READ_ONLY: boolean = false;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -117,9 +120,32 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     // In coda di proposito: agent-chat-flow-switch.spec.ts costruisce il componente a mano con
     // argomenti posizionali, quindi i servizi aggiunti dopo vanno appesi qui e non in mezzo.
-    private aiService: AiService
+    private aiService: AiService,
+    private readonly readOnlyService: ReadOnlyService
   ) {
     this.manageRouteChanges();
+  }
+
+  /**
+   * Accende la sola lettura se questa e' la rotta di preview.
+   *
+   * Va fatto **prima** che il canvas carichi il flusso, e lo e': il canvas vive dentro
+   * il router-outlet di questo guscio, che lo rende solo a inizializzazione finita.
+   *
+   * La forma di `data` e' insolita -- e' un array di un oggetto, `[{ roles: [...] }]`,
+   * perche' cosi' la legge RoleGuard -- e l'ereditarieta' dei dati di rotta verso il
+   * figlio a percorso vuoto puo' consegnarla come array o come oggetto con chiave `0`.
+   * `data[0]` va bene in entrambi i casi.
+   */
+  private applyReadOnlyFromRoute(): void {
+    // `route?.snapshot?` e non `route.snapshot`: il guscio viene costruito a mano in
+    // alcuni test con una rotta finta, e un errore qui fermerebbe tutta
+    // l'inizializzazione. Senza dati di rotta non e' la preview, quindi si modifica.
+    if (isReadOnlyRoute(this.route?.snapshot?.data)) {
+      this.readOnlyService.enable();
+      this.IS_READ_ONLY = true;
+      this.logger.log('[CDS DSHBRD] read-only: nessuna modifica verra\' salvata');
+    }
   }
 
   /** Checks the current route once at construction time (the initial load may
@@ -160,6 +186,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // ---------------------------------------
     // Changelog alert
     // ---------------------------------------
+    this.applyReadOnlyFromRoute();
     this.showChangelog = this.checkForChangelogNotify();
     this.executeAsyncFunctionsInSequence();
     // Whoever wants to move the studio to another flow of the family -- the

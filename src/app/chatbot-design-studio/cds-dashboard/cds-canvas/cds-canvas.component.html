@@ -1,5 +1,6 @@
 <!-- Sidebar Toggle - Right -->
-<div class="cds-toggle-setting-sidebar-icon-right-wpr" 
+<div class="cds-toggle-setting-sidebar-icon-right-wpr" *ngIf="!readOnlyService.readOnly"
+
     [class.is_opened]="IS_OPEN_INTENTS_LIST"
     [class.past-agent-chat]="IS_AGENT_CHAT_OPEN && !IS_OPEN_INTENTS_LIST"
     (click)="onToogleSidebarIntentsList()">
@@ -11,7 +12,10 @@
 </div>
 
 <!-- Left Sidebar - Intent List -->
-<div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
+<!-- In sola lettura non c'e': l'elenco dei subagent porterebbe ai flussi CORRENTI, non
+     a quelli pubblicati con questa release, e sarebbe una promessa che la preview non
+     puo' mantenere. -->
+<div class="box-left" *ngIf="!readOnlyService.readOnly" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
 
     <!-- Tab: alterna Blocks / Subagents nello stesso slot (mutua esclusione via activeLeftPanel).
          Visibili anche dentro un subagent (la lista mostra parent + subagent fratelli). -->
@@ -81,13 +85,14 @@
          spanned underneath the sidebar. The container is a real flex
          sibling starting after .box-left (and the chat panel) now, so its
          own left edge already is the visible edge in both states. -->
-    <cds-panel-elements class="cds-panel-elements"
+    <cds-panel-elements *ngIf="!readOnlyService.readOnly"
+        class="cds-panel-elements"
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
         (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
     </cds-panel-elements>
 
     <!-- Drop Zone for Elements -->
-    <div #receiver_elements_dropped_on_stage 
+    <div #receiver_elements_dropped_on_stage *ngIf="!readOnlyService.readOnly"
         cdkDropList
         class="receiver-elements-dropped-on-stage"
         custom-attribute="tds_container" 

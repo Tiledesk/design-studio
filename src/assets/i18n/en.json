@@ -181,6 +181,27 @@
         "WellDonePublishingChatbot": "Well done! You are about to publish your Flow 🚀",
         "FollowTheseSimpleInstructions": "Follow these simple instructions to activate it on your website"
     },
+    "CDSPublishPanel": {
+        "WhatWillBePublished": "What will be published",
+        "LoadingAgents": "Loading the agent and its subagents...",
+        "CouldNotLoadAgents": "The subagents could not be loaded, so only this agent will be published. Close and reopen this panel to try again.",
+        "HasUnpublishedChanges": "There are unpublished changes",
+        "NothingToPublish": "Nothing has changed since the last publish. Tick what you want to publish again.",
+        "PublishedAgents": "What was published"
+    },
+    "CDSPublishHistory": {
+        "RestoreTooltip": "Bring the flow you are editing back to this version",
+        "AreYouSureYouWantToRestoreDraft": "Bring {{release_name}} back to the version of {{release_date}}?",
+        "RestoreWarning": "The flow you are editing will be replaced by this published version, and what it contains now cannot be brought back. Subagents are not restored: this version is of this flow only.",
+        "RestoreUnpublishedWarning": "This flow has changes that were never published. Those are the changes you are about to lose.",
+        "RestoreDone": "The flow you are editing is back to the version of {{release_date}}.",
+        "RestoreError": "The flow could not be restored"
+    },
+    "CDSPreview": {
+        "ReadOnlyBanner": "You are viewing a published version. Nothing you change here is saved.",
+        "ModalTitle": "Published version",
+        "ViewTooltip": "Look at this published version, read-only"
+    },
     "CDSModalMouseTrackPad": {
         "HowToMove": "How to move",
         "ClickWhellDragToMove": "Click wheel button & drag \n to move around",
@@ -1622,8 +1643,10 @@
     "NowThatYouHavePublished": "Now that you’ve published your AI Agent, make it visible to users.",
     "InstallWidget": "Install widget",
     "DoNotShowThisAgain": "Don’t show this again",
+    "Restore": "Restore",
     "Republish": "Republish",
     "RepublishReleaseTooltip": "Publishes this version online again. The chatbot you are currently editing is not modified.",
+    "View": "View",
     "Less": "less",
     "More": "more",
     "NowThatYouHavePublishedWhCp": "Now that you've published your {{sub_type}}, use the following URL to trigger it",
