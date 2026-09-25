@@ -168,6 +168,14 @@ $toogle-sidebar-width: 22px;
   display: block;
   position: absolute;
   left: 50px;
+
+  /* Con la chat AI aperta e i blocchi chiusi, il pulsante sta appena oltre il bordo
+     destro della chat. La misura viene dalla variabile e non da un numero fisso: la
+     chat si ridimensiona trascinandola, e un 470px scritto a mano sarebbe giusto solo
+     alla larghezza di fabbrica. */
+  &.past-agent-chat {
+    left: calc(var(--agent-chat-width) + 50px);
+  }
   top: 50%;
   z-index: 1050;
 }

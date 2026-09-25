@@ -173,11 +173,18 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
   //
   // The width lives on the CSS custom property the stylesheet already reads
   // (--agent-chat-width, declared globally in _variables.scss at 420px):
-  // dragging overrides it as an inline style on this element only, so every
-  // rule that already keys off the variable (the open/closed width, the
-  // sanity of any other consumer of the same var) keeps working unchanged,
-  // and a reset is just removing the override to fall back to the global
-  // default -- no separate "current width" style path to keep in sync.
+  // dragging overrides it as an inline style, so every rule that already keys
+  // off the variable keeps working unchanged, and a reset is just removing the
+  // override to fall back to the global default -- no separate "current width"
+  // style path to keep in sync.
+  //
+  // The override is written on the PARENT, not on this element. Custom properties
+  // inherit downward only, so an override living here would be invisible to
+  // everything outside this panel -- including the canvas, which places the
+  // "reopen the blocks list" button just past the chat's right edge. Written one
+  // level up, on the flex row both are children of, the button follows a resize
+  // by itself instead of sitting at a number that was right on the day it was
+  // typed.
 
   onResizeStart(event: MouseEvent): void {
     event.preventDefault();
@@ -247,7 +254,7 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
   /** Double-click on the handle: back to the stylesheet default. */
   onResizeReset(): void {
     this.preferredWidth = null;
-    this.elementRef.nativeElement.style.removeProperty('--agent-chat-width');
+    this.widthScope()?.style.removeProperty('--agent-chat-width');
     this.removePersistedWidth();
   }
 
@@ -278,7 +285,14 @@ export class CdsPanelAgentChatComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   private applyWidth(px: number): void {
-    this.elementRef.nativeElement.style.setProperty('--agent-chat-width', `${px}px`);
+    this.widthScope()?.style.setProperty('--agent-chat-width', `${px}px`);
+  }
+
+  /** Where the width override is written: the row this panel and the canvas share,
+   *  so both read the same value. Falls back to this element if there is no parent,
+   *  which only happens before it is attached. */
+  private widthScope(): HTMLElement | null {
+    return this.elementRef.nativeElement.parentElement || this.elementRef.nativeElement;
   }
 
   private restorePersistedWidth(): void {

@@ -1,4 +1,6 @@
-<div class="content">
+<!-- `is-v3` marca l'intero elenco: le differenze V3 sono di aspetto e stanno nel
+     foglio di stile, non sparse in *ngIf riga per riga. -->
+<div class="content" [class.is-v3]="IS_V3">
 
     <div class="cds-title list-title" *ngIf="!hideTitle">
         {{ 'Blocks' | translate }}
@@ -20,7 +22,7 @@
                     <div class="item-box" *ngIf="IS_OPEN">
                         <div>
                             <p class="intent-display-name ellips"><span *ngIf="intent.agents_available" class="agents-available material-icons">boy</span>{{intent.intent_display_name}}</p>
-                            <div class="icon-list">
+                            <div class="icon-list" *ngIf="!IS_V3">
 
                                 <p *ngIf="intent.questions" class="ai-icon icon">Ai</p>
 
@@ -77,7 +79,14 @@
                 value="intent.intent_id" (click)="onSelectIntent(intent)">
                 
                 <div class="icon-container">
-                    <mat-icon class="icon" [class.active-icon]="idSelectedIntent === intent.intent_id" svgIcon="block" aria-hidden="true"></mat-icon>
+                    <!-- V3: un blocco, una action. L'icona dell'action dice cosa fa il
+                         blocco; quella generica sarebbe uguale per tutti. Senza action
+                         (blocco vuoto) si ricade sull'icona generica. -->
+                    <img *ngIf="IS_V3 && actionIconSrc(intent) as actionIcon; else genericBlockIcon"
+                        class="icon" [src]="actionIcon" alt="">
+                    <ng-template #genericBlockIcon>
+                        <mat-icon class="icon" [class.active-icon]="idSelectedIntent === intent.intent_id" svgIcon="block" aria-hidden="true"></mat-icon>
+                    </ng-template>
                     <!-- <img src="assets/images/icons/block.svg"
                         [class.active-icon]="idSelectedIntent === intent.intent_id"
                         class=" "> -->
@@ -90,7 +99,7 @@
                             <mat-icon *ngIf="intent.agents_available" class="icon agents-available" svgIcon="man" aria-hidden="true"></mat-icon>
                             {{intent.intent_display_name}}
                         </p>
-                        <div class="icon-list">
+                        <div class="icon-list" *ngIf="!IS_V3">
                             <p *ngIf="intent.questions" class="ai-icon icon">Ai</p>
               
                             <mat-icon *ngIf="intent.webhook_enabled" class="icon" svgIcon="webhook" aria-hidden="true"></mat-icon>

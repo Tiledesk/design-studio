@@ -4004,11 +4004,35 @@ describe('ConnectorService.ensureConnectorsDrawn — no connector left undrawn, 
     expect(connectors.missingConnectorIds(intents)).toEqual([]);
   });
 
+  it('draws a connector whose far block only appears after the first pass', async () => {
+    // Il caso che rompeva tutto: disegnare vuole ENTRAMBI i capi nel DOM, e con un lotto
+    // grande della chat il blocco d'arrivo e' ancora da impaginare. Prima il connettore
+    // veniva perso e tornava solo ricaricando la pagina.
+    const late = document.getElementById('B');
+    late.remove();
+    setTimeout(() => document.body.appendChild(late), 100);
+
+    const result = await connectors.ensureConnectorsDrawn(intents);
+
+    expect(result.stillMissing).toEqual([]);
+    expect(document.getElementById('N/nba-n/B')).not.toBeNull();
+  });
+
+  it('gives up after a bounded number of attempts instead of looping', async () => {
+    // Un connettore verso un blocco che non c'e' davvero non comparira' mai: si smette,
+    // lo si dice, e si va avanti.
+    document.getElementById('B').remove();
+
+    const result = await connectors.ensureConnectorsDrawn(intents);
+
+    expect(result.stillMissing).toEqual(['N/nba-n/B']);
+  });
+
   it('leaves a complete stage alone: nothing duplicated, no block redrawn', async () => {
     await connectors.ensureConnectorsDrawn(intents);
     const spy = spyOn(connectors, 'createConnectorsOfIntent').and.callThrough();
     const result = await connectors.ensureConnectorsDrawn(intents);
-    expect(result).toEqual({ missing: [], redrawnBlocks: 0 });
+    expect(result).toEqual({ missing: [], redrawnBlocks: 0, stillMissing: [] });
     expect(spy).not.toHaveBeenCalled();
     expect(countDistinctEdges('A/nba-a')).toBe(1);
   });
@@ -4041,7 +4065,7 @@ describe('FlowOpsService — connector check after the AI chat stops editing', (
     };
     connectorService = aConnectorService();
     connectorService.ensureConnectorsDrawn = jasmine.createSpy('ensureConnectorsDrawn')
-      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0 }));
+      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0, stillMissing: [] }));
     connectorService.missingConnectorIds = jasmine.createSpy('missingConnectorIds').and.returnValue([]);
     dashboardService = { id_faq_kb: 'kb1' };
 
@@ -4133,7 +4157,7 @@ describe('FlowOpsService — the flow is laid out again once the chat stops chan
     };
     connectorService = aConnectorService();
     connectorService.ensureConnectorsDrawn = jasmine.createSpy('ensureConnectorsDrawn')
-      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0 }));
+      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0, stillMissing: [] }));
     connectorService.missingConnectorIds = jasmine.createSpy('missingConnectorIds').and.returnValue([]);
     dashboardService = { id_faq_kb: 'kb1' };
 
@@ -4249,7 +4273,7 @@ describe('FlowOpsService — the connectors follow a block the agent moves', () 
     };
     connectorService = aConnectorService();
     connectorService.ensureConnectorsDrawn = jasmine.createSpy('ensureConnectorsDrawn')
-      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0 }));
+      .and.returnValue(Promise.resolve({ missing: [], redrawnBlocks: 0, stillMissing: [] }));
     connectorService.missingConnectorIds = jasmine.createSpy('missingConnectorIds').and.returnValue([]);
 
     TestBed.resetTestingModule();

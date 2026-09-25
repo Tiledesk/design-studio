@@ -35,7 +35,7 @@ import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
-import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
+import { StageService, DEFAULT_PANELS_STATE } from 'src/app/chatbot-design-studio/services/stage.service';
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
@@ -174,7 +174,13 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
 
     /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
     this.subscriptionAgentChatPanel = this.controllerService.isOpenAgentChatPanel$
-      .subscribe((isOpen: boolean) => { this.IS_OPEN_PANEL_AGENT_CHAT = isOpen; });
+      .subscribe((isOpen: boolean) => {
+        this.IS_OPEN_PANEL_AGENT_CHAT = isOpen;
+        // Si salva qui e non su ogni pulsante che apre o chiude: questo e' il punto in
+        // cui lo stato cambia davvero, quindi un domani anche un pulsante nuovo viene
+        // ricordato senza che nessuno se ne debba occupare.
+        this.stageService?.savePanelState?.(this.dashboardService.id_faq_kb, 'agentChat', isOpen);
+      });
   }
 
   ngOnDestroy() {
@@ -197,14 +203,30 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** The AI chat is open whenever an agent is opened, V3 or legacy: at the first load and at
-   *  every switch. The user can still close it from the panel. */
-  private openAgentChatByDefault(): void {
+  /** Reopens the AI chat as this agent was left, at the first load and at every switch.
+   *
+   *  It used to open it unconditionally, which was not a default but a decision taken
+   *  again every time: closing the chat and then moving to a subagent brought it back.
+   *  With no preference stored for this agent the chat opens -- that is the state you
+   *  start building a flow in. */
+  private restoreAgentChatPanel(): void {
+    if (!this.agentChatHostService.isConfigured?.()) { return; }
+
+    // Una preferenza che non si riesce a leggere vale quanto una che non c'e': si
+    // ricade sul default e si va avanti. Il contrario -- rinunciare ad aprire la chat
+    // perche' lo storage ha protestato -- sarebbe un guasto travestito da scelta.
+    let shouldOpen = DEFAULT_PANELS_STATE.agentChat;
     try {
-      if (!this.agentChatHostService.isConfigured?.()) { return; }
-      this.controllerService.openAgentChatPanel();
+      const stored = this.stageService?.getPanelsState?.(this.dashboardService.id_faq_kb);
+      if (stored) { shouldOpen = stored.agentChat; }
     } catch (error) {
-      this.logger.error('[CDS DSHBRD] could not open the AI chat', error);
+      this.logger.error('[CDS DSHBRD] could not read the panels state', error);
+    }
+
+    if (shouldOpen) {
+      this.controllerService.openAgentChatPanel();
+    } else {
+      this.controllerService.closeAgentChatPanel?.();
     }
   }
 
@@ -320,7 +342,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     }
     // After the load, never inside it: a failure here must not be reported as a flow that
     // could not be opened.
-    this.openAgentChatByDefault();
+    this.restoreAgentChatPanel();
   }
 
   /** Reloads the open flow in place -- its blocks, its attributes -- as a page
@@ -396,7 +418,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
-      this.openAgentChatByDefault();
+      this.restoreAgentChatPanel();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
       this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);

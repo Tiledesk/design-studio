@@ -7,7 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES
 import { IntentService } from '../../services/intent.service';
-import { StageService } from '../../services/stage.service';
+import { StageService, DEFAULT_PANELS_STATE } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -231,12 +231,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
     this.observeHostWidth();
-    if (this.dashboardService.isV3) {
-      // V3: the blocks sidebar is closed whenever an agent is opened, the AI chat is open instead.
-      this.IS_OPEN_INTENTS_LIST = false;
-    } else if (this.stageService.settings?.open_intent_list_state != null) {
-      this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
-    }
+    // Come questo agent e' stato lasciato l'ultima volta.
+    //
+    // Prima erano due regole diverse: i V3 sempre chiusi, gli altri con la preferenza
+    // dentro `<id>_stage` e default aperto. Ora la regola e' una sola per tutti, e la
+    // vecchia preferenza non si legge piu': due sorgenti per la stessa domanda, con
+    // default opposti, sono esattamente cio' che questa chiave toglie.
+    const panels = this.stageService.getPanelsState(this.id_faq_kb);
+    this.IS_OPEN_INTENTS_LIST = panels ? panels.blocks : DEFAULT_PANELS_STATE.blocks;
 
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
@@ -952,11 +954,20 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   // ============================================================
   // EVENT HANDLERS - INTENT LIST
   // ============================================================
+
+  /** La chat AI occupa la sinistra: con i blocchi chiusi il pulsante che li riapre va
+   *  spostato oltre il bordo destro della chat, altrimenti finisce sopra la
+   *  conversazione. Letto a ogni giro di rilevamento delle modifiche, perche' la chat
+   *  si apre e si chiude mentre il canvas resta montato. */
+  get IS_AGENT_CHAT_OPEN(): boolean {
+    return this.controllerService.isAgentChatPanelOpen;
+  }
+
   onToogleSidebarIntentsList() {
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ');
     this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
     this.removeConnectorDraftAndCloseFloatMenu();
-    this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, this.IS_OPEN_INTENTS_LIST);
+    this.stageService.savePanelState(this.id_faq_kb, 'blocks', this.IS_OPEN_INTENTS_LIST);
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ', this.IS_OPEN_INTENTS_LIST);
   }
 
