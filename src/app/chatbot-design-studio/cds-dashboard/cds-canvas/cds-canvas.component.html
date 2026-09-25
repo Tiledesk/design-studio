@@ -1,5 +1,6 @@
 <div class="cds-toggle-setting-sidebar-icon-right-wpr"
     [class.is_opened]="IS_OPEN_INTENTS_LIST"
+    [class.past-agent-chat]="IS_AGENT_CHAT_OPEN && !IS_OPEN_INTENTS_LIST"
     (click)="onToogleSidebarIntentsList()">
     <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
     <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->

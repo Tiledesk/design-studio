@@ -8,6 +8,13 @@
 *Tiledesk SRL*
 
 
+# this branch 25/09/2026
+
+- **changed**: i pannelli di sinistra si riaprono come li hai lasciati su quell'agent: la chat AI e l'elenco dei blocchi, ciascuno per agent. Senza una scelta precedente si parte con la chat aperta e i blocchi chiusi. Prima la chat non si limitava a partire aperta, si riapriva a ogni cambio di flusso: la chiudevi, passavi a un subagent e tornava
+- **fixed**: i collegamenti disegnati in ritardo non si perdono piu'. Disegnarne uno richiede che entrambi i blocchi siano gia' sullo schermo, e con una modifica ampia della chat AI il secondo poteva non esserlo ancora: quel collegamento spariva e tornava solo ricaricando la pagina. Ora il canvas ricontrolla e completa quello che manca
+- **changed**: negli agenti V3 l'elenco dei blocchi mostra per ogni blocco l'icona della sua azione invece di un'icona uguale per tutti, e non mostra piu' il contatore delle azioni, che su questi agenti vale sempre uno
+- **changed**: nell'azione di risposta lo spazio sotto le impostazioni e' piu' ampio
+
 # this branch 23/09/2026
 
 - **fixed**: quando la chat AI finisce di lavorare, i blocchi e i collegamenti sullo stage vengono completati subito. Prima il controllo partiva a tempo, uno e tre secondi dopo l'ultima modifica, e se l'agente continuava a lavorare piu' a lungo restavano blocchi con i collegamenti non disegnati, che si sistemavano solo ricaricando la pagina. Ora e' la chat stessa a dire quando ha finito, e vale anche quando il lavoro finisce per un errore o viene annullato

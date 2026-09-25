@@ -9,6 +9,16 @@ import { TYPE_ACTION, TYPE_ACTION_VXML, isReturnStackIntent } from '../utils-act
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { filter, map, shareReplay } from 'rxjs/operators';
 
+/** Quante volte `ensureConnectorsDrawn` guarda lo stage prima di arrendersi.
+ *  Tre e non "finche' non riesce": un connettore verso un blocco che non c'e'
+ *  davvero non comparira' mai, e un ciclo senza fine sarebbe peggio del difetto. */
+const CONNECTOR_DRAW_ATTEMPTS = 3;
+
+/** L'attesa prima di ogni nuovo tentativo, in millisecondi -- una per tentativo
+ *  dopo il primo. Cresce perche' le due cause sono diverse: una carta in ritardo
+ *  di un fotogramma, e un lotto grande che il browser sta ancora impaginando. */
+const CONNECTOR_DRAW_RETRY_MS = [80, 400];
+
 
 // SERVICES //
 // import { StageService } from '../services/stage.service';
@@ -1747,23 +1757,64 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
    *  only a page reload brought it back. This compares the expected connectors with the stage and
    *  redraws the blocks that miss one. `createConnectorsOfIntent` updates an existing connector
    *  instead of duplicating it, so a block is only ever completed. Connectors on the stage that
-   *  the data no longer asks for are left alone. */
-  public async ensureConnectorsDrawn(intents: any[]): Promise<{ missing: string[]; redrawnBlocks: number }> {
-    this.syncIntents(intents);
-    const missing: string[] = [];
+   *  the data no longer asks for are left alone.
+   *
+   *  It checks its own work. Drawing a connector needs BOTH its ends in the DOM, so a single
+   *  pass can fail for the same reason it was called: the other end of the last batch is not
+   *  rendered yet. Before, that connector was simply lost -- the missing list was returned and
+   *  nobody read it -- and only a page reload brought it back. Now each pass is followed by a
+   *  fresh look at the stage, and what is still absent is tried again, a few times, waiting a
+   *  little longer each time. It stops as soon as nothing is missing, so the common case costs
+   *  one pass, exactly as before. */
+  public async ensureConnectorsDrawn(
+    intents: any[]
+  ): Promise<{ missing: string[]; redrawnBlocks: number; stillMissing: string[] }> {
     let redrawnBlocks = 0;
-    for (const intent of intents || []) {
-      const absent = this.expectedConnectorIds(intent).filter(id => !document.getElementById(id));
-      if (absent.length === 0) { continue; }
-      missing.push(...absent);
-      try {
-        await this.createConnectorsOfIntent(intent);
-        redrawnBlocks++;
-      } catch (error) {
-        this.logger.error('[CONNECTOR-SERV] ensureConnectorsDrawn: redraw failed', intent?.intent_id, error);
+    // `missing` keeps its meaning: what was found absent and therefore redrawn, across
+    // every pass. What the retries add is `stillMissing` -- absent even after the last
+    // one -- which is a different question and gets its own answer rather than
+    // redefining this one.
+    const missing: string[] = [];
+
+    for (let attempt = 0; attempt < CONNECTOR_DRAW_ATTEMPTS; attempt++) {
+      if (attempt > 0) {
+        // The wait grows: the first retry is for a card one frame late, the last for a
+        // batch the browser is still laying out.
+        await this.waitAFrame(CONNECTOR_DRAW_RETRY_MS[attempt - 1]);
       }
+
+      this.syncIntents(intents);
+      let absentThisPass = 0;
+      for (const intent of intents || []) {
+        const absent = this.expectedConnectorIds(intent).filter(id => !document.getElementById(id));
+        if (absent.length === 0) { continue; }
+        absentThisPass += absent.length;
+        for (const id of absent) {
+          if (!missing.includes(id)) { missing.push(id); }
+        }
+        try {
+          await this.createConnectorsOfIntent(intent);
+          redrawnBlocks++;
+        } catch (error) {
+          this.logger.error('[CONNECTOR-SERV] ensureConnectorsDrawn: redraw failed', intent?.intent_id, error);
+        }
+      }
+
+      if (absentThisPass === 0) { break; }
     }
-    return { missing, redrawnBlocks };
+
+    const stillMissing = missing.filter(id => !document.getElementById(id));
+    if (stillMissing.length) {
+      this.logger.warn('[CONNECTOR-SERV] connectors still missing after '
+        + CONNECTOR_DRAW_ATTEMPTS + ' attempts:', stillMissing);
+    }
+    return { missing, redrawnBlocks, stillMissing };
+  }
+
+  /** A frame after a delay: the delay lets the browser lay out, the frame lets it paint. */
+  private waitAFrame(delayMs: number): Promise<void> {
+    return new Promise(resolve =>
+      setTimeout(() => requestAnimationFrame(() => resolve()), delayMs));
   }
 
   createListOfConnectorsByIntent2(json: any): void {

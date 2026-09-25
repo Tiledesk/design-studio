@@ -2010,6 +2010,51 @@ export class FlowOpsService implements OnDestroy {
     // stage before it has placed them finds anchors that are not there yet.
     await new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve(null)), 0));
     await this.redrawFlow(faqKbId, true);
+    this.reportUnreachableBlocks();
+  }
+
+  /**
+   * Segnala i blocchi che nessuno puo' raggiungere, a lavoro finito.
+   *
+   * Non ne cancella nessuno, ed e' voluto: fra la prima e la seconda chiamata di una
+   * costruzione i blocchi sono legittimamente scollegati -- la prima li crea tutti
+   * senza destinazioni, la seconda li collega -- e anche chi costruisce a mano tiene
+   * spesso un blocco staccato da parte. Un blocco vuoto di troppo si toglie in un
+   * clic; uno cancellato non torna.
+   *
+   * Le porte d'ingresso non sono solo `start`: `defaultFallback` e `webhook` lo sono
+   * per costruzione, e lo e' anche qualunque blocco con delle frasi di addestramento,
+   * perche' ci si arriva scrivendo. Contarli come irraggiungibili sarebbe un falso
+   * allarme, ed e' il modo piu' rapido per far ignorare l'avviso.
+   */
+  private reportUnreachableBlocks(): void {
+    try {
+      const intents: any[] = (this.intentService.listOfIntents || []).filter(intent => !!intent?.intent_id);
+      if (intents.length === 0) { return; }
+
+      const isEntryPoint = (intent: any): boolean =>
+        [RESERVED_INTENT_NAMES.START, RESERVED_INTENT_NAMES.WEBHOOK, RESERVED_INTENT_NAMES.DEFAULT_FALLBACK]
+          .includes(intent.intent_display_name)
+        || (typeof intent.question === 'string' && intent.question.trim().length > 0);
+
+      const byId = new Map<string, any>(intents.map(intent => [intent.intent_id, intent]));
+      const reached = new Set<string>();
+      const stack = intents.filter(isEntryPoint).map(intent => intent.intent_id);
+      while (stack.length) {
+        const id = stack.pop();
+        if (!id || reached.has(id) || !byId.has(id)) { continue; }
+        reached.add(id);
+        stack.push(...this.outgoingTargets(byId.get(id)));
+      }
+
+      const unreachable = intents.filter(intent => !reached.has(intent.intent_id));
+      if (unreachable.length) {
+        console.warn('[FLOW-OPS] blocks nothing can reach:',
+          unreachable.map(intent => intent.intent_display_name || intent.intent_id));
+      }
+    } catch (error) {
+      // Diagnostica: non deve poter rompere la fine di un turno.
+    }
   }
 
   private scheduleConnectorCheck(faqKbId: string): void {

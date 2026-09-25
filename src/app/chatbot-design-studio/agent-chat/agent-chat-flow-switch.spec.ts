@@ -246,7 +246,10 @@ function makeDashboard(parts: any): any {
     { getConfig: () => ({}) },
     { getItem: () => null, setItem: () => {} },
     parts.dashboardService ?? {},
-    {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+    // kb, dataTable, department, upload, faqKb, faq, openai, whatsapp,
+    {}, {}, {}, {}, {}, {}, {}, {},
+    // stage: serve ai test sullo stato dei pannelli, poi webhook
+    parts.stageService ?? {}, {},
     parts.controllerService ?? { isOpenAgentChatPanel$: new Subject(), openAgentChatPanel: () => {} },
     agentChatHostService,
     intentService,
@@ -697,10 +700,11 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
 
 describe('CdsDashboardComponent — the AI chat is open whenever an agent is opened', () => {
 
-  function build(isV3: boolean, configured = true) {
+  function build(isV3: boolean, configured = true, stageService?: any) {
     const controllerService: any = {
       isOpenAgentChatPanel$: new Subject(),
-      openAgentChatPanel: jasmine.createSpy('openAgentChatPanel')
+      openAgentChatPanel: jasmine.createSpy('openAgentChatPanel'),
+      closeAgentChatPanel: jasmine.createSpy('closeAgentChatPanel')
     };
     const dashboardService: any = {
       projectID: 'p1',
@@ -712,6 +716,7 @@ describe('CdsDashboardComponent — the AI chat is open whenever an agent is ope
     const component = makeDashboard({
       dashboardService,
       controllerService,
+      stageService,
       agentChatHostService: { setFlowNavigator: () => {}, isConfigured: () => configured },
       intentService: { getAllIntents: () => Promise.resolve(true) },
       router: {
@@ -734,6 +739,25 @@ describe('CdsDashboardComponent — the AI chat is open whenever an agent is ope
 
   it('opens the chat when switching to a legacy agent too', async () => {
     const { component, controllerService } = build(false);
+    await component.openFlow('kb2');
+    expect(controllerService.openAgentChatPanel).toHaveBeenCalledTimes(1);
+  });
+
+  it('reopens the chat closed, when that is how this agent was left', async () => {
+    const { component, controllerService } = build(true, true, {
+      getPanelsState: () => ({ agentChat: false, blocks: true }),
+      savePanelState: () => {}
+    });
+    await component.openFlow('kb2');
+    expect(controllerService.openAgentChatPanel).not.toHaveBeenCalled();
+    expect(controllerService.closeAgentChatPanel).toHaveBeenCalled();
+  });
+
+  it('opens the chat when this agent has no stored preference', async () => {
+    const { component, controllerService } = build(true, true, {
+      getPanelsState: () => null,
+      savePanelState: () => {}
+    });
     await component.openFlow('kb2');
     expect(controllerService.openAgentChatPanel).toHaveBeenCalledTimes(1);
   });

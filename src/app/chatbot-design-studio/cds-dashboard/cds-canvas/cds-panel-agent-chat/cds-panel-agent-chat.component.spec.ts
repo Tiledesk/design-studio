@@ -309,7 +309,10 @@ describe('CdsPanelAgentChatComponent', () => {
     }
 
     function currentWidthVar(): string {
-      return (fixture.nativeElement as HTMLElement).style.getPropertyValue('--agent-chat-width');
+      // La variabile si scrive sul GENITORE, non sul pannello: le proprieta'
+      // personalizzate si ereditano solo verso il basso, e il pulsante che riapre i
+      // blocchi vive fuori da questo componente. Scritta qui dentro, non la vedrebbe.
+      return hostDiv.style.getPropertyValue('--agent-chat-width');
     }
 
     function mousedown(clientX: number): void {

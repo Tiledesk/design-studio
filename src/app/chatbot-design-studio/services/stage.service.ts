@@ -19,6 +19,13 @@ export interface Settings {
   open_intent_list_state: boolean;
 }
 
+/**
+ * Come si apre la sinistra quando su questo agent non si e' mai scelto: la chat AI
+ * aperta, la lista dei blocchi chiusa. E' la configurazione con cui si comincia a
+ * lavorare a un flusso, non quella con cui lo si rilegge.
+ */
+export const DEFAULT_PANELS_STATE = { agentChat: true, blocks: false };
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +40,7 @@ export class StageService {
   loaded: boolean = false;
 
   private readonly LEFT_PANEL_KEY_PREFIX = 'cds_left_panel_';
+  private readonly PANELS_KEY_PREFIX = 'cds_panels_';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -369,6 +377,48 @@ export class StageService {
     // distinguere "l'utente ha scelto Blocks" da "l'utente non ha mai scelto",
     // altrimenti non e' possibile avere una tab di default al primo accesso.
     return null;
+  }
+
+  /**
+   * Quali pannelli di sinistra erano aperti l'ultima volta su QUESTO agent.
+   *
+   * Per agent e non globale: chi lavora a un flusso lungo tiene aperta la lista dei
+   * blocchi, chi ne sta scrivendo uno nuovo tiene aperta la chat, e sono spesso agent
+   * diversi nella stessa giornata.
+   *
+   * Una chiave sola per entrambi i pannelli perche' la domanda e' una: com'era la
+   * sinistra quando me ne sono andato. Due chiavi separate si sarebbero potute
+   * disallineare, e nessuna delle due avrebbe saputo dell'altra.
+   *
+   * Torna `null` quando non c'e' preferenza, e la differenza conta: il chiamante deve
+   * poter distinguere "l'utente aveva chiuso la chat" da "l'utente non ha mai scelto",
+   * che portano a due stati opposti.
+   */
+  public getPanelsState(id_faq_kb: string): { agentChat: boolean; blocks: boolean } | null {
+    if (!id_faq_kb) { return null; }
+    try {
+      const raw = this.appStorageService.getItem(this.PANELS_KEY_PREFIX + id_faq_kb);
+      if (!raw) { return null; }
+      const value = JSON.parse(raw);
+      if (typeof value?.agentChat !== 'boolean' || typeof value?.blocks !== 'boolean') { return null; }
+      return { agentChat: value.agentChat, blocks: value.blocks };
+    } catch (error) {
+      // Una preferenza illeggibile vale quanto una preferenza assente.
+      return null;
+    }
+  }
+
+  /** Aggiorna uno dei due pannelli lasciando l'altro com'era. */
+  public savePanelState(id_faq_kb: string, panel: 'agentChat' | 'blocks', isOpen: boolean): void {
+    if (!id_faq_kb) { return; }
+    const current = this.getPanelsState(id_faq_kb) || DEFAULT_PANELS_STATE;
+    const next = { ...current, [panel]: isOpen };
+    try {
+      this.appStorageService.setItem(this.PANELS_KEY_PREFIX + id_faq_kb, JSON.stringify(next));
+    } catch (error) {
+      // Lo storage puo' rifiutare (finestra privata, quota): si perde la preferenza,
+      // non la sessione.
+    }
   }
 
   public saveActiveLeftPanel(familyId: string, panel: 'blocks' | 'subagents'){

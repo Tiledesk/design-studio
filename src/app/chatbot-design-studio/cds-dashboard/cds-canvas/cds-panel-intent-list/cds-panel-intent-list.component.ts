@@ -3,12 +3,14 @@ import { Subscription } from 'rxjs';
 
 // SERVICES //
 import { IntentService } from '../../../services/intent.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
  
 // MODEL //
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
 import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
+import { ACTIONS_LIST } from '../../../utils-actions';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -50,10 +52,37 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
-    private intentService: IntentService
+    private intentService: IntentService,
+    private dashboardService: DashboardService
   ) { 
     this.setSubscriptions();
   }
+
+  /** Su un agent V3 un blocco contiene una sola action, quindi l'icona di quella
+   *  action dice cosa fa il blocco meglio dell'icona generica uguale per tutti -- e il
+   *  contatore accanto al nome, che su V3 vale sempre uno, non dice niente. */
+  get IS_V3(): boolean {
+    return !!this.dashboardService?.isV3;
+  }
+
+  /** Percorso dell'icona dell'action del blocco, o null se non ce n'e' una da mostrare.
+   *
+   *  Legge la prima action: su V3 e' anche l'unica. I blocchi vuoti e quelli riservati
+   *  (start, defaultFallback) non ne hanno, e ricadono sull'icona generica.
+   *
+   *  Il risultato e' tenuto da parte per tipo: il template lo chiede a ogni giro di
+   *  rilevamento delle modifiche, per ogni riga dell'elenco. */
+  actionIconSrc(intent: Intent): string | null {
+    const type = (intent?.actions?.[0] as any)?._tdActionType;
+    if (!type) { return null; }
+    if (!this.actionIconByType.has(type)) {
+      const entry = Object.values(ACTIONS_LIST).find(action => action.type === type);
+      this.actionIconByType.set(type, entry?.src || null);
+    }
+    return this.actionIconByType.get(type);
+  }
+
+  private readonly actionIconByType = new Map<string, string | null>();
 
   ngOnInit(): void {
     // // console.log('ngOnInit:: ');
