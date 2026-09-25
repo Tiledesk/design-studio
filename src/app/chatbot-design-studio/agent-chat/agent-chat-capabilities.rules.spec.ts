@@ -1,5 +1,5 @@
 import {
-  actionTypeRefusal, resolveAttachedServers, resolveLlmModel, withDefaultLlmModel
+  actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, withDefaultLlmModel
 } from './agent-chat-capabilities.rules';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import { LlmModel, applySelectedServerToAction } from '../utils-llm-models';
@@ -169,12 +169,13 @@ const MODELS: LlmModel[] = [
   aModel('openai', 'small', 'Small', undefined, 4096)
 ];
 
-/** What the three panels' own setModel() writes for `model` on an action
+/** What the `type` panel's own setModel() writes for `model` on an action
  *  holding `existing` -- the same lines in cds-action-ai-prompt,
  *  cds-action-ai-condition and cds-action-askgpt-v2, max_tokens kept and
- *  clamped into the model's range (resetMaxTokens false) -- as it is saved
+ *  clamped into the model's range (resetMaxTokens false), plus AI Prompt's
+ *  reasoning switched off for a model without it -- as it is saved
  *  (undefined keys dropped). */
-function whatThePanelStores(model: LlmModel, existing: Record<string, any> = {}): Record<string, any> {
+function whatThePanelStores(type: string, model: LlmModel, existing: Record<string, any> = {}): Record<string, any> {
   const DEFAULT_MAX_TOKENS = 10000;
   const action: any = { ...existing };
   action.llm = model?.llm ? model.llm : '';
@@ -191,6 +192,9 @@ function whatThePanelStores(model: LlmModel, existing: Record<string, any> = {})
     action.max_tokens = next;
   } else {
     action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
+  }
+  if (type === 'ai_prompt' && model?.reasoning !== true) {
+    action.reasoning = false;
   }
   return action;
 }
@@ -217,7 +221,7 @@ describe('resolveLlmModel', () => {
     it(`stores for ${type} exactly what its panel's setModel writes, keeping the other fields`, () => {
       const r = resolveLlmModel(type, { question: 'q', llm: 'anthropic', model: 'claude-sonnet-4' }, snap);
       expect(r.error).toBeUndefined();
-      expect(saved(r.fields)).toEqual(whatThePanelStores(MODELS[2], { question: 'q' }));
+      expect(saved(r.fields)).toEqual(whatThePanelStores(type, MODELS[2], { question: 'q' }));
     });
   }
 
@@ -231,12 +235,15 @@ describe('resolveLlmModel', () => {
     const r = resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-4o', vllmServer: 'gpu-a' }, snap);
     expect('vllmServer' in r.fields).toBe(true);
     expect(r.fields.vllmServer).toBeUndefined();
+    expect('llmServer' in r.fields).toBe(true);
+    expect(r.fields.llmServer).toBeUndefined();
+    expect('agentPlatformServer' in r.fields).toBe(true);
     expect(r.fields.agentPlatformServer).toBeUndefined();
   });
 
   it('takes the vLLM server from vllmServer, as the panel stores it', () => {
     const r = resolveLlmModel('ai_prompt', { llm: 'vllm', model: 'llama-3', vllmServer: 'gpu-b' }, snap);
-    expect(saved(r.fields)).toEqual(whatThePanelStores(MODELS[4]));
+    expect(saved(r.fields)).toEqual(whatThePanelStores('ai_prompt', MODELS[4]));
     expect(r.fields.vllmServer).toBe('gpu-b');
     expect(r.fields.modelName).toBe('gpu-b ・ llama-3');
   });
@@ -244,9 +251,51 @@ describe('resolveLlmModel', () => {
   it('infers the server when only one serves that model, and stores it under the provider\'s field', () => {
     const r = resolveLlmModel('askgptv2', { llm: 'agentplatform', model: 'gemini-2.5-flash' }, snap);
     expect(r.error).toBeUndefined();
-    expect(saved(r.fields)).toEqual(whatThePanelStores(MODELS[5]));
-    expect(r.fields.agentPlatformServer).toBe('eu');
+    expect(saved(r.fields)).toEqual(whatThePanelStores('askgptv2', MODELS[5]));
+    expect(r.fields.llmServer).toBe('eu');
     expect(r.fields.vllmServer).toBeUndefined();
+  });
+
+  it('takes the Agent Platform server from llmServer, as the panel stores it', () => {
+    const r = resolveLlmModel('ai_prompt', { llm: 'agentplatform', model: 'gemini-2.5-flash', llmServer: 'eu' }, snap);
+    expect(r.error).toBeUndefined();
+    expect(saved(r.fields)).toEqual(whatThePanelStores('ai_prompt', MODELS[5]));
+    expect(r.fields.llmServer).toBe('eu');
+  });
+
+  it('accepts agentPlatformServer, the name llmServer had before, and stores it as llmServer only', () => {
+    const r = resolveLlmModel('ai_condition',
+      { llm: 'agentplatform', model: 'gemini-2.5-flash', agentPlatformServer: 'eu' }, snap);
+    expect(r.error).toBeUndefined();
+    expect(saved(r.fields)).toEqual(whatThePanelStores('ai_condition', MODELS[5]));
+    expect(r.fields.llmServer).toBe('eu');
+    expect('agentPlatformServer' in r.fields).toBe(true);
+    expect(r.fields.agentPlatformServer).toBeUndefined();
+  });
+
+  it('refuses an Agent Platform server that does not serve that model, under either name', () => {
+    for (const key of ['llmServer', 'agentPlatformServer']) {
+      const r = resolveLlmModel('ai_prompt', { llm: 'agentplatform', model: 'gemini-2.5-flash', [key]: 'zz' }, snap);
+      expect(r.fields).toBeUndefined();
+      expect(r.error).toContain('agentplatform / gemini-2.5-flash @ zz');
+    }
+  });
+
+  it('treats a server field alone as picking a model, and asks for llm and model', () => {
+    for (const key of ['vllmServer', 'llmServer', 'agentPlatformServer']) {
+      expect(setsLlmModel({ [key]: 'eu' })).toBe(true);
+      expect(resolveLlmModel('ai_prompt', { [key]: 'eu' }, snap).error).toContain('"llm" and "model"');
+    }
+  });
+
+  it('turns an AI Prompt\'s reasoning off for a model without it, as its panel does, and only there', () => {
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'gpt-4o', reasoning: true }, snap)
+      .fields.reasoning).toBe(false);
+    const reasoner = { ...aModel('openai', 'o3', 'o3'), reasoning: true };
+    expect(resolveLlmModel('ai_prompt', { llm: 'openai', model: 'o3', reasoning: true }, withModels([reasoner]))
+      .fields.reasoning).toBe(true);
+    expect('reasoning' in resolveLlmModel('ai_condition', { llm: 'openai', model: 'gpt-4o' }, snap).fields)
+      .toBe(false);
   });
 
   it('asks for the server when several serve that model, listing them', () => {
@@ -341,18 +390,18 @@ describe('resolveLlmModel', () => {
 describe('withDefaultLlmModel', () => {
   it('gives an action that sets no model the default, GPT-4o, when the project has it', () => {
     const fields = withDefaultLlmModel('ai_condition', { instructions: 'i' }, withModels(MODELS));
-    expect(saved(fields)).toEqual(whatThePanelStores(MODELS[1], { instructions: 'i' }));
+    expect(saved(fields)).toEqual(whatThePanelStores('ai_condition', MODELS[1], { instructions: 'i' }));
   });
 
   it('gives the first model when the project has no GPT-4o', () => {
     const fields = withDefaultLlmModel('ai_prompt', undefined, withModels(MODELS.slice(2)));
-    expect(saved(fields)).toEqual(whatThePanelStores(MODELS[2]));
+    expect(saved(fields)).toEqual(whatThePanelStores('ai_prompt', MODELS[2]));
   });
 
   it('keeps the scaffold\'s max_tokens when it fits the default model', () => {
     const fields = withDefaultLlmModel('ai_prompt', { question: 'q' }, withModels(MODELS),
       { max_tokens: 256, temperature: 0.7 });
-    expect(saved(fields)).toEqual(whatThePanelStores(MODELS[1], { question: 'q', max_tokens: 256 }));
+    expect(saved(fields)).toEqual(whatThePanelStores('ai_prompt', MODELS[1], { question: 'q', max_tokens: 256 }));
   });
 
   it('leaves an action that sets its own model, another type, or a project with no model alone', () => {

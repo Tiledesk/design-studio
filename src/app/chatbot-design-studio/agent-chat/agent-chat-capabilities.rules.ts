@@ -102,12 +102,20 @@ export function resolveAttachedServers(value: unknown, snapshot: CapabilitiesSna
 const LLM_MODEL_ACTION_TYPES: string[] = [TYPE_ACTION.AI_PROMPT, TYPE_ACTION.AI_CONDITION, TYPE_ACTION.ASKGPTV2];
 
 /** The fields an agent picks a model with. Setting any of them is choosing a
- *  model, and is checked; setting none leaves the model alone. */
-const LLM_MODEL_SELECTION_FIELDS = ['llm', 'model', 'vllmServer', 'agentPlatformServer'];
+ *  model, and is checked; setting none leaves the model alone.
+ *  `agentPlatformServer` is the name `llmServer` had before the rename, still
+ *  accepted on input. */
+const LLM_MODEL_SELECTION_FIELDS = ['llm', 'model', 'vllmServer', 'llmServer', 'agentPlatformServer'];
 
-/** Where each multi-server provider keeps its server on the action. */
+/** Where each multi-server provider keeps its server on the action, as
+ *  applySelectedServerToAction writes it. */
 const SERVER_FIELD: Record<string, keyof ActionWithServer> = {
   vllm: 'vllmServer',
+  agentplatform: 'llmServer'
+};
+
+/** Older names a provider's server may still arrive under from the agent. */
+const LEGACY_SERVER_FIELD: Record<string, keyof ActionWithServer> = {
   agentplatform: 'agentPlatformServer'
 };
 
@@ -143,9 +151,10 @@ function describeModels(models: LlmModel[]): string {
  *  picked (cds-action-ai-prompt, cds-action-ai-condition, cds-action-askgpt-v2
  *  alike): llm, model and modelName -- modelName is what the panel finds the
  *  model by when it opens -- then the server through
- *  applySelectedServerToAction. That one deletes both server fields first; a
- *  patch can only assign, so the one that does not apply is written as
- *  undefined, which is dropped when the flow is saved. */
+ *  applySelectedServerToAction. That one deletes every server field first,
+ *  the legacy agentPlatformServer included; a patch can only assign, so the
+ *  ones that do not apply are written as undefined, which is dropped when the
+ *  flow is saved. */
 function llmModelFields(entry: LlmModel): Record<string, any> {
   const server: ActionWithServer = {};
   applySelectedServerToAction(server, entry);
@@ -154,7 +163,8 @@ function llmModelFields(entry: LlmModel): Record<string, any> {
     model: entry.model,
     modelName: entry.modelName,
     vllmServer: server.vllmServer,
-    agentPlatformServer: server.agentPlatformServer
+    llmServer: server.llmServer,
+    agentPlatformServer: undefined
   };
 }
 
@@ -186,6 +196,13 @@ function modelLimitFields(type: string, entry: LlmModel, current: Record<string,
   return { max_tokens: maxTokens, ...(isGpt5 ? { temperature: 1 } : {}) };
 }
 
+/** What the AI Prompt panel's setModel() also does on a pick: a model that
+ *  does not support reasoning turns the action's reasoning off (the panel
+ *  then disables the checkbox, so it could not be turned back on). */
+function reasoningFields(type: string, entry: LlmModel): Record<string, any> {
+  return type === TYPE_ACTION.AI_PROMPT && entry.reasoning !== true ? { reasoning: false } : {};
+}
+
 /** Everything a pick of `entry` stores: the model fields, then the limits. */
 function pickedModelFields(
   type: string, entry: LlmModel, fields: Record<string, any> | undefined, base: Record<string, any> | undefined
@@ -193,7 +210,8 @@ function pickedModelFields(
   return {
     ...(fields || {}),
     ...llmModelFields(entry),
-    ...modelLimitFields(type, entry, { ...(base || {}), ...(fields || {}) })
+    ...modelLimitFields(type, entry, { ...(base || {}), ...(fields || {}) }),
+    ...reasoningFields(type, entry)
   };
 }
 
@@ -214,7 +232,10 @@ export function resolveLlmModel(
   }
   const models = snapshot.llmModels;
   const serverField = SERVER_FIELD[fields.llm];
-  const server = serverField ? fields[serverField] : undefined;
+  const legacyField = LEGACY_SERVER_FIELD[fields.llm];
+  const server = serverField
+    ? (fields[serverField] ?? (legacyField ? fields[legacyField] : undefined))
+    : undefined;
   const sent = describeModel(fields.llm, fields.model, server);
   if (models.length === 0) {
     const why = snapshot.capabilities.llm_models_error

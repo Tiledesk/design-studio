@@ -262,8 +262,7 @@ export class AgentChatCapabilitiesService {
     // `description` is an i18n key; one with no translation comes back as the
     // key itself, or empty, and says nothing.
     const description = m.description ? translate.instant(m.description) : '';
-    // generateLlmModelsFlat() sets `reasoning`, which LlmModel does not declare.
-    const reasoning = (m as LlmModel & { reasoning?: boolean }).reasoning === true;
+    const reasoning = m.reasoning === true;
     return {
       llm: m.llm,
       model: m.model,

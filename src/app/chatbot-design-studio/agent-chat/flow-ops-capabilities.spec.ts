@@ -28,7 +28,8 @@ const MODELS: LlmModel[] = [
   aModel('anthropic', 'claude-sonnet-4', 'Claude Sonnet 4', undefined, 64000),
   aModel('openai', 'gpt-5.4', 'Gpt-5.4'),
   aModel('vllm', 'llama-3', 'gpu-a ・ llama-3', 'gpu-a'),
-  aModel('vllm', 'llama-3', 'gpu-b ・ llama-3', 'gpu-b')
+  aModel('vllm', 'llama-3', 'gpu-b ・ llama-3', 'gpu-b'),
+  aModel('agentplatform', 'gemini-2.5-flash', 'eu ・ gemini-2.5-flash', 'eu')
 ];
 
 function anIntent(intentId: string, name: string): Intent {
@@ -326,7 +327,7 @@ describe('FlowOpsService — project capabilities', () => {
       expect(report.ok).toBe(true);
       expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q',
         llm: 'vllm', model: 'llama-3', modelName: 'gpu-b ・ llama-3', vllmServer: 'gpu-b',
-        max_tokens: 256, temperature: 0.7 });
+        max_tokens: 256, temperature: 0.7, reasoning: false });
     });
 
     it('refuses the whole batch for a model the project does not have, applying nothing', async () => {
@@ -367,7 +368,7 @@ describe('FlowOpsService — project capabilities', () => {
         fields: { question: 'q' } }]);
       expect(report.ok).toBe(true);
       expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q',
-        llm: 'openai', model: 'gpt-4o', modelName: 'GPT-4o', max_tokens: 256, temperature: 0.7 });
+        llm: 'openai', model: 'gpt-4o', modelName: 'GPT-4o', max_tokens: 256, temperature: 0.7, reasoning: false });
     });
 
     it('sets temperature 1 when a Gpt-5 model is picked, as the panel does', async () => {
@@ -421,7 +422,31 @@ describe('FlowOpsService — project capabilities', () => {
         fields: { llm: 'anthropic', model: 'claude-sonnet-4' } }]);
       expect(good.ok).toBe(true);
       expect(stored('i1', 2)).toEqual({ _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'q',
-        llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4', max_tokens: 10000 });
+        llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4', max_tokens: 10000,
+        reasoning: false });
+    });
+
+    it('stores an Agent Platform server as llmServer, taking the legacy agentPlatformServer too', async () => {
+      const report = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai2',
+        fields: { llm: 'agentplatform', model: 'gemini-2.5-flash', agentPlatformServer: 'eu' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i1', 2)).toEqual({ _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'q',
+        llm: 'agentplatform', model: 'gemini-2.5-flash', modelName: 'eu ・ gemini-2.5-flash', llmServer: 'eu',
+        max_tokens: 10000, reasoning: false });
+    });
+
+    it('drops a legacy agentPlatformServer stored on the action when another model is picked', async () => {
+      const legacy = intentService.getIntentFromId('i1').actions[2];
+      Object.assign(legacy, { llm: 'agentplatform', model: 'gemini-2.5-flash',
+        modelName: 'eu ・ gemini-2.5-flash', agentPlatformServer: 'eu' });
+      delete legacy.vllmServer;
+      const report = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai2',
+        fields: { llm: 'anthropic', model: 'claude-sonnet-4' } }]);
+      expect(report.ok).toBe(true);
+      const after = stored('i1', 2);
+      expect(after.llm).toBe('anthropic');
+      expect('agentPlatformServer' in after).toBe(false);
+      expect('llmServer' in after).toBe(false);
     });
 
     it('leaves an existing model alone, even one the project does not have, when update_action does not set it', async () => {
