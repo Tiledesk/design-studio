@@ -12,6 +12,8 @@ import { TYPE_ACTION, actionEndsTheFlow } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
+import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
+import { actionTypeRefusal, resolveAttachedServers } from './agent-chat-capabilities.rules';
 
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
  *  of the AI chat: once it has paused (the first pass), and again after the connector service's
@@ -162,6 +164,20 @@ export class FlowOpsService implements OnDestroy {
    *  instead of inside validation. */
   private subagentBlocks = new Map<string, Set<string>>();
 
+  /** Where apply() reads what this project can build with. Set by the host
+   *  when the chat attaches; null means nothing is checked, which is also how
+   *  every spec that predates it runs. */
+  private capabilitiesSource: (() => Promise<CapabilitiesSnapshot>) | null = null;
+
+  /** The capabilities for the batch being applied, read by apply() before
+   *  validation (which is synchronous and cannot fetch them) -- the same
+   *  arrangement as subagentBlocks. Null when the batch needs none. */
+  private capabilities: CapabilitiesSnapshot | null = null;
+
+  public setCapabilitiesSource(source: (() => Promise<CapabilitiesSnapshot>) | null): void {
+    this.capabilitiesSource = source;
+  }
+
   constructor(
     private intentService: IntentService,
     private connectorService: ConnectorService,
@@ -197,11 +213,33 @@ export class FlowOpsService implements OnDestroy {
       };
     }
     this.subagentBlocks = subagentFetch.blocks;
+    this.capabilities = null;
+    if (this.capabilitiesSource && this.batchNeedsCapabilities(ops)) {
+      try {
+        this.capabilities = await this.capabilitiesSource();
+      } catch (err) {
+        this.forgetLastBatch();
+        return {
+          ok: false, rejected_before_applying: true,
+          results: [{ op: '(none)', ok: false,
+            error: `Could not read what this project can use (${String(err?.message ?? err)}). `
+              + `Nothing was applied; retry the call.` }]
+        };
+      }
+    }
     const validation = ops.map(op => this.validate(op));
     // V3 agents only: a legacy flow is validated exactly as before.
     if (this.dashboardService.isV3 && validation.every(r => r.ok)) {
       this.validateV3Batch(ops).forEach((error, i) => {
         if (error) { validation[i] = { op: ops[i].op, ok: false, error }; }
+      });
+    }
+    // After the shape checks, like the V3 rules: a malformed op is reported as
+    // malformed, not as unavailable.
+    if (this.capabilities && validation.every(r => r.ok)) {
+      ops.forEach((op, i) => {
+        const error = this.capabilityError(op);
+        if (error) { validation[i] = { op: op.op, ok: false, error }; }
       });
     }
     if (validation.some(r => !r.ok)) {
@@ -211,6 +249,9 @@ export class FlowOpsService implements OnDestroy {
       this.forgetLastBatch();
       return { ok: false, rejected_before_applying: true, results: validation };
     }
+    // What is stored for an attached MCP server is built from the capabilities,
+    // never taken from the agent: it names a server and its tools, nothing else.
+    ops = this.withResolvedServers(ops);
 
     // Measured rather than assumed: each of updateIntent / saveNewIntent /
     // deleteIntentNew pushes exactly one entry today, but the honest count of
@@ -968,6 +1009,84 @@ export class FlowOpsService implements OnDestroy {
       }
     }
     return null;
+  }
+
+  /** Whether any op in the batch adds an action or attaches MCP servers --
+   *  the only things the capabilities decide. A batch that only moves, renames,
+   *  connects or deletes never waits on them. */
+  private batchNeedsCapabilities(ops: FlowOp[]): boolean {
+    return ops.some((op: any) =>
+      op?.op === 'add_action'
+      || (op?.op === 'add_intent' && Array.isArray(op.actions) && op.actions.length > 0)
+      || (op?.op === 'update_action' && op.fields && 'servers' in op.fields));
+  }
+
+  private existingActionType(op: any): string | null {
+    const intent = this.intentService.getIntentFromId(op.intent_id);
+    const action = (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id);
+    return action?._tdActionType ?? null;
+  }
+
+  /** Refusal text for an op that breaks the project's capabilities, or null.
+   *  Adding checks the type; any ai_prompt that sets `servers` checks those.
+   *  update_action never checks the type: an action already on the canvas stays
+   *  editable even if the project could no longer add it. */
+  private capabilityError(op: FlowOp): string | null {
+    const snapshot = this.capabilities;
+    const check = (type: string, fields: Record<string, any> | undefined, adding: boolean): string | null => {
+      if (adding) {
+        const refusal = actionTypeRefusal(type, snapshot.capabilities);
+        if (refusal) { return refusal; }
+      }
+      if (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields) {
+        return resolveAttachedServers(fields.servers, snapshot).error ?? null;
+      }
+      return null;
+    };
+    switch (op.op) {
+      case 'add_action':
+        return check(op.type, op.fields, true);
+      case 'add_intent':
+        for (const action of op.actions || []) {
+          const error = check(action.type, action.fields, true);
+          if (error) { return error; }
+        }
+        return null;
+      case 'update_action': {
+        const type = this.existingActionType(op);
+        return type ? check(type, op.fields, false) : null;
+      }
+      default:
+        return null;
+    }
+  }
+
+  /** A copy of `ops` whose ai_prompt `servers` are replaced by what
+   *  resolveAttachedServers built. Only called once validation has passed,
+   *  so every resolution here succeeds. */
+  private withResolvedServers(ops: FlowOp[]): FlowOp[] {
+    const snapshot = this.capabilities;
+    if (!snapshot) { return ops; }
+    const resolve = (type: string, fields?: Record<string, any>): Record<string, any> | undefined =>
+      (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields)
+        ? { ...fields, servers: resolveAttachedServers(fields.servers, snapshot).servers }
+        : fields;
+    return ops.map((op): FlowOp => {
+      switch (op.op) {
+        case 'add_action':
+          return { ...op, fields: resolve(op.type, op.fields) };
+        case 'add_intent':
+          return op.actions
+            ? { ...op, actions: op.actions.map(a => ({ ...a, fields: resolve(a.type, a.fields) })) }
+            : op;
+        case 'update_action': {
+          const type = this.existingActionType(op);
+          return type ? { ...op, fields: resolve(type, op.fields) } : op;
+        }
+        default:
+          return op;
+      }
+    });
   }
 
   /** Whether a `callsubagent` (`TYPE_ACTION.REPLACE_BOTV4`)'s `fields` name a
