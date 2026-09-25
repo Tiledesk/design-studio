@@ -9,6 +9,9 @@
 
 # this branch 23/09/2026
 
+- **added**: the AI chat that builds agents asks the studio what the project can use before it builds: the actions of the element panel for this agent (the ones a plan does not unlock are reported as such) and the MCP servers an AI Prompt can call, native and the project's own, with their tools
+- **changed**: the AI chat can no longer add an action the project does not have, or attach an MCP server or tool the project does not have: the change is refused with the reason, and nothing is applied. What is stored for an attached server is built by the studio, never taken from the chat
+- **changed**: the element panel and the AI chat read the list of available actions from one place, so they cannot disagree
 - **fixed**: quando la chat AI finisce di lavorare, i blocchi e i collegamenti sullo stage vengono completati subito. Prima il controllo partiva a tempo, uno e tre secondi dopo l'ultima modifica, e se l'agente continuava a lavorare piu' a lungo restavano blocchi con i collegamenti non disegnati, che si sistemavano solo ricaricando la pagina. Ora e' la chat stessa a dire quando ha finito, e vale anche quando il lavoro finisce per un errore o viene annullato
 - **fixed**: nelle conversazioni lunghe con la chat AI le regole degli agenti V3 non si perdono piu'. La versione dell'agente accompagna ogni risposta che il Design Studio da' alla chat, quindi anche dopo molti scambi le modifiche continuano a seguire le regole giuste. Prima la versione veniva comunicata una volta sola, all'inizio, e in una conversazione molto lunga la chat poteva tornare a costruire con le regole degli agenti precedenti
 

@@ -6,6 +6,7 @@ import {
 import { BehaviorSubject, of } from 'rxjs';
 import { AgentChatHostService } from './agent-chat-host.service';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -568,7 +569,13 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
         { provide: AppConfigService,
           useValue: { getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } },
         { provide: AgentChatFamilyService, useValue: familyServiceStub },
-        { provide: FaqService, useValue: faqServiceStub }
+        { provide: FaqService, useValue: faqServiceStub },
+        // Not what these tests are about -- they never call get_project_capabilities
+        // -- but AgentChatHostService now depends on it, and the real service
+        // would reach for HttpClient, which this module does not provide.
+        { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
+            { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
+              customServerConfigs: {} }) } }
       ]
     });
     host = TestBed.inject(AgentChatHostService);

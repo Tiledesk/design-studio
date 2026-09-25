@@ -7,6 +7,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -15,6 +16,7 @@ describe('AgentChatHostService', () => {
   let service: AgentChatHostService;
   let flowOps: any;
   let familyService: any;
+  let capabilitiesService: any;
   let registered: Record<string, Function>;
   let created: any;
   let createdHosts: any[];
@@ -58,7 +60,8 @@ describe('AgentChatHostService', () => {
       redrawAfterRun: jasmine.createSpy('redrawAfterRun').and.returnValue(Promise.resolve()),
       readFlow: jasmine.createSpy('readFlow').and.returnValue({ id_faq_kb: 'kb1', intents: [] }),
       apply: jasmine.createSpy('apply').and.returnValue(
-        Promise.resolve({ ok: true, rejected_before_applying: false, results: [] }))
+        Promise.resolve({ ok: true, rejected_before_applying: false, results: [] })),
+      setCapabilitiesSource: jasmine.createSpy('setCapabilitiesSource')
     };
 
     tokenChanged = new Subject<string>();
@@ -66,6 +69,12 @@ describe('AgentChatHostService', () => {
     dashboardService = {
       projectID: 'p1', id_faq_kb: 'kb1', selectedChatbot$: selectedChatbot
     };
+
+    capabilitiesService = { snapshot: jasmine.createSpy('snapshot').and.returnValue(Promise.resolve({
+      capabilities: { chatbot_subtype: 'chatbot', subagent: false,
+        actions: [{ type: 'reply', status: 'available' }], mcp_servers: [] },
+      customServerConfigs: { 'Acme CRM': { name: 'Acme CRM', url: 'https://crm.example.com/mcp', transport: 'x' } }
+    })) };
 
     TestBed.configureTestingModule({
       providers: [
@@ -87,7 +96,8 @@ describe('AgentChatHostService', () => {
               subagents: [{ _id: 'sub1', name: 'Alfa' }] }),
             contains: (id: string) => Promise.resolve(['parent1', 'sub1'].includes(id)),
             createSubagent: (name: string) => Promise.resolve({ _id: 'new1', name })
-          } }
+          } },
+        { provide: AgentChatCapabilitiesService, useValue: capabilitiesService }
       ]
     });
     service = TestBed.inject(AgentChatHostService);
@@ -144,11 +154,11 @@ describe('AgentChatHostService', () => {
     expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
   });
 
-  it('registers exactly the five client tools', async () => {
+  it('registers exactly the six client tools', async () => {
     await service.attach(document.createElement('iframe'));
     expect(Object.keys(registered).sort())
       .toEqual(['apply_flow_patch', 'create_subagent', 'get_canvas_selection', 'get_flow',
-                'open_flow']);
+                'get_project_capabilities', 'open_flow']);
   });
 
   // A session the studio opens by itself declares AGENT_CHAT_CLIENT_TOOLS:
@@ -156,6 +166,23 @@ describe('AgentChatHostService', () => {
   it('declares the same tools it registers', async () => {
     await service.attach(document.createElement('iframe'));
     expect([...AGENT_CHAT_CLIENT_TOOLS].sort()).toEqual(Object.keys(registered).sort());
+  });
+
+  it('answers get_project_capabilities with the capabilities and nothing private', async () => {
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['get_project_capabilities']({});
+    expect(answer.actions).toEqual([{ type: 'reply', status: 'available' }]);
+    expect(answer.mcp_servers).toEqual([]);
+    expect(JSON.stringify(answer)).not.toContain('crm.example.com');
+    expect(answer.customServerConfigs).toBeUndefined();
+  });
+
+  it('hands flow-ops the same capabilities to check patches against', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect(flowOps.setCapabilitiesSource).toHaveBeenCalled();
+    const source = flowOps.setCapabilitiesSource.calls.mostRecent().args[0];
+    const snapshot = await source();
+    expect(snapshot.customServerConfigs['Acme CRM'].url).toBe('https://crm.example.com/mcp');
   });
 
   it('answers get_flow from the canvas', async () => {
@@ -287,7 +314,7 @@ describe('AgentChatHostService', () => {
     const iframe = document.createElement('iframe');
     await service.attach(iframe);
     expect(iframe.getAttribute('src')).toBeNull();
-    expect(Object.keys(registered).length).toBe(5);
+    expect(Object.keys(registered).length).toBe(6);
   });
 
   it('emits the flow ops report on applied$ after apply_flow_patch', async () => {
@@ -363,7 +390,10 @@ describe('AgentChatHostService', () => {
         { provide: DashboardService, useValue: { selectedChatbot$: new BehaviorSubject(null) } },
         { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: new Subject<string>() } },
         { provide: AppConfigService, useValue: { getConfig: () => ({}) } },
-        { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } }
+        { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } },
+        { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
+            { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
+              customServerConfigs: {} }) } }
       ]
     });
     expect(TestBed.inject(AgentChatHostService).isConfigured()).toBe(false);

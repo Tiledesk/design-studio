@@ -10,6 +10,7 @@ import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 
 /** The client tools this host registers on the chat. A session opened on the
@@ -17,7 +18,8 @@ import { V3_FLOW_RULES } from './v3-flow-rules';
  *  same list the chat declares when it attaches, or the runtime would offer
  *  the model a tool nobody answers. The host spec keeps the two in step. */
 export const AGENT_CHAT_CLIENT_TOOLS: string[] = [
-  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent'
+  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent',
+  'get_project_capabilities'
 ];
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -77,7 +79,8 @@ export class AgentChatHostService {
     private intentService: IntentService,
     private tiledeskAuthService: TiledeskAuthService,
     private flowOps: FlowOpsService,
-    private family: AgentChatFamilyService
+    private family: AgentChatFamilyService,
+    private capabilities: AgentChatCapabilitiesService
   ) {
     this.config = readAgentChatConfig(this.appConfigService.getConfig());
     // The chat is handed the token once, at `hello`, and then talks to the
@@ -179,6 +182,14 @@ export class AgentChatHostService {
       const selected = this.intentService.intentSelected;
       return { intent_ids: selected ? [selected.intent_id] : [] };
     });
+
+    // What this project can build with: the element panel's own action list
+    // and the MCP servers an ai_prompt may attach. The agent reads it; flow-ops
+    // enforces the same answer, so a patch the tool would not have suggested
+    // is refused rather than applied.
+    this.registerTool('get_project_capabilities', async () =>
+      (await this.capabilities.snapshot()).capabilities);
+    this.flowOps.setCapabilitiesSource(() => this.capabilities.snapshot());
 
     this.registerTool('apply_flow_patch', async (args) => {
       const declared = args?.['faq_kb_id'] as string | undefined;
