@@ -97,24 +97,52 @@ export class AgentChatCapabilitiesService {
    *  an ai_prompt is not invisible to the MCP dialogs. Called by flow-ops
    *  right before it applies a patch that attaches such a native.
    *
-   *  The integration is read fresh (`mcpService.loadMcpServers()`, not the
-   *  cache this service otherwise keeps): a user may have configured or
-   *  removed a server while the current snapshot was still valid, and
-   *  writing over that would lose it. The native's own catalogue entry --
-   *  id, name, transport, description, discovered tools -- comes from
+   *  The integration is read through `mcpService.loadMcpServers()`, not the
+   *  snapshot this service otherwise caches for up to a minute -- but that
+   *  call itself goes through ProjectService's own 60s integrations cache,
+   *  the same one the MCP dialogs read through. Saving (this method's own
+   *  `saveMcpIntegration` below, or the dialogs') clears that cache, so a
+   *  write from this tab is always seen; a write from another tab in the
+   *  last 60 seconds might not be, and would be overwritten by the save
+   *  below -- the same read-modify-write race the dialogs are exposed to,
+   *  not a new one this method introduces. The native's own catalogue entry
+   *  -- id, name, transport, description, discovered tools -- comes from
    *  `nativeConfigs` instead, since re-fetching it here would mean
    *  reconnecting to every native again for what loadMcp() already read.
    *
-   *  Errors -- from either read -- are left to propagate: flow-ops turns a
-   *  rejection here into a refusal, applying nothing. */
+   *  An id already configured is left alone. One that is not, but has no
+   *  usable catalogue entry -- unknown to the catalogue, or discovered with
+   *  no tools at all (its Connect failed on the load that built
+   *  `nativeConfigs`) -- cannot be added at all: silently dropping it would
+   *  let the caller believe the native is now configured when it is not.
+   *  That throws instead, naming every such id, so flow-ops refuses the
+   *  whole batch and the agent can retry rather than proceed on a false
+   *  premise.
+   *
+   *  Every other error -- from either read, or from the save -- is left to
+   *  propagate: flow-ops turns a rejection here into a refusal, applying
+   *  nothing. */
   public async configureNativeServers(ids: string[]): Promise<void> {
     const part = await this.mcpPart();
     const current = await this.mcpService.loadMcpServers();
-    const alreadyConfigured = (entry: McpServer): boolean =>
-      current.some(c => (entry.id && c.id === entry.id) || c.name === entry.name);
-    const missing = ids
-      .map(id => part.nativeConfigs[id])
-      .filter((entry): entry is McpServer => !!entry && !alreadyConfigured(entry));
+    const missing: McpServer[] = [];
+    const unresolved: string[] = [];
+    for (const id of ids) {
+      const entry = part.nativeConfigs[id];
+      const alreadyConfigured = entry
+        ? current.some(c => (entry.id && c.id === entry.id) || c.name === entry.name)
+        : current.some(c => c.id === id);
+      if (alreadyConfigured) { continue; }
+      if (!entry || (entry.tools || []).length === 0) {
+        unresolved.push(id);
+        continue;
+      }
+      missing.push(entry);
+    }
+    if (unresolved.length > 0) {
+      throw new Error(`No usable MCP catalogue entry for ${unresolved.join(', ')}: it is either `
+        + `not a known native, or its tools could not be discovered.`);
+    }
     if (missing.length === 0) { return; }
     await this.mcpService.saveMcpIntegration([...current, ...missing]);
     this.invalidate();

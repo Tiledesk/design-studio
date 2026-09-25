@@ -203,6 +203,47 @@ describe('FlowOpsService — project capabilities', () => {
     expect(calls).toEqual(['configure:tiledesk-data-table', 'updateIntent']);
   });
 
+  it('adds the unconfigured native before applying an add_intent whose inline action attaches it, calling the configurer once', async () => {
+    intentService.createNewIntent = jasmine.createSpy('createNewIntent')
+      .and.callFake(() => anIntent('new-id', 'ask'));
+    intentService.addNewIntentToListOfIntents = jasmine.createSpy('addNewIntentToListOfIntents')
+      .and.callFake((intent: Intent) => { intentService.listOfIntents.push(intent); });
+    const calls: string[] = [];
+    const configurer = jasmine.createSpy('configurer').and.callFake(async (ids: string[]) => {
+      calls.push(`configure:${ids.join(',')}`);
+    });
+    intentService.saveNewIntent = jasmine.createSpy('saveNewIntent').and.callFake(async () => {
+      calls.push('saveNewIntent');
+      return true;
+    });
+    service.setNativeConfigurer(configurer);
+    const report = await service.apply([{ op: 'add_intent', intent_display_name: 'ask',
+      actions: [{ type: 'ai_prompt', fields: { question: 'q',
+        servers: [{ id: 'tiledesk-data-table', tools: ['GET_ROW'] }] } }] }]);
+    expect(report.ok).toBe(true);
+    expect(configurer).toHaveBeenCalledTimes(1);
+    expect(configurer).toHaveBeenCalledWith(['tiledesk-data-table']);
+    expect(calls).toEqual(['configure:tiledesk-data-table', 'saveNewIntent']);
+  });
+
+  it('adds the unconfigured native before applying an update_action on an existing ai_prompt, calling the configurer once', async () => {
+    const calls: string[] = [];
+    const configurer = jasmine.createSpy('configurer').and.callFake(async (ids: string[]) => {
+      calls.push(`configure:${ids.join(',')}`);
+    });
+    intentService.updateIntent = jasmine.createSpy('updateIntent').and.callFake(async () => {
+      calls.push('updateIntent');
+      return true;
+    });
+    service.setNativeConfigurer(configurer);
+    const report = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai1',
+      fields: { servers: [{ id: 'tiledesk-data-table', tools: ['GET_ROW'] }] } }]);
+    expect(report.ok).toBe(true);
+    expect(configurer).toHaveBeenCalledTimes(1);
+    expect(configurer).toHaveBeenCalledWith(['tiledesk-data-table']);
+    expect(calls).toEqual(['configure:tiledesk-data-table', 'updateIntent']);
+  });
+
   it('does not call the configurer when every attached server is already configured', async () => {
     const configurer = jasmine.createSpy('configurer').and.returnValue(Promise.resolve());
     service.setNativeConfigurer(configurer);

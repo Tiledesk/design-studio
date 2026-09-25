@@ -286,5 +286,26 @@ describe('AgentChatCapabilitiesService', () => {
       await expectAsync(service.configureNativeServers(['tiledesk-data-table']))
         .toBeRejectedWithError('network down');
     });
+
+    // Silently dropping an id nobody could add would leave flow-ops thinking
+    // the batch is safe to apply, with the native still unconfigured.
+    it('throws naming the id when the requested native has no catalogue entry, and saves nothing', async () => {
+      mcpService.loadNativeServers.and.returnValue(Promise.resolve([]));
+      mcpService.loadMcpServers.and.returnValue(Promise.resolve([]));
+      await expectAsync(service.configureNativeServers(['tiledesk-data-table']))
+        .toBeRejectedWithError(/tiledesk-data-table/);
+      expect(mcpService.saveMcpIntegration).not.toHaveBeenCalled();
+    });
+
+    it('treats a catalogue entry with no discovered tools (a failed connect) as missing, and saves nothing', async () => {
+      mcpService.loadNativeServers.and.returnValue(Promise.resolve([
+        { id: 'tiledesk-data-table', name: 'Tiledesk Data Table', native: true, transport: 'streamable_http' }
+      ]));
+      mcpService.connectNativeServer.and.returnValue(Promise.reject(new Error('502')));
+      mcpService.loadMcpServers.and.returnValue(Promise.resolve([]));
+      await expectAsync(service.configureNativeServers(['tiledesk-data-table']))
+        .toBeRejectedWithError(/tiledesk-data-table/);
+      expect(mcpService.saveMcpIntegration).not.toHaveBeenCalled();
+    });
   });
 });
