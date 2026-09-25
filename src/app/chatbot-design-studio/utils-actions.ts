@@ -279,6 +279,44 @@ export function isActionAvailableInSubagentContext(action: { subagent_visibility
     return true;
 }
 
+/** One action as the element panel offers it: present in the menu, and either
+ *  usable (`canLoad`) or greyed out behind an upgrade prompt (`!canLoad`). */
+export interface ActionAvailability {
+    entry: (typeof ACTIONS_LIST)[string];
+    type: string;
+    plan?: PLAN_NAME;
+    canLoad: boolean;
+}
+
+/**
+ * availableActionEntries
+ * The single answer to "which actions can this flow use", shared by the element
+ * panel and the agent chat's get_project_capabilities so the two cannot disagree.
+ * An entry is kept when ProjectPlanUtils left it active, the chatbot subtype is
+ * one of its chatbot_types (a subagent counts as a chatbot), and its
+ * subagent_visibility allows the context. Reads `list`, never writes it:
+ * ProjectPlanUtils.checkIfActionIsInChatbotType mutates status for good, which
+ * would make a second subtype's answer depend on the first one asked.
+ */
+export function availableActionEntries(
+    subtype: string | undefined | null,
+    canLoad: (type: TYPE_ACTION | TYPE_ACTION_VXML, plan: PLAN_NAME) => boolean,
+    list: typeof ACTIONS_LIST = ACTIONS_LIST
+): ActionAvailability[] {
+    const chatbotType = resolveChatbotSubtype(subtype);
+    const isSubagent = isSubagentSubtype(subtype);
+    return Object.values(list)
+        .filter(el => el.status !== 'inactive'
+            && el.chatbot_types.includes(chatbotType)
+            && isActionAvailableInSubagentContext(el, isSubagent))
+        .map(el => ({
+            entry: el,
+            type: el.type as string,
+            plan: el.plan,
+            canLoad: el.plan ? canLoad(el.type, el.plan) : true
+        }));
+}
+
 /**
  * isReturnStackIntent
  * true quando il blocco contiene SOLO l'azione "Return to parent agent":
