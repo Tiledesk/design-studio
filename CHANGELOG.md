@@ -8,14 +8,11 @@
 *Tiledesk SRL*
 
 
-# this branch 25/09/2026
-- **changed**: i pannelli di sinistra si riaprono come li hai lasciati su quell'agent: la chat AI e l'elenco dei blocchi, ciascuno per agent. Senza una scelta precedente si parte con la chat aperta e i blocchi chiusi. Prima la chat non si limitava a partire aperta, si riapriva a ogni cambio di flusso: la chiudevi, passavi a un subagent e tornava
-- **fixed**: i collegamenti disegnati in ritardo non si perdono piu'. Disegnarne uno richiede che entrambi i blocchi siano gia' sullo schermo, e con una modifica ampia della chat AI il secondo poteva non esserlo ancora: quel collegamento spariva e tornava solo ricaricando la pagina. Ora il canvas ricontrolla e completa quello che manca
-- **changed**: negli agenti V3 l'elenco dei blocchi mostra per ogni blocco l'icona della sua azione invece di un'icona uguale per tutti, e non mostra piu' il contatore delle azioni, che su questi agenti vale sempre uno
-- **changed**: nell'azione di risposta lo spazio sotto le impostazioni e' piu' ampio
-
-# this branch 23/09/2026
-- **fixed**: quando la chat AI finisce di lavorare, i blocchi e i collegamenti sullo stage vengono completati subito. Prima il controllo partiva a tempo, uno e tre secondi dopo l'ultima modifica, e se l'agente continuava a lavorare piu' a lungo restavano blocchi con i collegamenti non disegnati, che si sistemavano solo ricaricando la pagina. Ora e' la chat stessa a dire quando ha finito, e vale anche quando il lavoro finisce per un errore o viene annullato
+# 1.40.15-rc13
+- **changed**: the left panels come back the way you left them on that agent — the AI chat and the blocks list, remembered per agent. With no earlier choice the chat is open and the blocks list closed. The chat did not merely start open before: it reopened on every flow switch, so closing it and stepping into a subagent brought it back
+- **fixed**: a connector is no longer lost when the block at its far end is drawn late. Drawing one needs both blocks on screen, and after a large AI chat edit the second could still be missing: that connector disappeared until the page was reloaded. The canvas now checks and completes what is missing
+- **changed**: on V3 agents each row of the blocks list carries its own action's icon instead of one icon for all, and drops the action counter, which on those agents is always one
+- **changed**: in the reply action there is more room below the settings
 
 # 1.40.15-rc12
 - **added**: three actions on every release in the history. **View** shows that version full screen, read-only, without leaving the Design Studio. **Republish** puts it back online and leaves the flow you are editing alone: it is the button formerly called *Restore*. **Restore** does the opposite, cannot be undone, and says what will be lost before you confirm
