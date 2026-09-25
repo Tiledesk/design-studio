@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { McpService } from 'src/app/services/mcp.service';
 import { McpServer } from 'src/app/models/mcp.model';
@@ -51,14 +51,19 @@ export class AgentChatCapabilitiesService {
 
   constructor(
     private dashboardService: DashboardService,
-    private projectPlanUtils: ProjectPlanUtils,
+    private injector: Injector,
     private mcpService: McpService
   ) {}
 
   public async snapshot(): Promise<CapabilitiesSnapshot> {
     const subtype = this.dashboardService.selectedChatbot?.subtype || TYPE_CHATBOT.CHATBOT;
+    // Resolved here, not injected: ProjectPlanUtils reads the current project
+    // in its constructor, and this service is built with the agent-chat host
+    // when the dashboard starts -- before any project is loaded. Built that
+    // early it throws, and the flow never opens.
+    const projectPlanUtils = this.injector.get(ProjectPlanUtils);
     const actions: ActionCapability[] = availableActionEntries(subtype,
-      (type, plan) => this.projectPlanUtils.checkIfCanLoad(type, plan))
+      (type, plan) => projectPlanUtils.checkIfCanLoad(type, plan))
       .map(a => a.canLoad
         ? { type: a.type, status: 'available' as const }
         : { type: a.type, status: 'needs_upgrade' as const, plan: String(a.plan) });

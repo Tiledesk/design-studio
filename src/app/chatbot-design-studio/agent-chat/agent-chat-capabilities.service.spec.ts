@@ -11,6 +11,7 @@ describe('AgentChatCapabilitiesService', () => {
   let dashboardService: any;
   let mcpService: any;
   let planUtils: any;
+  let planUtilsBuilt: number;
   let savedList: string;
 
   beforeEach(() => {
@@ -42,10 +43,21 @@ describe('AgentChatCapabilitiesService', () => {
         AgentChatCapabilitiesService,
         { provide: DashboardService, useValue: dashboardService },
         { provide: McpService, useValue: mcpService },
-        { provide: ProjectPlanUtils, useValue: planUtils }
+        { provide: ProjectPlanUtils, useFactory: () => { planUtilsBuilt++; return planUtils; } }
       ]
     });
+    planUtilsBuilt = 0;
     service = TestBed.inject(AgentChatCapabilitiesService);
+  });
+
+  // ProjectPlanUtils reads the current project in its constructor. This
+  // service is built with the agent-chat host at dashboard start, before a
+  // project is loaded; building ProjectPlanUtils then threw and the flow never
+  // opened (found on stage).
+  it('does not build ProjectPlanUtils until capabilities are asked for', async () => {
+    expect(planUtilsBuilt).toBe(0);
+    await service.snapshot();
+    expect(planUtilsBuilt).toBe(1);
   });
 
   afterEach(() => {
