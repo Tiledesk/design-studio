@@ -7,6 +7,181 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 23/09/2026
+
+- **fixed**: quando la chat AI finisce di lavorare, i blocchi e i collegamenti sullo stage vengono completati subito. Prima il controllo partiva a tempo, uno e tre secondi dopo l'ultima modifica, e se l'agente continuava a lavorare piu' a lungo restavano blocchi con i collegamenti non disegnati, che si sistemavano solo ricaricando la pagina. Ora e' la chat stessa a dire quando ha finito, e vale anche quando il lavoro finisce per un errore o viene annullato
+- **fixed**: nelle conversazioni lunghe con la chat AI le regole degli agenti V3 non si perdono piu'. La versione dell'agente accompagna ogni risposta che il Design Studio da' alla chat, quindi anche dopo molti scambi le modifiche continuano a seguire le regole giuste. Prima la versione veniva comunicata una volta sola, all'inizio, e in una conversazione molto lunga la chat poteva tornare a costruire con le regole degli agenti precedenti
+
+
+# this branch 22/09/2026
+
+- **changed**: la versione con cui nascono i sub agent degli agenti V3, creati dal pannello o dalla chat AI, si imposta per deploy con la variabile CHATBOT_VERSION, senza ricompilare. Se il deploy non la imposta resta il valore di sempre
+- **changed**: nell'intestazione della chat AI il pulsante di chiusura si vede bene: prima era grigio chiarissimo su bianco, ora ha il blu del titolo ed e' un po' piu' grande
+- **fixed**: con la chat AI aperta il pannello dei log non finisce piu' sotto l'anteprima del widget: la sua larghezza segue lo spazio rimasto, anche quando la chat si apre, si chiude o viene ridimensionata
+- **changed**: quando compare un nuovo blocco sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) la vista resta dove l'hai lasciata: il blocco non lampeggia piu' e lo stage non si sposta per centrarsi su di lui. I suoi collegamenti vengono comunque disegnati subito
+
+
+# this branch 21/09/2026
+
+- **changed**: le tendine di scelta si chiudono da sole appena si scorre la pagina o un pannello: prima restavano aperte, staccate dal campo a cui appartengono. Scorrendo dentro l'elenco delle opzioni la tendina resta aperta
+- **changed**: nell'intestazione delle impostazioni AI l'anteprima si vede sempre per intero, aperta o chiusa, e il system context sta in fondo su una riga sola che finisce con i puntini, senza l'etichetta davanti. Il titolo non viene piu' coperto quando le opzioni sono tante
+- **changed**: negli agenti V3 il blocco del fallback vuoto e' piu' stretto e il suo titolo e' centrato nella pastiglia, e l'icona del blocco di avvio e' bianca con il contorno verde
+- **changed**: negli agenti V3 il punto di uscita dei blocchi prende la grafica del ramo "vero" delle condizioni: pallino grande e verde, sia quando e' libero sia quando e' collegato, al posto di quello piccolo e bianco
+- **changed**: negli agenti V3 il blocco del fallback, finche' resta vuoto come nasce, si presenta come il blocco di avvio: forma a pastiglia invece della scheda degli altri blocchi, e il suo punto di uscita resta grigio, dentro al blocco sul lato destro. Se al fallback viene aggiunta un'action torna un blocco come gli altri, punto di uscita verde compreso
+- **changed**: negli agenti V3 il blocco di avvio e' piu' compatto: sotto il titolo non resta piu' lo spazio che negli altri blocchi separa il titolo dall'action
+
+
+# this branch 18/09/2026
+
+- **changed**: quando la chat AI finisce di lavorare il flusso viene riordinato da sinistra a destra, un passo per colonna e i rami uno sotto l'altro senza sovrapposizioni, e la vista si adatta all'intero flusso. I collegamenti seguono i blocchi, compresi quelli che la chat ha spostato lei stessa. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
+- **fixed**: all'apertura di un agente la chat AI, che ora si apre da sola, restava bianca e non partiva; ora si carica subito
+- **fixed**: quando la chat AI sposta i blocchi sulla canvas, i collegamenti li seguono. Prima restavano disegnati dov'erano i blocchi prima e si sistemavano solo ricaricando la pagina
+
+# this branch 17/09/2026
+
+- **changed**: aprendo un agente, V3 o precedente, la chat AI è già aperta. Mentre è aperta il pulsante per mostrarla sparisce dall'header e la chat si chiude dalla sua barra in alto; quando è chiusa il pulsante ricompare con una nuova icona e il suggerimento «Mostra chat». Sugli agenti V3 il pannello laterale dei blocchi e dei sub agent parte chiuso
+- **changed**: quando la chat AI finisce di aggiungere, eliminare o ricollegare blocchi, tutto il flusso viene riordinato da sinistra a destra: un passo per colonna, i rami uno sotto l'altro senza sovrapposizioni, il fallback e i blocchi scollegati in fondo. I collegamenti seguono i blocchi e la vista si adatta all'intero flusso. Il riordino si annulla in un solo passo e l'Annulla della chat lo toglie insieme all'ultima modifica; le modifiche solo di testo non spostano nulla
+- **fixed**: quando la chat AI finisce di modificare il flusso, il Design Studio controlla che tutti i collegamenti previsti siano disegnati sullo stage e completa quelli mancanti. Prima alcuni collegamenti comparivano solo ricaricando la pagina
+- **changed**: sugli agenti V3 la chat AI riceve le regole dell'editor V3 e le sue modifiche vengono controllate: una sola action per blocco, domanda e risposta in due blocchi, risposta dell'utente che prosegue dal collegamento del blocco, fallback senza action, avvio e fallback non eliminabili ne' collegabili come destinazione, nessun collegamento dopo un blocco che chiude la conversazione, chiusura della conversazione solo dietro un pulsante. Una modifica che viola una regola viene rifiutata per intero indicando la regola, e la chat la corregge. Sugli agenti precedenti la chat funziona come prima
+- **changed**: i sub agent creati da un agente V3, dal pannello o dalla chat AI, nascono V3
+- **changed**: ogni volta che un nuovo blocco compare sullo stage (creato a mano, incollato, trascinato da un collegamento o aggiunto dalla chat AI) viene evidenziato e lo stage si centra su di lui, con la stessa animazione della simulazione con il widget. Se ne arrivano piu' insieme, lo stage si centra sull'ultimo
+- **fixed**: quando un nuovo blocco compare sullo stage vengono disegnati e aggiornati tutti i suoi collegamenti, sia in uscita sia in entrata. Dopo l'eliminazione di un blocco i collegamenti verso i blocchi creati in seguito venivano azzerati invece di essere disegnati; i blocchi riposizionati dalla chat AI vengono ridisegnati alla nuova posizione
+- **changed**: cambiare agente dal selettore dell'header, eliminare un agente ed eliminare un sub agent non ricaricano piu' la pagina: il canvas si aggiorna al suo posto, la chat AI resta aperta e l'header (elenco agenti, webhook, test in corso) segue l'agente aperto
+
+# this branch 16/09/2026
+
+- **changed**: unito il Design Studio V3 con la chat AI integrata: su questo branch gli agenti V3 si creano e si modificano descrivendoli a parole nella chat AI dentro il Design Studio, insieme ai sub agent e alle impostazioni del modello della chat. La vecchia modale «Crea agente con l'AI» e il pannello AI con la storia delle versioni non ci sono
+- **removed**: tolta la creazione di agenti con l'AI a partire da un prompt, insieme al pannello AI per modificarli e alla loro storia delle versioni: spariscono il pulsante nella sidebar e il pulsante «AI» nell'header, e il Design Studio non contatta piu' il servizio di generazione. Gli agenti gia' creati restano e si aprono come prima con l'editor V3; pubblicazione, cronologia delle release, selettore ed eliminazione degli agenti funzionano come prima
+- **changed**: negli agenti creati con l'AI la chiusura della conversazione non compare piu' dentro il flusso: c'e' soltanto se l'utente la sceglie premendo un pulsante, ad esempio "non ho altre domande, chiudi la chat", e dopo quella scelta non segue nient'altro
+- **changed**: negli agenti V3 il blocco che chiede una risposta all'utente usa lo stesso punto di uscita di tutti gli altri blocchi, quello sul bordo in basso a destra, invece di un secondo pallino appeso di lato alla action: si collega come ogni altro blocco e la destinazione si sceglie dal pannello del blocco. Gli agenti creati con le versioni precedenti restano come sono
+
+# this branch 15/09/2026
+
+- **changed**: quale versione del Design Studio si apre su un agente dipende ora solo dall'etichetta che l'agente porta con se', dichiarata da chi lo crea: la data di creazione non viene piu' guardata. Gli agenti che non la portano, cioe' tutti quelli esistenti, si aprono con l'editor precedente
+- **added**: la versione dichiarata dagli agenti creati con l'AI si imposta per ambiente, accanto alle altre impostazioni, ed e' indipendente dalla versione del prodotto
+- **changed**: gli agenti creati con l'AI non chiudono piu' la conversazione in fondo al percorso: l'ultimo messaggio resta leggibile e l'esito del flusso si vede
+- **changed**: gli agenti creati e corretti con l'AI nascono piu' compatti e si appoggiano di piu' all'intelligenza artificiale: una sola ricerca nella knowledge base al posto di un blocco per domanda, un solo smistamento AI al posto di un albero di condizioni, una domanda aperta al posto di un menu profondo
+- **changed**: i messaggi degli agenti creati con l'AI usano la risposta semplice invece della risposta avanzata, comprese le domande e i menu con i pulsanti
+- **changed**: negli agenti V3 i blocchi che chiudono la conversazione non hanno piu' il punto di uscita: chiusura, passaggio a un operatore, rimessa in coda, passaggio a un altro agente e cambio di dipartimento quando avvia il bot del dipartimento. Restano invariati gli agenti precedenti e i collegamenti gia' presenti
+- **fixed**: negli agenti V3 un blocco con la richiesta di una risposta all'utente restava senza alcun punto di uscita e non si poteva collegare a nulla
+
+# this branch 14/09/2026
+
+- **changed**: merged branch V3/master-V3 (the V3 look of the blocks, the «Create agent with AI» modal and the AI panel with the agent history) into the agent chat branch. On this branch the V3 AI authoring stays inactive behind a single switch, off by default: no «Create agent with AI» button in the sidebar, no «AI» button in the header, no history probe on the server. Nothing is removed; a single environment can turn it on from the remote config with `aiAgentGeneratorEnabled: true`. The agent chat (vibe coder) of this branch stays active as before
+
+# this branch 09/09/2026
+
+- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+
+# this branch 08/09/2026
+
+- **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
+- **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
+- **changed**: nel pannello Subagents la **casella di ricerca** "Search a subagent" e il **badge `parent`** sono nascosti: rimosso il markup, conservati stili e logica di filtro (`onSearch`/`applyFilter`), cosi' ripristinarli e' questione di poche righe
+- **changed**: il **parent** usa ora l'icona di gruppo e ogni **subagent** un **omino blu a mezzo busto** — nuova icona `person` registrata in `IconService`, ricavata dai tracciati gia' presenti in `actions/online_agents.svg` (testa e spalle, senza le onde del segnale) e ricentrata con una `translate`, per non alterare i numeri originali
+- **changed**: icone delle righe del pannello da 18 a 20px e grigio piu' carico (`#5a6672`): l'icona di gruppo e' fitta e alla dimensione precedente si leggeva male. L'omino dei **subagent** e' disegnato piu' piccolo (svg 12x12) ma il suo box resta 20px, cosi' i nomi restano allineati fra riga del parent e righe dei subagent
+- **fixed**: nel pannello Subagents la dimensione dell'icona era applicata solo alla riga **attiva**, quindi tutte le altre rendevano alla misura di default di `mat-icon` (24px) invece che a quella prevista
+- **fixed**: l'icona della tab **Blocks** non e' piu' bianca — `search.svg` porta `fill="#FFFFFF"` nell'asset e l'attributo sull'elemento vince sul colore ereditato; ora l'icona segue il colore della tab (grigio, blu quando attiva) come tutte le altre
+- **changed**: il pulsante **New subagent** e' visibile anche **dentro un subagent**. Il nuovo agent viene creato sotto il **parent della famiglia**, non sotto il subagent aperto: si ottiene un fratello, non un annidamento. L'id del parent lo decide il pannello e viaggia nei `data` della modale, che prima lo ricavava da se' con `id_faq_kb`; il pulsante non compare se quell'id non e' risolvibile
+- **changed**: la tab **Blocks** e' ora un pulsante quadrato con la sola icona a **lente**, che dice a colpo d'occhio che da li' si cerca un blocco; l'etichetta e' passata nel tooltip e la tab **Subagents** occupa tutta la larghezza rimanente
+- **changed**: rinominate tre action — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. Il nuovo nome e' allineato ovunque compaia: menu delle action, etichetta sul blocco nel canvas e titolo nella documentazione del pannello
+- **changed**: pannello **Subagents** — la tab passa al primo posto (Blocks seconda) ed e' quella aperta di default **quando l'agente non ha ancora una preferenza salvata**: se l'utente ne sceglie una, vince la sua (`getActiveLeftPanel` ora distingue "nessuna preferenza" da "Blocks", prima erano lo stesso valore). Entrambe le tab hanno un'icona; la risoluzione della tab si e' spostata in `ngOnInit`, cosi' il pannello Blocks non viene piu' montato e subito distrutto a ogni apertura. Il pulsante **New subagent** e' ora un footer ancorato in fondo al pannello invece che sopra l'elenco, quindi resta raggiungibile anche con la lista lunga. Icone dei subagent sostituite con SVG registrati in `IconService`, in linea con le altre del DS. L'elenco dei subagent e' ordinato **alfabeticamente** (case e accenti ignorati, numeri confrontati come numeri: "Agente 2" prima di "Agente 10"); il parent resta sempre primo
+- **added**: primi test unitari sul pannello Subagents — l'ordinamento alfabetico (estratto in `sortSubagentsByName`, funzione pura: maiuscole, accenti, numeri, lista vuota) e `getActiveLeftPanel` (preferenza assente, salvata, famiglie separate). ⚠️ **Non sono eseguibili**: l'harness Karma del repo non esegue alcun test (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — guasto preesistente, indipendente da queste modifiche
+# this branch gio 27 ago 2026
+- **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
+- **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
+- **changed**: the **Return** action is available again in the menu, with its original name "Return"
+- **added**: **Invoke Agent** preselects the start block when an agent is selected and clears the block when the agent is cleared, like **Invoke subagent**
+- **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
+- **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
+
+# this branch 
+- **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
+- **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
+- **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
+- **changed**: the Sub Agent action is hidden from the Special actions
+- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent), superseding the `subagent_visibility: never` rule on **Invoke subagent**
+- **bug fix**: inside a subagent the invocable agents are now the siblings (parent's subagents), excluding itself, instead of an empty list
+- **added**: selecting a subagent preselects its start block
+- **bug fix**: clearing the selected subagent left the previously selected block
+- **changed**: the "Return" action is renamed "Return to agent"
+- **added**: the Blocks/Subagents tab is kept across reloads and parent/subagent navigation
+- **added**: delete a subagent from the Subagents panel (hover menu + confirmation modal)
+- **changed**: after creating a subagent the Design Studio reloads on the new subagent; after deleting one it reloads on the parent
+- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
+- **changed**: subagents and the parent chatbot open in the same browser tab
+- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
+- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
+- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
+- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
+- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
+- **changed**: the Sub Agent action is not available inside a subagent
+- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
+- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
+- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
+- **changed**: Sub Agent detail panel now fills the panel height like the other actions
+- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
+- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
+
+
+# this branch
+- **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
+- **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
+- **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
+- **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
+- **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
+- **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
+- **added**: l'agente creato con l'AI dichiara al server la versione del Design Studio con cui e' stato costruito, e se la porta dietro
+- **changed**: all'apertura di un agente la versione dell'editor si legge da quel dato invece di dedurla dalla data di creazione: un agente costruito con il V3 resta sul V3 anche se la data di taglio viene spostata. Gli agenti che non la portano, cioe' tutti quelli creati finora, restano decisi dalla data esattamente come prima
+
+# this branch 13/09/2026
+
+- **added**: dentro ogni agente V3, un pulsante «AI» nell'header apre un pannello a destra con la storia dell'agente. La scheda «Prompt» mostra il prompt di creazione, le modifiche fatte con l'AI e i ripristini, e permette di chiedere una modifica in linguaggio naturale: l'AI propone i cambiamenti, il DS li mostra in anteprima (blocchi aggiunti, modificati, rimossi, collegamenti) e li applica solo su «Applica». La scheda «Versioni» elenca tutte le versioni e le release, con «Salva versione», «Ripristina qui», «Crea copia», «Vedi prompt» e «Riusa nel generatore». Il pulsante compare su ogni agente V3 con il servizio di generazione configurato; se il server non ha ancora il modulo delle revisioni, il pannello si apre e lo dice
+- **added**: ogni ripristino è preceduto da un salvataggio automatico della versione corrente, quindi è reversibile; prima di confermare, il DS avvisa se la versione usa dipartimenti, knowledge base, tabelle o agenti che nel progetto non esistono più. La versione pubblicata non cambia: per portare online un ripristino si pubblica di nuovo
+- **changed**: l'agente creato con l'AI non porta più i dati della generazione nei suoi attributi: prompt, intervista e flusso generato stanno nella storia dell'agente sul server, fuori dal percorso dei messaggi. Con il modulo del server acceso la creazione avviene in una sola chiamata atomica, senza riletture dei blocchi; con il modulo spento la creazione funziona come prima e la storia non viene salvata
+- **changed**: la modale «Crea agente con l'AI» salva la bozza nella scheda prima di creare l'agente; a creazione riuscita la svuota e si azzera del tutto; se la creazione fallisce, bozza e anteprima restano. Errori più precisi quando il server rifiuta dei blocchi
+- **added**: ogni pubblicazione e ripubblicazione collega la release alla storia dell'agente; la cancellazione di un agente cancella la sua storia. Se queste chiamate falliscono, l'utente non viene bloccato
+- **added**: nel pannello si può chiedere una modifica e vederne l'anteprima anche quando il server non ha il modulo delle revisioni; in quel caso resta disabilitato solo «Applica», e il pannello spiega perché. Le nuove etichette sono tradotte nelle 15 lingue
+
+# this branch 12/09/2026
+
+- **added**: nella modale «Crea agente con l'AI» si sceglie il modello AI, fra quelli che il servizio dichiara disponibili; è preselezionato il più potente, e l'ultima scelta viene ricordata. La scelta vale per le domande e per la generazione. Il servizio concede più tempo alle generazioni con i modelli che ragionano
+- **added**: il generatore di agenti usa come riferimento fino a tre agenti verificati simili alla richiesta, e l'anteprima lo dice («Ispirato ad agenti verificati»); nell'anteprima si può votare il flusso con un pollice, e il DS comunica al servizio se l'agente è stato creato, rigenerato o scartato, senza mai inviare la conversazione
+- **changed**: il blocco defaultFallback, quando è vuoto, non accetta più action: non se ne possono trascinare dentro, il pulsante «Add action» e il segnaposto non compaiono, e nemmeno il menu delle action o lo spostamento da un altro blocco lo riempiono. I chatbot che hanno ancora una risposta dentro il defaultFallback restano modificabili (regola riportata dal branch ds-generic-bug-fix-39)
+- **changed**: il pulsante «Crea agente con l'AI» compare su tutti gli agenti, anche quelli precedenti al V3: crea sempre un agente nuovo e non modifica quello aperto. Resta nascosto solo se il servizio di generazione non è configurato
+- **changed**: negli agenti creati con l'AI il blocco defaultFallback è sempre presente, vuoto e senza collegamenti in ingresso: il messaggio di fallback sta in un blocco «Fallback» a sé, che poi prosegue dove indicato
+- **added**: la modale «Crea agente con l'AI» conserva l'intervista nella scheda del browser: chiuderla o cambiare agente non la perde, e alla riapertura si riprende dalla domanda o dal prompt finale; «Ricomincia» e la creazione dell'agente la cancellano
+- **changed**: all'apertura della modale il DS sveglia il servizio di generazione, che sul piano gratuito si addormenta dopo una pausa
+- **added**: messaggio dedicato quando il progetto non è abilitato al generatore di agenti
+
+# this branch 11/09/2026
+
+- **added**: il generatore di agenti conosce 15 action in più: risposta casuale, attesa, cancellazione di una variabile, azzeramento della cronologia, rimessa in coda, tag, log, aggiornamento del contatto, testo scritto dall'AI, ciclo su una lista, passaggio a un altro agente, aggiunta a una knowledge base, email, tabelle dati e smistamento con l'AI. Le action che richiedono un piano o dati assenti dal progetto non vengono proposte; l'anteprima mostra le nuove uscite
+- **changed**: il flusso generato ha una forma più compatta, con i soli campi di ogni blocco; i flussi nella forma precedente restano validi
+- **fixed**: dopo la creazione di un agente con l'AI, il DS rilegge i blocchi fino a 6 volte prima di segnalare collegamenti non conservati. Il server risponde all'import prima di averli salvati tutti, e con agenti grandi compariva un falso errore
+- **added**: l'agente creato con l'AI conserva, oltre al prompt finale, la descrizione iniziale, l'indicazione se il prompt è stato modificato, un riassunto dell'intervista, le scelte fatte dall'AI e le richieste da configurare a mano. La conversazione completa non viene salvata
+- **changed**: «Crea agente con l'AI», il selettore dell'agent e l'icona «Elimina agent» sono visibili **solo sugli agenti V3**: sui legacy l'header mostra di nuovo il solo nome e la sidebar non ha il pulsante dell'AI. Sui V3 il pulsante compare solo se il servizio di generazione è configurato, quindi per spegnere la funzione basta togliere la configurazione
+- **added**: **creazione dell'agente con l'AI**: dall'anteprima, «Crea l'agente» trasforma il flusso generato in un nuovo agente V3 del progetto e lo apre nel Design Studio. Prima di aprirlo verifica che il server abbia conservato i collegamenti fra i blocchi; se non li ha conservati lo segnala e non lo apre. Nell'agente restano il prompt finale, il modello e la versione del prompt usati per generarlo
+- **added**: **compilatore del flusso generato**: una sola action per blocco, la domanda con risposta divisa in messaggio e cattura della risposta, collegamenti verso i blocchi reali, blocchi di avvio e di fallback, nomi validi e unici per l'editor, disposizione sul canvas per livelli, variabili dichiarate. Usa i dipartimenti e le knowledge base reali del progetto. Un flusso incompleto dà un errore esplicito, senza creare nulla. Test senza browser su 6 flussi di prova
+- **added**: **intervista prima della generazione**: l'AI pone una domanda alla volta, con opzioni cliccabili o risposta libera, e mostra lo stato delle 11 sezioni del brief; «Genera comunque» le fa completare da sola le parti mancanti. Alla fine propone il **prompt finale**, modificabile insieme al nome dell'agente, con le scelte fatte dall'AI e le richieste da configurare a mano
+- **added**: la modale **"Crea agente con l'AI"** usa il **servizio di generazione esterno**, indicato nella configurazione, e mostra l'**anteprima** dell'agente: blocchi, collegamenti, note e avvisi, con il JSON da copiare. Le chiamate al servizio non portano le credenziali Tiledesk. Errori distinti per servizio non configurato o non raggiungibile, chiave rifiutata, troppe richieste, errore del provider. Webhook e Copilot restano «Presto disponibili»
+
+# this branch 08/09/2026
+
+- **added**: **selettore dell'agent nell'header** — il nome del bot e' ora un menu a tendina con tutti gli agent del progetto: si passa da un agent all'altro senza uscire dal Design Studio. Accanto, l'icona **Elimina agent** con tooltip, coerente con le altre icone dell'header, e conferma esplicita prima di cancellare; a eliminazione avvenuta si apre il primo agent rimasto, o si torna alla dashboard se non ne restano. Aggiunto `deleteBot()` a `faq-kb.service.ts` (`DELETE /faq_kb/{botId}`, endpoint gia' presente sul server e riservato ai ruoli admin/owner — gli stessi che possono entrare nel DS). Il pannello dell'elenco non riusa la classe `menuElement` degli altri menu dell'header, che ha `overflow: hidden` e un posizionamento assoluto: e' scrollabile, contenuto in altezza e ancorato al pulsante. Il cambio di agent avviene con un caricamento completo della pagina: il DS si inizializza una volta sola in `ngOnInit` e una semplice `router.navigate` cambierebbe solo l'URL lasciando l'editor agganciato all'agent precedente
+- **added**: pulsante **"Crea agente con l'AI"** in cima alla sidebar del Design Studio: apre una modale in cui descrivere l'agente da generare (tipo Chat/Webhook/Copilot, prompt libero, galleria di 21 casi d'uso filtrabili per categoria). Mentre la modale e' aperta l'interfaccia sottostante e' **bloccata**: il backdrop ferma il puntatore, e gli ascoltatori da tastiera del canvas — che sono su `document` e riceverebbero comunque i tasti digitati nella modale — sono disattivati. La generazione chiama `POST /chatbots/generate`, **endpoint non ancora disponibile su questo server**: finche' manca, la modale mostra l'errore. Nessun impatto sui flussi esistenti
+
+# this branch 07/09/2026
+
+- **changed**: in V3 il pallino di uscita del blocco e' posizionato **dentro** il blocco, in basso a destra sul bordo, invece di pendere fuori; la regola base resta invariata e l'override e' delimitato da `.tds-v3-intent`, quindi i chatbot legacy non cambiano
+- **added**: in V3 il pallino di uscita del blocco viene **nascosto quando l'action ha gia' connettori propri** (Success/Else, bottoni, noInput/noMatch...) e mostrato solo dove sarebbe l'unica via d'uscita; la famiglia Reply (reply, replyv2, randomreply) lo mostra **sempre**, con o senza bottoni, perche' il flusso deve poter proseguire di default; un pallino gia' collegato non viene mai nascosto, le action voice restano fuori dalla regola e i chatbot legacy sono esclusi. L'elenco delle action con uscite proprie e' dichiarato in `ACTIONS_WITH_OWN_OUTPUTS` (`utils-actions.ts`)
+- **changed**: il trascinamento **dall'header dell'action** parte solo dopo ~4px di movimento, cosi' un click impreciso non sposta il blocco; maniglie storiche e note restano immediate, quindi i chatbot legacy sono invariati
+- **added**: in V3 il blocco si sposta sul canvas afferrando l'**header dell'action**, che ne diventa la maniglia per ogni tipo di action; il motore di drag ha ora una risalita opt-in (`tds_draggable_deep`) che si attiva solo dove il markup la dichiara, quindi i blocchi legacy sono invariati
+- **changed**: restyle del blocco V3 (`.tds-slim-intent` → `.tds-v3-intent`) — rimossi lo spazio morto e il cursore da bottone sul footer vuoto, il gap tra action e la doppia cornice attorno all'unica action
+- **changed**: un chatbot **senza** `createdAt` è ora trattato come legacy (prima come V3), così un payload incompleto non cambia editor
+- **changed**: la versione è risolta una volta sola per chatbot in `DashboardService` (`isV3`/`isV3$`) invece di essere ricalcolata da ogni blocco; `isNewChatbot` rinominato `isV3`
+- **added**: Design Studio **V3** — i chatbot creati dal 07/09/2026 aprono l'editor semplificato (una sola action per blocco, drag delle action disabilitato, niente menu inline edit/copy/delete, niente "+ Add action" sui blocchi pieni); la versione si ricava da `createdAt` confrontato con `DATE_NEW_CHATBOT` (**data da allineare al rilascio effettivo**: deve restare nel futuro, altrimenti agenti gia' creati col DS vecchio passerebbero a V3)
+
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
 

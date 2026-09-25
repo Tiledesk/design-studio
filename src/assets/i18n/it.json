@@ -185,6 +185,19 @@
     },
     "BotDetails": "Dettagli del bot",
     "Developer": "Sviluppatore",
+    "LlmSettingsTab": "Vibe Coder",
+    "LlmSettingsTitle": "Vibe Coder",
+    "LlmSettingsProjectScope": "Stai configurando dal flusso che hai aperto, ma l'impostazione vale per l'intero progetto: ogni sessione del Vibe Coder di questo progetto userà questo modello.",
+    "LlmSettingsModel": "Modello",
+    "LlmSettingsDefault": "predefinito",
+    "LlmSettingsInherited": "lascia vuoto per usare l’impostazione del deployment",
+    "LlmSettingsTemperature": "Temperatura",
+    "LlmSettingsMaxTokens": "Token massimi in uscita",
+    "LlmSettingsSave": "Salva",
+    "LlmSettingsSaved": "Salvato. Vale dal prossimo messaggio.",
+    "LlmSettingsForbidden": "Solo un amministratore del progetto può visualizzare o modificare questa impostazione.",
+    "LlmSettingsLoadError": "Impossibile caricare la configurazione del runtime.",
+    "LlmSettingsSaveError": "Impossibile salvare l'impostazione.",
     "Done": "Fatto!",
     "RememberToClickThePublishButton": "Ricordati di fare clic sul pulsante Pubblica una volta terminato il lavoro. ",
     "UnauthorizedPage": {
@@ -326,5 +339,26 @@
         "field_label": "Scrivi un'etichetta chiara che aiuti gli utenti a inserire i dati corretti (es: come ti chiami?)",
         "field_error": "Scrivi un messaggio di errore se i dati inseriti dall'utente non sono corretti"
       }
+    },
+    "CDS": {
+      "AgentChat": {
+        "Title": "Costruisci con l'AI",
+        "Toggle": "Costruisci questo flusso descrivendolo",
+        "Show": "Mostra chat",
+        "Hide": "Nascondi chat",
+        "LoadFailed": "Non è stato possibile caricare la chat AI.",
+        "Applied": "Applicate {{count}} modifiche a questo flusso.",
+        "Failed": "{{count}} modifiche non sono state applicate:",
+        "Undo": "Annulla"
+      }
+    },
+    "CDSHeader": {
+        "SelectAgent": "Seleziona agente",
+        "DeleteAgent": "Elimina agent",
+        "DeleteAgentTitle": "Elimina agent",
+        "DeleteAgentText": "L'agente \"{{name}}\" e tutti i suoi blocchi verranno eliminati definitivamente. L'operazione non è reversibile.",
+        "DeleteAgentError": "Non sono riuscito a eliminare l'agente. Riprova.",
+        "NoAgents": "Nessun agente in questo progetto",
+        "OpenAgentError": "Non è stato possibile aprire l'agente. Riprova."
     }
-  }
+}

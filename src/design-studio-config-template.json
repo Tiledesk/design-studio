@@ -6,6 +6,7 @@
   "widgetBaseUrl": "${WIDGET_LOCATION}",
   "dashboardBaseUrl": "${DASHBOARD_URL}",
   "whatsappTemplatesBaseUrl":"${WHATSAPP_TEMPLATES_BASE_URL}",
+  "agentChatUrl": "${AGENT_CHAT_URL}",
   "wsUrl": "${WS_URL}",
   "wsUrlRel": "${WS_URL_RELATIVE}",
   "uploadEngine": "${UPLOAD_ENGINE}",
@@ -16,6 +17,7 @@
   "storage_prefix": "${CDS_STORAGE_PREFIX}",
   "authPersistence": "${AUTH_PERSISTENCE}",
   "pineconeReranking": "${PINECONE_RERANKING}",
+  "CHATBOT_VERSION": "${CHATBOT_VERSION}",
   "phoneNumber":"${PHONE_NUMBER}",
   "firebase": {
     "apiKey": "${FIREBASE_APIKEY}",

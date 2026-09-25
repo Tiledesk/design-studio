@@ -1,0 +1,229 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" height="24" width="24">
+                <g>
+                    <circle cx="16.8" cy="27.5" r="3.1" />
+                    <path d="M24.9,8.6V6.8V5.1c1.2-0.5,1.8-1.9,1.3-3.1c-0.5-1.2-1.9-1.8-3.1-1.3c-1.2,0.5-1.8,1.9-1.3,3.1c0.2,0.6,0.7,1,1.3,1.3v1.7
+     v1.8c-10.4,0.5-18.5,9.4-18,19.8c0.5,10.4,9.4,18.5,19.8,18c10.4-0.5,18.5-9.4,18-19.8C42.4,16.8,34.6,9,24.9,8.6z M24,37.2
+     c-8.9,0-16-4.4-16-9.7s7.2-9.7,16-9.7c8.9,0,16,4.4,16,9.7v0C40,32.8,32.9,37.2,24,37.2z" />
+                    <path d="M31.2,24.4c-1.7,0-3.1,1.4-3.1,3.1c0,1.7,1.4,3.1,3.1,3.1v0c1.7,0,3.1-1.4,3.1-3.1C34.3,25.8,32.9,24.4,31.2,24.4z" />
+                </g>
+            </svg>
+        </div>
+
+        <div *ngIf="action?.subagent_id" class="action-row-right">
+            {{ getSelectedBotName() }}
+        </div>
+        <div *ngIf="!action?.subagent_id" class="action-row-right empty">
+            {{ 'CDSCanvas.ChooseAgent' | translate }}
+        </div>
+    </div>
+
+    <div class="action-row">
+        <div class="action-row-left icon-action">
+            <img src="assets/images/icons/block.svg">
+        </div>
+
+        <div *ngIf="action?.intentName" class="action-row-right">
+            {{ getSelectedBlockName() || action.intentName }}
+        </div>
+        <div *ngIf="!action?.intentName" class="action-row-right empty">
+            {{ 'CDSCanvas.ChooseBlock' | translate }}
+        </div>
+    </div>
+
+    <ng-container *ngIf="showBranching">
+        <div class="previewContent">
+            <div class="icon-action">
+                <img src="assets/images/icons/if_condition.svg">
+            </div>
+            <label class="title-preview-label">{{ 'CDSCanvas.Success' | translate }}</label>
+            <cds-connector class="connector-true"
+                [idConnector]="idConnectorTrue"
+                [idConnection]="idConnectionTrue"
+                [isConnected]="isConnectedTrue">
+            </cds-connector>
+        </div>
+
+        <hr class="preview-divider">
+
+        <div class="previewContent">
+            <label class="title-preview-label">{{ 'CDSCanvas.Else' | translate }}</label>
+            <cds-connector class="connector-false"
+                [idConnector]="idConnectorFalse"
+                [idConnection]="idConnectionFalse"
+                [isConnected]="isConnectedFalse">
+            </cds-connector>
+        </div>
+    </ng-container>
+</div>
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.ChooseAgent' | translate }}</label>
+        <cds-select id="sub-agent-bot"
+            [items]="chatbots_name_list"
+            [bindLabelSelect]="'name2'"
+            [bindValueSelect]="'id'"
+            [searchable]="true"
+            [clearable]="true"
+            [itemSelected]="action?.subagent_id"
+            (onSelected)="onChangeSelect($event)"
+            (onReset)="onResetSelect($event, 'subagent_id')">
+        </cds-select>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.ExecuteBlock' | translate }}</label>
+        <label class="subtitle-label">{{ 'CDSCanvas.ChooseBlockDescription' | translate }}</label>
+        <cds-select id="sub-agent-block"
+            [items]="autocompleteOptionsBlockName"
+            [bindLabelSelect]="'label'"
+            [bindValueSelect]="'value'"
+            [searchable]="true"
+            [clearable]="true"
+            [itemSelected]="action?.intentName"
+            (onSelected)="onChangeBlockSelect($event)"
+            (onReset)="onResetSelect($event, 'intentName')">
+        </cds-select>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.SubAgentMode' | translate }}</label>
+        <cds-select id="sub-agent-mode"
+            [items]="modeOptions"
+            [bindLabelSelect]="'name'"
+            [bindValueSelect]="'value'"
+            [searchable]="false"
+            [clearable]="false"
+            [itemSelected]="action?.mode"
+            (onSelected)="onChangeModeSelect($event)">
+        </cds-select>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{ 'CDSCanvas.BodyParameters' | translate }}</label>
+        <cds-attributes
+            class="cds-attributes"
+            [method]="typeMethodAttribute.INPUT"
+            [attributes]="jsonParameters"
+            (changeAttributes)="onChangeAttributes($event)">
+        </cds-attributes>
+    </div>
+
+    <ng-container *ngIf="showBranching">
+        <hr class="custom-divider">
+
+        <div class="field-box">
+            <div class="condition-container">
+                <div class="icon-action">
+                    <img class="active-icon" src="assets/images/icons/if_condition.svg">
+                </div>
+                <span class="condition-text">{{ 'CDSCanvas.Success' | translate }}</span>
+            </div>
+            <cds-select id="sub-agent-true-intent"
+                [items]="listOfIntents"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.trueIntent"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                [clearable]="true"
+                (onSelected)="onChangeBlockSelectIntent($event, 'trueIntent')"
+                (onReset)="onResetBlockSelectIntent($event, 'trueIntent')">
+            </cds-select>
+        </div>
+
+        <div class="field-box">
+            <div class="condition-container">
+                <span class="condition-text">{{ 'CDSCanvas.Else' | translate | titlecase }}</span>
+            </div>
+            <cds-select id="sub-agent-false-intent"
+                [items]="listOfIntents"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.falseIntent"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                [clearable]="true"
+                (onSelected)="onChangeBlockSelectIntent($event, 'falseIntent')"
+                (onReset)="onResetBlockSelectIntent($event, 'falseIntent')">
+            </cds-select>
+        </div>
+    </ng-container>
+
+    <hr class="custom-divider">
+    <mat-accordion>
+        <mat-expansion-panel class="custom-expansion-panel">
+            <mat-expansion-panel-header class="disable_ripple">
+                <mat-panel-title>
+                    {{ 'CDSCanvas.Advanced' | translate }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <section class="disable-input-message-section">
+                <mat-checkbox
+                    [checked]="action?.awaitWebhookPublish"
+                    (change)="onChangeCheckbox($event, 'awaitWebhookPublish')">
+                    {{ 'CDSCanvas.SubAgentAwaitWebhook' | translate }}
+                </mat-checkbox>
+            </section>
+
+            <div class="field-box">
+                <label class="title-label">{{ 'CDSCanvas.AssignStatusTo' | translate }}</label>
+                <cds-textarea id="sub-agent-status"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    [readonly]="true"
+                    [text]="action.assignStatusTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignStatusTo')">
+                </cds-textarea>
+            </div>
+
+            <div class="field-box">
+                <label class="title-label">{{ 'CDSCanvas.AssignErrorTo' | translate }}</label>
+                <cds-textarea id="sub-agent-error"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    [readonly]="true"
+                    [text]="action.assignErrorTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+                </cds-textarea>
+            </div>
+
+            <div class="field-box">
+                <label class="title-label">{{ 'CDSCanvas.SubAgentAssignRunIdTo' | translate }}</label>
+                <cds-textarea id="sub-agent-run-id"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    [readonly]="true"
+                    [text]="action.assignRunIdTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignRunIdTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignRunIdTo')">
+                </cds-textarea>
+            </div>
+
+            <div class="field-box">
+                <label class="title-label">{{ 'CDSCanvas.AssignResultTo' | translate }}</label>
+                <cds-textarea id="sub-agent-result"
+                    [textLimitBtn]="false"
+                    [emojiPikerBtn]="false"
+                    [setAttributeBtn]="true"
+                    [minRow]="1" [maxRow]="1"
+                    [readonly]="true"
+                    [text]="action.assignResultTo"
+                    (selectedAttribute)="onSelectedAttribute($event, 'assignResultTo')"
+                    (clearSelectedAttribute)="onSelectedAttribute($event, 'assignResultTo')">
+                </cds-textarea>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

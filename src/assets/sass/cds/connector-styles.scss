@@ -81,6 +81,106 @@ cds-connector.connector-isLast {
     }
 }
 
+/* V3 - il pallino di uscita del blocco entra NEL blocco, ancorato in basso a
+   destra sul bordo, invece di pendere fuori (right:-32px della regola base),
+   e prende la grafica del ramo "vero" di una condizione: stessa forma del
+   pallino base del componente e stesso verde, sia libero sia collegato.
+
+   In V3 l'uscita del blocco e' l'unica uscita che il blocco ha, quindi e'
+   quella che deve leggersi da lontano: il pallino piccolo e bianco della
+   regola qui sopra era pensato per un punto che convive con gli altri di una
+   lista di action. Delimitato da .tds-v3-intent, presente solo sui blocchi V3:
+   i chatbot delle versioni precedenti restano come sono. */
+.tds-v3-intent cds-connector.connector-isLast {
+    right: -17px;
+    top: auto;
+    bottom: 17px;
+
+    /* Gli stessi valori di cds-connector.connector-true: la forma e' quella
+       base del componente (cds-connector.component.scss), il colore e' il
+       verde dei connettori. */
+    .point-connector-empty {
+        border: 1px solid var(--success-connector);
+        background: var(--success-connector);
+        width: 18px;
+        height: 18px;
+
+        &:hover {
+            border: 0px;
+            background: var(--success-connector);
+            cursor: copy;
+        }
+    }
+    .point-connector {
+        border: 2px solid rgb(255, 255, 255);
+        background: var(--success-connector);
+        width: 16px;
+        height: 16px;
+    }
+
+    /* .connector-isLast spegne l'anello interno e il cursore "copy" sotto il
+       mouse; su questo pallino l'invito a trascinare serve, come sul true. */
+    &:hover {
+        cursor: copy;
+        .point-connector-empty::before {
+            border: 4px solid rgb(255, 255, 255);
+        }
+        .point-connector::before {
+            border: 1px solid rgb(168, 168, 174);
+        }
+    }
+}
+
+/* V3 - la defaultFallback vuota porta il punto di uscita dello start, e non
+   quello degli altri blocchi V3: per chi guarda la canvas i due blocchi sono
+   la stessa cosa, i due estremi fissi del flusso, senza niente dentro. Stesso
+   pallino (grande e grigio, quello base del componente) e stessa collocazione:
+   dentro al blocco, a meta' altezza e a 11px dal bordo destro, che e' dove lo
+   tiene .cds-start-content.
+
+   Solo finche' la fallback e' vuota, che in V3 e' come nasce: .cds-fallback-locked
+   e' esattamente quello stato. Appena ci si mette dentro una action il blocco
+   torna un blocco come gli altri, pallino verde in basso a destra compreso. */
+.tds-v3-intent.cds-fallback-locked {
+    /* L'ancora del position:absolute qui sotto. Senza, il pallino si posiziona
+       rispetto al wrapper dell'ultima action, che e' alto quanto il pallino
+       stesso: li' "meta' altezza" non vuol dire niente. */
+    cds-action-intent .cds-action-preview {
+        position: static;
+    }
+
+    cds-connector.connector-isLast {
+        right: 11px;
+        top: -40px;
+        bottom: auto;
+
+        /* I valori del componente (cds-connector.component.scss), cioe' quelli
+           dello start: la regola V3 qui sopra li colora di verde per gli altri
+           blocchi, questa li riporta al grigio. */
+        .point-connector-empty {
+            border: 1px solid rgb(255, 255, 255);
+            background: rgb(168, 168, 174);
+            width: 18px;
+            height: 18px;
+
+            &:hover {
+                border: 0px;
+                background: rgb(168, 168, 174);
+                cursor: copy;
+            }
+        }
+        .point-connector {
+            border: 2px solid rgb(255, 255, 255);
+            background: rgba(221, 221, 221, 1);
+            width: 16px;
+            height: 16px;
+        }
+        .header {
+            padding-top: 4px;
+        }
+    }
+}
+
 
 cds-connector.button-connector {
     position: absolute;

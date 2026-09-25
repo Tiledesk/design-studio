@@ -79,6 +79,19 @@
     "Maximize": "Maximize",
     "Minimize": "Minimize",
     "Advanced": "Advanced",
+    "LlmSettingsTab": "Vibe Coder",
+    "LlmSettingsTitle": "Vibe Coder",
+    "LlmSettingsProjectScope": "You are configuring this from the flow you have open, but the setting applies to the whole project: every Vibe Coder session in this project will use this model.",
+    "LlmSettingsModel": "Model",
+    "LlmSettingsDefault": "default",
+    "LlmSettingsInherited": "leave blank to use the deployment’s own setting",
+    "LlmSettingsTemperature": "Temperature",
+    "LlmSettingsMaxTokens": "Max output tokens",
+    "LlmSettingsSave": "Save",
+    "LlmSettingsSaved": "Saved. It applies from the next message.",
+    "LlmSettingsForbidden": "Only a project admin can view or change this.",
+    "LlmSettingsLoadError": "The runtime configuration could not be loaded.",
+    "LlmSettingsSaveError": "The setting could not be saved.",
     "WatchVideo": "Watch video",
     "LearnMore": "Learn more",
     "CdsOptions": {
@@ -421,7 +434,7 @@
         "AssignTo": "Assign to",
         "SelectAttribute": "Select attribute",
         "SelectOperator": "Select a operator",
-        "TransferToAHuman": "Transfer to a human",
+        "TransferToAHuman": "Transfer to Human",
         "CaptureUserReplyTo": "Capture user reply to",
         "AssignUserReplyTo": "Assign user reply to",
         "AssignUserReplyDescription": "Awaits for the user reply and automatically assign it to the selected attribute. If no attribute is selected the reply is automatically assigned to lastUserText",
@@ -512,6 +525,7 @@
         "Error": "Error",
         "ChooseBot": "Choose a bot",
         "ChooseAgent": "Choose an Agent",
+        "ChooseSubagent": "Choose a Subagent",
         "UseChatbotSlug": "Use Chatbot slag",
         "ChooseBlock": "Choose a block",
         "ChooseBlockDescription": "Automatically execute this block when the Agent joins the conversation",
@@ -603,6 +617,8 @@
         "ViewList": "View list",
         "UseBotSlug": "Use bot slug",
         "ChooseBotBySlug": "Choose bot by slug",
+        "ChooseSubagentBySlug": "Choose subagent by slug",
+        "UseSubagentSlug": "Use subagent slug",
         "CopilotEnabled": "Copilot enabled",
         "CopilotDisabled": "Copilot disabled",
         "ResponseStatus": "Response status",
@@ -612,6 +628,11 @@
         "Examples": "Examples",
         "FlowLog": "Log",
         "SetFlowLog":"Set the log",
+        "SubAgentMode": "Execution mode",
+        "SubAgentFireAndContinue": "Fire and continue",
+        "SubAgentWaitForResult": "Wait for result",
+        "SubAgentAwaitWebhook": "Wait for webhook response",
+        "SubAgentAssignRunIdTo": "Assign run id to",
         "AvailableToAgents": "Available to agents",
         "InfoAvailableToAgents": "A block with this option is visible to agents for the purpose to be put back in the conversation",
         "Create": "Create",
@@ -632,6 +653,16 @@
         "MCPServer": "MCP Server",
         "TiledeskTools": "Tiledesk Tools",
         "Native": "native",
+        "Subagents": "Subagents",
+        "SearchASubagent": "Search a subagent...",
+        "NoSubagentsYet": "No subagents available yet",
+        "DeleteSubagent": "Delete subagent",
+        "DeleteSubagentTitle": "Delete subagent",
+        "DeleteSubagentText": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+        "NewSubagent": "New subagent",
+        "EnterSubagentName": "Enter subagent name",
+        "CreatingSubagent": "Creating subagent",
+        "Creating": "Creating",
         "EditMCPServer": "Edit MCP Server",
         "Name": "Name",
         "EnterServerName": "Enter server name",
@@ -863,7 +894,7 @@
             "Reply": "Reply",
             "ReplyV2": "Advanced reply",
             "RandomReply": "Random reply",
-            "AgentHandoff": "Transfer to a human",
+            "AgentHandoff": "Transfer to Human",
             "Close": "Close",
             "IfOperatingHours": "If operating hours",
             "IfOnlineAgent": "If online agents",
@@ -873,8 +904,9 @@
             "ConnectBlock": "Connect block",
             "SetAttribute": "Set attribute",
             "DeleteAttribute": "Delete attribute",
-            "ReplaceBot": "Replace bot",
-            "ReplaceAIAgent":"Replace AI Agent",
+            "InvokeAgent": "Move to another AI Agent",
+            "InvokeSubagent": "Invoke Sub Agent",
+            "ReturnStack":"Return to agent",
             "Wait": "Wait",
             "WebRequest": "Web request",
             "WebResponse": "Web response",
@@ -906,6 +938,8 @@
             "DataTable": "Data Table",
             "AddTag": "Add tag",
             "FlowLog":"Flow log",
+            "SubAgent": "Sub Agent",
+            "Return": "Return",
             "DTMFForm": "DTMF form",
             "DTMFMenu": "DTMF menu",
             "BlindTransfer": "Blind transfer",
@@ -938,7 +972,7 @@
                 "DOC_URL": ""
             },
             "AgentHandoff": {
-                "TITLE": "Transfer to a human",
+                "TITLE": "Transfer to Human",
                 "DESCRIPTION": "This action removes the chatbot from the conversation and moves the flow to a human",
                 "IMAGE": "assets/images/doc/AGENT.png",
                 "VIDEO_URL": "",
@@ -1007,19 +1041,27 @@
                 "VIDEO_URL": "",
                 "DOC_URL": ""
             },
-            "ReplaceBot": {
-                "TITLE": "Replace the current bot with another one",
-                "DESCRIPTION": "Replaces the current chatbot with the specied one",
-                "IMAGE": "assets/images/doc/REPLACE_BOT.png",
-                "VIDEO_URL": "",
-                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
-            },
-            "ReplaceAIAgent":{
+            "InvokeAgent":{
                 "TITLE":"Replaces the current Agent with the specied one",
                 "DESCRIPTION":"",
                 "IMAGE":"assets/images/doc/REPLACE_BOT.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
+            },
+            "InvokeSubagent":{
+                "TITLE":"Invoke a subagent and resume the parent flow on return",
+                "DESCRIPTION":"Switches to another AI agent and saves the current position on the stack. When the subagent executes a Return action, the parent flow resumes from the block configured in Go to block.",
+                "RESUME_HINT":"After the subagent returns, the parent flow continues from the block selected in Go to block (intent panel).",
+                "IMAGE":"assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL":"",
+                "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/replace-ai-agent-action"
+            },
+            "ReturnStack":{
+                "TITLE":"Return to the parent agent",
+                "DESCRIPTION":"Pops the subagent stack and resumes the parent agent flow from where it was paused.",
+                "IMAGE":"",
+                "VIDEO_URL":"",
+                "DOC_URL":""
             },
             "Wait": {
                 "TITLE": "Wait before next action",
@@ -1188,6 +1230,20 @@
                 "IMAGE":"assets/images/doc/LOG.png",
                 "VIDEO_URL":"",
                 "DOC_URL":"https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/flow-log"
+            },
+            "SubAgent": {
+                "TITLE": "Invoke a sub-agent",
+                "DESCRIPTION": "This action invokes another AI agent and optionally waits for its result.",
+                "IMAGE": "assets/images/doc/REPLACE_BOT.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
+            },
+            "Return": {
+                "TITLE": "Return response",
+                "DESCRIPTION": "This action publishes the HTTP status and payload to complete a sub-agent or webhook flow.",
+                "IMAGE": "assets/images/doc/WEB_RESPONSE.png",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
             },
             "Qapla": {
                 "TITLE": "Ask an order status to Qapla'",
@@ -1503,6 +1559,13 @@
     },
     "Options": "Options",
     "CDSHeader": {
+        "SelectAgent": "Select agent",
+        "DeleteAgent": "Delete agent",
+        "DeleteAgentTitle": "Delete agent",
+        "DeleteAgentText": "The agent \"{{name}}\" and all its blocks will be permanently deleted. This cannot be undone.",
+        "DeleteAgentError": "The agent could not be deleted. Try again.",
+        "NoAgents": "No agents in this project",
+        "OpenAgentError": "The agent could not be opened. Try again.",
         "LinkCopiedToClipboard": "Link copied to clipboard",
         "ThereAreUnpublishedChanges": "There are unpublished changes"
     },
@@ -1524,5 +1587,17 @@
     "NoReleaseHistoryAvailable": "No release history available",
     "PublishYourFlowToSeeTheReleaseHistoryAppearHere": "Publish your Flow to see the release history appear here",
     "FollowLog": "Follow log",
-    "DeleteLog": "Delete log"
+    "DeleteLog": "Delete log",
+    "CDS": {
+        "AgentChat": {
+            "Title": "Build with AI",
+            "Toggle": "Build this flow by describing it",
+            "Show": "Show chat",
+            "Hide": "Hide chat",
+            "LoadFailed": "The AI chat could not be loaded.",
+            "Applied": "Applied {{count}} change(s) to this flow.",
+            "Failed": "{{count}} change(s) could not be applied:",
+            "Undo": "Undo"
+        }
+    }
 }
