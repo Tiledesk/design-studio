@@ -211,6 +211,10 @@ export class AgentChatHostService {
     this.registerTool('get_project_capabilities', async () =>
       (await this.capabilities.snapshot()).capabilities);
     this.flowOps.setCapabilitiesSource(() => this.capabilities.snapshot());
+    // A native flow-ops finds unconfigured in an attached ai_prompt is added
+    // to the project's own MCP integration through here, before the patch
+    // that attaches it is applied -- see FlowOpsService.apply().
+    this.flowOps.setNativeConfigurer(ids => this.capabilities.configureNativeServers(ids));
 
     this.registerTool('apply_flow_patch', async (args) => {
       const declared = args?.['faq_kb_id'] as string | undefined;

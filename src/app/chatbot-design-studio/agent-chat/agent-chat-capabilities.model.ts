@@ -30,6 +30,12 @@ export interface McpServerCapability {
   tools: McpToolCapability[];
   /** Set when this server's tools could not be read; it cannot be attached. */
   tools_error?: string;
+  /** Native servers only: whether the project's own `mcp` integration already
+   *  lists this native (same match rule as the Native Tools dialog's own
+   *  `isConfigured`). A custom server is configured by definition -- it only
+   *  exists here because it is in that same list -- so it never carries this
+   *  field. */
+  configured?: boolean;
 }
 
 export interface ProjectCapabilities {

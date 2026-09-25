@@ -13,6 +13,13 @@ import {
 interface McpPart {
   servers: McpServerCapability[];
   configs: Record<string, McpServer>;
+  /** The full native catalogue entry for each native discovered this load,
+   *  keyed by id -- the same shape mcp-server-edit-dialog's
+   *  buildServerConfigForIntegration() saves for a native, discovered tools
+   *  included. Never surfaced in `capabilities`; read only by
+   *  configureNativeServers() to add a missing native to the project's own
+   *  integration. */
+  nativeConfigs: Record<string, McpServer>;
   error?: string;
 }
 
@@ -84,6 +91,35 @@ export class AgentChatCapabilitiesService {
     this.mcpCache = null;
   }
 
+  /** Adds to the project's own `mcp` integration every native in `ids` that
+   *  is not already there -- exactly what picking it from the Native Tools
+   *  dialog and saving would do -- so a native the AI chat just attached to
+   *  an ai_prompt is not invisible to the MCP dialogs. Called by flow-ops
+   *  right before it applies a patch that attaches such a native.
+   *
+   *  The integration is read fresh (`mcpService.loadMcpServers()`, not the
+   *  cache this service otherwise keeps): a user may have configured or
+   *  removed a server while the current snapshot was still valid, and
+   *  writing over that would lose it. The native's own catalogue entry --
+   *  id, name, transport, description, discovered tools -- comes from
+   *  `nativeConfigs` instead, since re-fetching it here would mean
+   *  reconnecting to every native again for what loadMcp() already read.
+   *
+   *  Errors -- from either read -- are left to propagate: flow-ops turns a
+   *  rejection here into a refusal, applying nothing. */
+  public async configureNativeServers(ids: string[]): Promise<void> {
+    const part = await this.mcpPart();
+    const current = await this.mcpService.loadMcpServers();
+    const alreadyConfigured = (entry: McpServer): boolean =>
+      current.some(c => (entry.id && c.id === entry.id) || c.name === entry.name);
+    const missing = ids
+      .map(id => part.nativeConfigs[id])
+      .filter((entry): entry is McpServer => !!entry && !alreadyConfigured(entry));
+    if (missing.length === 0) { return; }
+    await this.mcpService.saveMcpIntegration([...current, ...missing]);
+    this.invalidate();
+  }
+
   private mcpPart(): Promise<McpPart> {
     const projectId = this.dashboardService.projectID;
     const stale = this.mcpCache?.loadedAt !== undefined
@@ -115,16 +151,35 @@ export class AgentChatCapabilitiesService {
       })
     ]);
 
+    // Whether a native from the catalogue is already in the project's own
+    // integration -- the same match rule the Native Tools dialog's own
+    // isConfigured uses. `customs` is the FULL integration list (natives and
+    // customs alike), not the customs-only filter used below for customCaps.
+    const isConfigured = (s: McpServer): boolean =>
+      customs.some(c => (s.id && c.id === s.id) || c.name === s.name);
+
+    const nativeConfigs: Record<string, McpServer> = {};
     const nativeCaps = await Promise.all(natives.filter(s => !!s.id).map(async (s): Promise<McpServerCapability> => {
       const base: McpServerCapability = {
         id: s.id, name: s.name, native: true, transport: s.transport,
+        ...(s.description ? { description: s.description } : {}),
+        tools: [], configured: isConfigured(s)
+      };
+      // The same shape mcp-server-edit-dialog's buildServerConfigForIntegration()
+      // saves for a native, kept private -- configureNativeServers() reads it
+      // to add a missing native to the integration without connecting again.
+      const configEntry: McpServer = {
+        id: s.id, name: s.name, url: '', transport: s.transport, native: true,
         ...(s.description ? { description: s.description } : {}),
         tools: []
       };
       try {
         const tools = await withTimeout(this.mcpService.connectNativeServer(s.id), NATIVE_CONNECT_TIMEOUT_MS);
+        configEntry.tools = tools;
+        nativeConfigs[s.id] = configEntry;
         return { ...base, tools: tools.map(t => ({ name: t.name, ...(t.description ? { description: t.description } : {}) })) };
       } catch (e) {
+        nativeConfigs[s.id] = configEntry;
         return { ...base, tools_error: `connect failed: ${messageOf(e)}` };
       }
     }));
@@ -144,6 +199,7 @@ export class AgentChatCapabilitiesService {
     return {
       servers: [...nativeCaps, ...customCaps],
       configs,
+      nativeConfigs,
       ...(errors.length ? { error: errors.join('; ') } : {})
     };
   }

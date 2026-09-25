@@ -178,6 +178,18 @@ export class FlowOpsService implements OnDestroy {
     this.capabilitiesSource = source;
   }
 
+  /** Where apply() hands off, right before applying, the native ids a batch
+   *  attaches that the project has not configured -- so they can be added to
+   *  its own MCP integration first, exactly as the Native Tools dialog would.
+   *  Set by the host when the chat attaches; null means nothing is
+   *  configured, which is also how every spec that predates this feature
+   *  runs. */
+  private nativeConfigurer: ((ids: string[]) => Promise<void>) | null = null;
+
+  public setNativeConfigurer(fn: ((ids: string[]) => Promise<void>) | null): void {
+    this.nativeConfigurer = fn;
+  }
+
   constructor(
     private intentService: IntentService,
     private connectorService: ConnectorService,
@@ -248,6 +260,31 @@ export class FlowOpsService implements OnDestroy {
       // pop entries this batch never pushed.
       this.forgetLastBatch();
       return { ok: false, rejected_before_applying: true, results: validation };
+    }
+    // A native this batch attaches may not be in the project's own MCP
+    // integration yet -- get_project_capabilities lists every native from the
+    // global catalogue, not only the ones the project has configured, so the
+    // agent can attach one the Native Tools dialog never saw. Left alone, the
+    // engine would still run it (it resolves natives by id), but neither MCP
+    // dialog could show or manage it. So, before anything is applied, this
+    // adds it to the integration exactly as picking it from Native Tools
+    // would -- validation already proved every server here resolves, so this
+    // only has to find which of them are new. A rejection here (the save
+    // failed) refuses the whole batch, the same as any other pre-apply check:
+    // nothing was applied, so nothing from this batch is on the undo stack.
+    const unconfiguredIds = this.unconfiguredNativeIds(ops);
+    if (unconfiguredIds.length > 0 && this.nativeConfigurer) {
+      try {
+        await this.nativeConfigurer(unconfiguredIds);
+      } catch (err) {
+        this.forgetLastBatch();
+        return {
+          ok: false, rejected_before_applying: true,
+          results: [{ op: '(none)', ok: false,
+            error: `Could not add the MCP server(s) ${unconfiguredIds.join(', ')} to this project ` +
+              `(${String(err?.message ?? err)}). Nothing was applied; retry the call.` }]
+        };
+      }
     }
     // What is stored for an attached MCP server is built from the capabilities,
     // never taken from the agent: it names a server and its tools, nothing else.
@@ -1059,6 +1096,46 @@ export class FlowOpsService implements OnDestroy {
       default:
         return null;
     }
+  }
+
+  /** The distinct native ids this batch newly attaches to an ai_prompt --
+   *  via add_action, add_intent's inline actions, or update_action on an
+   *  existing one -- that the project has not configured, per the
+   *  capabilities' own `configured` flag. Walks the same three shapes
+   *  `withResolvedServers` does, and resolves `fields.servers` the same way
+   *  (`resolveAttachedServers`): validation already proved every entry here
+   *  resolves, so this only has to ask which of the resolved natives are new.
+   *  Empty when there is no capabilities snapshot -- nothing can be judged
+   *  configured or not without one. */
+  private unconfiguredNativeIds(ops: FlowOp[]): string[] {
+    const snapshot = this.capabilities;
+    if (!snapshot) { return []; }
+    const ids = new Set<string>();
+    const collect = (type: string, fields?: Record<string, any>): void => {
+      if (type !== TYPE_ACTION.AI_PROMPT || !fields || !('servers' in fields)) { return; }
+      const resolved = resolveAttachedServers(fields.servers, snapshot).servers ?? [];
+      for (const server of resolved) {
+        if (!server.native || !server.id) { continue; }
+        const capability = snapshot.capabilities.mcp_servers.find(s => s.native && s.id === server.id);
+        if (capability?.configured === false) { ids.add(server.id); }
+      }
+    };
+    ops.forEach((op: any) => {
+      switch (op.op) {
+        case 'add_action':
+          collect(op.type, op.fields);
+          break;
+        case 'add_intent':
+          (op.actions || []).forEach((a: any) => collect(a.type, a.fields));
+          break;
+        case 'update_action': {
+          const type = this.existingActionType(op);
+          if (type) { collect(type, op.fields); }
+          break;
+        }
+      }
+    });
+    return [...ids];
   }
 
   /** A copy of `ops` whose ai_prompt `servers` are replaced by what

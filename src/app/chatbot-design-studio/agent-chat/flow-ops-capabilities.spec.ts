@@ -30,7 +30,13 @@ function aSnapshot(): CapabilitiesSnapshot {
       ],
       mcp_servers: [
         { id: 'tiledesk-communicator', name: 'Tiledesk Communicator', native: true,
-          transport: 'streamable_http', tools: [{ name: 'TRANSFER_TO_AGENT' }] }
+          transport: 'streamable_http', tools: [{ name: 'TRANSFER_TO_AGENT' }], configured: true },
+        // Unconfigured: the project has not added this one to its own MCP
+        // integration yet, which is exactly what configureNativeServers below
+        // is for.
+        { id: 'tiledesk-data-table', name: 'Tiledesk Data Table', native: true,
+          transport: 'streamable_http', tools: [{ name: 'GET_ROW' }], configured: false },
+        { name: 'Acme CRM', native: false, transport: 'streamable_http', tools: [{ name: 'lookup_customer' }] }
       ]
     },
     customServerConfigs: {}
@@ -174,6 +180,64 @@ describe('FlowOpsService — project capabilities', () => {
   it('checks nothing when no source is set', async () => {
     service.setCapabilitiesSource(null);
     const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'gpt_task' }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('adds an unconfigured native to the project before applying the patch, calling the configurer once with its id', async () => {
+    const calls: string[] = [];
+    const configurer = jasmine.createSpy('configurer').and.callFake(async (ids: string[]) => {
+      calls.push(`configure:${ids.join(',')}`);
+    });
+    intentService.updateIntent = jasmine.createSpy('updateIntent').and.callFake(async () => {
+      calls.push('updateIntent');
+      return true;
+    });
+    service.setNativeConfigurer(configurer);
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+      fields: { question: 'q', servers: [{ id: 'tiledesk-data-table', tools: ['GET_ROW'] }] }
+    }]);
+    expect(report.ok).toBe(true);
+    expect(configurer).toHaveBeenCalledTimes(1);
+    expect(configurer).toHaveBeenCalledWith(['tiledesk-data-table']);
+    expect(calls).toEqual(['configure:tiledesk-data-table', 'updateIntent']);
+  });
+
+  it('does not call the configurer when every attached server is already configured', async () => {
+    const configurer = jasmine.createSpy('configurer').and.returnValue(Promise.resolve());
+    service.setNativeConfigurer(configurer);
+    const nativeReport = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+      fields: { question: 'q', servers: [{ id: 'tiledesk-communicator', tools: ['TRANSFER_TO_AGENT'] }] }
+    }]);
+    expect(nativeReport.ok).toBe(true);
+    const customReport = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+      fields: { question: 'q2', servers: [{ name: 'Acme CRM', tools: ['lookup_customer'] }] }
+    }]);
+    expect(customReport.ok).toBe(true);
+    expect(configurer).not.toHaveBeenCalled();
+  });
+
+  it('refuses the batch when the configurer rejects, applying nothing', async () => {
+    const configurer = jasmine.createSpy('configurer').and.returnValue(Promise.reject(new Error('save failed')));
+    service.setNativeConfigurer(configurer);
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+      fields: { question: 'q', servers: [{ id: 'tiledesk-data-table', tools: ['GET_ROW'] }] }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('tiledesk-data-table');
+    expect(report.results[0].error).toContain('save failed');
+    expect(intentService.updateIntent).not.toHaveBeenCalled();
+  });
+
+  it('applies as before when no native configurer is set, even though the native is unconfigured', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+      fields: { question: 'q', servers: [{ id: 'tiledesk-data-table', tools: ['GET_ROW'] }] }
+    }]);
     expect(report.ok).toBe(true);
   });
 });

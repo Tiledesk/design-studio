@@ -61,7 +61,8 @@ describe('AgentChatHostService', () => {
       readFlow: jasmine.createSpy('readFlow').and.returnValue({ id_faq_kb: 'kb1', intents: [] }),
       apply: jasmine.createSpy('apply').and.returnValue(
         Promise.resolve({ ok: true, rejected_before_applying: false, results: [] })),
-      setCapabilitiesSource: jasmine.createSpy('setCapabilitiesSource')
+      setCapabilitiesSource: jasmine.createSpy('setCapabilitiesSource'),
+      setNativeConfigurer: jasmine.createSpy('setNativeConfigurer')
     };
 
     tokenChanged = new Subject<string>();
@@ -74,7 +75,8 @@ describe('AgentChatHostService', () => {
       capabilities: { chatbot_subtype: 'chatbot', subagent: false,
         actions: [{ type: 'reply', status: 'available' }], mcp_servers: [] },
       customServerConfigs: { 'Acme CRM': { name: 'Acme CRM', url: 'https://crm.example.com/mcp', transport: 'x' } }
-    })), invalidate: jasmine.createSpy('invalidate') };
+    })), invalidate: jasmine.createSpy('invalidate'),
+      configureNativeServers: jasmine.createSpy('configureNativeServers').and.returnValue(Promise.resolve()) };
 
     TestBed.configureTestingModule({
       providers: [
@@ -183,6 +185,17 @@ describe('AgentChatHostService', () => {
     const source = flowOps.setCapabilitiesSource.calls.mostRecent().args[0];
     const snapshot = await source();
     expect(snapshot.customServerConfigs['Acme CRM'].url).toBe('https://crm.example.com/mcp');
+  });
+
+  // A native an attached ai_prompt names but the project has not configured
+  // must still end up in the project's own MCP integration, so both MCP
+  // dialogs can show and manage it -- flow-ops calls this to make that happen.
+  it('wires flow-ops with a native configurer that calls capabilities.configureNativeServers', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect(flowOps.setNativeConfigurer).toHaveBeenCalled();
+    const configurer = flowOps.setNativeConfigurer.calls.mostRecent().args[0];
+    await configurer(['tiledesk-data-table']);
+    expect(capabilitiesService.configureNativeServers).toHaveBeenCalledWith(['tiledesk-data-table']);
   });
 
   // A new chat session reads the project's MCP servers afresh: one may have
@@ -419,7 +432,8 @@ describe('AgentChatHostService', () => {
         { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } },
         { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
             { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
-              customServerConfigs: {} }), invalidate: () => {} } }
+              customServerConfigs: {} }), invalidate: () => {},
+            configureNativeServers: () => Promise.resolve() } }
       ]
     });
     expect(TestBed.inject(AgentChatHostService).isConfigured()).toBe(false);

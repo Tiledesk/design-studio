@@ -36,7 +36,8 @@ describe('AgentChatCapabilitiesService', () => {
           tools: [{ name: 'lookup_customer' }, { name: 'delete_customer' }],
           selectedTools: ['lookup_customer'] },
         { name: 'Stale native copy', native: true, url: 'x', transport: 'streamable_http' }
-      ]))
+      ])),
+      saveMcpIntegration: jasmine.createSpy('saveMcpIntegration').and.returnValue(Promise.resolve())
     };
     TestBed.configureTestingModule({
       providers: [
@@ -88,7 +89,7 @@ describe('AgentChatCapabilitiesService', () => {
     const native = capabilities.mcp_servers.find(s => s.native);
     expect(native).toEqual({
       id: 'tiledesk-communicator', name: 'Tiledesk Communicator', native: true,
-      transport: 'streamable_http', description: 'Talk to the visitor',
+      transport: 'streamable_http', description: 'Talk to the visitor', configured: false,
       tools: [{ name: 'REPLY_TO_USER', description: 'Send a message' },
               { name: 'TRANSFER_TO_AGENT', description: 'Hand off' }]
     });
@@ -202,5 +203,88 @@ describe('AgentChatCapabilitiesService', () => {
     dashboardService.projectID = 'p2';
     await service.snapshot();
     expect(mcpService.loadNativeServers).toHaveBeenCalledTimes(2);
+  });
+
+  it('marks configured true for a native matched by id or by name in the integration, false when absent; a custom server carries no configured', async () => {
+    mcpService.loadNativeServers.and.returnValue(Promise.resolve([
+      { id: 'tiledesk-communicator', name: 'Tiledesk Communicator', native: true, transport: 'streamable_http' },
+      { id: 'tiledesk-data-table', name: 'Tiledesk Data Table', native: true, transport: 'streamable_http' },
+      { id: 'tiledesk-unused', name: 'Tiledesk Unused', native: true, transport: 'streamable_http' }
+    ]));
+    mcpService.connectNativeServer.and.returnValue(Promise.resolve([]));
+    mcpService.loadMcpServers.and.returnValue(Promise.resolve([
+      // Matched by id, even though the copy stored in the integration has a
+      // different name -- the same rule isConfigured uses.
+      { id: 'tiledesk-communicator', name: 'Renamed copy', native: true, url: '', transport: 'streamable_http' },
+      // Matched by name only, as a stale copy without an id would be.
+      { name: 'Tiledesk Data Table', native: true, url: '', transport: 'streamable_http' },
+      { name: 'Acme CRM', url: 'https://crm.example.com/mcp', transport: 'streamable_http', tools: [] }
+    ]));
+    const { capabilities } = await service.snapshot();
+    const byId = (id: string) => capabilities.mcp_servers.find(s => s.id === id);
+    expect(byId('tiledesk-communicator').configured).toBe(true);
+    expect(byId('tiledesk-data-table').configured).toBe(true);
+    expect(byId('tiledesk-unused').configured).toBe(false);
+    const custom = capabilities.mcp_servers.find(s => !s.native);
+    expect('configured' in custom).toBe(false);
+  });
+
+  describe('configureNativeServers', () => {
+    it('reads the integration fresh, appends the missing native without selectedTools, keeps existing entries in order, saves once and invalidates', async () => {
+      mcpService.loadNativeServers.and.returnValue(Promise.resolve([
+        { id: 'tiledesk-data-table', name: 'Tiledesk Data Table', native: true,
+          transport: 'streamable_http', description: 'Read and write rows' }
+      ]));
+      mcpService.connectNativeServer.and.returnValue(Promise.resolve([
+        { name: 'GET_ROW', description: 'Read a row' }
+      ]));
+      const existing = [
+        { name: 'Acme CRM', url: 'https://crm.example.com/mcp', transport: 'streamable_http', tools: [] }
+      ];
+      mcpService.loadMcpServers.and.returnValue(Promise.resolve(existing));
+      // Populates the private catalogue entry the configurer reads from.
+      await service.snapshot();
+      mcpService.loadMcpServers.calls.reset();
+      // Changed since the snapshot was taken: configureNativeServers must read
+      // it again, not reuse the cached copy.
+      const freshIntegration = [...existing, { name: 'Another one', url: 'x', transport: 'streamable_http', tools: [] }];
+      mcpService.loadMcpServers.and.returnValue(Promise.resolve(freshIntegration));
+
+      await service.configureNativeServers(['tiledesk-data-table']);
+
+      expect(mcpService.loadMcpServers).toHaveBeenCalledTimes(1);
+      expect(mcpService.saveMcpIntegration).toHaveBeenCalledTimes(1);
+      const saved = mcpService.saveMcpIntegration.calls.mostRecent().args[0];
+      expect(saved).toEqual([
+        ...freshIntegration,
+        { id: 'tiledesk-data-table', name: 'Tiledesk Data Table', url: '', transport: 'streamable_http',
+          native: true, description: 'Read and write rows', tools: [{ name: 'GET_ROW', description: 'Read a row' }] }
+      ]);
+
+      mcpService.loadNativeServers.calls.reset();
+      await service.snapshot();
+      expect(mcpService.loadNativeServers).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not save when the id is already configured', async () => {
+      mcpService.loadNativeServers.and.returnValue(Promise.resolve([
+        { id: 'tiledesk-communicator', name: 'Tiledesk Communicator', native: true, transport: 'streamable_http' }
+      ]));
+      mcpService.loadMcpServers.and.returnValue(Promise.resolve([
+        { id: 'tiledesk-communicator', name: 'Tiledesk Communicator', native: true, url: '', transport: 'streamable_http' }
+      ]));
+      await service.configureNativeServers(['tiledesk-communicator']);
+      expect(mcpService.saveMcpIntegration).not.toHaveBeenCalled();
+    });
+
+    it('rejects when saveMcpIntegration rejects', async () => {
+      mcpService.loadNativeServers.and.returnValue(Promise.resolve([
+        { id: 'tiledesk-data-table', name: 'Tiledesk Data Table', native: true, transport: 'streamable_http' }
+      ]));
+      mcpService.loadMcpServers.and.returnValue(Promise.resolve([]));
+      mcpService.saveMcpIntegration.and.returnValue(Promise.reject(new Error('network down')));
+      await expectAsync(service.configureNativeServers(['tiledesk-data-table']))
+        .toBeRejectedWithError('network down');
+    });
   });
 });
