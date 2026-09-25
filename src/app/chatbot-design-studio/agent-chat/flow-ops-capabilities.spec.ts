@@ -9,6 +9,23 @@ import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { LlmModel } from '../utils-llm-models';
+
+function aModel(llm: string, model: string, modelName: string, server?: string): LlmModel {
+  return {
+    uid: `${llm}::${server ?? ''}::${model}`, modelName, llm, llmLabel: llm, model,
+    description: '', src: '', status: 'active', configured: true,
+    ...(server ? { server } : {})
+  };
+}
+
+const MODELS: LlmModel[] = [
+  aModel('openai', 'gpt-4.1-mini', 'GPT-4.1 mini'),
+  aModel('openai', 'gpt-4o', 'GPT-4o'),
+  aModel('anthropic', 'claude-sonnet-4', 'Claude Sonnet 4'),
+  aModel('vllm', 'llama-3', 'gpu-a ・ llama-3', 'gpu-a'),
+  aModel('vllm', 'llama-3', 'gpu-b ・ llama-3', 'gpu-b')
+];
 
 function anIntent(intentId: string, name: string): Intent {
   const intent = new Intent();
@@ -19,15 +36,19 @@ function anIntent(intentId: string, name: string): Intent {
   return intent;
 }
 
-function aSnapshot(): CapabilitiesSnapshot {
+function aSnapshot(models: LlmModel[] = MODELS): CapabilitiesSnapshot {
   return {
     capabilities: {
       chatbot_subtype: 'chatbot', subagent: false,
       actions: [
         { type: 'reply', status: 'available' },
         { type: 'ai_prompt', status: 'available' },
+        { type: 'ai_condition', status: 'available' },
+        { type: 'askgptv2', status: 'available' },
         { type: 'code', status: 'needs_upgrade', plan: 'Custom' }
       ],
+      llm_models: models.map(m => ({ llm: m.llm, model: m.model, label: `${m.llmLabel} · ${m.modelName}`,
+        ...(m.server ? { server: m.server } : {}) })),
       mcp_servers: [
         { id: 'tiledesk-communicator', name: 'Tiledesk Communicator', native: true,
           transport: 'streamable_http', tools: [{ name: 'TRANSFER_TO_AGENT' }], configured: true },
@@ -39,6 +60,7 @@ function aSnapshot(): CapabilitiesSnapshot {
         { name: 'Acme CRM', native: false, transport: 'streamable_http', tools: [{ name: 'lookup_customer' }] }
       ]
     },
+    llmModels: models,
     customServerConfigs: {}
   };
 }
@@ -54,7 +76,10 @@ describe('FlowOpsService — project capabilities', () => {
     const withLegacy = anIntent('i1', 'start');
     withLegacy.actions = [
       { _tdActionId: 'old', _tdActionType: 'gpt_task', question: 'q' } as any,
-      { _tdActionId: 'ai1', _tdActionType: 'ai_prompt', question: 'q' } as any
+      { _tdActionId: 'ai1', _tdActionType: 'ai_prompt', question: 'q' } as any,
+      // Saved on a model this project does not have (any more).
+      { _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'q', llm: 'vllm', model: 'old',
+        modelName: 'gpu-z ・ old', vllmServer: 'gpu-z' } as any
     ];
     intentService = {
       listOfIntents: [withLegacy, anIntent('i2', 'welcome')],
@@ -280,5 +305,98 @@ describe('FlowOpsService — project capabilities', () => {
       fields: { question: 'q', servers: [{ id: 'tiledesk-data-table', tools: ['GET_ROW'] }] }
     }]);
     expect(report.ok).toBe(true);
+  });
+  describe('models of the AI actions', () => {
+    const stored = (intentId: string, index = 0) =>
+      JSON.parse(JSON.stringify(intentService.getIntentFromId(intentId).actions[index]));
+
+    it('stores what the panel would for a model the project has, on add_action ai_prompt', async () => {
+      const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+        fields: { question: 'q', llm: 'vllm', model: 'llama-3', vllmServer: 'gpu-b', modelName: 'x' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q',
+        llm: 'vllm', model: 'llama-3', modelName: 'gpu-b ・ llama-3', vllmServer: 'gpu-b' });
+    });
+
+    it('refuses the whole batch for a model the project does not have, applying nothing', async () => {
+      const report = await service.apply([
+        { op: 'add_action', intent_id: 'i2', type: 'reply' },
+        { op: 'add_action', intent_id: 'i2', type: 'ai_prompt', fields: { llm: 'openai', model: 'gpt-9' } }
+      ]);
+      expect(report.rejected_before_applying).toBe(true);
+      expect(report.results[1].error).toContain('openai / gpt-9');
+      expect(report.results[1].error).toContain('openai / gpt-4o');
+      expect(intentService.updateIntent).not.toHaveBeenCalled();
+    });
+
+    it('gives an ai_condition added without a model GPT-4o, when the project has it', async () => {
+      const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_condition' }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i2')).toEqual(jasmine.objectContaining({ llm: 'openai', model: 'gpt-4o', modelName: 'GPT-4o' }));
+    });
+
+    it('gives it the first model when the project has no GPT-4o', async () => {
+      service.setCapabilitiesSource(() => Promise.resolve(aSnapshot(MODELS.slice(2))));
+      await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_condition' }]);
+      expect(stored('i2')).toEqual(jasmine.objectContaining(
+        { llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4' }));
+    });
+
+    it('leaves a new action as today when the project has no model', async () => {
+      service.setCapabilitiesSource(() => Promise.resolve(aSnapshot([])));
+      const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+        fields: { question: 'q' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt', question: 'q' });
+    });
+
+    it('checks and fills askgptv2 inside add_intent, defaulting the one that sets no model', async () => {
+      intentService.createNewIntent = jasmine.createSpy('createNewIntent')
+        .and.callFake(() => anIntent('new-id', 'kb'));
+      intentService.addNewIntentToListOfIntents = jasmine.createSpy('addNewIntentToListOfIntents')
+        .and.callFake((intent: Intent) => { intentService.listOfIntents.push(intent); });
+      const bad = await service.apply([{ op: 'add_intent', intent_display_name: 'kb',
+        actions: [{ type: 'askgptv2', fields: { llm: 'vllm', model: 'llama-3' } }] }]);
+      expect(bad.rejected_before_applying).toBe(true);
+      expect(bad.results[0].error).toContain('vllmServer');
+      const report = await service.apply([{ op: 'add_intent', intent_display_name: 'kb',
+        actions: [{ type: 'askgptv2', fields: { llm: 'anthropic', model: 'claude-sonnet-4' } },
+                  { type: 'askgptv2' }] }]);
+      expect(report.ok).toBe(true);
+      expect(stored('new-id', 0)).toEqual(jasmine.objectContaining(
+        { llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4' }));
+      expect(stored('new-id', 1)).toEqual(jasmine.objectContaining({ llm: 'openai', model: 'gpt-4o' }));
+    });
+
+    it('checks and fills a model set by update_action on an existing ai_prompt, dropping its old server', async () => {
+      const source = jasmine.createSpy('source').and.returnValue(Promise.resolve(aSnapshot()));
+      service.setCapabilitiesSource(source);
+      const bad = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai2',
+        fields: { llm: 'openai', model: 'gpt-9' } }]);
+      expect(bad.rejected_before_applying).toBe(true);
+      expect(source).toHaveBeenCalled();
+      const good = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai2',
+        fields: { llm: 'anthropic', model: 'claude-sonnet-4' } }]);
+      expect(good.ok).toBe(true);
+      expect(stored('i1', 2)).toEqual({ _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'q',
+        llm: 'anthropic', model: 'claude-sonnet-4', modelName: 'Claude Sonnet 4' });
+    });
+
+    it('leaves an existing model alone, even one the project does not have, when update_action does not set it', async () => {
+      const report = await service.apply([{ op: 'update_action', intent_id: 'i1', action_id: 'ai2',
+        fields: { question: 'new' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i1', 2)).toEqual({ _tdActionId: 'ai2', _tdActionType: 'ai_prompt', question: 'new',
+        llm: 'vllm', model: 'old', modelName: 'gpu-z ・ old', vllmServer: 'gpu-z' });
+    });
+
+    it('checks and fills nothing when no source is set', async () => {
+      service.setCapabilitiesSource(null);
+      const report = await service.apply([{ op: 'add_action', intent_id: 'i2', type: 'ai_prompt',
+        fields: { llm: 'openai', model: 'gpt-9' } }]);
+      expect(report.ok).toBe(true);
+      expect(stored('i2')).toEqual({ _tdActionId: 'generated', _tdActionType: 'ai_prompt',
+        llm: 'openai', model: 'gpt-9' });
+    });
   });
 });

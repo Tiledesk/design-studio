@@ -1,13 +1,18 @@
 import { Injectable, Injector } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { McpService } from 'src/app/services/mcp.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { AppConfigService } from 'src/app/services/app-config';
+import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { McpServer } from 'src/app/models/mcp.model';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import {
   TYPE_CHATBOT, availableActionEntries, isSubagentSubtype, resolveChatbotSubtype
 } from '../utils-actions';
+import { LlmModel, initLLMModels } from '../utils-llm-models';
 import {
-  ActionCapability, CapabilitiesSnapshot, McpServerCapability
+  ActionCapability, CapabilitiesSnapshot, LlmModelCapability, McpServerCapability
 } from './agent-chat-capabilities.model';
 
 interface McpPart {
@@ -21,6 +26,36 @@ interface McpPart {
    *  integration. */
   nativeConfigs: Record<string, McpServer>;
   error?: string;
+}
+
+interface LlmPart {
+  /** The configured picker entries, kept for flow-ops (see CapabilitiesSnapshot). */
+  models: LlmModel[];
+  capabilities: LlmModelCapability[];
+  error?: string;
+}
+
+/** The models the AI actions' own picker lists -- initLLMModels, the call
+ *  each of their panels makes -- behind a seam the spec can replace, since
+ *  initLLMModels is a plain function reaching ProjectService, the app config
+ *  and the integrations endpoint. */
+@Injectable({ providedIn: 'root' })
+export class AgentChatLlmModelsLoader {
+  constructor(
+    private projectService: ProjectService,
+    private dashboardService: DashboardService,
+    private appConfigService: AppConfigService
+  ) {}
+
+  public load(): Promise<LlmModel[]> {
+    return initLLMModels({
+      projectService: this.projectService,
+      dashboardService: this.dashboardService,
+      appConfigService: this.appConfigService,
+      logger: LoggerInstance.getInstance(),
+      componentName: 'AGENT-CHAT CAPABILITIES'
+    });
+  }
 }
 
 function messageOf(error: any): string {
@@ -46,8 +81,10 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
  *  to check patches against.
  *
  *  Actions are recomputed on every call: open_flow can move the canvas into a
- *  subagent, and what a subagent may use differs. The MCP servers are read once
- *  per project and kept for up to a minute, because discovering a native
+ *  subagent, and what a subagent may use differs. So are the models: the
+ *  integrations they come from are already cached by ProjectService for a
+ *  minute. The MCP servers are read once per project and kept for up to a
+ *  minute, because discovering a native
  *  server's tools is a connection per server; an answer with any failure in it
  *  (or a load that threw) is not kept, so the next call tries again instead of
  *  repeating a transient error for the whole session. */
@@ -74,16 +111,19 @@ export class AgentChatCapabilitiesService {
       .map(a => a.canLoad
         ? { type: a.type, status: 'available' as const }
         : { type: a.type, status: 'needs_upgrade' as const, plan: String(a.plan) });
-    const mcp = await this.mcpPart();
+    const [mcp, llm] = await Promise.all([this.mcpPart(), this.llmPart()]);
     return {
       capabilities: {
         chatbot_subtype: resolveChatbotSubtype(subtype),
         subagent: isSubagentSubtype(subtype),
         actions,
         mcp_servers: mcp.servers,
-        ...(mcp.error ? { mcp_error: mcp.error } : {})
+        ...(mcp.error ? { mcp_error: mcp.error } : {}),
+        llm_models: llm.capabilities,
+        ...(llm.error ? { llm_models_error: llm.error } : {})
       },
-      customServerConfigs: mcp.configs
+      customServerConfigs: mcp.configs,
+      llmModels: llm.models
     };
   }
 
@@ -146,6 +186,40 @@ export class AgentChatCapabilitiesService {
     if (missing.length === 0) { return; }
     await this.mcpService.saveMcpIntegration([...current, ...missing]);
     this.invalidate();
+  }
+
+  /** The models the project has configured, in the picker's own order
+   *  (OpenAI first). A failure is reported in the answer, never thrown: the
+   *  actions and MCP servers are still worth returning. */
+  private async llmPart(): Promise<LlmPart> {
+    try {
+      // Resolved here for the same reason as ProjectPlanUtils in snapshot().
+      const all = await this.injector.get(AgentChatLlmModelsLoader).load();
+      const translate = this.injector.get(TranslateService);
+      const models = all.filter(m => m.configured === true);
+      return { models, capabilities: models.map(m => this.llmCapability(m, translate)) };
+    } catch (e) {
+      return { models: [], capabilities: [], error: messageOf(e) };
+    }
+  }
+
+  /** What the agent is told about one model. Never a key or a url. */
+  private llmCapability(m: LlmModel, translate: TranslateService): LlmModelCapability {
+    // `description` is an i18n key; one with no translation comes back as the
+    // key itself, or empty, and says nothing.
+    const description = m.description ? translate.instant(m.description) : '';
+    // generateLlmModelsFlat() sets `reasoning`, which LlmModel does not declare.
+    const reasoning = (m as LlmModel & { reasoning?: boolean }).reasoning === true;
+    return {
+      llm: m.llm,
+      model: m.model,
+      label: `${m.llmLabel} · ${m.modelName}`,
+      ...(m.server ? { server: m.server } : {}),
+      ...(description && description !== m.description ? { description } : {}),
+      ...(reasoning ? { reasoning: true } : {}),
+      ...(m.multiplier ? { cost_multiplier: m.multiplier } : {}),
+      ...(typeof m.max_output_tokens === 'number' ? { max_output_tokens: m.max_output_tokens } : {})
+    };
   }
 
   private mcpPart(): Promise<McpPart> {
@@ -232,3 +306,4 @@ export class AgentChatCapabilitiesService {
     };
   }
 }
+

@@ -13,7 +13,9 @@ import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
-import { actionTypeRefusal, resolveAttachedServers } from './agent-chat-capabilities.rules';
+import {
+  actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, withDefaultLlmModel
+} from './agent-chat-capabilities.rules';
 
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
  *  of the AI chat: once it has paused (the first pass), and again after the connector service's
@@ -286,9 +288,10 @@ export class FlowOpsService implements OnDestroy {
         };
       }
     }
-    // What is stored for an attached MCP server is built from the capabilities,
-    // never taken from the agent: it names a server and its tools, nothing else.
-    ops = this.withResolvedServers(ops);
+    // What is stored for an attached MCP server, or for an AI action's model,
+    // is built from the capabilities, never taken from the agent: it names a
+    // server and its tools, or a provider and a model, nothing else.
+    ops = this.withResolvedCapabilities(ops);
 
     // Measured rather than assumed: each of updateIntent / saveNewIntent /
     // deleteIntentNew pushes exactly one entry today, but the honest count of
@@ -1048,14 +1051,14 @@ export class FlowOpsService implements OnDestroy {
     return null;
   }
 
-  /** Whether any op in the batch adds an action or attaches MCP servers --
-   *  the only things the capabilities decide. A batch that only moves, renames,
-   *  connects or deletes never waits on them. */
+  /** Whether any op in the batch adds an action, attaches MCP servers or
+   *  picks an AI action's model -- the only things the capabilities decide. A
+   *  batch that only moves, renames, connects or deletes never waits on them. */
   private batchNeedsCapabilities(ops: FlowOp[]): boolean {
     return ops.some((op: any) =>
       op?.op === 'add_action'
       || (op?.op === 'add_intent' && Array.isArray(op.actions) && op.actions.length > 0)
-      || (op?.op === 'update_action' && op.fields && 'servers' in op.fields));
+      || (op?.op === 'update_action' && op.fields && ('servers' in op.fields || setsLlmModel(op.fields))));
   }
 
   private existingActionType(op: any): string | null {
@@ -1065,9 +1068,11 @@ export class FlowOpsService implements OnDestroy {
   }
 
   /** Refusal text for an op that breaks the project's capabilities, or null.
-   *  Adding checks the type; any ai_prompt that sets `servers` checks those.
+   *  Adding checks the type; any ai_prompt that sets `servers` checks those;
+   *  any AI action that picks a model checks it (resolveLlmModel).
    *  update_action never checks the type: an action already on the canvas stays
-   *  editable even if the project could no longer add it. */
+   *  editable even if the project could no longer add it -- nor the model it
+   *  already has, unless the patch picks another. */
   private capabilityError(op: FlowOp): string | null {
     const snapshot = this.capabilities;
     const check = (type: string, fields: Record<string, any> | undefined, adding: boolean): string | null => {
@@ -1076,9 +1081,10 @@ export class FlowOpsService implements OnDestroy {
         if (refusal) { return refusal; }
       }
       if (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields) {
-        return resolveAttachedServers(fields.servers, snapshot).error ?? null;
+        const error = resolveAttachedServers(fields.servers, snapshot).error;
+        if (error) { return error; }
       }
-      return null;
+      return resolveLlmModel(type, fields, snapshot).error ?? null;
     };
     switch (op.op) {
       case 'add_action':
@@ -1102,7 +1108,7 @@ export class FlowOpsService implements OnDestroy {
    *  via add_action, add_intent's inline actions, or update_action on an
    *  existing one -- that the project has not configured, per the
    *  capabilities' own `configured` flag. Walks the same three shapes
-   *  `withResolvedServers` does, and resolves `fields.servers` the same way
+   *  `withResolvedCapabilities` does, and resolves `fields.servers` the same way
    *  (`resolveAttachedServers`): validation already proved every entry here
    *  resolves, so this only has to ask which of the resolved natives are new.
    *  Empty when there is no capabilities snapshot -- nothing can be judged
@@ -1139,26 +1145,33 @@ export class FlowOpsService implements OnDestroy {
   }
 
   /** A copy of `ops` whose ai_prompt `servers` are replaced by what
-   *  resolveAttachedServers built. Only called once validation has passed,
-   *  so every resolution here succeeds. */
-  private withResolvedServers(ops: FlowOp[]): FlowOp[] {
+   *  resolveAttachedServers built, and whose AI actions' model fields by what
+   *  resolveLlmModel built -- plus, on an AI action being added that picks no
+   *  model, the default one (withDefaultLlmModel), so it does not open on the
+   *  panel's GPT-4o fallback whatever the project has. Only called once
+   *  validation has passed, so every resolution here succeeds. */
+  private withResolvedCapabilities(ops: FlowOp[]): FlowOp[] {
     const snapshot = this.capabilities;
     if (!snapshot) { return ops; }
-    const resolve = (type: string, fields?: Record<string, any>): Record<string, any> | undefined =>
-      (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields)
+    const resolve = (type: string, fields: Record<string, any> | undefined, adding: boolean)
+      : Record<string, any> | undefined => {
+      let resolved = (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields)
         ? { ...fields, servers: resolveAttachedServers(fields.servers, snapshot).servers }
         : fields;
+      resolved = resolveLlmModel(type, resolved, snapshot).fields;
+      return adding ? withDefaultLlmModel(type, resolved, snapshot) : resolved;
+    };
     return ops.map((op): FlowOp => {
       switch (op.op) {
         case 'add_action':
-          return { ...op, fields: resolve(op.type, op.fields) };
+          return { ...op, fields: resolve(op.type, op.fields, true) };
         case 'add_intent':
           return op.actions
-            ? { ...op, actions: op.actions.map(a => ({ ...a, fields: resolve(a.type, a.fields) })) }
+            ? { ...op, actions: op.actions.map(a => ({ ...a, fields: resolve(a.type, a.fields, true) })) }
             : op;
         case 'update_action': {
           const type = this.existingActionType(op);
-          return type ? { ...op, fields: resolve(type, op.fields) } : op;
+          return type ? { ...op, fields: resolve(type, op.fields, false) } : op;
         }
         default:
           return op;

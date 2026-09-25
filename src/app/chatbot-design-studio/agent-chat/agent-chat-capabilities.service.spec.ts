@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
+import { TranslateService } from '@ngx-translate/core';
+import { AgentChatCapabilitiesService, AgentChatLlmModelsLoader } from './agent-chat-capabilities.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { McpService } from 'src/app/services/mcp.service';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
@@ -13,6 +14,9 @@ describe('AgentChatCapabilitiesService', () => {
   let planUtils: any;
   let planUtilsBuilt: number;
   let savedList: string;
+  let llmLoader: any;
+  let loaderBuilt: number;
+  let translate: any;
 
   beforeEach(() => {
     LoggerInstance.setInstance({
@@ -39,15 +43,34 @@ describe('AgentChatCapabilitiesService', () => {
       ])),
       saveMcpIntegration: jasmine.createSpy('saveMcpIntegration').and.returnValue(Promise.resolve())
     };
+    // What initLLMModels answers: every model, configured or not, in its own
+    // order (OpenAI first), as the AI action pickers show them.
+    llmLoader = { load: jasmine.createSpy('load').and.returnValue(Promise.resolve([
+      { uid: 'openai::::gpt-4o', modelName: 'GPT-4o', llm: 'openai', llmLabel: 'OpenAI', model: 'gpt-4o',
+        description: 'TYPE_GPT_MODEL.gpt-4o.description', src: 'x', status: 'active', configured: true,
+        min_tokens: 1, max_output_tokens: 16384, reasoning: false, multiplier: '1 x tokens' },
+      { uid: 'anthropic::::claude-sonnet-4', modelName: 'Claude Sonnet 4', llm: 'anthropic',
+        llmLabel: 'Anthropic', model: 'claude-sonnet-4', description: 'TYPE_GPT_MODEL.untranslated.description',
+        src: 'x', status: 'active', configured: false, max_output_tokens: 64000 },
+      { uid: 'vllm::gpu-a::llama-3', modelName: 'gpu-a ・ llama-3', llm: 'vllm', llmLabel: 'vLLM',
+        model: 'llama-3', description: '', src: 'x', status: 'active', configured: true,
+        max_output_tokens: 128000, reasoning: true, server: 'gpu-a',
+        url: 'https://secret.example.com/v1', apikey: 'secret' }
+    ])) };
+    translate = { instant: jasmine.createSpy('instant').and.callFake((key: string) =>
+      key === 'TYPE_GPT_MODEL.gpt-4o.description' ? 'Fast and capable' : key) };
     TestBed.configureTestingModule({
       providers: [
         AgentChatCapabilitiesService,
         { provide: DashboardService, useValue: dashboardService },
         { provide: McpService, useValue: mcpService },
+        { provide: AgentChatLlmModelsLoader, useFactory: () => { loaderBuilt++; return llmLoader; } },
+        { provide: TranslateService, useValue: translate },
         { provide: ProjectPlanUtils, useFactory: () => { planUtilsBuilt++; return planUtils; } }
       ]
     });
     planUtilsBuilt = 0;
+    loaderBuilt = 0;
     service = TestBed.inject(AgentChatCapabilitiesService);
   });
 
@@ -59,6 +82,48 @@ describe('AgentChatCapabilitiesService', () => {
     expect(planUtilsBuilt).toBe(0);
     await service.snapshot();
     expect(planUtilsBuilt).toBe(1);
+  });
+
+  it('lists only the configured models, in initLLMModels\' order, with what the agent picks by', async () => {
+    const snap = await service.snapshot();
+    expect(snap.capabilities.llm_models).toEqual([
+      { llm: 'openai', model: 'gpt-4o', label: 'OpenAI · GPT-4o', description: 'Fast and capable',
+        cost_multiplier: '1 x tokens', max_output_tokens: 16384 },
+      { llm: 'vllm', model: 'llama-3', label: 'vLLM · gpu-a ・ llama-3', server: 'gpu-a',
+        reasoning: true, max_output_tokens: 128000 }
+    ]);
+    expect(snap.capabilities.llm_models_error).toBeUndefined();
+    expect(snap.llmModels.map(m => m.uid)).toEqual(['openai::::gpt-4o', 'vllm::gpu-a::llama-3']);
+  });
+
+  it('never puts a model\'s key or url in what the agent is sent', async () => {
+    const { capabilities } = await service.snapshot();
+    expect(JSON.stringify(capabilities.llm_models)).not.toContain('secret');
+    expect(JSON.stringify(capabilities.llm_models)).not.toContain('https://');
+  });
+
+  it('reads the models again on every call', async () => {
+    await service.snapshot();
+    await service.snapshot();
+    expect(llmLoader.load).toHaveBeenCalledTimes(2);
+  });
+
+  it('reports llm_models_error when the models cannot be read, and still returns actions and servers', async () => {
+    llmLoader.load.and.returnValue(Promise.reject(new Error('integrations 503')));
+    const snap = await service.snapshot();
+    expect(snap.capabilities.llm_models).toEqual([]);
+    expect(snap.capabilities.llm_models_error).toContain('integrations 503');
+    expect(snap.llmModels).toEqual([]);
+    expect(snap.capabilities.actions.length).toBeGreaterThan(0);
+    expect(snap.capabilities.mcp_servers.length).toBe(2);
+  });
+
+  // Same reason as ProjectPlanUtils above: the loader reaches ProjectService
+  // and the app config, which this early service must not need to exist.
+  it('does not build the models loader until capabilities are asked for', async () => {
+    expect(loaderBuilt).toBe(0);
+    await service.snapshot();
+    expect(loaderBuilt).toBe(1);
   });
 
   afterEach(() => {
