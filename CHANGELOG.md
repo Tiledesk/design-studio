@@ -8,6 +8,15 @@
 *Tiledesk SRL*
 
 
+# this branch 25/09/2026
+
+- **changed**: the AI actions the AI chat builds (AI Prompt, AI Condition, Ask knowledge base) get a model the project really has — chosen by the chat for the task, and checked by the studio — instead of always falling back to GPT-4o
+- **fixed**: a Tiledesk native MCP server the AI chat attaches to an AI Prompt is also added to the project's MCP servers, as picking it from Native Tools would, so both MCP dialogs show and manage it
+- **changed**: the flow the AI chat reads no longer carries the address or the headers of the project's own MCP servers, so their credentials never reach the chat or its model
+- **added**: the AI chat that builds agents asks the studio what the project can use before it builds: the actions of the element panel for this agent (the ones a plan does not unlock are reported as such) and the MCP servers an AI Prompt can call, native and the project's own, with their tools
+- **changed**: the AI chat can no longer add an action the project does not have, or attach an MCP server or tool the project does not have: the change is refused with the reason, and nothing is applied. What is stored for an attached server is built by the studio, never taken from the chat
+- **changed**: the element panel and the AI chat read the list of available actions from one place, so they cannot disagree
+
 # 1.40.15-rc13
 - **changed**: the left panels come back the way you left them on that agent — the AI chat and the blocks list, remembered per agent. With no earlier choice the chat is open and the blocks list closed. The chat did not merely start open before: it reopened on every flow switch, so closing it and stepping into a subagent brought it back
 - **fixed**: a connector is no longer lost when the block at its far end is drawn late. Drawing one needs both blocks on screen, and after a large AI chat edit the second could still be missing: that connector disappeared until the page was reloaded. The canvas now checks and completes what is missing
