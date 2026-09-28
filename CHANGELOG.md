@@ -7,9 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 28/09/2026
-- **fixed**: the operator list of a reply filter offers again only what the server can actually evaluate. It had quietly gone back to showing all 38, and a filter written with one of the 22 it cannot read stopped being evaluated, so the message it guarded disappeared with nothing said
-- **fixed**: *contains ignore case* and *starts with ignore case* are selectable again in the filters and in the legacy condition. They had been dropped although the server has always evaluated them
+# 1.40.16-rc2
+- **fixed**: the reply filter picker offers again only the 16 operators the server evaluates. It had regressed to all 38, and a filter using one of the others was never evaluated: the message it guarded vanished with nothing said
+- **fixed**: *contains ignore case* and *starts with ignore case* are selectable again in the legacy filter and condition, after being dropped although the server evaluates them
 
 # 1.40.16-rc1
 - **changed**: on V3 agents the block holding a condition with several cases no longer shows its own outgoing point. The action's exits are its cases and the *else*, so a connector started from the block would never be travelled at runtime — the same behaviour the other conditions already have
