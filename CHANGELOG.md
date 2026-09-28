@@ -7,15 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 28/09/2026
-- **added**: a condition can now hold several cases instead of a single test with two exits. Each case has its own conditions, its own destination block and its own connector on the block; they are evaluated in order and the first one that matches sends the conversation on, leaving the action. When none matches, the flow takes the final *else* branch
-- **added**: the cases are numbered and can be moved up or down, because the order is what decides which branches below stay reachable. A case left without a condition never fires, and says so instead of leaving it to be guessed
-- **changed**: it replaces the chain of one-condition blocks — one block per branch — that a multi-way choice needed until now. The two existing conditions are untouched: every agent already saved keeps working exactly as before
-- **fixed**: comparing a text value against something written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened, and lost its quotes at the next save. The condition quietly stopped testing what it was written to test. It affects the condition already in use, not only the new one
-
-# this branch 25/09/2026
-- **added**: a text condition can ignore uppercase and lowercase. A checkbox under the value, on text comparisons only — is equal to, contains, starts with, ends with and their negations. Off by default, so every condition already saved keeps comparing exactly as it did
-- **changed**: **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why. A condition that wants case ignored asks for it with the checkbox above
+# 1.40.16-rc1
+- **added**: a condition can hold several cases instead of a single test with two exits. They are evaluated in order, the first one that matches sends the conversation to its own block, and when none matches the flow takes the *else* branch. Cases are numbered and can be reordered, because the order decides what below them stays reachable; one left without a condition never fires and says so. It replaces the chain of one-condition blocks, one per branch
+- **added**: a text comparison can ignore uppercase and lowercase — a checkbox on text operators only, off by default, so every condition already saved keeps comparing exactly as it did
+- **changed**: **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why
+- **fixed**: comparing text against a value written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened and lost its quotes at the next save, quietly changing what it tested. It affects the condition already in use, not only the new one
 
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
