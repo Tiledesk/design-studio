@@ -12,21 +12,51 @@ export class TiledeskStage {
     drawer;
     classDraggable = "tds_draggable";
 
+    /** Come classDraggable, ma vale anche per i discendenti: il drag parte da un
+     *  punto qualsiasi del sottoalbero. Serve dove la maniglia e' un componente
+     *  con markup proprio (l'header dell'action in V3), i cui figli non possono
+     *  essere raggiunti dal CSS del componente padre. */
+    classDraggableDeep = "tds_draggable_deep";
+
+    /** Spostamento minimo (px) prima che un mousedown diventi un trascinamento:
+     *  sotto questa soglia il blocco non si muove, cosi' un click impreciso non
+     *  lo sposta di un paio di pixel. */
+    dragThreshold = 4;
+
 
     isDragging = false;
     position = {x: 0, y: 0};
+
+    /** rAF throttle: at most one moved-and-scaled dispatch per animation frame */
+    _movedAndScaledRafId = null;
+    _movedAndScaledPending = null;
 
     constructor(containerId, drawerId, classDraggable) {
         this.containerId = containerId;
         this.drawerId = drawerId;
         this.classDraggable = classDraggable;
         this.moveAndZoom = this.moveAndZoom.bind(this);
+        this._scheduleMovedAndScaled = this._scheduleMovedAndScaled.bind(this);
+    }
+
+    _scheduleMovedAndScaled() {
+        this._movedAndScaledPending = { scale: this.scale, x: this.tx, y: this.ty };
+        if (this._movedAndScaledRafId != null) return;
+        this._movedAndScaledRafId = requestAnimationFrame(() => {
+            this._movedAndScaledRafId = null;
+            const p = this._movedAndScaledPending;
+            this._movedAndScaledPending = null;
+            if (p == null) return;
+            const customEvent = new CustomEvent("moved-and-scaled", { detail: p });
+            document.dispatchEvent(customEvent);
+        });
     }
     
     setDrawer() {
         this.container = document.getElementById(this.containerId);
         this.drawer = document.getElementById(this.drawerId);
         this.drawer.style.transformOrigin = this.torigin;
+        this.getPositionNow();
         this.container.addEventListener("wheel", this.moveAndZoom);
         this.setupMouseDrag();
     }
@@ -57,10 +87,7 @@ export class TiledeskStage {
                         this.tx = startX + (event.clientX - clientX) * direction;
                         this.ty = startY + (event.clientY - clientY) * direction;
                         this.transform();
-                        setTimeout(() => {
-                            const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });
-                            document.dispatchEvent(customEvent);
-                        }, 0)
+                        this._scheduleMovedAndScaled();
                     }
                 }).bind(this);
 
@@ -77,12 +104,7 @@ export class TiledeskStage {
 
 
     moveAndZoom(event) {
-        // // console.log("[TILEDESK-STAGE-JS]  •••• moveAndZoom ••••");
         event.preventDefault();
-        const dx = event.deltaX;
-        const dy = event.deltaY;
-        this.getPositionNow();
-
         if (event.ctrlKey === false) {
             let direction = -1;
             this.tx += event.deltaX * direction;
@@ -97,7 +119,7 @@ export class TiledeskStage {
             zoom_point.y = event.pageY - this.drawer.offsetTop-originRec.y;
             zoom_target.x = (zoom_point.x - this.tx)/this.scale;
             zoom_target.y = (zoom_point.y - this.ty)/this.scale;
-            this.scale += dy * -0.01;
+            this.scale += event.deltaY * -0.01;
             // Restrict scale
             this.scale = Math.min(Math.max(0.125, this.scale), 4);
             this.tx = -zoom_target.x * this.scale + zoom_point.x
@@ -105,11 +127,7 @@ export class TiledeskStage {
             // Apply scale transform
             this.transform();
         }
-        setTimeout(() => {
-            const customEvent = new CustomEvent("moved-and-scaled", { detail: {scale: this.scale, x: this.tx, y: this.ty} });
-            document.dispatchEvent(customEvent);
-        }, 0)
-        
+        this._scheduleMovedAndScaled();
     }
 
     // richiamato solo quando premo sul plsante più e meno
@@ -133,25 +151,28 @@ export class TiledeskStage {
     }
     
     transform() {
-        let tcmd = `translate(${this.tx}px, ${this.ty}px)`;
-        let scmd = `scale(${this.scale})`;
-        const cmd = tcmd + " " + scmd;
-        this.drawer.style.transform = cmd;
+        const tcmd = `translate3d(${this.tx}px, ${this.ty}px, 0)`;
+        const scmd = `scale(${this.scale})`;
+        this.drawer.style.transform = tcmd + " " + scmd;
     }
 
 
     getPositionNow(){
         if(window.getComputedStyle(this.drawer)){
-            let computedStyle = window.getComputedStyle(this.drawer);
-            let transformValue = computedStyle.getPropertyValue('transform');
-            if(transformValue !== "none") {
-                let transformMatrix = transformValue.match(/matrix.*\((.+)\)/)[1].split(', ');
-                let translateX = parseFloat(transformMatrix[4]);
-                let translateY = parseFloat(transformMatrix[5]);
-                let scaleX = parseFloat(transformMatrix[0]);
-                this.tx = translateX;
-                this.ty = translateY;
-                this.scale = scaleX;
+            const computedStyle = window.getComputedStyle(this.drawer);
+            const transformValue = computedStyle.getPropertyValue('transform');
+            if(transformValue === "none") return;
+            const m = transformValue.match(/matrix3?d?\((.+)\)/);
+            if (!m) return;
+            const parts = m[1].split(', ').map(s => parseFloat(s.trim()));
+            if (transformValue.startsWith("matrix3d") && parts.length >= 16) {
+                this.tx = parts[12];
+                this.ty = parts[13];
+                this.scale = parts[0];
+            } else if (parts.length >= 6) {
+                this.tx = parts[4];
+                this.ty = parts[5];
+                this.scale = parts[0];
             }
         }
     }
@@ -164,13 +185,33 @@ export class TiledeskStage {
         let pos_mouse_x;
         let pos_mouse_y;
         element.onmousedown = (function(event) {
-            if (!event.target.classList.contains(this.classDraggable)) {
+            // Il confronto esatto sul target resta la regola storica. La risalita
+            // e' opt-in: si attiva solo dove il markup dichiara classDraggableDeep,
+            // quindi i blocchi che non la portano si comportano esattamente come prima.
+            const target = event.target;
+            const isExact = target.classList && target.classList.contains(this.classDraggable);
+            const isDeep = !isExact && typeof target.closest === 'function'
+                && target.closest('.' + this.classDraggableDeep);
+            if (!isExact && !isDeep) {
                 return false;
             }
+            // La soglia vale solo per il gesto introdotto in V3 (presa dall'header
+            // dell'action, area ampia e facile da urtare). Le maniglie storiche e le
+            // note restano immediate, esattamente come prima.
+            const useThreshold = !!isDeep;
             event = event || window.event;
             event.preventDefault();
             pos_mouse_x = event.clientX;
             pos_mouse_y = event.clientY;
+            // Origine del gesto, usata solo per la soglia. pos_mouse_* resta fermo
+            // qui finche' la soglia non e' superata, cosi' il primo movimento
+            // applica lo spostamento per intero e il blocco non resta indietro.
+            const origin_mouse_x = event.clientX;
+            const origin_mouse_y = event.clientY;
+            let drag_started = false;
+            // start-dragging viene emesso subito, come prima: end-dragging deve
+            // restare accoppiato ad esso (cattura startDraggingPosition e gestisce
+            // l'apertura del pannello quando la posizione non e' cambiata).
             const custom_event = new CustomEvent("start-dragging", {
                 detail: {
                     element: element
@@ -180,6 +221,14 @@ export class TiledeskStage {
             document.onmousemove = (function(event) {
                 event = event || window.event;
                 event.preventDefault();
+                if (useThreshold && !drag_started) {
+                    const dist_x = event.clientX - origin_mouse_x;
+                    const dist_y = event.clientY - origin_mouse_y;
+                    if (Math.sqrt(dist_x * dist_x + dist_y * dist_y) < this.dragThreshold) {
+                        return;
+                    }
+                    drag_started = true;
+                }
                 const delta_x = event.clientX - pos_mouse_x;
                 const delta_y = event.clientY - pos_mouse_y;
                 pos_mouse_x = event.clientX;

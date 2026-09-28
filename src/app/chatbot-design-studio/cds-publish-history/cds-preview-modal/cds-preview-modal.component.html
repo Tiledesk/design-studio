@@ -1,0 +1,18 @@
+<div class="cds-preview-modal">
+
+    <div class="cds-preview-modal__bar">
+        <span class="cds-preview-modal__title">
+            {{ 'CDSPreview.ModalTitle' | translate }}
+            <span class="cds-preview-modal__date" *ngIf="data?.title">· {{ data.title }}</span>
+        </span>
+        <button type="button" class="cds-preview-modal__close" (click)="onClose()"
+            attr.aria-label="{{ 'Close' | translate }}"
+            matTooltip="{{ 'Close' | translate }}" matTooltipClass="cds-mat-tooltip" matTooltipPosition="below">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+
+    <!-- Applicazione a se': i suoi servizi non sono quelli dell'editor dietro. -->
+    <iframe class="cds-preview-modal__frame" [src]="safeUrl" title="{{ 'CDSPreview.ModalTitle' | translate }}"></iframe>
+
+</div>

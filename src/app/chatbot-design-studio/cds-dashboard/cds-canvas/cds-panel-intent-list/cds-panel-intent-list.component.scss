@@ -378,3 +378,13 @@ mat-icon.agents-available {
 .agents-available {
     font-size: 16px;
 }
+
+/* Solo V3 -------------------------------------------------------------------
+   Senza la riga delle icone secondarie il contenuto della riga e' una sola linea,
+   e `.item-box` resta piu' basso della riga che lo contiene: l'altezza piena lo
+   rimette a occupare tutto, cosi' il nome resta centrato come prima. */
+.content.is-v3 {
+  .item-box {
+    height: 100%;
+  }
+}
