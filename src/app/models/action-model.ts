@@ -805,6 +805,43 @@ export class Condition {
 
 }
 
+/**
+ * Un caso della Condition a piu' uscite (`jsonconditionmulti`).
+ *
+ * E' un'`Expression` -- stessa forma di un gruppo della condition V2, quindi l'editor di gruppo
+ * si riusa senza modifiche -- con in piu' l'identita' del ramo e la sua destinazione.
+ *
+ * `_tdCaseId` e' l'ancora del connettore: NON l'indice (riordinare i casi sposterebbe i
+ * collegamenti) e NON la label (rinominarla li staccherebbe).
+ */
+export class ConditionCase extends Expression {
+    _tdCaseId: string = uuidv4();
+    /** Etichetta facoltativa, solo per la lettura sul canvas. */
+    label?: string;
+    /** Blocco di destinazione quando il caso e' vero. Vuoto = uscita non collegata. */
+    intent?: string;
+    intentAttributes?: string;
+}
+
+/**
+ * Condition a piu' uscite: N casi valutati IN ORDINE, il primo vero porta il flusso al suo
+ * blocco e l'azione finisce li'. Nessun caso vero -> `elseIntent`.
+ *
+ * Azione distinta da `jsoncondition2` (e da `jsoncondition`) per retrocompatibilita' totale:
+ * la V2 salva UNA sola stringa `when`, qui ne serve una per caso.
+ */
+export class ActionJsonConditionMulti extends Action {
+    cases: Array<ConditionCase>;
+    elseIntent: string;
+    elseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.JSON_CONDITION_MULTI;
+        this.cases = [];
+        this.elseIntent = '';
+    }
+}
+
 export class WhatsappBroadcast {
     id_project: string;
     phone_number_id: string;

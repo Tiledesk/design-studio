@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 28/09/2026
+
+- **added**: a condition can now hold several cases instead of a single test with two exits. Each case has its own conditions, its own destination block and its own connector on the block; they are evaluated in order and the first one that matches sends the conversation on, leaving the action. When none matches, the flow takes the final *else* branch
+- **added**: the cases are numbered and can be moved up or down, because the order is what decides which branches below stay reachable. A case left without a condition never fires, and says so instead of leaving it to be guessed
+- **changed**: it replaces the chain of one-condition blocks — one block per branch — that a multi-way choice needed until now. The two existing conditions are untouched: every agent already saved keeps working exactly as before
+- **fixed**: comparing a text value against something written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened, and lost its quotes at the next save. The condition quietly stopped testing what it was written to test. It affects the condition already in use, not only the new one
+
 # this branch 25/09/2026
 
 - **added**: a text condition can ignore uppercase and lowercase. A checkbox under the value, on text comparisons only — is equal to, contains, starts with, ends with and their negations. Off by default, so every condition already saved keeps comparing exactly as it did

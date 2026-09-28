@@ -575,6 +575,37 @@ export class ConnectorService {
           }
         }
 
+        /**  JSON-CONDITION-MULTI: un connettore per caso (ancorato a `_tdCaseId`, non all'indice
+         *   ne' alla label: riordinare o rinominare un caso non deve staccare il collegamento)
+         *   piu' quello del ramo Altrimenti. */
+        if(action._tdActionType === TYPE_ACTION.JSON_CONDITION_MULTI){
+          const cases = Array.isArray(action.cases) ? action.cases : [];
+          cases.forEach(element => {
+            if(element && element.intent && element.intent !== ''){
+              idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/case/' + element._tdCaseId;
+              idConnectorTo = element.intent.replace("#", "");
+              if(!this.intentExists(idConnectorTo)){
+                element.intent = '';
+                idConnectorTo = null;
+              }
+              this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION_MULTI ACTION -> idConnectorFrom', idConnectorFrom);
+              this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION_MULTI ACTION -> idConnectorTo', idConnectorTo);
+              this.createConnector(intent, idConnectorFrom, idConnectorTo);
+            }
+          });
+          if(action.elseIntent && action.elseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/else';
+            idConnectorTo = action.elseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.elseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION_MULTI ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - JSON_CONDITION_MULTI ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
         /**  JSON-CONDITION (legacy) + JSON-CONDITION2 (V2): stessi connettori true/false */
         if(action._tdActionType === TYPE_ACTION.JSON_CONDITION || action._tdActionType === TYPE_ACTION.JSON_CONDITION2){
           if(action.trueIntent && action.trueIntent !== ''){

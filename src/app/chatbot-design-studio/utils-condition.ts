@@ -493,7 +493,11 @@ export function parseCondition(text: string): Condition | null {
     if (sym === '==' && rhsRaw === 'true')  return makeCondition(left, TYPE_OPERATOR_V2.isTrue,  { type: 'const', value: '' });
     if (sym === '==' && rhsRaw === 'false') return makeCondition(left, TYPE_OPERATOR_V2.isFalse, { type: 'const', value: '' });
     const rhs = parseOperandRight(rhsRaw);
-    const isNum = rhs.type === 'const' && /^-?\d+(\.\d+)?$/.test(String(rhs.value));
+    // Numerico si decide sul testo GREZZO, non sul valore gia' spogliato degli apici:
+    // `x == "1"` e' un confronto di TESTO con la stringa "1", `x == 1` e' un confronto di numeri.
+    // Leggendolo dal valore, un `"1"` tornava indietro come equalAsNumbers e al salvataggio
+    // successivo perdeva gli apici, cambiando in silenzio il significato della condizione.
+    const isNum = rhs.type === 'const' && /^-?\d+(\.\d+)?$/.test(rhsRaw.trim());
     let op: string | null = null;
     switch (sym) {
       case '==': op = isNum ? TYPE_OPERATOR_V2.equalAsNumbers    : TYPE_OPERATOR_V2.equalAsStrings; break;
@@ -572,6 +576,9 @@ export const SAVE_ONLY_WHEN = true;
 
 /** type-id dell'azione JSON Condition V2 (hardcoded per evitare import circolari da utils-actions). */
 const JSON_CONDITION_TYPE = 'jsoncondition2';
+
+/** type-id dell'azione Condition a piu' uscite. */
+const JSON_CONDITION_MULTI_TYPE = 'jsonconditionmulti';
 
 /**
  * Filtro reply LEGACY = ha condizioni MA non è marcato `version: 2`.
@@ -671,6 +678,69 @@ function applyNestedExpressionSaveMode(node: any): void {
   }
 }
 
+/**
+ * Ricostruisce in apertura l'AST dei casi di una Condition a piu' uscite.
+ *
+ * I casi persistono SOLO `when` (come l'azione V2), quindi al reload `conditions` non c'e'.
+ * Qui la si ricostruisce per rendere il caso ri-editabile. Idempotente; no-op sui casi che
+ * hanno gia' l'AST e su quelli con `when` vuoto o non ricostruibile (il dato sopravvive:
+ * `applyCaseSaveMode` non rigenera da un AST vuoto).
+ */
+export function ensureCaseConditionsFromWhen(action: any): void {
+  if (!action || typeof action !== 'object' || !Array.isArray(action.cases)) return;
+  action.cases.forEach((branch: any) => {
+    if (!branch || typeof branch !== 'object') return;
+    if (Array.isArray(branch.conditions) && branch.conditions.length > 0) return;
+    const when = typeof branch.when === 'string' ? branch.when.trim() : '';
+    if (!when) {
+      if (!Array.isArray(branch.conditions)) branch.conditions = [];
+      return;
+    }
+    let rebuilt: Array<Condition | Operator> = [];
+    try {
+      rebuilt = parseConditionsList(when);
+    } catch (_e) {
+      rebuilt = [];
+    }
+    if (!rebuilt.length) {
+      console.warn('[JSON-Condition] caso: `when` non ricostruibile, AST lasciato vuoto:', when);
+      if (!Array.isArray(branch.conditions)) branch.conditions = [];
+      return;
+    }
+    // Diagnostica: una ricostruzione parziale perderebbe i frammenti non riconosciuti al prossimo save.
+    if (serializeExpression({ type: 'expression', conditions: rebuilt } as any) !== when) {
+      console.warn('[JSON-Condition] caso: ricostruzione PARZIALE del `when`:', when);
+    }
+    branch.conditions = rebuilt;
+  });
+}
+
+/**
+ * Modalita' di salvataggio di un singolo caso: `when` rigenerato dal suo AST, `conditions`
+ * svuotate nel payload (come fa l'azione V2 con `groups`).
+ *
+ * Non rigenera da un AST vuoto: un caso con `conditions` vuote non e' stato aperto in questa
+ * sessione (arriva dal server gia' in forma solo-`when`) e rigenerare produrrebbe '' —
+ * cancellando la condizione.
+ *
+ * CONTRATTO CON L'EDITOR: quando l'utente toglie l'ULTIMA condizione di un caso, il componente
+ * deve azzerare anche `branch.when`. Altrimenti resterebbe qui un `when` che l'utente ha
+ * appena cancellato dallo schermo, e il caso continuerebbe a scattare.
+ */
+function applyCaseSaveMode(branch: any): void {
+  if (!branch || typeof branch !== 'object' || !Array.isArray(branch.conditions)) return;
+  if (branch.conditions.length === 0) return;
+  const when = serializeExpression(branch as Expression);
+  if (when) {
+    branch.when = when;
+    if (SAVE_ONLY_WHEN) branch.conditions = [];
+  } else {
+    // Nessuna condizione serializzabile (es. RHS vuoto su operatore non unario):
+    // non sovrascriviamo `when` con '' — l'AST resta la fonte.
+    console.warn('[JSON-Condition] caso non serializzabile in `when`: AST conservato', branch);
+  }
+}
+
 /** Applica la modalità di salvataggio a una singola action (JSON Condition + eventuali filtri annidati). */
 function applyConditionSaveModeToAction(action: any): void {
   if (!action || typeof action !== 'object') return;
@@ -678,6 +748,10 @@ function applyConditionSaveModeToAction(action: any): void {
   if (action._tdActionType === JSON_CONDITION_TYPE && Array.isArray(action.groups)) {
     action.when = serializeConditionToWhen(action.groups);
     if (SAVE_ONLY_WHEN) action.groups = [];
+  }
+  // Condition a piu' uscite: un `when` per caso, indipendenti fra loro
+  if (action._tdActionType === JSON_CONDITION_MULTI_TYPE && Array.isArray(action.cases)) {
+    action.cases.forEach((branch: any) => applyCaseSaveMode(branch));
   }
   // Filtri (reply, ecc.): `_tdJSONCondition` annidato a qualsiasi profondità
   applyNestedExpressionSaveMode(action);

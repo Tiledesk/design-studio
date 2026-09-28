@@ -143,6 +143,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-json-condition2>
 
+                    <cds-action-json-condition-multi *ngSwitchCase="TYPE_ACTION.JSON_CONDITION_MULTI"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-json-condition-multi>
+
                     <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT"
                         class="panel-response"
                         [action]="elementSelected"

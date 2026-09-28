@@ -11,6 +11,7 @@ import {
   parseCondition,
   hasFilter,
   ensureConditionsFromWhen,
+  ensureCaseConditionsFromWhen,
 } from './utils-condition';
 
 /** Helpers di costruzione AST */
@@ -501,4 +502,165 @@ describe('utils-condition · ignora maiuscole e minuscole', () => {
     expect(parsed.ignoreCase).toBeUndefined();
     expect(parsed.operand1).toBe('lowerCase(nome)');
   });
+});
+
+/* ============================================================================
+ * Condition a piu' uscite (`jsonconditionmulti`)
+ * ==========================================================================*/
+
+describe('jsonconditionmulti — casi indipendenti', () => {
+
+  const branch = (id: string, conditions: any[], intent: string) =>
+    ({ type: 'expression', _tdCaseId: id, conditions, intent } as any);
+
+  const save = (action: any) => {
+    const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
+    applyConditionSaveModeToPayload(payload);
+    return action;
+  };
+
+  it('ogni caso esce con il PROPRIO `when` e le conditions svuotate', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [
+        branch('c1', [cond('x', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '1' })], '#B1'),
+        branch('c2', [cond('y', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '2' })], '#B2'),
+      ],
+      elseIntent: '#ELSE',
+    };
+    save(action);
+    expect(action.cases[0].when).toBe('x == "1"');
+    expect(action.cases[1].when).toBe('y == "2"');
+    if (SAVE_ONLY_WHEN) {
+      expect(action.cases[0].conditions).toEqual([]);
+      expect(action.cases[1].conditions).toEqual([]);
+    }
+    // id, destinazione e ramo else non vengono toccati dal salvataggio
+    expect(action.cases[0]._tdCaseId).toBe('c1');
+    expect(action.cases[0].intent).toBe('#B1');
+    expect(action.elseIntent).toBe('#ELSE');
+  });
+
+  it('dentro un caso AND/OR continuano a funzionare', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [branch('c1', [
+        cond('lastUserText', TYPE_OPERATOR_V2.isNotEmpty),
+        { type: 'operator', operator: 'AND' },
+        cond('user_city', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'new' }),
+      ], '#B1')],
+    };
+    save(action);
+    expect(action.cases[0].when).toBe('!isEmpty(lastUserText) && contains(user_city, "new")');
+  });
+
+  it('un caso NON aperto in questa sessione conserva il suo `when`', () => {
+    // Arriva dal server in forma solo-`when`: rigenerare da un AST vuoto lo cancellerebbe.
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [{ type: 'expression', _tdCaseId: 'c1', conditions: [], when: 'x == "1"', intent: '#B1' }],
+    };
+    save(action);
+    expect(action.cases[0].when).toBe('x == "1"');
+  });
+
+  it('R1 — un payload misto lascia intatte V1 e V2', () => {
+    const v1: any = {
+      _tdActionType: 'jsoncondition',
+      groups: [expr(cond('a', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '1' }))],
+    };
+    const v2: any = {
+      _tdActionType: 'jsoncondition2',
+      groups: [expr(cond('b', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '2' }))],
+      when: '',
+    };
+    const multi: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [branch('c1', [cond('c', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '3' })], '#B1')],
+    };
+    const payload = { operations: [{ type: 'put', intent: { actions: [v1, v2, multi] } }] };
+    applyConditionSaveModeToPayload(payload);
+
+    // V1: nessun `when`, AST intatto — come prima che la action nuova esistesse
+    expect(v1.when).toBeUndefined();
+    expect(v1.groups.length).toBe(1);
+    // V2: una sola stringa, dai suoi `groups`
+    expect(v2.when).toBe('b == "2"');
+    expect((v2 as any).cases).toBeUndefined();
+    // Multi: il suo caso
+    expect(multi.cases[0].when).toBe('c == "3"');
+    expect((multi as any).groups).toBeUndefined();
+  });
+
+  it('riapertura: i casi si ricostruiscono da `when`, nell ordine', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [
+        { type: 'expression', _tdCaseId: 'c1', conditions: [], when: 'x == "1"', intent: '#B1' },
+        { type: 'expression', _tdCaseId: 'c2', conditions: [], when: 'contains(user_city, "new")', intent: '#B2' },
+      ],
+    };
+    ensureCaseConditionsFromWhen(action);
+    expect(action.cases[0].conditions.length).toBe(1);
+    expect(action.cases[0].conditions[0].operand1).toBe('x');
+    expect(action.cases[1].conditions[0].operand1).toBe('user_city');
+    expect(action.cases[1].conditions[0].operator).toBe(TYPE_OPERATOR_V2.contains);
+  });
+
+  it('giro completo: salva, riapri, risalva -> stesso `when`', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [branch('c1', [
+        cond('x', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '1' }),
+        { type: 'operator', operator: 'OR' },
+        cond('y', TYPE_OPERATOR_V2.greaterThan, { type: 'const', value: '10' }),
+      ], '#B1')],
+    };
+    save(action);
+    const primo = action.cases[0].when;
+    ensureCaseConditionsFromWhen(action);
+    save(action);
+    expect(action.cases[0].when).toBe(primo);
+  });
+
+  it('un caso vuoto resta vuoto: nessun `when` inventato', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [{ type: 'expression', _tdCaseId: 'c1', conditions: [], intent: '' }],
+    };
+    save(action);
+    expect(action.cases[0].when).toBeUndefined();
+    ensureCaseConditionsFromWhen(action);
+    expect(action.cases[0].conditions).toEqual([]);
+  });
+
+  it('azione senza `cases` non fa esplodere il salvataggio', () => {
+    const action: any = { _tdActionType: 'jsonconditionmulti', elseIntent: '#ELSE' };
+    expect(() => save(action)).not.toThrow();
+    expect(() => ensureCaseConditionsFromWhen(action)).not.toThrow();
+  });
+
+});
+
+describe('round-trip dei letterali numerici (V2 e multi)', () => {
+
+  it('`x == "1"` resta un confronto di TESTO dopo riapertura e risalvataggio', () => {
+    const groups = parseWhenToGroups('x == "1"');
+    expect(serializeConditionToWhen(groups)).toBe('x == "1"');
+    const c: any = (groups[0] as any).conditions[0];
+    expect(c.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+  });
+
+  it('`x == 1` resta un confronto di NUMERI', () => {
+    const groups = parseWhenToGroups('x == 1');
+    expect(serializeConditionToWhen(groups)).toBe('x == 1');
+    const c: any = (groups[0] as any).conditions[0];
+    expect(c.operator).toBe(TYPE_OPERATOR_V2.equalAsNumbers);
+  });
+
+  it('vale anche per il diverso', () => {
+    expect(serializeConditionToWhen(parseWhenToGroups('x != "2"'))).toBe('x != "2"');
+    expect(serializeConditionToWhen(parseWhenToGroups('x != 2'))).toBe('x != 2');
+  });
+
 });

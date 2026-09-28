@@ -40,6 +40,7 @@ import { CdsActionJsonConditionComponent } from './cds-action-json-condition/cds
 import { BaseConditionRow2Component } from './cds-action-json-condition2/base-condition-row2/base-condition-row2.component';
 import { BaseFilter2Component } from './cds-action-json-condition2/base-filter2/base-filter2.component';
 import { CdsActionJsonCondition2Component } from './cds-action-json-condition2/cds-action-json-condition2.component';
+import { CdsActionJsonConditionMultiComponent } from './cds-action-json-condition-multi/cds-action-json-condition-multi.component';
 import { CdsActionMakeComponent } from './cds-action-make/cds-action-make.component';
 import { CdsActionOnlineAgentsComponent } from './cds-action-online-agents/cds-action-online-agents.component';
 import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-open-hours.component';
@@ -125,6 +126,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
     CdsActionJsonCondition2Component,
+    CdsActionJsonConditionMultiComponent,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
@@ -247,6 +249,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
     CdsActionJsonCondition2Component,
+    CdsActionJsonConditionMultiComponent,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,

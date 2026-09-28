@@ -367,6 +367,13 @@
         "QuestionPlaceholderNew": "Add user expression and press enter or click ADD",
         "Success": "Success",
         "Else": "else",
+        "CaseIf": "If",
+        "CaseElseIf": "Else if",
+        "CaseEmpty": "no condition yet",
+        "CaseMoveUp": "Move up",
+        "CaseMoveDown": "Move down",
+        "CaseDelete": "Delete case",
+        "AddCase": "Add case",
         "Prompt": "Prompt",
         "UserQuestion": "User question",
         "EnterPrompt": "Enter prompt",
@@ -871,6 +878,7 @@
             "Condition": "Condition",
             "ConditionElse": "Condition w/ else",
             "ConditionElseV2": "Condition w/ else V2",
+            "ConditionMulti": "Condition w/ multiple cases",
             "ConnectBlock": "Connect block",
             "SetAttribute": "Set attribute",
             "DeleteAttribute": "Delete attribute",
@@ -983,6 +991,13 @@
             "ConditionElseV2": {
                 "TITLE": "Condition with else branch (V2)",
                 "DESCRIPTION": "This action allows branching based on the specified condition with true/false branches",
+                "IMAGE": "assets/images/doc/JSON_CONDITION.png",
+                "VIDEO_URL": "",
+                "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/json-condition"
+            },
+            "ConditionMulti": {
+                "TITLE": "Condition with multiple cases",
+                "DESCRIPTION": "Several cases, evaluated in order: the first one that matches sends the conversation to its own block and the action stops there. When none matches, the flow leaves through the else branch",
                 "IMAGE": "assets/images/doc/JSON_CONDITION.png",
                 "VIDEO_URL": "",
                 "DOC_URL": "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/json-condition"
