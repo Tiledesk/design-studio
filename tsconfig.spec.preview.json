@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-preview",
+    "types": ["jasmine", "node"]
+  },
+  "files": ["src/test-preview.ts", "src/polyfills.ts"],
+  "include": [
+    "src/app/services/read-only.service.unit.spec.ts",
+    "src/app/chatbot-design-studio/utils.center.unit.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

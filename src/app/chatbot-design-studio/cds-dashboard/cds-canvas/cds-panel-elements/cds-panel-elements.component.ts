@@ -1,12 +1,17 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
-import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, availableActionEntries, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -35,20 +40,27 @@ export class CdsPanelElementsComponent implements OnInit {
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   ACTION_CATEGORY = ACTION_CATEGORY;
+  // menuCategory holds the enum KEY (ACTION_CATEGORY[].type === getKeyByValue(...)), not the value.
+  INTEGRATIONS_CATEGORY_KEY = getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY);
 
   actionsByCategory = {};
   actionsList: Array<any> = [];
-  
+  connectorGroups: ConnectorGroup[] = [];
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   actionCategory: any;
   
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
+    private readonly projectService: ProjectService,
   ) { }
 
   ngOnInit(): void {
     this.createActionListByCategory();
+    this.loadConnectorActions();
+    this.loadConfiguredConnectors();
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -119,23 +131,61 @@ export class CdsPanelElementsComponent implements OnInit {
 
 
   createActionListByCategory(){
+    const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype, 'isSubagent:', isSubagentSubtype(subtype));
+    // subtype normalizzato: un subagent è a tutti gli effetti un chatbot, altrimenti
+    // checkIfActionIsInChatbotType disattiverebbe ogni azione (nessuna dichiara 'subagent')
+    this.projectPlanUtils.checkIfActionIsInChatbotType(resolveChatbotSubtype(subtype));
+    // The same filter get_project_capabilities answers the agent chat with.
+    const available = availableActionEntries(subtype,
+      (type, plan) => this.projectPlanUtils.checkIfCanLoad(type, plan));
     ACTION_CATEGORY.forEach(category => {
-      const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
-      this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype);
-      this.projectPlanUtils.checkIfActionIsInChatbotType(subtype as TYPE_CHATBOT);
-      let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive')).map(element => {
-        return {
-          type: TYPE_OF_MENU.ACTION,
-          value: element,
-          canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
-        };
-      });
+      let menuItemsList = available
+        .filter(a => a.entry.category === TYPE_ACTION_CATEGORY[category.type])
+        .map(a => ({ type: TYPE_OF_MENU.ACTION, value: a.entry, canLoad: a.canLoad }));
       if(menuItemsList.length>0){
         this.actionsByCategory[category.type] = menuItemsList;
       }
       this.logger.log('[CDS-PANEL-ELEMENTS] menuItemsList:: ', category.type, menuItemsList);
     });
     this.logger.log('[CDS-PANEL-ELEMENTS] actionsByCategory:: ', this.actionsByCategory);
+  }
+
+  loadConnectorActions() {
+    const projectId = this.dashboardService.projectID;
+    if (!projectId) { return; }
+    this.projectService.getIntegrations(projectId).pipe(
+      catchError(() => of(null))
+    ).subscribe((integrations: any) => {
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl }) => {
+        this.connectorCatalogService.fetchManifest(baseUrl).pipe(
+          catchError(() => of(null))
+        ).subscribe(manifest => {
+          if (!manifest) { return; }
+          const group = this.connectorCatalogService.toConnectorGroup(manifest);
+          if (!group.entries || group.entries.length === 0) { return; }
+          this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
+        });
+      });
+    });
+  }
+
+  // TEMP: surface connectors from a statically configured base URL (environment.connectorBaseUrls)
+  // until the per-project install / integration-record flow exists. Feeds the same connectorGroups
+  // as loadConnectorActions(); dedupe-by-id keeps it from doubling once the dynamic path is live.
+  loadConfiguredConnectors() {
+    const urls: string[] = (environment as any).connectorBaseUrls || [];
+    urls.forEach((baseUrl: string) => {
+      if (!baseUrl) { return; }
+      this.connectorCatalogService.fetchManifest(baseUrl).pipe(
+        catchError(() => of(null))
+      ).subscribe(manifest => {
+        if (!manifest) { return; }
+        const group = this.connectorCatalogService.toConnectorGroup(manifest);
+        if (!group.entries || group.entries.length === 0) { return; }
+        this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
+      });
+    });
   }
 
 }

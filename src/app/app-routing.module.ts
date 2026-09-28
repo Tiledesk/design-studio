@@ -20,10 +20,24 @@ const routes: Routes = [
   { path: 'project/unauthorized', component: UnauthorizedComponent },
 
 
-  { path: 'project/:projectid/chatbot/:faqkbid', 
+  { path: 'project/:projectid/chatbot/:faqkbid',
     loadChildren: () => import('./chatbot-design-studio/cds-dashboard/cds-dashboard.module').then( m => m.CdsDashboardModule),
     canActivate:[AuthGuard, RoleGuard],
     data: [ { roles: ['owner', 'admin']}]
+  },
+
+  /** Sola lettura: lo stesso design studio, su un flusso che non si puo' modificare.
+   *  Serve a guardare una release gia' pubblicata, che lato server e' un chatbot come
+   *  gli altri, quindi `:faqkbid` qui e' l'id della release.
+   *
+   *  E' una rotta a se' e non un parametro di query sulla rotta dell'editor: il modo
+   *  deve stare nell'identita' dell'URL. Un `?preview=1` si perde alla prima
+   *  navigazione interna che non lo ripropaga, e si finirebbe a modificare un flusso
+   *  pubblicato senza accorgersene. */
+  { path: 'project/:projectid/preview/:faqkbid',
+    loadChildren: () => import('./chatbot-design-studio/cds-dashboard/cds-dashboard.module').then( m => m.CdsDashboardModule),
+    canActivate:[AuthGuard, RoleGuard],
+    data: [ { roles: ['owner', 'admin'], readOnly: true }]
   },
 
     // Wildcard route for a 404 page

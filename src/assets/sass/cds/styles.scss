@@ -115,9 +115,20 @@ button.close {
     right: 0;
     left: 0;
     bottom: var(--footer-panel-action-detail-height);
-    overflow: scroll;
-    // overflow: auto; // nk
-    // max-height: calc(100vh - 200px); // nk
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    // Scrollbar minimalista, coerente con le sidebar Blocks/Subagents: nessuno sfondo (track
+    // trasparente), thumb sottile visibile solo su hover, e presente solo quando serve (overflow auto).
+    // Punto UNICO: vale per il pannello di dettaglio di TUTTE le action.
+    &::-webkit-scrollbar { width: 6px; height: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
+    &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
+    &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
 }
 
 .no-footer {

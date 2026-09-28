@@ -33,10 +33,9 @@ export class ControllerService {
   private publishPanelStatusSubject = new Subject<any>();
   public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
 
-  /** Pannello AI a destra (storia, versioni, modifica via prompt): true apre, false chiude. */
-  private aiPanelStatusSubject = new Subject<boolean>();
-  public isOpenAiPanel$ = this.aiPanelStatusSubject.asObservable();
-  private aiPanelOpen = false;
+  private agentChatPanelSource = new Subject<boolean>();
+  public isOpenAgentChatPanel$ = this.agentChatPanelSource.asObservable();
+  private agentChatPanelOpen = false;
 
   constructor() {
   }
@@ -85,30 +84,32 @@ export class ControllerService {
     this.publishPanelStatusSubject.next(true);  
   }
 
-  public openAiPanel(){
-    this.aiPanelOpen = true;
-    this.aiPanelStatusSubject.next(true);
-  }
-
-  public closeAiPanel(){
-    this.aiPanelOpen = false;
-    this.aiPanelStatusSubject.next(false);
-  }
-
-  public toggleAiPanel(){
-    if (this.aiPanelOpen) this.closeAiPanel(); else this.openAiPanel();
-  }
-
-  /** Il canvas lo chiama quando chiude i pannelli per altre vie, cosi' il toggle resta coerente. */
-  public markAiPanelClosed(){
-    this.aiPanelOpen = false;
-  }
-
   public closeAllPanels(){
     this.intentSource.next(null);
     this.addActionMenu.next(null);
     this.buttonSource.next(null);
     this.actionSource.next({type: null, element: null});
+  }
+
+  /** The agent chat panel is a toggle rather than an open/close pair: it is
+   *  driven by one header button, which reflects its own state. */
+  public toggleAgentChatPanel(){
+    this.agentChatPanelOpen = !this.agentChatPanelOpen;
+    this.agentChatPanelSource.next(this.agentChatPanelOpen);
+  }
+
+  public get isAgentChatPanelOpen(): boolean {
+    return this.agentChatPanelOpen;
+  }
+
+  public openAgentChatPanel(){
+    this.agentChatPanelOpen = true;
+    this.agentChatPanelSource.next(true);
+  }
+
+  public closeAgentChatPanel(){
+    this.agentChatPanelOpen = false;
+    this.agentChatPanelSource.next(false);
   }
 
 }

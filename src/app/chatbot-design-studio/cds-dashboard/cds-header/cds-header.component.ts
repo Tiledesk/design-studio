@@ -6,8 +6,6 @@ import { lastValueFrom, firstValueFrom, every, filter, Subscription } from 'rxjs
 import { MultichannelService } from 'src/app/services/multichannel.service';
 import { AppConfigService } from 'src/app/services/app-config';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
-import { AgentRevisionsService } from 'src/app/chatbot-design-studio/services/agent-revisions.service';
-import { AgentGeneratorService } from 'src/app/chatbot-design-studio/services/agent-generator.service';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -31,6 +29,10 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
+import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
+import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
 
 const swal = require('sweetalert');
 
@@ -51,6 +53,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
    private subscriptionTestItOutPlayed: Subscription;
    private subscriptionIsSaving: Subscription;
    private subscriptionIsSavingVisible: Subscription;
+   private subscriptionSelectedChatbot: Subscription;
 
   id_faq_kb: string;
   projectID: string;
@@ -108,11 +111,27 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
-    private readonly agentRevisionsService: AgentRevisionsService,
-    private readonly agentGeneratorService: AgentGeneratorService,
+    private readonly triggerService: ConnectorTriggerService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
+    private readonly projectService: ProjectService,
+    private agentChatHostService: AgentChatHostService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
+  }
+
+  /** The button exists only where the feature is configured, exactly as
+   *  connector base URLs gate the connector catalogue. */
+  get isAgentChatAvailable(): boolean {
+    return this.agentChatHostService.isConfigured();
+  }
+
+  get isAgentChatPanelOpen(): boolean {
+    return this.controllerService.isAgentChatPanelOpen;
+  }
+
+  onToggleAgentChat(){
+    this.controllerService.toggleAgentChatPanel();
   }
 
   manageRouteChanges(){
@@ -148,6 +167,15 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.isWebhook = true;
       this.initializeWebhook();
     }
+    // The studio can now move to another agent without a page reload
+    // (CdsDashboardComponent.openFlow), and this header is not rebuilt when it
+    // does: everything above that was read once must follow the agent.
+    this.subscriptionSelectedChatbot = this.dashboardService.selectedChatbot$
+      .subscribe((chatbot: Chatbot | null) => {
+        if (chatbot?._id && chatbot._id !== this.id_faq_kb) {
+          this.onAgentChanged(chatbot);
+        }
+      });
     this.getOSCODE();
     this.getTranslations()
     this.isBetaUrl = false;
@@ -182,7 +210,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
   /**
    * Passa a un altro agent. La rotta e' `/project/:projectid/chatbot/:faqkbid/blocks`
-   * e il Design Studio si ricarica sul nuovo agent.
+   * e il canvas si ricostruisce sul nuovo agent, senza ricaricare la pagina.
    */
   onSelectAgent(agent: Chatbot): void {
     if (!agent || !agent._id || agent._id === this.id_faq_kb) return;
@@ -191,19 +219,38 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Apre un agent con un caricamento completo della pagina.
-   *
-   * Il Design Studio si inizializza una volta sola in `CdsDashboardComponent.ngOnInit`
-   * (traduzioni, parametri, progetto, bot, dipartimenti), poi inizializza i servizi
-   * con quell'`id_faq_kb` e costruisce stage e connettori. Una `router.navigate`
-   * cambia solo il parametro di rotta: il componente viene riusato e resterebbe
-   * agganciato all'agent precedente. Finche' il boot non e' reattivo al cambio di
-   * parametro, il modo corretto di cambiare agent e' ricaricare, esattamente come
-   * quando si entra nel DS dalla dashboard.
+   * Apre un agent senza ricaricare la pagina: `dashboardService.openFlow` naviga, azzera
+   * undo/redo, ricarica bot e blocchi e ricostruisce il canvas. L'header si riallinea da
+   * solo tramite `selectedChatbot$` (vedi `onAgentChanged`). I servizi inizializzati nel
+   * boot sono legati al progetto, non all'agent, quindi restano validi.
    */
-  private openAgent(botId: string): void {
-    this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks'])
-      .then(() => window.location.reload());
+  private async openAgent(botId: string): Promise<void> {
+    if (!this.dashboardService.openFlow) {
+      // Nessun dashboard montato: si cambia solo la rotta, mai un reload.
+      this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks']);
+      return;
+    }
+    try {
+      await this.dashboardService.openFlow(botId);
+    } catch (error) {
+      this.logger.error('[CdsHeaderComponent] openAgent ERROR: ', error);
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.OpenAgentError'), 4, 'report_problem');
+    }
+  }
+
+  /** Riallinea l'header all'agent aperto, quando cambia senza ricaricare la pagina. */
+  private onAgentChanged(chatbot: Chatbot): void {
+    // Prima di cambiare `isWebhook`: la chiusura del test usa lo stato dell'agent precedente.
+    if (this.isPlaying) {
+      this.onCloseTestItOut();
+    }
+    this.id_faq_kb = chatbot._id;
+    this.selectedChatbot = chatbot;
+    this.isWebhook = chatbot.subtype === 'webhook' || chatbot.subtype === 'copilot';
+    if (this.isWebhook) {
+      this.initializeWebhook();
+    }
+    this.loadAgents();
   }
 
   /**
@@ -227,8 +274,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.faqKbService.deleteBot(botId).subscribe({
         next: () => {
           this.isDeletingAgent = false;
-          // La storia dell'agente si cancella con lui (mai bloccante)
-          this.agentRevisionsService.deleteHistoryQuietly(botId);
           const remaining = this.agents.filter(a => a._id !== botId);
           this.agents = remaining;
           if (remaining.length > 0) {
@@ -256,6 +301,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     if (this.subscriptionTestItOutPlayed) {
       this.subscriptionTestItOutPlayed.unsubscribe();
     }
+    this.subscriptionSelectedChatbot?.unsubscribe();
     this.subscriptionIsSaving?.unsubscribe();
     this.subscriptionIsSavingVisible?.unsubscribe();
   }
@@ -348,26 +394,15 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     // this.logger.log('[WS-REQUESTS-MSGS] this.is0penDropDown ',this.is0penDropDown)  
   }
 
-  /**
-   * Pannello AI a destra: storia dei prompt, versioni, ripristino e modifica via prompt.
-   * Solo su agenti V3 con il servizio di generazione configurato. Se il server non ha il modulo delle
-   * revisioni, il pannello si apre lo stesso e lo dice: cosi' si capisce perche' la storia non c'e'.
-   */
-  get showAiPanelButton(): boolean {
-    return this.isV3 && !!this.selectedChatbot?._id && this.agentGeneratorService.isConfigured;
-  }
-
-  onClickAiPanel(){
-    this.controllerService.toggleAiPanel();
-  }
-
   onClickPublish(){
     // Non aprire il pannello se c'e' un salvataggio in volo: si pubblicherebbe uno stato
     // non ancora persistito. Ridondante col [disabled], ma protegge da click programmatici.
     if (this.isSaving) { return; }
     // this.publishPaneltoggleState = !this.publishPaneltoggleState
     this.logger.log('[CDS DSBRD] click on PUBLISH --> open ', this.publishPaneltoggleState);
-    this.selectedChatbot.modified = false;
+    // Il flag NON si azzera qui: aprire il pannello non e' pubblicare, e il pannello ha
+    // bisogno di sapere chi ha modifiche in sospeso proprio in questo momento. Lo spegne
+    // il pannello stesso, e solo per i chatbot che sono stati pubblicati davvero.
     this.controllerService.openPublishPanel()
   }
 
@@ -509,12 +544,36 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
 
+  /** Arm/disarm connector dev-mirroring for the current chatbot webhook across every
+   *  configured/installed connector, so Test-It-Out also delivers trigger events to the
+   *  draft (/dev) bot. Best-effort — never blocks the test session. */
+  private async setConnectorsDebug(arm: boolean): Promise<void> {
+    if (!this.webhookId) { return; }
+    const conns: Array<{ baseUrl: string; apiKey?: string }> = [];
+    ((environment as any).connectorBaseUrls || []).forEach((b: string) => { if (b) { conns.push({ baseUrl: b }); } });
+    try {
+      const integrations: any = await firstValueFrom((this.projectService as any).getIntegrations(this.projectID));
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl, apiKey }) => {
+        if (!conns.find(c => c.baseUrl === baseUrl)) {
+          conns.push({ baseUrl, apiKey });
+        }
+      });
+    } catch { /* ignore — dev path still arms via connectorBaseUrls */ }
+    conns.forEach(c => {
+      const call$ = arm
+        ? this.triggerService.armDebug(c.baseUrl, c.apiKey || '', this.webhookId, 3600)
+        : this.triggerService.disarmDebug(c.baseUrl, c.apiKey || '', this.webhookId);
+      call$.subscribe({ error: (e: any) => this.logger.error('[triggers] ' + (arm ? 'armDebug' : 'disarmDebug') + ' failed', e) });
+    });
+  }
+
   async onOpenTestItOut(){
     let request_id: string | Promise<void>;
-    this.logService.initialize(null); 
+    this.logService.initialize(null);
     if(this.isWebhook){
       this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
       request_id = await this.webhookStarterLog();
+      this.setConnectorsDebug(true);
     } else {
       request_id = this.logService.request_id;
     }
@@ -526,6 +585,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     const mqtt_token = tokenResp.token || null;
     request_id = tokenResp.request_id || null;
     this.logService.starterLog(mqtt_token, request_id);
+
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
@@ -535,6 +595,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   onCloseTestItOut(){
     if(this.isWebhook){
       this.stopWebhook();
+      this.setConnectorsDebug(false);
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
