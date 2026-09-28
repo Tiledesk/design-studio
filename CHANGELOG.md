@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 28/09/2026
+- **fixed**: the operator list of a reply filter offers again only what the server can actually evaluate. It had quietly gone back to showing all 38, and a filter written with one of the 22 it cannot read stopped being evaluated, so the message it guarded disappeared with nothing said
+- **fixed**: *contains ignore case* and *starts with ignore case* are selectable again in the filters and in the legacy condition. They had been dropped although the server has always evaluated them
+
 # 1.40.16-rc1
 - **added**: a condition can hold several cases instead of a single test with two exits. They are evaluated in order, the first one that matches sends the conversation to its own block, and when none matches the flow takes the *else* branch. Cases are numbered and can be reordered, because the order decides what below them stays reachable; one left without a condition never fires and says so. It replaces the chain of one-condition blocks, one per branch
 - **added**: a text comparison can ignore uppercase and lowercase — a checkbox on text operators only, off by default, so every condition already saved keeps comparing exactly as it did
