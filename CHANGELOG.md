@@ -9,6 +9,7 @@
 
 # this branch 28/09/2026
 
+- **changed**: on V3 agents the block holding a condition with several cases no longer shows its own outgoing point. The action's exits are its cases and the *else*, so a connector started from the block would never be travelled at runtime — the same behaviour the other conditions already have
 - **added**: a condition can now hold several cases instead of a single test with two exits. Each case has its own conditions, its own destination block and its own connector on the block; they are evaluated in order and the first one that matches sends the conversation on, leaving the action. When none matches, the flow takes the final *else* branch
 - **added**: the cases are numbered and can be moved up or down, because the order is what decides which branches below stay reachable. A case left without a condition never fires, and says so instead of leaving it to be guessed
 - **changed**: it replaces the chain of one-condition blocks — one block per branch — that a multi-way choice needed until now. The two existing conditions are untouched: every agent already saved keeps working exactly as before
