@@ -1,0 +1,25 @@
+{
+  "version": "blueprint-2",
+  "name": "Richiesta di preventivo",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": null,
+  "notes": [],
+  "blocks": [
+    { "id": "benvenuto", "name": "Benvenuto", "type": "randomreply", "texts": ["Ciao! Ti aiuto a preparare una richiesta di preventivo.", "Benvenuto! Prepariamo insieme la tua richiesta di preventivo."], "next": "azzera_cronologia" },
+    { "id": "azzera_cronologia", "name": "Azzera cronologia", "type": "clear_transcript", "next": "chiedi_nome" },
+    { "id": "chiedi_nome", "name": "Chiedi nome", "type": "ask", "text": "Come ti chiami?", "options": null, "saveTo": "user_name", "next": "chiedi_email" },
+    { "id": "chiedi_email", "name": "Chiedi email", "type": "ask", "text": "Qual è la tua email? Ci serve per inviarti il preventivo.", "options": null, "saveTo": "user_email", "next": "aggiorna_contatto" },
+    { "id": "aggiorna_contatto", "name": "Aggiorna contatto", "type": "leadupdate", "leadFields": [{ "field": "fullname", "value": "{{user_name}}" }, { "field": "email", "value": "{{user_email}}" }], "next": "chiedi_richiesta" },
+    { "id": "chiedi_richiesta", "name": "Chiedi richiesta", "type": "ask", "text": "Descrivimi il lavoro che ti serve.", "options": null, "saveTo": "richiesta", "next": "riassumi" },
+    { "id": "riassumi", "name": "Riassumi richiesta", "type": "ai_prompt", "question": "Riassumi in due frasi la richiesta del cliente: {{richiesta}}", "instructions": "Sei un assistente commerciale. Scrivi in italiano, in modo chiaro e senza aggiungere dettagli.", "saveTo": "riassunto", "history": true, "exits": { "true": "mostra_riassunto", "false": "riassunto_non_riuscito" } },
+    { "id": "mostra_riassunto", "name": "Mostra riassunto", "type": "replyv2", "text": "Ecco la tua richiesta in breve: {{riassunto}}", "buttons": null, "next": "tagga_richiesta" },
+    { "id": "riassunto_non_riuscito", "name": "Riassunto non riuscito", "type": "replyv2", "text": "Ho registrato la tua richiesta così come l'hai scritta.", "buttons": null, "next": "tagga_richiesta" },
+    { "id": "tagga_richiesta", "name": "Tagga richiesta", "type": "add_tags", "tags": ["preventivo", "da ricontattare"], "target": "request", "next": "registra" },
+    { "id": "registra", "name": "Registra richiesta", "type": "flow_log", "level": "info", "log": "Richiesta di preventivo da {{user_email}}", "next": "pausa" },
+    { "id": "pausa", "name": "Pausa", "type": "wait", "seconds": 1.5, "next": "annuncio_coda" },
+    { "id": "annuncio_coda", "name": "Annuncio coda", "type": "replyv2", "text": "Grazie {{user_name}}! Un collega riprenderà la conversazione appena possibile.", "buttons": null, "next": "in_coda" },
+    { "id": "in_coda", "name": "In coda", "type": "move_to_unassigned" }
+  ]
+}

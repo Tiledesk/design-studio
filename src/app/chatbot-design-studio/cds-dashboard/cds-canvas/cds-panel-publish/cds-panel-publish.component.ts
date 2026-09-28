@@ -16,6 +16,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { SavingStateService } from 'src/app/services/saving-state.service';
 import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
+import { AgentRevisionsService } from 'src/app/chatbot-design-studio/services/agent-revisions.service';
 import { NotifyService } from 'src/app/services/notify.service';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -116,6 +117,7 @@ export class CdsPanelPublishComponent implements OnInit, OnDestroy {
     private readonly webhookService: WebhookService,
     private readonly appConfigService: AppConfigService,
     private readonly savingStateService: SavingStateService,
+    private readonly agentRevisionsService: AgentRevisionsService,
   ) {
 
   }
@@ -319,6 +321,8 @@ export class CdsPanelPublishComponent implements OnInit, OnDestroy {
         this.logger.log('[CDS DSBRD] publish  - RES ', data)
         if (data) {
           this.status = 'success';
+          // Storia dell'agente: la release appena creata si collega alla revisione corrente (mai bloccante)
+          this.agentRevisionsService.linkReleaseQuietly(this.selectedChatbot?._id, data['bot_id']);
         }
         // const elapsed = (Date.now() - startTime) / 1000;
         // this.animationDuration = elapsed + 1; // Progress + 1s buffer

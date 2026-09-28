@@ -1,0 +1,15 @@
+{
+  "version": "blueprint-1",
+  "name": "Richiesta di richiamata",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": "benvenuto",
+  "notes": [],
+  "blocks": [
+    { "id": "benvenuto", "name": "Benvenuto", "type": "replyv2", "text": "Ciao! Lasciami il tuo nome e un numero: un consulente ti richiamerà.", "next": "chiedi_nome" },
+    { "id": "chiedi_nome", "name": "Chiedi nome", "type": "ask", "text": "Come ti chiami?", "saveTo": "user_name", "next": "chiedi_telefono" },
+    { "id": "chiedi_telefono", "name": "Chiedi telefono", "type": "ask", "text": "A quale numero possiamo richiamarti?", "saveTo": "user_phone", "next": "conferma" },
+    { "id": "conferma", "name": "Conferma", "type": "replyv2", "text": "Grazie {{user_name}}! Un consulente ti richiamerà al numero {{user_phone}}." }
+  ]
+}

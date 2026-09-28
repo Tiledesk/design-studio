@@ -1,0 +1,24 @@
+{
+  "version": "blueprint-2",
+  "name": "Offerte del giorno",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": null,
+  "notes": [],
+  "blocks": [
+    { "id": "benvenuto", "name": "Benvenuto", "type": "replyv2", "text": "Ciao! Ti mostro le offerte di oggi.", "buttons": null, "next": "leggi_offerte" },
+    { "id": "leggi_offerte", "name": "Leggi offerte", "type": "data_table", "table": "Prodotti", "operation": "get", "match": "all", "conditions": [{ "column": "offerta", "operator": "equal", "value": "si" }], "data": null, "saveTo": "offerte", "exits": { "true": "verifica_offerte", "false": "annuncio_supporto" } },
+    { "id": "verifica_offerte", "name": "Verifica offerte", "type": "jsoncondition2", "when": "!isEmpty(offerte)", "exits": { "true": "scorri_offerte", "false": "nessuna_offerta" } },
+    { "id": "scorri_offerte", "name": "Scorri offerte", "type": "iteration", "iterable": "offerte", "itemVariable": "offerta", "exits": { "each": "mostra_offerta", "done": "pulisci_offerta" } },
+    { "id": "mostra_offerta", "name": "Mostra offerta", "type": "replyv2", "text": "{{offerta.nome}}: {{offerta.prezzo}} euro", "buttons": null, "next": "scorri_offerte" },
+    { "id": "pulisci_offerta", "name": "Pulisci offerta", "type": "delete", "variable": "offerta", "next": "chiedi_email" },
+    { "id": "nessuna_offerta", "name": "Nessuna offerta", "type": "replyv2", "text": "Oggi non ci sono offerte attive.", "buttons": null, "next": "chiedi_email" },
+    { "id": "chiedi_email", "name": "Chiedi email", "type": "ask", "text": "Vuoi ricevere le prossime offerte? Scrivimi la tua email e ti avviseremo noi.", "options": null, "saveTo": "user_email", "next": "avvisa_team" },
+    { "id": "avvisa_team", "name": "Avvisa team", "type": "email", "to": "vendite@example.com", "subject": "Nuovo iscritto alle offerte", "body": "Il cliente {{user_email}} vuole ricevere le prossime offerte.", "replyTo": "{{user_email}}", "next": "salva_iscritto" },
+    { "id": "salva_iscritto", "name": "Salva iscritto", "type": "add_kb_content", "knowledgeBase": "Note clienti", "title": "Iscritto offerte {{user_email}}", "content": "{{user_email}} ha chiesto di ricevere le offerte.", "next": "conferma" },
+    { "id": "conferma", "name": "Conferma", "type": "replyv2", "text": "Grazie! Ti scriveremo a {{user_email}} quando arrivano nuove offerte.", "buttons": null, "next": null },
+    { "id": "annuncio_supporto", "name": "Annuncio supporto", "type": "replyv2", "text": "Non riesco a leggere le offerte. Ti passo all'assistente del supporto.", "buttons": null, "next": "passa_supporto" },
+    { "id": "passa_supporto", "name": "Passa al supporto", "type": "replacebotv3", "bot": "Assistente supporto" }
+  ]
+}

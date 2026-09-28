@@ -17,6 +17,8 @@
   "authPersistence": "${AUTH_PERSISTENCE}",
   "pineconeReranking": "${PINECONE_RERANKING}",
   "phoneNumber":"${PHONE_NUMBER}",
+  "aiAgentGeneratorUrl": "${AI_AGENT_GENERATOR_URL}",
+  "aiAgentGeneratorKey": "${AI_AGENT_GENERATOR_KEY}",
   "firebase": {
     "apiKey": "${FIREBASE_APIKEY}",
     "authDomain": "${FIREBASE_AUTHDOMAIN}",

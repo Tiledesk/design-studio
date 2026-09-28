@@ -1,0 +1,18 @@
+{
+  "version": "blueprint-1",
+  "name": "Sondaggio di soddisfazione",
+  "language": "it",
+  "start": "benvenuto",
+  "fallbackText": "Scusa, non ho capito.",
+  "fallbackNext": null,
+  "notes": [],
+  "blocks": [
+    { "id": "benvenuto", "name": "Benvenuto", "type": "replyv2", "text": "Ciao! Ti rubo solo un minuto per un parere.", "next": "chiedi_voto" },
+    { "id": "chiedi_voto", "name": "Chiedi voto", "type": "ask", "text": "Da 1 a 5, quanto sei soddisfatto?", "options": ["1", "2", "3", "4", "5"], "saveTo": "voto", "next": "verifica_voto" },
+    { "id": "verifica_voto", "name": "Verifica voto", "type": "jsoncondition2", "when": "voto >= 4", "exits": { "true": "ringrazia", "false": "chiedi_problema" } },
+    { "id": "ringrazia", "name": "Ringrazia", "type": "replyv2", "text": "Che bello! Grazie per il tuo voto." },
+    { "id": "chiedi_problema", "name": "Chiedi problema", "type": "ask", "text": "Ci dispiace. Cosa non ha funzionato?", "saveTo": "problema", "next": "annuncio_operatore" },
+    { "id": "annuncio_operatore", "name": "Annuncio operatore", "type": "replyv2", "text": "Grazie per avercelo detto: ti passo a un responsabile.", "next": "operatore" },
+    { "id": "operatore", "name": "Operatore", "type": "agent" }
+  ]
+}
