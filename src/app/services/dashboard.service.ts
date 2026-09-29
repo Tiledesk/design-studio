@@ -13,7 +13,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Department } from 'src/app/models/department-model';
 // UTILS //
-import { convertJsonToArray } from 'src/app/chatbot-design-studio/utils';
+import { convertJsonToArray, DS_VERSION_V3 } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -36,6 +36,15 @@ export class DashboardService {
   readonly selectedChatbot$ = new BehaviorSubject<Chatbot | null>(null);
   translateparamBotName: any;
 
+  /**
+   * Design Studio version of the selected chatbot: true = V3, false = legacy.
+   * Read from the label the chatbot carries (see resolveDsVersion). Single source
+   * of truth: computed once per chatbot here, never recomputed by the components.
+   */
+  isV3: boolean = false;
+  /** Reactive counterpart of `isV3`, for components that render before the chatbot is loaded. */
+  readonly isV3$ = new BehaviorSubject<boolean>(false);
+
   project: Project;
   /** Reactive stream for components that need to react to project changes. */
   readonly project$ = new BehaviorSubject<Project | null>(null);
@@ -43,6 +52,19 @@ export class DashboardService {
 
   departments: Department[]
   defaultDepartment: Department;
+
+  /** Set by CdsDashboardComponent; how anything moves the studio to another
+   *  flow of the same family without a page reload.
+   *
+   *  It lives here, and not on the chat host, so a side panel does not have
+   *  to ask the AI chat to navigate for it: this service is the one thing
+   *  everything that moves the studio already depends on. Null while no
+   *  dashboard is mounted -- callers fall back to their old navigation. */
+  public openFlow: ((faqKbId: string) => Promise<void>) | null = null;
+
+  /** Set by CdsDashboardComponent: reloads the open flow in place, without a
+   *  page reload. Null while no dashboard is mounted. */
+  public refreshFlow: (() => Promise<void>) | null = null;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   
@@ -88,6 +110,40 @@ export class DashboardService {
 
 
   // ----------------------------------------------------------
+  // Design Studio version of the selected chatbot
+  // ----------------------------------------------------------
+  /**
+   * Resolves whether the chatbot must be edited with the V3 Design Studio.
+   *
+   * The ONLY source of truth is the label the chatbot carries in
+   * `attributes.dsVersion`, declared by whoever created it: only the tool that
+   * built it knows which editor it was built with, so the server stores what it
+   * receives and never invents one.
+   *
+   * There is no date fallback any more: a creation date lives in the bundle of
+   * whoever compares it, so it would reclassify existing chatbots on every
+   * deploy that moved it, which is exactly what the label is here to prevent.
+   *
+   * Anything that is not the V3 label - no label at all, which is the case of
+   * every chatbot created so far, or an unknown one - is LEGACY on purpose: it
+   * is the long-standing behaviour, so an incomplete or unexpected payload never
+   * silently switches editor.
+   */
+  private resolveDsVersion(chatbot: Chatbot): void {
+    let isV3 = false;
+    try {
+      const label = chatbot?.attributes?.dsVersion;
+      isV3 = typeof label === 'string' && label.trim().toLowerCase() === DS_VERSION_V3;
+    } catch (error) {
+      this.logger.error('[ DSHBRD-SERVICE ] resolveDsVersion ERROR: ', error);
+      isV3 = false;
+    }
+    this.isV3 = isV3;
+    this.isV3$.next(isV3);
+    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { label: chatbot?.attributes?.dsVersion, isV3 });
+  }
+
+  // ----------------------------------------------------------
   // Get bot by id
   // ----------------------------------------------------------
   async getBotById(): Promise<boolean> {
@@ -98,6 +154,7 @@ export class DashboardService {
           if (chatbot) {
             this.selectedChatbot = chatbot;
             this.selectedChatbot$.next(chatbot);
+            this.resolveDsVersion(chatbot);
             this.translateparamBotName = { bot_name: this.selectedChatbot.name }
             variableList.find(el => el.key ==='userDefined').elements = [];
             if (this.selectedChatbot && this.selectedChatbot.attributes && this.selectedChatbot.attributes.variables) {

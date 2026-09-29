@@ -1,0 +1,49 @@
+@import "./src/assets/sass/cds/settings-section.scss";
+
+/* Angular's emulated encapsulation scopes a component's styles to that
+   component, so the three rules below are NOT inherited from the sibling
+   sections that also declare them (advanced, developer, detail). Without them
+   this section rendered with left-aligned labels, full-width controls and no
+   left margin, next to siblings that had none of those things -- which is the
+   whole of what "it does not look like the others" meant. */
+
+.csd-chatbot-dtls-input {
+    max-width: 400px;
+}
+
+.cds--custom-label {
+    text-align: right !important;
+}
+
+.chatbot-details-wpr,
+.row {
+    margin-right: 0px;
+    margin-left: 8px;
+    align-items: center;
+}
+
+/* The same treatment `detail.component.html` gives its field hints, used here
+   for the one line that says the setting is wider than the flow it is reached
+   from. */
+.llm-settings-scope {
+    color: #9aa0a6;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.llm-settings-wpr {
+  .error {
+    color: #b00020;
+    margin-bottom: 16px;
+  }
+
+  .llm-settings-actions {
+    display: flex;
+    align-items: center;
+
+    .saved {
+      margin-left: 12px;
+      color: var(--color-green-hex, #2e7d32);
+    }
+  }
+}

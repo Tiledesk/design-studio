@@ -60,4 +60,7 @@ settings.json
 docs
 .claude
 json-condition-when-grammar.md
+
+# Scratch output from Playwright MCP browsing sessions. Never part of the repo.
+.playwright-mcp/
 proxy.conf.json

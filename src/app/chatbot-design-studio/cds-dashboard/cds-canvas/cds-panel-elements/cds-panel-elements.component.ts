@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
-import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, isActionAvailableInSubagentContext } from 'src/app/chatbot-design-studio/utils-actions';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -119,11 +119,14 @@ export class CdsPanelElementsComponent implements OnInit {
 
 
   createActionListByCategory(){
+    const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    const isSubagent = isSubagentSubtype(subtype);
+    this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype, 'isSubagent:', isSubagent);
+    // subtype normalizzato: un subagent è a tutti gli effetti un chatbot, altrimenti
+    // checkIfActionIsInChatbotType disattiverebbe ogni azione (nessuna dichiara 'subagent')
+    this.projectPlanUtils.checkIfActionIsInChatbotType(resolveChatbotSubtype(subtype));
     ACTION_CATEGORY.forEach(category => {
-      const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
-      this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype);
-      this.projectPlanUtils.checkIfActionIsInChatbotType(subtype as TYPE_CHATBOT);
-      let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive')).map(element => {
+      let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive' && isActionAvailableInSubagentContext(el, isSubagent))).map(element => {
         return {
           type: TYPE_OF_MENU.ACTION,
           value: element,

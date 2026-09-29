@@ -118,7 +118,7 @@ export class WebhookService {
     let thereIsWebResponse = false;
     for (const intent of listOfIntents) {
       for (const action of intent.actions) {
-        if (action._tdActionType === TYPE_ACTION.WEB_RESPONSE) {
+        if (action._tdActionType === TYPE_ACTION.WEB_RESPONSE || action._tdActionType === TYPE_ACTION.RETURN) {
           thereIsWebResponse = true;
           break;
         }

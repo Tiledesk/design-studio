@@ -15,6 +15,7 @@ export interface FaqKb {
     external?: boolean;
     type?: string;
     subtype?: string
+    parent_id?: string;
     description?: string;
     message_count?: number;
     mainCategory?: any

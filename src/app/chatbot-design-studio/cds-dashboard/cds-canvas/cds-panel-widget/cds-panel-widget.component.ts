@@ -73,15 +73,12 @@ export class CdsPanelWidgetComponent implements OnInit, OnDestroy {
   }
 
 
-  ngAfterViewInit() {
-    const iframe = document.querySelector('iframe');
-    if (iframe) {
-      iframe.addEventListener('load', (event) => {
-        this.logger.log('[CDS-PANEL-WIDGET] onLoaded  ');
-        this.onLoaded(event);
-      });
-    }
-  }
+  // The iframe reports loading through the template's (load) binding, which
+  // Angular attaches before the src is set. Hooking it in ngAfterViewInit was a
+  // race this panel always lost: by then the iframe had already loaded and no
+  // event was left to hear -- and the listener went on
+  // `document.querySelector('iframe')`, which is now the agent-chat frame,
+  // mounted in the dashboard shell and present even while that panel is closed.
 
   setIframeUrl(){
     this.WIDGET_BASE_URL = this.appConfigService.getConfig().widgetBaseUrl;

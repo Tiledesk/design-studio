@@ -4,11 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
-/**
- * Cutoff date used to determine whether a chatbot is considered "new".
- * ISO string format, compared lexicographically against `createdAt` (also ISO).
- */
-export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+/** Valore dell'etichetta `attributes.dsVersion` che identifica un agente da aprire
+ *  con il Design Studio V3. E' l'unica cosa che decide quale editor si apre: chi crea
+ *  l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
+ *  Confronto in minuscolo. */
+export const DS_VERSION_V3 = 'v3';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
@@ -111,7 +111,8 @@ export enum SETTINGS_SECTION {
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
-    ADVANCED        = 'advanced'
+    ADVANCED        = 'advanced',
+    LLM_SETTINGS    = 'llm_settings',
 }
 
 export enum EXTERNAL_URL {
@@ -637,8 +638,9 @@ export function checkInternalIntent(intent: Intent): boolean {
  * True SOLO per un blocco defaultFallback che non contiene alcuna action.
  * I chatbot nuovi nascono con defaultFallback vuoto (actions: []) e collegano
  * la reply a un blocco separato tramite attributes.nextBlockAction: in quello
- * stato il blocco e' chiuso e non deve accettare nuove action.
+ * stato il blocco e' chiuso e non deve accettare nuove action, in nessun modo.
  * Un defaultFallback legacy (actions.length > 0) NON e' bloccato.
+ * Regola riportata dal branch features-2026/ds-generic-bug-fix-39 (278c658b).
  */
 export function isDefaultFallbackWithoutActions(intent: any): boolean {
     if (!intent) { return false; }
