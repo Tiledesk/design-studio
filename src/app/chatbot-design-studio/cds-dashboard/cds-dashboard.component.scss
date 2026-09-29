@@ -120,3 +120,45 @@ cds-sidebar {
     border-top: solid 3px transparent;
   }
 }
+/* Sola lettura ------------------------------------------------------------- */
+
+/* La sidebar qui non c'e'. Invece di riscrivere le larghezze del canvas una per una,
+   si azzera la misura che tutte quelle regole sottraggono: `calc(100% - 0px)` e' la
+   larghezza piena, e ogni calcolo che la usa -- oggi e domani -- si adegua da solo.
+   E' anche cio' che rimette a posto la centratura: lo stage misura lo spazio con le
+   stesse formule, quindi centra su un'area che corrisponde davvero a quella visibile. */
+.cds-read-only {
+  --sidebar-base-width: 0px;
+}
+
+/* Il banner prende esattamente l'altezza dell'header che sostituisce, cosi' il canvas
+   sotto occupa lo stesso spazio di sempre (`100vh - header-height`) e non serve
+   toccare il calcolo dell'altezza. */
+.cds-read-only-banner {
+  height: var(--header-height);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 16px;
+  background-color: #FFF4D6;
+  border-bottom: 1px solid #E8C96B;
+  color: #6B5200;
+  font-family: var(--font-family-poppins);
+  font-size: 14px;
+  /* Sopra il canvas e i suoi pannelli: e' l'unica cosa che spiega perche' le
+     modifiche non restano, e non deve poter finire sotto a qualcosa. */
+  position: relative;
+  z-index: 200;
+}
+
+.cds-read-only-banner__icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.cds-read-only-banner__text {
+  font-weight: 500;
+  text-align: center;
+}

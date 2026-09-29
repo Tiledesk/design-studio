@@ -1,0 +1,139 @@
+<!-- ============================ PREVIEW SUL BLOCCO ============================ -->
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="previewContent case-row" *ngFor="let branch of action?.cases; let i = index; trackBy: trackByCaseId">
+        <div class="icon-action" *ngIf="i === 0">
+            <img src="assets/images/icons/if_condition.svg">
+        </div>
+        <div class="case-index">{{ i + 1 }}</div>
+        <div class="case-summary">
+            <ng-container *ngIf="firstCondition(branch); else emptyCase">
+                <b>{{ firstCondition(branch)?.operand1 }}</b>
+                {{ operatorLabel(firstCondition(branch)?.operator) | translate }}
+                <b>{{ operandRightDisplay(firstCondition(branch)) }}</b>
+                <span class="case-more" *ngIf="extraConditionsCount(branch) > 0">+{{ extraConditionsCount(branch) }}</span>
+            </ng-container>
+            <ng-template #emptyCase>
+                <span class="case-empty">{{ 'CDSCanvas.ClickAddCondition' | translate }}</span>
+            </ng-template>
+        </div>
+        <cds-connector class="connector-true"
+            [idConnector]="listOfConnectors[branch._tdCaseId]?.idConnector"
+            [idConnection]="listOfConnectors[branch._tdCaseId]?.idConnection"
+            [isConnected]="listOfConnectors[branch._tdCaseId]?.isConnected">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{ 'CDSCanvas.Else' | translate | titlecase }}</label>
+        <cds-connector class="connector-false"
+            [idConnector]="idConnectorElse"
+            [idConnection]="idConnectionElse"
+            [isConnected]="isConnectedElse">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<!-- ============================ PANNELLO DI DETTAGLIO ============================ -->
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail" id="scrollMe">
+
+        <div class="case-card" *ngFor="let branch of action?.cases; let i = index; let last = last; trackBy: trackByCaseId">
+
+            <!-- intestazione: dice a voce alta che i casi sono alternative in sequenza,
+                 non condizioni da comporre fra loro -->
+            <div class="case-card-header" (click)="onToggleCase(branch)">
+                <span class="case-card-index">{{ i + 1 }}</span>
+                <span class="case-card-role">
+                    {{ (i === 0 ? 'CDSCanvas.CaseIf' : 'CDSCanvas.CaseElseIf') | translate }}
+                </span>
+                <span class="case-card-resume" *ngIf="!isOpen(branch)">
+                    <ng-container *ngIf="firstCondition(branch)">
+                        {{ firstCondition(branch)?.operand1 }}
+                        {{ operatorLabel(firstCondition(branch)?.operator) | translate }}
+                        {{ operandRightDisplay(firstCondition(branch)) }}
+                        <span class="case-more" *ngIf="extraConditionsCount(branch) > 0">+{{ extraConditionsCount(branch) }}</span>
+                    </ng-container>
+                    <span class="case-empty" *ngIf="isCaseEmpty(branch)">{{ 'CDSCanvas.CaseEmpty' | translate }}</span>
+                </span>
+                <span class="case-card-actions">
+                    <span class="case-move" [class.disabled]="i === 0"
+                        [title]="'CDSCanvas.CaseMoveUp' | translate"
+                        (click)="$event.stopPropagation(); onMoveCase(i, -1)">
+                        <span class="material-icons-outlined">arrow_upward</span>
+                    </span>
+                    <span class="case-move" [class.disabled]="last"
+                        [title]="'CDSCanvas.CaseMoveDown' | translate"
+                        (click)="$event.stopPropagation(); onMoveCase(i, 1)">
+                        <span class="material-icons-outlined">arrow_downward</span>
+                    </span>
+                    <span class="case-delete"
+                        [title]="'CDSCanvas.CaseDelete' | translate"
+                        (click)="$event.stopPropagation(); onDeleteCase(i)">
+                        <span class="material-icons-outlined">delete</span>
+                    </span>
+                    <span class="material-icons-outlined case-chevron">
+                        {{ isOpen(branch) ? 'expand_less' : 'expand_more' }}
+                    </span>
+                </span>
+            </div>
+
+            <div class="case-card-body" *ngIf="isOpen(branch)">
+                <base-filter2
+                    [expression]="branch"
+                    [booleanOperators]="booleanOperators"
+                    (onChangeExpression)="onChangeExpression($event)">
+                </base-filter2>
+
+                <div class="field-box case-target">
+                    <div class="condition-container">
+                        <div class="icon-action">
+                            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+                        </div>
+                        <span class="condition-text">MATCH</span>
+                    </div>
+                    <cds-select
+                        [items]="listOfIntents"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'value'"
+                        [itemSelected]="branch.intent"
+                        [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                        [clearable]="true"
+                        (onSelected)="onChangeCaseIntent($event, branch)"
+                        (onReset)="onResetCaseIntent($event, branch)">
+                    </cds-select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="filter-add-group-wrapper add-conditions-group">
+            <div class="filter-add-group" (click)="onAddCase()">
+                <div class="filter-add-group-plus"><span class="material-icons">add</span></div>
+                <span class="text">{{ 'CDSCanvas.AddCase' | translate }}</span>
+            </div>
+        </div>
+
+        <!-- ramo finale: destinazione facoltativa, come il falseIntent della condition V2 -->
+        <div class="field-box else-box">
+            <div class="condition-container">
+                <span class="condition-text">{{ 'CDSCanvas.Else' | translate | titlecase }}</span>
+            </div>
+            <cds-select
+                [items]="listOfIntents"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.elseIntent"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                [clearable]="true"
+                (onSelected)="onChangeElseIntent($event)"
+                (onReset)="onResetElseIntent($event)">
+            </cds-select>
+        </div>
+
+    </div>
+</div>

@@ -1,32 +1,69 @@
 <div *ngIf="!initFinished" class="loader">
 </div>
 
-<div *ngIf="initFinished" (wheel)="onSwipe($event)">
-    <cds-header 
-        class="cds-header" 
-        [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR" 
+<div *ngIf="initFinished" (wheel)="onSwipe($event)" [class.cds-read-only]="IS_READ_ONLY">
+
+    <!-- Sola lettura: al posto dell'header, l'avviso. Resta in vista per tutto il tempo,
+         perche' i blocchi si possono ancora trascinare sullo schermo e nulla viene
+         salvato: senza questa riga sembrerebbe un editor che funziona. -->
+    <div class="cds-read-only-banner" *ngIf="IS_READ_ONLY">
+        <span class="material-icons cds-read-only-banner__icon">visibility</span>
+        <span class="cds-read-only-banner__text">
+            {{ 'CDSPreview.ReadOnlyBanner' | translate }}
+        </span>
+    </div>
+
+    <cds-header *ngIf="!IS_READ_ONLY"
+        class="cds-header"
+        [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR"
         [selectedChatbot]="selectedChatbot"
         (goToBck)="goBack()"
         (toggleSidebarWith)="onToggleSidebarWith($event)">
     </cds-header>
 
-    <div id="chatbot--dashboard" 
-        class="chatboat-dashboard" 
+    <div id="chatbot--dashboard"
+        class="chatboat-dashboard"
         [class.is_opened_sidebar]="IS_OPEN_SIDEBAR">
 
-        <!-- <cds-changelog *ngIf="showChangelog" 
+        <!-- <cds-changelog *ngIf="showChangelog"
             (onClose)="onCloseChangelog()">
         </cds-changelog> -->
 
-        <cds-sidebar class="cds-sidebar" 
+        <cds-sidebar class="cds-sidebar" *ngIf="!IS_READ_ONLY"
             [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR">
         </cds-sidebar>
 
-        <router-outlet></router-outlet>
+        <!-- Mounted here, not inside cds-canvas, so a flow switch can destroy
+             and rebuild the canvas without taking the iframe -- and the
+             conversation inside it -- with it. Still before the outlet in this
+             flex row, so it opens as a column rather than an overlay.
+             Hidden outside the blocks section, never removed. It used to be
+             `*ngIf="isBlockSectionActive"`, which destroyed the panel -- and
+             the iframe, and the conversation in it -- the moment the user
+             opened Settings or Knowledge base, and rebuilt an empty one on
+             the way back. Nothing on screen said why. `isHidden` is a width
+             of 0 (see the panel's own SCSS), so the frame stays loaded and
+             the chat is still there when the user returns. -->
+        <cds-panel-agent-chat
+            [class.isVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive"
+            [class.isHidden]="!(IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive)"
+            [isPanelVisible]="IS_OPEN_PANEL_AGENT_CHAT && isBlockSectionActive"
+            [showCloseButton]="true"
+            (closePanel)="onCloseAgentChat()">
+        </cds-panel-agent-chat>
+
+        <!-- The outlet ALONE. cds-panel-agent-chat above is deliberately its
+             sibling: openFlow() drops flowVisible to destroy whatever the
+             outlet holds and rebuild it on the new flow, and anything inside
+             this container is destroyed with it -- which for the chat would
+             mean losing the iframe, and the conversation in it, on every
+             flow switch, silently. -->
+        <ng-container *ngIf="flowVisible">
+            <router-outlet></router-outlet>
+        </ng-container>
 
     </div>
 
     <cds-popup></cds-popup>
-    
-</div>
 
+</div>

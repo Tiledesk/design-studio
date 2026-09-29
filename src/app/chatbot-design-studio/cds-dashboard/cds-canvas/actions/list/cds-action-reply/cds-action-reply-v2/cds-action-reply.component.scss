@@ -174,6 +174,16 @@ $margin-bottom: 15px;
         display: block;
         position: relative;
         height: auto;
+
+        /* Solo per replyv2. La regola sta qui e non nel foglio di
+           cds-action-reply-settings perche' quel componente e' condiviso, e uno
+           spazio in fondo chiesto da questa action non deve seguirlo altrove.
+           `display: block` serve perche' il padding di un elemento in linea non
+           spinge quello che viene dopo. */
+        cds-action-reply-settings {
+            display: block;
+            padding-bottom: 20px;
+        }
         width: 100%;
         min-height: auto;
         margin: 0px;
