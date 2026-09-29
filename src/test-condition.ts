@@ -16,5 +16,5 @@ getTestBed().initTestEnvironment(
   platformBrowserDynamicTesting(),
 );
 
-const context = (require as any).context('./app/chatbot-design-studio/', true, /utils-(condition|actions)\.spec\.ts$/);
+const context = (require as any).context('./app/chatbot-design-studio/', true, /(utils-(condition|actions)|connector-map)\.spec\.ts$/);
 context.keys().forEach(context);

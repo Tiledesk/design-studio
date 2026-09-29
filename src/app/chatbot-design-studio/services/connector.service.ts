@@ -1738,7 +1738,17 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
       return intent_id+"/"+tdActionId+'/error/'+idConnectorTo;
     } else if(key === 'goToIntent'){
       return intent_id+"/"+tdActionId+'/goto/'+idConnectorTo;
+    } else if(key === 'elseIntent'){
+      return intent_id+"/"+tdActionId+'/else/'+idConnectorTo;
+    } else if(key === 'intent' && obj._tdCaseId){
+      // Condizione a piu' casi: la destinazione di un caso. Il riconoscimento e' su
+      // `_tdCaseId` e non sul nome della chiave, che da solo sarebbe troppo generico.
+      return intent_id+"/"+tdActionId+'/case/'+obj._tdCaseId+'/'+idConnectorTo;
     }
+    // Nessuna corrispondenza: stringa vuota. ATTENZIONE, non e' innocuo --
+    // createListOfConnectorsByIntent2 registra comunque la voce in mapOfConnectors, e
+    // una voce che nessun connettore reale potra' mai marcare come disegnata lascia il
+    // canvas fermo sulla schermata di caricamento. Una destinazione nuova va aggiunta qui.
     return '';
   }
 

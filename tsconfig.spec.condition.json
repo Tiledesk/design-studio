@@ -8,6 +8,7 @@
   "include": [
     "src/app/chatbot-design-studio/utils-condition.spec.ts",
     "src/app/chatbot-design-studio/utils-actions.spec.ts",
+    "src/app/chatbot-design-studio/services/connector-map.spec.ts",
     "src/**/*.d.ts"
   ]
 }
