@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 29/09/2026
+- **fixed**: negli agenti V3 il blocco che contiene la condizione a piu' casi non mostra piu' il proprio punto di uscita. Le sue uscite sono i casi e l'*altrimenti*: un collegamento partito dal blocco non verrebbe mai percorso
+
 # this branch 28/09/2026
 
 - **added**: a condition can now hold several cases instead of a single test with two exits. Each case has its own conditions, its own destination block and its own connector on the block; they are evaluated in order and the first one that matches sends the conversation on, leaving the action. When none matches, the flow takes the final *else* branch
