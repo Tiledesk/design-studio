@@ -1360,6 +1360,9 @@
             },
             "flowError": {
                 "description": "The last error generated in the flow"
+            },
+            "voiceStreaming": {
+                "description": "The voice streaming status. True if the voice is streaming, false otherwise"
             }
         },
         "uploadedDocumentElements": {

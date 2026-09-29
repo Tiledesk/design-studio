@@ -145,16 +145,17 @@ export class CDSVoiceSettingsComponent implements OnInit {
       const resp = await this.aiService.getElevenLabsModels();
       this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels ', resp)
       if (resp && Array.isArray(resp)) {
-        resp.forEach(model => {
-          const elevenLabsProvider = voiceProviderList.find(el => el.key === 'elevenlabs');
-          if (elevenLabsProvider && elevenLabsProvider.tts_model) {
-            elevenLabsProvider.tts_model.push({
-              model: model.model_id,
-              name: model.name,
-              status: 'active'
-            });
-          }
-        });
+        resp.filter(model => model?.can_do_text_to_speech === true)
+          .forEach(model => {
+            const elevenLabsProvider = voiceProviderList.find(el => el.key === 'elevenlabs');
+            if (elevenLabsProvider && elevenLabsProvider.tts_model) {
+              elevenLabsProvider.tts_model.push({
+                model: model.model_id,
+                name: model.name,
+                status: 'active'
+              });
+            }
+          });
       }
     } catch (error) {
       this.logger.error('[CDS-CHATBOT-VOICE-SETTINGS] getElevenLabsModels error: ', error);
