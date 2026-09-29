@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc4
+- **added**: system variable `voiceStreaming` (chatbot and voice agents) — true while voice is streaming, false otherwise
+- **changed**: ElevenLabs STT models — `scribe_v2`, `scribe_v2_realtime` and `scribe_v2_medical` are active; legacy `scribe_v1` / `scribe_v1_experimental` are inactive
+- **changed**: ElevenLabs TTS model list only includes models with `can_do_text_to_speech: true`
+
 # 1.40.16-rc3
 - **fixed**: the canvas no longer stays on the loading screen when the agent holds a condition with several cases. It waits for every connection it expects, and the exits of the cases and of the *else* were not among the ones it knew how to recognise
 - **changed**: the AI chat knows the multi-case condition and uses it when there are more than two ways out, instead of chaining one condition per branch. It is also told what goes wrong: the order decides, and an empty case or an early negative test leaves everything below it unreachable
