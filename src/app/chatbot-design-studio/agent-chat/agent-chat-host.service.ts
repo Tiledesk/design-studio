@@ -10,6 +10,7 @@ import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 
 /** The client tools this host registers on the chat. A session opened on the
@@ -17,7 +18,8 @@ import { V3_FLOW_RULES } from './v3-flow-rules';
  *  same list the chat declares when it attaches, or the runtime would offer
  *  the model a tool nobody answers. The host spec keeps the two in step. */
 export const AGENT_CHAT_CLIENT_TOOLS: string[] = [
-  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent'
+  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent',
+  'get_project_capabilities'
 ];
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -31,6 +33,25 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
  *  guaranteed to be there. */
 function stripTokenScheme(token: string): string {
   return token.replace(/^\s*jwt\s+/i, '');
+}
+
+/** A copy of the flow without the address and headers of attached MCP
+ *  servers: for the project's own servers they are credentials, and neither
+ *  the chat nor its model needs them to read or edit the flow. */
+function withoutServerCredentials<T>(flow: T): T {
+  const copy = JSON.parse(JSON.stringify(flow));
+  for (const intent of Array.isArray(copy?.intents) ? copy.intents : []) {
+    for (const action of Array.isArray(intent?.actions) ? intent.actions : []) {
+      if (!Array.isArray(action?.servers)) { continue; }
+      for (const server of action.servers) {
+        if (server && typeof server === 'object') {
+          delete server.url;
+          delete server.customHeaders;
+        }
+      }
+    }
+  }
+  return copy;
 }
 
 /** Owns the chat iframe's host side.
@@ -77,7 +98,8 @@ export class AgentChatHostService {
     private intentService: IntentService,
     private tiledeskAuthService: TiledeskAuthService,
     private flowOps: FlowOpsService,
-    private family: AgentChatFamilyService
+    private family: AgentChatFamilyService,
+    private capabilities: AgentChatCapabilitiesService
   ) {
     this.config = readAgentChatConfig(this.appConfigService.getConfig());
     // The chat is handed the token once, at `hello`, and then talks to the
@@ -119,6 +141,8 @@ export class AgentChatHostService {
     // is after a failure -- and a failed attach() left no host behind.
     this.host?.destroy();
     this.host = null;
+    // A new chat session reads the project's MCP servers afresh.
+    this.capabilities.invalidate();
     let adapter;
     try {
       adapter = await loadAgentChatAdapter(this.config.chatUrl);
@@ -130,14 +154,19 @@ export class AgentChatHostService {
     this.host = adapter.createAgentChatHost({
       iframe,
       chatOrigin: this.config.chatOrigin,
-      getConfig: (): HostConfig => ({
-        // The chat's own mount point: it proxies /v1/ to the runtime, which is
-        // why design-studio never learns the runtime's address.
-        baseUrl: this.config.chatUrl,
-        token: this.storedToken(),
-        projectId: this.dashboardService.projectID,
-        flowId: this.family.rootId()
-      })
+      // Called by the adapter only when the chat's `ready` arrives, so it is
+      // also the one place the studio can see that the frame is alive.
+      getConfig: (): HostConfig => {
+        this.logger.log('[AGENT-CHAT-HOST] ready received from the chat, sending hello');
+        return {
+          // The chat's own mount point: it proxies /v1/ to the runtime, which is
+          // why design-studio never learns the runtime's address.
+          baseUrl: this.config.chatUrl,
+          token: this.storedToken(),
+          projectId: this.dashboardService.projectID,
+          flowId: this.family.rootId()
+        };
+      }
     });
 
     // The chat now says when a turn has finished, so the canvas is redrawn on
@@ -151,6 +180,11 @@ export class AgentChatHostService {
     });
 
     this.registerTool('get_flow', async () => {
+      // RICEVUTO: la richiesta del vibe coder. Da qui al log di risposta il run
+      // e' fermo sul runtime e sta lavorando solo il Design Studio.
+      this.logger.log('[AGENT-CHAT-HOST] ddp <<< RICEVUTO get_flow - agent aperto:',
+        this.dashboardService.id_faq_kb,
+        '| V3:', !!this.dashboardService.isV3);
       // readFlow() is synchronous and cannot fail; family.read() awaits up to
       // two HTTP calls and can. Losing id_faq_kb and intents -- the flow the
       // agent could always read -- to a transient family lookup failure would
@@ -162,27 +196,55 @@ export class AgentChatHostService {
       try {
         family = await this.family.read();
       } catch (error) {
-        this.logger.error('[AGENT-CHAT-HOST] get_flow: family read failed:', error);
+        this.logger.error('[AGENT-CHAT-HOST] ddp get_flow: family read failed:', error);
       }
       // The rules travel with the flow: the runtime's prompt describes the
       // legacy editor, and only the studio knows which editor this agent uses.
       const isV3 = !!this.dashboardService.isV3;
-      return {
-        ...this.flowOps.readFlow(),
+      const snapshot = {
+        ...withoutServerCredentials(this.flowOps.readFlow()),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {})
       };
+      // INVIATO: cosa esce davvero verso il vibe coder, voce per voce.
+      this.logger.log('[AGENT-CHAT-HOST] ddp >>> INVIATO get_flow',
+        '\n   agent    :', snapshot.id_faq_kb,
+        '\n   blocchi  :', snapshot.intents?.length ?? 0,
+          '(' + (snapshot.intents || []).map((i: any) => i?.intent_display_name).join(', ') + ')',
+        '\n   famiglia :', snapshot.family
+          ? `root ${snapshot.family.root_name}, ${snapshot.family.subagents?.length ?? 0} sub agent`
+            + (snapshot.family.is_subagent ? ' (siamo dentro un sub agent)' : '')
+          : 'assente (lettura fallita)',
+        '\n   versione :', snapshot.ds_version,
+        '\n   regole V3:', snapshot.ds_version === 'v3' ? `${V3_FLOW_RULES.length} regole` : 'non inviate (legacy)');
+      this.logger.log('[AGENT-CHAT-HOST] ddp >>> payload completo:', snapshot);
+      return snapshot;
     });
 
     this.registerTool('get_canvas_selection', async () => {
       const selected = this.intentService.intentSelected;
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- get_canvas_selection:', selected?.intent_id ?? 'nessuna');
       return { intent_ids: selected ? [selected.intent_id] : [] };
     });
+
+    // What this project can build with: the element panel's own action list
+    // and the MCP servers an ai_prompt may attach. The agent reads it; flow-ops
+    // enforces the same answer, so a patch the tool would not have suggested
+    // is refused rather than applied.
+    this.registerTool('get_project_capabilities', async () =>
+      (await this.capabilities.snapshot()).capabilities);
+    this.flowOps.setCapabilitiesSource(() => this.capabilities.snapshot());
+    // A native flow-ops finds unconfigured in an attached ai_prompt is added
+    // to the project's own MCP integration through here, before the patch
+    // that attaches it is applied -- see FlowOpsService.apply().
+    this.flowOps.setNativeConfigurer(ids => this.capabilities.configureNativeServers(ids));
 
     this.registerTool('apply_flow_patch', async (args) => {
       const declared = args?.['faq_kb_id'] as string | undefined;
       const open = this.dashboardService.id_faq_kb;
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- apply_flow_patch su', declared, ':',
+        ((args?.['operations'] ?? []) as FlowOp[]).map(o => o?.op).join(', '));
       // The canvas can now move under a running turn -- the agent opens a
       // subagent, or the user picks a sibling from the panel while the agent
       // is thinking. A refusal is something the agent reads and recovers
@@ -203,12 +265,17 @@ export class AgentChatHostService {
         } as FlowOpsReport;
       }
       const report = await this.flowOps.apply((args?.['operations'] ?? []) as FlowOp[]);
+      this.logger.log('[AGENT-CHAT-HOST] ddp -> apply_flow_patch:',
+        report.ok ? 'applicato' : (report.rejected_before_applying ? 'RIFIUTATO in validazione' : 'FALLITO a meta'),
+        '-', report.results.filter(r => r.ok).length, 'ok,',
+        report.results.filter(r => !r.ok).map(r => r.error).join(' | '));
       this.appliedSource.next(report);
       return report;
     });
 
     this.registerTool('open_flow', async (args) => {
       const id = String(args?.['faq_kb_id'] ?? '');
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- open_flow:', id);
       // The agent is a way to build one family, not a way to walk the
       // project: anything outside it is refused before the studio moves.
       //
@@ -246,6 +313,7 @@ export class AgentChatHostService {
 
     this.registerTool('create_subagent', async (args) => {
       const name = String(args?.['name'] ?? '').trim();
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- create_subagent:', name);
       // Thrown, not returned as a refusal report: the adapter turns a throw
       // into a `handler_error` tool result the agent reads. There is no
       // partial success to describe here.

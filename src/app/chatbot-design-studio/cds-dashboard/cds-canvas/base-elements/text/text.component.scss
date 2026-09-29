@@ -263,6 +263,53 @@ input[type=number] {
     &.mat-active{
         background-color: #ebf5ff !important;;
     }
+
+    .option-item-wrp[additionalText = true]{
+        .option-item-wrp{
+            justify-content: space-between;
+        }
+    }
+
+    .option-item-wrp{
+        width: 100%; 
+        display: flex; 
+        flex-direction: row;
+        align-items: center;
+        font-size: 14px;
+    }
+
+    span.label-option {
+        margin-right: 4px;
+        color: var(--blu);
+        // line-height: 17px;
+    }
+
+    span.label-option-text {
+        color: #a8a8a8;
+    }
+
+    span.description {
+        width: 80%;
+        font-size: 12px;
+        margin-bottom: 0px;
+        color: #a8a8a8;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    span.description-margin{
+        margin-left: 28px
+    }
+
+
+    &.ng-option-disabled {
+        
+        pointer-events: none;
+        .label-select{
+            color: #ccc;
+
+        }
+    }
 }
 
 .slide-top {
