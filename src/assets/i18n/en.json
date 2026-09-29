@@ -1001,7 +1001,7 @@
             },
             "RemoveHuman": {
                 "TITLE": "Remove a human",
-                "DESCRIPTION": "Removes human participants from the conversation while the chatbot keeps running: only the humans this flow invited, or all of them. Place it at the end of the part of the flow that needs a human: until they are removed, invited humans who leave are replaced automatically. Use Remove current bot instead to hand the conversation over completely.",
+                "DESCRIPTION": "Removes human participants from the conversation while the chatbot keeps running: only the humans this flow invited, or all of them. Place it at the end of the part of the flow that needs a human: until they are removed, invited humans who leave are replaced automatically. The Removed output is also taken when there was nobody to remove. Available only in conversations started by a webhook. To hand the conversation over completely to the invited humans, remove the bot instead with a Reply whose text is \\removecurrentbot.",
                 "IMAGE": "",
                 "VIDEO_URL": "",
                 "DOC_URL": ""
