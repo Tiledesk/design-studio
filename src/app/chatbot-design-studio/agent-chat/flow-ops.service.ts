@@ -8,7 +8,7 @@ import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
-import { TYPE_ACTION, actionEndsTheFlow } from '../utils-actions';
+import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
@@ -631,6 +631,7 @@ export class FlowOpsService implements OnDestroy {
   private static readonly CONDITIONAL_ROUTER_FIELDS: Record<string, string[]> = {
     [TYPE_ACTION.JSON_CONDITION]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.JSON_CONDITION2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.JSON_CONDITION_MULTI]: ['elseIntent'],
     [TYPE_ACTION.CONDITION]: ['trueIntent'],
     [TYPE_ACTION.AI_CONDITION]: ['fallbackIntent', 'errorIntent'],
     [TYPE_ACTION.ONLINE_AGENTS]: ['trueIntent', 'falseIntent'],
@@ -758,6 +759,16 @@ export class FlowOpsService implements OnDestroy {
         if (violation) { return violation; }
       }
     }
+    // Stessa forma di `ai_condition`: la destinazione di ogni caso vive a un indice
+    // variabile dentro un array, quindi `DESTINATION_FIELDS` non puo' elencarla per nome.
+    // `elseIntent` invece e' un campo piatto e lo copre la mappa.
+    if (actionType === TYPE_ACTION.JSON_CONDITION_MULTI && Array.isArray(fields.cases)) {
+      for (let i = 0; i < fields.cases.length; i++) {
+        const violation = this.validateDestinationField(
+          actionType, `cases[${i}].intent`, fields.cases[i]?.intent);
+        if (violation) { return violation; }
+      }
+    }
     // A reply's buttons route the flow as much as any named field does; their
     // destination just sits nested in `attributes` under a per-button
     // `action`, so it has to be walked rather than looked up by name. Only
@@ -799,6 +810,9 @@ export class FlowOpsService implements OnDestroy {
     if (actionType === TYPE_ACTION.AI_CONDITION && Array.isArray(fields.intents)) {
       return fields.intents.some((entry: any) => entry && 'conditionIntentId' in entry);
     }
+    if (actionType === TYPE_ACTION.JSON_CONDITION_MULTI && Array.isArray(fields.cases)) {
+      return fields.cases.some((entry: any) => entry && 'intent' in entry);
+    }
     // A reply's buttons are destinations too -- they route the flow and draw
     // their own connectors, they just live nested in `attributes` instead of
     // in a named field, so DESTINATION_FIELDS cannot list them. Any write
@@ -824,6 +838,21 @@ export class FlowOpsService implements OnDestroy {
     return Array.isArray(action.intents) && action.intents.some((i: any) => !!i?.conditionIntentId);
   }
 
+  /** Whether `action` is a multi-case condition with at least one case already
+   *  pointed somewhere -- `cases[].intent`. The twin of
+   *  `hasConfiguredAiConditionBranch`, and split out for the same reason: the
+   *  destination sits at a variable index in an array, which
+   *  `CONDITIONAL_ROUTER_FIELDS` cannot name. `elseIntent` is not checked here
+   *  because it IS in that map and is already covered by the caller.
+   *
+   *  A case that matches routes the flow away from the block exactly as a
+   *  `trueIntent` does, so a block holding one is already routed and `connect`
+   *  must not add the dot on top of it. */
+  private hasConfiguredMultiConditionCase(action: any): boolean {
+    if (!action || action._tdActionType !== TYPE_ACTION.JSON_CONDITION_MULTI) { return false; }
+    return Array.isArray(action.cases) && action.cases.some((c: any) => !!c?.intent);
+  }
+
   /** The first action in `actions` that already routes the block by itself --
    *  present, and carrying at least one non-empty destination among its entry
    *  in `CONDITIONAL_ROUTER_FIELDS` (or, for `ai_condition`, a configured
@@ -839,7 +868,9 @@ export class FlowOpsService implements OnDestroy {
       if (!action) { continue; }
       const fields = FlowOpsService.CONDITIONAL_ROUTER_FIELDS[action._tdActionType];
       if (!fields) { continue; }
-      const configured = fields.some(f => !!action[f]) || this.hasConfiguredAiConditionBranch(action);
+      const configured = fields.some(f => !!action[f])
+        || this.hasConfiguredAiConditionBranch(action)
+        || this.hasConfiguredMultiConditionCase(action);
       if (configured) { return { action, fields }; }
     }
     return null;
@@ -941,6 +972,10 @@ export class FlowOpsService implements OnDestroy {
       if (!action || typeof action.type !== 'string' || !action.type) {
         return { op: op.op, ok: false, error: 'Every action in add_intent.actions needs a type.' };
       }
+      const versionViolation = this.validateActionEditorVersion(action.type);
+      if (versionViolation) {
+        return { op: op.op, ok: false, error: versionViolation };
+      }
       const scaffold = this.intentService.createNewAction(action.type as any);
       if (!scaffold) {
         return {
@@ -968,6 +1003,33 @@ export class FlowOpsService implements OnDestroy {
       }
     }
     return null;
+  }
+
+  /** Refuses an action that belongs to the V3 editor when the open agent is not
+   *  a V3 one. The catalogue entry says which editor an action belongs to
+   *  (`ds_version: 'v3'`); everything without that marker is offered
+   *  everywhere, which stays the normal case.
+   *
+   *  Why here and not in the capability list the chat is handed: that list is
+   *  built from `availableActionEntries`, which deliberately ignores the
+   *  marker so the action panel on screen keeps showing exactly what it
+   *  showed before. The distinction exists for the agent chat, which builds
+   *  flows on agents of both editors, so it is enforced where the chat's
+   *  writes are checked.
+   *
+   *  Why not inside `validateV3Batch`: that runs only when the open agent IS
+   *  V3, and the case to stop is the opposite one.
+   *
+   *  `update_action` deliberately does not call this: the action is already on
+   *  the agent, and refusing to edit it would leave it stranded -- unreachable
+   *  through the chat and still there. Only putting a new one in is refused. */
+  private validateActionEditorVersion(actionType: string): string | null {
+    const entry = Object.values(ACTIONS_LIST).find(el => el.type === actionType);
+    if (entry?.ds_version !== 'v3') { return null; }
+    if (this.dashboardService.isV3) { return null; }
+    return `"${actionType}" exists only in the V3 editor, and this agent is a legacy one ` +
+      `(ds_version "legacy"). Build this step with the actions a legacy agent has: for a ` +
+      `multi-way choice, chain one condition per branch.`;
   }
 
   /** Whether a `callsubagent` (`TYPE_ACTION.REPLACE_BOTV4`)'s `fields` name a
@@ -1047,6 +1109,8 @@ export class FlowOpsService implements OnDestroy {
         if (typeof op.type !== 'string' || !op.type) {
           return fail('add_action needs a type.');
         }
+        const versionViolation = this.validateActionEditorVersion(op.type);
+        if (versionViolation) { return fail(versionViolation); }
         // Built and discarded here the same way validateAddIntentActions
         // already does it: createNewAction only constructs a plain object, so
         // calling it to check shape costs nothing. A type the studio cannot
@@ -1272,6 +1336,31 @@ export class FlowOpsService implements OnDestroy {
     Object.keys(fields)
       .filter(key => FlowOpsService.PROTECTED_FIELDS.indexOf(key) === -1)
       .forEach(key => { action[key] = fields[key]; });
+    this.ensureCaseIds(action);
+  }
+
+  /** Gives every case of a multi-case condition the id its connector hangs off.
+   *
+   *  `_tdCaseId` is studio-owned identity, like `_tdActionId`: the canvas draws
+   *  a case's connector as `<intentId>/<actionId>/case/<_tdCaseId>`, so a case
+   *  without one draws a connector anchored to `undefined`. The agent is not
+   *  asked to invent these -- the catalogue keeps the studio's identity fields
+   *  out of what it sets -- and `assignFields` replaces `cases` wholesale
+   *  (`findScaffoldViolation` only checks the array is still a non-empty
+   *  array, not the shape of what is in it), so the ids have to be put back
+   *  right after the write, before the batch redraws the block's connectors.
+   *
+   *  Idempotent: a case that already carries an id keeps it, which is what
+   *  makes reordering and renaming safe. `IntentService.patchActionId` does
+   *  the same at load time, for flows that arrive from anywhere else. */
+  private ensureCaseIds(action: any): void {
+    if (!action || action._tdActionType !== TYPE_ACTION.JSON_CONDITION_MULTI) { return; }
+    if (!Array.isArray(action.cases)) { return; }
+    action.cases.forEach((branch: any) => {
+      if (branch && typeof branch === 'object' && !branch._tdCaseId) {
+        branch._tdCaseId = generateShortUID();
+      }
+    });
   }
 
   /** The three action types `createNewAction` scaffolds with the same

@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 29/09/2026
+- **fixed**: negli agenti V3 il blocco che contiene la condizione a piu' casi non mostra piu' il proprio punto di uscita. Le sue uscite sono i casi e l'*altrimenti*: un collegamento partito dal blocco non verrebbe mai percorso. Era gia' cosi' e si era perso rimettendo insieme i branch
+- **changed**: la chat AI conosce la condizione a piu' casi e la usa quando le vie sono piu' di due, invece di incatenare una condizione per ramo. Sa anche cosa la fa sbagliare: l'ordine decide, un caso senza condizioni non scatta mai, e un confronto negativo messo presto rende irraggiungibile tutto il resto
+- **changed**: la chat AI non puo' piu' mettere in un agente precedente un'azione che esiste solo nell'editor V3: la richiesta viene rifiutata spiegando perche'. Modificare un'azione gia' presente resta possibile, per non lasciarla li' senza poterla piu' toccare
+- **fixed**: i casi scritti dalla chat ricevono l'identita' su cui pende il loro connettore anche quando la chat non la manda, e una destinazione che non esiste sul canvas viene rifiutata invece di essere salvata e cancellata in silenzio al primo aggiornamento
+
 # this branch 28/09/2026
 
 # this branch 25/09/2026

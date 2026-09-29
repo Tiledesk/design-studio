@@ -31,6 +31,13 @@ export const V3_FLOW_RULES: string[] = [
   'WITHOUT a `close` block. Add a `close` block only when the user explicitly asks to end the ' +
   'conversation with a button (e.g. "Do you want to close the conversation?" -> "Yes, close"): the ' +
   'close block is the destination of that button only, and nothing comes after it.',
+  'V3-U6: to route more than two ways on an exact value, use ONE `jsonconditionmulti` block ' +
+  'instead of chaining a `jsoncondition2` per branch. Its `cases` are evaluated IN ORDER and the ' +
+  'first one that matches wins, so put the most specific first; a case left without conditions ' +
+  'never fires and is NOT a default branch; a negative test (is not equal to, does not contain) ' +
+  'placed early matches nearly everything and makes every case below it, and the else, ' +
+  'unreachable. What does not match any case leaves through `elseIntent`. Send each case its ' +
+  '`conditions`, never `when`: the studio derives it on save.',
   'V3-P1: build the fewest blocks that do the job. V3-P2: prefer AI blocks (one `askgptv2` for many ' +
   'questions on documents, one `ai_condition` instead of a tree of conditions, `ai_prompt` to write ' +
   'or summarise). V3-P3: an open question followed by `ai_condition` beats a deep menu.'

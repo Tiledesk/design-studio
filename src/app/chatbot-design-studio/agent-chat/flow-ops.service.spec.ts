@@ -4334,3 +4334,247 @@ describe('FlowOpsService — the connectors follow a block the agent moves', () 
     expect(laidOut).toEqual([]);
   }));
 });
+
+/* ============================================================================
+ * Azioni che appartengono a un solo editor (`ds_version` sulla voce di catalogo)
+ * ==========================================================================*/
+
+describe('FlowOpsService — azioni riservate all\'editor V3', () => {
+  let service: FlowOpsService;
+  let intentService: any;
+  let dashboardService: any;
+
+  /** L'unica azione marcata `ds_version: 'v3'` oggi. */
+  const SOLO_V3 = 'jsonconditionmulti';
+
+  function build(isV3: boolean, intents?: Intent[]): void {
+    intentService = {
+      listOfIntents: intents || [anIntent('i1', 'start'), anIntent('i2', 'welcome')],
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent').and.callFake(() => anIntent('new-id', 'Untitled Block 1')),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: recordingUndo('saveNewIntent', []),
+      updateIntent: recordingUndo('updateIntent', []),
+      deleteIntentNew: recordingUndo('deleteIntentNew', []),
+      // Scaffold minimo: `cases` non vuoto, come lo costruisce createNewAction,
+      // cosi' la guardia di forma non entra in gioco e resta in prova solo quella di versione.
+      createNewAction: jasmine.createSpy('createNewAction')
+        .and.callFake((type: string) => ({ _tdActionType: type, cases: [{}], elseIntent: '' })),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    dashboardService = { id_faq_kb: 'kb1', isV3 };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: aConnectorService() },
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  }
+
+  it('su un agente legacy rifiuta add_action, e dice perche\'', async () => {
+    build(false);
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: SOLO_V3 } as any
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain(SOLO_V3);
+    expect(report.results[0].error).toContain('V3');
+  });
+
+  it('su un agente V3 la stessa add_action passa', async () => {
+    build(true);
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: SOLO_V3 } as any
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('vale anche per le action inline di add_intent', async () => {
+    build(false);
+    const report = await service.apply([
+      { op: 'add_intent', intent_display_name: 'scelta', actions: [{ type: SOLO_V3 }] } as any
+    ]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain(SOLO_V3);
+    // Il blocco non deve nascere a meta': la validazione precede la creazione.
+    expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+  });
+
+  it('un\'azione senza marcatore resta offerta ovunque', async () => {
+    build(false);
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'i1', type: 'reply' } as any
+    ]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('update_action su un\'azione gia\' presente NON viene rifiutata, nemmeno su un agente legacy', async () => {
+    // Deliberato: l'azione e' gia' sull'agente. Rifiutare la modifica la lascerebbe
+    // li', irraggiungibile dalla chat e comunque presente. Si blocca l'ingresso,
+    // non la manutenzione.
+    const intent = anIntent('i1', 'start');
+    intent.actions = [{ _tdActionId: 'a1', _tdActionType: SOLO_V3, cases: [{ _tdCaseId: 'c1' }], elseIntent: '' } as any];
+    build(false, [intent, anIntent('i2', 'welcome')]);
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'i1', action_id: 'a1', fields: { elseIntent: '#i2' } } as any
+    ]);
+    expect(report.ok).toBe(true);
+  });
+});
+
+/* ============================================================================
+ * Condizione a piu' casi: destinazioni annidate e identita' dei casi
+ * ==========================================================================*/
+
+describe('FlowOpsService — condizione a piu\' casi scritta dalla chat', () => {
+  // Le destinazioni dei casi vivono a un indice variabile dentro `cases[]`,
+  // quindi nessuna mappa di nomi fissi puo' elencarle: vanno percorse. E gli id
+  // dei casi, su cui pendono i connettori, non li manda l'agente.
+  let service: FlowOpsService;
+  let intentService: any;
+  let connectorService: any;
+
+  function intentWithActions(id: string, name: string, actions: any[]): Intent {
+    const intent = anIntent(id, name);
+    intent.actions = actions;
+    return intent;
+  }
+
+  function build(intents: Intent[]): void {
+    intentService = {
+      listOfIntents: intents,
+      arrayUNDO: [],
+      getIntentFromId(id: string) {
+        return this.listOfIntents.find((i: Intent) => i.intent_id === id);
+      },
+      createNewIntent: jasmine.createSpy('createNewIntent').and.callFake(() => anIntent('new-id', 'Untitled Block 1')),
+      addNewIntentToListOfIntents: jasmine.createSpy('addNewIntentToListOfIntents'),
+      saveNewIntent: jasmine.createSpy('saveNewIntent').and.returnValue(Promise.resolve(true)),
+      updateIntent: jasmine.createSpy('updateIntent').and.returnValue(Promise.resolve(true)),
+      deleteIntentNew: jasmine.createSpy('deleteIntentNew').and.returnValue(Promise.resolve(true)),
+      createNewAction: jasmine.createSpy('createNewAction').and.callFake((type: string) =>
+        ({ _tdActionId: 'act1', _tdActionType: type, cases: [{ _tdCaseId: 'scaffold' }], elseIntent: '' })),
+      setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
+        .and.returnValue(Promise.resolve()),
+      restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
+    };
+    connectorService = aConnectorService();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        FlowOpsService,
+        { provide: IntentService, useValue: intentService },
+        { provide: ConnectorService, useValue: connectorService },
+        // isV3: l'azione esiste solo nell'editor V3 (vedi la guardia di versione)
+        { provide: DashboardService, useValue: { id_faq_kb: 'kb1', isV3: true } },
+        { provide: AgentChatFamilyService, useValue: defaultFamilyStub() },
+        { provide: FaqService, useValue: defaultFaqServiceStub() }
+      ]
+    });
+    service = TestBed.inject(FlowOpsService);
+  }
+
+  beforeEach(() => {
+    build([anIntent('i1', 'start'), anIntent('i2', 'uno'), anIntent('i3', 'due')]);
+  });
+
+  it('rifiuta la destinazione di un caso che non esiste sul canvas', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'jsonconditionmulti',
+      fields: { cases: [{ when: 'x == "1"', intent: '#blocco_inventato' }], elseIntent: '#i3' }
+    } as any]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain('cases[0].intent');
+  });
+
+  it('accetta la destinazione di un caso che esiste', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'jsonconditionmulti',
+      fields: { cases: [{ when: 'x == "1"', intent: '#i2' }], elseIntent: '#i3' }
+    } as any]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('rifiuta anche l\'elseIntent inventato, che e\' un campo piatto', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'jsonconditionmulti',
+      fields: { cases: [{ when: 'x == "1"', intent: '#i2' }], elseIntent: '#fantasma' }
+    } as any]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain('elseIntent');
+  });
+
+  it('assegna un id ai casi che la chat manda senza, e lascia quelli che ce l\'hanno', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'jsonconditionmulti',
+      fields: {
+        cases: [
+          { when: 'x == "1"', intent: '#i2' },
+          { _tdCaseId: 'mio', when: 'x == "2"', intent: '#i3' }
+        ],
+        elseIntent: ''
+      }
+    } as any]);
+    expect(report.ok).toBe(true);
+    const azione = intentService.getIntentFromId('i1').actions
+      .find((a: any) => a._tdActionType === 'jsonconditionmulti');
+    expect(azione.cases[0]._tdCaseId).toBeTruthy();
+    expect(azione.cases[1]._tdCaseId).toBe('mio');
+    // id distinti: due casi non possono condividere il connettore
+    expect(azione.cases[0]._tdCaseId).not.toBe(azione.cases[1]._tdCaseId);
+  });
+
+  it('ridisegna il blocco quando la scrittura tocca SOLO la destinazione di un caso', async () => {
+    // Senza `elseIntent` fra i campi scritti: altrimenti basterebbe quello, che e'
+    // un campo piatto gia' coperto dalla mappa, e il ramo sui casi non verrebbe
+    // mai messo alla prova. La mutazione lo ha dimostrato.
+    await service.apply([{
+      op: 'add_action', intent_id: 'i1', type: 'jsonconditionmulti',
+      fields: { cases: [{ when: 'x == "1"', intent: '#i2' }] }
+    } as any]);
+    expect(connectorService.createConnectorsOfIntent).toHaveBeenCalled();
+    const disegnato = connectorService.createConnectorsOfIntent.calls.mostRecent().args[0];
+    expect(disegnato.intent_id).toBe('i1');
+  });
+
+  it('connect viene rifiutato se un caso e\' gia\' collegato', async () => {
+    build([
+      intentWithActions('i1', 'scelta', [{
+        _tdActionId: 'a1', _tdActionType: 'jsonconditionmulti',
+        cases: [{ _tdCaseId: 'c1', when: 'x == "1"', intent: '#i2' }], elseIntent: ''
+      }]),
+      anIntent('i2', 'uno'), anIntent('i3', 'due')
+    ]);
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' } as any
+    ]);
+    expect(report.ok).toBe(false);
+  });
+
+  it('connect passa se nessun caso e\' ancora collegato', async () => {
+    build([
+      intentWithActions('i1', 'scelta', [{
+        _tdActionId: 'a1', _tdActionType: 'jsonconditionmulti',
+        cases: [{ _tdCaseId: 'c1', when: 'x == "1"', intent: '' }], elseIntent: ''
+      }]),
+      anIntent('i2', 'uno'), anIntent('i3', 'due')
+    ]);
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i1', to_intent_id: 'i3' } as any
+    ]);
+    expect(report.ok).toBe(true);
+  });
+});

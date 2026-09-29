@@ -366,6 +366,18 @@ export class IntentService {
         if(!action._tdActionId || action._tdActionId === "UUIDV4"){
           action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
         }
+        // Stessa ragione, un livello piu' sotto: il connettore di un caso della
+        // condizione a piu' uscite e' ancorato a `_tdCaseId`. Un flusso importato,
+        // scritto a mano o generato dalla chat puo' non averlo, e senza id il
+        // connettore nasce agganciato a `undefined`. Chi ce l'ha se lo tiene:
+        // e' cosi' che riordinare i casi non stacca i collegamenti.
+        if(Array.isArray(action.cases)){
+          action.cases.forEach(branch => {
+            if(branch && !branch._tdCaseId){
+              branch._tdCaseId = generateShortUID();
+            }
+          });
+        }
       });
     });
   }
