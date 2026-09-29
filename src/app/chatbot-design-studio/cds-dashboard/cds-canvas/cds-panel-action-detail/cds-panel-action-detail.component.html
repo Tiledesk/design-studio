@@ -99,6 +99,15 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-invite-human>
 
+                    <cds-action-remove-human *ngSwitchCase="TYPE_ACTION.REMOVE_HUMAN"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-remove-human>
+
                     <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS"
                         class="panel-response"   
                         [intentSelected]="intentSelected"

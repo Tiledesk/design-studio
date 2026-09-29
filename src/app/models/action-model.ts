@@ -108,6 +108,19 @@ export class ActionInviteHuman extends Action {
     }
 }
 
+export class ActionRemoveHuman extends Action {
+    scope: string;
+    trueIntent: string;
+    falseIntent: string;
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.REMOVE_HUMAN;
+        this.scope = 'invited';
+    }
+}
+
 export class ActionOpenHours extends Action {
     slotId?: string;
     trueIntent: string;

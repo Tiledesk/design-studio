@@ -625,6 +625,11 @@
         "InviteHumanMembersDescription": "All listed members are invited. If none is valid, one available agent of the department is invited.",
         "InviteHumanInvited": "Invited",
         "InviteHumanNoHuman": "No human available",
+        "RemoveHumanScope": "Who to remove",
+        "RemoveHumanScopeInvited": "Only humans invited by this flow",
+        "RemoveHumanScopeAll": "All human participants",
+        "RemoveHumanRemoved": "Removed",
+        "RemoveHumanError": "Error",
         "StartWebhook": "Start from webhook",
         "InfoStartWebhook": "Lets an external system start this chatbot with an HTTP call, exactly like a new widget conversation.",
         "InfoStartWebhookBranch": "Webhook starts set the variables webhook_http_method and payload: branch on them in the start flow to tell webhook and widget conversations apart.",
@@ -888,6 +893,7 @@
             "IfOperatingHours": "If operating hours",
             "IfOnlineAgent": "If online agents",
             "InviteHuman": "Invite human",
+            "RemoveHuman": "Remove human",
             "Condition": "Condition",
             "ConditionElse": "Condition w/ else",
             "ConditionElseV2": "Condition w/ else V2",
@@ -988,7 +994,14 @@
             },
             "InviteHuman": {
                 "TITLE": "Invite a human",
-                "DESCRIPTION": "Adds a platform user to the conversation while the chatbot keeps running. Place it right before the block that asks the question (e.g. Advanced reply with buttons) to wait for the human answer. Available only in conversations started by a webhook.",
+                "DESCRIPTION": "Adds a platform user to the conversation while the chatbot keeps running. Place it right before the block that asks the question (e.g. Advanced reply with buttons) to wait for the human answer. Available only in conversations started by a webhook. If the invited human leaves, another available agent is invited; if nobody is available, the flow continues from No human available.",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
+            },
+            "RemoveHuman": {
+                "TITLE": "Remove a human",
+                "DESCRIPTION": "Removes human participants from the conversation while the chatbot keeps running: only the humans this flow invited, or all of them. Place it at the end of the part of the flow that needs a human: until they are removed, invited humans who leave are replaced automatically. Use Remove current bot instead to hand the conversation over completely.",
                 "IMAGE": "",
                 "VIDEO_URL": "",
                 "DOC_URL": ""

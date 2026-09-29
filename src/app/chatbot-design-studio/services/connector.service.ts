@@ -520,7 +520,7 @@ export class ConnectorService {
         }
 
         /**  ONLINE_AGENTS */
-        if(action._tdActionType === TYPE_ACTION.ONLINE_AGENTS || action._tdActionType === TYPE_ACTION.ONLINE_AGENTSV2 || action._tdActionType === TYPE_ACTION.INVITE_HUMAN){
+        if(action._tdActionType === TYPE_ACTION.ONLINE_AGENTS || action._tdActionType === TYPE_ACTION.ONLINE_AGENTSV2 || action._tdActionType === TYPE_ACTION.INVITE_HUMAN || action._tdActionType === TYPE_ACTION.REMOVE_HUMAN){
           if(action.trueIntent && action.trueIntent !== ''){
             idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
             idConnectorTo = action.trueIntent.replace("#", "");
