@@ -123,7 +123,7 @@ export class CdsActionAiPromptComponent implements OnInit {
 
     this.project_id = this.dashboardService.projectID;
     // const ai_models = loadTokenMultiplier(this.appConfigService.getConfig().aiModels);
-    // i modelli dei provider dinamici (ollama, vllm, agentplatform) vengono caricati da initLLMModels()
+    // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {

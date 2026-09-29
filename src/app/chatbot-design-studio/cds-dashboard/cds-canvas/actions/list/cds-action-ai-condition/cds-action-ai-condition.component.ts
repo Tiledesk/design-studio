@@ -126,7 +126,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     this.browserLang = lang.startsWith('it') ? 'it' : 'en';
     this.logger.log("[ACTION AI_CONDITION] ngOnInit action: ", this.action);
     this.project_id = this.dashboardService.projectID;
-    // i modelli dei provider dinamici (ollama, vllm, agentplatform) vengono caricati da initLLMModels()
+    // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name;
     this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {

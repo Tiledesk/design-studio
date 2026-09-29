@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-
+# 1.40.15
+- **added**: Adds OpenRouter to the AI action model picker
 
 # 1.40.14
 - **added**: the management of MCP servers and tools has been extracted from the AI Prompt action into a reusable section, so the other LLM actions can adopt it as it is

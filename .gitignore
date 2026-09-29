@@ -60,3 +60,4 @@ settings.json
 docs
 .claude
 json-condition-when-grammar.md
+proxy.conf.json
