@@ -7,12 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 29/09/2026
-- **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare
-- **fixed**: negli agenti V3 il blocco che contiene la condizione a piu' casi non mostra piu' il proprio punto di uscita. Le sue uscite sono i casi e l'*altrimenti*: un collegamento partito dal blocco non verrebbe mai percorso. Era gia' cosi' e si era perso rimettendo insieme i branch
-- **changed**: la chat AI conosce la condizione a piu' casi e la usa quando le vie sono piu' di due, invece di incatenare una condizione per ramo. Sa anche cosa la fa sbagliare: l'ordine decide, un caso senza condizioni non scatta mai, e un confronto negativo messo presto rende irraggiungibile tutto il resto
-- **changed**: la chat AI non puo' piu' mettere in un agente precedente un'azione che esiste solo nell'editor V3: la richiesta viene rifiutata spiegando perche'. Modificare un'azione gia' presente resta possibile, per non lasciarla li' senza poterla piu' toccare
-- **fixed**: i casi scritti dalla chat ricevono l'identita' su cui pende il loro connettore anche quando la chat non la manda, e una destinazione che non esiste sul canvas viene rifiutata invece di essere salvata e cancellata in silenzio al primo aggiornamento
+# 1.40.16-rc3
+- **fixed**: the canvas no longer stays on the loading screen when the agent holds a condition with several cases. It waits for every connection it expects, and the exits of the cases and of the *else* were not among the ones it knew how to recognise
+- **changed**: the AI chat knows the multi-case condition and uses it when there are more than two ways out, instead of chaining one condition per branch. It is also told what goes wrong: the order decides, and an empty case or an early negative test leaves everything below it unreachable
+- **changed**: the AI chat can no longer put an action that exists only in the V3 editor into an older agent; the request is refused with the reason. Editing one already on the agent stays possible
+- **fixed**: a case written by the chat gets the identity its connector hangs off, and a destination that does not exist on the canvas is refused instead of being saved and silently cleared later
 
 # 1.40.16-rc2
 - **fixed**: the reply filter picker offers again only the 16 operators the server evaluates. It had regressed to all 38, and a filter using one of the others was never evaluated: the message it guarded vanished with nothing said
