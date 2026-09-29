@@ -241,6 +241,7 @@
                     <div class="title-and-parameters-container">
                         <div class="title-label">{{'CDSCanvas.AISettings' | translate }}</div>
                         <div class="parameters-preview">
+                            <div class="preview-badges">
 
                             <span *ngIf="(action?.modelName || llm_model_selected?.modelName)" class="preview-badge">
                                 <span class="preview-badge-text">{{ action?.modelName || llm_model_selected?.modelName }}</span>
@@ -253,8 +254,8 @@
                                 <mat-icon class="preview-icon" aria-label="temperature" title="temperature">thermostat</mat-icon> 
                                 <span class="preview-badge-text">{{action.temperature | formatNumber}}</span>
                             </span>
-                            <span *ngIf="action?.context">system context: {{action.context}}</span>
-
+                            </div>
+                            <span *ngIf="action?.context" class="preview-context">{{action.context}}</span>
                         </div>
                     </div>
                 </mat-panel-title>

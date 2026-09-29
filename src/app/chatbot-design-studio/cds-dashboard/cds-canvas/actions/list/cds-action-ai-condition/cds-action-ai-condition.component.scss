@@ -192,12 +192,34 @@ mat-expansion-panel ::ng-deep {
         display: flex;
         flex-direction: column;
         width: 100%;
+        /* Senza, il contenitore non scende sotto la larghezza del suo contenuto
+           piu' lungo -- il system context -- e i puntini non scattano mai. */
+        min-width: 0;
     }
 
     .parameters-preview {
         font-size: 11px;
-        height: 24px;
+        /* Nessuna altezza fissa e niente taglio: l'anteprima si vede tutta,
+           e l'intestazione cresce con lei (l'altezza auto in fondo al file). */
         line-height: normal;
+
+        /* I badge prendono tutte le righe che servono. */
+        .preview-badges {
+            display: block;
+        }
+
+        /* Sempre l'ultima riga, sempre una sola, troncata con i puntini: da
+           qui si vede che un system context c'e' e come comincia, il testo
+           intero sta nel suo campo dentro il pannello. Aperto o chiuso non
+           cambia niente. Senza etichetta davanti: "system context:" si
+           mangiava mezza riga per dire una cosa gia' scritta sotto. */
+        .preview-context {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 0;
+        }
         span {
             line-height: 16px;
             margin-right: 5px;
@@ -682,3 +704,24 @@ cds-select#model-condition.not-configured ::ng-deep {
     }
 }
 // PREVIEW SECTION --- start **************** //
+
+/* L'intestazione di Material ha un'altezza fissa (48px chiusa, 64px aperta).
+   Con un'anteprima su due righe il contenuto non ci stava: il titolo finiva
+   sopra il bordo e la riga di separazione tagliava il testo a meta'. Qui
+   l'altezza segue il contenuto, con il minimo di prima come pavimento. */
+:host ::ng-deep .custom-expansion-panel .mat-expansion-panel-header {
+    height: auto !important;
+    min-height: 48px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* I puntini dell'ultima riga scattano solo se quella riga ha una larghezza da
+   rispettare. Nell'intestazione la catena e' tutta flex, e in un flex ogni
+   elemento parte con `min-width: auto`, cioe' "mai piu' stretto del mio
+   contenuto": il titolo si allargava quanto il system context e il testo
+   finiva tagliato dal bordo del pannello invece che dall'ellissi. */
+:host ::ng-deep .custom-expansion-panel .mat-expansion-panel-header-title {
+    min-width: 0;
+    overflow: hidden;
+}
