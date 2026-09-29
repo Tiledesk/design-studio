@@ -1519,6 +1519,12 @@
     },
     "Options": "Options",
     "CDSHeader": {
+        "SelectAgent": "Select agent",
+        "DeleteAgent": "Delete agent",
+        "DeleteAgentTitle": "Delete agent",
+        "DeleteAgentText": "The agent \"{{name}}\" and all its blocks will be permanently deleted. This cannot be undone.",
+        "DeleteAgentError": "The agent could not be deleted. Try again.",
+        "NoAgents": "No agents in this project",
         "LinkCopiedToClipboard": "Link copied to clipboard",
         "ThereAreUnpublishedChanges": "There are unpublished changes"
     },

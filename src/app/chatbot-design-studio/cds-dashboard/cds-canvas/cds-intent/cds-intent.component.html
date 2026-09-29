@@ -3,8 +3,8 @@
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
-    [class.isStart]="isStart" 
-    [class.tds-slim-intent]="isNewChatbot"
+    [class.isStart]="isStart"
+    [class.tds-v3-intent]="isV3"
     [class.cds-fallback-locked]="isDefaultFallbackLocked"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
@@ -75,16 +75,17 @@
         [class.cds-fallback-locked]="isDefaultFallbackLocked"
         cdkDropList
         [cdkDropListData]="listOfActions"
-        [cdkDropListDisabled]="isNewChatbot || isDefaultFallbackLocked"
+        [cdkDropListDisabled]="isV3 || isDefaultFallbackLocked"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
+        <!-- defaultFallback vuota: bloccata, niente segnaposto ne' pulsante "Add action"                                                -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked" 
+        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked"
             cdkDrag
-            [cdkDragDisabled]="dragDisabled || isNewChatbot">
+            [cdkDragDisabled]="dragDisabled || isV3">
             <!-- add-action-placeholder  -->
             <!-- <div class="add--action-placeholder-add-icon">
                 <span class="material-icons"> add </span>
@@ -112,7 +113,7 @@
 
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
-            [cdkDragDisabled]="isNewChatbot"
+            [cdkDragDisabled]="isV3"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
             (cdkDragMoved)="onDragMove($event)"
@@ -145,15 +146,16 @@
             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
-                    class="header-action" 
+                <cds-action-description
+                    class="header-action"
                     cdkDragHandle
+                    [class.tds_draggable_deep]="isV3"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
-                    <cds-action-controls *ngIf="!isNewChatbot"
+                    <cds-action-controls *ngIf="!isV3"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
     
@@ -552,7 +554,7 @@
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent && !hideBlockConnector"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
@@ -561,7 +563,7 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
                 + {{ 'CDSCanvas.AddAction' | translate}}

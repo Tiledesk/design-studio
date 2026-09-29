@@ -2,6 +2,10 @@ export const environment = {
     production: true,
     t2y12PruGU9wUtEGzBJfolMIgK: 'CHANGEIT',
     VERSION: require('../../package.json').version,
+    /** Versione dell'editor con cui nasce un chatbot creato da qui: finisce sull'agente
+     *  come `attributes.dsVersion` e all'apertura decide quale Design Studio si apre.
+     *  Nessun rapporto con VERSION, che e' la versione del pacchetto. */
+    CHATBOT_VERSION: 'v3',
     remoteConfig: true, 
     remoteConfigUrl: './design-studio-config.json',
     apiUrl: 'CHANGEIT',
