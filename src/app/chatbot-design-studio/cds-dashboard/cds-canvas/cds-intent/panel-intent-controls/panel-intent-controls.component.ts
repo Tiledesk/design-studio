@@ -41,8 +41,10 @@ export class PanelIntentControlsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // isReturnStack cambia a runtime (il blocco diventa/smette di essere una pastiglia)
-    if (changes['isReturnStack'] && !changes['isReturnStack'].firstChange) {
+    // isReturnStack cambia a runtime (il blocco diventa/smette di essere una pastiglia);
+    // isStartPoint arriva dopo il primo render (ngOnInit del padre è async): mai tenere la toolbar completa
+    const changed = ['isReturnStack', 'isStartPoint', 'display_name'].some(k => changes[k] && !changes[k].firstChange);
+    if (changed) {
       this.initialize();
     }
   }
@@ -94,6 +96,7 @@ export class PanelIntentControlsComponent implements OnInit, OnChanges {
     this.showDelete = true;
     this.showCopy = true;
     this.showPlay = true;
+    this.isStart = false;
     if (this.display_name === RESERVED_INTENT_NAMES.START) {
       this.showMore = true;
       this.showColor = false;

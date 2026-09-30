@@ -1,4 +1,4 @@
-import { isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
+import { isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import {
   AfterViewInit,
   Component,
@@ -333,7 +333,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
       this.showIntentOptions = false;
     }
-    
+    // before the await: the toolbar child initialises on the first change detection
+    this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+
     await this.initializeWebhook();
     this.initializeIntentType();
     this.initializeActions();
@@ -1267,10 +1269,16 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Serializza l’intent e lo salva in localStorage tramite IntentService e AppStorageService per un successivo incolla.
    */
   private copyIntent(): void {
+    if (isStartBox(this.intent)) {
+      // a second marker block would break the one-per-type rule
+      return;
+    }
     const intent = JSON.parse(JSON.stringify(this.intent));
     const element = { element: intent, type: 'INTENT', chatbot: this.intent.id_faq_kb, intentId: this.intent.intent_id };
     const data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data);
+    if (data) {
+      this.appStorageService.setItem(data.key, data.data);
+    }
   }
 
   /**
@@ -1281,7 +1289,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     const action = JSON.parse(JSON.stringify(ele));
     const element = { element: action, type: 'ACTION', chatbot: this.intent.id_faq_kb, intentId: this.intent.intent_id };
     const data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data);
+    if (data) {
+      this.appStorageService.setItem(data.key, data.data);
+    }
   }
 
   /**
@@ -1309,6 +1319,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Emette deleteIntent verso il parent (canvas) che gestirà la rimozione dell’intent e l’aggiornamento della lista.
    */
   onDeleteIntent(intent: Intent): void {
+    if (isStartBox(intent)) {
+      // a start box is deleted from its panel only (the server start point goes first)
+      return;
+    }
     this.deleteIntent.emit(intent);
   }
 

@@ -28,6 +28,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
+import { isStartBox } from '../utils-start-points';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -1021,6 +1022,10 @@ export class IntentService {
   */
   public deleteSelectedAction(){
     // this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
+    if (isStartBox(this.intentSelected)) {
+      // the connect action of a start box is its only content
+      return;
+    }
     if(this.intentSelected.intent_id && this.actionSelectedID){
       this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
@@ -2119,6 +2124,10 @@ export class IntentService {
   /************************************************/
   public copyElement(element): {key: string, data: any} {
     this.logger.log('[INTENT SERVICE] -> copyElement, ', element);
+    if (element?.type === 'INTENT' && isStartBox(element.element)) {
+      // start boxes are one per type: never copied
+      return null;
+    }
     let value= {}
     if(element && element.type === 'INTENT'){
       this.arrayCOPYPAST[0] = element;
@@ -2144,6 +2153,12 @@ export class IntentService {
 
   public async pasteElementToStage(positions){
     let element = this.arrayCOPYPAST[0];
+    if (element?.type === 'INTENT' && isStartBox(element.element)) {
+      // e.g. copied before start boxes were refused, still in storage
+      localStorage.removeItem('copied_items');
+      this.arrayCOPYPAST = [];
+      return;
+    }
     let point = this.connectorService.logicPoint(positions);
     this.logger.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){

@@ -26,6 +26,15 @@ export function startPointTypeOf(intent: any): 'web' | 'webhook' | null {
 }
 
 /**
+ * A start box (the `start` block or a marker block, whatever its name): no delete, copy, color or
+ * "Start test from here" on the canvas, only its panel. The webhook box is deleted from its panel only,
+ * which removes the server start point first.
+ */
+export function isStartBox(intent: any): boolean {
+  return startPointTypeOf(intent) !== null;
+}
+
+/**
  * Web is always present; any other type is present when a block carries its marker, whether or not the server
  * start point exists. A marker block without a start point (imported, forked, redone) is recovered from its panel
  * switch, and the palette never offers a second box that would clash on the block name.
