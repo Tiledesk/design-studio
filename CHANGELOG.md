@@ -9,6 +9,7 @@
 
 # this branch 30/09/2026
 - **added**: i filtri delle reply offrono di nuovo tutte le opzioni di confronto: esiste, non contiene, vero/falso, prima e dopo una data, contenuto e lunghezza di una lista. L'editor dei filtri gia' esistenti e la condizione precedente restano con le opzioni di prima, perche' sono valutati in un altro modo
+
 # 1.40.16-rc5
 - **added**: an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
 - **changed**: when the AI chat cannot be reached the description is handed back instead of lost, and it is used once only: reloading the page does not start a second build
@@ -35,6 +36,7 @@
 - **added**: a text comparison can ignore uppercase and lowercase — a checkbox on text operators only, off by default, so every condition already saved keeps comparing exactly as it did
 - **changed**: **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why
 - **fixed**: comparing text against a value written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened and lost its quotes at the next save, quietly changing what it tested. It affects the condition already in use, not only the new one
+- **fixed**: *esiste* e *non esiste* dicono il vero su una variabile messa a null, e restano lo stesso operatore quando la condizione si riapre: *non esiste* si rileggeva come *non e' definita*. Un filtro salvato con la forma precedente viene riscritto al primo salvataggio
 
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
