@@ -39,6 +39,9 @@ import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
 import { IntentService } from '../services/intent.service';
+import { TranslateService } from '@ngx-translate/core';
+import { AgentFromPromptService } from '../agent-chat/agent-chat-from-prompt.service';
+const swal = require('sweetalert');
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -112,9 +115,55 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly controllerService: ControllerService,
     private readonly agentChatHostService: AgentChatHostService,
     private readonly intentService: IntentService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    // In coda di proposito: agent-chat-flow-switch.spec.ts costruisce il componente con
+    // argomenti posizionali, quindi i servizi aggiunti dopo vanno appesi qui e non in mezzo.
+    private readonly agentFromPromptService?: AgentFromPromptService,
+    private readonly translate?: TranslateService
   ) {
     this.manageRouteChanges();
+  }
+
+  /** An agent just created from a description in the dashboard: start the build before the chat
+   *  opens.
+   *
+   *  The order is the point. The chat joins a run that is already in progress when it mounts, so
+   *  the run must exist first; started afterwards, it would have nobody to execute its tools and
+   *  would sit waiting. If the runtime refuses, the agent exists all the same: the chat opens
+   *  anyway and the user is handed their own text back rather than being left to rewrite it. */
+  private async sendPendingAgentPrompt(): Promise<void> {
+    const botId = this.dashboardService.selectedChatbot?._id;
+    const pending = botId ? this.agentFromPromptService?.takePending(botId) : null;
+    if (!pending) { return; }
+
+    // Configured is checked after the note is taken, not before: an unconfigured studio has no
+    // way to build the flow, and leaving the note behind would only make it fire on the next
+    // agent opened in this tab.
+    if (!this.agentChatHostService.isConfigured?.()) {
+      this.logger.log('[CDS DSHBRD] a description arrived but the agent chat is not configured');
+      this.handBackAgentPrompt(pending.prompt);
+      return;
+    }
+
+    try {
+      await this.agentFromPromptService.startRun(this.dashboardService.projectID, pending);
+    } catch (error) {
+      this.logger.error('[CDS DSHBRD] agent from prompt: run not started', error);
+      this.handBackAgentPrompt(pending.prompt);
+    }
+  }
+
+  /** Gives the user their own words back when nothing is going to build from them.
+   *
+   *  The note is consumed by the time we get here -- it has to be, or it would fire again on the
+   *  next agent opened in this tab. So this is the only copy left: without it the description is
+   *  swallowed and the person is left to rewrite from memory something they already wrote. */
+  private handBackAgentPrompt(prompt: string): void {
+    swal({
+      title: this.translate?.instant('CDSAgentFromPrompt.SendFailedTitle'),
+      text: `${this.translate?.instant('CDSAgentFromPrompt.SendFailedText')}\n\n${prompt}`,
+      icon: 'warning'
+    });
   }
 
   /** Checks the current route once at construction time (the initial load may
@@ -413,6 +462,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
+      // Between knowing which agent is open and opening the chat: the run has to exist before
+      // the panel mounts, or the chat attaches to nothing and the description is lost.
+      await this.sendPendingAgentPrompt();
       this.restoreAgentChatPanel();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();

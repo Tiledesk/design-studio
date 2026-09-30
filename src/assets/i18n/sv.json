@@ -2731,5 +2731,9 @@
         "LABEL_PRECHAT_STATIC_TERMS_PRIVACY": "Innan du fortsätter i konversationen, godkänn våra <a href='https://tiledesk.com/termsofservice/' target='_blank'>Villkor</a> och <a href='https://tiledesk.com/privacy.html' target='_blank'>Sekretesspolicy</a>",
         "LABEL_PRECHAT_ACCEPT_TERMS_PRIVACY": "jag håller med",
         "PRECHAT_REQUIRED_ERROR": "Detta fält är obligatoriskt"
+    },
+    "CDSAgentFromPrompt": {
+        "SendFailedTitle": "The request was not sent to the AI chat",
+        "SendFailedText": "The agent has been created, but the description could not be sent. Paste it in the AI chat to build the flow:"
     }
 }
