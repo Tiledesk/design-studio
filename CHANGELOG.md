@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 30/09/2026
+- **added**: i filtri delle reply e la condizione offrono di nuovo tutte le opzioni di confronto: esiste, non contiene, vero/falso, prima e dopo una data, contenuto e lunghezza di una lista. Erano sparite dall'elenco e restavano usabili solo nella condizione piu' recente. Le voci che ignorano maiuscole e minuscole restano dove sono
+
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
 

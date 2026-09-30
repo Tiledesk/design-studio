@@ -359,21 +359,23 @@ describe('utils-condition · filtri reply V2', () => {
     expect(td.when).toBeUndefined();
   });
 
-  it('il picker dei filtri reply espone SOLO gli operatori che il server valuta', () => {
-    // i 22 solo-V2 non sono rappresentabili nell'AST V1 -> non devono essere selezionabili
-    const soloV2 = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'isTrue', 'isFalse',
-                    'isAfter', 'arrayContains', 'lengthGreaterThan'];
-    soloV2.forEach(o => {
-      expect(isReplyFilterOperatorSupported(o)).toBe(false);
-      expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeUndefined();
-    });
-    const comuni = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
-                    'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
-    comuni.forEach(o => {
+  it('il picker dei filtri reply espone tutti gli operatori del catalogo', () => {
+    // Il picker e' DERIVATO: tiene le chiavi di OPERATORS_LIST_V2 presenti nell'enum legacy.
+    // Restringerlo non e' piu' il modo di proteggere l'utente da un operatore che il motore
+    // non sa valutare: quella protezione vive nel motore, che ora li implementa tutti.
+    const prima = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
+                   'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
+    const rimessi = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'notEndsWith',
+                     'notMatches', 'isTrue', 'isFalse', 'equalAsDate', 'notEqualAsDate', 'isAfter',
+                     'isBefore', 'isAfterOrEqual', 'isBeforeOrEqual', 'arrayContains',
+                     'arrayNotContains', 'lengthEqualTo', 'lengthNotEqualTo', 'lengthGreaterThan',
+                     'lengthLessThan', 'lengthGreaterThanOrEqual', 'lengthLessThanOrEqual'];
+    [...prima, ...rimessi].forEach(o => {
       expect(isReplyFilterOperatorSupported(o)).toBe(true);
       expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeDefined();
     });
-    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(16);
+    expect(rimessi.length).toBe(22);
+    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(38);
   });
 
   it('hasFilter: riconosce entrambe le forme ed è null-safe', () => {
