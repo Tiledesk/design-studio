@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc9
+- **added**: a flow can be started by a webhook: drag *Webhook* from the new *Start points* section of the palette, connect the box to the flow, and copy its production or development URL. The box panel sets the name the conversations show as requester, turns the start point on and off, and runs *Test webhook start*
+- **added**: *Invite human*, *Remove human* and *Remove current bot* actions, so a flow started by a webhook can bring operators in, let them go when it no longer needs them, or hand the conversation over to them completely
+- **changed**: the start block is shown as *Web start*; a flow keeps working as before when it is started from the widget
+
 # 1.40.16-rc8
 - **added**: while the described agent is being built the canvas says so and asks you to wait, and the message goes when the chat is done. It does not appear for edits asked in the chat, where the work is already visible
 
