@@ -1,12 +1,17 @@
 import { CdsPanelElementsComponent } from './cds-panel-elements.component';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { of } from 'rxjs';
 
 describe('CdsPanelElementsComponent start points', () => {
-  const build = (subtype?: string) => {
+  const build = (subtype?: string, readOnly: ReadOnlyService = new ReadOnlyService()) => {
     LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
     const dashboard: any = { selectedChatbot: { subtype } };
     const plan: any = { checkIfActionIsInChatbotType: () => {}, checkIfCanLoad: () => true };
-    const c = new CdsPanelElementsComponent(plan, dashboard);
+    // master-pre: connector catalog and projects (no projectID here, so no integrations are loaded)
+    const catalog: any = { fetchManifest: () => of(null), getInstalledConnectorEntries: () => [], toConnectorGroup: () => ({ entries: [] }) };
+    const projects: any = { getIntegrations: () => of(null) };
+    const c = new CdsPanelElementsComponent(plan, dashboard, catalog, projects, readOnly);
     c.ngOnInit();
     return c;
   };
@@ -75,5 +80,15 @@ describe('CdsPanelElementsComponent start points', () => {
     c.focusStartPoint.subscribe(t => seen.push(t));
     c.onStartPointClick('webhook');
     expect(seen).toEqual(['webhook']);
+  });
+
+  it('read-only mode: every start point item is disabled', () => {
+    const readOnly = new ReadOnlyService();
+    readOnly.enable();
+    const c = build('chatbot', readOnly);
+    c.intents = [start];
+    const items = c.buildStartPointItems();
+    expect(items[0].value.disabled).toBe(true);
+    expect(items[1].value.disabled).toBe(true);
   });
 });

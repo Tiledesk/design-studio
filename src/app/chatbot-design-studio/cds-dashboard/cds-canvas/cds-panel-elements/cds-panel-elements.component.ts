@@ -12,6 +12,7 @@ import { of } from 'rxjs';
 import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { environment } from 'src/environments/environment';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
 
@@ -63,6 +64,7 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
     private readonly dashboardService: DashboardService,
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
+    private readonly readOnlyService: ReadOnlyService,
   ) { }
 
   ngOnInit(): void {
@@ -79,7 +81,8 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
   }
 
   buildStartPointItems(): Array<any> {
-    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending);
+    // Sola lettura: nessun box di partenza si aggiunge, le voci restano disabilitate
+    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending || this.readOnlyService.readOnly);
   }
 
   onStartPointClick(type: string) {

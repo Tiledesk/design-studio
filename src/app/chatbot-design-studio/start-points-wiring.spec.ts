@@ -1,6 +1,7 @@
 import { of, Subject } from 'rxjs';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { SavingStateService } from 'src/app/services/saving-state.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { IntentService } from './services/intent.service';
 import { CdsIntentComponent } from './cds-dashboard/cds-canvas/cds-intent/cds-intent.component';
 import { createStartPointBox, createStartPointBlock } from './utils-start-points';
@@ -16,6 +17,7 @@ describe('start points wiring', () => {
     let faq: any;
     let service: IntentService;
     let createResponse: Subject<any>;
+    let readOnly: ReadOnlyService;
 
     beforeEach(() => {
       createResponse = new Subject<any>();
@@ -25,7 +27,8 @@ describe('start points wiring', () => {
         opsUpdate: jasmine.createSpy('opsUpdate').and.callFake(() => of({ success: true })),
       };
       const dashboard: any = { selectedChatbot: { subtype: 'chatbot' } };
-      service = new IntentService(faq, null, null, null, null, dashboard, null, new SavingStateService());
+      readOnly = new ReadOnlyService();
+      service = new IntentService(faq, null, null, null, null, dashboard, null, null, new SavingStateService(), readOnly);
     });
 
     it('the start point PUT is issued only after the POST /faq response resolves', async () => {
@@ -97,6 +100,25 @@ describe('start points wiring', () => {
       expect(service.arrayUNDO.length).toBe(0);
     });
 
+    it('read-only mode: no start box POST, the create rejects so no PUT follows; the rollback DELETE is skipped too', async () => {
+      readOnly.enable();
+      const upsert = jasmine.createSpy('upsert');
+      const run = createStartPointBox({
+        pending: { value: false },
+        createBlock: (b) => service.createIntentWithoutHistory(b),
+        deleteBlock: (b) => service.deleteSavedIntentWithoutHistory(b),
+        upsert,
+        confirmSwitch: async () => true,
+        onError: () => {},
+        onCreated: () => {},
+      }, 'webhook', { x: 0, y: 0 });
+      expect(await run).toBe('failed');
+      expect(faq.addIntent).not.toHaveBeenCalled();
+      expect(upsert).not.toHaveBeenCalled();
+      expect(await service.deleteSavedIntentWithoutHistory(createStartPointBlock('webhook', { x: 0, y: 0 }))).toBeNull();
+      expect(faq.deleteFaq).not.toHaveBeenCalled();
+    });
+
     it('moveNewActionIntoIntent ignores a start point palette item', () => {
       const intent: any = { intent_id: 'i1', actions: [] };
       service.listOfIntents = [intent];
@@ -107,17 +129,31 @@ describe('start points wiring', () => {
   });
 
   describe('CdsIntentComponent drop into a block', () => {
-    const ctx = (over: any = {}) => ({ isDefaultFallbackLocked: false, isNewChatbot: false, intent: { intent_id: 'i1', actions: [] }, ...over });
-    const predicate = (c: any) => CdsIntentComponent.prototype.canEnterDropList.call(c, c.intent);
+    const ctx = (over: any = {}) => ({ isDefaultFallbackLocked: false, isV3: false, intent: { intent_id: 'i1', actions: [] }, ...over });
+    // master-pre: the enter predicate is the arrow property dropListEnterPredicate, bound to the instance
+    const predicate = (c: any) => {
+      spyOn(CdsIntentComponent.prototype, 'initSubscriptions').and.stub();
+      const component: any = new (CdsIntentComponent as any)(null, null, null, null, null, null, null, null, null, null, null);
+      const { isDefaultFallbackLocked, ...rest } = c;
+      Object.assign(component, rest);
+      // a getter on the component: shadow it on the instance
+      Object.defineProperty(component, 'isDefaultFallbackLocked', { get: () => isDefaultFallbackLocked });
+      return component.dropListEnterPredicate;
+    };
 
-    it('canEnterDropList rejects Start points palette items', () => {
-      expect(predicate(ctx())({ data: { type: 'action', value: { type: 'webhook', start_point: 'webhook' } } } as any)).toBeFalse();
-      expect(predicate(ctx())({ data: { type: 'action', value: { type: 'web', start_point: 'web' } } } as any)).toBeFalse();
+    it('dropListEnterPredicate rejects Start points palette items', () => {
+      const accept = predicate(ctx());
+      expect(accept({ data: { type: 'action', value: { type: 'webhook', start_point: 'webhook' } } } as any)).toBeFalse();
+      expect(accept({ data: { type: 'action', value: { type: 'web', start_point: 'web' } } } as any)).toBeFalse();
     });
 
-    it('canEnterDropList still accepts ordinary palette items and actions', () => {
-      expect(predicate(ctx())({ data: { type: 'action', value: { type: 'reply' } } } as any)).toBeTrue();
-      expect(predicate(ctx())({ data: undefined } as any)).toBeTrue();
+    it('dropListEnterPredicate still accepts ordinary palette items and actions', () => {
+      const accept = predicate(ctx());
+      expect(accept({ data: { type: 'action', value: { type: 'reply' } } } as any)).toBeTrue();
+      expect(accept({ data: undefined } as any)).toBeTrue();
+    });
+
+    it('dropListEnterPredicate keeps refusing a locked defaultFallback', () => {
       expect(predicate(ctx({ isDefaultFallbackLocked: true }))({ data: { value: { type: 'reply' } } } as any)).toBeFalse();
     });
 

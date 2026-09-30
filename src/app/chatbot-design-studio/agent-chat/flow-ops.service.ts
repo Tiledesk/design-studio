@@ -12,6 +12,7 @@ import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
+import { startPointTypeOf } from '../utils-start-points';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import {
   actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, usesLlmModel, withDefaultLlmModel
@@ -648,8 +649,17 @@ export class FlowOpsService implements OnDestroy {
           : this.validateDisplayName(op, op.intent_display_name);
         return nameError ?? this.validateAddIntentActions(op) ?? { op: op.op, ok: true };
       }
+      case 'delete_intent': {
+        // A start box (attributes.start_point) is registered on the server webhook: deleting it here
+        // would leave a start point without its block. It is removed from its own panel only.
+        const target = this.intentService.getIntentFromId(op.intent_id);
+        if (target && startPointTypeOf(target) === 'webhook') {
+          return { op: op.op, ok: false, error: `"${target.intent_display_name}" is the webhook start box: ` +
+            `it is removed from its own panel (Delete), not by delete_intent.` };
+        }
+        return needsIntent(op.intent_id) ?? this.validateShape(op);
+      }
       case 'update_intent':
-      case 'delete_intent':
       case 'move':
       case 'add_action':
       case 'update_action':
@@ -717,6 +727,8 @@ export class FlowOpsService implements OnDestroy {
     [TYPE_ACTION.AI_CONDITION]: ['fallbackIntent', 'errorIntent'],
     [TYPE_ACTION.ONLINE_AGENTS]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.ONLINE_AGENTSV2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.INVITE_HUMAN]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.REMOVE_HUMAN]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.OPEN_HOURS]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.WEB_REQUESTV2]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.ASKGPT]: ['trueIntent', 'falseIntent'],

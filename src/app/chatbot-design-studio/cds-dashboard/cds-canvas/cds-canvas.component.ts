@@ -1039,6 +1039,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
 
   /** the panel already deleted the webhook start point on the server: delete the box (palette item enabled again) */
   async onDeleteStartBox(intent: Intent) {
+    // Sola lettura: il box di partenza non si cancella
+    if (this.readOnlyService.readOnly) {
+      return;
+    }
     this.removeConnectorDraftAndCloseFloatMenu();
     this.closeAllPanels();
     this.closeActionDetailPanel();
@@ -1275,7 +1279,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
 
   /** Drop of a Start points item: create the marker block, then register it as the start point */
   async createStartPointFromPanelElement(pos, type: string) {
-    if (type !== 'webhook') {
+    // Sola lettura: nessun box di partenza si crea (la palette e' nascosta, questo e' il guard)
+    if (this.readOnlyService.readOnly || type !== 'webhook') {
       return;
     }
     if (this.startPointPendingRef.value) {

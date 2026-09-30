@@ -5,6 +5,7 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { IntentService } from './intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 
 describe('WebhookService', () => {
   let service: WebhookService;
@@ -55,5 +56,17 @@ describe('WebhookService', () => {
     expect(req.request.method).toBe('DELETE');
     expect(req.request.headers.get('Authorization')).toBe('JWT test-token');
     req.flush({});
+  });
+
+  it('start point mutations are skipped in read-only mode', () => {
+    TestBed.inject(ReadOnlyService).enable();
+    let upserted: any = 'unset';
+    let deleted: any = 'unset';
+    service.upsertStartPoint('bot1', 'webhook', { block_id: 'b1', enabled: true }).subscribe(r => upserted = r);
+    service.deleteStartPoint('bot1', 'webhook').subscribe(r => deleted = r);
+
+    httpMock.expectNone('https://api.test/project1/webhooks/bot1/start_points/webhook');
+    expect(upserted).toBeNull();
+    expect(deleted).toBeNull();
   });
 });

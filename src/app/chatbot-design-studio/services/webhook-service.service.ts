@@ -199,6 +199,8 @@ export class WebhookService {
   }
 
   upsertStartPoint(chatbot_id: string, type: 'webhook', body: { block_id: string, enabled?: boolean, mapping?: { source_name?: string }, confirm?: boolean }){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] upsertStartPoint', type);
     const httpOptions = {
@@ -213,6 +215,8 @@ export class WebhookService {
   }
 
   deleteStartPoint(chatbot_id: string, type: 'webhook'){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] deleteStartPoint', type);
     const httpOptions = {

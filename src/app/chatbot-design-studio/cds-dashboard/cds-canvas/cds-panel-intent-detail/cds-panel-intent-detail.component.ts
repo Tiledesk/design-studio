@@ -16,6 +16,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 import { startPointTypeOf, startPointPanelState } from 'src/app/chatbot-design-studio/utils-start-points';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 
 const swal = require('sweetalert');
 
@@ -71,7 +72,8 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     private readonly stageService: StageService,
     private readonly intentService: IntentService,
     private readonly connectorService: ConnectorService,
-    private readonly controllerService: ControllerService
+    private readonly controllerService: ControllerService,
+    private readonly readOnlyService: ReadOnlyService
   ) {
   }
 
@@ -118,6 +120,11 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     if(this.intent.agents_available !== false) this.intent.agents_available = true;
   }
 
+  /** Sola lettura: il pannello del box di partenza mostra lo stato ma non lo cambia */
+  get readOnly(): boolean {
+    return this.readOnlyService.readOnly;
+  }
+
   initializeStartPoint(){
     this.isStartPoint = true;
     this.maximize = true;
@@ -136,11 +143,19 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
 
   /** switch on/off: the block stays, only the start point is enabled or disabled */
   onStartPointEnabledChange(enabled: boolean){
+    if (this.readOnly) {
+      this.applyStartPointState();
+      return;
+    }
     this.spEnabled = enabled;
     this.upsertStartPoint({ block_id: this.intent.intent_id, enabled });
   }
 
   onStartPointSourceNameChange(){
+    if (this.readOnly) {
+      this.applyStartPointState();
+      return;
+    }
     const source_name = (this.spSourceName || '').trim();
     this.upsertStartPoint({ block_id: this.intent.intent_id, mapping: { source_name } });
   }
@@ -158,6 +173,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   }
 
   onDeleteStartPoint(){
+    if (this.readOnly) {
+      return;
+    }
     swal({
       title: this.translate.instant('CDSCanvas.StartWebhookDeleteTitle'),
       text: this.translate.instant('CDSCanvas.StartWebhookDeleteText'),
@@ -275,6 +293,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   }
 
   onRegenerateWebhook(){
+    if (this.isStartPoint && this.readOnly) {
+      return;
+    }
     swal({
       title: "Are you sure",
       text: 'if you regenerate the webhook url, the previous url will no longer be available',

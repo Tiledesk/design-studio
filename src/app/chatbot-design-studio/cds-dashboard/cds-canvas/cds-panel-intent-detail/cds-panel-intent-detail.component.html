@@ -123,6 +123,7 @@
                         <input type="checkbox" name="start_point_enabled_switch"
                         class="nw-onoffswitch-checkbox" id="start_point_enabled_switch"
                         [checked]="spEnabled"
+                        [disabled]="readOnly"
                         (change)="onStartPointEnabledChange($event.target.checked)" />
                     </label>
                 </div>
@@ -163,13 +164,13 @@
 
             <div class="field-box">
                 <label class="title-label">{{ 'CDSCanvas.StartWebhookSourceName' | translate }}</label>
-                <input class="start-point-input" type="text" [(ngModel)]="spSourceName" (change)="onStartPointSourceNameChange()">
+                <input class="start-point-input" type="text" [(ngModel)]="spSourceName" [readonly]="readOnly" (change)="onStartPointSourceNameChange()">
             </div>
 
             <div class="webhook-buttons">
-                <button *ngIf="webhookUrl" type="button" class="btn btn-primary cds-blue-button" (click)="onRegenerateWebhook()">{{'Regenerate' | translate}}</button>
-                <button type="button" class="btn btn-primary cds-blue-button" [disabled]="!spEnabled" (click)="onTestStartWebhook()">{{ 'CDSCanvas.StartWebhookTest' | translate }}</button>
-                <button type="button" class="btn btn-danger" [disabled]="spBusy" (click)="onDeleteStartPoint()">{{ 'Delete' | translate }}</button>
+                <button *ngIf="webhookUrl" type="button" class="btn btn-primary cds-blue-button" [disabled]="readOnly" (click)="onRegenerateWebhook()">{{'Regenerate' | translate}}</button>
+                <button type="button" class="btn btn-primary cds-blue-button" [disabled]="!spEnabled || readOnly" (click)="onTestStartWebhook()">{{ 'CDSCanvas.StartWebhookTest' | translate }}</button>
+                <button type="button" class="btn btn-danger" [disabled]="spBusy || readOnly" (click)="onDeleteStartPoint()">{{ 'Delete' | translate }}</button>
             </div>
 
             <p *ngIf="messageText" class="webhook-message fade-in-out">

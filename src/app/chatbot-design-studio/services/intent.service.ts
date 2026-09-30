@@ -1823,6 +1823,10 @@ export class IntentService {
    * Not ops_update: that answers before its loopback calls have saved anything. No undo entry.
    */
   public async createIntentWithoutHistory(intent: Intent): Promise<any> {
+    // Sola lettura: e' un POST diretto, non passa dal guard di opsUpdate; rifiuta invece di fingere un salvataggio
+    if (this.readOnlyService.readOnly) {
+      throw new Error('read-only: start box not created');
+    }
     const body = removeNodesStartingWith(JSON.parse(JSON.stringify(intent)), '__');
     const saved = await firstValueFrom(this.savingStateService.track(this.faqService.addIntent(body)));
     if (this.dashboardService.selectedChatbot) {
@@ -1833,6 +1837,10 @@ export class IntentService {
 
   /** Start boxes: rollback of createIntentWithoutHistory, a direct DELETE /faq/intentId… resolved by the server. No undo entry. */
   public async deleteSavedIntentWithoutHistory(intent: Intent): Promise<any> {
+    // Sola lettura: DELETE diretto, non passa dal guard di opsUpdate
+    if (this.readOnlyService.readOnly) {
+      return null;
+    }
     return firstValueFrom(this.savingStateService.track(this.faqService.deleteFaq(intent.id, intent.intent_id, intent.id_faq_kb)));
   }
 
