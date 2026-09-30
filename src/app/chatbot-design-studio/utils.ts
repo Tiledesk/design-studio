@@ -208,24 +208,52 @@ export enum TYPE_EVENT_CATEGORY {
 }
 
 export enum TYPE_OPERATOR {
-    equalAsNumbers          = "equalAsNumbers",
+    // Existence / generic (unary, type-agnostic)
+    exists                  = "exists",
+    doesNotExist            = "doesNotExist",
+    isEmpty                 = "isEmpty",
+    isNotEmpty              = "isNotEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    // Text (string coercion)
     equalAsStrings          = "equalAsStrings",
-    notEqualAsNumbers       = "notEqualAsNumbers",
     notEqualAsStrings       = "notEqualAsStrings",
+    contains                = "contains",
+    notContains             = "notContains",
+    containsIgnoreCase      = "containsIgnoreCase",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    startsWithIgnoreCase    = "startsWithIgnoreCase",
+    endsWith                = "endsWith",
+    notEndsWith             = "notEndsWith",
+    matches                 = "matches",
+    notMatches              = "notMatches",
+    // Number (number coercion)
+    equalAsNumbers          = "equalAsNumbers",
+    notEqualAsNumbers       = "notEqualAsNumbers",
     greaterThan             = "greaterThan",
     greaterThanOrEqual      = "greaterThanOrEqual",
     lessThan                = "lessThan",
     lessThanOrEqual         = "lessThanOrEqual",
-    startsWith              = "startsWith",
-    notStartsWith           = 'notStartsWith',
-    startsWithIgnoreCase    = "startsWithIgnoreCase",
-    contains                = "contains",
-    containsIgnoreCase      = "containsIgnoreCase",
-    endsWith                = "endsWith",
-    isEmpty                 = "isEmpty",
-    isNull                  = "isNull",
-    isUndefined             = "isUndefined",
-    matches                 = "matches"
+    // Boolean (unary)
+    isTrue                  = "isTrue",
+    isFalse                 = "isFalse",
+    // Date & Time (date coercion)
+    equalAsDate             = "equalAsDate",
+    notEqualAsDate          = "notEqualAsDate",
+    isAfter                 = "isAfter",
+    isBefore                = "isBefore",
+    isAfterOrEqual          = "isAfterOrEqual",
+    isBeforeOrEqual         = "isBeforeOrEqual",
+    // Array (length -> number; contains -> string)
+    arrayContains           = "arrayContains",
+    arrayNotContains        = "arrayNotContains",
+    lengthEqualTo           = "lengthEqualTo",
+    lengthNotEqualTo        = "lengthNotEqualTo",
+    lengthGreaterThan       = "lengthGreaterThan",
+    lengthLessThan          = "lengthLessThan",
+    lengthGreaterThanOrEqual = "lengthGreaterThanOrEqual",
+    lengthLessThanOrEqual   = "lengthLessThanOrEqual"
 }
 
 /**
