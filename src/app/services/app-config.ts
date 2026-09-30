@@ -31,7 +31,20 @@ export class AppConfigService {
     return this.http.get(this.appConfig.remoteConfigUrl).toPromise().then((data: any) => {
         // console.log('AppConfigService loadAppConfig data: ', data);
 
-        const allconfig = data
+        const remoteConfig = data || {};
+        const baseConfig = this.appConfig || {};
+
+        // Merge remote config onto environment defaults (keep defaults when remote misses fields).
+        // Also avoid letting remote override build-time values like VERSION.
+        const allconfig: any = {
+          ...baseConfig,
+          ...remoteConfig,
+          firebaseConfig: { ...(baseConfig.firebaseConfig || {}), ...(remoteConfig.firebaseConfig || {}) },
+          chat21Config: { ...(baseConfig.chat21Config || {}), ...(remoteConfig.chat21Config || {}) },
+          VERSION: baseConfig.VERSION,
+          remoteConfig: baseConfig.remoteConfig,
+          remoteConfigUrl: baseConfig.remoteConfigUrl
+        };
         // console.log('[APP-CONFIG-SERVICE] - loadAppConfig allconfig: ', allconfig);
 
         if (allconfig.hasOwnProperty('wsUrlRel')) {
@@ -100,6 +113,16 @@ export class AppConfigService {
   /** */
   getConfig() {
     return this.appConfig;
+  }
+
+  /** The editor version a chatbot created from here is born with (`attributes.dsVersion`).
+   *  Set per deploy through CHATBOT_VERSION; when the deploy leaves it unset -- empty, still
+   *  the `${CHATBOT_VERSION}` placeholder, or CHANGEIT -- the build's own value applies. */
+  getChatbotVersion(): string {
+    const value = this.appConfig?.CHATBOT_VERSION;
+    const unset = typeof value !== 'string' || value.trim() === '' ||
+      value.startsWith('${') || value === 'CHANGEIT';
+    return unset ? environment.CHATBOT_VERSION : value.trim();
   }
 
 

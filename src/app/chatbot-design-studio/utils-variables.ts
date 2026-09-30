@@ -45,6 +45,7 @@ export var variableList: Array<{key: string, elements: Array<any>}> = [
             { name: 'user_ip_address', chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE], value: 'user_ip_address', description: 'CDSvariablesList.systemDefinedElements.user_ip_address.description', src: '', icon: 'laptop' },
             { name: 'ticketId', chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE], value: 'ticketId', description: 'CDSvariablesList.systemDefinedElements.ticketId.description', src: '', icon: 'sell' },
             { name: 'flowError', chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE], value: 'flowError', description: 'CDSvariablesList.systemDefinedElements.flowError.description', src: '', icon: 'error' },
+            { name: 'voiceStreaming', chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE], value: 'voiceStreaming', description: 'CDSvariablesList.systemDefinedElements.voiceStreaming.description', src: '', icon: 'graphic_eq' },
         ]
     },
     {

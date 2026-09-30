@@ -4,11 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
-/**
- * Cutoff date used to determine whether a chatbot is considered "new".
- * ISO string format, compared lexicographically against `createdAt` (also ISO).
- */
-export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+/** Valore dell'etichetta `attributes.dsVersion` che identifica un agente da aprire
+ *  con il Design Studio V3. E' l'unica cosa che decide quale editor si apre: chi crea
+ *  l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
+ *  Confronto in minuscolo. */
+export const DS_VERSION_V3 = 'v3';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
@@ -34,18 +34,18 @@ export const DOCS_LINK = {
         more_json_uttons: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        twilio: {
+        'twilio': {
             voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
         },
-        openai: {
+        'openai': {
             tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
             voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
         },
-        elevenlabs: {
+        'elevenlabs': {
             tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
-            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},
-            voice_elevenlabs: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
         },
     },
     LIQUIDJS: {
@@ -111,7 +111,8 @@ export enum SETTINGS_SECTION {
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
-    ADVANCED        = 'advanced'
+    ADVANCED        = 'advanced',
+    LLM_SETTINGS    = 'llm_settings',
 }
 
 export enum EXTERNAL_URL {
@@ -341,21 +342,6 @@ export enum OPTIONS {
     MOUSE       = 'mouse',
     ALPHA       = 'alpha'
 }
-
-export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
-    { name: "GPT-4.1",                          value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 mini",                     value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 nano",                     value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
-    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
-    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
-    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
-    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
-    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "inactive"    },
-    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "inactive"    }
-]
-
 
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
@@ -693,8 +679,9 @@ export function checkInternalIntent(intent: Intent): boolean {
  * True SOLO per un blocco defaultFallback che non contiene alcuna action.
  * I chatbot nuovi nascono con defaultFallback vuoto (actions: []) e collegano
  * la reply a un blocco separato tramite attributes.nextBlockAction: in quello
- * stato il blocco e' chiuso e non deve accettare nuove action.
+ * stato il blocco e' chiuso e non deve accettare nuove action, in nessun modo.
  * Un defaultFallback legacy (actions.length > 0) NON e' bloccato.
+ * Regola riportata dal branch features-2026/ds-generic-bug-fix-39 (278c658b).
  */
 export function isDefaultFallbackWithoutActions(intent: any): boolean {
     if (!intent) { return false; }
@@ -722,29 +709,78 @@ export function findFreeId (array, key) {
     return previousId + 1;
   }
 
+/**
+ * Quanto spazio dello stage si vede davvero.
+ *
+ * Il rettangolo di `tds_container` non coincide con l'area visibile per due motivi che
+ * si sommano: il pannello dei blocchi gli sta davanti a sinistra, e il contenitore e'
+ * piu' largo della finestra, quindi sfora a destra. Centrare dentro quel rettangolo
+ * significa centrare dentro un'area piu' grande di quella che l'utente vede, ed e' il
+ * motivo per cui il flusso appare spostato.
+ *
+ * Qui si misura invece la banda visibile: il contenitore intersecato con la finestra,
+ * meno l'ingombro del pannello. Si misura dal DOM e non si deduce dal CSS, cosi' vale
+ * con il pannello aperto o chiuso e non dipende da come si risolvono i `calc`.
+ *
+ * `offsetX` / `offsetY` dicono di quanto il centro di cio' che si vede e' spostato
+ * rispetto al centro del contenitore: quando non c'e' niente di coperto valgono zero e
+ * il conto torna identico a prima.
+ */
+export function getVisibleStageBox(stage: DOMRect) {
+    const panel = document.querySelector('.box-left')?.getBoundingClientRect();
+    const panelRight = panel && panel.width > 0 ? panel.right : stage.left;
+
+    const left = Math.max(stage.left, panelRight, 0);
+    const right = Math.min(stage.right, window.innerWidth);
+    const top = Math.max(stage.top, 0);
+    const bottom = Math.min(stage.bottom, window.innerHeight);
+
+    // Se le misure non hanno senso (contenitore non ancora disegnato) si ripiega sul
+    // rettangolo intero: meglio la centratura di prima che una divisione per zero.
+    const width = right - left > 1 ? right - left : stage.width;
+    const height = bottom - top > 1 ? bottom - top : stage.height;
+
+    return {
+        width,
+        height,
+        offsetX: (left + right) / 2 - (stage.left + stage.right) / 2,
+        offsetY: (top + bottom) / 2 - (stage.top + stage.bottom) / 2
+    };
+}
+
 export function scaleAndcenterStageOnCenterPosition(listOfIntents: Intent[]){
     let arrayCoord = [];
     listOfIntents.forEach(intent => {
         const element = document.getElementById(intent.intent_id);
+        // Un blocco non ancora disegnato non ha un rettangolo da cui leggere: si salta,
+        // invece di far fallire tutta la centratura.
+        if (!element) { return; }
         arrayCoord.push({maxX:element.offsetLeft+element.offsetWidth, minX:element.offsetLeft, maxY:element.offsetTop+element.offsetHeight, minY:element.offsetTop});
     });
+    if (arrayCoord.length === 0) { return null; }
+
     var maxX = Math.max(...arrayCoord.map(obj => obj.maxX));
     var minX = Math.min(...arrayCoord.map(obj => obj.minX));
     var maxY = Math.max(...arrayCoord.map(obj => obj.maxY));
     var minY = Math.min(...arrayCoord.map(obj => obj.minY));
-    
+
     const padding = 100
     var width = (maxX - minX)+ padding;
     var height = (maxY - minY) + padding;
+
     const stage = document.getElementById('tds_container').getBoundingClientRect()
-    var scale = Math.min(stage.width / width, stage.height / height);
-    
+    const visible = getVisibleStageBox(stage);
+    var scale = Math.min(visible.width / width, visible.height / height);
+
     width = width*scale;
     height = height*scale;
-    
-    let centerPointX = (minX + (maxX-minX)/2)*scale;
-    let centerPointY = (minY + (maxY-minY)/2)*scale;
-    
+
+    // Il centro del flusso va portato al centro di cio' che si vede, non a quello del
+    // contenitore: si chiede quindi di centrare un punto spostato dello stesso scarto,
+    // in direzione opposta.
+    let centerPointX = (minX + (maxX-minX)/2)*scale - visible.offsetX;
+    let centerPointY = (minY + (maxY-minY)/2)*scale - visible.offsetY;
+
     return { point: { x: centerPointX, y: centerPointY }, scale: scale }
 }
 
@@ -988,4 +1024,158 @@ export class ColorUtils {
     // fallback sul colore di default (già con alpha desiderato)
     return defaultColor;
   }
+}
+// =============================
+// INTENT UTILITY FUNCTIONS
+// =============================
+
+/**
+ * Verifica se il colore fornito è valido.
+ * 
+ * @param color - Colore da validare
+ * @returns true se il colore è valido, false altrimenti
+ */
+export function isValidColor(color: any): boolean {
+  return color && color !== undefined && color !== null && color !== '';
+}
+
+/**
+ * Verifica se gli ID sono validi per la creazione di un connettore.
+ * 
+ * @param fromId - ID di origine
+ * @param toId - ID di destinazione
+ * @returns true se gli ID sono validi, false altrimenti
+ */
+export function areValidIds(fromId: string | null, toId: string | null): boolean {
+  return fromId !== null && toId !== null && fromId !== '' && toId !== '';
+}
+
+/**
+ * Trova la chiave dell'enum corrispondente al tipo di azione.
+ * 
+ * @param actionType - Il tipo di azione da cercare
+ * @param TYPE_ACTION - L'enum dei tipi di azione
+ * @returns La chiave dell'enum o null se non trovata
+ */
+export function findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+  const enumKeys = Object.keys(TYPE_ACTION);
+  
+  for (const key of enumKeys) {
+    if (TYPE_ACTION[key] === actionType) {
+      return key;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Aggiunge una classe CSS a un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da aggiungere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function addCssClassToElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log("[UTILS] Aggiunta classe CSS:", className, "a elemento:", componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element) {
+      element.classList.add(className);
+      if (logger) {
+        logger.log("[UTILS] Classe aggiunta con successo");
+      }
+    } else {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nell'aggiunta della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Rimuove una classe CSS da un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da rimuovere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function removeCssClassFromElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log('[UTILS] Rimozione classe CSS:', className, 'da elemento:', componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+      if (logger) {
+        logger.log("[UTILS] Classe rimossa con successo");
+      }
+    } else if (!element) {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    } else {
+      if (logger) {
+        logger.debug("[UTILS] Classe non presente sull'elemento:", className);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nella rimozione della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Calcola il numero di domande da una stringa di testo.
+ * 
+ * @param questionText - Testo contenente le domande
+ * @returns Numero di domande calcolato
+ */
+export function calculateQuestionCount(questionText: string): number {
+  if (!questionText) {
+    return 0;
+  }
+  
+  const questionSegments = questionText
+    .split(/\r?\n/)
+    .filter(segment => segment.trim() !== '');
+  
+  return questionSegments.length;
+}
+
+/**
+ * Calcola la dimensione di un form.
+ * 
+ * @param form - Oggetto form da analizzare
+ * @returns Dimensione del form (numero di campi)
+ */
+export function calculateFormSize(form: any): number {
+  if (form && form !== null) {
+    return Object.keys(form).length;
+  }
+  return 0;
 }

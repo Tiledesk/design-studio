@@ -14,6 +14,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { IntegrationService } from 'src/app/services/integration.service';
+import { AgentChatSettingsService } from '../agent-chat/agent-chat-settings.service';
 const swal = require('sweetalert');
 
 @Component({
@@ -31,6 +32,10 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
   TYPE_CHATBOT = TYPE_CHATBOT;
   BRAND_BASE_INFO = BRAND_BASE_INFO
   isVisibleDEP: boolean;
+  /** Cached once in ngOnInit rather than called from the template's *ngIf on
+   *  every change-detection pass -- the same pattern the other tabs use to
+   *  gate their nav entries. */
+  llmSettingsAvailable = false;
 
   project: Project;
 
@@ -49,8 +54,9 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
     private translate: TranslateService,
     private dashboardService: DashboardService,
     private router: Router,
-    private route: ActivatedRoute
-  ) { super(); 
+    private route: ActivatedRoute,
+    private settingsService: AgentChatSettingsService
+  ) { super();
   }
 
   ngOnInit(): void {
@@ -58,6 +64,7 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
 
     // this.getParamsBotIdAndThenInit();
     this.getOSCODE();
+    this.llmSettingsAvailable = this.settingsService.isAvailable();
     this.project = this.projectService.getCurrentProject()
     this.integrationService.initialize(this.appConfigService.getConfig().serverBaseUrl, this.project._id)
     this.getTranslations();
@@ -75,6 +82,17 @@ export class CdsChatbotDetailsComponent extends BotsBaseComponent implements OnI
       }
       this.activeSection = params['active']
     })
+  }
+
+  /** The runtime is reachable but declares no `model_catalog`, so there is
+   *  nothing for this tab to configure. `isAvailable()` cannot tell -- it only
+   *  knows whether `agentChatUrl` is set -- and the runtime only says so on
+   *  the settings route's 409, which the section itself is the one to make.
+   *  So the tab is dropped when the section reports back, and the panel falls
+   *  back to Details rather than leaving an empty body behind. */
+  onLlmSettingsUnavailable(): void {
+    this.llmSettingsAvailable = false;
+    this.toggleTab(SETTINGS_SECTION.DETAIL);
   }
 
   toggleTab(section) {
