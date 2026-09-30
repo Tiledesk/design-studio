@@ -1,3 +1,4 @@
+import { startPointLabelKey, startPointTypeOf } from '../../../../utils-start-points';
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
@@ -28,6 +29,8 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   isStart: boolean = false;
   isDefaultFallback: boolean = false;
   isWebhook: boolean = false;
+  /** i18n key of the fixed label of a start box (never editable, the block name is not shown) */
+  startLabelKey: string | null = null;
   isNotErrorName: boolean = true;
 
   intentNameAlreadyExist: boolean = false
@@ -78,6 +81,10 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     } else if(this.intentName === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.isWebhook = true;
       // this.intentNameAlreadyExist = true;
+    }
+    this.startLabelKey = startPointLabelKey(this.intent);
+    if(startPointTypeOf(this.intent) === 'webhook'){
+      this.isWebhook = true;
     }
     if(!this.intentColor){
       this.intentColor = INTENT_COLORS.COLOR1;

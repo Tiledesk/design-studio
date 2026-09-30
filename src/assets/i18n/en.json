@@ -634,7 +634,6 @@
         "StartWebhook": "Start from webhook",
         "InfoStartWebhook": "Lets an external system start this chatbot with an HTTP call, exactly like a new widget conversation.",
         "InfoStartWebhookBranch": "Webhook starts set the variables webhook_http_method and payload: branch on them in the start flow to tell webhook and widget conversations apart.",
-        "StartWebhookDepartment": "Conversation department",
         "StartWebhookSourceName": "Source name",
         "StartPointPresent": "Already in this flow",
         "StartPointError": "Unable to add the webhook start",
@@ -642,6 +641,10 @@
         "StartWebhookSwitchText": "This chatbot already has a webhook that runs a block without a conversation. Switching it will make calls start conversations from the start block. Continue?",
         "StartWebhookSwitchConfirm": "Switch",
         "StartWebhookSwitchCancel": "Cancel",
+        "StartWebhookDeleteTitle": "Delete the webhook start",
+        "StartWebhookDeleteText": "The webhook will stop starting conversations from this box and the box will be deleted. Continue?",
+        "WebStart": "Web start",
+        "WebhookStart": "Webhook start",
         "StartWebhookError": "Unable to update the webhook",
         "StartWebhookTest": "Test webhook start",
         "StartWebhookLoadError": "Unable to load the webhook settings",
@@ -1183,7 +1186,7 @@
             },
             "ChangeDept": {
                 "TITLE": "Chage the department",
-                "DESCRIPTION": "Change the current conversation department",
+                "DESCRIPTION": "Change the current conversation department. In conversations started by a webhook, changing department re-routes the conversation and removes the chatbot.",
                 "IMAGE": "assets/images/doc/CHANGE_DEPARTMENT.png",
                 "VIDEO_URL": "",
                 "DOC_URL": ""

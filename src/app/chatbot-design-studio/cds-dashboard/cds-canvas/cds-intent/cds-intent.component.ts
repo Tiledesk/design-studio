@@ -1,3 +1,4 @@
+import { startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
@@ -70,6 +71,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isOpen: boolean = true;
   positionMenu: any;
   isStart = false;
+  /** marker start box (webhook start) */
+  isStartPointBox = false;
   isDefaultFallback = false;
 
   /** isDefaultFallbackLocked
@@ -273,7 +276,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+      this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || startPointTypeOf(this.intent) === 'webhook'){
         this.isStart = true;
         if(this.intent.actions.length === 0){
           let action = new Action;
@@ -536,10 +540,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  /** Blocks that get the "live start" highlight: the webhook block, or the start block during a webhook start test */
+  /** Blocks that get the "live start" highlight: the webhook block, or the webhook start box (by marker) during a webhook start test */
   private isLiveStartBlock(): boolean {
     const name = this.intent?.intent_display_name;
-    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && name === TYPE_INTENT_NAME.START);
+    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && startPointTypeOf(this.intent) === 'webhook');
   }
 
   ngOnDestroy() {

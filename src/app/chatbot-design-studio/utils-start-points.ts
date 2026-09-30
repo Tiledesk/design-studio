@@ -38,6 +38,34 @@ export function isWebhookStartPointActive(webhook: any): boolean {
   return !!(webhook?.webhook_id && sp && sp.enabled !== false);
 }
 
+/** i18n key of the label shown on a start box header (never the block name); null for any other block */
+export function startPointLabelKey(intent: any): string | null {
+  const type = startPointTypeOf(intent);
+  if (type === 'web') {
+    return 'CDSCanvas.WebStart';
+  }
+  return type === 'webhook' ? 'CDSCanvas.WebhookStart' : null;
+}
+
+export interface StartPointPanelState {
+  enabled: boolean;
+  sourceName: string;
+  url: string;
+  devUrl: string;
+}
+
+/** What the webhook start box panel shows: enabled only when the start point points to this block */
+export function startPointPanelState(webhook: any, intent: any, apiUrl: string = ''): StartPointPanelState {
+  const sp = webhook?.start_points?.webhook;
+  const url = webhook?.webhook_id ? `${apiUrl}webhook/${webhook.webhook_id}` : '';
+  return {
+    enabled: !!(sp && sp.block_id === intent?.intent_id && sp.enabled !== false),
+    sourceName: sp?.mapping?.source_name || '',
+    url,
+    devUrl: url ? url + '/dev' : ''
+  };
+}
+
 const WEBHOOK_START_BLOCK_NAME = 'Webhook start';
 
 /** The block dropped on the canvas for a start point: readonly, marked, ending with an empty connect action like `start` */

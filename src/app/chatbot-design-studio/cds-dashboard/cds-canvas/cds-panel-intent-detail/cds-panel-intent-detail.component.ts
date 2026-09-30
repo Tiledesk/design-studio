@@ -14,6 +14,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
+import { startPointTypeOf, startPointPanelState } from 'src/app/chatbot-design-studio/utils-start-points';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 
 const swal = require('sweetalert');
@@ -30,11 +31,19 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   @Output() savePanelIntentDetail = new EventEmitter();
   @Output() closePanel = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter();
+  /** the webhook start box was unregistered on the server: the canvas deletes the block */
+  @Output() deleteStartBox = new EventEmitter();
   
   maximize: boolean = true;
 
   isStart: boolean = false;
   isWebhook: boolean = false;
+  /** panel of the marker block "Webhook start" */
+  isStartPoint: boolean = false;
+  webhook: any = null;
+  spEnabled: boolean = false;
+  spSourceName: string = '';
+  spBusy: boolean = false;
 
   // Connector management
   listOfIntents: Array<{name: string, value: string, icon?:string}> = [];
@@ -68,12 +77,14 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.maximize = this.stageService.getMaximize();
     if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.START) {
       this.initializeStart();
+    } else if(startPointTypeOf(this.intent) === 'webhook') {
+      this.initializeStartPoint();
     } else if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.initializeWebhook();
     }
     
     // Inizializza la lista degli intent per la select del connettore
-    if (!this.isStart && !this.isWebhook) {
+    if (!this.isStart && !this.isWebhook && !this.isStartPoint) {
       this.initializeConnectorSelect();
     }
   }
@@ -103,6 +114,70 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     if(this.intent.agents_available !== false) this.intent.agents_available = true;
   }
 
+  initializeStartPoint(){
+    this.isStartPoint = true;
+    this.maximize = true;
+    this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    this.chatbot_id = this.dashboardService.id_faq_kb;
+    this.getWebhook();
+  }
+
+  private applyStartPointState(){
+    const state = startPointPanelState(this.webhook, this.intent, this.serverBaseURL);
+    this.spEnabled = state.enabled;
+    this.spSourceName = state.sourceName;
+    this.webhookUrl = state.url;
+    this.webhookUrlDev = state.devUrl;
+  }
+
+  /** switch on/off: the block stays, only the start point is enabled or disabled */
+  onStartPointEnabledChange(enabled: boolean){
+    this.spEnabled = enabled;
+    this.upsertStartPoint({ block_id: this.intent.intent_id, enabled });
+  }
+
+  onStartPointSourceNameChange(){
+    const source_name = (this.spSourceName || '').trim();
+    this.upsertStartPoint({ block_id: this.intent.intent_id, mapping: { source_name } });
+  }
+
+  private upsertStartPoint(body: any){
+    this.webhookService.upsertStartPoint(this.chatbot_id, 'webhook', body).subscribe({ next: (resp: any) => {
+      this.stopWebhookStartTest();
+      // the webhook is the source of truth for the panel
+      this.getWebhook();
+    }, error: (error) => {
+      this.logger.error("[CdsPanelIntentDetailComponent] error upsertStartPoint: ", error);
+      this.applyStartPointState();
+      this.showMessage(this.translate.instant('CDSCanvas.StartWebhookError'));
+    }});
+  }
+
+  onDeleteStartPoint(){
+    swal({
+      title: this.translate.instant('CDSCanvas.StartWebhookDeleteTitle'),
+      text: this.translate.instant('CDSCanvas.StartWebhookDeleteText'),
+      icon: "warning",
+      buttons: [this.translate.instant('CDSCanvas.StartWebhookSwitchCancel'), this.translate.instant('Delete')],
+      dangerMode: true,
+    }).then((ok: boolean) => {
+      if (!ok || this.spBusy) {
+        return;
+      }
+      this.spBusy = true;
+      // the server first: a failure keeps the box, so the flow never has a start point without its block
+      this.webhookService.deleteStartPoint(this.chatbot_id, 'webhook').subscribe({ next: () => {
+        this.spBusy = false;
+        this.stopWebhookStartTest();
+        this.deleteStartBox.emit(this.intent);
+      }, error: (error) => {
+        this.spBusy = false;
+        this.logger.error("[CdsPanelIntentDetailComponent] error deleteStartPoint: ", error);
+        this.showMessage(this.translate.instant('CDSCanvas.StartWebhookError'));
+      }});
+    });
+  }
+
   initializeWebhook(){
     this.project_id = this.dashboardService.projectID;
     this.maximize = true;
@@ -130,10 +205,18 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   getWebhook(){
     this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] getWebhook : ", resp);
+      this.webhook = resp;
+      if (this.isStartPoint) {
+        this.applyStartPointState();
+        return;
+      }
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
       this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {
       this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
+      if (this.isStartPoint) {
+        this.showMessage(this.translate.instant('CDSCanvas.StartWebhookLoadError'));
+      }
       // // this.createWebhook();
     }, complete: () => {
       this.logger.log("[CdsPanelIntentDetailComponent] getWebhook completed.");
@@ -197,6 +280,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.webhookService.regenerateWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] regenerateWebhook : ", resp);
       this.stopWebhookStartTest();
+      if (this.webhook) {
+        this.webhook = { ...this.webhook, webhook_id: resp.webhook_id };
+      }
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
       this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {

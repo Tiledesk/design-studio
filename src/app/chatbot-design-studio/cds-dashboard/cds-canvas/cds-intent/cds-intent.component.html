@@ -25,6 +25,7 @@
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"
         [display_name]="intent.intent_display_name"
+        [isStartPoint]="isStartPointBox"
         [deleteOptionEnabled]="listOfActions?.length > 0"
         [webhookEnabled]="intent.webhook_enabled"
         (optionClicked)="onOptionClicked($event)">

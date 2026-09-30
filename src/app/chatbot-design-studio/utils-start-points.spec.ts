@@ -1,5 +1,5 @@
 import { of, throwError } from 'rxjs';
-import { presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox } from './utils-start-points';
+import { presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
 
 describe('utils-start-points', () => {
   const start = { intent_id: 's', intent_display_name: 'start' };
@@ -146,6 +146,36 @@ describe('utils-start-points', () => {
       deps.upsert = (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return throwError({ status: confirm ? 500 : 409 }); };
       expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
       expect(calls).toEqual(['save', 'upsert', 'ask', 'upsert:confirm', 'remove', 'error']);
+    });
+  });
+  describe('start boxes', () => {
+    it('a renamed marker block is still a start box; an unmarked block named Webhook start is not', () => {
+      expect(startPointTypeOf({ intent_id: 'b1', intent_display_name: 'My entry', attributes: { start_point: 'webhook' } })).toBe('webhook');
+      expect(startPointTypeOf(plain)).toBeNull();
+    });
+
+    it('startPointLabelKey gives Web start for start and Webhook start for the marker block', () => {
+      expect(startPointLabelKey(start)).toBe('CDSCanvas.WebStart');
+      expect(startPointLabelKey(marked)).toBe('CDSCanvas.WebhookStart');
+      expect(startPointLabelKey(plain)).toBeNull();
+      expect(startPointLabelKey(null)).toBeNull();
+    });
+  });
+
+  describe('startPointPanelState', () => {
+    const block = { intent_id: 'b1' };
+    it('enabled with source name and urls', () => {
+      const wh = { webhook_id: 'w1', start_points: { webhook: { block_id: 'b1', enabled: true, mapping: { source_name: 'crm' } } } };
+      expect(startPointPanelState(wh, block, 'https://api/')).toEqual({ enabled: true, sourceName: 'crm', url: 'https://api/webhook/w1', devUrl: 'https://api/webhook/w1/dev' });
+    });
+    it('enabled defaults to true when the flag is missing, false when disabled', () => {
+      expect(startPointPanelState({ webhook_id: 'w1', start_points: { webhook: { block_id: 'b1' } } }, block, 'u/').enabled).toBeTrue();
+      expect(startPointPanelState({ webhook_id: 'w1', start_points: { webhook: { block_id: 'b1', enabled: false } } }, block, 'u/').enabled).toBeFalse();
+    });
+    it('absent start point, another block or no webhook is disabled with empty source name', () => {
+      expect(startPointPanelState({ webhook_id: 'w1' }, block, 'u/')).toEqual({ enabled: false, sourceName: '', url: 'u/webhook/w1', devUrl: 'u/webhook/w1/dev' });
+      expect(startPointPanelState({ webhook_id: 'w1', start_points: { webhook: { block_id: 'other' } } }, block, 'u/').enabled).toBeFalse();
+      expect(startPointPanelState(null, block, 'u/')).toEqual({ enabled: false, sourceName: '', url: '', devUrl: '' });
     });
   });
 });

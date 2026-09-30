@@ -10,6 +10,8 @@ export class PanelIntentControlsComponent implements OnInit {
 
   @Input() isInternalIntent: boolean = false;
   @Input() display_name: string;
+  /** marker start box (webhook): opened only through its panel, no delete/copy/play on the box */
+  @Input() isStartPoint: boolean = false;
   @Input() deleteOptionEnabled: boolean = true;
   @Input() webhookEnabled: boolean = false;
   @Output() optionClicked = new EventEmitter();
@@ -45,12 +47,13 @@ export class PanelIntentControlsComponent implements OnInit {
       this.showDelete = false;
       this.showCopy = false;
       this.showPlay = true;
-    } else if(this.display_name === RESERVED_INTENT_NAMES.WEBHOOK){
+    } else if(this.isStartPoint || this.display_name === RESERVED_INTENT_NAMES.WEBHOOK){
       this.showMore = true;
       this.showColor = false;
       this.showDelete = false;
       this.showCopy = false;
       this.showPlay = false;
+      this.isStart = this.isStartPoint;
     }
   }
 
