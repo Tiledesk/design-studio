@@ -649,6 +649,7 @@
         "StartWebhookTest": "Test webhook start",
         "StartWebhookLoadError": "Unable to load the webhook settings",
         "InfoStartWebhookDevSingleUse": "Each development call uses one test run: click Test webhook start again before the next call.",
+        "InfoStartWebhookPublish": "The production URL runs the published flow: publish after changing the flow. The development URL runs the current draft.",
         "Copy": "Copy",
         "TextCopied": "Text copied successfully!",
         "TextErrorCopied": "Error copying text",

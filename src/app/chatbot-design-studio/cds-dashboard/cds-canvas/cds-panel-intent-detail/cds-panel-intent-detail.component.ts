@@ -219,6 +219,12 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
       this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {
+      if (this.isStartPoint && error?.status === 404) {
+        // no webhook yet (imported, forked or redone box): the switch is off and turning it on registers this box
+        this.webhook = null;
+        this.applyStartPointState();
+        return;
+      }
       this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
       if (this.isStartPoint) {
         this.showMessage(this.translate.instant('CDSCanvas.StartWebhookLoadError'));

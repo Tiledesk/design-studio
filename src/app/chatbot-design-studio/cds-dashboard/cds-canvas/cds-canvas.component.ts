@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -173,8 +173,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   chatbotSubtype: string;
-  /** webhook of the chatbot (start points); null when absent or not loaded */
-  webhook: any = null;
   /** true while a start box is being created */
   startPointPending = false;
   private readonly startPointPendingRef = { value: false };
@@ -624,7 +622,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.listOfIntents = this.intentService.listOfIntents;
       // // this.initListOfIntents();
       this.refreshIntents();
-      this.loadWebhook();
       this.initLoadingStage();
       // // this.intentService.setStartIntent();
       this.mapOfIntents = await this.intentService.setMapOfIntents();
@@ -1266,20 +1263,22 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       try {
         return await createStartPointBox({
           pending: flag,
-          saveBlock: async (block) => {
+          createBlock: (block) => {
             block.id_faq_kb = chatbot_id;
-            this.intentService.addNewIntentToListOfIntents(block);
-            block.id = INTENT_TEMP_ID;
-            this.intentService.setDragAndListnerEventToElement(block.intent_id);
-            this.intentService.setIntentSelected(block.intent_id);
-            this.closeExtraPanels();
-            await this.intentService.saveNewIntent(block, null, null);
+            return this.intentService.createIntentWithoutHistory(block);
           },
-          removeBlock: (block) => this.intentService.rollbackNewIntent(block),
+          deleteBlock: (block) => this.intentService.deleteSavedIntentWithoutHistory(block),
           upsert: (block, confirm) => this.webhookService.upsertStartPoint(chatbot_id, 'webhook', confirm ? { block_id: block.intent_id, confirm: true } : { block_id: block.intent_id }),
           confirmSwitch: () => this.confirmStartWebhookSwitch(),
           onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSCanvas.StartPointError'), 4, 'report_problem'),
-          onCreated: () => this.loadWebhook()
+          onCreated: (block) => {
+            // same steps as a block created through ops_update, minus the save (already done)
+            block.id = INTENT_TEMP_ID;
+            this.intentService.addSavedIntentToListOfIntents(block);
+            this.intentService.setDragAndListnerEventToElement(block.intent_id);
+            this.intentService.setIntentSelected(block.intent_id);
+            this.closeExtraPanels();
+          }
         }, 'webhook', pos);
       } finally {
         setPending(false);
@@ -1296,19 +1295,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       dangerMode: false,
     });
     return !!ok;
-  }
-
-  /** load the chatbot webhook: needed to know whether the webhook start point exists */
-  private async loadWebhook() {
-    if ((this.dashboardService.selectedChatbot?.subtype || TYPE_CHATBOT.CHATBOT) !== TYPE_CHATBOT.CHATBOT) {
-      this.webhook = null;
-      return;
-    }
-    try {
-      this.webhook = await lastValueFrom(this.webhookService.getWebhook(this.id_faq_kb));
-    } catch (e) {
-      this.webhook = null;
-    }
   }
 
   /** click on a disabled Start points item: select and center its box */
@@ -1411,15 +1397,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.closeActionDetailPanel();
   }
 
-  /** the panel already deleted the webhook start point on the server: delete the box, then reload the webhook (palette item enabled again) */
+  /** the panel already deleted the webhook start point on the server: delete the box (palette item enabled again) */
   async onDeleteStartBox(intent: Intent) {
     this.removeConnectorDraftAndCloseFloatMenu();
     this.closeAllPanels();
     this.closeActionDetailPanel();
     this.intentService.setIntentSelectedById();
     // no undo entry: undoing would bring back a box whose start point no longer exists
-    await this.intentService.rollbackNewIntent(intent);
-    await this.loadWebhook();
+    await this.intentService.deleteIntentWithoutHistory(intent);
   }
 
   /** onDeleteIntent */

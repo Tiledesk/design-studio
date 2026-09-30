@@ -2,6 +2,7 @@ import { startPointLabelKey, startPointTypeOf } from '../../../../utils-start-po
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { Intent } from 'src/app/models/intent-model';
 import { IntentService } from '../../../../services/intent.service';
+import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { INTENT_COLORS, RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX } from '../../../../utils';
@@ -39,7 +40,8 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   constructor(
-    public intentService: IntentService
+    public intentService: IntentService,
+    private readonly dashboardService: DashboardService
   ) { 
     this.intentService.getIntents().subscribe(intents => {
       if(intents){
@@ -82,7 +84,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
       this.isWebhook = true;
       // this.intentNameAlreadyExist = true;
     }
-    this.startLabelKey = startPointLabelKey(this.intent);
+    this.startLabelKey = startPointLabelKey(this.intent, this.dashboardService.selectedChatbot?.subtype);
     if(startPointTypeOf(this.intent) === 'webhook'){
       this.isWebhook = true;
     }

@@ -26,6 +26,7 @@
                 (cdkDragStarted)="onDragStarted($event, i)" 
                 (cdkDragMoved)="onDragMoved($event)" 
                 (cdkDragEnded)="onDragEnd($event)"
+                [cdkDragData]="item"
                 [cdkDragDisabled]="item.value.disabled">
 
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>

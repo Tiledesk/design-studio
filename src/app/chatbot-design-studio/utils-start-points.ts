@@ -25,17 +25,25 @@ export function startPointTypeOf(intent: any): 'web' | 'webhook' | null {
   return START_POINT_TYPES.includes(marker) && marker !== 'web' ? marker : null;
 }
 
-/** Web is always present; webhook only when its start point points to an existing block carrying the marker */
-export function presentStartPointTypes(intents: any[], webhook: any): string[] {
+/**
+ * Web is always present; any other type is present when a block carries its marker, whether or not the server
+ * start point exists. A marker block without a start point (imported, forked, redone) is recovered from its panel
+ * switch, and the palette never offers a second box that would clash on the block name.
+ */
+export function presentStartPointTypes(intents: any[]): string[] {
   const present = ['web'];
-  const blockId = findStartPoint(webhook, 'webhook')?.block_id;
-  if (blockId) {
-    const block = (intents || []).find(i => i.intent_id === blockId);
-    if (block && startPointTypeOf(block) === 'webhook') {
-      present.push('webhook');
+  (intents || []).forEach(i => {
+    const type = startPointTypeOf(i);
+    if (type && !present.includes(type)) {
+      present.push(type);
     }
-  }
+  });
   return present;
+}
+
+/** Palette items of the Start points section are dropped on the canvas only, never into a block */
+export function isStartPointPaletteItem(item: any): boolean {
+  return !!item?.value?.start_point;
 }
 
 /** Test webhook start needs an enabled webhook start point */
@@ -44,11 +52,14 @@ export function isWebhookStartPointActive(webhook: any): boolean {
   return !!(webhook?.webhook_id && sp && sp.enabled !== false);
 }
 
-/** i18n key of the label shown on a start box header (never the block name); null for any other block */
-export function startPointLabelKey(intent: any): string | null {
+/**
+ * i18n key of the label shown on a start box header (never the block name); null for any other block.
+ * "Web start" only for chatbot subtype `chatbot` (default): other subtypes (voice…) keep the block name.
+ */
+export function startPointLabelKey(intent: any, subtype: string = 'chatbot'): string | null {
   const type = startPointTypeOf(intent);
   if (type === 'web') {
-    return 'CDSCanvas.WebStart';
+    return (subtype || 'chatbot') === 'chatbot' ? 'CDSCanvas.WebStart' : null;
   }
   return type === 'webhook' ? 'CDSCanvas.WebhookStart' : null;
 }
@@ -123,18 +134,21 @@ export function buildStartPointItems(present: string[], pending: boolean): any[]
 export interface StartPointBoxDeps {
   /** shared flag: true while a create is in flight (a second drop does nothing) */
   pending: { value: boolean };
-  saveBlock: (block: Intent) => Promise<any>;
-  removeBlock: (block: Intent) => Promise<any>;
+  /** direct, awaited create (POST /faq, no undo entry): resolves only once the server has saved the block */
+  createBlock: (block: Intent) => Promise<any>;
+  /** direct, awaited delete of the saved block (no undo entry): the rollback of any later failure */
+  deleteBlock: (block: Intent) => Promise<any>;
   upsert: (block: Intent, confirm: boolean) => Observable<any>;
   confirmSwitch: () => Promise<boolean>;
   onError: (err?: any) => void;
-  /** awaited while the flag is still pending (e.g. reloading the webhook) */
+  /** the box is saved and registered: add it to the canvas. Awaited while the flag is still pending (e.g. reloading the webhook) */
   onCreated: (block: Intent) => void | Promise<any>;
 }
 
 /**
- * Creates the start box, then registers it as the webhook start point.
- * A failure after the block was saved deletes the block again (no orphan box).
+ * Creates the start box on the server, then registers it as the webhook start point, then hands it to the canvas.
+ * The PUT runs only after the create response: the server looks the block up by intent_id.
+ * A failure after the create deletes the block again (no orphan box); nothing reaches the canvas or the undo history.
  */
 export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhook', pos: { x: number, y: number }): Promise<'created' | 'cancelled' | 'failed' | 'busy'> {
   if (deps.pending.value) {
@@ -144,9 +158,9 @@ export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhoo
   const block = createStartPointBlock(type, pos);
   try {
     try {
-      await deps.saveBlock(block);
+      await deps.createBlock(block);
     } catch (err) {
-      await safeRemove(deps, block);
+      // nothing was saved
       deps.onError(err);
       return 'failed';
     }
@@ -158,13 +172,13 @@ export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhoo
           throw err;
         }
         if (!(await deps.confirmSwitch())) {
-          await safeRemove(deps, block);
+          await safeDelete(deps, block);
           return 'cancelled';
         }
         await lastValueFrom(deps.upsert(block, true));
       }
     } catch (err) {
-      await safeRemove(deps, block);
+      await safeDelete(deps, block);
       deps.onError(err);
       return 'failed';
     }
@@ -175,9 +189,9 @@ export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhoo
   }
 }
 
-async function safeRemove(deps: StartPointBoxDeps, block: Intent) {
+async function safeDelete(deps: StartPointBoxDeps, block: Intent) {
   try {
-    await deps.removeBlock(block);
+    await deps.deleteBlock(block);
   } catch (e) {
     // the caller still reports the original failure
   }

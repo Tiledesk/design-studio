@@ -1,5 +1,5 @@
-import { of, throwError } from 'rxjs';
-import { findStartPoint, presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
+import { of, throwError, Subject, lastValueFrom } from 'rxjs';
+import { findStartPoint, presentStartPointTypes, isStartPointPaletteItem, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
 
 describe('utils-start-points', () => {
   const start = { intent_id: 's', intent_display_name: 'start' };
@@ -13,20 +13,24 @@ describe('utils-start-points', () => {
     expect(startPointTypeOf({ intent_id: 'x', intent_display_name: 'x', attributes: { start_point: 'other' } })).toBeNull();
   });
 
-  it('presentStartPointTypes without webhook is web only', () => {
-    expect(presentStartPointTypes([start, marked], null)).toEqual(['web']);
-    expect(presentStartPointTypes([start, marked], { webhook_id: 'w' })).toEqual(['web']);
+  it('presentStartPointTypes: web always; webhook when a block carries the marker, with or without the server start point', () => {
+    expect(presentStartPointTypes([start])).toEqual(['web']);
+    expect(presentStartPointTypes(null)).toEqual(['web']);
+    // marker block ⇒ present (imported, forked or redone box without a start point: recovered from its panel)
+    expect(presentStartPointTypes([start, marked])).toEqual(['web', 'webhook']);
+    expect(presentStartPointTypes([marked, { ...marked, intent_id: 'b3' }])).toEqual(['web', 'webhook']);
   });
 
-  it('presentStartPointTypes with start point and marker block has both', () => {
-    const wh = { start_points: [{ type: 'webhook', block_id: 'b1' }] };
-    expect(presentStartPointTypes([start, marked], wh)).toEqual(['web', 'webhook']);
+  it('presentStartPointTypes ignores unmarked blocks, even named Webhook start', () => {
+    expect(presentStartPointTypes([start, plain])).toEqual(['web']);
+    expect(presentStartPointTypes([start, { intent_id: 'b1', intent_display_name: 'x', attributes: { start_point: 'other' } }])).toEqual(['web']);
   });
 
-  it('presentStartPointTypes ignores a start point whose block is missing or unmarked', () => {
-    const wh = { start_points: [{ type: 'webhook', block_id: 'b1' }] };
-    expect(presentStartPointTypes([start], wh)).toEqual(['web']);
-    expect(presentStartPointTypes([start, { intent_id: 'b1', intent_display_name: 'x' }], wh)).toEqual(['web']);
+  it('isStartPointPaletteItem recognises Start points palette items only', () => {
+    expect(isStartPointPaletteItem({ value: { type: 'webhook', start_point: 'webhook' } })).toBeTrue();
+    expect(isStartPointPaletteItem({ value: { type: 'reply' } })).toBeFalse();
+    expect(isStartPointPaletteItem({ _tdActionType: 'reply' })).toBeFalse();
+    expect(isStartPointPaletteItem(undefined)).toBeFalse();
   });
 
   it('isWebhookStartPointActive requires an enabled webhook start point', () => {
@@ -77,8 +81,8 @@ describe('utils-start-points', () => {
       calls = [];
       deps = {
         pending: flag(),
-        saveBlock: async (b) => { calls.push('save'); },
-        removeBlock: async (b) => { calls.push('remove'); },
+        createBlock: async (b) => { calls.push('create'); },
+        deleteBlock: async (b) => { calls.push('delete'); },
         upsert: (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return of({}); },
         confirmSwitch: async () => { calls.push('ask'); return true; },
         onError: () => { calls.push('error'); },
@@ -86,20 +90,35 @@ describe('utils-start-points', () => {
       };
     });
 
-    it('saves the block then upserts', async () => {
+    it('creates the block, then upserts, then hands it to the canvas', async () => {
       expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('created');
-      expect(calls).toEqual(['save', 'upsert', 'created']);
+      expect(calls).toEqual(['create', 'upsert', 'created']);
       expect(deps.pending.value).toBe(false);
+    });
+
+    it('issues the PUT only after the create response resolves', async () => {
+      const createResponse = new Subject<any>();
+      deps.createBlock = (b) => { calls.push('create'); return lastValueFrom(createResponse); };
+      const run = createStartPointBox(deps, 'webhook', { x: 1, y: 2 });
+      await new Promise(r => setTimeout(r, 0));
+      await new Promise(r => setTimeout(r, 0));
+      expect(calls).toEqual(['create']);
+      createResponse.next({ _id: 'f1' });
+      await new Promise(r => setTimeout(r, 0));
+      expect(calls).toEqual(['create']);
+      createResponse.complete();
+      expect(await run).toBe('created');
+      expect(calls).toEqual(['create', 'upsert', 'created']);
     });
 
     it('a second call while pending creates nothing', async () => {
       let release;
-      deps.saveBlock = (b) => { calls.push('save'); return new Promise<void>(r => release = r); };
+      deps.createBlock = (b) => { calls.push('create'); return new Promise<void>(r => release = r); };
       const first = createStartPointBox(deps, 'webhook', { x: 1, y: 2 });
       expect(await createStartPointBox(deps, 'webhook', { x: 3, y: 4 })).toBe('busy');
       release();
       await first;
-      expect(calls.filter(c => c === 'save').length).toBe(1);
+      expect(calls.filter(c => c === 'create').length).toBe(1);
       expect(calls.filter(c => c === 'upsert').length).toBe(1);
     });
 
@@ -115,37 +134,50 @@ describe('utils-start-points', () => {
       expect(deps.pending.value).toBe(false);
     });
 
-    it('a failed PUT removes the block again and reports the error', async () => {
-      deps.upsert = () => { calls.push('upsert'); return throwError({ status: 500 }); };
-      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
-      expect(calls).toEqual(['save', 'upsert', 'remove', 'error']);
+    it('a failed PUT deletes the saved block (awaited) before reporting, and never reaches the canvas', async () => {
+      let releaseDelete;
+      deps.upsert = () => { calls.push('upsert'); return throwError({ status: 404 }); };
+      deps.deleteBlock = () => { calls.push('delete'); return new Promise<void>(r => releaseDelete = r); };
+      const run = createStartPointBox(deps, 'webhook', { x: 1, y: 2 });
+      await new Promise(r => setTimeout(r, 0));
+      expect(calls).toEqual(['create', 'upsert', 'delete']);
+      releaseDelete();
+      expect(await run).toBe('failed');
+      expect(calls).toEqual(['create', 'upsert', 'delete', 'error']);
       expect(deps.pending.value).toBe(false);
     });
 
-    it('a failed save removes the block and reports the error without a PUT', async () => {
-      deps.saveBlock = async () => { calls.push('save'); throw false; };
+    it('a failed create reports the error without a PUT, a delete or the canvas', async () => {
+      deps.createBlock = async () => { calls.push('create'); throw { status: 500 }; };
       expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
-      expect(calls).toEqual(['save', 'remove', 'error']);
+      expect(calls).toEqual(['create', 'error']);
+    });
+
+    it('a failed rollback delete still reports the original failure', async () => {
+      deps.upsert = () => { calls.push('upsert'); return throwError({ status: 500 }); };
+      deps.deleteBlock = async () => { calls.push('delete'); throw { status: 500 }; };
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
+      expect(calls).toEqual(['create', 'upsert', 'delete', 'error']);
     });
 
     it('409 asks for confirmation and retries with confirm', async () => {
       let n = 0;
       deps.upsert = (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return n++ === 0 ? throwError({ status: 409 }) : of({}); };
       expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('created');
-      expect(calls).toEqual(['save', 'upsert', 'ask', 'upsert:confirm', 'created']);
+      expect(calls).toEqual(['create', 'upsert', 'ask', 'upsert:confirm', 'created']);
     });
 
-    it('409 declined removes the block silently', async () => {
+    it('409 declined deletes the block silently', async () => {
       deps.upsert = () => { calls.push('upsert'); return throwError({ status: 409 }); };
       deps.confirmSwitch = async () => { calls.push('ask'); return false; };
       expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('cancelled');
-      expect(calls).toEqual(['save', 'upsert', 'ask', 'remove']);
+      expect(calls).toEqual(['create', 'upsert', 'ask', 'delete']);
     });
 
-    it('a failure of the confirmed retry removes the block and reports the error', async () => {
+    it('a failure of the confirmed retry deletes the block and reports the error', async () => {
       deps.upsert = (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return throwError({ status: confirm ? 500 : 409 }); };
       expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
-      expect(calls).toEqual(['save', 'upsert', 'ask', 'upsert:confirm', 'remove', 'error']);
+      expect(calls).toEqual(['create', 'upsert', 'ask', 'upsert:confirm', 'delete', 'error']);
     });
   });
   describe('start boxes', () => {
@@ -156,9 +188,15 @@ describe('utils-start-points', () => {
 
     it('startPointLabelKey gives Web start for start and Webhook start for the marker block', () => {
       expect(startPointLabelKey(start)).toBe('CDSCanvas.WebStart');
+      expect(startPointLabelKey(start, 'chatbot')).toBe('CDSCanvas.WebStart');
+      expect(startPointLabelKey(start, undefined)).toBe('CDSCanvas.WebStart');
       expect(startPointLabelKey(marked)).toBe('CDSCanvas.WebhookStart');
       expect(startPointLabelKey(plain)).toBeNull();
       expect(startPointLabelKey(null)).toBeNull();
+    });
+
+    it('startPointLabelKey keeps the block name (null) for the start block of other subtypes', () => {
+      ['voice', 'voice_twilio', 'webhook', 'copilot'].forEach(st => expect(startPointLabelKey(start, st)).toBeNull());
     });
   });
 
@@ -187,7 +225,7 @@ describe('utils-start-points', () => {
     expect(findStartPoint(serverResponse, 'webhook').block_id).toBe('b1');
     expect(findStartPoint(serverResponse, 'other')).toBeUndefined();
     expect(findStartPoint({ start_points: { webhook: { block_id: 'x' } } }, 'webhook')).toBeUndefined();
-    expect(presentStartPointTypes([start, marked], serverResponse)).toEqual(['web', 'webhook']);
+    expect(presentStartPointTypes([start, marked])).toEqual(['web', 'webhook']);
     expect(isWebhookStartPointActive(serverResponse)).toBeTrue();
     expect(startPointPanelState(serverResponse, { intent_id: 'b1' }, 'u/')).toEqual({ enabled: true, sourceName: 'crm', url: 'u/webhook/w9', devUrl: 'u/webhook/w9/dev' });
   });

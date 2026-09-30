@@ -1,5 +1,5 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionInviteHuman, ActionRemoveHuman, ActionRemoveCurrentBot, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
@@ -687,6 +687,10 @@ export class IntentService {
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
+    if (action?.value?.start_point) {
+      // a start point palette item is not an action (createNewAction would return undefined)
+      return null;
+    }
     let newAction = this.createNewAction(action.value.type);
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
@@ -1647,8 +1651,31 @@ export class IntentService {
     this.setBehaviorUndoRedo();
     this.logger.log('[INTENT SERVICE] -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
-    // awaited: the start point PUT needs the saved block
-    await this.opsUpdate(this.payload);
+    this.opsUpdate(this.payload);
+  }
+
+  /**
+   * Start boxes: saves a new block with a direct POST /faq and resolves only with the saved faq.
+   * Not ops_update: that answers before its loopback calls have saved anything. No undo entry.
+   */
+  public async createIntentWithoutHistory(intent: Intent): Promise<any> {
+    const body = removeNodesStartingWith(JSON.parse(JSON.stringify(intent)), '__');
+    const saved = await firstValueFrom(this.savingStateService.track(this.faqService.addIntent(body)));
+    if (this.dashboardService.selectedChatbot) {
+      this.dashboardService.selectedChatbot.modified = true;
+    }
+    return saved;
+  }
+
+  /** Start boxes: rollback of createIntentWithoutHistory, a direct DELETE /faq/intentId… resolved by the server. No undo entry. */
+  public async deleteSavedIntentWithoutHistory(intent: Intent): Promise<any> {
+    return firstValueFrom(this.savingStateService.track(this.faqService.deleteFaq(intent.id, intent.intent_id, intent.id_faq_kb)));
+  }
+
+  /** Start boxes: a block saved by createIntentWithoutHistory joins the canvas; it is the new baseline for the next undo entry */
+  public addSavedIntentToListOfIntents(intent: Intent) {
+    this.addNewIntentToListOfIntents(intent);
+    this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
   }
 
 
@@ -1696,8 +1723,8 @@ export class IntentService {
     }
     
 
-    /** Removes a just-created block without leaving history: neither its save nor this delete can be undone */
-    public async rollbackNewIntent(intent: Intent){
+    /** Deletes a start box without leaving history: undoing would bring back a box whose start point no longer exists */
+    public async deleteIntentWithoutHistory(intent: Intent){
       try {
         await this.deleteIntentNew(intent);
       } finally {

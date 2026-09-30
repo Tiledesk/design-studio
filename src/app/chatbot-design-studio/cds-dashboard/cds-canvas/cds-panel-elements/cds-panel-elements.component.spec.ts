@@ -32,19 +32,17 @@ describe('CdsPanelElementsComponent start points', () => {
     expect(items[1].value.disabled).toBe(false);
   });
 
-  it('Webhook disabled with tooltip when its block is present', () => {
+  it('Webhook disabled with tooltip when a marker block is present', () => {
     const c = build('chatbot');
     c.intents = [start, block];
-    c.webhook = { webhook_id: 'w', start_points: [{ type: 'webhook', block_id: 'b1' }] };
     const items = c.buildStartPointItems();
     expect(items[1].value.disabled).toBe(true);
     expect(items[1].value.tooltip).toBe('CDSCanvas.StartPointPresent');
   });
 
-  it('Webhook enabled again when the start point block is missing', () => {
+  it('Webhook enabled again once no block carries the marker', () => {
     const c = build('chatbot');
-    c.intents = [start];
-    c.webhook = { webhook_id: 'w', start_points: [{ type: 'webhook', block_id: 'gone' }] };
+    c.intents = [start, { intent_id: 'b2', intent_display_name: 'Webhook start' }];
     expect(c.buildStartPointItems()[1].value.disabled).toBe(false);
   });
 

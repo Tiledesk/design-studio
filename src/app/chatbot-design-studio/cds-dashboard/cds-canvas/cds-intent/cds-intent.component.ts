@@ -1,4 +1,4 @@
-import { startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
+import { isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
@@ -73,6 +73,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isStart = false;
   /** marker start box (webhook start) */
   isStartPointBox = false;
+  /** the start pill shows a fixed label ("Web start", "Webhook start") and is sized to it */
+  hasStartLabel = false;
   isDefaultFallback = false;
 
   /** isDefaultFallbackLocked
@@ -277,6 +279,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         this.isDefaultFallback = true;
       }
       this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+      this.hasStartLabel = !!startPointLabelKey(this.intent, this.dashboardService.selectedChatbot?.subtype);
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || startPointTypeOf(this.intent) === 'webhook'){
         this.isStart = true;
         if(this.intent.actions.length === 0){
@@ -965,6 +968,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Predicate function that only allows type='intent' to be dropped into a list. */
   canEnterDropList(action: any) {
     return (item: CdkDrag<any>) => {
+      // Start points (palette) si droppano solo sullo stage: creano un box, non una action
+      if (isStartPointPaletteItem(item?.data)) {
+        return false;
+      }
       // defaultFallback vuota: blocco chiuso, nessun drop consentito al suo interno
       if (this.isDefaultFallbackLocked) {
         return false;
@@ -1023,6 +1030,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
             this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
             this.intentService.updateIntent(this.intent, null);
             this.connectorService.updateConnectorsOfBlock(this.intent.intent_id)
+          } else if (isStartPointPaletteItem(action)) {
+            // a start point is not an action: dropped only on the stage
+            return;
           } else if (action.value?.type) {
             // moving new action in intent from panel elements
             this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);

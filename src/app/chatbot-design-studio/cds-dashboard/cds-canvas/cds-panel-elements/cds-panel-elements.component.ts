@@ -24,9 +24,8 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
   @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
 
 
-  /** blocks of the flow and its webhook: they decide which start points are already present */
+  /** blocks of the flow: a block carrying a start point marker makes that start point present */
   @Input() intents: Array<any> = [];
-  @Input() webhook: any = null;
   /** true while a start box is being created: its palette item stays disabled */
   @Input() startPointPending: boolean = false;
   @Output() focusStartPoint = new EventEmitter<string>();
@@ -68,7 +67,7 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
   }
 
   buildStartPointItems(): Array<any> {
-    return buildStartPointItems(presentStartPointTypes(this.intents, this.webhook), this.startPointPending);
+    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending);
   }
 
   onStartPointClick(type: string) {
