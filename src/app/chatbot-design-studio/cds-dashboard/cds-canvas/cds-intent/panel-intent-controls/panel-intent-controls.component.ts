@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { RESERVED_INTENT_NAMES } from 'src/app/chatbot-design-studio/utils';
 
 @Component({
@@ -6,7 +6,7 @@ import { RESERVED_INTENT_NAMES } from 'src/app/chatbot-design-studio/utils';
   templateUrl: './panel-intent-controls.component.html',
   styleUrls: ['./panel-intent-controls.component.scss']
 })
-export class PanelIntentControlsComponent implements OnInit {
+export class PanelIntentControlsComponent implements OnInit, OnChanges {
 
   @Input() isInternalIntent: boolean = false;
   @Input() display_name: string;
@@ -32,8 +32,22 @@ export class PanelIntentControlsComponent implements OnInit {
     this.initialize();
   }
 
+  /** the parent may set isStartPoint after its own (async) init: recompute, never keep the first render's toolbar */
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = ['isStartPoint', 'display_name'].some(k => changes[k] && !changes[k].firstChange);
+    if (changed) {
+      this.initialize();
+    }
+  }
+
   initialize(){
     this.copyElementEnabled = false;
+    this.showMore = true;
+    this.showColor = true;
+    this.showDelete = true;
+    this.showCopy = true;
+    this.showPlay = true;
+    this.isStart = false;
     if(this.display_name === RESERVED_INTENT_NAMES.START){
       this.showMore = true;
       this.showColor = false;

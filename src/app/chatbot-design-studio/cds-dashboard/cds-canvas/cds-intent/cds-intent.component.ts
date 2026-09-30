@@ -1,4 +1,4 @@
-import { isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
+import { isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
@@ -1166,17 +1166,25 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
 
   private copyIntent(){
+    if (isStartBox(this.intent)) {
+      // a second marker block would break the one-per-type rule
+      return;
+    }
     let intent = JSON.parse(JSON.stringify(this.intent));
     const element = {element: intent, type: 'INTENT', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
     let data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data)
+    if (data) {
+      this.appStorageService.setItem(data.key, data.data);
+    }
   }
 
   private copyAction(ele){
     let action = JSON.parse(JSON.stringify(ele));
     const element = {element: action, type: 'ACTION', chatbot:this.intent.id_faq_kb, intentId: this.intent.intent_id}
     let data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data)
+    if (data) {
+      this.appStorageService.setItem(data.key, data.data);
+    }
   }
 
   // openTestSiteInPopupWindow() {
@@ -1202,6 +1210,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onDeleteIntent(intent: Intent) {
+    if (isStartBox(intent)) {
+      // a start box is deleted from its panel only (the server start point goes first)
+      return;
+    }
     this.deleteIntent.emit(intent);
   }
 

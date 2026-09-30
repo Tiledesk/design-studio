@@ -34,7 +34,7 @@ import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { v4 as uuidv4 } from 'uuid';
-import { createStartPointBox, startPointTypeOf } from '../../utils-start-points';
+import { createStartPointBox, isStartBox, startPointTypeOf } from '../../utils-start-points';
 import { NotifyService } from 'src/app/services/notify.service';
 
 const swal = require('sweetalert');
@@ -1409,6 +1409,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** onDeleteIntent */
   onDeleteIntent(intent: Intent) {
+    if (isStartBox(intent)) {
+      // start boxes are never deleted from the canvas: the webhook box goes through onDeleteStartBox (its panel)
+      return;
+    }
     // this.intentService.setIntentSelected(intent.intent_id);
     if (!this.hasClickedAddAction) {
       this.removeConnectorDraftAndCloseFloatMenu();
