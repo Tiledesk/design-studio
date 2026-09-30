@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc10
+- **fixed**: the Webhook start box shows only the button that opens its panel, like the Web start box: it can no longer be deleted, duplicated, recoloured or tested from the block toolbar, so its start point stays in step with the flow. It is deleted from its panel
+
 # 1.40.16-rc9
 - **added**: a flow can be started by a webhook: drag *Webhook* from the new *Start points* section of the palette, connect the box to the flow, and copy its production or development URL. The box panel sets the name the conversations show as requester, turns the start point on and off, and runs *Test webhook start*
 - **added**: *Invite human*, *Remove human* and *Remove current bot* actions, so a flow started by a webhook can bring operators in, let them go when it no longer needs them, or hand the conversation over to them completely
