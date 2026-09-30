@@ -9,6 +9,7 @@
 
 # this branch 30/09/2026
 - **added**: i filtri delle reply offrono di nuovo tutte le opzioni di confronto: esiste, non contiene, vero/falso, prima e dopo una data, contenuto e lunghezza di una lista. L'editor dei filtri gia' esistenti e la condizione precedente restano con le opzioni di prima, perche' sono valutati in un altro modo
+- **fixed**: *esiste* e *non esiste* dicono il vero su una variabile messa a null, e restano lo stesso operatore quando la condizione si riapre: *non esiste* si rileggeva come *non e' definita*. Un filtro salvato con la forma precedente viene riscritto al primo salvataggio
 
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker

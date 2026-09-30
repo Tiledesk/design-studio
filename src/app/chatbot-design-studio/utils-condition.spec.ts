@@ -223,7 +223,8 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     'matches(text, "^a.*")', '!matches(text, "^a.*")',
     'isEmpty(a)', '!isEmpty(a)',
     'isNull(a)',
-    'isUndefined(a)', '!isUndefined(a)',
+    'isUndefined(a)',
+    'exists(a)', '!exists(a)',
     'dateEqual(d, "2024-01-01")', '!dateEqual(d, "2024-01-01")',
     'isAfter(d, "2024-01-01")', 'isBefore(d, "2024-01-01")',
     'isAfterOrEqual(d, "2024-01-01")', 'isBeforeOrEqual(d, "2024-01-01")',
@@ -288,6 +289,30 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     expect(parseCondition('!isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
     expect(parseCondition('a == true')?.operator as any).toBe(TYPE_OPERATOR_V2.isTrue);
     expect(parseCondition('a == false')?.operator as any).toBe(TYPE_OPERATOR_V2.isFalse);
+  });
+
+  it('esiste / non esiste: un termine solo, che torna indietro intero', () => {
+    // Scritto come `!isUndefined(a)`, "esiste" era vero anche su una variabile messa a null.
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.exists))).toBe('exists(a)');
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.doesNotExist))).toBe('!exists(a)');
+    // Riaperta, la condizione deve tornare l'operatore da cui e' nata. `doesNotExist` non ce la
+    // faceva: veniva salvato come `isUndefined(a)` e si rileggeva come `isUndefined`, cambiando
+    // operatore sotto le mani di chi l'aveva scritto.
+    expect(parseCondition('exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(parseCondition('!exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.doesNotExist);
+    // I filtri salvati prima restano leggibili.
+    expect(parseCondition('isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.isUndefined);
+  });
+
+  it('un filtro salvato con la vecchia forma viene riscritto al primo salvataggio', () => {
+    // `!isUndefined(a)` si rilegge come "esiste" e si riscrive `exists(a)`: non e' un ritorno
+    // identico, ed e' voluto. La vecchia forma diceva che una variabile messa a null esiste, e
+    // riscriverla e' il modo in cui la correzione raggiunge i filtri gia' salvati. Finche'
+    // nessuno li riapre continuano a comportarsi come prima, perche' il motore legge la loro
+    // formula cosi' com'e'.
+    const riletta = parseCondition('!isUndefined(a)');
+    expect(riletta?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(conditionToWhen(riletta!)).toBe('exists(a)');
   });
 
 });

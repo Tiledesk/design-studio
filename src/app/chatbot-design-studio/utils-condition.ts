@@ -135,8 +135,12 @@ export function conditionToWhen(condition: Condition): string {
     case TYPE_OPERATOR_V2.isNotEmpty:   return `!isEmpty(${left})`;
     case TYPE_OPERATOR_V2.isNull:       return `isNull(${left})`;
     case TYPE_OPERATOR_V2.isUndefined:  return `isUndefined(${left})`;
-    case TYPE_OPERATOR_V2.exists:       return `!isUndefined(${left})`;
-    case TYPE_OPERATOR_V2.doesNotExist: return `isUndefined(${left})`;
+    // `exists` e non `!isUndefined`: una variabile messa esplicitamente a null non ha valore,
+    // e dirla esistente rendeva vere insieme "esiste" e "e' null" sulla stessa variabile.
+    // Un termine solo anche perche' torna indietro intero quando la condizione si riapre: una
+    // forma composta si rileggerebbe come due righe unite da AND.
+    case TYPE_OPERATOR_V2.exists:       return `exists(${left})`;
+    case TYPE_OPERATOR_V2.doesNotExist: return `!exists(${left})`;
     case TYPE_OPERATOR_V2.isTrue:       return `${left} == true`;
     case TYPE_OPERATOR_V2.isFalse:      return `${left} == false`;
   }
@@ -346,7 +350,11 @@ const FUNC_MAP: { [k: string]: { op: string; neg?: string; unary?: boolean } } =
   arrayContains:   { op: TYPE_OPERATOR_V2.arrayContains,  neg: TYPE_OPERATOR_V2.arrayNotContains },
   isEmpty:         { op: TYPE_OPERATOR_V2.isEmpty,        neg: TYPE_OPERATOR_V2.isNotEmpty, unary: true },
   isNull:          { op: TYPE_OPERATOR_V2.isNull, unary: true },
+  // `isUndefined` non ha piu' `neg: exists`: la negazione di "non e' definita" non e' "esiste",
+  // perche' una variabile a null e' definita e non esiste. Resta la lettura dei filtri salvati
+  // prima, dove `!isUndefined(x)` era esattamente quello che il Design Studio scriveva.
   isUndefined:     { op: TYPE_OPERATOR_V2.isUndefined,    neg: TYPE_OPERATOR_V2.exists,     unary: true },
+  exists:          { op: TYPE_OPERATOR_V2.exists,         neg: TYPE_OPERATOR_V2.doesNotExist, unary: true },
 };
 
 const LENGTH_MAP: { [sym: string]: string } = {
