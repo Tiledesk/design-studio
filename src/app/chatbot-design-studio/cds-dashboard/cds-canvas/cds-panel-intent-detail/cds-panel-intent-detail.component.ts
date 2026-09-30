@@ -172,6 +172,12 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
         this.deleteStartBox.emit(this.intent);
       }, error: (error) => {
         this.spBusy = false;
+        if (error?.status === 404) {
+          // the start point is already gone: the box can still be deleted
+          this.stopWebhookStartTest();
+          this.deleteStartBox.emit(this.intent);
+          return;
+        }
         this.logger.error("[CdsPanelIntentDetailComponent] error deleteStartPoint: ", error);
         this.showMessage(this.translate.instant('CDSCanvas.StartWebhookError'));
       }});

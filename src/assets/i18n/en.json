@@ -633,7 +633,7 @@
         "RemoveCurrentBotEnd": "Removes this chatbot",
         "StartWebhook": "Start from webhook",
         "InfoStartWebhook": "Lets an external system start this chatbot with an HTTP call, exactly like a new widget conversation.",
-        "InfoStartWebhookBranch": "Webhook starts set the variables webhook_http_method and payload: branch on them in the start flow to tell webhook and widget conversations apart.",
+        "InfoStartWebhookBranch": "This start point sets the variable start_type to \"webhook\" and each key of the request body as a variable, plus payload with the whole body.",
         "StartWebhookSourceName": "Source name",
         "StartPointPresent": "Already in this flow",
         "StartPointError": "Unable to add the webhook start",

@@ -1413,7 +1413,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** the panel already deleted the webhook start point on the server: delete the box, then reload the webhook (palette item enabled again) */
   async onDeleteStartBox(intent: Intent) {
-    this.onDeleteIntent(intent);
+    this.removeConnectorDraftAndCloseFloatMenu();
+    this.closeAllPanels();
+    this.closeActionDetailPanel();
+    this.intentService.setIntentSelectedById();
+    // no undo entry: undoing would bring back a box whose start point no longer exists
+    await this.intentService.rollbackNewIntent(intent);
     await this.loadWebhook();
   }
 

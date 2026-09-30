@@ -7,6 +7,12 @@ export const START_POINT_TYPES = ['web', 'webhook'];
 export const START_POINT_MARKER = 'start_point';
 const WEB_START_BLOCK_NAME = 'start';
 
+/** The server returns start_points as an array: [{type, block_id, enabled, mapping}] */
+export function findStartPoint(webhook: any, type: string): any {
+  const list = webhook?.start_points;
+  return Array.isArray(list) ? list.find(sp => sp?.type === type) : undefined;
+}
+
 /** `web` is the block named start; any other block is a start point only when it carries the marker */
 export function startPointTypeOf(intent: any): 'web' | 'webhook' | null {
   if (!intent) {
@@ -22,7 +28,7 @@ export function startPointTypeOf(intent: any): 'web' | 'webhook' | null {
 /** Web is always present; webhook only when its start point points to an existing block carrying the marker */
 export function presentStartPointTypes(intents: any[], webhook: any): string[] {
   const present = ['web'];
-  const blockId = webhook?.start_points?.webhook?.block_id;
+  const blockId = findStartPoint(webhook, 'webhook')?.block_id;
   if (blockId) {
     const block = (intents || []).find(i => i.intent_id === blockId);
     if (block && startPointTypeOf(block) === 'webhook') {
@@ -34,7 +40,7 @@ export function presentStartPointTypes(intents: any[], webhook: any): string[] {
 
 /** Test webhook start needs an enabled webhook start point */
 export function isWebhookStartPointActive(webhook: any): boolean {
-  const sp = webhook?.start_points?.webhook;
+  const sp = findStartPoint(webhook, 'webhook');
   return !!(webhook?.webhook_id && sp && sp.enabled !== false);
 }
 
@@ -56,7 +62,7 @@ export interface StartPointPanelState {
 
 /** What the webhook start box panel shows: enabled only when the start point points to this block */
 export function startPointPanelState(webhook: any, intent: any, apiUrl: string = ''): StartPointPanelState {
-  const sp = webhook?.start_points?.webhook;
+  const sp = findStartPoint(webhook, 'webhook');
   const url = webhook?.webhook_id ? `${apiUrl}webhook/${webhook.webhook_id}` : '';
   return {
     enabled: !!(sp && sp.block_id === intent?.intent_id && sp.enabled !== false),

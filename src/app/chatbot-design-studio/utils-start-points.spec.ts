@@ -1,5 +1,5 @@
 import { of, throwError } from 'rxjs';
-import { presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
+import { findStartPoint, presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
 
 describe('utils-start-points', () => {
   const start = { intent_id: 's', intent_display_name: 'start' };
@@ -19,12 +19,12 @@ describe('utils-start-points', () => {
   });
 
   it('presentStartPointTypes with start point and marker block has both', () => {
-    const wh = { start_points: { webhook: { block_id: 'b1' } } };
+    const wh = { start_points: [{ type: 'webhook', block_id: 'b1' }] };
     expect(presentStartPointTypes([start, marked], wh)).toEqual(['web', 'webhook']);
   });
 
   it('presentStartPointTypes ignores a start point whose block is missing or unmarked', () => {
-    const wh = { start_points: { webhook: { block_id: 'b1' } } };
+    const wh = { start_points: [{ type: 'webhook', block_id: 'b1' }] };
     expect(presentStartPointTypes([start], wh)).toEqual(['web']);
     expect(presentStartPointTypes([start, { intent_id: 'b1', intent_display_name: 'x' }], wh)).toEqual(['web']);
   });
@@ -32,8 +32,8 @@ describe('utils-start-points', () => {
   it('isWebhookStartPointActive requires an enabled webhook start point', () => {
     expect(isWebhookStartPointActive(null)).toBeFalse();
     expect(isWebhookStartPointActive({ webhook_id: 'w' })).toBeFalse();
-    expect(isWebhookStartPointActive({ webhook_id: 'w', start_points: { webhook: { block_id: 'b' } } })).toBeTrue();
-    expect(isWebhookStartPointActive({ webhook_id: 'w', start_points: { webhook: { block_id: 'b', enabled: false } } })).toBeFalse();
+    expect(isWebhookStartPointActive({ webhook_id: 'w', start_points: [{ type: 'webhook', block_id: 'b' }] })).toBeTrue();
+    expect(isWebhookStartPointActive({ webhook_id: 'w', start_points: [{ type: 'webhook', block_id: 'b', enabled: false }] })).toBeFalse();
   });
 
   it('createStartPointBlock builds the readonly marker block', () => {
@@ -165,17 +165,30 @@ describe('utils-start-points', () => {
   describe('startPointPanelState', () => {
     const block = { intent_id: 'b1' };
     it('enabled with source name and urls', () => {
-      const wh = { webhook_id: 'w1', start_points: { webhook: { block_id: 'b1', enabled: true, mapping: { source_name: 'crm' } } } };
+      const wh = { webhook_id: 'w1', start_points: [{ type: 'webhook', block_id: 'b1', enabled: true, mapping: { source_name: 'crm' } }] };
       expect(startPointPanelState(wh, block, 'https://api/')).toEqual({ enabled: true, sourceName: 'crm', url: 'https://api/webhook/w1', devUrl: 'https://api/webhook/w1/dev' });
     });
     it('enabled defaults to true when the flag is missing, false when disabled', () => {
-      expect(startPointPanelState({ webhook_id: 'w1', start_points: { webhook: { block_id: 'b1' } } }, block, 'u/').enabled).toBeTrue();
-      expect(startPointPanelState({ webhook_id: 'w1', start_points: { webhook: { block_id: 'b1', enabled: false } } }, block, 'u/').enabled).toBeFalse();
+      expect(startPointPanelState({ webhook_id: 'w1', start_points: [{ type: 'webhook', block_id: 'b1' }] }, block, 'u/').enabled).toBeTrue();
+      expect(startPointPanelState({ webhook_id: 'w1', start_points: [{ type: 'webhook', block_id: 'b1', enabled: false }] }, block, 'u/').enabled).toBeFalse();
     });
     it('absent start point, another block or no webhook is disabled with empty source name', () => {
       expect(startPointPanelState({ webhook_id: 'w1' }, block, 'u/')).toEqual({ enabled: false, sourceName: '', url: 'u/webhook/w1', devUrl: 'u/webhook/w1/dev' });
-      expect(startPointPanelState({ webhook_id: 'w1', start_points: { webhook: { block_id: 'other' } } }, block, 'u/').enabled).toBeFalse();
+      expect(startPointPanelState({ webhook_id: 'w1', start_points: [{ type: 'webhook', block_id: 'other' }] }, block, 'u/').enabled).toBeFalse();
       expect(startPointPanelState(null, block, 'u/')).toEqual({ enabled: false, sourceName: '', url: '', devUrl: '' });
     });
+  });
+
+  it('reads the literal server response shape (start_points array)', () => {
+    const serverResponse = {
+      webhook_id: 'w9', id_project: 'p', chatbot_id: 'c',
+      start_points: [{ type: 'webhook', block_id: 'b1', enabled: true, mapping: { source_name: 'crm' } }]
+    };
+    expect(findStartPoint(serverResponse, 'webhook').block_id).toBe('b1');
+    expect(findStartPoint(serverResponse, 'other')).toBeUndefined();
+    expect(findStartPoint({ start_points: { webhook: { block_id: 'x' } } }, 'webhook')).toBeUndefined();
+    expect(presentStartPointTypes([start, marked], serverResponse)).toEqual(['web', 'webhook']);
+    expect(isWebhookStartPointActive(serverResponse)).toBeTrue();
+    expect(startPointPanelState(serverResponse, { intent_id: 'b1' }, 'u/')).toEqual({ enabled: true, sourceName: 'crm', url: 'u/webhook/w9', devUrl: 'u/webhook/w9/dev' });
   });
 });
