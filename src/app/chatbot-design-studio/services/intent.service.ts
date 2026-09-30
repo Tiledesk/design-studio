@@ -1,8 +1,8 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionReplaceBotV4, ActionReturnStack, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn, ActionJsonConditionMulti, ConditionCase } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionInviteHuman, ActionRemoveHuman, ActionRemoveCurrentBot, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionReplaceBotV4, ActionReturnStack, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn, ActionJsonConditionMulti, ConditionCase } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, isDefaultFallbackWithoutActions } from '../utils';
 import { environment } from 'src/environments/environment';
@@ -41,6 +41,7 @@ export class IntentService {
   liveActiveIntent = new BehaviorSubject<{ intent: Intent; logAnimationType: boolean; scale: number|null }>(null);
   testIntent = new BehaviorSubject<Intent>(null);
   BSTestItOut = new BehaviorSubject<Intent>(null);
+  webhookStartTest: boolean = false;
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
   /** Emette quando cambiano intentSelectedID o intentActive; usato da cds-intent per aggiornare stili senza ngDoCheck. */
@@ -768,6 +769,10 @@ export class IntentService {
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
+    if (action?.value?.start_point) {
+      // a start point palette item is not an action (createNewAction would return undefined)
+      return null;
+    }
     let newAction = this.createNewAction(action.value.type, { connectorEntry: action.value.connectorEntry });
     if (!newAction) {
       return;
@@ -1133,6 +1138,15 @@ export class IntentService {
     }
     if(typeAction === TYPE_ACTION.ONLINE_AGENTSV2){
       action = new ActionOnlineAgentV2();
+    }
+    if(typeAction === TYPE_ACTION.INVITE_HUMAN){
+      action = new ActionInviteHuman();
+    }
+    if(typeAction === TYPE_ACTION.REMOVE_HUMAN){
+      action = new ActionRemoveHuman();
+    }
+    if(typeAction === TYPE_ACTION.REMOVE_CURRENT_BOT){
+      action = new ActionRemoveCurrentBot();
     }
     if(typeAction === TYPE_ACTION.OPEN_HOURS){
       action = new ActionOpenHours();
@@ -1804,6 +1818,30 @@ export class IntentService {
     this.opsUpdate(this.payload);
   }
 
+  /**
+   * Start boxes: saves a new block with a direct POST /faq and resolves only with the saved faq.
+   * Not ops_update: that answers before its loopback calls have saved anything. No undo entry.
+   */
+  public async createIntentWithoutHistory(intent: Intent): Promise<any> {
+    const body = removeNodesStartingWith(JSON.parse(JSON.stringify(intent)), '__');
+    const saved = await firstValueFrom(this.savingStateService.track(this.faqService.addIntent(body)));
+    if (this.dashboardService.selectedChatbot) {
+      this.dashboardService.selectedChatbot.modified = true;
+    }
+    return saved;
+  }
+
+  /** Start boxes: rollback of createIntentWithoutHistory, a direct DELETE /faq/intentId… resolved by the server. No undo entry. */
+  public async deleteSavedIntentWithoutHistory(intent: Intent): Promise<any> {
+    return firstValueFrom(this.savingStateService.track(this.faqService.deleteFaq(intent.id, intent.intent_id, intent.id_faq_kb)));
+  }
+
+  /** Start boxes: a block saved by createIntentWithoutHistory joins the canvas; it is the new baseline for the next undo entry */
+  public addSavedIntentToListOfIntents(intent: Intent) {
+    this.addNewIntentToListOfIntents(intent);
+    this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+  }
+
 
     /** deleteIntent2 */
     public async deleteIntentNew(intent: Intent){
@@ -1848,6 +1886,17 @@ export class IntentService {
       this.opsUpdate(this.payload);
     }
     
+
+    /** Deletes a start box without leaving history: undoing would bring back a box whose start point no longer exists */
+    public async deleteIntentWithoutHistory(intent: Intent){
+      try {
+        await this.deleteIntentNew(intent);
+      } finally {
+        this.arrayUNDO = this.arrayUNDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
+        this.arrayREDO = this.arrayREDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
+        this.setBehaviorUndoRedo();
+      }
+    }
 
     public deleteIntentAttributesConnectorByIntent(intentId, intent) {
       this.logger.log('[INTENT SERVICE] -> deleteIntentAttributesConnectorByIntent, ', intentId,  intent);

@@ -20,6 +20,7 @@
     <cds-panel-intent-controls
         [isInternalIntent]="isInternalIntent"
         [display_name]="intent.intent_display_name"
+        [isStartPoint]="isStartPointBox"
         [deleteOptionEnabled]="listOfActions?.length > 0"
         [webhookEnabled]="intent.webhook_enabled"
         [isReturnStack]="isReturnStack"
@@ -30,7 +31,7 @@
     <div [id]="'block-header-'+ intent?.intent_id"
         *ngIf="!isReturnStack"
         class="pic-header"
-        [ngClass]="{'cds-start': isStart}">
+        [ngClass]="{'cds-start': isStart, 'has-start-label': isStart && hasStartLabel}">
         <cds-panel-intent-header *ngIf="!isUntitledBlock" 
             class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
@@ -222,6 +223,25 @@
                             [action]="action"
                             (updateAndSaveAction)="onActionUpdate($event)">
                         </cds-action-online-agents-v2>
+
+                        <cds-action-invite-human *ngSwitchCase="TYPE_ACTION.INVITE_HUMAN"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onActionUpdate($event)">
+                        </cds-action-invite-human>
+
+                        <cds-action-remove-human *ngSwitchCase="TYPE_ACTION.REMOVE_HUMAN"
+                            class="panel-response"
+                            [intentSelected]="intent"
+                            [action]="action"
+                            (updateAndSaveAction)="onActionUpdate($event)">
+                        </cds-action-remove-human>
+
+                        <cds-action-remove-current-bot *ngSwitchCase="TYPE_ACTION.REMOVE_CURRENT_BOT"
+                            class="panel-response"
+                            [action]="action">
+                        </cds-action-remove-current-bot>
     
                         <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS" 
                             class="panel-response"

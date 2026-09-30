@@ -81,6 +81,9 @@ import { CdsActionConnectorComponent } from './cds-action-connector/cds-action-c
 import { CdsConnectorAuthRowComponent } from './cds-connector-auth-row/cds-connector-auth-row.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
+import { CdsActionInviteHumanComponent } from './cds-action-invite-human/cds-action-invite-human.component';
+import { CdsActionRemoveHumanComponent } from './cds-action-remove-human/cds-action-remove-human.component';
+import { CdsActionRemoveCurrentBotComponent } from './cds-action-remove-current-bot/cds-action-remove-current-bot.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionLeadUpdateComponent } from './cds-action-lead-update/cds-action-lead-update.component';
 import { CdsActionDataTableComponent } from './cds-action-data-table/cds-action-data-table.component';
@@ -125,6 +128,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
     CdsActionOnlineAgentsV2Component,
+    CdsActionInviteHumanComponent,
+    CdsActionRemoveHumanComponent,
+    CdsActionRemoveCurrentBotComponent,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
@@ -254,6 +260,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
     CdsActionOnlineAgentsV2Component,
+    CdsActionInviteHumanComponent,
+    CdsActionRemoveHumanComponent,
+    CdsActionRemoveCurrentBotComponent,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,

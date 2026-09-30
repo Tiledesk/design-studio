@@ -17,6 +17,8 @@ import { RESERVED_INTENT_NAMES } from 'src/app/chatbot-design-studio/utils';
 export class PanelIntentControlsComponent implements OnInit, OnChanges {
   @Input() isInternalIntent = false;
   @Input() display_name: string;
+  /** marker start box (webhook): opened only through its panel, no delete/copy/play on the box */
+  @Input() isStartPoint = false;
   @Input() deleteOptionEnabled = true;
   @Input() webhookEnabled = false;
   /** nodo terminale "Return to parent agent": mostra solo il cestino */
@@ -107,12 +109,13 @@ export class PanelIntentControlsComponent implements OnInit, OnChanges {
       this.showDelete = false;
       this.showCopy = false;
       this.showPlay = true;
-    } else if (this.display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
+    } else if (this.isStartPoint || this.display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.showMore = true;
       this.showColor = false;
       this.showDelete = false;
       this.showCopy = false;
       this.showPlay = false;
+      this.isStart = this.isStartPoint;
     } else if (this.isReturnStack) {
       // nodo terminale a pastiglia: solo il cestino, per non affollare la pastiglia
       // (è comunque l'unica via per eliminare il blocco dal canvas)

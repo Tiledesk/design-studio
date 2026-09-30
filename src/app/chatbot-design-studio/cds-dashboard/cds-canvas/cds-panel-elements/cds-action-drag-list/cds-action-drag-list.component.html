@@ -5,11 +5,15 @@
         (cdkDragStarted)="onDragStarted($event, i)"
         (cdkDragMoved)="onDragMoved($event)"
         (cdkDragEnded)="onDragEnd($event)"
+        [cdkDragData]="item"
         [cdkDragDisabled]="item.value.disabled">
 
       <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
       <div class="actions-btns-wpr" #divAction
+          [class.disabled]="item.value.disabled"
+          [attr.title]="item.value.tooltip ? (item.value.tooltip | translate) : null"
+          (click)="itemClick.emit(item)"
           (mouseover)="onHover(divAction, item.value)"
           [attr.id]="'menu-trigger-' + i">
 

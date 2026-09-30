@@ -25,6 +25,7 @@ export class CdsPanelActionsComponent implements OnInit {
   @Input() menuCategory: string;
   @Input() pos: any;
   @Input() connectorGroups: ConnectorGroup[] = [];
+  @Output() startPointClick = new EventEmitter<string>();
   @Output() isDraggingMenuElement = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
 
@@ -221,6 +222,12 @@ export class CdsPanelActionsComponent implements OnInit {
   onOverNested() { this.isOverNested = true; }
 
   onLeaveNested() { this.isOverNested = false; this.closeGroup(); }
+
+  onItemClick(item: any) {
+    if (item?.value?.start_point && item.value.disabled) {
+      this.startPointClick.emit(item.value.start_point);
+    }
+  }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);

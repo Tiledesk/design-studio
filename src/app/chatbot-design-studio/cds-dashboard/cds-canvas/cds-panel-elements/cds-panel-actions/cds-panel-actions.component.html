@@ -5,7 +5,8 @@
         [items]="menuItemsList"
         (isDragging)="onChildDragging($event)"
         (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
-        (hoverItem)="openInfo($event.element, $event.value)">
+        (hoverItem)="openInfo($event.element, $event.value)"
+        (itemClick)="onItemClick($event)">
     </cds-action-drag-list>
 
     <!-- CONNECTOR GROUP ROWS -->

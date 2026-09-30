@@ -87,6 +87,9 @@
          own left edge already is the visible edge in both states. -->
     <cds-panel-elements *ngIf="!readOnlyService.readOnly"
         class="cds-panel-elements"
+        [intents]="listOfIntents"
+        [startPointPending]="startPointPending"
+        (focusStartPoint)="onFocusStartPoint($event)"
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
         (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
     </cds-panel-elements>
@@ -206,6 +209,7 @@
     [project_id]="projectID"
     [intent]="elementIntentSelected"
     (closePanel)="closeAllPanels()"
+    (deleteStartBox)="onDeleteStartBox($event)"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-intent-detail>
 

@@ -59,7 +59,10 @@ export enum TYPE_ACTION {
     WEB_RESPONSE        = 'web_response',
     INVOKE_SUB_AGENT    = 'invoke_subagent',
     RETURN              = 'return',
-    DATA_TABLE          = 'data_table'
+    DATA_TABLE          = 'data_table',
+    INVITE_HUMAN        = 'invite_human',
+    REMOVE_HUMAN        = 'remove_human',
+    REMOVE_CURRENT_BOT  = 'removecurrentbot'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -80,6 +83,7 @@ export enum TYPE_ACTION_VXML {
 }
 
 export enum TYPE_ACTION_CATEGORY {
+    START_POINTS    = 'Start points',
     MOST_USED       = 'Most Used',
     AI              = 'AI',
     FLOW            = 'Flow',
@@ -137,6 +141,7 @@ export const ACTION_CATEGORY =[
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.START_POINTS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.StartPoints',  src: 'assets/images/actions_category/start_points.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
     { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE_TWILIO, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/twilio-voice.svg'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
@@ -184,6 +189,9 @@ export const ACTIONS_LIST: {
     OPEN_HOURS:             { name: 'CDSActionList.NAME.IfOperatingHours',      chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.OPEN_HOURS,           src: "assets/images/actions/open_hours.svg",            status: "active",                       doc: "CDSActionList.DOC.IfOperatingHours"                               },
     ONLINE_AGENTS:          { name: 'CDSActionList.NAME.IfOnlineAgent',         chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTS,        src: "assets/images/actions/online_agents.svg",         status: "inactive",                     doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
     ONLINE_AGENTSV2:        { name: 'CDSActionList.NAME.IfOnlineAgent',         chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.ONLINE_AGENTSV2,      src: "assets/images/actions/online_agents.svg",         status: "active",                       doc: "CDSActionList.DOC.IfOnlineAgent"                                  },
+    INVITE_HUMAN:           { name: 'CDSActionList.NAME.InviteHuman',           chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.INVITE_HUMAN,         src: "assets/images/actions/invite_human.svg",          status: "active",                       doc: "CDSActionList.DOC.InviteHuman"                                    },
+    REMOVE_HUMAN:           { name: 'CDSActionList.NAME.RemoveHuman',           chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REMOVE_HUMAN,         src: "assets/images/actions/remove_human.svg",          status: "active",                       doc: "CDSActionList.DOC.RemoveHuman"                                    },
+    REMOVE_CURRENT_BOT:     { name: 'CDSActionList.NAME.RemoveCurrentBot',           chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.REMOVE_CURRENT_BOT,         src: "assets/images/actions/remove_current_bot.svg",          status: "active",                       doc: "CDSActionList.DOC.RemoveCurrentBot"                                    },
     CLEAR_TRANSCRIPT:       { name: 'CDSActionList.NAME.ClearTranscript',       chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.CLEAR_TRANSCRIPT,     src: "assets/images/actions/clear_transcript.svg",      status: "active",                       doc: "CDSActionList.DOC.ClearTranscript"                                },
     MOVE_TO_UNASSIGNED:     { name: 'CDSActionList.NAME.MoveToUnassigned',      chatbot_types: [TYPE_CHATBOT.CHATBOT],                                                                                               category: TYPE_ACTION_CATEGORY.MOST_USED,           type: TYPE_ACTION.MOVE_TO_UNASSIGNED,   src: "assets/images/actions/move_to_unassigned.svg",    status: "active",                       doc: "CDSActionList.DOC.MoveToUnassigned"                               },
     CONDITION:              { name: 'CDSActionList.NAME.Condition',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.CONDITION,            src: "assets/images/actions/condition.svg",             status: "inactive",                     doc: "CDSActionList.DOC.Condition"                                      },

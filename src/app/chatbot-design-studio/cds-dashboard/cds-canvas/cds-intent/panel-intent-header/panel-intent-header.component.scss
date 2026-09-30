@@ -349,3 +349,19 @@ $circle-size: 40px;
     color: var(--color-yellow-hex);
   }
 }
+// fixed label of a start box: the pill is sized to it. Left padding clears the type icon (the form-group
+// is pulled 40px under it), right padding clears the connector dot at the pill's right edge.
+.form-group.has-start-label {
+    width: auto;
+    flex: none;
+}
+.start-label {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    padding: 0 36px 0 30px;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    font-weight: 500;
+}
