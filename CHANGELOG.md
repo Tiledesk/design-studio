@@ -7,8 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 30/09/2026
-- **added**: i filtri delle reply offrono di nuovo tutte le opzioni di confronto: esiste, non contiene, vero/falso, prima e dopo una data, contenuto e lunghezza di una lista. L'editor dei filtri gia' esistenti e la condizione precedente restano con le opzioni di prima, perche' sono valutati in un altro modo
+# 1.40.16-rc6
+- **changed**: the comparisons added in 1.40.16-rc5 stay in the reply filters only. The editor of filters saved earlier and the previous condition go back to the options they had, being evaluated another way
+- **fixed**: *exists* and *does not exist* tell the truth about a variable set to null, and stay the same operator when the condition is reopened — *does not exist* used to read back as *is not defined*. A filter saved in the previous form is rewritten on the next save
 
 # 1.40.16-rc5
 - **added**: an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
