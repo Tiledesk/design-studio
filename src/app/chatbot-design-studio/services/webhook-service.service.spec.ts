@@ -30,24 +30,30 @@ describe('WebhookService', () => {
     httpMock.verify();
   });
 
-  it('createStartWebhook posts a conversation-mode webhook bound to the start block', () => {
-    service.createStartWebhook('bot1', 'start-intent', { department_id: 'dep1', source_name: 'Grafana alerts' }).subscribe();
+  it('upsertStartPoint puts the start point body', () => {
+    service.upsertStartPoint('bot1', 'webhook', { block_id: 'b1', enabled: true }).subscribe();
 
-    const req = httpMock.expectOne('https://api.test/project1/webhooks/');
-    expect(req.request.method).toBe('POST');
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/webhook');
+    expect(req.request.method).toBe('PUT');
     expect(req.request.headers.get('Authorization')).toBe('JWT test-token');
-    expect(JSON.parse(req.request.body)).toEqual({
-      chatbot_id: 'bot1', block_id: 'start-intent', mode: 'conversation', department_id: 'dep1', source_name: 'Grafana alerts'
-    });
-    req.flush({ webhook_id: 'w1' });
+    expect(JSON.parse(req.request.body)).toEqual({ block_id: 'b1', enabled: true });
+    req.flush({});
   });
 
-  it('updateWebhookSettings puts only the given fields', () => {
-    service.updateWebhookSettings('bot1', { enabled: false }).subscribe();
+  it('upsertStartPoint sends mapping and confirm', () => {
+    service.upsertStartPoint('bot1', 'webhook', { block_id: 'b1', mapping: { source_name: 'Grafana' }, confirm: true }).subscribe();
 
-    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1');
-    expect(req.request.method).toBe('PUT');
-    expect(JSON.parse(req.request.body)).toEqual({ enabled: false });
-    req.flush({ webhook_id: 'w1' });
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/webhook');
+    expect(JSON.parse(req.request.body)).toEqual({ block_id: 'b1', mapping: { source_name: 'Grafana' }, confirm: true });
+    req.flush({});
+  });
+
+  it('deleteStartPoint deletes the start point', () => {
+    service.deleteStartPoint('bot1', 'webhook').subscribe();
+
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/webhook');
+    expect(req.request.method).toBe('DELETE');
+    expect(req.request.headers.get('Authorization')).toBe('JWT test-token');
+    req.flush({});
   });
 });

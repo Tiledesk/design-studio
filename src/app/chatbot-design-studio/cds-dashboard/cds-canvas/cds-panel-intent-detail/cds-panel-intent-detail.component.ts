@@ -14,8 +14,6 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
-import { Department } from 'src/app/models/department-model';
-import { isStartWebhookActive, needsSwitchConfirmation, startWebhookToggleRequest } from 'src/app/chatbot-design-studio/utils-webhook';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 
 const swal = require('sweetalert');
@@ -52,14 +50,6 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   messageText: string = '';
   action: any = {};
   chatbotSubtype: string;
-
-  /* start webhook params (conversational chatbots) */
-  isChatbotStart: boolean = false;
-  startWebhook: any = null;
-  startWebhookActive: boolean = false;
-  startWebhookDepartmentId: string | null = null;
-  startWebhookSourceName: string = '';
-  departments: Department[] = [];
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -111,115 +101,6 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   initializeStart(){
     this.isStart = true;
     if(this.intent.agents_available !== false) this.intent.agents_available = true;
-    const subtype = this.dashboardService.selectedChatbot?.subtype || TYPE_CHATBOT.CHATBOT;
-    if (subtype === TYPE_CHATBOT.CHATBOT) {
-      this.isChatbotStart = true;
-      this.project_id = this.dashboardService.projectID;
-      this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
-      this.chatbot_id = this.dashboardService.id_faq_kb;
-      this.departments = this.dashboardService.departments || [];
-      this.loadStartWebhook();
-    }
-  }
-
-  loadStartWebhook(){
-    this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
-      this.applyStartWebhook(resp);
-    }, error: (error) => {
-      this.applyStartWebhook(null);
-      if (error?.status === 404) {
-        // the chatbot has no webhook yet
-        this.logger.log("[CdsPanelIntentDetailComponent] loadStartWebhook: no webhook ", error);
-        return;
-      }
-      this.logger.error("[CdsPanelIntentDetailComponent] loadStartWebhook error: ", error);
-      this.showMessage(this.translate.instant('CDSCanvas.StartWebhookLoadError'));
-    }});
-  }
-
-  private applyStartWebhook(webhook: any){
-    this.startWebhook = (webhook && webhook.webhook_id) ? webhook : null;
-    this.startWebhookActive = isStartWebhookActive(this.startWebhook);
-    this.webhookUrl = this.startWebhook ? this.serverBaseURL + 'webhook/' + this.startWebhook.webhook_id : '';
-    this.webhookUrlDev = this.webhookUrl ? this.webhookUrl + '/dev' : '';
-    this.startWebhookDepartmentId = this.startWebhook?.department_id || null;
-    this.startWebhookSourceName = this.startWebhook?.source_name || '';
-  }
-
-  onStartWebhookToggle(enable: boolean){
-    if (enable && needsSwitchConfirmation(this.startWebhook)) {
-      swal({
-        title: this.translate.instant('CDSCanvas.StartWebhookSwitchTitle'),
-        text: this.translate.instant('CDSCanvas.StartWebhookSwitchText'),
-        icon: "warning",
-        buttons: [this.translate.instant('CDSCanvas.StartWebhookSwitchCancel'), this.translate.instant('CDSCanvas.StartWebhookSwitchConfirm')],
-        dangerMode: false,
-      }).then((resp: boolean) => {
-        if (resp) {
-          this.applyStartWebhookToggle(true);
-        } else {
-          this.startWebhookActive = false;
-        }
-      });
-      return;
-    }
-    this.applyStartWebhookToggle(enable);
-  }
-
-  private applyStartWebhookToggle(enable: boolean){
-    const request = startWebhookToggleRequest(this.startWebhook, enable, this.intent.intent_id);
-    if (request.type === 'none') {
-      return;
-    }
-    const call$ = request.type === 'create'
-      ? this.webhookService.createStartWebhook(this.chatbot_id, this.intent.intent_id)
-      : this.webhookService.updateWebhookSettings(this.chatbot_id, request.patch);
-    call$.subscribe({ next: (resp: any) => {
-      if (!enable) {
-        this.stopWebhookStartTest();
-      }
-      this.applyStartWebhook(resp);
-    }, error: (error) => {
-      this.logger.error("[CdsPanelIntentDetailComponent] start webhook toggle error: ", error);
-      this.startWebhookActive = isStartWebhookActive(this.startWebhook);
-      this.showMessage(this.startWebhookErrorMessage(error));
-    }});
-  }
-
-  onStartWebhookDepartmentChange(item: any){
-    this.updateStartWebhookSettings({ department_id: item ? item._id : null });
-  }
-
-  onStartWebhookDepartmentReset(){
-    this.updateStartWebhookSettings({ department_id: null });
-  }
-
-  onStartWebhookSourceNameSave(){
-    this.updateStartWebhookSettings({ source_name: this.startWebhookSourceName });
-  }
-
-  private updateStartWebhookSettings(patch: { department_id?: string | null, source_name?: string }){
-    if (!this.startWebhook) {
-      return;
-    }
-    this.webhookService.updateWebhookSettings(this.chatbot_id, patch).subscribe({ next: (resp: any) => {
-      this.applyStartWebhook(resp);
-    }, error: (error) => {
-      this.logger.error("[CdsPanelIntentDetailComponent] updateStartWebhookSettings error: ", error);
-      this.showMessage(this.startWebhookErrorMessage(error));
-    }});
-  }
-
-  /** Server validation errors come as { success: false, error: "<reason>" } */
-  private startWebhookErrorMessage(error: any): string {
-    const reason = error?.error?.error;
-    return (typeof reason === 'string' && reason.trim() !== '') ? reason : this.translate.instant('CDSCanvas.StartWebhookError');
-  }
-
-  onCopyStartUrl(value: string){
-    navigator.clipboard.writeText(value).then(() => {
-      this.showMessage(this.translate.instant('Copied') + '!');
-    });
   }
 
   initializeWebhook(){
@@ -315,11 +196,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   regenerateWebhook(){
     this.webhookService.regenerateWebhook(this.chatbot_id).subscribe({ next: (resp: any)=> {
       this.logger.log("[CdsPanelIntentDetailComponent] regenerateWebhook : ", resp);
-      if (this.isChatbotStart) {
-        this.stopWebhookStartTest();
-        this.applyStartWebhook(resp);
-        return;
-      }
+      this.stopWebhookStartTest();
       this.webhookUrl = this.serverBaseURL+'webhook/'+resp.webhook_id;
       this.webhookUrlDev = this.webhookUrl+"/dev";
     }, error: (error)=> {

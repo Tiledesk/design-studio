@@ -29,7 +29,7 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
-import { isStartWebhookActive } from '../../utils-webhook';
+import { isWebhookStartPointActive } from '../../utils-start-points';
 
 const swal = require('sweetalert');
 
@@ -448,7 +448,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.webhookStartTestStarting = true;
     try {
       const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
-      if (!isStartWebhookActive(webhook)) {
+      if (!isWebhookStartPointActive(webhook)) {
         this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
         return;
       }

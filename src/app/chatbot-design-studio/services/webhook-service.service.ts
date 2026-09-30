@@ -5,7 +5,6 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_ACTION } from '../utils-actions';
 import { IntentService } from './intent.service';
-import { WEBHOOK_MODE_CONVERSATION } from '../utils-webhook';
 
 @Injectable({
   providedIn: 'root'
@@ -186,9 +185,9 @@ export class WebhookService {
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
   }
 
-  createStartWebhook(chatbot_id: string, block_id: string, opts: { department_id?: string, source_name?: string } = {}){
+  upsertStartPoint(chatbot_id: string, type: 'webhook', body: { block_id: string, enabled?: boolean, mapping?: { source_name?: string }, confirm?: boolean }){
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    this.logger.log('[WEBHOOK_URL.SERV] createStartWebhook');
+    this.logger.log('[WEBHOOK_URL.SERV] upsertStartPoint', type);
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -196,14 +195,13 @@ export class WebhookService {
         'Authorization': this.tiledeskToken
       })
     };
-    const body = Object.assign({ chatbot_id: chatbot_id, block_id: block_id, mode: WEBHOOK_MODE_CONVERSATION }, opts);
-    const url = this.WEBHOOK_URL + '/webhooks/';
-    return this._httpClient.post<any>(url, JSON.stringify(body), httpOptions);
+    const url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id + '/start_points/' + type;
+    return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
   }
 
-  updateWebhookSettings(chatbot_id: string, patch: { enabled?: boolean, mode?: string, block_id?: string, department_id?: string | null, source_name?: string }){
+  deleteStartPoint(chatbot_id: string, type: 'webhook'){
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
-    this.logger.log('[WEBHOOK_URL.SERV] updateWebhookSettings', patch);
+    this.logger.log('[WEBHOOK_URL.SERV] deleteStartPoint', type);
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'application/json',
@@ -211,8 +209,8 @@ export class WebhookService {
         'Authorization': this.tiledeskToken
       })
     };
-    const url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
-    return this._httpClient.put<any>(url, JSON.stringify(patch), httpOptions);
+    const url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id + '/start_points/' + type;
+    return this._httpClient.delete<any>(url, httpOptions);
   }
 
   preloadWebhook(webhook_id: string){
