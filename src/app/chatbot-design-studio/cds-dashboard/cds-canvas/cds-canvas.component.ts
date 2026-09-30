@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, Output, EventEmitter, Input, ChangeDetectorRef, AfterViewInit} from '@angular/core';
-import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, skip, timeout, firstValueFrom, lastValueFrom } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateService } from '@ngx-translate/core';
@@ -34,8 +34,10 @@ import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { v4 as uuidv4 } from 'uuid';
+import { createStartPointBox, startPointTypeOf } from '../../utils-start-points';
+import { NotifyService } from 'src/app/services/notify.service';
 
-// const swal = require('sweetalert');
+const swal = require('sweetalert');
 
 
 @Component({
@@ -171,6 +173,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
 
   chatbotSubtype: string;
+  /** webhook of the chatbot (start points); null when absent or not loaded */
+  webhook: any = null;
+  /** true while a start box is being created */
+  startPointPending = false;
+  private readonly startPointPendingRef = { value: false };
   selectedChatbot: Chatbot;
   projectID: string;
 
@@ -191,7 +198,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    private readonly notify: NotifyService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -616,6 +624,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.listOfIntents = this.intentService.listOfIntents;
       // // this.initListOfIntents();
       this.refreshIntents();
+      this.loadWebhook();
       this.initLoadingStage();
       // // this.intentService.setStartIntent();
       this.mapOfIntents = await this.intentService.setMapOfIntents();
@@ -1161,7 +1170,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.closeAllPanels();
     this.closeActionDetailPanel();
       // this.removeConnectorDraftAndCloseFloatMenu();  
-      this.createNewIntentFromPanelElement(pos, action.value.type);
+      if (action.value.start_point) {
+        this.createStartPointFromPanelElement(pos, action.value.start_point);
+      } else {
+        this.createNewIntentFromPanelElement(pos, action.value.type);
+      }
     } else if (action) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
       let prevIntentOfaction = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
@@ -1236,6 +1249,78 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
 
+
+  /** Drop of a Start points item: create the marker block, then register it as the start point */
+  async createStartPointFromPanelElement(pos, type: string) {
+    if (type !== 'webhook') {
+      return;
+    }
+    if (this.startPointPendingRef.value) {
+      return;
+    }
+    const chatbot_id = this.id_faq_kb;
+    const setPending = (v: boolean) => { this.startPointPending = v; this.changeDetectorRef.detectChanges(); };
+    const flag = this.startPointPendingRef;
+    const result = await (async () => {
+      setPending(true);
+      try {
+        return await createStartPointBox({
+          pending: flag,
+          saveBlock: async (block) => {
+            block.id_faq_kb = chatbot_id;
+            this.intentService.addNewIntentToListOfIntents(block);
+            block.id = INTENT_TEMP_ID;
+            this.intentService.setDragAndListnerEventToElement(block.intent_id);
+            this.intentService.setIntentSelected(block.intent_id);
+            this.closeExtraPanels();
+            await this.intentService.saveNewIntent(block, null, null);
+          },
+          removeBlock: (block) => this.intentService.deleteIntentNew(block),
+          upsert: (block, confirm) => this.webhookService.upsertStartPoint(chatbot_id, 'webhook', confirm ? { block_id: block.intent_id, confirm: true } : { block_id: block.intent_id }),
+          confirmSwitch: () => this.confirmStartWebhookSwitch(),
+          onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSCanvas.StartPointError'), 4, 'report_problem'),
+          onCreated: () => {}
+        }, 'webhook', pos);
+      } finally {
+        setPending(false);
+      }
+    })();
+    if (result === 'created') {
+      await this.loadWebhook();
+    }
+  }
+
+  private async confirmStartWebhookSwitch(): Promise<boolean> {
+    const ok = await swal({
+      title: this.translate.instant('CDSCanvas.StartWebhookSwitchTitle'),
+      text: this.translate.instant('CDSCanvas.StartWebhookSwitchText'),
+      icon: 'warning',
+      buttons: [this.translate.instant('CDSCanvas.StartWebhookSwitchCancel'), this.translate.instant('CDSCanvas.StartWebhookSwitchConfirm')],
+      dangerMode: false,
+    });
+    return !!ok;
+  }
+
+  /** load the chatbot webhook: needed to know whether the webhook start point exists */
+  private async loadWebhook() {
+    if ((this.dashboardService.selectedChatbot?.subtype || TYPE_CHATBOT.CHATBOT) !== TYPE_CHATBOT.CHATBOT) {
+      this.webhook = null;
+      return;
+    }
+    try {
+      this.webhook = await lastValueFrom(this.webhookService.getWebhook(this.id_faq_kb));
+    } catch (e) {
+      this.webhook = null;
+    }
+  }
+
+  /** click on a disabled Start points item: select and center its box */
+  onFocusStartPoint(type: string) {
+    const block = this.listOfIntents.find(i => startPointTypeOf(i) === type);
+    if (block) {
+      this.onSelectIntent(block);
+    }
+  }
 
   /**
    * createNewIntentDraggingActionFromAnotherIntent

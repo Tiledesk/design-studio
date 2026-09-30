@@ -354,3 +354,8 @@ $base-padding: 6px;
         }
     }
 }
+
+.actions-btns-wpr.disabled {
+    opacity: 0.5;
+    &:hover { cursor: pointer; }
+}

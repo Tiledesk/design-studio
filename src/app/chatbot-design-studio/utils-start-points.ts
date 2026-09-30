@@ -1,3 +1,7 @@
+import { Observable, lastValueFrom } from 'rxjs';
+import { Intent } from 'src/app/models/intent-model';
+import { TYPE_OF_MENU } from './utils';
+
 export const START_POINT_TYPES = ['web', 'webhook'];
 export const START_POINT_MARKER = 'start_point';
 const WEB_START_BLOCK_NAME = 'start';
@@ -31,4 +35,112 @@ export function presentStartPointTypes(intents: any[], webhook: any): string[] {
 export function isWebhookStartPointActive(webhook: any): boolean {
   const sp = webhook?.start_points?.webhook;
   return !!(webhook?.webhook_id && sp && sp.enabled !== false);
+}
+
+const WEBHOOK_START_BLOCK_NAME = 'Webhook start';
+
+/** The block dropped on the canvas for a start point: readonly, marked, ending with an empty connect action like `start` */
+export function createStartPointBlock(type: 'webhook', pos: { x: number, y: number }): Intent {
+  const intent = new Intent();
+  intent.intent_display_name = WEBHOOK_START_BLOCK_NAME;
+  intent.attributes.start_point = type;
+  intent.attributes.position = pos;
+  intent.attributes.readonly = true;
+  intent.actions = [{ _tdActionType: 'intent', intentName: '' } as any];
+  return intent;
+}
+
+/** Palette items of the Start points section. Web is always present (the start block); webhook is one per flow */
+export function buildStartPointItems(present: string[], pending: boolean): any[] {
+  const webhookPresent = present.includes('webhook');
+  return [
+    {
+      type: TYPE_OF_MENU.ACTION,
+      canLoad: true,
+      value: {
+        name: 'CDSActionList.NAME.StartPointWeb',
+        type: 'web',
+        start_point: 'web',
+        src: 'assets/images/actions_category/start_points.svg',
+        status: 'active',
+        disabled: true,
+        tooltip: 'CDSCanvas.StartPointPresent'
+      }
+    },
+    {
+      type: TYPE_OF_MENU.ACTION,
+      canLoad: true,
+      value: {
+        name: 'CDSActionList.NAME.StartPointWebhook',
+        type: 'webhook',
+        start_point: 'webhook',
+        src: 'assets/images/actions_category/start_points.svg',
+        status: 'active',
+        disabled: webhookPresent || pending,
+        tooltip: webhookPresent ? 'CDSCanvas.StartPointPresent' : ''
+      }
+    }
+  ];
+}
+
+export interface StartPointBoxDeps {
+  /** shared flag: true while a create is in flight (a second drop does nothing) */
+  pending: { value: boolean };
+  saveBlock: (block: Intent) => Promise<any>;
+  removeBlock: (block: Intent) => Promise<any>;
+  upsert: (block: Intent, confirm: boolean) => Observable<any>;
+  confirmSwitch: () => Promise<boolean>;
+  onError: (err?: any) => void;
+  onCreated: (block: Intent) => void;
+}
+
+/**
+ * Creates the start box, then registers it as the webhook start point.
+ * A failure after the block was saved deletes the block again (no orphan box).
+ */
+export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhook', pos: { x: number, y: number }): Promise<'created' | 'cancelled' | 'failed' | 'busy'> {
+  if (deps.pending.value) {
+    return 'busy';
+  }
+  deps.pending.value = true;
+  const block = createStartPointBlock(type, pos);
+  try {
+    try {
+      await deps.saveBlock(block);
+    } catch (err) {
+      await safeRemove(deps, block);
+      deps.onError(err);
+      return 'failed';
+    }
+    try {
+      try {
+        await lastValueFrom(deps.upsert(block, false));
+      } catch (err) {
+        if (err?.status !== 409) {
+          throw err;
+        }
+        if (!(await deps.confirmSwitch())) {
+          await safeRemove(deps, block);
+          return 'cancelled';
+        }
+        await lastValueFrom(deps.upsert(block, true));
+      }
+    } catch (err) {
+      await safeRemove(deps, block);
+      deps.onError(err);
+      return 'failed';
+    }
+    deps.onCreated(block);
+    return 'created';
+  } finally {
+    deps.pending.value = false;
+  }
+}
+
+async function safeRemove(deps: StartPointBoxDeps, block: Intent) {
+  try {
+    await deps.removeBlock(block);
+  } catch (e) {
+    // the caller still reports the original failure
+  }
 }

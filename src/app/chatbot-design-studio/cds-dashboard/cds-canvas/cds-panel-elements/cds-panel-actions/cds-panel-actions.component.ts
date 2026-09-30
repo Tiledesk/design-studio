@@ -22,6 +22,7 @@ export class CdsPanelActionsComponent implements OnInit {
   @Input() menuType: string;
   @Input() menuCategory: string;
   @Input() pos: any;
+  @Output() startPointClick = new EventEmitter<string>();
   @Output() isDraggingMenuElement = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
 
@@ -162,6 +163,12 @@ export class CdsPanelActionsComponent implements OnInit {
     }
     setTimeout(() => {this.isOpen = false;},0)
     this.hoveredElement = null;
+  }
+
+  onItemClick(item: any) {
+    if (item?.value?.start_point && item.value.disabled) {
+      this.startPointClick.emit(item.value.start_point);
+    }
   }
 
   onDragStarted(event:CdkDragStart, currentIndex: number) {

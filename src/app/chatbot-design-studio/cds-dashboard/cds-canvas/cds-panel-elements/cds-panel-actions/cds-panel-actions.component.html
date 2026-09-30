@@ -31,6 +31,9 @@
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <div class="actions-btns-wpr" #divAction
+                    [class.disabled]="item.value.disabled"
+                    [attr.title]="item.value.tooltip ? (item.value.tooltip | translate) : null"
+                    (click)="onItemClick(item)"
                     (mouseover)="openInfo(divAction, item.value)" 
                     [attr.id]="'menu-trigger-' + i">
                     

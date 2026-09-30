@@ -1,4 +1,5 @@
-import { presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive } from './utils-start-points';
+import { of, throwError } from 'rxjs';
+import { presentStartPointTypes, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox } from './utils-start-points';
 
 describe('utils-start-points', () => {
   const start = { intent_id: 's', intent_display_name: 'start' };
@@ -33,5 +34,105 @@ describe('utils-start-points', () => {
     expect(isWebhookStartPointActive({ webhook_id: 'w' })).toBeFalse();
     expect(isWebhookStartPointActive({ webhook_id: 'w', start_points: { webhook: { block_id: 'b' } } })).toBeTrue();
     expect(isWebhookStartPointActive({ webhook_id: 'w', start_points: { webhook: { block_id: 'b', enabled: false } } })).toBeFalse();
+  });
+
+  it('createStartPointBlock builds the readonly marker block', () => {
+    const b = createStartPointBlock('webhook', { x: 10, y: 20 });
+    expect(b.intent_display_name).toBe('Webhook start');
+    expect(b.attributes.start_point).toBe('webhook');
+    expect(b.attributes.position).toEqual({ x: 10, y: 20 });
+    expect(b.attributes.readonly).toBe(true);
+    expect(b.actions.length).toBe(1);
+    expect((b.actions[0] as any)._tdActionType).toBe('intent');
+    expect((b.actions[0] as any).intentName).toBe('');
+    expect(startPointTypeOf(b)).toBe('webhook');
+  });
+
+  describe('buildStartPointItems', () => {
+    it('web is always disabled; webhook enabled when absent', () => {
+      const items = buildStartPointItems(['web'], false);
+      expect(items.map(i => i.value.start_point)).toEqual(['web', 'webhook']);
+      expect(items[0].value.disabled).toBe(true);
+      expect(items[1].value.disabled).toBe(false);
+      expect(items[1].value.tooltip).toBeFalsy();
+    });
+    it('webhook disabled with tooltip when present', () => {
+      const items = buildStartPointItems(['web', 'webhook'], false);
+      expect(items[1].value.disabled).toBe(true);
+      expect(items[1].value.tooltip).toBe('CDSCanvas.StartPointPresent');
+    });
+    it('webhook disabled while a create is pending, without the present tooltip', () => {
+      const items = buildStartPointItems(['web'], true);
+      expect(items[1].value.disabled).toBe(true);
+      expect(items[1].value.tooltip).toBeFalsy();
+    });
+  });
+
+  describe('createStartPointBox', () => {
+    let calls: string[];
+    let deps: any;
+    const flag = () => ({ value: false });
+    beforeEach(() => {
+      calls = [];
+      deps = {
+        pending: flag(),
+        saveBlock: async (b) => { calls.push('save'); },
+        removeBlock: async (b) => { calls.push('remove'); },
+        upsert: (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return of({}); },
+        confirmSwitch: async () => { calls.push('ask'); return true; },
+        onError: () => { calls.push('error'); },
+        onCreated: () => { calls.push('created'); },
+      };
+    });
+
+    it('saves the block then upserts', async () => {
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('created');
+      expect(calls).toEqual(['save', 'upsert', 'created']);
+      expect(deps.pending.value).toBe(false);
+    });
+
+    it('a second call while pending creates nothing', async () => {
+      let release;
+      deps.saveBlock = (b) => { calls.push('save'); return new Promise<void>(r => release = r); };
+      const first = createStartPointBox(deps, 'webhook', { x: 1, y: 2 });
+      expect(await createStartPointBox(deps, 'webhook', { x: 3, y: 4 })).toBe('busy');
+      release();
+      await first;
+      expect(calls.filter(c => c === 'save').length).toBe(1);
+      expect(calls.filter(c => c === 'upsert').length).toBe(1);
+    });
+
+    it('a failed PUT removes the block again and reports the error', async () => {
+      deps.upsert = () => { calls.push('upsert'); return throwError({ status: 500 }); };
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
+      expect(calls).toEqual(['save', 'upsert', 'remove', 'error']);
+      expect(deps.pending.value).toBe(false);
+    });
+
+    it('a failed save removes the block and reports the error without a PUT', async () => {
+      deps.saveBlock = async () => { calls.push('save'); throw false; };
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
+      expect(calls).toEqual(['save', 'remove', 'error']);
+    });
+
+    it('409 asks for confirmation and retries with confirm', async () => {
+      let n = 0;
+      deps.upsert = (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return n++ === 0 ? throwError({ status: 409 }) : of({}); };
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('created');
+      expect(calls).toEqual(['save', 'upsert', 'ask', 'upsert:confirm', 'created']);
+    });
+
+    it('409 declined removes the block silently', async () => {
+      deps.upsert = () => { calls.push('upsert'); return throwError({ status: 409 }); };
+      deps.confirmSwitch = async () => { calls.push('ask'); return false; };
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('cancelled');
+      expect(calls).toEqual(['save', 'upsert', 'ask', 'remove']);
+    });
+
+    it('a failure of the confirmed retry removes the block and reports the error', async () => {
+      deps.upsert = (b, confirm) => { calls.push('upsert' + (confirm ? ':confirm' : '')); return throwError({ status: confirm ? 500 : 409 }); };
+      expect(await createStartPointBox(deps, 'webhook', { x: 1, y: 2 })).toBe('failed');
+      expect(calls).toEqual(['save', 'upsert', 'ask', 'upsert:confirm', 'remove', 'error']);
+    });
   });
 });

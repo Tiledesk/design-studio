@@ -1647,7 +1647,8 @@ export class IntentService {
     this.setBehaviorUndoRedo();
     this.logger.log('[INTENT SERVICE] -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
-    this.opsUpdate(this.payload);
+    // awaited: the start point PUT needs the saved block
+    await this.opsUpdate(this.payload);
   }
 
 

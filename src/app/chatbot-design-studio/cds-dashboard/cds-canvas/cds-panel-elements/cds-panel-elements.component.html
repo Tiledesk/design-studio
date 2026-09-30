@@ -83,6 +83,7 @@
             [actionsList]="actionsList"
             [menuType]="menuType" 
             [menuCategory]="menuCategory"
+            (startPointClick)="onStartPointClick($event)"
             (isDraggingMenuElement)="onDraggingMenuElement($event)"
             (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
         </cds-panel-actions>

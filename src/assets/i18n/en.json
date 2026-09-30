@@ -636,6 +636,8 @@
         "InfoStartWebhookBranch": "Webhook starts set the variables webhook_http_method and payload: branch on them in the start flow to tell webhook and widget conversations apart.",
         "StartWebhookDepartment": "Conversation department",
         "StartWebhookSourceName": "Source name",
+        "StartPointPresent": "Already in this flow",
+        "StartPointError": "Unable to add the webhook start",
         "StartWebhookSwitchTitle": "Switch webhook",
         "StartWebhookSwitchText": "This chatbot already has a webhook that runs a block without a conversation. Switching it will make calls start conversations from the start block. Continue?",
         "StartWebhookSwitchConfirm": "Switch",
@@ -803,7 +805,8 @@
         "Integrations": "Integrations",
         "Special": "Special",
         "Voice": "Voice",
-        "VoiceTwilio": "Voice Twilio"
+        "VoiceTwilio": "Voice Twilio",
+        "StartPoints": "Start points"
     },
     "CDSOperatorList": {
         "equalAsNumbers": "equal As Numbers",
@@ -920,6 +923,8 @@
             "AiCondition": "AI Condition",
             "HiddenMessage": "Hidden message",
             "ChangeDept": "Change department",
+            "StartPointWeb": "Web",
+            "StartPointWebhook": "Webhook",
             "Code": "Code",
             "SetFunction": "Set function",
             "CaptureUserReply": "Capture user reply",
