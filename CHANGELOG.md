@@ -7,14 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 30/09/2026
-- **added**: un agente creato dalla dashboard descrivendo cosa deve fare si apre con la chat AI che ne sta gia' costruendo il flusso. La descrizione viaggia dalla creazione fino all'editor e il lavoro parte prima che la chat compaia, cosi' la chat si aggancia a qualcosa di gia' avviato e i blocchi si vedono nascere invece di apparire finiti
-- **added**: se la chat AI non e' raggiungibile o rifiuta la richiesta, la descrizione non va persa: viene rimessa davanti a chi l'ha scritta, pronta da incollare nella chat. L'agente resta creato in ogni caso
-- **changed**: una descrizione vale una volta sola e solo per l'agente a cui era destinata: ricaricare la pagina non fa ripartire una seconda costruzione sopra la prima, e una descrizione rimasta indietro da un tentativo interrotto viene ignorata invece di rimettersi in moto piu' tardi
-- **added**: mentre l'agente descritto viene costruito, sul canvas compare un avviso che lo dice e chiede di attendere, e sparisce quando la chat ha finito. Non compare per le modifiche chieste a voce nella chat, dove si vede gia' che sta lavorando
+# 1.40.16-rc8
+- **added**: while the described agent is being built the canvas says so and asks you to wait, and the message goes when the chat is done. It does not appear for edits asked in the chat, where the work is already visible
+
+# 1.40.16-rc7
+- **fixed**: *exists* and *does not exist* tell the truth about a variable set to null, and stay the same operator when the condition is reopened — *does not exist* used to read back as *is not defined*. A filter saved in the previous form is rewritten on the next save
+
 # 1.40.16-rc6
 - **changed**: the comparisons added in 1.40.16-rc5 stay in the reply filters only. The editor of filters saved earlier and the previous condition go back to the options they had, being evaluated another way
-- **fixed**: *exists* and *does not exist* tell the truth about a variable set to null, and stay the same operator when the condition is reopened — *does not exist* used to read back as *is not defined*. A filter saved in the previous form is rewritten on the next save
 
 # 1.40.16-rc5
 - **added**: an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
