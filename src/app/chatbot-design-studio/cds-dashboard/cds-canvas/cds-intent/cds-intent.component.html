@@ -230,6 +230,11 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-remove-human>
+
+                    <cds-action-remove-current-bot *ngSwitchCase="TYPE_ACTION.REMOVE_CURRENT_BOT"
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-remove-current-bot>
     
                     <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS" 
                         class="panel-response"

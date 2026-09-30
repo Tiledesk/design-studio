@@ -630,6 +630,7 @@
         "RemoveHumanScopeAll": "All human participants",
         "RemoveHumanRemoved": "Removed",
         "RemoveHumanError": "Error",
+        "RemoveCurrentBotEnd": "Removes this chatbot",
         "StartWebhook": "Start from webhook",
         "InfoStartWebhook": "Lets an external system start this chatbot with an HTTP call, exactly like a new widget conversation.",
         "InfoStartWebhookBranch": "Webhook starts set the variables webhook_http_method and payload: branch on them in the start flow to tell webhook and widget conversations apart.",
@@ -894,6 +895,7 @@
             "IfOnlineAgent": "If online agents",
             "InviteHuman": "Invite human",
             "RemoveHuman": "Remove human",
+            "RemoveCurrentBot": "Remove current bot",
             "Condition": "Condition",
             "ConditionElse": "Condition w/ else",
             "ConditionElseV2": "Condition w/ else V2",
@@ -995,6 +997,13 @@
             "InviteHuman": {
                 "TITLE": "Invite a human",
                 "DESCRIPTION": "Adds a platform user to the conversation while the chatbot keeps running. Place it right before the block that asks the question (e.g. Advanced reply with buttons) to wait for the human answer. Available only in conversations started by a webhook. If the invited human leaves, another available agent is invited; if nobody is available, the flow continues from No human available.",
+                "IMAGE": "",
+                "VIDEO_URL": "",
+                "DOC_URL": ""
+            },
+            "RemoveCurrentBot": {
+                "TITLE": "Remove the current bot",
+                "DESCRIPTION": "Removes this chatbot from the conversation. The conversation stays with the humans in it, and the flow ends here: nothing runs after this action. Typically placed after Invite human for a full handoff.",
                 "IMAGE": "",
                 "VIDEO_URL": "",
                 "DOC_URL": ""

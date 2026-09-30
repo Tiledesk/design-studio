@@ -121,6 +121,13 @@ export class ActionRemoveHuman extends Action {
     }
 }
 
+export class ActionRemoveCurrentBot extends Action {
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.REMOVE_CURRENT_BOT;
+    }
+}
+
 export class ActionOpenHours extends Action {
     slotId?: string;
     trueIntent: string;
