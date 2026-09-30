@@ -882,6 +882,7 @@
         "notMatches": "does not match regex",
         "startsWith": "starts with",
         "notStartsWith": "does not start with",
+        "startsWithIgnoreCase": "starts With Ignore Case",
         "endsWith": "ends with",
         "equalAsNumbers": "is equal to (number)",
         "notEqualAsNumbers": "is not equal to (number)",
