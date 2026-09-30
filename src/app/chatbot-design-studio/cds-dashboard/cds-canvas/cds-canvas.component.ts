@@ -565,7 +565,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         //this.controllerService.onStopTestItOut();
         this.logger.log('[CDS-CANVAS] CLOSE TEST IT OUT');
         this.IS_OPEN_PANEL_WIDGET = false;
-        //this.IS_OPEN_WIDGET_LOG = false;
+        // A stopped "Test webhook start" closes the logs panel it opened (the header still has
+        // webhookStartTest set while it emits this); the widget test keeps its logs panel open.
+        if(this.intentService.webhookStartTest){
+          this.IS_OPEN_WIDGET_LOG = false;
+        }
       }
     });
 
