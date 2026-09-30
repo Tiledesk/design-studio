@@ -1261,7 +1261,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const chatbot_id = this.id_faq_kb;
     const setPending = (v: boolean) => { this.startPointPending = v; this.changeDetectorRef.detectChanges(); };
     const flag = this.startPointPendingRef;
-    const result = await (async () => {
+    await (async () => {
       setPending(true);
       try {
         return await createStartPointBox({
@@ -1275,19 +1275,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
             this.closeExtraPanels();
             await this.intentService.saveNewIntent(block, null, null);
           },
-          removeBlock: (block) => this.intentService.deleteIntentNew(block),
+          removeBlock: (block) => this.intentService.rollbackNewIntent(block),
           upsert: (block, confirm) => this.webhookService.upsertStartPoint(chatbot_id, 'webhook', confirm ? { block_id: block.intent_id, confirm: true } : { block_id: block.intent_id }),
           confirmSwitch: () => this.confirmStartWebhookSwitch(),
           onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSCanvas.StartPointError'), 4, 'report_problem'),
-          onCreated: () => {}
+          onCreated: () => this.loadWebhook()
         }, 'webhook', pos);
       } finally {
         setPending(false);
       }
     })();
-    if (result === 'created') {
-      await this.loadWebhook();
-    }
   }
 
   private async confirmStartWebhookSwitch(): Promise<boolean> {

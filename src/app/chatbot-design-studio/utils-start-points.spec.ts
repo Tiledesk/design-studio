@@ -45,6 +45,7 @@ describe('utils-start-points', () => {
     expect(b.actions.length).toBe(1);
     expect((b.actions[0] as any)._tdActionType).toBe('intent');
     expect((b.actions[0] as any).intentName).toBe('');
+    expect((b.actions[0] as any)._tdActionId).toBeTruthy();
     expect(startPointTypeOf(b)).toBe('webhook');
   });
 
@@ -100,6 +101,18 @@ describe('utils-start-points', () => {
       await first;
       expect(calls.filter(c => c === 'save').length).toBe(1);
       expect(calls.filter(c => c === 'upsert').length).toBe(1);
+    });
+
+    it('stays pending until onCreated finishes, so a drop meanwhile does nothing', async () => {
+      let release;
+      deps.onCreated = () => new Promise<void>(r => release = r);
+      const first = createStartPointBox(deps, 'webhook', { x: 1, y: 2 });
+      await new Promise(r => setTimeout(r, 0));
+      expect(deps.pending.value).toBe(true);
+      expect(await createStartPointBox(deps, 'webhook', { x: 3, y: 4 })).toBe('busy');
+      release();
+      expect(await first).toBe('created');
+      expect(deps.pending.value).toBe(false);
     });
 
     it('a failed PUT removes the block again and reports the error', async () => {

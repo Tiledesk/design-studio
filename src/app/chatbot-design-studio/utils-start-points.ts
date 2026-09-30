@@ -1,5 +1,6 @@
 import { Observable, lastValueFrom } from 'rxjs';
 import { Intent } from 'src/app/models/intent-model';
+import { ActionIntentConnected } from 'src/app/models/action-model';
 import { TYPE_OF_MENU } from './utils';
 
 export const START_POINT_TYPES = ['web', 'webhook'];
@@ -46,7 +47,9 @@ export function createStartPointBlock(type: 'webhook', pos: { x: number, y: numb
   intent.attributes.start_point = type;
   intent.attributes.position = pos;
   intent.attributes.readonly = true;
-  intent.actions = [{ _tdActionType: 'intent', intentName: '' } as any];
+  const action = new ActionIntentConnected();
+  action.intentName = '';
+  intent.actions = [action];
   return intent;
 }
 
@@ -91,7 +94,8 @@ export interface StartPointBoxDeps {
   upsert: (block: Intent, confirm: boolean) => Observable<any>;
   confirmSwitch: () => Promise<boolean>;
   onError: (err?: any) => void;
-  onCreated: (block: Intent) => void;
+  /** awaited while the flag is still pending (e.g. reloading the webhook) */
+  onCreated: (block: Intent) => void | Promise<any>;
 }
 
 /**
@@ -130,7 +134,7 @@ export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhoo
       deps.onError(err);
       return 'failed';
     }
-    deps.onCreated(block);
+    await deps.onCreated(block);
     return 'created';
   } finally {
     deps.pending.value = false;

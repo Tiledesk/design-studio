@@ -1696,6 +1696,17 @@ export class IntentService {
     }
     
 
+    /** Removes a just-created block without leaving history: neither its save nor this delete can be undone */
+    public async rollbackNewIntent(intent: Intent){
+      try {
+        await this.deleteIntentNew(intent);
+      } finally {
+        this.arrayUNDO = this.arrayUNDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
+        this.arrayREDO = this.arrayREDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
+        this.setBehaviorUndoRedo();
+      }
+    }
+
     public deleteIntentAttributesConnectorByIntent(intentId, intent) {
       this.logger.log('[INTENT SERVICE] -> deleteIntentAttributesConnectorByIntent, ', intentId,  intent);
       const connectorsList = intent.attributes?.connectors;
