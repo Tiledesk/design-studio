@@ -7,17 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 30/09/2026
-- **added**: un agente creato dalla dashboard descrivendo cosa deve fare si apre con la chat AI che ne sta gia' costruendo il flusso. La descrizione viaggia dalla creazione fino all'editor e il lavoro parte prima che la chat compaia, cosi' la chat si aggancia a qualcosa di gia' avviato e i blocchi si vedono nascere invece di apparire finiti
-- **added**: se la chat AI non e' raggiungibile o rifiuta la richiesta, la descrizione non va persa: viene rimessa davanti a chi l'ha scritta, pronta da incollare nella chat. L'agente resta creato in ogni caso
-- **changed**: una descrizione vale una volta sola e solo per l'agente a cui era destinata: ricaricare la pagina non fa ripartire una seconda costruzione sopra la prima, e una descrizione rimasta indietro da un tentativo interrotto viene ignorata invece di rimettersi in moto piu' tardi
-
-# this branch 29/09/2026
-- **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare
-- **fixed**: negli agenti V3 il blocco che contiene la condizione a piu' casi non mostra piu' il proprio punto di uscita. Le sue uscite sono i casi e l'*altrimenti*: un collegamento partito dal blocco non verrebbe mai percorso. Era gia' cosi' e si era perso rimettendo insieme i branch
-- **changed**: la chat AI conosce la condizione a piu' casi e la usa quando le vie sono piu' di due, invece di incatenare una condizione per ramo. Sa anche cosa la fa sbagliare: l'ordine decide, un caso senza condizioni non scatta mai, e un confronto negativo messo presto rende irraggiungibile tutto il resto
-- **changed**: la chat AI non puo' piu' mettere in un agente precedente un'azione che esiste solo nell'editor V3: la richiesta viene rifiutata spiegando perche'. Modificare un'azione gia' presente resta possibile, per non lasciarla li' senza poterla piu' toccare
-- **fixed**: i casi scritti dalla chat ricevono l'identita' su cui pende il loro connettore anche quando la chat non la manda, e una destinazione che non esiste sul canvas viene rifiutata invece di essere salvata e cancellata in silenzio al primo aggiornamento
+# 1.40.16-rc5
+- **added**: an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
+- **changed**: when the AI chat cannot be reached the description is handed back instead of lost, and it is used once only: reloading the page does not start a second build
+- **added**: reply filters and conditions offer every comparison again — exists, does not contain, true/false, before and after a date, list contents and length — after 1.40.16-rc2 cut the picker down to 16
 
 # 1.40.16-rc4
 - **added**: system variable `voiceStreaming` (chatbot and voice agents) — true while voice is streaming, false otherwise
