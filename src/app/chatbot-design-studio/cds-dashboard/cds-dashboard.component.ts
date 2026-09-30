@@ -131,6 +131,43 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
    *  the run must exist first; started afterwards, it would have nobody to execute its tools and
    *  would sit waiting. If the runtime refuses, the agent exists all the same: the chat opens
    *  anyway and the user is handed their own text back rather than being left to rewrite it. */
+  /** True while the AI chat is building the agent that was just described in the dashboard.
+   *
+   *  Only that case, not every turn of the chat: someone typing into the chat can see it
+   *  working and does not need to be told. Someone who described an agent in another page and
+   *  landed on a canvas with three blocks on it has no idea why they are there, whether
+   *  anything is happening, or how long to wait. */
+  IS_BUILDING_FROM_PROMPT: boolean = false;
+  private buildingSubscription: Subscription;
+
+  /** Watches the chat until the build it was given comes to rest.
+   *
+   *  `idle` is the fact to wait for -- the chat says it once per turn, however the turn ended.
+   *  But the first status can arrive before the chat has joined the run that was started for
+   *  it, so an `idle` that no `busy` preceded means "not started yet", not "finished", and
+   *  taking the message down on it would hide it a moment before anything appeared.
+   *
+   *  The timeout is the other half: if the chat never reports anything -- an old build, a
+   *  failure the panel handles on its own -- a banner nobody can dismiss is worse than one
+   *  that leaves too early. */
+  private watchAgentBuild(): void {
+    const STOP_WAITING_AFTER_MS = 5 * 60 * 1000;
+    this.IS_BUILDING_FROM_PROMPT = true;
+    let seenBusy = false;
+
+    const stop = () => {
+      this.IS_BUILDING_FROM_PROMPT = false;
+      this.buildingSubscription?.unsubscribe();
+      this.changeDetectorRef.detectChanges();
+    };
+
+    this.buildingSubscription = this.agentChatHostService.status$.subscribe((state) => {
+      if (state === 'busy') { seenBusy = true; return; }
+      if (seenBusy) { stop(); }
+    });
+    setTimeout(() => { if (this.IS_BUILDING_FROM_PROMPT) { stop(); } }, STOP_WAITING_AFTER_MS);
+  }
+
   private async sendPendingAgentPrompt(): Promise<void> {
     const botId = this.dashboardService.selectedChatbot?._id;
     const pending = botId ? this.agentFromPromptService?.takePending(botId) : null;
@@ -147,6 +184,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
 
     try {
       await this.agentFromPromptService.startRun(this.dashboardService.projectID, pending);
+      this.watchAgentBuild();
     } catch (error) {
       this.logger.error('[CDS DSHBRD] agent from prompt: run not started', error);
       this.handBackAgentPrompt(pending.prompt);
@@ -239,6 +277,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // today only because the chat panel's own ngOnDestroy calls detach();
     // symmetry is what keeps it harmless.
     this.agentChatHostService.clearFlowNavigator();
+    this.buildingSubscription?.unsubscribe();
     if (this.subscriptionAgentChatPanel) {
       this.subscriptionAgentChatPanel.unsubscribe();
     }
