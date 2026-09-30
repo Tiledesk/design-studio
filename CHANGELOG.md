@@ -11,6 +11,7 @@
 - **added**: un agente creato dalla dashboard descrivendo cosa deve fare si apre con la chat AI che ne sta gia' costruendo il flusso. La descrizione viaggia dalla creazione fino all'editor e il lavoro parte prima che la chat compaia, cosi' la chat si aggancia a qualcosa di gia' avviato e i blocchi si vedono nascere invece di apparire finiti
 - **added**: se la chat AI non e' raggiungibile o rifiuta la richiesta, la descrizione non va persa: viene rimessa davanti a chi l'ha scritta, pronta da incollare nella chat. L'agente resta creato in ogni caso
 - **changed**: una descrizione vale una volta sola e solo per l'agente a cui era destinata: ricaricare la pagina non fa ripartire una seconda costruzione sopra la prima, e una descrizione rimasta indietro da un tentativo interrotto viene ignorata invece di rimettersi in moto piu' tardi
+- **added**: mentre l'agente descritto viene costruito, sul canvas compare un avviso che lo dice e chiede di attendere, e sparisce quando la chat ha finito. Non compare per le modifiche chieste a voce nella chat, dove si vede gia' che sta lavorando
 
 # this branch 29/09/2026
 - **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare

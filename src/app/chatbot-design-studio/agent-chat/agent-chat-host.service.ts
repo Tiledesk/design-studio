@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { IntentService } from '../services/intent.service';
@@ -84,6 +84,16 @@ export class AgentChatHostService {
    *  FlowOpsService will refuse (the entries describe the flow that is no
    *  longer open), so it must stop being offered. */
   public readonly flowSwitched$ = this.flowSwitchedSource.asObservable();
+
+  private statusSource = new BehaviorSubject<'busy' | 'idle'>('idle');
+  /** Whether the chat is working on a turn, as the chat itself reports it.
+   *
+   *  It is the only honest answer to "has the agent finished?": answering its
+   *  tool calls does not say, because it can read, patch, think and patch
+   *  again, and `idle` arrives once per turn however the turn ended --
+   *  completed, failed or cancelled. Anything built on timers instead gets
+   *  the long turns wrong, which are exactly the ones worth waiting for. */
+  public readonly status$ = this.statusSource.asObservable();
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
@@ -176,6 +186,7 @@ export class AgentChatHostService {
     // and the timers stay in charge.
     this.host.onStatus?.((state) => {
       this.logger.log('[AGENT-CHAT-HOST] stato della chat:', state);
+      this.statusSource.next(state);
       if (state === 'idle') { void this.flowOps.redrawAfterRun(); }
     });
 
@@ -394,6 +405,10 @@ export class AgentChatHostService {
   public detach(): void {
     this.host?.destroy();
     this.host = null;
+    // A chat that is gone is not working on anything. Without this, a panel torn
+    // down mid-turn would leave the last 'busy' standing and whoever watches it
+    // waiting for an 'idle' that can no longer arrive.
+    this.statusSource.next('idle');
   }
 
   /** The bare token for the chat's own config, stripped of the scheme

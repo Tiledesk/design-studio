@@ -371,6 +371,7 @@
     },
     "CDSAgentFromPrompt": {
         "SendFailedTitle": "La richiesta non è stata inviata alla chat AI",
-        "SendFailedText": "L'agente è stato creato, ma non è stato possibile inviare la descrizione. Incollala nella chat AI per costruire il flusso:"
+        "SendFailedText": "L'agente è stato creato, ma non è stato possibile inviare la descrizione. Incollala nella chat AI per costruire il flusso:",
+        "Building": "L'IA sta costruendo l'agente: i blocchi compaiono man mano. Ci vuole qualche istante."
     }
 }
