@@ -1,5 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { of } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -25,7 +27,8 @@ export class WebhookService {
   constructor(
     public appStorageService: AppStorageService,
     private readonly intentService: IntentService,
-    private readonly _httpClient: HttpClient
+    private readonly _httpClient: HttpClient,
+    private readonly readOnlyService: ReadOnlyService
   ) { }
 
   initialize(serverBaseUrl: string, projectId: string){
@@ -51,6 +54,8 @@ export class WebhookService {
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean, copilot: boolean){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     if(this.thereIsWebResponse === undefined){
       this.thereIsWebResponse = thereIsWebResponse;
     }
@@ -79,6 +84,8 @@ export class WebhookService {
   }
 
   regenerateWebhook(chatbot_id: string){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] regenerateWebhook');
     const httpOptions = {
@@ -95,6 +102,8 @@ export class WebhookService {
   }
 
   deleteWebhook(webhook_id: string){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.thereIsWebhook = false;
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] deleteWebhook');
@@ -137,6 +146,8 @@ export class WebhookService {
    * @returns 
    */
   updateWebhook(chatbot_id: string, thereIsWebResponse: boolean){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.logger.log('[WEBHOOK_URL.SERV] - thereIsWebResponse  ', thereIsWebResponse, this.thereIsWebResponse);
     if(this.thereIsWebResponse === undefined){
       this.thereIsWebResponse = thereIsWebResponse;
@@ -168,6 +179,8 @@ export class WebhookService {
    * @returns 
    */
   updateCopilotWebhook(chatbot_id: string, copilot: boolean){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.logger.log('[WEBHOOK_URL.SERV] - updateCopilotWebhook ', copilot);
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     const httpOptions = {
@@ -186,6 +199,8 @@ export class WebhookService {
   }
 
   preloadWebhook(webhook_id: string){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] preloadWebhook');
     const httpOptions = {
