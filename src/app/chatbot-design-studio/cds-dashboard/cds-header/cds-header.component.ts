@@ -29,7 +29,6 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
-import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
 
 const swal = require('sweetalert');
 
@@ -108,7 +107,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
-    private agentChatHostService: AgentChatHostService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -116,18 +114,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
   /** The button exists only where the feature is configured, exactly as
    *  connector base URLs gate the connector catalogue. */
-  get isAgentChatAvailable(): boolean {
-    return this.agentChatHostService.isConfigured();
-  }
-
-  get isAgentChatPanelOpen(): boolean {
-    return this.controllerService.isAgentChatPanelOpen;
-  }
-
-  onToggleAgentChat(){
-    this.controllerService.toggleAgentChatPanel();
-  }
-
   manageRouteChanges(){
     /** check INIT ROUTE */
     const urlWithoutParams = this.router.url.split('?')[0];

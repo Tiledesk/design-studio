@@ -7,6 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 01/10/2026
+- **changed**: a sinistra si apre una scheda per volta — chat AI, subagent, blocchi, azioni — scelte da linguette verticali appoggiate al bordo del flusso, visibili anche a pannello chiuso: sono anche il modo di riaprirlo. Ripremere la scheda che stai guardando la chiude e lascia tutto lo spazio al canvas, e riaprendo si torna su quella di prima. Aprendo un agente si parte sempre dalla chat
+- **changed**: le azioni non sono piu' un cassetto che compariva passando col mouse sul bordo del canvas, ma una scheda con la ricerca in cima e le categorie che si aprono al suo interno. Trascinarle sul flusso funziona come prima, e l'elenco non sparisce piu' mentre trascini
+- **added**: ogni azione ha una *i* che ne mostra la descrizione dopo un istante, e il riquadro resta aperto il tempo di raggiungerlo e premere il collegamento che contiene
+- **changed**: il pulsante della chat AI non e' piu' nell'intestazione: la chat si apre dalla sua linguetta, come le altre schede. Prima i due punti potevano raccontare cose diverse, e il pulsante restava li' anche a chat aperta
+- **changed**: i tre pannelli hanno ora le stesse misure, gli stessi colori e le stesse animazioni, decisi in un posto solo invece che copiati in tre: le righe erano di tre dimensioni diverse e i grigi non coincidevano
+- **fixed**: aprire e chiudere la chat AI non scatta piu' quando la conversazione e' piena. Il riquadro della conversazione veniva ridisegnato per intero a ogni fotogramma dell'animazione; ora si muove solo la finestra che lo mostra
+- **fixed**: aprendo un agente su cui erano state lasciate aperte due cose insieme, la sinistra si apre su una sola
+
 # this branch 29/09/2026
 - **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare
 - **fixed**: negli agenti V3 il blocco che contiene la condizione a piu' casi non mostra piu' il proprio punto di uscita. Le sue uscite sono i casi e l'*altrimenti*: un collegamento partito dal blocco non verrebbe mai percorso. Era gia' cosi' e si era perso rimettendo insieme i branch

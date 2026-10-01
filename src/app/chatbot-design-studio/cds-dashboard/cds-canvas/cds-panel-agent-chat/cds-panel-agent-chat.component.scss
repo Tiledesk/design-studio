@@ -16,7 +16,10 @@
   // the canvas, so the shadow only needs to read on the one edge that still
   // borders open canvas space.
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-  transition: width 0.2s ease-in-out;
+  // Curva di uscita: parte decisa e si posa, invece di accelerare e frenare. Un filo piu'
+  // lunga, perche' su una larghezza intera 0.2s si leggono come uno scatto.
+  transition: width 0.26s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: width;
 }
 
 :host(.isHidden) {
@@ -31,8 +34,13 @@
 // toward each new width on a 0.2s curve instead of tracking the cursor.
 :host(.is-resizing) { transition: none; }
 
+// Il contenuto tiene la sua larghezza mentre il pannello si stringe, e il pannello lo ritaglia
+// (overflow: hidden sopra). Con `width: 100%` l'iframe veniva ridisegnato a ogni fotogramma
+// dell'animazione -- ricalcolo di tutto il suo contenuto, non solo del bordo -- ed e' da li'
+// che veniva lo scatto quando la conversazione e' piena. Cosi' si muove solo la finestra.
 .agent-chat-panel, .agent-chat-frame {
-  width: 100%;
+  width: var(--agent-chat-width);
+  min-width: var(--agent-chat-width);
   height: 100%;
   border: 0;
 }

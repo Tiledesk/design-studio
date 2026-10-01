@@ -184,8 +184,12 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    border-radius: 6px;
-    min-height: 38px;
+    border-radius: var(--lp-row-radius, 6px);
+    min-height: var(--lp-row-height, 32px);
+    font-family: var(--lp-font, var(--font-family-poppins));
+    font-size: var(--lp-font-size, 13px);
+    color: var(--lp-text, #475467);
+    transition: background-color var(--lp-transition, .15s ease);
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.3s;
@@ -277,7 +281,8 @@
 }
 
 .intent:hover {
-    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    // Al posto dell'ombra, un fondo: la voce si accende restando nel piano del pannello.
+    background-color: var(--lp-hover-bg, #e0e3f1);
     opacity: 1;
 
     .delete-box {

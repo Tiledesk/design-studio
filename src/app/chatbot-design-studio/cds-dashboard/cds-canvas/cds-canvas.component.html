@@ -1,34 +1,11 @@
-<div class="cds-toggle-setting-sidebar-icon-right-wpr"
-    [class.is_opened]="IS_OPEN_INTENTS_LIST"
-    [class.past-agent-chat]="IS_AGENT_CHAT_OPEN && !IS_OPEN_INTENTS_LIST"
-    (click)="onToogleSidebarIntentsList()">
-    <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
-    <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
-    <mat-icon *ngIf="!IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_right" aria-hidden="true"></mat-icon>
-</div>
+<!-- La maniglia che riapriva il pannello chiuso non c'e' piu': quel lavoro lo fa la striscia
+     delle linguette, che resta visibile anche a pannello chiuso. Con entrambe si sarebbero
+     sovrapposte, e la maniglia doveva pure spostarsi oltre il bordo della chat per non finirle
+     sopra -- un calcolo che ora non serve piu' a nessuno. -->
 
-<div class="box-left" [class.is_closed]="!IS_OPEN_INTENTS_LIST">
+<div class="box-left" [class.is_closed]="!IS_BOX_LEFT_OPEN">
 
-    <!-- Tab: alterna Blocks / Subagents nello stesso slot (mutua esclusione via activeLeftPanel).
-         Visibili anche dentro un subagent (la lista mostra parent + subagent fratelli). -->
-    <div class="cds-left-panel-tabs" *ngIf="IS_OPEN_INTENTS_LIST">
-        <!-- Subagents non si restringe mai (--nowrap): l'etichetta deve leggersi
-             per intero. Blocks prende lo spazio che resta. -->
-        <button type="button" class="cds-left-panel-tab cds-left-panel-tab--nowrap"
-            [class.active]="activeLeftPanel === 'subagents'"
-            (click)="onSelectLeftPanel('subagents')">
-            <mat-icon class="cds-left-panel-tab-icon" svgIcon="groups" aria-hidden="true"></mat-icon>
-            <span class="cds-left-panel-tab-label">{{ 'CDSCanvas.Subagents' | translate }}</span>
-        </button>
-        <button type="button" class="cds-left-panel-tab"
-            [class.active]="activeLeftPanel === 'blocks'"
-            (click)="onSelectLeftPanel('blocks')">
-            <mat-icon class="cds-left-panel-tab-icon" svgIcon="block" aria-hidden="true"></mat-icon>
-            <span class="cds-left-panel-tab-label">{{ 'Blocks' | translate }}</span>
-        </button>
-    </div>
-
-    <cds-panel-intent-list *ngIf="activeLeftPanel === 'blocks'"
+    <cds-panel-intent-list *ngIf="activeLeftPanel === 'blocks' && IS_OPEN_INTENTS_LIST"
         id="cdsPanelIntentList"
         class="panel-intent-list"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST"
@@ -37,36 +14,66 @@
         (deleteIntent)="onDeleteIntent($event)">
     </cds-panel-intent-list>
 
-    <cds-panel-subagents *ngIf="activeLeftPanel === 'subagents'"
+    <cds-panel-subagents *ngIf="activeLeftPanel === 'subagents' && IS_OPEN_INTENTS_LIST"
         id="cdsPanelSubagents"
         class="panel-subagents"
         [IS_OPEN]="IS_OPEN_INTENTS_LIST">
     </cds-panel-subagents>
 
-    <div class="cds-toggle-setting-sidebar-icon-left-wpr"
-        [class.is_opened]="IS_OPEN_INTENTS_LIST"
-        (click)="onToogleSidebarIntentsList()">
-        <!-- <span *ngIf="IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_left</span> -->
-        <!-- <span *ngIf="!IS_OPEN_INTENTS_LIST" class="material-icons toggle-setting-sidebar-icon">chevron_right</span> -->
-        <mat-icon *ngIf="IS_OPEN_INTENTS_LIST" class="toggle-setting-sidebar-icon" svgIcon="chevron_left" aria-hidden="true"></mat-icon>
-    </div>
-</div>
-
-
-<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
-
-    <!-- Sits at #tds_container's own left edge (see .cds-panel-elements /
-         cds-panel-elements rule in the stylesheet) -- it used to need a
-         conditional +230px nudge to clear .box-left back when the container
-         spanned underneath the sidebar. The container is a real flex
-         sibling starting after .box-left (and the chat panel) now, so its
-         own left edge already is the visible edge in both states. -->
-    <cds-panel-elements class="cds-panel-elements"
+    <!-- La tavolozza delle azioni, ora una scheda come le altre invece di un cassetto agganciato
+         al bordo del canvas. Trascinare da qui allo stage continua a funzionare grazie al
+         collegamento esplicito fra le due liste: stando fuori da #tds_container non basta piu'
+         il cdkDropListGroup che le univa quando erano vicine. -->
+    <cds-panel-elements *ngIf="activeLeftPanel === 'actions' && IS_OPEN_INTENTS_LIST"
+        class="panel-actions"
+        [stageDropListId]="STAGE_DROP_LIST_ID"
         (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
         (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
     </cds-panel-elements>
 
+</div>
+
+
+
+
+<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
+
+    <!-- Le linguette, verticali, subito a destra del pannello e sempre visibili: sono anche il modo
+         di riaprire dopo aver chiuso, per questo non stanno dentro `.box-left`, che si stringe a
+         zero. Chiusa mostra la sola icona, quella attiva icona e nome. -->
+    <nav class="cds-left-rail" [class.is-booting]="leftPanelState.isBooting">
+        <button type="button" class="cds-left-rail__tab" *ngIf="IS_AGENT_CHAT_AVAILABLE"
+            [class.is-active]="isLeftTabVisible('chat')"
+            [attr.title]="'CDSCanvas.AgentChat' | translate"
+            (click)="onSelectLeftPanel('chat')">
+            <mat-icon class="cds-left-rail__icon" svgIcon="agent_chat" aria-hidden="true"></mat-icon>
+            <span class="cds-left-rail__label">{{ 'CDSCanvas.AgentChat' | translate }}</span>
+        </button>
+        <button type="button" class="cds-left-rail__tab"
+            [class.is-active]="isLeftTabVisible('subagents')"
+            [attr.title]="'CDSCanvas.Subagents' | translate"
+            (click)="onSelectLeftPanel('subagents')">
+            <mat-icon class="cds-left-rail__icon" svgIcon="groups" aria-hidden="true"></mat-icon>
+            <span class="cds-left-rail__label">{{ 'CDSCanvas.Subagents' | translate }}</span>
+        </button>
+        <button type="button" class="cds-left-rail__tab"
+            [class.is-active]="isLeftTabVisible('blocks')"
+            [attr.title]="'Blocks' | translate"
+            (click)="onSelectLeftPanel('blocks')">
+            <mat-icon class="cds-left-rail__icon" svgIcon="block" aria-hidden="true"></mat-icon>
+            <span class="cds-left-rail__label">{{ 'Blocks' | translate }}</span>
+        </button>
+        <button type="button" class="cds-left-rail__tab"
+            [class.is-active]="isLeftTabVisible('actions')"
+            [attr.title]="'CDSCanvas.Actions' | translate"
+            (click)="onSelectLeftPanel('actions')">
+            <mat-icon class="cds-left-rail__icon" svgIcon="bolt" aria-hidden="true"></mat-icon>
+            <span class="cds-left-rail__label">{{ 'CDSCanvas.Actions' | translate }}</span>
+        </button>
+</nav>
+
     <div #receiver_elements_dropped_on_stage cdkDropList
+        [id]="STAGE_DROP_LIST_ID"
         class="receiver-elements-dropped-on-stage"
         custom-attribute="tds_container" 
         (cdkDropListDropped)="onDroppedElementToStage($event)">

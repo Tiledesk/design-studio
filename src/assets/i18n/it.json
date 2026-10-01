@@ -299,7 +299,12 @@
       "Send": "Invia",
       "RemoveTag": "Rimuovi etichetta",
       "Tags": "Etichetta",
-      "TagsOptionalPlaceholder": "Digita un'etichetta e invia"
+      "TagsOptionalPlaceholder": "Digita un'etichetta e invia",
+      "AgentChat": "Chat AI",
+      "Actions": "Azioni",
+      "SearchAction": "Cerca un'azione",
+      "NoActionFound": "Nessuna azione trovata",
+      "ActionInfo": "Dettagli dell'azione"
     },
     "Name": "Nome",
     "Label": "Etichetta",

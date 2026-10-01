@@ -1,7 +1,8 @@
 <div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
     <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
-        cdkDropList [cdkDropListData]="menuItemsList">
+        cdkDropList [cdkDropListData]="menuItemsList"
+        [cdkDropListConnectedTo]="stageDropListId ? [stageDropListId] : []">
         
 
         <!-- <div [style.display]="isDragging?'block':'none'" class="menu-dragging">
@@ -20,7 +21,7 @@
 
 
         <div *ngIf="menuType === TYPE_OF_MENU.ACTION"
-            [style.display]="isDragging?'none':'block'" class="menu-dragging">
+            class="menu-dragging">
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
                 cdkDrag 
                 (cdkDragStarted)="onDragStarted($event, i)" 
@@ -31,7 +32,6 @@
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
                 <div class="actions-btns-wpr" #divAction
-                    (mouseover)="openInfo(divAction, item.value)" 
                     [attr.id]="'menu-trigger-' + i">
                     
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
@@ -43,18 +43,22 @@
                     <!-- <span *ngIf="item.value.badge" class="trigger-beta-badge" [class.deprecation-badge]="item.value.badge==='DEP'" [class.beta-badge]="item.value.badge==='beta'" [class.new-badge]="item.value.badge==='new'">{{item.value.badge}}</span> -->
                     <span *ngIf="item.value.badge" [class]="'trigger-beta-badge badge-' + item.value.badge">{{item.value.badge}}</span>
 
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                            <mat-icon class="svg-icon" svgIcon="drag_indicator" aria-hidden="true"></mat-icon>
-                            <!-- <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt=""> -->
-                        </button>
-                    </div>
+                    <!-- La descrizione si apre da qui e non passando sulla riga: la riga si
+                         trascina tutta, e un riquadro che compariva al solo passaggio finiva
+                         sopra a quello che si stava per prendere. -->
+                    <button type="button" class="action-info-btn"
+                        [attr.aria-label]="'CDSCanvas.ActionInfo' | translate"
+                        (mouseenter)="openInfo(divAction, item.value)"
+                        (mouseleave)="closeInfo()"
+                        (click)="$event.stopPropagation()">
+                        <mat-icon class="svg-icon" svgIcon="info" aria-hidden="true"></mat-icon>
+                    </button>
                 </div>
             </div>
         </div>
 
         <div *ngIf="menuType === TYPE_OF_MENU.EVENT" 
-            [style.display]="isDragging?'none':'block'" class="menu-dragging">
+            class="menu-dragging">
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
                 cdkDrag 
                 (cdkDragStarted)="onDragStarted($event, i)" 
@@ -83,9 +87,10 @@
     <!-- TOOLTIP FOR ACTION DOC -->
     <div #menuInfo id="menuInfo" 
         class="info-tooltip"
+        (mouseenter)="cancelCloseInfo()"
+        (mouseleave)="closeInfo()"
         [style.display]="isOpen?'block':'none'" 
-        [style.top.px]="positionMenu.y"
-        [style.left.px]="positionMenu.x">
+        [style.top.px]="positionMenu.y">
         <div class="tooltip-wrp">
             <div class="caret_tooltip"></div>
             <div class="info-tooltip-header">

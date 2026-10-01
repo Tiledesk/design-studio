@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { LeftPanelTab } from './left-panel-state.service';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -369,10 +370,12 @@ export class StageService {
    * l'id_faq_kb: con una chiave per-bot ogni navigazione ripartirebbe da 'blocks', che e'
    * esattamente il problema da risolvere.
    */
-  public getActiveLeftPanel(familyId: string): 'blocks' | 'subagents' | null {
+  public getActiveLeftPanel(familyId: string): LeftPanelTab | null {
     if (!familyId) { return null; }
     const value = this.appStorageService.getItem(this.LEFT_PANEL_KEY_PREFIX + familyId);
-    if (value === 'subagents' || value === 'blocks') { return value; }
+    if (value === 'subagents' || value === 'blocks' || value === 'chat' || value === 'actions') {
+      return value;
+    }
     // Nessuna preferenza salvata: null, non 'blocks'. Il chiamante deve poter
     // distinguere "l'utente ha scelto Blocks" da "l'utente non ha mai scelto",
     // altrimenti non e' possibile avere una tab di default al primo accesso.
@@ -421,7 +424,41 @@ export class StageService {
     }
   }
 
-  public saveActiveLeftPanel(familyId: string, panel: 'blocks' | 'subagents'){
+
+  /**
+   * Quale scheda mostrare a sinistra aprendo un agente, e se il pannello va aperto.
+   *
+   * La scheda si ricorda per **famiglia** (parent e suoi subagent) perche' navigando fra i due
+   * cambia l'id dell'agente, e ripartire ogni volta dalla scheda di default e' esattamente il
+   * fastidio da evitare. L'apertura invece si ricorda per **agente**: e' una scelta su quanto
+   * spazio dare al canvas di quel flusso.
+   *
+   * Converte anche le preferenze salvate quando i pannelli erano due booleani indipendenti e
+   * potevano essere aperti insieme. In quel caso vince la chat, che era il default di allora:
+   * senza questa conversione chi torna su un agente si ritroverebbe la scheda di default invece
+   * della sua.
+   */
+  public getLeftPanelSnapshot(familyId: string, agentId: string): { isOpen: boolean; activeTab: LeftPanelTab } {
+    const savedTab = this.getActiveLeftPanel(familyId);
+    let legacy: { agentChat: boolean; blocks: boolean } | null = null;
+    try {
+      legacy = this.getPanelsState(agentId);
+    } catch (error) {
+      // Una preferenza illeggibile vale quanto una che non c'e': si ricade sul default.
+      legacy = null;
+    }
+
+    if (savedTab) {
+      const isOpen = legacy ? (legacy.agentChat || legacy.blocks) : true;
+      return { isOpen, activeTab: savedTab };
+    }
+    if (legacy && legacy.agentChat) { return { isOpen: true, activeTab: 'chat' }; }
+    if (legacy && legacy.blocks) { return { isOpen: true, activeTab: 'blocks' }; }
+    if (legacy) { return { isOpen: false, activeTab: 'subagents' }; }
+    return { isOpen: true, activeTab: 'subagents' };
+  }
+
+  public saveActiveLeftPanel(familyId: string, panel: LeftPanelTab){
     if (!familyId) { return; }
     this.appStorageService.setItem(this.LEFT_PANEL_KEY_PREFIX + familyId, panel);
   }

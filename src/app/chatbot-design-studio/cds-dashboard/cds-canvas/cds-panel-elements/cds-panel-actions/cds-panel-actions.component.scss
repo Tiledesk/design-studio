@@ -5,7 +5,7 @@ $text-color: var(--blu);
 $icon-color: var(--gray-light-01);
 $text-hover-color: var(--blu);
 $icon-hover-color: var(--blu);
-$base-padding: 6px;
+$base-padding: 3px;
 
 :host{
     --tooltip-top-position: 0px;
@@ -14,7 +14,8 @@ $base-padding: 6px;
 #panel_actions_div{
     // position: absolute;
     padding: 0px;
-    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    // Niente ombra: era quella del cassetto sospeso sopra al canvas. Qui e' un pannello dentro
+    // la colonna di sinistra, e l'ombra lo faceva sembrare staccato da cio' che lo contiene.
     .menu-dragging,
     .coming-soon {
         overflow: hidden;
@@ -42,17 +43,27 @@ $base-padding: 6px;
 .actions-btns-wpr {
     // width: 136px; // dp
     width: 100%; // nk
-    height: 30px;
-    border-radius: 6px;
+    height: var(--lp-row-height, 32px);
+    border-radius: var(--lp-row-radius, 6px);
+    padding: var(--lp-row-padding, 0 8px);
+    gap: var(--lp-gap, 8px);
+    font-family: var(--lp-font, var(--font-family-poppins));
+    font-size: var(--lp-font-size, 13px);
+    color: var(--lp-text, #475467);
+    transition: background-color var(--lp-transition, .15s ease);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 5px;
-    padding: 0px 2px;
+    // Senza padding orizzontale: la riga parte e finisce col pannello.
+    padding: 0 0 0 4px;
     &:hover{
         cursor: -webkit-grab; 
         cursor: grab;
-        box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+        // Al posto dell'ombra, un fondo: la riga si accende restando nel piano del pannello
+        // invece di sollevarsene. Si legge anche dove un'ombra tenue sparisce, e scorrendo
+        // l'elenco non fa ballare le voci una dopo l'altra.
+        background-color: var(--lp-hover-bg, #e0e3f1);
 
         img{
             filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
@@ -245,13 +256,19 @@ $base-padding: 6px;
     margin: 0;
     position: absolute;
     top: 0px;
-    left: 85px;
+    // A filo con il bordo destro del pannello: lo scostamento di prima veniva dal cassetto
+    // sospeso, che era largo tutt'altro. Qui il pannello e' la colonna di sinistra, e un
+    // riquadro che parte piu' a destra scavalca la striscia delle linguette.
+    left: 100%;
     // border: 2px solid var(--gray-02);
 }
 
 
 // TOOLTIP ACTION INFO ICON : start
 .info-tooltip {
+    // Sopra alla striscia delle linguette (z-index 12): il riquadro esce dal pannello e le
+    // attraversa, e passarci sotto lo rendeva illeggibile proprio dove c'e' da leggere.
+    z-index: 30;
     background-color: var(--color-white-hex);
     color: white;
     font-size: 12px;
@@ -354,3 +371,36 @@ $base-padding: 6px;
         }
     }
 }
+
+
+/* Info della action: all'estrema destra della riga, al posto della vecchia maniglia di
+   trascinamento -- che non serviva piu', perche' si trascina tutta la riga.
+   Compare passando sulla riga, come nel V4: sempre visibile sarebbe una colonna di icone che
+   ripete la stessa cosa per ogni voce. */
+.action-info-btn {
+    flex: 0 0 auto;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #98a2b3;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s, background-color .15s, color .15s;
+
+    .svg-icon { width: 16px; height: 16px; }
+    ::ng-deep svg { width: 16px; height: 16px; fill: currentColor; }
+
+    &:hover { background: #eef2f6; color: var(--blu); }
+}
+
+.actions-btns-wpr:hover .action-info-btn { opacity: 1; }
+// Il puntatore puo' lasciare la riga per raggiungere il riquadro: finche' quello e' aperto la
+// "i" resta visibile, altrimenti sparirebbe sotto il puntatore a meta' strada.
+.action-info-btn:focus-visible { opacity: 1; }

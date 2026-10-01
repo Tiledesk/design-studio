@@ -152,9 +152,6 @@ cds-fulfillment {
      destro della chat. La misura viene dalla variabile e non da un numero fisso: la
      chat si ridimensiona trascinandola, e un 470px scritto a mano sarebbe giusto solo
      alla larghezza di fabbrica. */
-  &.past-agent-chat {
-    left: calc(var(--agent-chat-width) + 50px);
-  }
   top: 50%;
   z-index: 1050;
 }
@@ -195,6 +192,112 @@ cds-fulfillment {
 
 
 
+
+  /* Striscia verticale delle linguette.
+     Sta sopra al canvas, appoggiata al bordo sinistro del contenitore dello stage: cosi' resta
+     subito a destra del pannello aperto qualunque esso sia -- i blocchi, i subagent, le azioni
+     o la chat, che vive fuori dal canvas -- senza rubargli larghezza. */
+  .cds-left-rail {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    // Sopra al disegno del flusso (che sta fra 1 e 3) ma sotto a `.box-left`, che vale 10.
+    // `.box-right` non crea un contesto suo, quindi questo numero si confronta direttamente con
+    // quello del pannello: a 12 la striscia passava davanti al riquadro delle descrizioni, che
+    // dal pannello sporge proprio sopra di lei.
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    // Senza questo ogni linguetta prende la larghezza della piu' larga -- e' il valore
+    // predefinito di una colonna flessibile -- quindi aprendone una si allargavano tutte e
+    // sembravano aperte insieme. Ciascuna si misura da se'.
+    align-items: flex-start;
+    gap: 6px;
+    // Il canvas si trascina: la striscia non deve intercettare il puntatore dove non ha
+    // pulsanti, altrimenti si "inciampa" nella colonna invisibile fra una linguetta e l'altra.
+    pointer-events: none;
+
+    &.is-booting .cds-left-rail__tab { transition: none; }
+  }
+
+  .cds-left-rail__tab {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    height: 38px;
+    // Chiusa: quanto basta all'icona, uguale per tutte.
+    width: 41px;
+    padding: 0;
+    border: 1px solid var(--gray-light-02);
+    border-left: 0;
+    border-radius: 0 10px 10px 0;
+    background: #fff;
+    color: #667085;
+    font-family: var(--font-family-poppins);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 1px 1px 4px rgba(16, 24, 40, .08);
+    transition: background-color .18s, color .18s, box-shadow .18s, width .18s, padding .18s;
+
+    &:hover {
+      background: #f4f7fb;
+      color: var(--blu);
+      box-shadow: 2px 2px 8px rgba(16, 24, 40, .12);
+    }
+
+    // L'attiva si stacca dalle altre per colore pieno, non solo per sfumatura: in mezzo a un
+    // canvas chiaro una differenza di grigi non si vede.
+    // Aperta: si misura sul suo contenuto, icona piu' nome.
+    &.is-active {
+      width: auto;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 0 14px 0 10px;
+      background: var(--blu);
+      border-color: var(--blu);
+      color: #fff;
+      box-shadow: 2px 2px 10px rgba(33, 150, 243, .35);
+    }
+  }
+
+  .cds-left-rail__icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    ::ng-deep svg { width: 20px; height: 20px; fill: currentColor; }
+  }
+
+  // L'etichetta esiste solo sulla linguetta attiva: sulle altre direbbe quello che l'icona
+  // dice gia', occupando spazio sopra al flusso.
+  .cds-left-rail__label { display: none; }
+  .cds-left-rail__tab.is-active .cds-left-rail__label { display: inline; }
+
+  /* Le misure dei tre pannelli di sinistra, decise una volta sola.
+     Sono proprieta' personalizzate e non variabili Sass di proposito: ereditano lungo il DOM,
+     quindi attraversano l'incapsulamento degli stili dei componenti. Senza, servirebbe un
+     import in ognuno dei tre file e tre copie degli stessi numeri -- che e' esattamente il
+     modo in cui erano finiti a divergere (righe da 12, 13 e 14px, raggi 6 e 8). */
+  .box-left {
+    --lp-font: var(--font-family-poppins);
+    --lp-font-size: 13px;
+    --lp-font-size-sm: 11px;
+    --lp-row-height: 32px;
+    --lp-row-radius: 6px;
+    --lp-row-padding: 0 8px;
+    --lp-gap: 8px;
+    --lp-text: #475467;
+    --lp-text-muted: #98a2b3;
+    --lp-accent: var(--blu);
+    --lp-hover-bg: var(--blu-light-03, #e0e3f1);
+    --lp-transition: .15s ease;
+  }
+
   .box-left {
     width: $box-left-width;
     max-width: $box-left-width;
@@ -213,67 +316,6 @@ cds-fulfillment {
     // NB: niente overflow:hidden qui, altrimenti taglia il toggle handle che sporge a destra
     // (right: -11px). Il contenimento verticale è già gestito dal pannello (overflow-y:auto + min-height:0).
 
-    // Tab Blocks / Subagents (header condiviso dello slot sinistro)
-    .cds-left-panel-tabs {
-      flex: 0 0 auto;
-      display: flex;
-      gap: 4px;
-      padding: 10px 10px 4px;
-    }
-    .cds-left-panel-tab {
-      // Meta' larghezza ciascuna. Nei ~103px che ne risultano "Subagents" ci sta
-      // per intero solo riducendo font e padding: 12px + 4px di padding lasciano
-      // una quindicina di pixel di margine.
-      flex: 1 1 0;
-      min-width: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      height: 32px;
-      border: 0;
-      background: transparent;
-      padding: 0 4px;
-      font-family: var(--font-family-poppins);
-      font-size: 12px;
-      font-weight: 600;
-      color: #7d8a97;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color .2s, color .2s;
-      &:hover { background: #eef2f6; }
-      &.active { background: #fff; color: var(--blu); }
-
-      .cds-left-panel-tab-icon {
-        flex: 0 0 auto;
-        width: 18px;
-        height: 18px;
-        font-size: 18px;
-
-        // Alcuni asset (search.svg, man.svg...) portano fill="#FFFFFF" inchiodato
-        // e l'attributo sull'elemento vince sul color ereditato: senza questo
-        // l'icona resta bianca. Stesso rimedio gia' usato in cds-panel-intent-list.
-        ::ng-deep svg {
-          width: 18px;
-          height: 18px;
-          fill: currentColor;
-        }
-      }
-
-      // Subagents: l'etichetta non deve mai troncare (il font e' tarato apposta).
-      &.cds-left-panel-tab--nowrap .cds-left-panel-tab-label {
-        overflow: visible;
-        text-overflow: clip;
-      }
-
-      // Lo slot e' 230px per due tab: l'etichetta tronca invece di far crescere il pulsante.
-      .cds-left-panel-tab-label {
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
     .panel-subagents {
       position: relative;
       display: flex;

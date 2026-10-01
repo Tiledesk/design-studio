@@ -13,6 +13,17 @@ export class IconService {
 
   registerIcons(): void {
 
+    // Non c'erano, e un `svgIcon` che non esiste non solleva: disegna il nulla. La linguetta
+    // della chat e la "i" delle azioni restavano due cerchi vuoti, senza niente nel log.
+    this.matIconRegistry.addSvgIcon(
+      'info',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/info.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'agent_chat',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/agent_chat.svg')
+    );
+
     // ai prompt //
     this.matIconRegistry.addSvgIcon(
       'anthropic',

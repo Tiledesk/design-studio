@@ -9,6 +9,8 @@ import { IntentService } from '../../services/intent.service';
 import { StageService, DEFAULT_PANELS_STATE } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
+import { LeftPanelStateService, LeftPanelTab } from '../../services/left-panel-state.service';
+import { AgentChatHostService } from '../../agent-chat/agent-chat-host.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
@@ -102,15 +104,25 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   mapOfIntents = [];
   labelInfoLoading:string = 'Loading';
 
-  /** panel list of intent */
-  IS_OPEN_INTENTS_LIST: boolean = true;
+  /** panel list of intent
+   *
+   *  Appoggiate a LeftPanelStateService, non piu' campi di questo componente: la stessa
+   *  risposta -- cosa e' aperto a sinistra -- serve anche al dashboard, che ospita il pannello
+   *  della chat fuori dal canvas. Restano proprieta' per non toccare i punti che le leggono e
+   *  le scrivono, che sono parecchi e nessuno dei quali cambia comportamento.
+   */
+  get IS_OPEN_INTENTS_LIST(): boolean { return this.leftPanelState.isOpen; }
+  set IS_OPEN_INTENTS_LIST(value: boolean) {
+    if (value) { this.leftPanelState.open(); } else { this.leftPanelState.close(); }
+  }
 
   /**
    * Pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab).
    * Default 'subagents': e' la tab che si apre quando l'agente non ha ancora una preferenza
    * salvata. Se l'utente ne ha scelta una, vince la sua (vedi resolveActiveLeftPanel).
    */
-  activeLeftPanel: 'blocks' | 'subagents' = 'subagents';
+  get activeLeftPanel(): LeftPanelTab { return this.leftPanelState.activeTab; }
+  set activeLeftPanel(value: LeftPanelTab) { this.leftPanelState.hydrate({ activeTab: value }); }
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -201,6 +213,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly stageService: StageService,
     private readonly connectorService: ConnectorService,
     private readonly controllerService: ControllerService,
+    public readonly leftPanelState: LeftPanelStateService,
+    private readonly agentChatHostService: AgentChatHostService,
     private readonly translate: TranslateService,
     public dashboardService: DashboardService,
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -1255,14 +1269,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- // 
 
   /** onToogleSidebarIntentsList */
-  /** La chat AI occupa la sinistra: con i blocchi chiusi il pulsante che li riapre va
-   *  spostato oltre il bordo destro della chat, altrimenti finisce sopra la
-   *  conversazione. Letto a ogni giro di rilevamento delle modifiche, perche' la chat
-   *  si apre e si chiude mentre il canvas resta montato. */
-  get IS_AGENT_CHAT_OPEN(): boolean {
-    return this.controllerService.isAgentChatPanelOpen;
-  }
-
   onToogleSidebarIntentsList() {
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ')
     this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
@@ -1296,13 +1302,49 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.activeLeftPanel = saved ? saved : 'subagents';
   }
 
-  /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
-  onSelectLeftPanel(panel: 'blocks' | 'subagents') {
-    this.activeLeftPanel = panel;
-    this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), panel);
-    if (!this.IS_OPEN_INTENTS_LIST) {
+  /** L'identita' della lista che riceve le azioni rilasciate sullo stage.
+   *
+   *  Serve perche' la tavolozza ora sta fuori da #tds_container: il cdkDropListGroup collegava
+   *  le due liste finche' erano nello stesso sottoalbero, e fuori di li' il collegamento va
+   *  dichiarato per nome. Sta qui, in una costante sola, perche' le due parti devono
+   *  necessariamente concordare e una stringa ripetuta due volte prima o poi diverge. */
+  readonly STAGE_DROP_LIST_ID = 'cdsStageDropList';
+
+  /** Vero se quella linguetta e' quella che si sta guardando: pannello aperto E scheda attiva. */
+  isLeftTabVisible(tab: LeftPanelTab): boolean {
+    return this.leftPanelState.isTabVisible(tab);
+  }
+
+  /** La chat ha una linguetta solo dove esiste: senza indirizzo configurato non c'e' niente da
+   *  aprire, e una linguetta che non apre nulla e' peggio di una linguetta in meno. */
+  get IS_AGENT_CHAT_AVAILABLE(): boolean {
+    return !!this.agentChatHostService?.isConfigured?.();
+  }
+
+  /** Lo slot dentro il canvas si apre solo per le schede che vivono qui.
+   *
+   *  Quando la scheda attiva e' la chat, il pannello sta nel dashboard, fuori dal canvas: se
+   *  `box-left` restasse largo, resterebbe una colonna vuota fra la chat e le linguette. */
+  get IS_BOX_LEFT_OPEN(): boolean {
+    return this.leftPanelState.isOpen && this.leftPanelState.activeTab !== 'chat';
+  }
+
+  /** Apre la scheda; se era gia' quella aperta, chiude tutto e lascia la striscia.
+   *
+   *  E' lo stesso gesto della freccia di prima, spostato sulla linguetta: chi vuole tutto lo
+   *  spazio per il canvas ripreme quella che sta guardando. */
+  onSelectLeftPanel(panel: LeftPanelTab) {
+    if (this.leftPanelState.isTabVisible(panel)) {
       this.onToogleSidebarIntentsList();
+      return;
     }
+    this.leftPanelState.selectTab(panel);
+    // La scelta si ricorda solo per le schede che hanno una preferenza per famiglia; le altre
+    // arrivano qui senza che ci sia niente da salvare.
+    if (panel === 'blocks' || panel === 'subagents') {
+      this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), panel);
+    }
+    this.stageService.savePanelState(this.id_faq_kb, 'blocks', true);
   }
 
   /** onDroppedElementToStage **

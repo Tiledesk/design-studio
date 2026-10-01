@@ -8,6 +8,17 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+
+/** Quanto resta aperto il riquadro dopo che il puntatore ha lasciato la riga: il tempo di
+ *  raggiungerlo per premere il collegamento che contiene. */
+const CLOSE_INFO_DELAY_MS = 400;
+
+/** Quanto bisogna restare sulla "i" perche' la descrizione compaia.
+ *
+ *  Il puntatore attraversa quella colonna ogni volta che si scorre l'elenco: senza attesa il
+ *  riquadro sbatterebbe aperto e chiuso una voce dopo l'altra. Un secondo e' il tempo di una
+ *  intenzione, non di un passaggio. */
+const OPEN_INFO_DELAY_MS = 1000;
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -17,6 +28,13 @@ import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 })
 export class CdsPanelActionsComponent implements OnInit {
   @ViewChild('action_list_drop_connect') actionListDropConnect: CdkDropList;
+
+  /** La lista che riceve i rilasci sullo stage.
+   *
+   *  La tavolozza sta fuori dal contenitore dello stage, quindi il cdkDropListGroup non le
+   *  unisce piu': il collegamento va dichiarato, altrimenti si puo' trascinare un'azione e non
+   *  succede niente -- senza errori, che e' il modo peggiore in cui una cosa puo' non funzionare. */
+  @Input() stageDropListId: string;
 
   @Input() actionsList: Array<any>;
   @Input() menuType: string;
@@ -34,6 +52,8 @@ export class CdsPanelActionsComponent implements OnInit {
   indexDrag: number;
 
   hoveredElement: any;
+  private closeInfoTimer: any = null;
+  private openInfoTimer: any = null;
   positionMenu: any = {'x': 200, 'y': 0 };
   isOpen: boolean = false;
   // dropList: CdkDropList;
@@ -146,21 +166,60 @@ export class CdsPanelActionsComponent implements OnInit {
       return; 
     } 
 
-    setTimeout(() => {
+    this.cancelCloseInfo();
+    // Se il riquadro e' gia' aperto su un'altra voce passa subito a questa: l'attesa serve a
+    // non aprirlo per sbaglio, non a rallentare chi lo sta gia' leggendo.
+    clearTimeout(this.openInfoTimer);
+    this.openInfoTimer = setTimeout(() => {
       this.hoveredElement = element;
       //this.menuTrigger.openMenu();
       // let x = e.offsetLeft;
       let y = e.offsetTop;
       this.isOpen = true;
-      this.positionMenu = {'x': 200, 'y': y }
-    }, 0);
+      // Solo l'altezza: il lato lo decide il foglio di stile (`left: 100%`), cosi' il riquadro
+      // resta a filo col pannello anche se il pannello cambia larghezza. Uno stile in linea
+      // avrebbe la precedenza e inchioderebbe quella misura a un numero scritto qui.
+      this.positionMenu = {'x': 0, 'y': y }
+      this.openInfoTimer = null;
+    }, this.isOpen ? 0 : OPEN_INFO_DELAY_MS);
   }
 
+  /** Chiude il riquadro, ma non subito.
+   *
+   *  Dentro c'e' un collegamento da premere, e per premerlo il puntatore deve lasciare la riga
+   *  e attraversare il vuoto fra la riga e il riquadro: chiudendo all'istante il riquadro
+   *  sparirebbe proprio mentre lo si sta raggiungendo. Entrando nel riquadro la chiusura viene
+   *  annullata, cosi' resta aperto finche' serve. */
   closeInfo() {
     if(!BRAND_BASE_INFO['DOCS']){
       return;
     }
-    setTimeout(() => {this.isOpen = false;},0)
+    // Uscendo prima che sia comparso, l'apertura in attesa si annulla: altrimenti il riquadro
+    // si aprirebbe un secondo dopo, su una voce che il puntatore ha gia' lasciato.
+    clearTimeout(this.openInfoTimer);
+    this.openInfoTimer = null;
+    this.cancelCloseInfo();
+    this.closeInfoTimer = setTimeout(() => {
+      this.isOpen = false;
+      this.hoveredElement = null;
+      this.closeInfoTimer = null;
+    }, CLOSE_INFO_DELAY_MS);
+  }
+
+  /** Il puntatore e' arrivato sul riquadro: la chiusura in corso si annulla. */
+  cancelCloseInfo() {
+    if (this.closeInfoTimer) {
+      clearTimeout(this.closeInfoTimer);
+      this.closeInfoTimer = null;
+    }
+  }
+
+  /** Chiude senza aspettare: serve quando parte un trascinamento o si cambia categoria. */
+  closeInfoNow() {
+    clearTimeout(this.openInfoTimer);
+    this.openInfoTimer = null;
+    this.cancelCloseInfo();
+    this.isOpen = false;
     this.hoveredElement = null;
   }
 
@@ -168,7 +227,7 @@ export class CdsPanelActionsComponent implements OnInit {
     this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
     this.controllerService.closeActionDetailPanel();
     this.isDragging = true;
-    this.isOpen = false;
+    this.closeInfoNow();
     this.indexDrag = currentIndex;
     
     this.isDraggingMenuElement.emit(this.isDragging);

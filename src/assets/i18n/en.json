@@ -744,7 +744,12 @@
         "IterableAttribute": "Iterable attribute",
         "IteratableAttributeDescription": "The attribute that will be used to iterate over the data",
         "AssignOutputTo": "Assign output to",
-        "AssignOutputToDescription": "The attribute that will be used to assign the output"
+        "AssignOutputToDescription": "The attribute that will be used to assign the output",
+        "AgentChat": "AI Chat",
+        "Actions": "Actions",
+        "SearchAction": "Search an action",
+        "NoActionFound": "No action matches your search",
+        "ActionInfo": "Action details"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",

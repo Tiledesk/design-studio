@@ -21,30 +21,30 @@ export class CdsPanelElementsComponent implements OnInit {
   @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
 
 
-  @Output() addNewElement = new EventEmitter();
+    /** La lista che riceve i rilasci sullo stage, da collegare alla tavolozza. */
+  @Input() stageDropListId: string;
+
+@Output() addNewElement = new EventEmitter();
   // @Output() showPanelActions = new EventEmitter();
   @Output() onMouseOverActionMenuSx = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
-  isOpen: boolean = false;
-  isOverMenu: boolean = false;
-  positionMenu: any = {'x': 85, 'y': 0 };
   isDraggingMenuElement: boolean = false;
-  menuType: string;
-  menuCategory: string;
   TYPE_OF_MENU = TYPE_OF_MENU;
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   ACTION_CATEGORY = ACTION_CATEGORY;
+  // Il menu a comparsa che si apriva passando sulle categorie non esiste piu': la tavolozza e'
+  // un pannello, e le categorie si aprono al suo interno. Con lui se ne sono andati i campi che
+  // ne tenevano posizione e stato, e i cinque metodi che li muovevano.
 
   actionsByCategory = {};
-  actionsList: Array<any> = [];
   
   private readonly logger: LoggerService = LoggerInstance.getInstance();
-  actionCategory: any;
   
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -57,35 +57,9 @@ export class CdsPanelElementsComponent implements OnInit {
 
   onDraggingMenuElement(event) {
     this.isDraggingMenuElement = event;
-    if (event === true) {
-      this.isOpen = false;
-    }
-  } 
+  }
 
-  onOpenMenu(e, type, category?: string) {
-    this.onMouseOverActionMenuSx.emit(true)
-    setTimeout(() => {
-      this.menuType = type;
-      this.menuCategory = category;
-      this.actionsList = this.actionsByCategory[category];
-      // this.menuTrigger.openMenu();
-      // let x = e.offsetLeft;
-      let y = e.offsetTop;
-      this.isOpen = true;
-      if(this.isDraggingMenuElement === false){
-        this.positionMenu = {'x': 85, 'y': y }
-      }
-    }, 0);
-  }
   
-  onCloseMenu() {
-    // this.menuTrigger.closeMenu();
-    setTimeout(() => {
-      if(this.isOverMenu == false && this.isDraggingMenuElement == false){
-        this.isOpen = false;
-      }
-    }, 0);
-  }
 
   // onMouseOverElement(e){
   //   // let pos = {'x': e.target.offsetLeft+e.target.offsetWidth+20, 'y': e.target.offsetTop+12 }
@@ -97,26 +71,59 @@ export class CdsPanelElementsComponent implements OnInit {
   //   // this.showPanelActions.emit(pos);
   // }
 
-  onAddNewElement(){
-    // this.addNewElement.emit();
+
+
+
+
+
+
+  /** Testo cercato; vuoto significa nessun filtro. */
+  searchText: string = '';
+
+  /** Le categorie aperte. La prima che ha azioni si apre da sola: un pannello che si apre
+   *  tutto chiuso costringe a un clic in piu' per vedere qualunque cosa. */
+  private openCategories = new Set<string>();
+
+  /** Le azioni di una categoria che passano il filtro, gia' pronte per il pannello.
+   *
+   *  Il confronto e' sull'etichetta tradotta e non sulla chiave: chi cerca "risposta" non sa
+   *  che dentro si chiama `reply`. */
+  visibleActions(categoryType: string): Array<any> {
+    const all = this.actionsByCategory[categoryType] || [];
+    const needle = (this.searchText || '').trim().toLowerCase();
+    if (!needle) { return all; }
+    return all.filter(item => {
+      const key = item?.value?.name || '';
+      let label = key;
+      try { label = this.translate.instant(key) || key; } catch (e) { /* chiave senza traduzione */ }
+      return String(label).toLowerCase().includes(needle) || String(key).toLowerCase().includes(needle);
+    });
   }
 
-  onOverMenu(){
-    this.isOverMenu = true;
+  hasAnyVisible(): boolean {
+    return ACTION_CATEGORY.some(c => this.visibleActions(c.type).length > 0);
   }
 
-  onLeaveMenu(){
-    this.isOverMenu = false;
-    this.onCloseMenu();
+  isCategoryOpen(categoryType: string): boolean {
+    // Cercando si aprono tutte: nascondere i risultati dietro un clic vanificherebbe la ricerca.
+    if ((this.searchText || '').trim()) { return true; }
+    return this.openCategories.has(categoryType);
   }
 
-  onIsDraggingMenuElement(event: boolean){
-    this.isDraggingMenuElement = event;
-    if(event === false){
-      this.onCloseMenu();
-    }
+  toggleCategory(categoryType: string): void {
+    if (this.openCategories.has(categoryType)) { this.openCategories.delete(categoryType); }
+    else { this.openCategories.add(categoryType); }
   }
 
+  onSearchChange(): void { /* il filtro e' letto dal template: qui non serve altro */ }
+
+  clearSearch(): void { this.searchText = ''; }
+
+  /** Apre la prima categoria che ha qualcosa da mostrare. */
+  private openFirstCategory(): void {
+    const first = ACTION_CATEGORY.find(c => (this.actionsByCategory[c.type] || []).length > 0);
+    if (first) { this.openCategories.add(first.type); }
+  }
 
   createActionListByCategory(){
     const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
@@ -139,6 +146,7 @@ export class CdsPanelElementsComponent implements OnInit {
       this.logger.log('[CDS-PANEL-ELEMENTS] menuItemsList:: ', category.type, menuItemsList);
     });
     this.logger.log('[CDS-PANEL-ELEMENTS] actionsByCategory:: ', this.actionsByCategory);
+    this.openFirstCategory();
   }
 
 }

@@ -39,6 +39,7 @@ import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
 import { IntentService } from '../services/intent.service';
+import { LeftPanelStateService, LeftPanelTab } from '../services/left-panel-state.service';
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -57,7 +58,11 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   /** panel agent chat -- mounted here (not in cds-canvas) so it survives a
    *  canvas rebuild on flow switch; see cds-dashboard.component.html. */
   private subscriptionAgentChatPanel: Subscription;
-  IS_OPEN_PANEL_AGENT_CHAT: boolean = false;
+  /** La chat e' una delle schede di sinistra: e' visibile quando e' lei quella attiva.
+   *  Il pannello resta montato comunque -- vedi il commento nel template. */
+  get IS_OPEN_PANEL_AGENT_CHAT(): boolean {
+    return this.leftPanelState.isTabVisible('chat');
+  }
 
   /** Gates the chat panel to the blocks section. It reads only the URL's last
    *  segment, which a flow switch leaves as 'blocks', so it cannot flicker
@@ -112,7 +117,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly controllerService: ControllerService,
     private readonly agentChatHostService: AgentChatHostService,
     private readonly intentService: IntentService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    // In coda di proposito: agent-chat-flow-switch.spec.ts costruisce il componente a mano con
+    // argomenti posizionali, quindi i servizi aggiunti dopo vanno appesi qui e non in mezzo.
+    private readonly leftPanelState: LeftPanelStateService
   ) {
     this.manageRouteChanges();
   }
@@ -170,7 +178,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
     this.subscriptionAgentChatPanel = this.controllerService.isOpenAgentChatPanel$
       .subscribe((isOpen: boolean) => {
-        this.IS_OPEN_PANEL_AGENT_CHAT = isOpen;
+        // Il canale resta per i punti che aprono la chat da fuori (l'intestazione, la
+        // creazione da descrizione): ora muove la scheda attiva invece di un booleano suo.
+        if (isOpen) { this.leftPanelState.selectTab('chat'); }
+        else if (this.leftPanelState.activeTab === 'chat') { this.leftPanelState.close(); }
         // Si salva qui e non su ogni pulsante che apre o chiude: questo e' il punto in
         // cui lo stato cambia davvero, quindi un domani anche un pulsante nuovo viene
         // ricordato senza che nessuno se ne debba occupare.
@@ -205,28 +216,39 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
    *  With no preference stored for this agent the chat opens -- that is the state you
    *  start building a flow in. */
   private restoreAgentChatPanel(): void {
-    if (!this.agentChatHostService.isConfigured?.()) { return; }
+    const current: any = this.dashboardService.selectedChatbot;
+    const familyId = current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+    const canChat = !!this.agentChatHostService.isConfigured?.();
 
-    // Una preferenza che non si riesce a leggere vale quanto una che non c'e': si
-    // ricade sul default e si va avanti. Il contrario -- rinunciare ad aprire la chat
-    // perche' lo storage ha protestato -- sarebbe un guasto travestito da scelta.
-    let shouldOpen = DEFAULT_PANELS_STATE.agentChat;
-    try {
-      const stored = this.stageService?.getPanelsState?.(this.dashboardService.id_faq_kb);
-      if (stored) { shouldOpen = stored.agentChat; }
-    } catch (error) {
-      this.logger.error('[CDS DSHBRD] could not read the panels state', error);
+    // Chiamata facoltativa, come le altre su questo servizio: una preferenza che non si riesce a
+    // leggere vale quanto una che non c'e'. Rinunciare ad aprire la sinistra perche' la memoria
+    // non ha risposto sarebbe un guasto travestito da scelta.
+    let snapshot: { isOpen: boolean; activeTab: LeftPanelTab } =
+      this.stageService?.getLeftPanelSnapshot?.(familyId, this.dashboardService.id_faq_kb)
+      || { isOpen: true, activeTab: 'chat' };
+
+    // Al caricamento della pagina si parte sempre dalla chat: e' da li' che si comincia a
+    // lavorare a un flusso, e ritrovarsi sull'ultima scheda aperta giorni prima non aiuta.
+    // `isBooting` e' vero solo per il primo giro: passando da un flusso all'altro senza
+    // ricaricare questa funzione viene richiamata, e li' la scheda scelta deve restare.
+    if (this.leftPanelState.isBooting && canChat) {
+      snapshot = { isOpen: true, activeTab: 'chat' };
     }
 
-    if (shouldOpen) {
-      this.controllerService.openAgentChatPanel();
-    } else {
-      this.controllerService.closeAgentChatPanel?.();
+    // Dove la chat non e' configurata quella scheda non esiste, e una preferenza che la nomina
+    // lascerebbe la sinistra ferma su una scheda che nessuna linguetta puo' riaprire.
+    if (snapshot.activeTab === 'chat' && !canChat) {
+      snapshot = { isOpen: snapshot.isOpen, activeTab: 'blocks' };
     }
+
+    this.leftPanelState.hydrate(snapshot);
+    this.leftPanelState.finishBoot();
   }
 
   onCloseAgentChat(): void {
-    this.controllerService.closeAgentChatPanel();
+    this.leftPanelState.close();
   }
 
   /** Open another flow of this family without reloading the page.
