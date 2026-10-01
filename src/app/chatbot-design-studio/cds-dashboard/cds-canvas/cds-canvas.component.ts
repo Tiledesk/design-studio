@@ -343,8 +343,18 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // dentro `<id>_stage` e default aperto. Ora la regola e' una sola per tutti, e la
     // vecchia preferenza non si legge piu': due sorgenti per la stessa domanda, con
     // default opposti, sono esattamente cio' che questa chiave toglie.
-    const panels = this.stageService.getPanelsState(this.id_faq_kb);
-    this.IS_OPEN_INTENTS_LIST = panels ? panels.blocks : DEFAULT_PANELS_STATE.blocks;
+    //
+    // In V3 no: la sinistra la decide il dashboard, come in ngOnInit. E qui il danno era
+    // peggiore, perche' questa riga arriva DOPO il primo disegno e aveva l'ultima parola su
+    // tutti. Il valore che applica e' una preferenza nata quando questo flag voleva dire
+    // "l'elenco dei blocchi e' aperto" e conviveva con la chat; oggi vuol dire "la sinistra e'
+    // aperta", e il suo default -- blocchi chiusi -- chiude l'intero pannello. Su un agent
+    // senza preferenze, come un subagent appena creato, era l'unico esito possibile: lo stage
+    // si ricostruiva con tutte le schede chiuse.
+    if (!this.dashboardService.isV3) {
+      const panels = this.stageService.getPanelsState(this.id_faq_kb);
+      this.IS_OPEN_INTENTS_LIST = panels ? panels.blocks : DEFAULT_PANELS_STATE.blocks;
+    }
     // this.stageService.initStageSettings(this.id_faq_kb);
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();

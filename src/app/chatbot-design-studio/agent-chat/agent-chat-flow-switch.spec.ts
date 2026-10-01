@@ -19,6 +19,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { CdsDashboardComponent } from '../cds-dashboard/cds-dashboard.component';
 import { LeftPanelStateService } from '../services/left-panel-state.service';
 import { StageService } from '../services/stage.service';
+import { CdsPanelSubagentsComponent } from '../cds-dashboard/cds-canvas/cds-panel-subagents/cds-panel-subagents.component';
 
 /** Standing in for CdsCanvasComponent: all this test needs from it is that it
  *  is created and destroyed by the router outlet, which is a property of the
@@ -823,6 +824,83 @@ describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un a
 // Sta in questo file, e non in uno suo, perche' il caricatore dei test prende solo i file che
 // si chiamano agent-chat* o flow-ops*: uno spec chiamato per il suo servizio non verrebbe mai
 // eseguito, che e' peggio che averlo altrove.
+// Il percorso vero, dal clic su "nuovo subagent" fino al canvas ricostruito: il pannello crea,
+// si sposta sul subagent appena fatto, e la scheda sotto gli occhi deve restare la sua.
+describe('Creare un subagent — la scheda dei subagent resta aperta', () => {
+
+  function build(isV3: boolean) {
+    const leftPanelState = new LeftPanelStateService();
+    leftPanelState.finishBootNow();   // l'avvio e' passato: qui si crea, non si apre lo studio
+    const dashboardService: any = {
+      projectID: 'p1',
+      id_faq_kb: 'kb1',
+      isV3,
+      selectedChatbot: { _id: 'kb1', name: 'Parent' },
+      getBotById: () => Promise.resolve(true)
+    };
+    const dashboard = makeDashboard({
+      dashboardService,
+      leftPanelState,
+      stageService: {
+        // Direbbe "riapri la chat": e' la preferenza salvata su questo agente, e creando un
+        // subagent non deve avere voce.
+        getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'chat' }),
+        savePanelState: () => {}
+      },
+      agentChatHostService: {
+        setFlowNavigator: () => {}, clearFlowNavigator: () => {}, isConfigured: () => true
+      },
+      intentService: { getAllIntents: () => Promise.resolve(true) },
+      router: {
+        url: '/project/p1/chatbot/kb1/blocks',
+        events: new Subject(),
+        navigate: (commands: any[]) => { dashboardService.id_faq_kb = commands[3]; return Promise.resolve(true); }
+      }
+    });
+    // Il navigatore che il dashboard pubblica in ngOnInit: e' la strada che il pannello prende.
+    dashboardService.openFlow = (id: string) => dashboard.openFlow(id);
+
+    const panel = new (CdsPanelSubagentsComponent as any)(
+      { open: () => ({ afterClosed: () => of({ _id: 'kb2', name: 'Nuovo' }) }) },
+      { getAllBotsByProjectId: () => of([]), getBotById: () => of({ name: 'Parent' }) },
+      dashboardService,
+      { get: () => of('') },
+      { showWidgetStyleUpdatedNotification: () => {} },
+      { rootId: () => 'kb1' },
+      leftPanelState,
+      { saveActiveLeftPanel: () => {} }
+    );
+    panel.currentId = 'kb1';
+    panel.familyParentId = 'kb1';
+    return { panel, leftPanelState, dashboardService };
+  }
+
+  async function attendiLoSpostamento(): Promise<void> {
+    // openFlow attraversa piu' promise prima di ricostruire il canvas.
+    for (let i = 0; i < 10; i++) { await Promise.resolve(); }
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
+
+  it('in V3 resta sui subagent, anche se la preferenza salvata direbbe la chat', async () => {
+    const { panel, leftPanelState, dashboardService } = build(true);
+    leftPanelState.selectTab('subagents');
+    panel.onNewSubagent();
+    await attendiLoSpostamento();
+    expect(dashboardService.id_faq_kb).toBe('kb2');
+    expect(leftPanelState.isTabVisible('subagents')).toBe(true);
+  });
+
+  // Anche partendo da un'altra scheda: chi crea un subagent vuole vedere l'elenco in cui e'
+  // appena comparso, non quella da cui e' partito.
+  it('porta sui subagent anche chi stava guardando un\'altra scheda', async () => {
+    const { panel, leftPanelState } = build(true);
+    leftPanelState.selectTab('blocks');
+    panel.onNewSubagent();
+    await attendiLoSpostamento();
+    expect(leftPanelState.isTabVisible('subagents')).toBe(true);
+  });
+});
+
 describe('LeftPanelStateService — una scheda per volta', () => {
 
   it('scegliere una scheda apre il pannello e ne lascia una sola attiva', () => {

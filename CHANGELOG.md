@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 # this branch 01/10/2026
+- **fixed**: lo stage non si ricostruisce piu' con la sinistra chiusa. Creando un subagent -- o aprendo un agente su cui non si era mai scelto niente -- la scheda appena aperta veniva richiusa un istante dopo da una preferenza di quando a sinistra potevano stare aperte due cose insieme
+- **changed**: creando un subagent si riparte con la scheda dei subagent sotto gli occhi, dove il nuovo e' appena comparso
+- **changed**: il pannello dei subagent ha la grafica degli altri due: la sua intestazione con la freccia per chiudere, le stesse righe, gli stessi grigi e le stesse spaziature. Prima aveva una tavolozza sua, e il salto fra le tre schede si vedeva tutto
+- **changed**: passando su un subagent non compare piu' il riquadro col suo nome, che copriva la riga accanto per ripetere un nome gia' scritto li'
 - **changed**: negli agenti V3 il pannello di sinistra e la chat AI sono larghi uguale, e trascinando il bordo della chat il pannello la segue: le schede si alternano nello stesso spazio, e due misure diverse si leggevano come un salto del flusso a ogni cambio di scheda
 - **changed**: aprendo un agente si parte sempre dalla chat AI, mentre passando a un suo subagent resta aperta la scheda da cui stai navigando. Prima il cambio di flusso riportava in primo piano l'ultima scheda salvata su quell'agente, e chi apriva un subagent dal suo elenco se lo vedeva sparire sotto il clic. Anche uscire verso l'elenco degli agenti e rientrare conta come una nuova apertura
 - **changed**: il pannello delle azioni ha preso la grafica dell'editor nuovo: in cima il titolo con la freccia per chiudere, la stessa ricerca del pannello dei blocchi, un pallino colorato per categoria al posto dell'icona, e i nomi delle azioni nello stesso corpo e colore di quelli dei blocchi

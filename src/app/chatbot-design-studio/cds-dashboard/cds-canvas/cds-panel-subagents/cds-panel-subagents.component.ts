@@ -10,6 +10,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { DialogYesNoComponent } from 'src/app/chatbot-design-studio/cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { NotifyService } from 'src/app/services/notify.service';
 import { AgentChatFamilyService, sortSubagentsByName } from '../../../agent-chat/agent-chat-family.service';
+import { LeftPanelStateService } from '../../../services/left-panel-state.service';
+import { StageService } from '../../../services/stage.service';
 
 export interface SubagentItem {
   _id: string;
@@ -89,7 +91,9 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     private dashboardService: DashboardService,
     private translate: TranslateService,
     private notify: NotifyService,
-    private family: AgentChatFamilyService
+    private family: AgentChatFamilyService,
+    private readonly leftPanelState: LeftPanelStateService,
+    private readonly stageService: StageService
   ) { }
 
   ngOnDestroy(): void {
@@ -151,6 +155,25 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
         this.parentItem = { _id: parentId, name: '' };
       }
     });
+  }
+
+  /** Chiude il pannello di sinistra, come la freccia degli altri due: passa dallo stato
+   *  condiviso, lo stesso che muovono le linguette. */
+  onClosePanel(): void {
+    this.leftPanelState.close();
+  }
+
+  /**
+   * Tiene aperta questa scheda attraverso lo spostamento su un altro flusso della famiglia.
+   *
+   * Lo spostamento ricostruisce il canvas, e con esso questo pannello: la scheda da riaprire va
+   * detta, non lasciata al fatto che nessuno la cambi per strada. Due scritture perche' sono due
+   * domande diverse: quale scheda e' aperta adesso, e quale ritrovera' chi tornera' su questa
+   * famiglia -- la seconda la rilegge il canvas degli agenti precedenti quando viene ricostruito.
+   */
+  private keepSubagentsTabOpen(): void {
+    this.leftPanelState.selectTab('subagents');
+    this.stageService.saveActiveLeftPanel(this.familyParentId, 'subagents');
   }
 
   onSearch(value: string): void {
@@ -254,6 +277,9 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     ref.afterClosed().subscribe((created: any) => {
       if (created && created._id) {
         this.logger.log('[CDS-PANEL-SUBAGENTS] subagent added:', created);
+        // Chi ha appena creato un subagent sta lavorando sulla famiglia: deve ritrovare
+        // l'elenco in cui il nuovo e' appena comparso, non la scheda da cui era partito.
+        this.keepSubagentsTabOpen();
         this.openAgent(created._id);
       }
     });

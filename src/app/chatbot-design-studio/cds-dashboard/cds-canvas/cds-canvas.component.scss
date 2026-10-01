@@ -301,6 +301,7 @@ cds-fulfillment {
 
     --space-1: 2px;  --space-2: 4px;  --space-3: 6px;
     --space-4: 8px;  --space-5: 10px; --space-6: 12px;
+    --space-8: 16px;
 
     --fs-md: 13px;   --fs-sm: 12px;   --fs-tag: 10.5px;
     --fw-medium: 500;
@@ -361,16 +362,12 @@ cds-fulfillment {
       // pulsante "New subagent" in fondo scorrerebbe via insieme all'elenco.
       overflow: hidden;
       margin: 0;
-      padding: 0 2px 0 2px;
-
-      &::-webkit-scrollbar { width: 6px; height: 6px; }
-      &::-webkit-scrollbar-track { background: transparent; }
-      &::-webkit-scrollbar-thumb { background-color: transparent; border-radius: 8px; }
-      &:hover::-webkit-scrollbar-thumb { background-color: rgba(120, 138, 151, 0.45); }
-      &::-webkit-scrollbar-thumb:hover { background-color: rgba(120, 138, 151, 0.7); }
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
-      &:hover { scrollbar-color: rgba(120, 138, 151, 0.45) transparent; }
+      // Nessun padding, come nello slot dei blocchi: le righe e l'intestazione arrivano a filo
+      // dei bordi, e due pixel qui bastavano a far sembrare questo pannello piu' stretto.
+      padding: 0;
+      // Niente regole per la barra di scorrimento: qui l'overflow e' nascosto e la barra non
+      // compare mai. Lo scorrimento vive nell'elenco dentro il pannello, con la barra sottile
+      // che i tre pannelli prendono dal parziale condiviso.
     }
     .panel-intent-list {
       position: relative;

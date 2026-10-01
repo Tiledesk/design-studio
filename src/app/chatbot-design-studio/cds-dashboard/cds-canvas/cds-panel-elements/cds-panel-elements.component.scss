@@ -40,13 +40,8 @@
 
 /* ── Corpo ── */
 .cds-actions-panel__body {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 0 var(--space-0);
-
-    &::-webkit-scrollbar { width: 6px; }
-    &::-webkit-scrollbar-thumb { background: var(--ds-border); border-radius: 3px; }
+    @include lp.lp-scroll-area;
+    padding: 0;
 }
 
 /* ── Categorie ── */
@@ -103,57 +98,7 @@
 }
 
 
-/* Intestazione e fascia della ricerca: le stesse del pannello dei blocchi. Le regole sono qui
-   e non nel parziale perche' valgono per la cornice del pannello, non per gli elenchi dentro;
-   se un terzo pannello le volesse, allora varrebbe la pena spostarle. */
-.lp-head-title {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4, 8px);
-    padding: var(--space-5, 10px) var(--space-5, 10px) var(--space-5, 10px) var(--space-8, 16px);
-    border-bottom: 1px solid var(--ds-border, #ececea);
-}
-
-.lp-head-title__text {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: var(--fs-md, 13px);
-    font-weight: 600;
-    color: var(--ds-ink, #1a1a19);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.lp-head-title__close {
-    flex: 0 0 auto;
-    width: 26px;
-    height: 26px;
-    display: grid;
-    place-items: center;
-    border: 0;
-    border-radius: var(--radius-md, 6px);
-    background: none;
-    color: var(--ds-muted, #8a8884);
-    cursor: pointer;
-    transition: background var(--transition-fast, .12s), color var(--transition-fast, .12s);
-
-    .icon { width: var(--size-icon-base, 14px); height: var(--size-icon-base, 14px); }
-    ::ng-deep svg {
-        width: var(--size-icon-base, 14px);
-        height: var(--size-icon-base, 14px);
-        fill: none;
-        stroke: currentColor;
-    }
-
-    &:hover { background: var(--ds-border, #ececea); color: var(--ds-ink, #1a1a19); }
-}
-
-.lp-search-head {
-    flex: 0 0 auto;
-    padding: var(--space-6, 12px);
-    border-bottom: 1px solid var(--ds-border, #ececea);
-
-    .search-box { @include lp.lp-search-pill; }
-    .input-box-search-input-wpr { flex: 1 1 auto; min-width: 0; }
-}
+/* La cornice del pannello -- titolo, freccia di chiusura, fascia della ricerca -- viene dal
+   parziale condiviso: le stesse regole servono ai blocchi e ai subagent, e finche' erano
+   copiate in ciascun foglio bastava ritoccarne una per farli divergere. */
+@include lp.lp-panel-head;
