@@ -33,7 +33,6 @@ export enum HAS_SELECTED_TYPE {
 
 export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() intent: Intent;
-  @Input() hideActionPlaceholderOfActionPanel: boolean;
   @Input() chatbotSubtype: string;
   @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
@@ -430,25 +429,6 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
-    this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel)
-    if (this.hideActionPlaceholderOfActionPanel === false) {
-      const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-      if (addActionPlaceholderEl instanceof HTMLElement) {
-        this.logger.log('[CDS-INTENT] HERE 1 !!!! addActionPlaceholderEl ', addActionPlaceholderEl);
-        if (addActionPlaceholderEl !== null) {
-          addActionPlaceholderEl.style.opacity = '0';
-        }
-      }
-    } else if (this.hideActionPlaceholderOfActionPanel === true) {
-      const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-      if (addActionPlaceholderEl instanceof HTMLElement) {
-        this.logger.log('[CDS-INTENT] HERE 2 !!!! addActionPlaceholderEl ', addActionPlaceholderEl);
-        if (addActionPlaceholderEl !== null) {
-          addActionPlaceholderEl.style.opacity = '1';
-        }
-      }
-    }
     this.setAgentsAvailable();
     // Aggiorna isUntitledBlock se l'intent cambia
     if (changes['intent'] && !changes['intent'].firstChange) {

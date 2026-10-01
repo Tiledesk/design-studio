@@ -1,3 +1,5 @@
+@use '../left-panel' as lp;
+
 @import "./src/assets/sass/cds/_variables.scss";
 
 
@@ -16,7 +18,7 @@
     flex-direction: column;
     justify-content: center;
     color: #728087;
-    padding: 6px;
+    padding: 0px;
     
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -180,43 +182,15 @@
     margin: 6px 0px 14px 0px;
 }
 
+// Aspetto della riga: tutto nel mixin condiviso in fondo al file. Qui restano solo le
+// proprieta' strutturali e i figli da cui dipendono altre regole.
+// `height: 20px` stava qui e non lo annullava nessuno: schiacciava la riga a venti pixel,
+// ed e' il motivo per cui questo elenco sembrava compresso accanto a quello delle azioni.
 .intent {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    border-radius: var(--lp-row-radius, 6px);
-    min-height: var(--lp-row-height, 32px);
-    font-family: var(--lp-font, var(--font-family-poppins));
-    font-size: var(--lp-font-size, 13px);
-    color: var(--lp-text, #475467);
-    transition: background-color var(--lp-transition, .15s ease);
-    margin-bottom: 8px;
     cursor: pointer;
-    transition: all 0.3s;
-    align-items: flex-start;
-    height: 20px;
-    padding-left: 10px;
-    opacity: 0.7;
-
-    mat-icon {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        ::ng-deep svg {
-            height: 12px;
-            fill: var(--gray);
-        }
-    }
-
-    .icon-container {
-        mat-icon {
-            ::ng-deep svg {
-                width: 18px;
-                height: 18px;
-                fill: var(--gray);
-            }
-        }
-    }
+    // Era 0.7: le voci a riposo erano sbiadite e si accendevano al passaggio. Nel V4 l'elenco
+    // e' pieno, e la differenza col passaggio la fa il fondo, non la trasparenza del testo.
+    opacity: 1;
 
     .item-box {
         display: flex;
@@ -234,13 +208,9 @@
         right: 0px;
     }
     
+    // Corpo, colore e peso del nome vengono dal mixin condiviso: qui restavano tre valori
+    // diversi fra riposo, passaggio e selezione, e il nome cambiava sotto gli occhi.
     .intent-display-name {
-        color: rgba($color: var(--text-color), $alpha: 1);
-        font-weight: 500;
-        margin-bottom: 0px;
-        font-size: 14px;
-        overflow: hidden;
-        max-width: 170px;
         display: flex;
         align-items: center;
     }
@@ -281,8 +251,8 @@
 }
 
 .intent:hover {
-    // Al posto dell'ombra, un fondo: la voce si accende restando nel piano del pannello.
-    background-color: var(--lp-hover-bg, #e0e3f1);
+    // Il fondo del passaggio lo mette il mixin condiviso. Qui resta solo cio' che e' di questo
+    // elenco: l'opacita' piena e il cestino che compare.
     opacity: 1;
 
     .delete-box {
@@ -325,7 +295,7 @@
     }
 
     .intent-display-name {
-        color: var(--text-color-hover);
+        // colore invariato: nel V4 il passaggio cambia il fondo, non il testo
     }
 
     .ai-icon,
@@ -342,8 +312,7 @@
 .active {
     opacity: 1;
     .intent-display-name {
-        color: var(--text-color-active);
-        font-weight: 600;
+        // selezione: la dice la barra a sinistra e il fondo, non un peso diverso
         margin-bottom: 0px;
     }
 
@@ -392,4 +361,248 @@ mat-icon.agents-available {
   .item-box {
     height: 100%;
   }
+}
+
+
+/* ── Sezioni, con le stesse misure e gli stessi colori del pannello delle azioni ──
+   I valori sono quelli del V4; dichiarati qui sull'host perche' questo componente ha un solo
+   consumatore e cosi' non escono da lui. */
+:host {
+}
+
+.cds-acc {
+    border-bottom: 1px solid var(--ds-border);
+    &:last-child { border-bottom: none; }
+}
+
+.cds-acc__header {
+    @include lp.lp-accordion-header;
+}
+
+
+.cds-acc__name {
+    @include lp.lp-accordion-name;
+}
+
+
+.cds-acc__count {
+    @include lp.lp-accordion-count;
+}
+
+
+.cds-acc__chevron {
+    @include lp.lp-accordion-chevron;
+}
+
+
+.cds-acc__body { padding: 2px 0 8px; }
+
+
+/* ── Allineamento al V4: riga, nome, icona, selezione ──────────────────────
+   Le regole stanno in fondo di proposito: vincono sulle precedenti senza doverle riscrivere,
+   che su un foglio di 400 righe toccate da piu' mani e' il modo meno rischioso di intervenire.
+   I valori vengono dai token dichiarati su `.box-left`. */
+
+.intent.active {
+    background: var(--ds-canvas, #f7f6f3);
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        // L'altezza la danno `top` e `bottom` insieme: una `height` fissa qui vincerebbe sul
+        // `bottom` e la barra resterebbe un moncone, alta sempre uguale qualunque sia la riga.
+        top: var(--space-1, 4px);
+        bottom: var(--space-1, 4px);
+        width: 2px;
+        border-radius: 2px;
+        background: var(--ds-ink, #1a1a19);
+    }
+}
+
+
+/* I blocchi riservati tengono la loro tinta -- avvio e fallback si riconoscono dal colore
+   prima che dal nome -- ma con le stesse misure degli altri. */
+.topic-internal .intent .icon-container { color: var(--ds-ink-2, #4a4a47); }
+
+/* Le icone delle action arrivano come `<img>`, che non eredita il colore: senza maschera
+   resterebbero della tinta con cui sono disegnate, e l'elenco avrebbe tante tinte quante le
+   azioni. Il V4 risolve allo stesso modo per i blocchi riservati. */
+.intent .icon-container img.icon {
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-src);
+    mask-image: var(--icon-src);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+
+/* ── Intestazione e ricerca, nella forma del V4 ────────────────────────── */
+
+.lp-head-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+    padding: var(--space-5, 10px) var(--space-5, 10px) var(--space-5, 10px) var(--space-8, 16px);
+    border-bottom: 1px solid var(--ds-border, #ececea);
+}
+
+.lp-head-title__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--fs-md, 13px);
+    font-weight: 600;
+    color: var(--ds-ink, #1a1a19);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lp-head-title__close {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius-md, 6px);
+    background: none;
+    color: var(--ds-muted, #8a8884);
+    cursor: pointer;
+    transition: background var(--transition-fast, .12s), color var(--transition-fast, .12s);
+
+    .icon { width: var(--size-icon-base, 14px); height: var(--size-icon-base, 14px); }
+    ::ng-deep svg {
+        width: var(--size-icon-base, 14px);
+        height: var(--size-icon-base, 14px);
+        fill: none;
+        stroke: currentColor;
+    }
+
+    &:hover { background: var(--ds-border, #ececea); color: var(--ds-ink, #1a1a19); }
+}
+
+/* La ricerca vive in una fascia con il bordo sotto, come nel V4: la riga divisoria che
+   c'era prima faceva lo stesso lavoro ma non chiudeva nessuno spazio. */
+.lp-search-head {
+    padding: var(--space-6, 12px);
+    border-bottom: 1px solid var(--ds-border, #ececea);
+
+    .search-box {
+        @include lp.lp-search-pill;
+    }
+
+
+    .input-box-search-input-wpr { flex: 1 1 auto; min-width: 0; }
+
+}
+
+
+/* ── Ultimo allineamento al V4 ─────────────────────────────────────────── */
+
+/* Fondo bianco come nel pannello delle azioni: `.box-left` ha un fondo azzurrino che serviva
+   quando il pannello era l'unica cosa li' dentro. Ora i pannelli sono tre e devono sembrare
+   la stessa superficie. */
+:host {
+    display: block;
+    height: 100%;
+    background: var(--ds-surface, #fff);
+    font-family: var(--font-family-poppins, 'Poppins', 'Roboto', Arial, sans-serif);
+}
+
+.content { background: var(--ds-surface, #fff); }
+
+/* La riga e la cella sono le stesse del pannello delle azioni: i due elenchi si alternano
+   nello stesso slot, e una differenza di misure fra loro si legge come un difetto. */
+.intent {
+    @include lp.lp-row;
+    min-height: 0;
+    // Riferimento per la barra della selezione: senza, quel `::before` si ancora al primo
+    // antenato posizionato -- che qui e' tutt'altro elemento -- e compare lontano dalla riga.
+    position: relative;
+
+    .intent-display-name { @include lp.lp-row-name; }
+    .icon-container { @include lp.lp-icon-cell; margin-top: 0; }
+}
+
+/* I riservati non prendono la cella: sono due voci fisse in cima, e incorniciarle le
+   allontanerebbe dall'intestazione a cui appartengono. */
+.topic-internal .intent .icon-container {
+    border: 0;
+    background: none;
+}
+
+/* I riservati tengono il loro colore -- avvio e fallback si riconoscono da quello -- ma con
+   le stesse misure e lo stesso peso degli altri. */
+.topic-internal {
+    background: var(--ds-surface, #fff);
+    border-bottom: 1px solid var(--ds-border, #ececea);
+    padding: var(--space-2, 4px) 0;
+}
+
+/* Il titolo delle sezioni: stesso peso e colore del V4. */
+.cds-acc__header { padding: var(--space-4, 8px); }
+
+/* La freccia della sezione, disegnata e non un carattere: il `›` cambia forma col font e si
+   allinea male, e qui i font sono due (interfaccia e monospaziato per il conteggio). */
+.cds-acc__chevron {
+    width: var(--size-icon-xs, 12px);
+    height: var(--size-icon-xs, 12px);
+    display: grid;
+    place-items: center;
+    font-size: 0;
+
+    &::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transform: rotate(-45deg) translate(-1px, -1px);
+        transition: transform .2s;
+    }
+    &.is-open::before { transform: rotate(45deg) translate(-1px, -1px); }
+}
+
+
+/* Intestazioni di sezione e ricerca con lo stesso passo del pannello delle azioni: li' la
+   fascia e' 12px e l'intestazione 10/8, e i due elenchi devono partire alla stessa altezza. */
+.cds-acc__header {
+    gap: var(--space-5, 10px);
+    padding: var(--space-5, 10px) var(--space-4, 8px);
+}
+
+.cds-acc__name {
+    font-size: var(--fs-md, 13px);
+    font-weight: var(--fw-medium, 500);
+    color: var(--ds-ink, #1a1a19);
+}
+
+.cds-acc__body { padding: var(--space-1, 2px) 0 var(--space-4, 8px); }
+
+/* Il corpo scorrevole con lo stesso margine laterale delle azioni, cosi' le due colonne di
+   testo cadono sulla stessa verticale passando da una scheda all'altra. */
+// Senza margine laterale qui: il contenitore e' anche cio' che disegna i bordi fra le sezioni,
+// e un padding orizzontale li faceva fermare prima del bordo del pannello. Lo spazio ai lati
+// ce l'hanno gia' le righe e le intestazioni, dal mixin condiviso.
+.intents-list { padding: 0; }
+
+
+/* Avvio e fallback si riconoscono dal colore prima che dal nome: verde quello che apre la
+   conversazione, rosso quello che la raccoglie quando nient'altro ha risposto. Sono i due
+   toni del V4, in esadecimale. */
+.topic-internal .intent .icon-container {
+    &[data-reserved="rocket_launch"] { color: #2e9e6b; }
+    &[data-reserved="undo"]          { color: #d8502f; }
+
+    .material-icons-outlined {
+        font-size: var(--size-icon-base, 14px);
+        width: var(--size-icon-base, 14px);
+        height: var(--size-icon-base, 14px);
+        line-height: 1;
+    }
 }

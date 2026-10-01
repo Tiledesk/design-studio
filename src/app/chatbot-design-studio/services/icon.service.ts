@@ -20,6 +20,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/info.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'stack_node',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stack_node.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'agent_chat',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/agent_chat.svg')
     );

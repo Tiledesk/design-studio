@@ -234,9 +234,17 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
-    this.resolveActiveLeftPanel();
-    // V3: closed from the first render, not closed by an animation after it.
-    if (this.dashboardService.isV3) { this.IS_OPEN_INTENTS_LIST = false; }
+    // In V3 cosa e' aperto a sinistra non lo decide il canvas: lo decide il dashboard, che
+    // ospita la chat e sa se c'e'. Al caricamento si parte dalla chat, e da li' in avanti resta
+    // la scheda che hai scelto.
+    //
+    // Il canvas qui non ha voce perche' rinasce a ogni cambio di flusso, e la sua parola sarebbe
+    // sempre l'ultima: aprendo un subagent dal suo pannello la scheda cambierebbe da sola
+    // sotto il clic che l'ha appena usata. Nemmeno la chiusura al primo disegno serve piu': con
+    // la chat come scheda attiva `box-left` nasce gia' stretto, perche' non ospita quella scheda.
+    if (!this.dashboardService.isV3) {
+      this.resolveActiveLeftPanel();
+    }
     this.initialize();
   }
 
@@ -1107,7 +1115,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
     this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target, event);
-    if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
+    // Il clic "fuori" e' quello che atterra sull'area vuota dello stage, riconosciuta dall'id
+    // della lista che riceve i rilasci. Quell'id era generato da Angular (`cdk-drop-list-N`)
+    // finche' nessuno gliene dava uno: da quando la tavolozza vive fuori dal canvas e si
+    // collega per nome, e' STAGE_DROP_LIST_ID. Il prefisso resta accettato per le altre liste.
+    const targetId: string = event.target?.id || '';
+    const isStage = targetId === this.STAGE_DROP_LIST_ID || targetId.startsWith('cdk-drop-list-');
+    if (isStage && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
       this.controllerService.stopTestItOut();
       this.closeAllPanels();
@@ -1309,6 +1323,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    *  dichiarato per nome. Sta qui, in una costante sola, perche' le due parti devono
    *  necessariamente concordare e una stringa ripetuta due volte prima o poi diverge. */
   readonly STAGE_DROP_LIST_ID = 'cdsStageDropList';
+
+  /** Vero sugli agenti V3. Serve al template per una cosa sola: la larghezza del pannello di
+   *  sinistra, che qui segue quella della chat e sugli agenti precedenti resta quella di sempre. */
+  get isV3(): boolean { return !!this.dashboardService.isV3; }
 
   /** Vero se quella linguetta e' quella che si sta guardando: pannello aperto E scheda attiva. */
   isLeftTabVisible(tab: LeftPanelTab): boolean {

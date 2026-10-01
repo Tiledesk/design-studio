@@ -8,8 +8,15 @@
 *Tiledesk SRL*
 
 # this branch 01/10/2026
+- **changed**: negli agenti V3 il pannello di sinistra e la chat AI sono larghi uguale, e trascinando il bordo della chat il pannello la segue: le schede si alternano nello stesso spazio, e due misure diverse si leggevano come un salto del flusso a ogni cambio di scheda
+- **changed**: aprendo un agente si parte sempre dalla chat AI, mentre passando a un suo subagent resta aperta la scheda da cui stai navigando. Prima il cambio di flusso riportava in primo piano l'ultima scheda salvata su quell'agente, e chi apriva un subagent dal suo elenco se lo vedeva sparire sotto il clic. Anche uscire verso l'elenco degli agenti e rientrare conta come una nuova apertura
+- **changed**: il pannello delle azioni ha preso la grafica dell'editor nuovo: in cima il titolo con la freccia per chiudere, la stessa ricerca del pannello dei blocchi, un pallino colorato per categoria al posto dell'icona, e i nomi delle azioni nello stesso corpo e colore di quelli dei blocchi
+- **changed**: anche il pannello dei blocchi segue l'editor nuovo: fondo bianco, blocchi raccolti in due sezioni -- quelli rinominati e quelli col nome di default -- separatori che attraversano tutta la larghezza, e i segni del blocco di avvio e del fallback a contorno, verde e rosso
+- **added**: nell'elenco dei blocchi tornano visibili anche i blocchi a cui non e' stato dato un nome
+- **changed**: passando sopra un'azione, un blocco o un subagent la riga si accende con un fondo invece di sollevarsi con un'ombra: l'ombra non si leggeva sui grigi chiari e faceva ballare le voci una dopo l'altra mentre si scorreva l'elenco
+- **fixed**: l'icona della lente nelle ricerche dei pannelli non e' piu' sgranata
 - **changed**: a sinistra si apre una scheda per volta — chat AI, subagent, blocchi, azioni — scelte da linguette verticali appoggiate al bordo del flusso, visibili anche a pannello chiuso: sono anche il modo di riaprirlo. Ripremere la scheda che stai guardando la chiude e lascia tutto lo spazio al canvas, e riaprendo si torna su quella di prima. Aprendo un agente si parte sempre dalla chat
-- **changed**: le azioni non sono piu' un cassetto che compariva passando col mouse sul bordo del canvas, ma una scheda con la ricerca in cima e le categorie che si aprono al suo interno. Trascinarle sul flusso funziona come prima, e l'elenco non sparisce piu' mentre trascini
+- **changed**: le azioni non sono piu' un cassetto che compariva passando col mouse sul bordo del canvas, ma una scheda con la ricerca in cima e le categorie che si aprono al suo interno. Trascinarle sul flusso funziona come prima
 - **added**: ogni azione ha una *i* che ne mostra la descrizione dopo un istante, e il riquadro resta aperto il tempo di raggiungerlo e premere il collegamento che contiene
 - **changed**: il pulsante della chat AI non e' piu' nell'intestazione: la chat si apre dalla sua linguetta, come le altre schede. Prima i due punti potevano raccontare cose diverse, e il pulsante restava li' anche a chat aperta
 - **changed**: i tre pannelli hanno ora le stesse misure, gli stessi colori e le stesse animazioni, decisi in un posto solo invece che copiati in tre: le righe erano di tre dimensioni diverse e i grigi non coincidevano

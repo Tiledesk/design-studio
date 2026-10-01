@@ -201,6 +201,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // today only because the chat panel's own ngOnDestroy calls detach();
     // symmetry is what keeps it harmless.
     this.agentChatHostService.clearFlowNavigator();
+    // Lo studio si chiude: il prossimo agente che si apre e' un avvio, e riparte dalla chat.
+    // Senza questo, uscire verso l'elenco e rientrare su un altro agente -- che non ricarica la
+    // pagina -- lo aprirebbe sull'ultima scheda guardata su quello di prima.
+    this.leftPanelState.restartBoot();
     if (this.subscriptionAgentChatPanel) {
       this.subscriptionAgentChatPanel.unsubscribe();
     }
@@ -216,26 +220,46 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
    *  With no preference stored for this agent the chat opens -- that is the state you
    *  start building a flow in. */
   private restoreAgentChatPanel(): void {
+    const canChat = !!this.agentChatHostService.isConfigured?.();
+
+    // Al caricamento della pagina si apre sempre la chat, qualunque cosa sia salvata: e' da
+    // li' che si comincia a lavorare a un flusso, e ritrovarsi sull'ultima scheda aperta
+    // giorni prima non aiuta nessuno. La memoria qui non viene nemmeno letta.
+    //
+    // `isBooting` e' vero solo per il primo giro. Questa funzione viene richiamata anche
+    // passando da un flusso all'altro senza ricaricare, e li' la scheda che hai scelto deve
+    // restare: forzare la chat a ogni cambio di flusso sarebbe un'altra cosa.
+    if (this.leftPanelState.isBooting) {
+      this.leftPanelState.hydrate(canChat
+        ? { isOpen: true, activeTab: 'chat' }
+        : { isOpen: true, activeTab: 'blocks' });   // senza chat, la scheda successiva
+      this.leftPanelState.finishBoot();
+      return;
+    }
+
+    // Da qui in poi siamo in un cambio di flusso senza ricaricare la pagina: aprire un subagent
+    // dal suo pannello, o un `open_flow` chiesto dalla chat.
+    //
+    // In V3 la scheda non si tocca. Chi apre un subagent lo fa dalla scheda dei subagent, e
+    // ritrovarsene un'altra davanti vorrebbe dire perdere l'elenco da cui si sta navigando --
+    // proprio quando serve per tornare indietro o passare al prossimo. Vale per tutte: la chat
+    // che sposta il canvas con `open_flow` resta aperta, perche' e' lei che stai usando.
+    //
+    // La preferenza salvata non viene nemmeno letta: descrive com'era questo agente l'ultima
+    // volta, non cosa stai guardando adesso, e qui l'unica risposta giusta e' "quello che c'e'".
+    if (this.dashboardService.isV3) { return; }
+
     const current: any = this.dashboardService.selectedChatbot;
     const familyId = current?.subtype === 'subagent'
       ? current?.parent_id
       : this.dashboardService.id_faq_kb;
-    const canChat = !!this.agentChatHostService.isConfigured?.();
 
-    // Chiamata facoltativa, come le altre su questo servizio: una preferenza che non si riesce a
-    // leggere vale quanto una che non c'e'. Rinunciare ad aprire la sinistra perche' la memoria
-    // non ha risposto sarebbe un guasto travestito da scelta.
+    // Chiamata facoltativa, come le altre su questo servizio: una preferenza che non si riesce
+    // a leggere vale quanto una che non c'e'. Rinunciare ad aprire la sinistra perche' la
+    // memoria non ha risposto sarebbe un guasto travestito da scelta.
     let snapshot: { isOpen: boolean; activeTab: LeftPanelTab } =
       this.stageService?.getLeftPanelSnapshot?.(familyId, this.dashboardService.id_faq_kb)
       || { isOpen: true, activeTab: 'chat' };
-
-    // Al caricamento della pagina si parte sempre dalla chat: e' da li' che si comincia a
-    // lavorare a un flusso, e ritrovarsi sull'ultima scheda aperta giorni prima non aiuta.
-    // `isBooting` e' vero solo per il primo giro: passando da un flusso all'altro senza
-    // ricaricare questa funzione viene richiamata, e li' la scheda scelta deve restare.
-    if (this.leftPanelState.isBooting && canChat) {
-      snapshot = { isOpen: true, activeTab: 'chat' };
-    }
 
     // Dove la chat non e' configurata quella scheda non esiste, e una preferenza che la nomina
     // lascerebbe la sinistra ferma su una scheda che nessuna linguetta puo' riaprire.
@@ -244,7 +268,6 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.leftPanelState.hydrate(snapshot);
-    this.leftPanelState.finishBoot();
   }
 
   onCloseAgentChat(): void {

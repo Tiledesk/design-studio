@@ -14,6 +14,7 @@ import { ACTIONS_LIST } from '../../../utils-actions';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
+import { LeftPanelStateService } from '../../../services/left-panel-state.service';
 @Component({
   selector: 'cds-panel-intent-list',
   templateUrl: './cds-panel-intent-list.component.html',
@@ -29,6 +30,9 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   @Input() IS_OPEN: boolean;
   @Input() intent_id: string;
   /** nasconde il titolo interno "Blocks" quando il pannello è sotto i tab Blocks/Subagents */
+  /** Teneva nascosto il titolo quando il pannello stava sotto le linguette orizzontali.
+   *  Con l'intestazione del V4 il titolo torna a esserci sempre, ma l'ingresso resta per non
+   *  rompere chi lo passa. */
   @Input() hideTitle: boolean = false;
   @Output() selectIntent = new EventEmitter();
   @Output() deleteIntent = new EventEmitter();
@@ -39,6 +43,14 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   internalIntents: Intent[] = [];
   defaultIntents: Intent[] = [];
   filteredIntents: Intent[] = [];
+  /** I blocchi che non hanno ancora un nome. Prima venivano tolti dall'elenco: esistevano sul
+   *  canvas e non comparivano qui, quindi l'unico modo di raggiungerli era trovarli a vista.
+   *  Come nel V4, stanno in un gruppo a parte invece che nascosti. */
+  untitledIntents: Intent[] = [];
+  filteredUntitledIntents: Intent[] = [];
+  searchText: string = '';
+  isRenamedExpanded: boolean = true;
+  isUntitledExpanded: boolean = true;
   
   idSelectedIntent: string;
 
@@ -53,7 +65,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   
   constructor(
     private intentService: IntentService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private readonly leftPanelState: LeftPanelStateService
   ) { 
     this.setSubscriptions();
   }
@@ -136,6 +149,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- internalIntents ',this.internalIntents);
     this.defaultIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
+    this.untitledIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly !== true && obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));
     this.logger.log('[cds-panel-intent-list] --- defaultIntents ',this.defaultIntents);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.START, 0);
     this.internalIntents = moveItemToPosition(this.internalIntents, TYPE_INTENT_NAME.DEFAULT_FALLBACK, 1);
@@ -149,6 +163,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     });
 
     this.filteredIntents = this.defaultIntents;
+    this.filteredUntitledIntents = this.untitledIntents;
     if(!this.defaultIntents || this.defaultIntents.length == 0){
       this.intentService.setDefaultIntentSelected();
       this.idSelectedIntent = this.intentService.intentSelected.intent_id;
@@ -180,15 +195,36 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     return icon;
   }
 
+  /** Chiude il pannello di sinistra, come la freccia del V4. Passa dallo stato condiviso, lo
+   *  stesso che muovono le linguette: un secondo interruttore avrebbe potuto dire il contrario. */
+  onClosePanel(): void {
+    this.leftPanelState.close();
+  }
+
   /** Search a block... */
   onLiveSearch(text: string) {
-    this.filteredIntents = this.defaultIntents.filter(element => 
-      element.intent_display_name.toLowerCase().includes(text.toLowerCase())
-    ).sort((a, b) => {
-      const nameA = a.intent_display_name?.toLowerCase() || '';
-      const nameB = b.intent_display_name?.toLowerCase() || '';
-      return nameA.localeCompare(nameB);
-    });
+    const needle = (text || '').toLowerCase();
+    const perNome = (list: Intent[]) => list
+      .filter(element => (element.intent_display_name || '').toLowerCase().includes(needle))
+      .sort((a, b) => (a.intent_display_name || '').toLowerCase()
+        .localeCompare((b.intent_display_name || '').toLowerCase()));
+
+    this.filteredIntents = perNome(this.defaultIntents);
+    // Anche i senza nome rispondono alla ricerca: cercando "untitled" si trovano tutti.
+    this.filteredUntitledIntents = perNome(this.untitledIntents);
+    this.searchText = text || '';
+  }
+
+  /** Vero se la sezione e' aperta. Cercando si aprono entrambe, altrimenti i risultati
+   *  resterebbero nascosti dietro una sezione chiusa. */
+  isSectionOpen(section: 'renamed' | 'untitled'): boolean {
+    if (this.searchText.trim()) { return true; }
+    return section === 'renamed' ? this.isRenamedExpanded : this.isUntitledExpanded;
+  }
+
+  toggleSection(section: 'renamed' | 'untitled'): void {
+    if (section === 'renamed') { this.isRenamedExpanded = !this.isRenamedExpanded; }
+    else { this.isUntitledExpanded = !this.isUntitledExpanded; }
   }
 
   /** onSelectIntent */

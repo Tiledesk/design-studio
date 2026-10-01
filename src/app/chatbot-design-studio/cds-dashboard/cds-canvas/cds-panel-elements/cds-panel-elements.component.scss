@@ -1,9 +1,18 @@
-/* La tavolozza come pannello della scheda "Azioni": ricerca in cima, categorie a fisarmonica.
-   Lo scorrimento vive nel corpo, cosi' la ricerca resta sempre in vista. */
+@use '../left-panel' as lp;
+
+/* Pannello delle azioni, allineato a quello del Design Studio V4.
+   I nomi dei valori sono quelli di la' (`--ds-*`, `--space-*`, `--fs-*`, `--cat-*`) per rendere
+   immediato il confronto fra i due progetti. I colori delle categorie sono gli stessi espressi
+   in esadecimale: il V4 li scrive in oklch, che qui non aggiunge niente e toglie supporto.
+   Dichiarati sull'host, quindi non escono da questo pannello. */
 :host {
+    // Dichiarato qui come fa `panel-shell` nel V4, invece di ereditarlo: le righe e la ricerca
+    // usano `font-family: inherit`, quindi basta questo punto solo per tenerle tutte in passo.
+    font-family: var(--font-family-poppins, 'Poppins', 'Roboto', Arial, sans-serif);
     display: block;
     height: 100%;
     min-height: 0;
+    background: var(--ds-surface);
 }
 
 .cds-actions-panel {
@@ -11,123 +20,140 @@
     flex-direction: column;
     height: 100%;
     min-height: 0;
-    background: transparent;
 }
 
-.cds-actions-panel__search {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 10px 10px 8px;
-    padding: 0 8px;
-    height: 34px;
-    background: #fff;
-    border: 1px solid var(--gray-light-02);
-    border-radius: 8px;
+/* ── Ricerca ── */
 
-    input {
-        flex: 1 1 auto;
-        min-width: 0;
-        border: 0;
-        outline: 0;
-        background: transparent;
-        font-family: var(--lp-font, var(--font-family-poppins));
-        font-size: var(--lp-font-size, 13px);
-        color: var(--lp-text, #475467);
-        &::placeholder { color: var(--lp-text-muted, #98a2b3); }
-    }
-}
 
-.cds-actions-panel__search-icon {
-    flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
-    color: var(--lp-text-muted, #98a2b3);
-    ::ng-deep svg { width: 16px; height: 16px; fill: currentColor; }
-}
+
 
 .cds-actions-panel__clear {
     flex: 0 0 auto;
     border: 0;
     background: transparent;
-    color: #98a2b3;
+    color: var(--ds-muted);
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
-    &:hover { color: #344054; }
+    &:hover { color: var(--ds-ink); }
 }
 
+/* ── Corpo ── */
 .cds-actions-panel__body {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-    padding: 0 6px 12px;
+    padding: 0 var(--space-0);
 
     &::-webkit-scrollbar { width: 6px; }
-    &::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 3px; }
+    &::-webkit-scrollbar-thumb { background: var(--ds-border); border-radius: 3px; }
+}
+
+/* ── Categorie ── */
+.cds-actions-cat {
+    border-bottom: 1px solid var(--ds-border);
+    &:last-child { border-bottom: none; }
+
+    &[data-cat="MOST_USED"]    { --cat-color: var(--cat-most-used);    --cat-soft: var(--cat-most-used-soft); }
+    &[data-cat="AI"]           { --cat-color: var(--cat-ai);           --cat-soft: var(--cat-ai-soft); }
+    &[data-cat="FLOW"]         { --cat-color: var(--cat-flow);         --cat-soft: var(--cat-flow-soft); }
+    &[data-cat="INTEGRATIONS"] { --cat-color: var(--cat-integrations); --cat-soft: var(--cat-integrations-soft); }
+    &[data-cat="SPECIAL"]      { --cat-color: var(--cat-special);      --cat-soft: var(--cat-special-soft); }
+    &[data-cat="VOICE"],
+    &[data-cat="VOICE_TWILIO"] { --cat-color: var(--cat-ai);           --cat-soft: var(--cat-ai-soft); }
 }
 
 .cds-actions-cat__header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 6px;
-    border: 0;
-    background: transparent;
-    font-family: var(--lp-font, var(--font-family-poppins));
-    font-size: var(--lp-font-size, 13px);
-    font-weight: 600;
-    color: var(--lp-text, #475467);
-    cursor: pointer;
-    border-radius: var(--lp-row-radius, 6px);
-    transition: background-color var(--lp-transition, .15s ease);
-    &:hover { background: var(--lp-hover-bg, #e0e3f1); }
+    @include lp.lp-accordion-header;
 }
 
-.cds-actions-cat__icon {
-    flex: 0 0 auto;
-    width: 16px;
-    height: 16px;
-    color: inherit;
-    ::ng-deep svg { width: 16px; height: 16px; fill: currentColor; }
+
+.cds-actions-cat__dot {
+    width: var(--space-4);
+    height: var(--space-4);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--cat-color, var(--ds-muted));
+    // L'alone tiene il pallino leggibile anche sul fondo chiaro, senza ingrandirlo.
+    box-shadow: 0 0 0 3px var(--cat-soft, var(--ds-canvas));
 }
 
 .cds-actions-cat__name {
+    @include lp.lp-accordion-name;
+}
+
+
+.cds-actions-cat__count {
+    @include lp.lp-accordion-count;
+}
+
+
+.cds-actions-cat__chevron {
+    @include lp.lp-accordion-chevron;
+}
+
+
+.cds-actions-cat__body { padding: var(--space-1) 0 var(--space-4); }
+
+.cds-actions-panel__empty {
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+    font-size: var(--fs-sm);
+    color: var(--ds-muted);
+}
+
+
+/* Intestazione e fascia della ricerca: le stesse del pannello dei blocchi. Le regole sono qui
+   e non nel parziale perche' valgono per la cornice del pannello, non per gli elenchi dentro;
+   se un terzo pannello le volesse, allora varrebbe la pena spostarle. */
+.lp-head-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+    padding: var(--space-5, 10px) var(--space-5, 10px) var(--space-5, 10px) var(--space-8, 16px);
+    border-bottom: 1px solid var(--ds-border, #ececea);
+}
+
+.lp-head-title__text {
     flex: 1 1 auto;
     min-width: 0;
-    text-align: left;
+    font-size: var(--fs-md, 13px);
+    font-weight: 600;
+    color: var(--ds-ink, #1a1a19);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.cds-actions-cat__count {
+.lp-head-title__close {
     flex: 0 0 auto;
-    min-width: 20px;
-    padding: 1px 6px;
-    border-radius: 999px;
-    background: #eef2f6;
-    color: var(--lp-text-muted, #98a2b3);
-    font-size: var(--lp-font-size-sm, 11px);
-    font-weight: 600;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius-md, 6px);
+    background: none;
+    color: var(--ds-muted, #8a8884);
+    cursor: pointer;
+    transition: background var(--transition-fast, .12s), color var(--transition-fast, .12s);
+
+    .icon { width: var(--size-icon-base, 14px); height: var(--size-icon-base, 14px); }
+    ::ng-deep svg {
+        width: var(--size-icon-base, 14px);
+        height: var(--size-icon-base, 14px);
+        fill: none;
+        stroke: currentColor;
+    }
+
+    &:hover { background: var(--ds-border, #ececea); color: var(--ds-ink, #1a1a19); }
 }
 
-.cds-actions-cat__chevron {
+.lp-search-head {
     flex: 0 0 auto;
-    color: var(--lp-text-muted, #98a2b3);
-    font-size: 16px;
-    transition: transform var(--lp-transition, .15s ease);
-    &.is-open { transform: rotate(90deg); }
-}
+    padding: var(--space-6, 12px);
+    border-bottom: 1px solid var(--ds-border, #ececea);
 
-.cds-actions-cat__body { padding: 0 0 6px; }
-
-.cds-actions-panel__empty {
-    padding: 18px 6px;
-    text-align: center;
-    font-family: var(--lp-font, var(--font-family-poppins));
-    font-size: var(--lp-font-size, 13px);
-    color: var(--lp-text-muted, #98a2b3);
+    .search-box { @include lp.lp-search-pill; }
+    .input-box-search-input-wpr { flex: 1 1 auto; min-width: 0; }
 }

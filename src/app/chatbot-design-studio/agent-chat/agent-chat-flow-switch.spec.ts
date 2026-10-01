@@ -725,7 +725,9 @@ describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un a
         getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'chat' }),
         savePanelState: () => {}
       },
-      agentChatHostService: { setFlowNavigator: () => {}, isConfigured: () => configured },
+      agentChatHostService: {
+        setFlowNavigator: () => {}, clearFlowNavigator: () => {}, isConfigured: () => configured
+      },
       intentService: { getAllIntents: () => Promise.resolve(true) },
       router: {
         url: '/project/p1/chatbot/kb1/blocks',
@@ -765,20 +767,33 @@ describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un a
     expect(leftPanelState.isTabVisible('chat')).toBe(true);
   });
 
-  it('apre la chat passando a un agente V3', async () => {
+  // V3: dopo il caricamento la scheda non si rimescola piu'. Chi apre un subagent lo fa dalla
+  // scheda dei subagent, e ritrovarsene un'altra davanti vorrebbe dire perdere l'elenco da cui
+  // sta navigando -- proprio quando serve per tornare indietro.
+  it('in V3 la scheda dei subagent resta aperta aprendo un subagent', async () => {
     const { component, leftPanelState } = build(true);
+    leftPanelState.selectTab('subagents');
     await component.openFlow('kb2');
-    expect(leftPanelState.isTabVisible('chat')).toBe(true);
+    expect(leftPanelState.isTabVisible('subagents')).toBe(true);
   });
 
-  it('apre la chat anche su un agente precedente', async () => {
+  // La stessa regola vista dall'altra parte: nemmeno la chat viene imposta, e la preferenza
+  // salvata -- che qui direbbe 'chat' -- non viene nemmeno letta.
+  it('in V3 cambiare flusso non riporta in primo piano la chat', async () => {
+    const { component, leftPanelState } = build(true);
+    leftPanelState.selectTab('blocks');
+    await component.openFlow('kb2');
+    expect(leftPanelState.isTabVisible('blocks')).toBe(true);
+  });
+
+  it('apre la chat su un agente precedente', async () => {
     const { component, leftPanelState } = build(false);
     await component.openFlow('kb2');
     expect(leftPanelState.isTabVisible('chat')).toBe(true);
   });
 
   it('riapre la sinistra chiusa, se cosi\' era stato lasciato questo agente', async () => {
-    const { component, leftPanelState } = build(true, true, {
+    const { component, leftPanelState } = build(false, true, {
       getLeftPanelSnapshot: () => ({ isOpen: false, activeTab: 'chat' }),
       savePanelState: () => {}
     });
@@ -789,8 +804,17 @@ describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un a
 
   // La scheda della chat non esiste dove la chat non e' configurata: lasciarcela sopra
   // significherebbe una sinistra ferma su una scheda che nessuna linguetta puo' riaprire.
+  // Uscire verso l'elenco degli agenti e rientrare su un altro non ricarica la pagina, ma e'
+  // comunque un'apertura: la scheda dell'agente di prima non deve sopravvivergli.
+  it('uscendo dallo studio il prossimo agente riparte dall\'avvio', async () => {
+    const { component, leftPanelState } = build(true);
+    leftPanelState.selectTab('actions');
+    component.ngOnDestroy();
+    expect(leftPanelState.isBooting).toBe(true);
+  });
+
   it('non lascia la sinistra sulla chat dove la chat non c\'e\'', async () => {
-    const { component, leftPanelState } = build(true, false);
+    const { component, leftPanelState } = build(false, false);
     await component.openFlow('kb2');
     expect(leftPanelState.activeTab).not.toBe('chat');
   });

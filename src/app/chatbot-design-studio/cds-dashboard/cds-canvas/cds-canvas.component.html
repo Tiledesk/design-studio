@@ -3,7 +3,7 @@
      sovrapposte, e la maniglia doveva pure spostarsi oltre il bordo della chat per non finirle
      sopra -- un calcolo che ora non serve piu' a nessuno. -->
 
-<div class="box-left" [class.is_closed]="!IS_BOX_LEFT_OPEN">
+<div class="box-left" [class.is_closed]="!IS_BOX_LEFT_OPEN" [class.is-v3]="isV3">
 
     <cds-panel-intent-list *ngIf="activeLeftPanel === 'blocks' && IS_OPEN_INTENTS_LIST"
         id="cdsPanelIntentList"
@@ -60,7 +60,7 @@
             [class.is-active]="isLeftTabVisible('blocks')"
             [attr.title]="'Blocks' | translate"
             (click)="onSelectLeftPanel('blocks')">
-            <mat-icon class="cds-left-rail__icon" svgIcon="block" aria-hidden="true"></mat-icon>
+            <mat-icon class="cds-left-rail__icon cds-left-rail__icon--stroke" svgIcon="stack_node" aria-hidden="true"></mat-icon>
             <span class="cds-left-rail__label">{{ 'Blocks' | translate }}</span>
         </button>
         <button type="button" class="cds-left-rail__tab"
@@ -90,7 +90,6 @@
             [intent]="intent"
             [alpha]=""
             [chatbotSubtype]="chatbotSubtype"
-            [hideActionPlaceholderOfActionPanel]="hideActionPlaceholderOfActionPanel"
             (componentRendered)="onIntentRendered($event)"
             (actionSelected)=onActionSelected($event) 
             (questionSelected)=onQuestionSelected($event)

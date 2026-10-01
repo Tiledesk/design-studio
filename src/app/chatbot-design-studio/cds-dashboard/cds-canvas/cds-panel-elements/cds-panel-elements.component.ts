@@ -9,6 +9,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { DashboardService } from 'src/app/services/dashboard.service';
 
 
+import { LeftPanelStateService } from '../../../services/left-panel-state.service';
 @Component({
   selector: 'cds-panel-elements',
   templateUrl: './cds-panel-elements.component.html',
@@ -44,7 +45,8 @@ export class CdsPanelElementsComponent implements OnInit {
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
     private readonly dashboardService: DashboardService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    private readonly leftPanelState: LeftPanelStateService
   ) { }
 
   ngOnInit(): void {
@@ -76,6 +78,12 @@ export class CdsPanelElementsComponent implements OnInit {
 
 
 
+
+  /** Chiude il pannello di sinistra, come la freccia del pannello dei blocchi. Passa dallo
+   *  stato condiviso, lo stesso che muovono le linguette. */
+  onClosePanel(): void {
+    this.leftPanelState.close();
+  }
 
   /** Testo cercato; vuoto significa nessun filtro. */
   searchText: string = '';

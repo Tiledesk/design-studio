@@ -181,7 +181,8 @@
       "PublicEmail": "E-mail pubblica",
       "YourPublicEmail": "La tua email pubblica",
       "UpdateYourProfile": "Aggiorna il tuo profilo",
-      "Processing": "In lavorazione..."
+      "Processing": "In lavorazione...",
+      "SelectABlock": "Seleziona un blocco"
     },
     "BotDetails": "Dettagli del bot",
     "Developer": "Sviluppatore",
@@ -304,7 +305,9 @@
       "Actions": "Azioni",
       "SearchAction": "Cerca un'azione",
       "NoActionFound": "Nessuna azione trovata",
-      "ActionInfo": "Dettagli dell'azione"
+      "ActionInfo": "Dettagli dell'azione",
+      "BlocksRenamed": "Rinominati",
+      "BlocksUntitled": "Nome default"
     },
     "Name": "Nome",
     "Label": "Etichetta",

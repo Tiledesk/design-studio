@@ -2,8 +2,17 @@
      foglio di stile, non sparse in *ngIf riga per riga. -->
 <div class="content" [class.is-v3]="IS_V3">
 
-    <div class="cds-title list-title" *ngIf="!hideTitle">
-        {{ 'Blocks' | translate }}
+    <!-- Intestazione nella forma del V4: cosa stai guardando, e come chiuderlo. La freccia
+         fa la stessa cosa della linguetta attiva nella striscia: due strade per lo stesso
+         gesto, come la', perche' chi ha il pannello sotto gli occhi non deve cercare la
+         linguetta per toglierlo di mezzo. -->
+    <div class="lp-head-title">
+        <span class="lp-head-title__text">{{ 'CDSSetting.SelectABlock' | translate }}</span>
+        <button type="button" class="lp-head-title__close"
+            [attr.aria-label]="'Close' | translate"
+            (click)="onClosePanel()">
+            <mat-icon class="icon" svgIcon="chevron_left" aria-hidden="true"></mat-icon>
+        </button>
     </div>
 
     <div class="intents-list">
@@ -15,8 +24,12 @@
                     [value]="intent.intent_id"
                     (click)="onSelectIntent(intent)">
 
-                    <div class="icon-container">
-                        <span class="material-icons">{{onGetIconForName(intent)}}</span>
+                    <!-- `material-icons-outlined` e non `material-icons`: la variante piena, a
+                         questa misura, e' una macchia del colore invece di un simbolo. Nel V4
+                         sono contorni, e il colore resta leggibile perche' corre lungo una
+                         linea sottile anziche' riempire tutto. -->
+                    <div class="icon-container" [attr.data-reserved]="onGetIconForName(intent)">
+                        <span class="material-icons-outlined">{{onGetIconForName(intent)}}</span>
                     </div>
 
                     <div class="item-box" *ngIf="IS_OPEN">
@@ -55,6 +68,7 @@
     </div>
 
 
+    <div class="lp-search-head">
     <div class="search-box">
         <div class="icon-container">
             <mat-icon class="icon" svgIcon="search" aria-hidden="true"></mat-icon>
@@ -65,16 +79,24 @@
                 (input)="onLiveSearch($event.target.value);">
         </div>
     </div>
-
-
-    <div style="width: 100%; display: flex; justify-content: center;">
-        <div class="custom-divider-search"></div>
     </div>
+
 
     <div class="intents-list">
 
+        <!-- Due sezioni come nel V4: i blocchi rinominati e quelli rimasti col nome di
+             partenza. Prima i secondi venivano tolti dall'elenco -- esistevano sul canvas e qui
+             non comparivano, quindi l'unico modo di raggiungerli era trovarli a vista. -->
         <div class="intents" id="intents-list">
-            <div *ngFor="let intent of filteredIntents; let id = index" id="intent_{{id}}" class="intent"
+
+            <div class="cds-acc" *ngIf="filteredIntents?.length > 0">
+                <button type="button" class="cds-acc__header" (click)="toggleSection('renamed')">
+                    <span class="cds-acc__name">{{ 'CDSCanvas.BlocksRenamed' | translate }}</span>
+                    <span class="cds-acc__count">{{ filteredIntents.length }}</span>
+                    <span class="cds-acc__chevron" [class.is-open]="isSectionOpen('renamed')">&rsaquo;</span>
+                </button>
+                <div class="cds-acc__body" *ngIf="isSectionOpen('renamed')">
+<div *ngFor="let intent of filteredIntents; let id = index" id="intent_{{id}}" class="intent"
                 [ngClass]="{'active': idSelectedIntent === intent.intent_id}"
                 value="intent.intent_id" (click)="onSelectIntent(intent)">
                 
@@ -83,9 +105,9 @@
                          blocco; quella generica sarebbe uguale per tutti. Senza action
                          (blocco vuoto) si ricade sull'icona generica. -->
                     <img *ngIf="IS_V3 && actionIconSrc(intent) as actionIcon; else genericBlockIcon"
-                        class="icon" [src]="actionIcon" alt="">
+                        class="icon" [src]="actionIcon" [style.--icon-src]="'url(' + actionIcon + ')'" alt="">
                     <ng-template #genericBlockIcon>
-                        <mat-icon class="icon" [class.active-icon]="idSelectedIntent === intent.intent_id" svgIcon="block" aria-hidden="true"></mat-icon>
+                        <mat-icon class="icon" [class.active-icon]="idSelectedIntent === intent.intent_id" svgIcon="stack_node" aria-hidden="true"></mat-icon>
                     </ng-template>
                     <!-- <img src="assets/images/icons/block.svg"
                         [class.active-icon]="idSelectedIntent === intent.intent_id"
@@ -121,6 +143,66 @@
                     </div> -->
                 </div>
 
+            </div>
+                </div>
+            </div>
+
+            <div class="cds-acc" *ngIf="filteredUntitledIntents?.length > 0">
+                <button type="button" class="cds-acc__header" (click)="toggleSection('untitled')">
+                    <span class="cds-acc__name">{{ 'CDSCanvas.BlocksUntitled' | translate }}</span>
+                    <span class="cds-acc__count">{{ filteredUntitledIntents.length }}</span>
+                    <span class="cds-acc__chevron" [class.is-open]="isSectionOpen('untitled')">&rsaquo;</span>
+                </button>
+                <div class="cds-acc__body" *ngIf="isSectionOpen('untitled')">
+<div *ngFor="let intent of filteredUntitledIntents; let id = index" id="intent_{{id}}" class="intent"
+                [ngClass]="{'active': idSelectedIntent === intent.intent_id}"
+                value="intent.intent_id" (click)="onSelectIntent(intent)">
+                
+                <div class="icon-container">
+                    <!-- V3: un blocco, una action. L'icona dell'action dice cosa fa il
+                         blocco; quella generica sarebbe uguale per tutti. Senza action
+                         (blocco vuoto) si ricade sull'icona generica. -->
+                    <img *ngIf="IS_V3 && actionIconSrc(intent) as actionIcon; else genericBlockIcon"
+                        class="icon" [src]="actionIcon" [style.--icon-src]="'url(' + actionIcon + ')'" alt="">
+                    <ng-template #genericBlockIcon>
+                        <mat-icon class="icon" [class.active-icon]="idSelectedIntent === intent.intent_id" svgIcon="stack_node" aria-hidden="true"></mat-icon>
+                    </ng-template>
+                    <!-- <img src="assets/images/icons/block.svg"
+                        [class.active-icon]="idSelectedIntent === intent.intent_id"
+                        class=" "> -->
+                </div>
+
+                <div class="item-box" *ngIf="IS_OPEN">
+                    <div>
+                        <p class="intent-display-name ellips">
+                            <!-- <span *ngIf="!intent.agents_available" class="agents-available material-icons">boy</span> -->
+                            <mat-icon *ngIf="intent.agents_available" class="icon agents-available" svgIcon="man" aria-hidden="true"></mat-icon>
+                            {{intent.intent_display_name}}
+                        </p>
+                        <div class="icon-list" *ngIf="!IS_V3">
+                            <p *ngIf="intent.questions" class="ai-icon icon">Ai</p>
+              
+                            <mat-icon *ngIf="intent.webhook_enabled" class="icon" svgIcon="webhook" aria-hidden="true"></mat-icon>
+                            <!-- <span *ngIf="!intent.webhook_enabled" class="material-icons icon webhook-icon">webhook</span> -->
+
+                            <mat-icon *ngIf="intent.form" class="icon" svgIcon="list_alt" aria-hidden="true"></mat-icon>
+                            <!-- <span *ngIf="!intent.form" class="material-icons icon list-alt-icon">list_alt</span> -->
+
+                            <div *ngIf="intent?.actions && intent?.actions?.length > 0" class="actions">
+                                <mat-icon class="icon" svgIcon="bolt" aria-hidden="true"></mat-icon>
+                                <!-- <span class="material-icons icon bolt-icon">bolt</span> -->
+                                <p class="action-counter icon">{{ intent.actions?.length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="delete-box" *ngIf="selectedIntent !== null">
+                        <span class="material-icons delete-icon"
+                            (click)="$event.stopPropagation();onDeleteIntent(intent)">delete</span>
+                    </div> -->
+                </div>
+
+            </div>
+                </div>
             </div>
 
         </div>

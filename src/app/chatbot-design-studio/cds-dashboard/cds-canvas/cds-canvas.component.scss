@@ -232,7 +232,7 @@ cds-fulfillment {
     padding: 0;
     border: 1px solid var(--gray-light-02);
     border-left: 0;
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 3px 3px 0;
     background: #fff;
     color: #667085;
     font-family: var(--font-family-poppins);
@@ -241,13 +241,13 @@ cds-fulfillment {
     line-height: 1;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 1px 1px 4px rgba(16, 24, 40, .08);
+    // box-shadow: 1px 1px 4px rgba(16, 24, 40, .08);
     transition: background-color .18s, color .18s, box-shadow .18s, width .18s, padding .18s;
 
     &:hover {
       background: #f4f7fb;
       color: var(--blu);
-      box-shadow: 2px 2px 8px rgba(16, 24, 40, .12);
+      // box-shadow: 2px 2px 8px rgba(16, 24, 40, .12);
     }
 
     // L'attiva si stacca dalle altre per colore pieno, non solo per sfumatura: in mezzo a un
@@ -261,7 +261,7 @@ cds-fulfillment {
       background: var(--blu);
       border-color: var(--blu);
       color: #fff;
-      box-shadow: 2px 2px 10px rgba(33, 150, 243, .35);
+      // box-shadow: 2px 2px 10px rgba(33, 150, 243, .35);
     }
   }
 
@@ -273,16 +273,50 @@ cds-fulfillment {
     ::ng-deep svg { width: 20px; height: 20px; fill: currentColor; }
   }
 
+  // Le icone disegnate a contorni: riempirne i tracciati le trasformerebbe in una macchia.
+  // La stessa distinzione che fanno i pannelli, qui sulla striscia.
+  .cds-left-rail__icon--stroke {
+    ::ng-deep svg { fill: none; stroke: currentColor; }
+  }
+
   // L'etichetta esiste solo sulla linguetta attiva: sulle altre direbbe quello che l'icona
   // dice gia', occupando spazio sopra al flusso.
   .cds-left-rail__label { display: none; }
   .cds-left-rail__tab.is-active .cds-left-rail__label { display: inline; }
 
-  /* Le misure dei tre pannelli di sinistra, decise una volta sola.
-     Sono proprieta' personalizzate e non variabili Sass di proposito: ereditano lungo il DOM,
-     quindi attraversano l'incapsulamento degli stili dei componenti. Senza, servirebbe un
-     import in ognuno dei tre file e tre copie degli stessi numeri -- che e' esattamente il
-     modo in cui erano finiti a divergere (righe da 12, 13 e 14px, raggi 6 e 8). */
+  /* Il linguaggio visivo dei pannelli di sinistra, dichiarato una volta sola.
+     I nomi sono quelli del Design Studio V4 (`--ds-*`, `--space-*`, `--fs-*`) per rendere
+     immediato il confronto fra i due progetti; i colori delle categorie sono gli stessi
+     espressi in esadecimale, perche' l'oklch del V4 qui non aggiunge nulla e toglie supporto.
+     Sono proprieta' personalizzate e non variabili Sass: ereditano lungo il DOM, quindi
+     attraversano l'incapsulamento degli stili dei componenti senza un import per file -- che
+     e' il modo in cui erano finiti a divergere. */
+  .box-left {
+    --ds-ink:     #1a1a19;
+    --ds-ink-2:   #4a4a47;
+    --ds-muted:   #8a8884;
+    --ds-border:  #ececea;
+    --ds-canvas:  #f7f6f3;
+    --ds-surface: #ffffff;
+
+    --space-1: 2px;  --space-2: 4px;  --space-3: 6px;
+    --space-4: 8px;  --space-5: 10px; --space-6: 12px;
+
+    --fs-md: 13px;   --fs-sm: 12px;   --fs-tag: 10.5px;
+    --fw-medium: 500;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --size-icon-cell: 22px;
+    --size-icon-base: 14px;
+    --transition-fast: .12s;
+
+    --cat-most-used:        #5fa832;  --cat-most-used-soft:    #e8f6dd;
+    --cat-ai:               #2a8fd4;  --cat-ai-soft:           #dceefa;
+    --cat-flow:             #e08a1e;  --cat-flow-soft:         #fbeed9;
+    --cat-integrations:     #5a2d8f;  --cat-integrations-soft: #ece0f5;
+    --cat-special:          #dcb423;  --cat-special-soft:      #fbf3d7;
+  }
+
   .box-left {
     --lp-font: var(--font-family-poppins);
     --lp-font-size: 13px;
@@ -347,7 +381,7 @@ cds-fulfillment {
       border-radius: 0em;
       overflow: hidden;
       margin: 0px;
-      padding: 0px 2px 10px 2px;
+      padding: 0px 0px 10px 0px;
       align-items: flex-start;
       overflow-y: auto;
 
@@ -369,6 +403,25 @@ cds-fulfillment {
       width: $box-left-width-closed;
       max-width: $box-left-width-closed;
       min-width: $box-left-width-closed;
+    }
+
+    /* In V3 la sinistra e' larga quanto la chat, e non per un numero copiato: le schede si
+       alternano nello stesso slot, e due misure diverse si leggono come un salto del canvas a
+       ogni cambio di linguetta. La variabile e' quella che la chat scrive sulla riga che le due
+       colonne condividono, quindi trascinando il bordo della chat questo pannello la segue da
+       solo -- restando uguale anche dopo un ridimensionamento, che e' il punto.
+       Solo in V3: sugli agenti precedenti la chat non c'e' e la sinistra resta com'era. */
+    &.is-v3 {
+      width: var(--agent-chat-width);
+      max-width: var(--agent-chat-width);
+      min-width: var(--agent-chat-width);
+
+      // Tre classi contro due: senza questo vincerebbe la regola qui sopra, che viene dopo.
+      &.is_closed {
+        width: $box-left-width-closed;
+        max-width: $box-left-width-closed;
+        min-width: $box-left-width-closed;
+      }
     }
 
 

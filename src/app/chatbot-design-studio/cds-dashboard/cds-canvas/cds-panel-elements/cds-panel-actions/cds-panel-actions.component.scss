@@ -1,3 +1,5 @@
+@use '../../left-panel' as lp;
+
 @import "./src/assets/sass/cds/_variables.scss";
 
 
@@ -37,51 +39,37 @@ $base-padding: 3px;
 
 
 .action-box {
-    padding: 0px $base-padding;
+    padding: 0px;
 }
 
+/* Riga dell'azione, allineata al V4. I valori arrivano dal pannello che la contiene
+   (cds-panel-elements), che li dichiara sul proprio host: qui bastano i ripieghi, perche'
+   questo componente non e' usato altrove. */
 .actions-btns-wpr {
-    // width: 136px; // dp
-    width: 100%; // nk
-    height: var(--lp-row-height, 32px);
-    border-radius: var(--lp-row-radius, 6px);
-    padding: var(--lp-row-padding, 0 8px);
-    gap: var(--lp-gap, 8px);
-    font-family: var(--lp-font, var(--font-family-poppins));
-    font-size: var(--lp-font-size, 13px);
-    color: var(--lp-text, #475467);
-    transition: background-color var(--lp-transition, .15s ease);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-    // Senza padding orizzontale: la riga parte e finisce col pannello.
-    padding: 0 0 0 4px;
-    &:hover{
-        cursor: -webkit-grab; 
-        cursor: grab;
-        // Al posto dell'ombra, un fondo: la riga si accende restando nel piano del pannello
-        // invece di sollevarsene. Si legge anche dove un'ombra tenue sparisce, e scorrendo
-        // l'elenco non fa ballare le voci una dopo l'altra.
-        background-color: var(--lp-hover-bg, #e0e3f1);
+    width: 100%;
+    @include lp.lp-row;
+    cursor: -webkit-grab;
+    cursor: grab;
+    &:active { cursor: grabbing; }
+}
 
-        img{
-            filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
-            cursor: -webkit-grab; 
-            cursor: grab;
-        }
 
-        .action-btn-text{
-            color: $text-hover-color
-        }
-    }
+/* L'icona in una cella squadrata con bordo, come nel V4: distingue l'azione dal testo senza
+   doverla colorare, e tiene le righe allineate anche con icone di forme diverse. */
+.action-btn-icon:first-of-type {
+    @include lp.lp-icon-cell;
+}
 
+
+.action-btn-text {
+    @include lp.lp-row-name;
 }
 
 
 .action-btn-icon {
     display: inline-flex;
-    color: $text-color;
+    // La tinta della cella la da' il mixin: azzurra, l'icona competeva col nome.
+    color: inherit;
     padding: 0;
     vertical-align: middle;
     // margin: 0 6px;
@@ -151,13 +139,12 @@ $base-padding: 3px;
 }
 
 
-.action-btn-text{
-    // display: inline-flex;
-    color: $text-color;
+// Corpo, colore e peso del nome arrivano dal mixin condiviso, incluso piu' sopra. Qui
+// restavano l'azzurro e i 10px del cassetto sospeso, e vincevano perche' dichiarati dopo:
+// e' il motivo per cui i nomi delle azioni restavano diversi da quelli dei blocchi.
+.action-btn-text {
     padding: 0;
     vertical-align: middle;
-    font-size: 10px;
-    font-weight: 400;
 }
 
 
@@ -196,9 +183,7 @@ $base-padding: 3px;
     }
 
     .action-btn-text {
-        color: $text-hover-color;
-        font-size: 10px;
-        font-weight: 300;
+        // Al passaggio cambia il fondo della riga, non il testo: era una terza misura ancora.
     }
 }
   
@@ -324,7 +309,8 @@ $base-padding: 3px;
             width: 12px;
             filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%)
         }
-        .action-btn-text{
+        // Bianco solo qui: e' il segnaposto che segue il puntatore, su fondo pieno.
+        .action-btn-text {
             color: white;
         }
     }
@@ -380,24 +366,35 @@ $base-padding: 3px;
 .action-info-btn {
     flex: 0 0 auto;
     margin-left: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 22px;
     height: 22px;
     padding: 0;
+    display: grid;
+    place-items: center;
+    // Quadrato arrotondato come nel V4, non un cerchio: lo stesso raggio della cella
+    // dell'icona a sinistra, cosi' i due estremi della riga si rispondono.
     border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: #98a2b3;
+    border-radius: var(--radius-md, 6px);
+    background: none;
+    color: var(--ds-muted, #8a8884);
     cursor: pointer;
     opacity: 0;
-    transition: opacity .15s, background-color .15s, color .15s;
+    transition: opacity var(--transition-fast, .12s), background var(--transition-fast, .12s), color var(--transition-fast, .12s);
 
-    .svg-icon { width: 16px; height: 16px; }
-    ::ng-deep svg { width: 16px; height: 16px; fill: currentColor; }
+    // Icona a tratto, come tutte quelle del V4: `fill: none` e il tratto che segue il colore
+    // del testo. Senza `fill: none` un'icona disegnata a contorni si riempirebbe di nero.
+    .svg-icon { width: 13px; height: 13px; }
+    ::ng-deep svg {
+        width: 13px;
+        height: 13px;
+        fill: none;
+        stroke: currentColor;
+    }
 
-    &:hover { background: #eef2f6; color: var(--blu); }
+    &:hover {
+        background: var(--ds-border, #ececea);
+        color: var(--ds-ink, #1a1a19);
+    }
 }
 
 .actions-btns-wpr:hover .action-info-btn { opacity: 1; }

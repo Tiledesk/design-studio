@@ -90,6 +90,15 @@ export class LeftPanelStateService {
    *  browser che disegni e resterebbero in avvio per sempre. */
   public finishBootNow(): void { this._isBooting$.next(false); }
 
+  /** Rimette l'avvio, per il prossimo ingresso nello studio.
+   *
+   *  Questo servizio vive quanto l'applicazione, non quanto lo studio: uscendo verso l'elenco
+   *  degli agenti e rientrando su un altro non c'e' nessun ricaricamento di pagina, e senza
+   *  questo si riaprirebbe l'ultima scheda guardata sull'agente precedente. Aprire un agente e'
+   *  un avvio, e riparte dalla sua scheda iniziale; restano fuori i cambi di flusso dentro lo
+   *  studio, che non distruggono il dashboard e dove la scheda scelta deve restare. */
+  public restartBoot(): void { this._isBooting$.next(true); }
+
   public finishBoot(): void {
     if (!this._isBooting$.value) { return; }
     requestAnimationFrame(() => {

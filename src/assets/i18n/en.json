@@ -278,7 +278,8 @@
         "SelectProvider":"Select provider",
         "SelectAnOption":"Select an option",
         "TextToSpeechModelDescription": "Generates audio from the input text.",
-        "SpeechToTextModelDescription":"Transcribes audio into the input language."
+        "SpeechToTextModelDescription":"Transcribes audio into the input language.",
+        "SelectABlock": "Select a block"
     },
     "VoiceSettings":"Voice settings",
     "BotDetails": "Bot details",
@@ -749,7 +750,9 @@
         "Actions": "Actions",
         "SearchAction": "Search an action",
         "NoActionFound": "No action matches your search",
-        "ActionInfo": "Action details"
+        "ActionInfo": "Action details",
+        "BlocksRenamed": "Renamed",
+        "BlocksUntitled": "Default name"
     },
     "Alert": {
         "ErrorMaxOptions": "Cannot add another option. Max available options achived ( 0..9, *, # )",

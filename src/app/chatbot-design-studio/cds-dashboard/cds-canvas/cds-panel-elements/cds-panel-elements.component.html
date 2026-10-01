@@ -3,23 +3,47 @@
      una scheda quel menu' non ha dove comparire, e il pannello restava vuoto. -->
 <div class="cds-actions-panel">
 
-    <div class="cds-actions-panel__search">
-        <mat-icon class="cds-actions-panel__search-icon" svgIcon="search" aria-hidden="true"></mat-icon>
-        <input type="text"
-            [(ngModel)]="searchText"
-            (ngModelChange)="onSearchChange()"
-            [attr.placeholder]="'CDSCanvas.SearchAction' | translate">
+    <!-- Intestazione e ricerca nella stessa forma del pannello dei blocchi: le due schede si
+         alternano nello stesso slot, e partire da altezze diverse si legge come un salto. -->
+    <div class="lp-head-title">
+        <span class="lp-head-title__text">{{ 'CDSCanvas.Actions' | translate }}</span>
+        <button type="button" class="lp-head-title__close"
+            [attr.aria-label]="'Close' | translate"
+            (click)="onClosePanel()">
+            <mat-icon class="icon" svgIcon="chevron_left" aria-hidden="true"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Struttura e classi clonate dal pannello dei blocchi: le due ricerche sono la stessa
+         cosa nello stesso punto dello schermo, e con due marcature diverse tornerebbero a
+         divergere alla prima modifica. -->
+    <div class="lp-search-head">
+    <div class="search-box">
+        <div class="icon-container">
+            <mat-icon class="icon" svgIcon="search" aria-hidden="true"></mat-icon>
+        </div>
+        <div class="input-box-search-input-wpr">
+            <input class="custom-input ellips"
+                [(ngModel)]="searchText"
+                (ngModelChange)="onSearchChange()"
+                placeholder="{{ 'CDSCanvas.SearchAction' | translate }}">
+        </div>
         <button type="button" class="cds-actions-panel__clear" *ngIf="searchText"
             (click)="clearSearch()">&times;</button>
     </div>
+    </div>
 
     <div class="cds-actions-panel__body">
-        <div class="cds-actions-cat" *ngFor="let category of ACTION_CATEGORY">
+        <div class="cds-actions-cat" *ngFor="let category of ACTION_CATEGORY"
+             [attr.data-cat]="category.type">
             <ng-container *ngIf="visibleActions(category.type)?.length > 0">
 
                 <button type="button" class="cds-actions-cat__header"
                     (click)="toggleCategory(category.type)">
-                    <mat-icon class="cds-actions-cat__icon" [svgIcon]="category.src" aria-hidden="true"></mat-icon>
+                    <!-- Un pallino colorato per categoria, come nel V4: l'icona ripeteva in
+                         piccolo quello che dice gia' il nome, il colore invece si ritrova a
+                         colpo d'occhio scorrendo l'elenco. -->
+                    <span class="cds-actions-cat__dot" aria-hidden="true"></span>
                     <span class="cds-actions-cat__name">{{ category.name | translate }}</span>
                     <span class="cds-actions-cat__count">{{ visibleActions(category.type).length }}</span>
                     <span class="cds-actions-cat__chevron" [class.is-open]="isCategoryOpen(category.type)">&rsaquo;</span>
