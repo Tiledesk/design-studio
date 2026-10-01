@@ -43,6 +43,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   webhook: any = null;
   spEnabled: boolean = false;
   spSourceName: string = '';
+  defaultSourceName: string = '';
   spBusy: boolean = false;
 
   // Connector management
@@ -119,6 +120,8 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.maximize = true;
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
     this.chatbot_id = this.dashboardService.id_faq_kb;
+    // an empty source name falls back to the chatbot name on the server
+    this.defaultSourceName = this.dashboardService.selectedChatbot?.name || '';
     this.getWebhook();
   }
 

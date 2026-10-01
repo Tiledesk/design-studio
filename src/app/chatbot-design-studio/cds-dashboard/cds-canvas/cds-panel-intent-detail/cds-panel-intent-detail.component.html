@@ -161,7 +161,7 @@
 
             <div class="field-box">
                 <label class="title-label">{{ 'CDSCanvas.StartWebhookSourceName' | translate }}</label>
-                <input class="start-point-input" type="text" [(ngModel)]="spSourceName" (change)="onStartPointSourceNameChange()">
+                <input class="start-point-input" type="text" [(ngModel)]="spSourceName" [placeholder]="defaultSourceName" (change)="onStartPointSourceNameChange()">
             </div>
 
             <div class="webhook-buttons">
