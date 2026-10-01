@@ -118,15 +118,35 @@
         </cds-attributes>
     </div>
     
-    <div class="cds-web-request-row" *ngIf="optionSelected === 'body'" [ngSwitch]="action?.bodyType ">
+    <div class="cds-web-request-row" *ngIf="optionSelected === 'body'" [ngSwitch]="bodyMode">
 
-        <cds-radio-buttons
-            [items]="bodyOptions"
-            [rows]="1" [columns]="3"
-            (changeButtonSelect)="onChangeButtonSelect($event)">
-        </cds-radio-buttons>
+        <div class="cds-web-request-body-selectors">
+            <cds-select
+                class="cds-body-mode-select"
+                [items]="bodyModes"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [sortAlphabetically]="false"
+                [searchable]="false"
+                [clearable]="false"
+                [itemSelected]="bodyMode"
+                (onSelected)="onChangeBodyMode($event)">
+            </cds-select>
 
-        <cds-textarea *ngSwitchCase="'json'"
+            <cds-select *ngIf="bodyMode === 'raw'"
+                class="cds-raw-type-select"
+                [items]="rawTypes"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [sortAlphabetically]="false"
+                [searchable]="false"
+                [clearable]="false"
+                [itemSelected]="rawType"
+                (onSelected)="onChangeRawType($event)">
+            </cds-select>
+        </div>
+
+        <cds-textarea *ngSwitchCase="'raw'"
             [ngClass]="{'jsonError': !jsonIsValid}"
             class = "text-editable-div"
             [text]="body"
@@ -135,7 +155,7 @@
             [setAttributeBtn]="true"
             [minRow]="10" [maxRow]="10"
             [readonly]="false"
-            [isJsonAttribute]="true"
+            [isJsonAttribute]="rawType === 'json'"
             (blur)="onBlur($event)"
             (changeTextarea)="onChangeTextarea($event, 'body')">
         </cds-textarea>
@@ -149,7 +169,7 @@
             (onDataRowChanged)="onFormDataChanged($event)">
         </cds-form-data>
 
-        <div class="cds-web-request-row-body center json-error-yes" *ngIf="action?.bodyType === 'body' && !jsonIsValid">
+        <div class="cds-web-request-row-body center json-error-yes" *ngIf="bodyMode === 'raw' && !jsonIsValid">
             <span>{{errorMessage}}</span>
         </div>
 

@@ -1,15 +1,24 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
-import { MatMenuTrigger } from '@angular/material/menu';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
 import { TYPE_OF_MENU } from '../../../utils';
-import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, isActionAvailableInSubagentContext } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, availableActionEntries, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { environment } from 'src/environments/environment';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
 
 import { LeftPanelStateService } from '../../../services/left-panel-state.service';
+
+const START_POINTS_CATEGORY = 'START_POINTS';
+
 @Component({
   selector: 'cds-panel-elements',
   templateUrl: './cds-panel-elements.component.html',
@@ -17,15 +26,17 @@ import { LeftPanelStateService } from '../../../services/left-panel-state.servic
   // standalone: true,
   // imports: [MatButtonModule, MatMenuModule],
 })
-export class CdsPanelElementsComponent implements OnInit {
-  @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
-  @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
+export class CdsPanelElementsComponent implements OnInit, OnChanges {
 
 
-    /** La lista che riceve i rilasci sullo stage, da collegare alla tavolozza. */
+  /** La lista che riceve i rilasci sullo stage, da collegare alla tavolozza. */
   @Input() stageDropListId: string;
-
-@Output() addNewElement = new EventEmitter();
+  /** blocks of the flow: a block carrying a start point marker makes that start point present */
+  @Input() intents: Array<any> = [];
+  /** true while a start box is being created: its palette item stays disabled */
+  @Input() startPointPending: boolean = false;
+  @Output() focusStartPoint = new EventEmitter<string>();
+  @Output() addNewElement = new EventEmitter();
   // @Output() showPanelActions = new EventEmitter();
   @Output() onMouseOverActionMenuSx = new EventEmitter();
   @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
@@ -37,20 +48,48 @@ export class CdsPanelElementsComponent implements OnInit {
   // Il menu a comparsa che si apriva passando sulle categorie non esiste piu': la tavolozza e'
   // un pannello, e le categorie si aprono al suo interno. Con lui se ne sono andati i campi che
   // ne tenevano posizione e stato, e i cinque metodi che li muovevano.
+  //
+  // menuCategory holds the enum KEY (ACTION_CATEGORY[].type === getKeyByValue(...)), not the value.
+  INTEGRATIONS_CATEGORY_KEY = getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY);
 
   actionsByCategory = {};
-  
+  connectorGroups: ConnectorGroup[] = [];
+
+
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
     private readonly dashboardService: DashboardService,
     private readonly translate: TranslateService,
-    private readonly leftPanelState: LeftPanelStateService
+    private readonly leftPanelState: LeftPanelStateService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
+    private readonly projectService: ProjectService,
+    private readonly readOnlyService: ReadOnlyService,
   ) { }
 
   ngOnInit(): void {
     this.createActionListByCategory();
+    this.loadConnectorActions();
+    this.loadConfiguredConnectors();
+  }
+
+  ngOnChanges(): void {
+    // Le voci dei punti di partenza dicono quali esistono gia' nel flusso e se ce n'e' uno in
+    // creazione: vanno rifatte quando il flusso cambia. Prima questo valeva per il menu aperto,
+    // che qui non c'e' piu': la sezione vive nell'elenco, e si aggiorna li'.
+    if (this.actionsByCategory[START_POINTS_CATEGORY]) {
+      this.actionsByCategory[START_POINTS_CATEGORY] = this.buildStartPointItems();
+    }
+  }
+
+  buildStartPointItems(): Array<any> {
+    // Sola lettura: nessun box di partenza si aggiunge, le voci restano disabilitate
+    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending || this.readOnlyService.readOnly);
+  }
+
+  onStartPointClick(type: string) {
+    this.focusStartPoint.emit(type);
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -60,6 +99,7 @@ export class CdsPanelElementsComponent implements OnInit {
   onDraggingMenuElement(event) {
     this.isDraggingMenuElement = event;
   }
+
 
   
 
@@ -135,19 +175,24 @@ export class CdsPanelElementsComponent implements OnInit {
 
   createActionListByCategory(){
     const subtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
-    const isSubagent = isSubagentSubtype(subtype);
-    this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype, 'isSubagent:', isSubagent);
+    this.logger.log('[CDS-PANEL-ELEMENTS] subtype:: ', ACTIONS_LIST, subtype, 'isSubagent:', isSubagentSubtype(subtype));
     // subtype normalizzato: un subagent è a tutti gli effetti un chatbot, altrimenti
     // checkIfActionIsInChatbotType disattiverebbe ogni azione (nessuna dichiara 'subagent')
     this.projectPlanUtils.checkIfActionIsInChatbotType(resolveChatbotSubtype(subtype));
+    // The same filter get_project_capabilities answers the agent chat with.
+    const available = availableActionEntries(subtype,
+      (type, plan) => this.projectPlanUtils.checkIfCanLoad(type, plan));
     ACTION_CATEGORY.forEach(category => {
-      let menuItemsList = Object.values(ACTIONS_LIST).filter(el => (el.category === TYPE_ACTION_CATEGORY[category.type] && el.status !== 'inactive' && isActionAvailableInSubagentContext(el, isSubagent))).map(element => {
-        return {
-          type: TYPE_OF_MENU.ACTION,
-          value: element,
-          canLoad: element.plan? this.projectPlanUtils.checkIfCanLoad(element.type, element.plan) : true
-        };
-      });
+      if (category.type === START_POINTS_CATEGORY) {
+        // start points are not actions: only conversational chatbots have them
+        if (subtype === TYPE_CHATBOT.CHATBOT) {
+          this.actionsByCategory[category.type] = this.buildStartPointItems();
+        }
+        return;
+      }
+      let menuItemsList = available
+        .filter(a => a.entry.category === TYPE_ACTION_CATEGORY[category.type])
+        .map(a => ({ type: TYPE_OF_MENU.ACTION, value: a.entry, canLoad: a.canLoad }));
       if(menuItemsList.length>0){
         this.actionsByCategory[category.type] = menuItemsList;
       }
@@ -155,6 +200,43 @@ export class CdsPanelElementsComponent implements OnInit {
     });
     this.logger.log('[CDS-PANEL-ELEMENTS] actionsByCategory:: ', this.actionsByCategory);
     this.openFirstCategory();
+  }
+
+  loadConnectorActions() {
+    const projectId = this.dashboardService.projectID;
+    if (!projectId) { return; }
+    this.projectService.getIntegrations(projectId).pipe(
+      catchError(() => of(null))
+    ).subscribe((integrations: any) => {
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl }) => {
+        this.connectorCatalogService.fetchManifest(baseUrl).pipe(
+          catchError(() => of(null))
+        ).subscribe(manifest => {
+          if (!manifest) { return; }
+          const group = this.connectorCatalogService.toConnectorGroup(manifest);
+          if (!group.entries || group.entries.length === 0) { return; }
+          this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
+        });
+      });
+    });
+  }
+
+  // TEMP: surface connectors from a statically configured base URL (environment.connectorBaseUrls)
+  // until the per-project install / integration-record flow exists. Feeds the same connectorGroups
+  // as loadConnectorActions(); dedupe-by-id keeps it from doubling once the dynamic path is live.
+  loadConfiguredConnectors() {
+    const urls: string[] = (environment as any).connectorBaseUrls || [];
+    urls.forEach((baseUrl: string) => {
+      if (!baseUrl) { return; }
+      this.connectorCatalogService.fetchManifest(baseUrl).pipe(
+        catchError(() => of(null))
+      ).subscribe(manifest => {
+        if (!manifest) { return; }
+        const group = this.connectorCatalogService.toConnectorGroup(manifest);
+        if (!group.entries || group.entries.length === 0) { return; }
+        this.connectorGroups = [...this.connectorGroups.filter(g => g.id !== group.id), group];
+      });
+    });
   }
 
 }

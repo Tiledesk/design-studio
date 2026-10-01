@@ -49,6 +49,9 @@
     border-bottom: 1px solid var(--ds-border);
     &:last-child { border-bottom: none; }
 
+    // I punti di partenza prendono il verde dell'avvio: e' da li' che la conversazione comincia,
+    // ed e' il colore con cui il blocco di avvio si riconosce sul flusso.
+    &[data-cat="START_POINTS"] { --cat-color: #2e9e6b;                 --cat-soft: #e2f4ec; }
     &[data-cat="MOST_USED"]    { --cat-color: var(--cat-most-used);    --cat-soft: var(--cat-most-used-soft); }
     &[data-cat="AI"]           { --cat-color: var(--cat-ai);           --cat-soft: var(--cat-ai-soft); }
     &[data-cat="FLOW"]         { --cat-color: var(--cat-flow);         --cat-soft: var(--cat-flow-soft); }

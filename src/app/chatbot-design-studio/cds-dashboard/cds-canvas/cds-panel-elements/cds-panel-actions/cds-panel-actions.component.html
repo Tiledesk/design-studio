@@ -1,68 +1,77 @@
-<div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
+<div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()" (wheel)="$event.stopPropagation()">
 
-    <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
-        cdkDropList [cdkDropListData]="menuItemsList"
-        [cdkDropListConnectedTo]="stageDropListId ? [stageDropListId] : []">
-        
+    <!-- ACTION: shared draggable list -->
+    <cds-action-drag-list *ngIf="menuType === TYPE_OF_MENU.ACTION"
+        [items]="menuItemsList"
+        [stageDropListId]="stageDropListId"
+        (isDragging)="onChildDragging($event)"
+        (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
+        (hoverItem)="openInfo($event.element, $event.value)"
+        (leaveItem)="closeInfo()"
+        (itemClick)="onItemClick($event)">
+    </cds-action-drag-list>
 
-        <!-- <div [style.display]="isDragging?'block':'none'" class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;">
-                <div *ngIf="indexDrag===i" class="example-custom-placeholder"></div>
-                <div *ngIf="indexDrag!==i" class="actions-btns-wpr">
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <button class="btn btn-tdblu-no-boxshadow action-btn">
-                            <img [src]="item.value.src" [title]="item.value.name">
-                        </button>
-                    </div>
-                    <div *ngIf="item.value.name" class="action-btn-text">{{item.value.name}}</div>
-                </div>
-            </div>
-        </div> -->
-
-
-        <div *ngIf="menuType === TYPE_OF_MENU.ACTION"
-            class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
-                (cdkDragEnded)="onDragEnd($event)"
-                [cdkDragDisabled]="item.value.disabled">
-
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
-
-                <div class="actions-btns-wpr" #divAction
-                    [attr.id]="'menu-trigger-' + i">
-                    
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
-                        <!-- <img [src]="item.value.src" [title]="item.value.name | translate" alt=""> -->
-                    </div>
-                    <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
-                    <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
-                    <!-- <span *ngIf="item.value.badge" class="trigger-beta-badge" [class.deprecation-badge]="item.value.badge==='DEP'" [class.beta-badge]="item.value.badge==='beta'" [class.new-badge]="item.value.badge==='new'">{{item.value.badge}}</span> -->
-                    <span *ngIf="item.value.badge" [class]="'trigger-beta-badge badge-' + item.value.badge">{{item.value.badge}}</span>
-
-                    <!-- La descrizione si apre da qui e non passando sulla riga: la riga si
-                         trascina tutta, e un riquadro che compariva al solo passaggio finiva
-                         sopra a quello che si stava per prendere. -->
-                    <button type="button" class="action-info-btn"
-                        [attr.aria-label]="'CDSCanvas.ActionInfo' | translate"
-                        (mouseenter)="openInfo(divAction, item.value)"
-                        (mouseleave)="closeInfo()"
-                        (click)="$event.stopPropagation()">
-                        <mat-icon class="svg-icon" svgIcon="info" aria-hidden="true"></mat-icon>
-                    </button>
-                </div>
-            </div>
+    <!-- CONNECTOR GROUP ROWS -->
+    <div *ngIf="menuType === TYPE_OF_MENU.ACTION && groupRows.length > 0"
+        [style.display]="isDragging?'none':'block'" class="connector-groups">
+        <div class="connector-group-row" *ngFor="let row of groupRows" #groupRowEl
+            (mouseover)="openGroup(groupRowEl, row)"
+            (mouseleave)="closeGroup()">
+            <span class="action-btn-icon">
+                <img class="connector-group-icon" [src]="row.group.icon" alt="" aria-hidden="true">
+            </span>
+            <span class="action-btn-text truncate">{{ row.group.name }}</span>
+            <span class="group-chevron">&rsaquo;</span>
         </div>
+    </div>
 
-        <div *ngIf="menuType === TYPE_OF_MENU.EVENT" 
-            class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
+    <!-- NESTED CONNECTOR FLYOUT -->
+    <div id="connector_flyout" class="connector-flyout"
+        [style.display]="activeGroup ? 'block' : 'none'"
+        [style.top.px]="activeGroupPos.y"
+        [style.left.px]="activeGroupPos.x"
+        (mouseover)="onOverNested()"
+        (mouseleave)="onLeaveNested()">
+
+        <ng-container *ngIf="activeSubgroups.length > 0; else flatConnectorList">
+            <div class="connector-subgroups-scroll">
+                <div class="connector-subgroup" *ngFor="let sg of activeSubgroups">
+                    <div class="connector-subgroup-header">
+                        <img class="connector-group-icon" *ngIf="sg.icon" [src]="sg.icon" alt="" aria-hidden="true">
+                        <span class="action-btn-text truncate">{{ sg.name }}</span>
+                    </div>
+                    <cds-action-drag-list
+                        [items]="sg.items"
+                        [stageDropListId]="stageDropListId"
+                        (isDragging)="onChildDragging($event)"
+                        (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
+                        (hoverItem)="openInfo($event.element, $event.value)"
+                        (leaveItem)="closeInfo()">
+                    </cds-action-drag-list>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-template #flatConnectorList>
+            <cds-action-drag-list
+                [items]="activeItems"
+                [stageDropListId]="stageDropListId"
+                (isDragging)="onChildDragging($event)"
+                (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
+                (hoverItem)="openInfo($event.element, $event.value)"
+                (leaveItem)="closeInfo()">
+            </cds-action-drag-list>
+        </ng-template>
+    </div>
+
+    <!-- EVENT: unchanged -->
+    <div *ngIf="menuType === TYPE_OF_MENU.EVENT" class="action-list" id="action_list_drop_connect"
+        cdkDropList [cdkDropListData]="menuItemsList">
+        <div [style.display]="isDragging?'none':'block'" class="menu-dragging">
+            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
+                cdkDrag
+                (cdkDragStarted)="onDragStarted($event, i)"
+                (cdkDragMoved)="onDragMoved($event)"
                 (cdkDragEnded)="onDragEnd($event)">
 
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
@@ -80,7 +89,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
 

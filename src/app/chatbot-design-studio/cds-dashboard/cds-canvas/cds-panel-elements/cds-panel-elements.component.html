@@ -50,11 +50,17 @@
                 </button>
 
                 <div class="cds-actions-cat__body" *ngIf="isCategoryOpen(category.type)">
+                    <!-- I connettori installati arrivano solo alla sezione delle integrazioni: sono
+                         azioni che un connettore porta con se', e altrove non avrebbero senso.
+                         I punti di partenza invece non si trascinano: si premono, e il canvas
+                         porta su quello scelto. -->
                     <cds-panel-actions
                         [actionsList]="visibleActions(category.type)"
                         [stageDropListId]="stageDropListId"
                         [menuType]="TYPE_OF_MENU.ACTION"
                         [menuCategory]="category.type"
+                        [connectorGroups]="category.type === INTEGRATIONS_CATEGORY_KEY ? connectorGroups : []"
+                        (startPointClick)="onStartPointClick($event)"
                         (isDraggingMenuElement)="onDraggingMenuElement($event)"
                         (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
                     </cds-panel-actions>

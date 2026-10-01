@@ -1,5 +1,3 @@
-@use '../../left-panel' as lp;
-
 @import "./src/assets/sass/cds/_variables.scss";
 
 
@@ -7,22 +5,17 @@ $text-color: var(--blu);
 $icon-color: var(--gray-light-01);
 $text-hover-color: var(--blu);
 $icon-hover-color: var(--blu);
-$base-padding: 3px;
+$base-padding: 6px;
 
 :host{
     --tooltip-top-position: 0px;
 }
 
 #panel_actions_div{
-    // position: absolute;
+    position: relative;
     padding: 0px;
-    // Niente ombra: era quella del cassetto sospeso sopra al canvas. Qui e' un pannello dentro
-    // la colonna di sinistra, e l'ombra lo faceva sembrare staccato da cio' che lo contiene.
-    .menu-dragging,
-    .coming-soon {
-        overflow: hidden;
-        padding: $base-padding 0px ;
-    }
+    // Niente ombra: era quella del cassetto sospeso sopra al canvas. Qui e' una scheda dentro
+    // la colonna di sinistra, e l'ombra la faceva sembrare staccata da cio' che la contiene.
     .section-title {
         padding-top: 3px;
         font-size: 11px;
@@ -38,188 +31,18 @@ $base-padding: 3px;
 }
 
 
-.action-box {
-    padding: 0px;
-}
-
-/* Riga dell'azione, allineata al V4. I valori arrivano dal pannello che la contiene
-   (cds-panel-elements), che li dichiara sul proprio host: qui bastano i ripieghi, perche'
-   questo componente non e' usato altrove. */
+// EVENT branch: component-scoped copies of the drag rules (view encapsulation requires them here)
+.action-box { padding: 0px 6px; }
 .actions-btns-wpr {
-    width: 100%;
-    @include lp.lp-row;
-    cursor: -webkit-grab;
-    cursor: grab;
-    &:active { cursor: grabbing; }
+  width: 100%; height: 30px; border-radius: 6px; display: flex; align-items: center;
+  justify-content: space-between; gap: 5px; padding: 0px 2px;
+  // Al posto dell'ombra, un fondo: la riga si accende restando nel piano del pannello.
+  &:hover { cursor: grab; background: var(--ds-canvas, #f7f6f3); }
 }
-
-
-/* L'icona in una cella squadrata con bordo, come nel V4: distingue l'azione dal testo senza
-   doverla colorare, e tiene le righe allineate anche con icone di forme diverse. */
-.action-btn-icon:first-of-type {
-    @include lp.lp-icon-cell;
-}
-
-
-.action-btn-text {
-    @include lp.lp-row-name;
-}
-
-
-.action-btn-icon {
-    display: inline-flex;
-    // La tinta della cella la da' il mixin: azzurra, l'icona competeva col nome.
-    color: inherit;
-    padding: 0;
-    vertical-align: middle;
-    // margin: 0 6px;
-    .btn-tdblu-no-boxshadow {
-        margin: 0;
-        padding: 0!important;
-        background: transparent !important;
-        height: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: none;
-    }
-}
-
-
-.truncate {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 100%
-}
-
-.trigger-beta-badge {
-    font-weight: 400;
-    background: linear-gradient(45deg, #3167e2, #a736ff);
-    padding: 1px 8px;
-    border-radius: 5px;
-    padding: 0px 6px;
-    height: 16px;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: #fff;
-    position: relative;
-    margin: 0px 3px;
-    display: flex;
-    align-items: center;
-}
-
-.badge-NEW {
-    background: linear-gradient(45deg, #3167e2, #a736ff);
-}
-
-.badge-BETA {
-    background: linear-gradient(45deg, #e23131, #ff8736);
-}
-
-
-.deprecation-badge,
-.badge-DEP {
-    background: linear-gradient(45deg, #e23131, #640b0b)
-}
-
-.action-btn-icon img{
-    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
-}
-
-.action-btn-icon img,
-.drag-btn img{
-    width: 16px;
-}
-
-.action-btn-icon .svg-icon {
-    width: 16px;
-    color: var(--gray-light-01);
-    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
-}
-
-
-// Corpo, colore e peso del nome arrivano dal mixin condiviso, incluso piu' sopra. Qui
-// restavano l'azzurro e i 10px del cassetto sospeso, e vincevano perche' dichiarati dopo:
-// e' il motivo per cui i nomi delle azioni restavano diversi da quelli dei blocchi.
-.action-btn-text {
-    padding: 0;
-    vertical-align: middle;
-}
-
-
-.example-custom-placeholder {
-    height: 30px;
-    width: 100%;
-    border-radius: 6px;
-    display: block;
-    background: #e7eeefcc;
-}
-
-
-/* Drag placeholder 
-/* ******************************** */
-
-.cdk-drag-preview {
-
-    // cursor: -webkit-grabbing; 
-    // cursor: grabbing;
-
-    .actions-btns-wpr{
-        transform: rotate(-3deg);
-        background-color: white;
-        box-sizing: border-box;
-        border-radius: 6px;
-        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-        0 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0 3px 14px 2px rgba(0, 0, 0, 0.12);
-
-        // cursor: -webkit-grabbing; 
-        // cursor: grabbing;
-    }
-   
-    img{
-        filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
-    }
-
-    .action-btn-text {
-        // Al passaggio cambia il fondo della riga, non il testo: era una terza misura ancora.
-    }
-}
-  
-  
-.cdk-drag-animating {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-  
-.action-box:last-child {
-    border: none;
-}
-
-.action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.action-drag-placeholder {
-    background: #ccc;
-    // background: rgba(221,228,234,.8);
-    border: dotted 3px #999;
-    // border: dashed 1px var(--brown);
-    min-height: 60px;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    border-radius: 8px;
-}
-
-.cdk-drag-disabled{
-    background: var(--gray-02);
-    .actions-btns-wpr,
-    .actions-btns-wpr:hover{
-        cursor: not-allowed;
-        user-select: none;
-        box-shadow: none;
-    }
-}
-
+.action-btn-icon { display: inline-flex; color: var(--blu); }
+.action-btn-icon img, .drag-btn img { width: 16px; }
+.action-btn-text { color: var(--blu); font-size: 10px; font-weight: 400; }
+.menu-dragging { overflow: hidden; padding: 6px 0px; }
 
 
 #menuInfo {
@@ -245,15 +68,15 @@ $base-padding: 3px;
     // sospeso, che era largo tutt'altro. Qui il pannello e' la colonna di sinistra, e un
     // riquadro che parte piu' a destra scavalca la striscia delle linguette.
     left: 100%;
+    // Sopra alla striscia delle linguette (z-index 5): il riquadro esce dal pannello e le
+    // attraversa, e passarci sotto lo rendeva illeggibile proprio dove c'e' da leggere.
+    z-index: 30;
     // border: 2px solid var(--gray-02);
 }
 
 
 // TOOLTIP ACTION INFO ICON : start
 .info-tooltip {
-    // Sopra alla striscia delle linguette (z-index 12): il riquadro esce dal pannello e le
-    // attraversa, e passarci sotto lo rendeva illeggibile proprio dove c'e' da leggere.
-    z-index: 30;
     background-color: var(--color-white-hex);
     color: white;
     font-size: 12px;
@@ -309,8 +132,7 @@ $base-padding: 3px;
             width: 12px;
             filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%)
         }
-        // Bianco solo qui: e' il segnaposto che segue il puntatore, su fondo pieno.
-        .action-btn-text {
+        .action-btn-text{
             color: white;
         }
     }
@@ -319,7 +141,7 @@ $base-padding: 3px;
         display: flex;
         flex-direction: column;
         gap: 5px;
-        
+
         .title{
             font-size: 14px;
         }
@@ -358,46 +180,107 @@ $base-padding: 3px;
     }
 }
 
+.connector-groups { padding: 0 6px 6px; }
 
-/* Info della action: all'estrema destra della riga, al posto della vecchia maniglia di
-   trascinamento -- che non serviva piu', perche' si trascina tutta la riga.
-   Compare passando sulla riga, come nel V4: sempre visibile sarebbe una colonna di icone che
-   ripete la stessa cosa per ogni voce. */
-.action-info-btn {
-    flex: 0 0 auto;
-    margin-left: auto;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    display: grid;
-    place-items: center;
-    // Quadrato arrotondato come nel V4, non un cerchio: lo stesso raggio della cella
-    // dell'icona a sinistra, cosi' i due estremi della riga si rispondono.
-    border: 0;
-    border-radius: var(--radius-md, 6px);
-    background: none;
-    color: var(--ds-muted, #8a8884);
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity var(--transition-fast, .12s), background var(--transition-fast, .12s), color var(--transition-fast, .12s);
-
-    // Icona a tratto, come tutte quelle del V4: `fill: none` e il tratto che segue il colore
-    // del testo. Senza `fill: none` un'icona disegnata a contorni si riempirebbe di nero.
-    .svg-icon { width: 13px; height: 13px; }
-    ::ng-deep svg {
-        width: 13px;
-        height: 13px;
-        fill: none;
-        stroke: currentColor;
-    }
-
-    &:hover {
-        background: var(--ds-border, #ececea);
-        color: var(--ds-ink, #1a1a19);
-    }
+.connector-group-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  .connector-group-icon { width: 16px; height: 16px; object-fit: contain; display: block; }
+  .action-btn-text { flex: 1; }
+  .group-chevron { font-size: 16px; color: var(--gray-light-01); line-height: 1; padding-right: 2px; }
+  &:hover {
+    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    .action-btn-text, .group-chevron { color: var(--blu); }
+  }
 }
 
-.actions-btns-wpr:hover .action-info-btn { opacity: 1; }
-// Il puntatore puo' lasciare la riga per raggiungere il riquadro: finche' quello e' aperto la
-// "i" resta visibile, altrimenti sparirebbe sotto il puntatore a meta' strada.
-.action-info-btn:focus-visible { opacity: 1; }
+.connector-flyout {
+  position: absolute;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+  z-index: 10;
+}
+
+// EVENT branch drag placeholder/preview rules (component-scoped; shared cds-action-drag-list
+// uses Emulated encapsulation so its styles don't reach this host's EVENT template)
+.example-custom-placeholder {
+    height: 30px;
+    width: 100%;
+    border-radius: 6px;
+    display: block;
+    background: #e7eeefcc;
+}
+
+.cdk-drag-preview {
+    .actions-btns-wpr {
+        transform: rotate(-3deg);
+        background-color: white;
+        box-sizing: border-box;
+        border-radius: 6px;
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+    img { filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%); }
+    .action-btn-text { color: var(--blu); font-size: 10px; font-weight: 300; }
+}
+
+.cdk-drag-animating { transition: transform 250ms cubic-bezier(0, 0, 0.2, 1); }
+
+.action-box:last-child { border: none; }
+
+.action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.action-drag-placeholder {
+    background: #ccc;
+    border: dotted 3px #999;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    border-radius: 8px;
+}
+
+.cdk-drag-disabled {
+    background: var(--gray-02);
+    .actions-btns-wpr,
+    .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; }
+}
+
+// Multi-service connectors render one cds-action-drag-list per subgroup, each with its own
+// internal .action-list scroll region — so the combined flyout had no single scrollbar and could
+// grow past the viewport. Cap and scroll the whole group here instead (matches the flat-list
+// .action-list budget: min(70vh, 560px)), and let per-subgroup lists grow naturally inside it.
+.connector-subgroups-scroll {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  ::ng-deep .action-list {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+.connector-subgroup + .connector-subgroup { border-top: 1px solid var(--gray-02, #eceef1); }
+
+.connector-subgroup-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 2px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--gray-light-01, #99a3ad);
+  .connector-group-icon { width: 14px; height: 14px; object-fit: contain; }
+  .action-btn-text { color: inherit; }
+}

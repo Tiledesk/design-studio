@@ -1,0 +1,41 @@
+<div class="action-list" cdkDropList [cdkDropListData]="items"
+    [cdkDropListConnectedTo]="stageDropListId ? [stageDropListId] : []">
+  <div [style.display]="dragging?'none':'block'" class="menu-dragging">
+    <div class="action-box" *ngFor="let item of items; let i = index;"
+        cdkDrag
+        (cdkDragStarted)="onDragStarted($event, i)"
+        (cdkDragMoved)="onDragMoved($event)"
+        (cdkDragEnded)="onDragEnd($event)"
+        [cdkDragData]="item"
+        [cdkDragDisabled]="item.value.disabled">
+
+      <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+
+      <div class="actions-btns-wpr" #divAction
+          [class.disabled]="item.value.disabled"
+          [attr.title]="item.value.tooltip ? (item.value.tooltip | translate) : null"
+          (click)="itemClick.emit(item)"
+          [attr.id]="'menu-trigger-' + i">
+
+        <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
+          <img *ngIf="isUrlIcon(item.value.src); else nativeIcon"
+               class="connector-action-icon" [src]="item.value.src" alt="" aria-hidden="true">
+          <ng-template #nativeIcon>
+            <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
+          </ng-template>
+        </div>
+        <div *ngIf="item.value.name" class="action-btn-text truncate">{{item.value.name | translate}}</div>
+        <span *ngIf="!item.canLoad" class="trigger-beta-badge">PRO</span>
+        <span *ngIf="item.value.badge" [class]="'trigger-beta-badge badge-' + item.value.badge">{{item.value.badge}}</span>
+
+        <button type="button" class="action-info-btn"
+            [attr.aria-label]="'CDSCanvas.ActionInfo' | translate"
+            (mouseenter)="onHover(divAction, item.value)"
+            (mouseleave)="leaveItem.emit()"
+            (click)="$event.stopPropagation()">
+          <mat-icon class="svg-icon" svgIcon="info" aria-hidden="true"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
