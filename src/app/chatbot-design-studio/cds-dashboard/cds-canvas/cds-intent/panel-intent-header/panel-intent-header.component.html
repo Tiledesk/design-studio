@@ -16,9 +16,12 @@
 
     <div class="form-group"
          [class.is-error]="!isNotErrorName"
-         [class.is-start]="isStart || isWebhook">
+         [class.is-start]="isStart || isWebhook"
+         [class.has-start-label]="!!startLabelKey">
+        <div *ngIf="startLabelKey" class="input ellips form-control tds_draggable start-label" [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}">{{ startLabelKey | translate }}</div>
         <input #inputIntentName
                type="text"
+               [hidden]="startLabelKey"
                class="input ellips form-control tds_draggable"
                [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}"
                [(ngModel)]="intentName"

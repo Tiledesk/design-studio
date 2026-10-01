@@ -1,3 +1,4 @@
+import { isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import {
   AfterViewInit,
   Component,
@@ -81,6 +82,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   isOpen: boolean = true;
   positionMenu: any;
   isStart = false;
+  /** marker start box (webhook start) */
+  isStartPointBox = false;
+  /** the start pill shows a fixed label ("Web start", "Webhook start") and is sized to it */
+  hasStartLabel = false;
   isDefaultFallback = false;
   /** true quando il blocco contiene SOLO l'azione "Return to parent agent":
    *  in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita */
@@ -233,9 +238,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
             const intent = data.intent;
             const logAnimationType = data.logAnimationType;
             const scale = data.scale;
-            if(intent && intent.intent_id !== this.intent?.intent_id && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            if(intent && intent.intent_id !== this.intent?.intent_id && this.isLiveStartBlock()){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
-            } else if(!intent && this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            } else if(!intent && this.isLiveStartBlock()){
               const stageElement = document.getElementById(this.intent.intent_id);
               this.addCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
               this.stageService.centerStageOnTopPosition(this.intent.id_faq_kb, stageElement, scale);
@@ -254,7 +259,7 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
               }, 500);
             }
           } else {
-            if(this.intent?.intent_display_name === TYPE_CHATBOT.WEBHOOK){
+            if(this.isLiveStartBlock()){
               this.removeCssClassIntentActive('live-start-intent', '#intent-content-' + this.intent.intent_id);
             }
             this.removeCssClassIntentActive('live-active-intent-pulse', '#intent-content-' + this.intent?.intent_id);
@@ -328,7 +333,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
       this.showIntentOptions = false;
     }
-    
+    // before the await: the toolbar child initialises on the first change detection
+    this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+
     await this.initializeWebhook();
     this.initializeIntentType();
     this.initializeActions();
@@ -362,7 +369,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
       this.isDefaultFallback = true;
     }
-    if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK){
+    this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+    this.hasStartLabel = !!startPointLabelKey(this.intent, this.dashboardService.selectedChatbot?.subtype);
+    if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || this.isStartPointBox){
       this.isStart = true;
       if(this.intent.actions.length === 0){
         let action = new Action;
@@ -643,6 +652,12 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     this.setIntentAttributes();
   }
 
+
+  /** Blocks that get the "live start" highlight: the webhook block, or the webhook start box (by marker) during a webhook start test */
+  private isLiveStartBlock(): boolean {
+    const name = this.intent?.intent_display_name;
+    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && startPointTypeOf(this.intent) === 'webhook');
+  }
 
   /**
    * Chiamata da Angular prima della distruzione del componente.
@@ -1037,6 +1052,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Blocca l’ingresso nella lista se il chatbot è V3 e l’intent ha già un’action (limite un’action per blocco).
    */
   readonly dropListEnterPredicate = (item: CdkDrag<any>) => {
+    // Start points (palette) si droppano solo sullo stage: creano un box, non una action
+    if (isStartPointPaletteItem(item?.data)) {
+      return false;
+    }
     // defaultFallback vuota: blocco chiuso, nessun drop consentito al suo interno
     if (this.isDefaultFallbackLocked) {
       return false;
@@ -1133,6 +1152,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
             this.intentService.moveActionBetweenDifferentIntents(event, action, this.intent.intent_id);
             this.intentService.updateIntent(this.intent, null);
             this.connectorService.updateConnectorsOfBlock(this.intent.intent_id);
+          } else if (isStartPointPaletteItem(action)) {
+            // a start point is not an action: dropped only on the stage
+            return;
           } else if (action.value?.type) {
             this.logger.log("[CDS-INTENT] onDropAction aggiungo una nuova action all'intent da panel elements - action ", this.newActionCreated);
             this.intentService.moveNewActionIntoIntent(event.currentIndex, action, this.intent.intent_id);
@@ -1247,10 +1269,16 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Serializza l’intent e lo salva in localStorage tramite IntentService e AppStorageService per un successivo incolla.
    */
   private copyIntent(): void {
+    if (isStartBox(this.intent)) {
+      // a second marker block would break the one-per-type rule
+      return;
+    }
     const intent = JSON.parse(JSON.stringify(this.intent));
     const element = { element: intent, type: 'INTENT', chatbot: this.intent.id_faq_kb, intentId: this.intent.intent_id };
     const data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data);
+    if (data) {
+      this.appStorageService.setItem(data.key, data.data);
+    }
   }
 
   /**
@@ -1261,7 +1289,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     const action = JSON.parse(JSON.stringify(ele));
     const element = { element: action, type: 'ACTION', chatbot: this.intent.id_faq_kb, intentId: this.intent.intent_id };
     const data = this.intentService.copyElement(element);
-    this.appStorageService.setItem(data.key, data.data);
+    if (data) {
+      this.appStorageService.setItem(data.key, data.data);
+    }
   }
 
   /**
@@ -1289,6 +1319,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Emette deleteIntent verso il parent (canvas) che gestirà la rimozione dell’intent e l’aggiornamento della lista.
    */
   onDeleteIntent(intent: Intent): void {
+    if (isStartBox(intent)) {
+      // a start box is deleted from its panel only (the server start point goes first)
+      return;
+    }
     this.deleteIntent.emit(intent);
   }
 

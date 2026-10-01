@@ -198,6 +198,38 @@ export class WebhookService {
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
   }
 
+  upsertStartPoint(chatbot_id: string, type: 'webhook', body: { block_id: string, enabled?: boolean, mapping?: { source_name?: string }, confirm?: boolean }){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.logger.log('[WEBHOOK_URL.SERV] upsertStartPoint', type);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id + '/start_points/' + type;
+    return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
+  }
+
+  deleteStartPoint(chatbot_id: string, type: 'webhook'){
+    // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.logger.log('[WEBHOOK_URL.SERV] deleteStartPoint', type);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+    const url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id + '/start_points/' + type;
+    return this._httpClient.delete<any>(url, httpOptions);
+  }
+
   preloadWebhook(webhook_id: string){
     // Sola lettura: i webhook si creano e si cambiano solo dall'editor.
     if (this.readOnlyService.readOnly) { return of<any>(null); }

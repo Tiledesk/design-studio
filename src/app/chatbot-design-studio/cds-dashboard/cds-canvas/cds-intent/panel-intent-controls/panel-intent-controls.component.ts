@@ -17,6 +17,8 @@ import { RESERVED_INTENT_NAMES } from 'src/app/chatbot-design-studio/utils';
 export class PanelIntentControlsComponent implements OnInit, OnChanges {
   @Input() isInternalIntent = false;
   @Input() display_name: string;
+  /** marker start box (webhook): opened only through its panel, no delete/copy/play on the box */
+  @Input() isStartPoint = false;
   @Input() deleteOptionEnabled = true;
   @Input() webhookEnabled = false;
   /** nodo terminale "Return to parent agent": mostra solo il cestino */
@@ -39,8 +41,10 @@ export class PanelIntentControlsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // isReturnStack cambia a runtime (il blocco diventa/smette di essere una pastiglia)
-    if (changes['isReturnStack'] && !changes['isReturnStack'].firstChange) {
+    // isReturnStack cambia a runtime (il blocco diventa/smette di essere una pastiglia);
+    // isStartPoint arriva dopo il primo render (ngOnInit del padre è async): mai tenere la toolbar completa
+    const changed = ['isReturnStack', 'isStartPoint', 'display_name'].some(k => changes[k] && !changes[k].firstChange);
+    if (changed) {
       this.initialize();
     }
   }
@@ -92,6 +96,7 @@ export class PanelIntentControlsComponent implements OnInit, OnChanges {
     this.showDelete = true;
     this.showCopy = true;
     this.showPlay = true;
+    this.isStart = false;
     if (this.display_name === RESERVED_INTENT_NAMES.START) {
       this.showMore = true;
       this.showColor = false;
@@ -107,12 +112,13 @@ export class PanelIntentControlsComponent implements OnInit, OnChanges {
       this.showDelete = false;
       this.showCopy = false;
       this.showPlay = true;
-    } else if (this.display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
+    } else if (this.isStartPoint || this.display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.showMore = true;
       this.showColor = false;
       this.showDelete = false;
       this.showCopy = false;
       this.showPlay = false;
+      this.isStart = this.isStartPoint;
     } else if (this.isReturnStack) {
       // nodo terminale a pastiglia: solo il cestino, per non affollare la pastiglia
       // (è comunque l'unica via per eliminare il blocco dal canvas)

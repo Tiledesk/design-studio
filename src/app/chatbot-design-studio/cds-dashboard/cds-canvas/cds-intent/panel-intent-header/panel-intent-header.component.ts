@@ -1,3 +1,5 @@
+import { startPointLabelKey, startPointTypeOf } from '../../../../utils-start-points';
+import { DashboardService } from 'src/app/services/dashboard.service';
 import {
   Component,
   ElementRef,
@@ -38,12 +40,18 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   intentNameAlreadyExist = false;
   intentNameNOTHasSpecialCharacters = true;
 
+  /** i18n key of the fixed label of a start box (never editable, the block name is not shown) */
+  startLabelKey: string | null = null;
+
   private readonly logger: LoggerService =
     LoggerInstance.getInstance();
   private listOfIntents: Intent[] = [];
   private isFocused = false;
 
-  constructor(public intentService: IntentService) {
+  constructor(
+    public intentService: IntentService,
+    private readonly dashboardService: DashboardService
+  ) {
     this.intentService.getIntents().subscribe((intents) => {
       if (intents) {
         this.listOfIntents = intents;
@@ -244,6 +252,10 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     } else if (this.intentName === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
       this.isDefaultFallback = true;
     } else if (this.intentName === RESERVED_INTENT_NAMES.WEBHOOK) {
+      this.isWebhook = true;
+    }
+    this.startLabelKey = startPointLabelKey(this.intent, this.dashboardService.selectedChatbot?.subtype);
+    if (startPointTypeOf(this.intent) === 'webhook') {
       this.isWebhook = true;
     }
     if (!this.intentColor) {

@@ -286,6 +286,11 @@
     .cds-intent-options {
       margin-right: 30px;
     }
+    // fixed label: the pill is sized to the label (it grows leftwards, the connector stays in place)
+    &.has-start-label {
+      max-width: none;
+      white-space: nowrap;
+    }
   }
 
   .cds-start-content {

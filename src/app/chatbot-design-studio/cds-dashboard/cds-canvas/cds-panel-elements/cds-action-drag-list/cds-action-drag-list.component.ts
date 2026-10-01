@@ -14,6 +14,7 @@ export class CdsActionDragListComponent {
   @Output() isDragging = new EventEmitter<boolean>();
   @Output() hideActionPlaceholder = new EventEmitter<boolean>();
   @Output() hoverItem = new EventEmitter<{ element: HTMLElement; value: any }>();
+  @Output() itemClick = new EventEmitter<any>();
 
   dragging = false;
   indexDrag: number;

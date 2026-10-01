@@ -58,6 +58,14 @@
              this container is destroyed with it -- which for the chat would
              mean losing the iframe, and the conversation in it, on every
              flow switch, silently. -->
+        <!-- Solo mentre la chat costruisce l'agente appena descritto: il canvas si popola da
+             solo e senza una riga che lo dica sembra che stia succedendo per caso. Fuori dal
+             flusso del router-outlet, che openFlow() distrugge e ricostruisce. -->
+        <div class="agent-building-banner" *ngIf="IS_BUILDING_FROM_PROMPT">
+            <span class="agent-building-banner__spinner"></span>
+            <span>{{ 'CDSAgentFromPrompt.Building' | translate }}</span>
+        </div>
+
         <ng-container *ngIf="flowVisible">
             <router-outlet></router-outlet>
         </ng-container>

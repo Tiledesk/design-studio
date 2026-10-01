@@ -33,6 +33,7 @@ import { ConnectorTriggerService } from '../../connector/connector-trigger.servi
 import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
+import { isWebhookStartPointActive } from '../../utils-start-points';
 
 const swal = require('sweetalert');
 
@@ -78,6 +79,9 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
   isPlaying:boolean = false;
+  isWebhookStartTest: boolean = false;
+  private subscriptionWebhookStartTest: Subscription;
+  private webhookStartTestStarting: boolean = false;
   /** true appena parte un salvataggio: disabilita il pulsante Publish */
   isSaving: boolean = false;
   /** true solo se il salvataggio supera i 300ms: mostra spinner + "Saving..." */
@@ -304,6 +308,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.subscriptionSelectedChatbot?.unsubscribe();
     this.subscriptionIsSaving?.unsubscribe();
     this.subscriptionIsSavingVisible?.unsubscribe();
+    this.subscriptionWebhookStartTest?.unsubscribe();
+    this.intentService.webhookStartTest = false;
   }
 
 
@@ -315,6 +321,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
         if(!state){
           this.onCloseTestItOut()
         }
+      });
+
+      /** SUBSCRIBE TO WEBHOOK START TEST REQUESTS (start block panel) */
+      this.subscriptionWebhookStartTest = this.controllerService.webhookStartTestRequested$.subscribe(() => {
+        this.onOpenWebhookStartTest();
       });
 
       /** SUBSCRIBE TO THE GLOBAL SAVING STATE */
@@ -593,14 +604,56 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
   onCloseTestItOut(){
-    if(this.isWebhook){
+    if(this.isWebhook || this.isWebhookStartTest){
       this.stopWebhook();
       this.setConnectorsDebug(false);
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
     this.intentService.resetLiveActiveIntent();
+    this.isWebhookStartTest = false;
+    this.intentService.webhookStartTest = false;
     this.logService.closeLog();
+  }
+
+  async onOpenWebhookStartTest(){
+    if (this.webhookStartTestStarting) {
+      return;
+    }
+    if (this.isPlaying) {
+      this.onCloseTestItOut();
+    }
+    this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    this.webhookStartTestStarting = true;
+    try {
+      const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+      if (!isWebhookStartPointActive(webhook)) {
+        this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
+        return;
+      }
+      this.webhookId = webhook.webhook_id;
+      this.webhookUrl = `${this.serverBaseURL}webhook/${webhook.webhook_id}`;
+      const preload = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
+      if (!preload?.request_id) {
+        this.logger.warn("[CDS-header] preload request_id not found");
+        return;
+      }
+      this.logService.initialize(null);
+      const tokenResp = await this.getToken(preload.request_id);
+      if (!tokenResp) {
+        return;
+      }
+      this.isWebhookStartTest = true;
+      this.intentService.webhookStartTest = true;
+      this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || preload.request_id);
+      this.openTestSiteInPopupWindow();
+      this.isPlaying = true;
+    } catch (error) {
+      this.logger.error("[CDS-header] onOpenWebhookStartTest error:", error);
+    } finally {
+      this.webhookStartTestStarting = false;
+    }
   }
 
 

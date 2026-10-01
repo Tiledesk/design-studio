@@ -13,7 +13,7 @@
         <!-- ---------------------------------------------------------- -->
         <!-- Agents available -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook" class="row">
+        <div *ngIf="!isWebhook && !isStartPoint" class="row">
 
             <div class="nw-onoffswitch-wrapper"> 
                 <div *ngIf="intent.agents_available" class="agents-available"><span class="material-icons">boy</span></div>
@@ -35,7 +35,6 @@
             </span>
    
         </div>
-
 
         <!-- ---------------------------------------------------------- -->
         <!-- webhook -->
@@ -115,9 +114,74 @@
         </div>
 
         <!-- ---------------------------------------------------------- -->
+        <!-- webhook start box -->
+        <!-- ---------------------------------------------------------- -->
+        <div *ngIf="isStartPoint" class="row start-point">
+            <div class="nw-onoffswitch-wrapper">
+                <div class="nw-onoffswitch">
+                    <label class="nw-onoffswitch-label" for="start_point_enabled_switch" [class.checked]="spEnabled">
+                        <input type="checkbox" name="start_point_enabled_switch"
+                        class="nw-onoffswitch-checkbox" id="start_point_enabled_switch"
+                        [checked]="spEnabled"
+                        [disabled]="readOnly"
+                        (change)="onStartPointEnabledChange($event.target.checked)" />
+                    </label>
+                </div>
+                <span class="checkmark">{{ 'CDSCanvas.StartWebhook' | translate }}</span>
+            </div>
+            <p class="start-point-hint">{{ 'CDSCanvas.InfoStartWebhook' | translate }} {{ 'CDSCanvas.InfoStartWebhookBranch' | translate }}</p>
+
+            <div>
+                <div>{{'CDSCanvas.ProductionUrl' | translate}}</div>
+                <div class="webhook-block">
+                    <input #copyInput class="webhook-link" type="text" readonly [value]="webhookUrl">
+                    <div *ngIf="webhookUrl" class="webhook-icon end" (click)="onCopyToClipboard(copyInput.value)"
+                        matTooltip="{{'Copied' | translate}}!"
+                        #tooltip="matTooltip" 
+                        matTooltipClass="cds-mat-tooltip" 
+                        [matTooltipDisabled]="true"
+                        matTooltipPosition="above">
+                        <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="webhookUrlDev">
+                <div>{{'CDSCanvas.DevelopmentUrl' | translate}}</div>
+                <div class="webhook-block">
+                    <input #copyInputDev class="webhook-link" type="text" readonly [value]="webhookUrlDev">
+                    <div class="webhook-icon end" (click)="onCopyToClipboard(copyInputDev.value)"
+                        matTooltip="{{'Copied' | translate}}!"
+                        #tooltip="matTooltip" 
+                        matTooltipClass="cds-mat-tooltip" 
+                        [matTooltipDisabled]="true"
+                        matTooltipPosition="above">
+                        <mat-icon class="icon" svgIcon="copy" aria-hidden="true"></mat-icon>
+                    </div>
+                </div>
+                <p class="start-point-hint">{{ 'CDSCanvas.InfoStartWebhookDevSingleUse' | translate }}</p>
+            </div>
+            <p class="start-point-hint">{{ 'CDSCanvas.InfoStartWebhookPublish' | translate }}</p>
+
+            <div class="field-box">
+                <label class="title-label">{{ 'CDSCanvas.StartWebhookSourceName' | translate }}</label>
+                <input class="start-point-input" type="text" [(ngModel)]="spSourceName" [readonly]="readOnly" (change)="onStartPointSourceNameChange()">
+            </div>
+
+            <div class="webhook-buttons">
+                <button *ngIf="webhookUrl" type="button" class="btn btn-primary cds-blue-button" [disabled]="readOnly" (click)="onRegenerateWebhook()">{{'Regenerate' | translate}}</button>
+                <button type="button" class="btn btn-primary cds-blue-button" [disabled]="!spEnabled || readOnly" (click)="onTestStartWebhook()">{{ 'CDSCanvas.StartWebhookTest' | translate }}</button>
+                <button type="button" class="btn btn-danger" [disabled]="spBusy || readOnly" (click)="onDeleteStartPoint()">{{ 'Delete' | translate }}</button>
+            </div>
+
+            <p *ngIf="messageText" class="webhook-message fade-in-out">
+                {{ messageText }}
+            </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
         <!-- Next Block Connector -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook && !isStart && !isReturnStack" class="row">
+        <div *ngIf="!isWebhook && !isStart && !isReturnStack && !isStartPoint" class="row">
             <div class="field-box">
                 <label class="title-label">{{'CDSCanvas.GoToBlock' | translate}}</label>
                 <cds-select id="next-intent-select"

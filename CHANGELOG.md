@@ -7,6 +7,33 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc10
+- **fixed**: the Webhook start box shows only the button that opens its panel, like the Web start box: it can no longer be deleted, duplicated, recoloured or tested from the block toolbar, so its start point stays in step with the flow. It is deleted from its panel
+
+# 1.40.16-rc9
+- **added**: a flow can be started by a webhook: drag *Webhook* from the new *Start points* section of the palette, connect the box to the flow, and copy its production or development URL. The box panel sets the name the conversations show as requester, turns the start point on and off, and runs *Test webhook start*
+- **added**: *Invite human*, *Remove human* and *Remove current bot* actions, so a flow started by a webhook can bring operators in, let them go when it no longer needs them, or hand the conversation over to them completely
+- **changed**: the start block is shown as *Web start*; a flow keeps working as before when it is started from the widget
+
+# 1.40.16-rc8
+- **added**: while the described agent is being built the canvas says so and asks you to wait, and the message goes when the chat is done. It does not appear for edits asked in the chat, where the work is already visible
+
+# 1.40.16-rc7
+- **fixed**: *exists* and *does not exist* tell the truth about a variable set to null, and stay the same operator when the condition is reopened — *does not exist* used to read back as *is not defined*. A filter saved in the previous form is rewritten on the next save
+
+# 1.40.16-rc6
+- **changed**: the comparisons added in 1.40.16-rc5 stay in the reply filters only. The editor of filters saved earlier and the previous condition go back to the options they had, being evaluated another way
+
+# 1.40.16-rc5
+- **added**: an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
+- **changed**: when the AI chat cannot be reached the description is handed back instead of lost, and it is used once only: reloading the page does not start a second build
+- **added**: reply filters and conditions offer every comparison again — exists, does not contain, true/false, before and after a date, list contents and length — after 1.40.16-rc2 cut the picker down to 16
+
+# 1.40.16-rc4
+- **added**: system variable `voiceStreaming` (chatbot and voice agents) — true while voice is streaming, false otherwise
+- **changed**: ElevenLabs STT models — `scribe_v2`, `scribe_v2_realtime` and `scribe_v2_medical` are active; legacy `scribe_v1` / `scribe_v1_experimental` are inactive
+- **changed**: ElevenLabs TTS model list only includes models with `can_do_text_to_speech: true`
+
 # 1.40.16-rc3
 - **fixed**: the canvas no longer stays on the loading screen when the agent holds a condition with several cases. It waits for every connection it expects, and the exits of the cases and of the *else* were not among the ones it knew how to recognise
 - **changed**: the AI chat knows the multi-case condition and uses it when there are more than two ways out, instead of chaining one condition per branch. It is also told what goes wrong: the order decides, and an empty case or an early negative test leaves everything below it unreachable
@@ -23,6 +50,7 @@
 - **added**: a text comparison can ignore uppercase and lowercase — a checkbox on text operators only, off by default, so every condition already saved keeps comparing exactly as it did
 - **changed**: **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why
 - **fixed**: comparing text against a value written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened and lost its quotes at the next save, quietly changing what it tested. It affects the condition already in use, not only the new one
+- **fixed**: *esiste* e *non esiste* dicono il vero su una variabile messa a null, e restano lo stesso operatore quando la condizione si riapre: *non esiste* si rileggeva come *non e' definita*. Un filtro salvato con la forma precedente viene riscritto al primo salvataggio
 
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker

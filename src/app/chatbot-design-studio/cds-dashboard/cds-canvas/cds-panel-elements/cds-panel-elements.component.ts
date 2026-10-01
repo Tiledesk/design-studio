@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, availableActionEntries, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
@@ -12,7 +12,11 @@ import { of } from 'rxjs';
 import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { environment } from 'src/environments/environment';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
+
+const START_POINTS_CATEGORY = 'START_POINTS';
 
 @Component({
   selector: 'cds-panel-elements',
@@ -21,11 +25,16 @@ import { environment } from 'src/environments/environment';
   // standalone: true,
   // imports: [MatButtonModule, MatMenuModule],
 })
-export class CdsPanelElementsComponent implements OnInit {
+export class CdsPanelElementsComponent implements OnInit, OnChanges {
   @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
   @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
 
 
+  /** blocks of the flow: a block carrying a start point marker makes that start point present */
+  @Input() intents: Array<any> = [];
+  /** true while a start box is being created: its palette item stays disabled */
+  @Input() startPointPending: boolean = false;
+  @Output() focusStartPoint = new EventEmitter<string>();
   @Output() addNewElement = new EventEmitter();
   // @Output() showPanelActions = new EventEmitter();
   @Output() onMouseOverActionMenuSx = new EventEmitter();
@@ -55,12 +64,29 @@ export class CdsPanelElementsComponent implements OnInit {
     private readonly dashboardService: DashboardService,
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
+    private readonly readOnlyService: ReadOnlyService,
   ) { }
 
   ngOnInit(): void {
     this.createActionListByCategory();
     this.loadConnectorActions();
     this.loadConfiguredConnectors();
+  }
+
+  ngOnChanges(): void {
+    // keep an open Start points menu in sync (item enabled/disabled) with the flow state
+    if (this.menuCategory === START_POINTS_CATEGORY && this.actionsByCategory[START_POINTS_CATEGORY]) {
+      this.actionsList = this.buildStartPointItems();
+    }
+  }
+
+  buildStartPointItems(): Array<any> {
+    // Sola lettura: nessun box di partenza si aggiunge, le voci restano disabilitate
+    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending || this.readOnlyService.readOnly);
+  }
+
+  onStartPointClick(type: string) {
+    this.focusStartPoint.emit(type);
   }
 
   onHideActionPlaceholderOfActionPanel(event) {
@@ -79,7 +105,7 @@ export class CdsPanelElementsComponent implements OnInit {
     setTimeout(() => {
       this.menuType = type;
       this.menuCategory = category;
-      this.actionsList = this.actionsByCategory[category];
+      this.actionsList = category === START_POINTS_CATEGORY ? this.buildStartPointItems() : this.actionsByCategory[category];
       // this.menuTrigger.openMenu();
       // let x = e.offsetLeft;
       let y = e.offsetTop;
@@ -140,6 +166,13 @@ export class CdsPanelElementsComponent implements OnInit {
     const available = availableActionEntries(subtype,
       (type, plan) => this.projectPlanUtils.checkIfCanLoad(type, plan));
     ACTION_CATEGORY.forEach(category => {
+      if (category.type === START_POINTS_CATEGORY) {
+        // start points are not actions: only conversational chatbots have them
+        if (subtype === TYPE_CHATBOT.CHATBOT) {
+          this.actionsByCategory[category.type] = this.buildStartPointItems();
+        }
+        return;
+      }
       let menuItemsList = available
         .filter(a => a.entry.category === TYPE_ACTION_CATEGORY[category.type])
         .map(a => ({ type: TYPE_OF_MENU.ACTION, value: a.entry, canLoad: a.canLoad }));

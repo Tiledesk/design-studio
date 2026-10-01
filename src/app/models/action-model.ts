@@ -94,6 +94,40 @@ export class ActionOnlineAgentV2 extends Action {
     }
 }
 
+export class ActionInviteHuman extends Action {
+    departmentId?: string;
+    members?: string;
+    trueIntent: string;
+    falseIntent: string;
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.INVITE_HUMAN;
+        this.members = '';
+    }
+}
+
+export class ActionRemoveHuman extends Action {
+    scope: string;
+    trueIntent: string;
+    falseIntent: string;
+    trueIntentAttributes?: string;
+    falseIntentAttributes?: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.REMOVE_HUMAN;
+        this.scope = 'invited';
+    }
+}
+
+export class ActionRemoveCurrentBot extends Action {
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.REMOVE_CURRENT_BOT;
+    }
+}
+
 export class ActionOpenHours extends Action {
     slotId?: string;
     trueIntent: string;

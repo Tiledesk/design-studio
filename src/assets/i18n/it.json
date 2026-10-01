@@ -368,5 +368,10 @@
         "DeleteAgentError": "Non sono riuscito a eliminare l'agente. Riprova.",
         "NoAgents": "Nessun agente in questo progetto",
         "OpenAgentError": "Non è stato possibile aprire l'agente. Riprova."
+    },
+    "CDSAgentFromPrompt": {
+        "SendFailedTitle": "La richiesta non è stata inviata alla chat AI",
+        "SendFailedText": "L'agente è stato creato, ma non è stato possibile inviare la descrizione. Incollala nella chat AI per costruire il flusso:",
+        "Building": "L'IA sta costruendo l'agente: i blocchi compaiono man mano. Ci vuole qualche istante."
     }
 }

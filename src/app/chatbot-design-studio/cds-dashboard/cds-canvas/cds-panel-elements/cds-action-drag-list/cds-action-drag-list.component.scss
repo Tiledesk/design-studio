@@ -81,3 +81,9 @@ $base-padding: 6px;
 .action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) { transition: transform 250ms cubic-bezier(0,0,.2,1); }
 .action-drag-placeholder { background: #ccc; border: dotted 3px #999; min-height: 60px; transition: transform 250ms cubic-bezier(0,0,.2,1); border-radius: 8px; }
 .cdk-drag-disabled { background: var(--gray-02); .actions-btns-wpr, .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; } }
+
+// a disabled start point item stays clickable: the click focuses the start box already in the flow
+.actions-btns-wpr.disabled {
+    opacity: 0.5;
+    &:hover { cursor: pointer; }
+}
