@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc11
+- **changed**: system variable `voiceStreaming` renamed to `voice_mode` (chatbot and voice agents)
+
 # 1.40.16-rc10
 - **fixed**: the Webhook start box shows only the button that opens its panel, like the Web start box: it can no longer be deleted, duplicated, recoloured or tested from the block toolbar, so its start point stays in step with the flow. It is deleted from its panel
 
