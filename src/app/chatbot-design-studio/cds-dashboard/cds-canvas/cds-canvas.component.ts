@@ -1303,7 +1303,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
             return this.intentService.createIntentWithoutHistory(block);
           },
           deleteBlock: (block) => this.intentService.deleteSavedIntentWithoutHistory(block),
-          upsert: (block, confirm) => this.webhookService.upsertStartPoint(chatbot_id, 'webhook', confirm ? { block_id: block.intent_id, confirm: true } : { block_id: block.intent_id }),
+          upsert: (block, confirm) => {
+            // the source name starts as the chatbot name, so the requester is never a generic "Webhook"
+            const source_name = this.dashboardService.selectedChatbot?.name;
+            const body: any = { block_id: block.intent_id };
+            if (source_name) body.mapping = { source_name };
+            if (confirm) body.confirm = true;
+            return this.webhookService.upsertStartPoint(chatbot_id, 'webhook', body);
+          },
           confirmSwitch: () => this.confirmStartWebhookSwitch(),
           onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSCanvas.StartPointError'), 4, 'report_problem'),
           onCreated: (block) => {
