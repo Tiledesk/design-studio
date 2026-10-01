@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc12
+- **changed**: the requester name of conversations started by a webhook defaults to the chatbot name: a new Webhook start box saves it as source name, and an empty source name shows it and uses it
+
 # 1.40.16-rc11
 - **changed**: system variable `voiceStreaming` renamed to `voice_mode` (chatbot and voice agents)
 
