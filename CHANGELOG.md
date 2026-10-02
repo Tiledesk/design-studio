@@ -7,9 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 02/10/2026
-- **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
-- **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
+# 1.40.16-rc15
+- **fixed**: dragging an item onto the flow no longer leaves a gap in the palette: the row stays where it is for the whole gesture
+- **changed**: the palette no longer reorders itself while you drag, and what follows the pointer is the row as the browser draws it
 
 # 1.40.16-rc14
 - **added**: a flow can start on a schedule: drag *Scheduled* from *Start points*, choose when it repeats (every N minutes or hours, daily, weekly, monthly) and in which timezone, and the data each run receives. The schedule goes live when the agent is published, and the box shows whether what you see is live
