@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch 02/10/2026
+- **added**: passando su un'azione il cui nome non entra nella riga, il nome compare per intero accanto. Solo dove la riga lo taglia davvero, e non mentre si sta sulla *i* della descrizione: li' sparisce subito
 - **added**: un blocco nasce del colore della famiglia dell'azione che contiene -- verde le piu' usate, blu l'AI, arancio il flusso, viola le integrazioni, rosso le speciali -- e i connettori che ne escono prendono la stessa tinta. Vale comunque sia nato: trascinando un'azione sul flusso, spostandola da un altro blocco, tirando un connettore nel vuoto o chiedendolo alla chat AI. Un colore scelto a mano continua a vincere, e i blocchi di avvio e di fallback restano come sono
 - **changed**: nel pannello delle azioni il pallino di ogni famiglia ha la tinta dei blocchi che quella famiglia crea, e passando su un'azione la sua icona si accende come nell'elenco dei blocchi
 - **changed**: a sinistra la chat AI e uno degli altri tre pannelli -- subagent, blocchi, azioni -- stanno aperti insieme, affiancati. Prima si alternavano, e tenere d'occhio l'elenco dei blocchi voleva dire chiudere la chat; il pannello dei tre e' piu' stretto di prima, perche' ogni pixel in piu' li' e' un pixel in meno di flusso

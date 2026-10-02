@@ -28,10 +28,19 @@
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
                 [class.is-disabled]="item.value.disabled"
                 [draggable]="!item.value.disabled"
-                (dragstart)="onDragStart($event, item)">
+                (dragstart)="onDragStart($event, item); nameTip.hide(0)">
 
+                <!-- Il nome per intero, ma solo dove la riga non riesce a mostrarlo: a deciderlo
+                     e' onRowEnter, misurando il testo. Un riquadro che ripete un nome gia'
+                     leggibile copre la riga accanto per non dire niente. -->
                 <div class="actions-btns-wpr" #divAction
-                    [attr.id]="'menu-trigger-' + i">
+                    [attr.id]="'menu-trigger-' + i"
+                    [matTooltip]="item.value.name | translate"
+                    #nameTip="matTooltip"
+                    matTooltipClass="cds-mat-tooltip"
+                    matTooltipPosition="right"
+                    [matTooltipShowDelay]="NAME_TOOLTIP_DELAY_MS"
+                    (mouseenter)="onRowEnter(divAction, nameTip)">
                     
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
@@ -47,7 +56,7 @@
                          sopra a quello che si stava per prendere. -->
                     <button type="button" class="action-info-btn"
                         [attr.aria-label]="'CDSCanvas.ActionInfo' | translate"
-                        (mouseenter)="openInfo(divAction, item.value)"
+                        (mouseenter)="nameTip.hide(0); openInfo(divAction, item.value)"
                         (mouseleave)="closeInfo()"
                         (click)="$event.stopPropagation()">
                         <mat-icon class="svg-icon" svgIcon="info" aria-hidden="true"></mat-icon>

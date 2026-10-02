@@ -124,7 +124,7 @@
   flex: 0 0 auto;
   width: 12px;
   height: 12px;
-  display: grid;
+  display: flex;
   place-items: center;
   font-size: 0;
   color: var(--ds-muted, #8a8884);

@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
+import { MatTooltip } from '@angular/material/tooltip';
 import { ACTION_DRAG_MIME, TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -18,6 +19,10 @@ const CLOSE_INFO_DELAY_MS = 400;
  *  riquadro sbatterebbe aperto e chiuso una voce dopo l'altra. Un secondo e' il tempo di una
  *  intenzione, non di un passaggio. */
 const OPEN_INFO_DELAY_MS = 1000;
+
+/** Quanto bisogna restare sulla riga perche' compaia il nome per intero. Piu' breve dell'attesa
+ *  della descrizione: qui si risponde a "cosa c'e' scritto", non si apre un riquadro. */
+const NAME_TOOLTIP_DELAY_MS = 400;
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -32,6 +37,7 @@ export class CdsPanelActionsComponent implements OnInit {
   @Input() menuCategory: string;
   @Input() pos: any;
 
+  NAME_TOOLTIP_DELAY_MS = NAME_TOOLTIP_DELAY_MS;
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
@@ -142,6 +148,23 @@ export class CdsPanelActionsComponent implements OnInit {
     // // this.dragDropService.connectedIDLists;
   }
 
+
+  /**
+   * Il puntatore entra in una riga: il nome per intero si mostra solo se la riga lo taglia.
+   *
+   * La misura si fa adesso e non una volta per tutte: la stessa riga taglia o non taglia a
+   * seconda della lingua, del carattere caricato e della larghezza del pannello, che cambia.
+   * `scrollWidth` e' quanto servirebbe al testo, `clientWidth` quanto gli e' stato dato.
+   *
+   * Si spegne il riquadro invece di non aprirlo: Material ha gia' il suo ascoltatore su questa
+   * riga, e quale dei due arrivi prima non e' una cosa su cui valga la pena scommettere.
+   */
+  onRowEnter(row: HTMLElement, tooltip: MatTooltip): void {
+    const name = row.querySelector('.action-btn-text') as HTMLElement | null;
+    const isTruncated = !!name && name.scrollWidth > name.clientWidth;
+    tooltip.disabled = !isTruncated;
+    if (!isTruncated) { tooltip.hide(0); }
+  }
 
   openInfo(e, element) {
     this.logger.log('[CDS-PANEL-ACTIONS] openInfo!', element);
