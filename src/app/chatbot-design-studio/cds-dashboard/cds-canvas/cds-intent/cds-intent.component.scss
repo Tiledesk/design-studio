@@ -216,7 +216,8 @@
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.15);
       &.badge-live { background: #2e7d32; color: #fff; }
-      &.badge-changes, &.badge-error { background: #ed6c02; color: #fff; }
+      &.badge-changes { background: #ed6c02; color: #fff; }
+      &.badge-error { background: #c62828; color: #fff; }
     }
   }
 

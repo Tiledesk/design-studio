@@ -91,9 +91,31 @@ describe('WebhookService', () => {
     expect(seen).toEqual([null, { scheduled_available: true }]);
   });
 
-  it('loadWebhook keeps the previous value when the GET fails', () => {
+  it('loadWebhook keeps the previous value when a reload of the same chatbot fails', () => {
     service.loadWebhook('bot1');
+    httpMock.expectOne('https://api.test/project1/webhooks/bot1').flush({ scheduled_available: true });
+    service.loadWebhook('bot1', true);
     httpMock.expectOne('https://api.test/project1/webhooks/bot1').flush('x', { status: 503, statusText: 'no' });
+    expect(service.webhook$.value).toEqual({ scheduled_available: true });
+  });
+
+  it('loadWebhook for another chatbot clears the previous value and a failed GET leaves null', () => {
+    service.loadWebhook('bot1');
+    httpMock.expectOne('https://api.test/project1/webhooks/bot1').flush({ scheduled_available: true });
+    service.loadWebhook('bot2');
     expect(service.webhook$.value).toBeNull();
+    httpMock.expectOne('https://api.test/project1/webhooks/bot2').flush('x', { status: 503, statusText: 'no' });
+    expect(service.webhook$.value).toBeNull();
+  });
+
+  it('switching chatbot while A is in flight cancels A and emits only B', () => {
+    const seen: any[] = [];
+    service.webhook$.subscribe(w => seen.push(w));
+    service.loadWebhook('botA');
+    const reqA = httpMock.expectOne('https://api.test/project1/webhooks/botA');
+    service.loadWebhook('botB');
+    expect(reqA.cancelled).toBeTrue();
+    httpMock.expectOne('https://api.test/project1/webhooks/botB').flush({ id: 'B' });
+    expect(seen).toEqual([null, { id: 'B' }]);
   });
 });

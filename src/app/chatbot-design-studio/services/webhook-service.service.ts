@@ -22,6 +22,7 @@ export class WebhookService {
   /** the chatbot webhook (start_points, scheduled_live, scheduled_available, next_runs), loaded once and shared by the palette and the start boxes */
   webhook$ = new BehaviorSubject<any>(null);
   private loading: Subscription | null = null;
+  private loadedChatbotId: string | null = null;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -56,14 +57,26 @@ export class WebhookService {
     return this._httpClient.get<any>(url, httpOptions);
   }
 
-  /** one GET at a time (a call while one is in flight reuses it unless forced); the result goes to webhook$, a failure leaves the previous value */
+  /**
+   * Loads the webhook of a chatbot into webhook$. webhook$ always belongs to the last chatbot asked for:
+   * a different id cancels the in-flight GET and resets webhook$ to null first; a failed load for a new id leaves null.
+   * Same id: a call while one is in flight reuses it unless forced (a forced one cancels the stale response);
+   * a failed reload keeps the previous value.
+   */
   loadWebhook(chatbot_id: string, force: boolean = false){
-    if (this.loading && !this.loading.closed) {
-      if (!force) {
-        return;
-      }
-      // a newer state is needed (e.g. right after a drop): the in-flight response would be stale
+    const sameChatbot = this.loadedChatbotId === chatbot_id;
+    const inFlight = !!this.loading && !this.loading.closed;
+    if (sameChatbot && inFlight && !force) {
+      return;
+    }
+    if (inFlight) {
       this.loading.unsubscribe();
+    }
+    if (!sameChatbot) {
+      this.loadedChatbotId = chatbot_id;
+      if (this.webhook$.value !== null) {
+        this.webhook$.next(null);
+      }
     }
     this.loading = this.getWebhook(chatbot_id).subscribe({
       next: (webhook) => this.webhook$.next(webhook),

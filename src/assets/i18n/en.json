@@ -650,7 +650,7 @@
             "live": "Live",
             "changes": "Changes not live",
             "not_live": "Not live",
-            "error": "Changes not live"
+            "error": "Sync error"
         },
         "StartWebhookError": "Unable to update the webhook",
         "StartWebhookTest": "Test webhook start",
