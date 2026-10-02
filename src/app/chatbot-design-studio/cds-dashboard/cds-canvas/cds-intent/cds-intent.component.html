@@ -47,10 +47,6 @@
 
 
         
-        <div *ngIf="isScheduledBox && scheduledStatus" class="cds-scheduled-summary tds_draggable">
-            <span class="cds-scheduled-summary-text ellips">{{ scheduledSummary }}</span>
-            <span class="cds-scheduled-badge" [ngClass]="'badge-' + scheduledStatus">{{ 'CDSCanvas.ScheduledBadge.' + scheduledStatus | translate }}</span>
-        </div>
 
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
             <div class="option" 
@@ -66,6 +62,12 @@
 
     </div>
     
+    <!-- below the pill, not inside it: the pill clips its content (overflow hidden, fixed height) -->
+    <div *ngIf="isScheduledBox && scheduledStatus" class="cds-scheduled-summary tds_draggable">
+        <span class="cds-scheduled-summary-text ellips">{{ scheduledSummary }}</span>
+        <span class="cds-scheduled-badge" [ngClass]="'badge-' + scheduledStatus">{{ 'CDSCanvas.ScheduledBadge.' + scheduledStatus | translate }}</span>
+    </div>
+
     <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
 
     <div *ngIf="isStart" class="cds-start-content tds_draggable">

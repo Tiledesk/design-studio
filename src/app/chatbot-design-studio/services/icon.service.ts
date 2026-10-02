@@ -87,6 +87,10 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/start_points.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions_category/start_point_scheduled.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/start_point_scheduled.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions_category/special.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/special.svg')
     );

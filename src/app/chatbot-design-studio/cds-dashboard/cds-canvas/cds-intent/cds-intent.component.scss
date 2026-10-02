@@ -200,12 +200,15 @@
   }
 
   .cds-scheduled-summary {
+    position: absolute;
+    top: 48px;
+    right: 0;
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-right: 30px;
+    white-space: nowrap;
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.8);
+    color: #4b5052;
     .cds-scheduled-summary-text {
       max-width: 220px;
       overflow: hidden;
@@ -214,7 +217,7 @@
     .cds-scheduled-badge {
       padding: 1px 6px;
       border-radius: 8px;
-      background: rgba(255, 255, 255, 0.15);
+      background: #e3e5e6;
       &.badge-live { background: #2e7d32; color: #fff; }
       &.badge-changes { background: #ed6c02; color: #fff; }
       &.badge-error { background: #c62828; color: #fff; }
