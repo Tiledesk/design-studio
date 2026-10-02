@@ -1,5 +1,5 @@
 import { of, throwError, Subject, lastValueFrom } from 'rxjs';
-import { findStartPoint, presentStartPointTypes, isStartPointPaletteItem, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
+import { START_POINT_TYPES, isStartBox, findStartPoint, presentStartPointTypes, isStartPointPaletteItem, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
 
 describe('utils-start-points', () => {
   const start = { intent_id: 's', intent_display_name: 'start' };
@@ -70,6 +70,50 @@ describe('utils-start-points', () => {
       const items = buildStartPointItems(['web'], true);
       expect(items[1].value.disabled).toBe(true);
       expect(items[1].value.tooltip).toBeFalsy();
+    });
+  });
+
+  describe('scheduled start point', () => {
+    const sched = { intent_id: 's1', intent_display_name: 'Scheduled start', attributes: { start_point: 'scheduled' } };
+    it('marker detection and presence', () => {
+      expect(startPointTypeOf(sched)).toBe('scheduled');
+      expect(isStartBox(sched)).toBeTrue();
+      expect(presentStartPointTypes([start, sched])).toEqual(['web', 'scheduled']);
+      expect(START_POINT_TYPES).toEqual(['web', 'webhook', 'scheduled']);
+    });
+    it('block factory', () => {
+      const b = createStartPointBlock('scheduled', { x: 1, y: 2 });
+      expect(b.intent_display_name).toBe('Scheduled start');
+      expect(b.attributes.start_point).toBe('scheduled');
+      expect(b.attributes.readonly).toBe(true);
+      expect(startPointTypeOf(b)).toBe('scheduled');
+      expect(createStartPointBlock('webhook', { x: 0, y: 0 }).intent_display_name).toBe('Webhook start');
+    });
+    it('palette item hidden unless available, disabled when present', () => {
+      expect(buildStartPointItems(['web'], false).map(i => i.value.start_point)).toEqual(['web', 'webhook']);
+      expect(buildStartPointItems(['web'], false, false).length).toBe(2);
+      const items = buildStartPointItems(['web'], false, true);
+      expect(items.map(i => i.value.start_point)).toEqual(['web', 'webhook', 'scheduled']);
+      expect(items[2].value.name).toBe('CDSActionList.NAME.StartPointScheduled');
+      expect(items[2].value.disabled).toBe(false);
+      const present = buildStartPointItems(['web', 'scheduled'], false, true);
+      expect(present[2].value.disabled).toBe(true);
+      expect(present[2].value.tooltip).toBe('CDSCanvas.StartPointPresent');
+      expect(buildStartPointItems(['web'], true, true)[2].value.disabled).toBe(true);
+    });
+    it('createStartPointBox accepts the scheduled type', async () => {
+      const calls: any[] = [];
+      const r = await createStartPointBox({
+        pending: { value: false },
+        createBlock: async b => { calls.push(b.intent_display_name); },
+        deleteBlock: async () => {},
+        upsert: () => of({}),
+        confirmSwitch: async () => true,
+        onError: () => {},
+        onCreated: () => {},
+      }, 'scheduled', { x: 1, y: 2 });
+      expect(r).toBe('created');
+      expect(calls).toEqual(['Scheduled start']);
     });
   });
 
