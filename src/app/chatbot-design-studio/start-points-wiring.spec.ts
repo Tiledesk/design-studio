@@ -8,6 +8,8 @@ import { SavingStateService } from 'src/app/services/saving-state.service';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { IntentService } from './services/intent.service';
 import { CdsIntentComponent } from './cds-dashboard/cds-canvas/cds-intent/cds-intent.component';
+import { CdsPanelIntentDetailComponent } from './cds-dashboard/cds-canvas/cds-panel-intent-detail/cds-panel-intent-detail.component';
+import { FlowOpsService } from './agent-chat/flow-ops.service';
 import { createStartPointBox, createStartPointBlock, buildStartPointItems, buildStartPointUpsertBody, startPointErrorKey, isLiveStartBox, shouldDeleteWebhookPreload } from './utils-start-points';
 
 const tick = () => new Promise(r => setTimeout(r, 0));
@@ -577,5 +579,130 @@ describe('scheduled final review fixes', () => {
       // the debounce of the edit was replaced by the retry
       expect(upsert).toHaveBeenCalledTimes(3);
     }));
+  });
+});
+
+describe('scheduled start point in read-only mode (master-pre)', () => {
+  beforeAll(() => {
+    LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
+  });
+
+  it('palette: the Scheduled item is disabled in read-only (pending flag), enabled otherwise', () => {
+    const scheduledItem = (pending: boolean) => buildStartPointItems(['web'], pending, true).find(i => i.value.start_point === 'scheduled');
+    expect(scheduledItem(false).value.disabled).toBeFalse();
+    expect(scheduledItem(true).value.disabled).toBeTrue();
+  });
+
+  it('dropping a Scheduled box: no POST, the create rejects so no PUT follows', async () => {
+    const readOnly = new ReadOnlyService();
+    readOnly.enable();
+    const faq: any = { addIntent: jasmine.createSpy('addIntent'), deleteFaq: jasmine.createSpy('deleteFaq') };
+    const service = new IntentService(faq, null, null, null, null, { selectedChatbot: { subtype: 'chatbot' } } as any, null, null, new SavingStateService(), readOnly);
+    const upsert = jasmine.createSpy('upsert');
+    const run = createStartPointBox({
+      pending: { value: false },
+      createBlock: (b) => service.createIntentWithoutHistory(b),
+      deleteBlock: (b) => service.deleteSavedIntentWithoutHistory(b),
+      upsert,
+      confirmSwitch: async () => true,
+      onError: () => {},
+      onCreated: () => {},
+    }, 'scheduled', { x: 0, y: 0 });
+    expect(await run).toBe('failed');
+    expect(faq.addIntent).not.toHaveBeenCalled();
+    expect(upsert).not.toHaveBeenCalled();
+    expect(await service.deleteSavedIntentWithoutHistory(createStartPointBlock('scheduled', { x: 0, y: 0 }))).toBeNull();
+    expect(faq.deleteFaq).not.toHaveBeenCalled();
+  });
+
+  describe('Scheduled panel handlers', () => {
+    const MODEL_METHODS = ['setEnabled', 'setRepeat', 'setEvery', 'setTime', 'toggleWeekday', 'setDayOfMonth', 'setTimezone',
+      'setSourceName', 'addRow', 'removeRow', 'rowsEdited', 'setRowType', 'retrySync', 'retrySave', 'flushAndWait'];
+
+    const panel = (readOnly: boolean) => {
+      const readOnlyService = new ReadOnlyService();
+      if (readOnly) { readOnlyService.enable(); }
+      const scheduled = jasmine.createSpyObj('scheduled', MODEL_METHODS);
+      scheduled.enabled = false;
+      scheduled.hasError = false;
+      scheduled.flushAndWait.and.returnValue(Promise.resolve(true));
+      const controllerService = jasmine.createSpyObj('controllerService', ['requestWebhookStartTest']);
+      const ctx: any = Object.assign(Object.create(CdsPanelIntentDetailComponent.prototype), { readOnlyService, scheduled, controllerService });
+      return { ctx, scheduled, controllerService };
+    };
+
+    const editEverything = async (ctx: any) => {
+      const row: any = { name: 'a', type: 'text', value: 'x' };
+      const input = { checked: true };
+      ctx.onScheduledEnabledChange(input);
+      ctx.onScheduledRepeatChange('weekly');
+      ctx.onScheduledEveryChange(5);
+      ctx.onScheduledTimeChange('10:00');
+      ctx.onScheduledWeekdayToggle('mon');
+      ctx.onScheduledDayOfMonthChange(3);
+      ctx.onScheduledTimezoneChange('Europe/London');
+      ctx.onScheduledSourceNameChange('Name');
+      ctx.onScheduledAddRow();
+      ctx.onScheduledRemoveRow(0);
+      ctx.onScheduledRowNameChange(row, 'b');
+      ctx.onScheduledRowValueChange(row, 'y');
+      ctx.onScheduledRowTypeChange(0, 'number');
+      ctx.onRetryScheduledSync();
+      ctx.onRetryScheduledSave();
+      await ctx.onTestScheduledStart();
+      return { row, input };
+    };
+
+    it('read-only: switch, schedule, source name, payload rows, retry and test are no-ops', async () => {
+      const { ctx, scheduled, controllerService } = panel(true);
+      const { row, input } = await editEverything(ctx);
+      MODEL_METHODS.forEach(m => expect(scheduled[m]).withContext(m).not.toHaveBeenCalled());
+      expect(controllerService.requestWebhookStartTest).not.toHaveBeenCalled();
+      // the checkbox goes back to the model state, the row keeps its values
+      expect(input.checked).toBeFalse();
+      expect(row).toEqual({ name: 'a', type: 'text', value: 'x' });
+    });
+
+    it('read-only: Delete does not open the confirmation', () => {
+      const { ctx } = panel(true);
+      ctx.confirmAndDeleteStartPoint = jasmine.createSpy('confirmAndDeleteStartPoint');
+      ctx.onDeleteScheduledStart();
+      expect(ctx.confirmAndDeleteStartPoint).not.toHaveBeenCalled();
+    });
+
+    it('editor: the same handlers reach the model, the test and the delete', async () => {
+      const { ctx, scheduled, controllerService } = panel(false);
+      const { row } = await editEverything(ctx);
+      MODEL_METHODS.forEach(m => expect(scheduled[m]).withContext(m).toHaveBeenCalled());
+      expect(row.name).toBe('b');
+      expect(row.value).toBe('y');
+      expect(controllerService.requestWebhookStartTest).toHaveBeenCalledOnceWith('scheduled');
+      ctx.confirmAndDeleteStartPoint = jasmine.createSpy('confirmAndDeleteStartPoint');
+      ctx.onDeleteScheduledStart();
+      expect(ctx.confirmAndDeleteStartPoint).toHaveBeenCalledWith('scheduled', 'CDSCanvas.ScheduledPanel.DeleteTitle', 'CDSCanvas.ScheduledPanel.DeleteText');
+    });
+  });
+
+  describe('agent chat delete_intent', () => {
+    const validate = (target: any) => {
+      const ctx: any = {
+        intentService: { getIntentFromId: (id: string) => (target && target.intent_id === id ? target : null) },
+        validateShape: (op: any) => ({ op: op.op, ok: true }),
+      };
+      return (FlowOpsService.prototype as any).validate.call(ctx, { op: 'delete_intent', intent_id: 'b1' });
+    };
+
+    it('refuses the Scheduled start box, like the webhook one', () => {
+      const scheduled = validate({ intent_id: 'b1', intent_display_name: 'Scheduled start', attributes: { start_point: 'scheduled' } });
+      expect(scheduled.ok).toBeFalse();
+      expect(scheduled.error).toContain('scheduled start box');
+      const webhook = validate({ intent_id: 'b1', intent_display_name: 'Webhook start', attributes: { start_point: 'webhook' } });
+      expect(webhook.ok).toBeFalse();
+      expect(webhook.error).toContain('webhook start box');
+    });
+
+    it('still accepts an ordinary block', () => {
+      expect(validate({ intent_id: 'b1', intent_display_name: 'block', attributes: {} }).ok).toBeTrue();
+    });
   });
 });

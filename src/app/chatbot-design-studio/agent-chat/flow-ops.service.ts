@@ -653,8 +653,9 @@ export class FlowOpsService implements OnDestroy {
         // A start box (attributes.start_point) is registered on the server webhook: deleting it here
         // would leave a start point without its block. It is removed from its own panel only.
         const target = this.intentService.getIntentFromId(op.intent_id);
-        if (target && startPointTypeOf(target) === 'webhook') {
-          return { op: op.op, ok: false, error: `"${target.intent_display_name}" is the webhook start box: ` +
+        const startType = target ? startPointTypeOf(target) : null;
+        if (startType === 'webhook' || startType === 'scheduled') {
+          return { op: op.op, ok: false, error: `"${target.intent_display_name}" is the ${startType} start box: ` +
             `it is removed from its own panel (Delete), not by delete_intent.` };
         }
         return needsIntent(op.intent_id) ?? this.validateShape(op);

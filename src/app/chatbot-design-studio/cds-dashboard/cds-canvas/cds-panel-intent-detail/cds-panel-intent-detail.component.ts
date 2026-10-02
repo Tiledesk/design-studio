@@ -322,11 +322,77 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
     return { check: '{{check}}', start_type: '{{start_type}}' };
   }
 
+  // Sola lettura: il pannello Scheduled mostra la bozza ma non la cambia; i controlli sono disabilitati
+  // e questi handler non toccano il modello (nessun salvataggio, sync, test o cancellazione parte)
+
+  /** the switch: in read-only the checkbox is put back to the model state */
+  onScheduledEnabledChange(input: { checked: boolean }){
+    if (this.readOnly) {
+      if (input) { input.checked = this.scheduled.enabled; }
+      return;
+    }
+    this.scheduled.setEnabled(input.checked);
+  }
+
   onScheduledRepeatChange(value: ScheduledRepeat){
+    if (this.readOnly) { return; }
     this.scheduled.setRepeat(value);
   }
 
+  onScheduledEveryChange(value: any){
+    if (this.readOnly) { return; }
+    this.scheduled.setEvery(value);
+  }
+
+  onScheduledTimeChange(value: string){
+    if (this.readOnly) { return; }
+    this.scheduled.setTime(value);
+  }
+
+  onScheduledWeekdayToggle(day: Weekday){
+    if (this.readOnly) { return; }
+    this.scheduled.toggleWeekday(day);
+  }
+
+  onScheduledDayOfMonthChange(value: any){
+    if (this.readOnly) { return; }
+    this.scheduled.setDayOfMonth(value);
+  }
+
+  onScheduledTimezoneChange(value: string){
+    if (this.readOnly) { return; }
+    this.scheduled.setTimezone(value);
+  }
+
+  onScheduledSourceNameChange(value: string){
+    if (this.readOnly) { return; }
+    this.scheduled.setSourceName(value);
+  }
+
+  onScheduledAddRow(){
+    if (this.readOnly) { return; }
+    this.scheduled.addRow();
+  }
+
+  onScheduledRemoveRow(index: number){
+    if (this.readOnly) { return; }
+    this.scheduled.removeRow(index);
+  }
+
+  onScheduledRowNameChange(row: PayloadRow, value: string){
+    if (this.readOnly) { return; }
+    row.name = value;
+    this.scheduled.rowsEdited();
+  }
+
+  onScheduledRowValueChange(row: PayloadRow, value: any){
+    if (this.readOnly) { return; }
+    row.value = value;
+    this.scheduled.rowsEdited();
+  }
+
   onScheduledRowTypeChange(index: number, type: PayloadRow['type']){
+    if (this.readOnly) { return; }
     this.scheduled.setRowType(index, type);
   }
 
@@ -335,15 +401,17 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   onRetryScheduledSync(){
+    if (this.readOnly) { return; }
     this.scheduled.retrySync();
   }
 
   onRetryScheduledSave(){
+    if (this.readOnly) { return; }
     this.scheduled.retrySave();
   }
 
   async onTestScheduledStart(){
-    if (this.scheduled.hasError) {
+    if (this.readOnly || this.scheduled.hasError) {
       return;
     }
     // the draft the user sees: wait for a pending save
@@ -357,6 +425,9 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
   }
 
   onDeleteScheduledStart(){
+    if (this.readOnly) {
+      return;
+    }
     this.confirmAndDeleteStartPoint('scheduled', 'CDSCanvas.ScheduledPanel.DeleteTitle', 'CDSCanvas.ScheduledPanel.DeleteText');
   }
 

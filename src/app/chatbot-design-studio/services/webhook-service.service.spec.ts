@@ -70,6 +70,21 @@ describe('WebhookService', () => {
     expect(deleted).toBeNull();
   });
 
+  it('scheduled start point calls (upsert, delete, test, sync) are skipped in read-only mode', () => {
+    TestBed.inject(ReadOnlyService).enable();
+    const results: any[] = [];
+    const body = { block_id: 'b1', schedule: { frequency: 'daily' as const, time: '09:00', timezone: 'Europe/Rome' }, mapping: { payload: {} } };
+    service.upsertStartPoint('bot1', 'scheduled', body).subscribe(r => results.push(r));
+    service.deleteStartPoint('bot1', 'scheduled').subscribe(r => results.push(r));
+    service.testScheduledStart('bot1').subscribe(r => results.push(r));
+    service.syncScheduledStart('bot1').subscribe(r => results.push(r));
+
+    httpMock.expectNone('https://api.test/project1/webhooks/bot1/start_points/scheduled');
+    httpMock.expectNone('https://api.test/project1/webhooks/bot1/start_points/scheduled/test');
+    httpMock.expectNone('https://api.test/project1/webhooks/bot1/start_points/scheduled/sync');
+    expect(results).toEqual([null, null, null, null]);
+  });
+
   it('testScheduledStart posts to the scheduled test route', () => {
     service.testScheduledStart('bot1').subscribe(r => expect(r.request_id).toBe('r1'));
     const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/scheduled/test');

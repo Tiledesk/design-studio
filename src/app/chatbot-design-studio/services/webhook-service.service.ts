@@ -298,11 +298,15 @@ export class WebhookService {
 
   /** POST …/start_points/scheduled/test → { request_id } (404 when there is no scheduled draft) */
   testScheduledStart(chatbot_id: string){
+    // Sola lettura: il punto di partenza programmato si prova e si sincronizza solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     return this._httpClient.post<any>(this.scheduledUrl(chatbot_id) + '/test', '{}', this.jsonOptions());
   }
 
   /** POST …/start_points/scheduled/sync → scheduled_live */
   syncScheduledStart(chatbot_id: string){
+    // Sola lettura: il punto di partenza programmato si prova e si sincronizza solo dall'editor.
+    if (this.readOnlyService.readOnly) { return of<any>(null); }
     return this._httpClient.post<any>(this.scheduledUrl(chatbot_id) + '/sync', '{}', this.jsonOptions());
   }
 
