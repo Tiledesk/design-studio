@@ -21,6 +21,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { environment } from 'src/environments/environment';
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
 import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
+import { scheduledTestError } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
@@ -33,7 +34,7 @@ import { ConnectorTriggerService } from '../../connector/connector-trigger.servi
 import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
-import { isWebhookStartPointActive } from '../../utils-start-points';
+import { isWebhookStartPointActive, shouldDeleteWebhookPreload } from '../../utils-start-points';
 
 const swal = require('sweetalert');
 
@@ -298,6 +299,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.subscriptionIsSavingVisible?.unsubscribe();
     this.subscriptionWebhookStartTest?.unsubscribe();
     this.intentService.webhookStartTest = false;
+    this.intentService.startTestKind = null;
   }
 
 
@@ -312,8 +314,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       });
 
       /** SUBSCRIBE TO WEBHOOK START TEST REQUESTS (start block panel) */
-      this.subscriptionWebhookStartTest = this.controllerService.webhookStartTestRequested$.subscribe(() => {
-        this.onOpenWebhookStartTest();
+      this.subscriptionWebhookStartTest = this.controllerService.webhookStartTestRequested$.subscribe((kind) => {
+        this.onOpenWebhookStartTest(kind);
       });
 
       /** SUBSCRIBE TO THE GLOBAL SAVING STATE */
@@ -592,7 +594,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
   onCloseTestItOut(){
-    if(this.isWebhook || this.isWebhookStartTest){
+    // a scheduled start test has no webhook preload to delete
+    if(shouldDeleteWebhookPreload(this.isWebhook, this.isWebhookStartTest, this.intentService.startTestKind)){
       this.stopWebhook();
       this.setConnectorsDebug(false);
     }
@@ -601,10 +604,16 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.intentService.resetLiveActiveIntent();
     this.isWebhookStartTest = false;
     this.intentService.webhookStartTest = false;
+    this.intentService.startTestKind = null;
     this.logService.closeLog();
   }
 
-  async onOpenWebhookStartTest(){
+  private notifyScheduledTestError(error: any){
+    const { message, key } = scheduledTestError(error);
+    this.notify.showWidgetStyleUpdateNotification(message || this.translate.instant(key), 4, 'report_problem');
+  }
+
+  async onOpenWebhookStartTest(kind: 'webhook' | 'scheduled' = 'webhook'){
     if (this.webhookStartTestStarting) {
       return;
     }
@@ -615,30 +624,48 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     const chatbot_id = this.dashboardService.id_faq_kb;
     this.webhookStartTestStarting = true;
     try {
-      const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
-      if (!isWebhookStartPointActive(webhook)) {
-        this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
-        return;
-      }
-      this.webhookId = webhook.webhook_id;
-      this.webhookUrl = `${this.serverBaseURL}webhook/${webhook.webhook_id}`;
-      const preload = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
-      if (!preload?.request_id) {
-        this.logger.warn("[CDS-header] preload request_id not found");
-        return;
+      let requestId: string;
+      if (kind === 'scheduled') {
+        // the draft schedule, now: no URL, only the conversation and its logs
+        const test = await lastValueFrom(this.webhookService.testScheduledStart(chatbot_id));
+        if (!test?.request_id) {
+          this.logger.warn("[CDS-header] scheduled test request_id not found");
+          this.notifyScheduledTestError(null);
+          return;
+        }
+        this.webhookUrl = '';
+        requestId = test.request_id;
+      } else {
+        const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+        if (!isWebhookStartPointActive(webhook)) {
+          this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
+          return;
+        }
+        this.webhookId = webhook.webhook_id;
+        this.webhookUrl = `${this.serverBaseURL}webhook/${webhook.webhook_id}`;
+        const preload = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
+        if (!preload?.request_id) {
+          this.logger.warn("[CDS-header] preload request_id not found");
+          return;
+        }
+        requestId = preload.request_id;
       }
       this.logService.initialize(null);
-      const tokenResp = await this.getToken(preload.request_id);
+      const tokenResp = await this.getToken(requestId);
       if (!tokenResp) {
         return;
       }
       this.isWebhookStartTest = true;
       this.intentService.webhookStartTest = true;
-      this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || preload.request_id);
+      this.intentService.startTestKind = kind;
+      this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || requestId);
       this.openTestSiteInPopupWindow();
       this.isPlaying = true;
     } catch (error) {
       this.logger.error("[CDS-header] onOpenWebhookStartTest error:", error);
+      if (kind === 'scheduled') {
+        this.notifyScheduledTestError(error);
+      }
     } finally {
       this.webhookStartTestStarting = false;
     }

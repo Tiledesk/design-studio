@@ -13,7 +13,7 @@
         <!-- ---------------------------------------------------------- -->
         <!-- Agents available -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook && !isStartPoint" class="row">
+        <div *ngIf="!isWebhook && !isStartPoint && !isScheduledStart" class="row">
 
             <div class="nw-onoffswitch-wrapper"> 
                 <div *ngIf="intent.agents_available" class="agents-available"><span class="material-icons">boy</span></div>
@@ -179,9 +179,136 @@
         </div>
 
         <!-- ---------------------------------------------------------- -->
+        <!-- scheduled start box -->
+        <!-- ---------------------------------------------------------- -->
+        <div *ngIf="isScheduledStart" class="row start-point scheduled-start">
+            <ng-container *ngIf="scheduledUnavailable">
+                <p class="scheduled-unavailable">{{ scheduledUnavailable }}</p>
+                <!-- no scheduler: nothing can be live, the box can still be deleted -->
+                <div class="webhook-buttons">
+                    <button type="button" class="btn btn-danger" [disabled]="spBusy || readOnly" (click)="onDeleteScheduledStart()">{{ 'Delete' | translate }}</button>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="!scheduledUnavailable && scheduled">
+                <p *ngIf="scheduledStatusLine" class="scheduled-status" [ngClass]="'status-' + scheduledStatusLine.status">
+                    {{ 'CDSCanvas.ScheduledPanel.Status.' + scheduledStatusLine.key | translate: scheduledStatusLine.params }}
+                    <button *ngIf="scheduledStatusLine.status === 'error'" type="button" class="scheduled-retry" [disabled]="readOnly" (click)="onRetryScheduledSync()">{{ 'CDSCanvas.ScheduledPanel.Retry' | translate }}</button>
+                </p>
+                <p *ngIf="scheduled.saveFailed" class="scheduled-save-failed">
+                    {{ 'CDSCanvas.ScheduledPanel.NotSaved' | translate }}
+                    <button type="button" class="scheduled-retry" [disabled]="readOnly" (click)="onRetryScheduledSave()">{{ 'CDSCanvas.ScheduledPanel.Retry' | translate }}</button>
+                </p>
+
+                <div class="nw-onoffswitch-wrapper">
+                    <div class="nw-onoffswitch">
+                        <label class="nw-onoffswitch-label" for="scheduled_enabled_switch" [class.checked]="scheduled.enabled">
+                            <input type="checkbox" name="scheduled_enabled_switch"
+                            class="nw-onoffswitch-checkbox" id="scheduled_enabled_switch"
+                            [checked]="scheduled.enabled"
+                            [disabled]="readOnly"
+                            (change)="onScheduledEnabledChange($event.target)" />
+                        </label>
+                    </div>
+                    <span class="checkmark">{{ 'CDSCanvas.ScheduledPanel.Enabled' | translate }}</span>
+                </div>
+                <p class="start-point-hint">{{ 'CDSCanvas.ScheduledPanel.EnabledHint' | translate }}</p>
+
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.ScheduledPanel.Repeat' | translate }}</label>
+                    <select class="start-point-input" [ngModel]="scheduled.repeat" [disabled]="readOnly" (ngModelChange)="onScheduledRepeatChange($event)">
+                        <option value="interval_minutes">{{ 'CDSCanvas.ScheduledPanel.EveryMinutes' | translate }}</option>
+                        <option value="interval_hours">{{ 'CDSCanvas.ScheduledPanel.EveryHours' | translate }}</option>
+                        <option value="daily">{{ 'CDSCanvas.ScheduledPanel.Daily' | translate }}</option>
+                        <option value="weekly">{{ 'CDSCanvas.ScheduledPanel.Weekly' | translate }}</option>
+                        <option value="monthly">{{ 'CDSCanvas.ScheduledPanel.Monthly' | translate }}</option>
+                    </select>
+                </div>
+
+                <div class="field-box" *ngIf="scheduled.schedule.frequency === 'interval'">
+                    <label class="title-label">{{ (scheduled.schedule.unit === 'hours' ? 'CDSCanvas.ScheduledPanel.Hours' : 'CDSCanvas.ScheduledPanel.Minutes') | translate }}</label>
+                    <select class="start-point-input" [ngModel]="scheduled.schedule.every" [disabled]="readOnly" (ngModelChange)="onScheduledEveryChange($event)">
+                        <option *ngFor="let n of (scheduled.schedule.unit === 'hours' ? hourSteps : minuteSteps)" [ngValue]="n">{{ n }}</option>
+                    </select>
+                </div>
+
+                <div class="field-box" *ngIf="scheduled.schedule.frequency !== 'interval'">
+                    <label class="title-label">{{ 'CDSCanvas.ScheduledPanel.Time' | translate }}</label>
+                    <input class="start-point-input" type="time" [ngModel]="scheduled.schedule.time" [disabled]="readOnly" (ngModelChange)="onScheduledTimeChange($event)">
+                </div>
+
+                <div class="field-box" *ngIf="scheduled.schedule.frequency === 'weekly'">
+                    <label class="title-label">{{ 'CDSCanvas.ScheduledPanel.Weekdays' | translate }}</label>
+                    <div class="weekday-chips">
+                        <button *ngFor="let d of weekdays" type="button" class="weekday-chip" [class.selected]="scheduled.hasWeekday(d)" [disabled]="readOnly" (click)="onScheduledWeekdayToggle(d)">{{ 'CDSCanvas.ScheduledPanel.Weekday.' + d | translate }}</button>
+                    </div>
+                </div>
+
+                <div class="field-box" *ngIf="scheduled.schedule.frequency === 'monthly'">
+                    <label class="title-label">{{ 'CDSCanvas.ScheduledPanel.DayOfMonth' | translate }}</label>
+                    <select class="start-point-input" [ngModel]="scheduled.schedule.day_of_month" [disabled]="readOnly" (ngModelChange)="onScheduledDayOfMonthChange($event)">
+                        <option *ngFor="let d of daysOfMonth" [ngValue]="d">{{ d === 'last' ? ('CDSCanvas.ScheduledPanel.LastDay' | translate) : d }}</option>
+                    </select>
+                </div>
+
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.ScheduledPanel.Timezone' | translate }}</label>
+                    <!-- read-only: cds-select has no disabled state, the timezone is shown as text -->
+                    <input *ngIf="readOnly" class="start-point-input" type="text" disabled [value]="scheduled.schedule.timezone">
+                    <cds-select *ngIf="!readOnly" id="scheduled-timezone-select"
+                        [items]="timezones"
+                        [bindLabelSelect]="'name'"
+                        [bindValueSelect]="'value'"
+                        [itemSelected]="scheduled.schedule.timezone"
+                        [searchable]="true"
+                        [clearable]="false"
+                        (onSelected)="onScheduledTimezoneChange($event?.value)">
+                    </cds-select>
+                </div>
+                <p *ngIf="scheduled.scheduleErrorText" class="scheduled-field-error">{{ scheduled.scheduleErrorText }}</p>
+
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.StartWebhookSourceName' | translate }}</label>
+                    <input class="start-point-input" type="text" [ngModel]="scheduled.sourceName" [placeholder]="defaultSourceName" [readonly]="readOnly" (ngModelChange)="onScheduledSourceNameChange($event)">
+                </div>
+
+                <div class="field-box">
+                    <label class="title-label">{{ 'CDSCanvas.ScheduledPanel.Payload' | translate }}</label>
+                    <div class="payload-row" *ngFor="let row of scheduled.rows; let i = index; trackBy: trackByIndex">
+                        <input class="start-point-input payload-name" type="text" [placeholder]="'CDSCanvas.ScheduledPanel.FieldName' | translate" [ngModel]="row.name" [disabled]="readOnly" (ngModelChange)="onScheduledRowNameChange(row, $event)">
+                        <select class="start-point-input payload-type" [ngModel]="row.type" [disabled]="readOnly" (ngModelChange)="onScheduledRowTypeChange(i, $event)">
+                            <option value="text">{{ 'CDSCanvas.ScheduledPanel.TypeText' | translate }}</option>
+                            <option value="number">{{ 'CDSCanvas.ScheduledPanel.TypeNumber' | translate }}</option>
+                            <option value="boolean">{{ 'CDSCanvas.ScheduledPanel.TypeBoolean' | translate }}</option>
+                        </select>
+                        <select *ngIf="row.type === 'boolean'" class="start-point-input payload-value" [ngModel]="row.value" [disabled]="readOnly" (ngModelChange)="onScheduledRowValueChange(row, $event)">
+                            <option [ngValue]="true">true</option>
+                            <option [ngValue]="false">false</option>
+                        </select>
+                        <input *ngIf="row.type !== 'boolean'" class="start-point-input payload-value" type="text" [attr.inputmode]="row.type === 'number' ? 'decimal' : 'text'" [placeholder]="'CDSCanvas.ScheduledPanel.FieldValue' | translate" [ngModel]="row.value" [disabled]="readOnly" (ngModelChange)="onScheduledRowValueChange(row, $event)">
+                        <button type="button" class="payload-remove" [title]="'CDSCanvas.ScheduledPanel.RemoveField' | translate" [disabled]="readOnly" (click)="onScheduledRemoveRow(i)"><span class="material-icons">close</span></button>
+                    </div>
+                    <button type="button" class="btn btn-primary cds-blue-button payload-add" [disabled]="readOnly" (click)="onScheduledAddRow()">+ {{ 'CDSCanvas.ScheduledPanel.AddField' | translate }}</button>
+                    <p *ngIf="scheduled.payloadErrorText" class="scheduled-field-error">{{ scheduled.payloadErrorText }}</p>
+                    <p class="start-point-hint">{{ 'CDSCanvas.ScheduledPanel.PayloadHint' | translate: scheduledPayloadHintParams }}</p>
+                </div>
+
+                <div class="webhook-buttons">
+                    <button type="button" class="btn btn-primary cds-blue-button" [disabled]="scheduled.hasError || readOnly" (click)="onTestScheduledStart()">{{ 'CDSCanvas.ScheduledPanel.Test' | translate }}</button>
+                    <button type="button" class="btn btn-danger" [disabled]="spBusy || readOnly" (click)="onDeleteScheduledStart()">{{ 'Delete' | translate }}</button>
+                </div>
+                <p class="start-point-hint">{{ 'CDSCanvas.ScheduledPanel.DeleteHelp' | translate }}</p>
+            </ng-container>
+
+            <p *ngIf="messageText" class="webhook-message fade-in-out">
+                {{ messageText }}
+            </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
         <!-- Next Block Connector -->
         <!-- ---------------------------------------------------------- -->
-        <div *ngIf="!isWebhook && !isStart && !isReturnStack && !isStartPoint" class="row">
+        <div *ngIf="!isWebhook && !isStart && !isReturnStack && !isStartPoint && !isScheduledStart" class="row">
             <div class="field-box">
                 <label class="title-label">{{'CDSCanvas.GoToBlock' | translate}}</label>
                 <cds-select id="next-intent-select"

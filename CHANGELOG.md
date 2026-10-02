@@ -11,32 +11,17 @@
 - **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
 - **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
 
-# this branch 01/10/2026
-- **fixed**: lo stage non si ricostruisce piu' con la sinistra chiusa. Creando un subagent -- o aprendo un agente su cui non si era mai scelto niente -- la scheda appena aperta veniva richiusa un istante dopo da una preferenza di quando a sinistra potevano stare aperte due cose insieme
-- **changed**: creando un subagent si riparte con la scheda dei subagent sotto gli occhi, dove il nuovo e' appena comparso
-- **changed**: il pannello dei subagent ha la grafica degli altri due: la sua intestazione con la freccia per chiudere, le stesse righe, gli stessi grigi e le stesse spaziature. Prima aveva una tavolozza sua, e il salto fra le tre schede si vedeva tutto
-- **changed**: passando su un subagent non compare piu' il riquadro col suo nome, che copriva la riga accanto per ripetere un nome gia' scritto li'
-- **changed**: negli agenti V3 il pannello di sinistra e la chat AI sono larghi uguale, e trascinando il bordo della chat il pannello la segue: le schede si alternano nello stesso spazio, e due misure diverse si leggevano come un salto del flusso a ogni cambio di scheda
-- **changed**: aprendo un agente si parte sempre dalla chat AI, mentre passando a un suo subagent resta aperta la scheda da cui stai navigando. Prima il cambio di flusso riportava in primo piano l'ultima scheda salvata su quell'agente, e chi apriva un subagent dal suo elenco se lo vedeva sparire sotto il clic. Anche uscire verso l'elenco degli agenti e rientrare conta come una nuova apertura
-- **changed**: il pannello delle azioni ha preso la grafica dell'editor nuovo: in cima il titolo con la freccia per chiudere, la stessa ricerca del pannello dei blocchi, un pallino colorato per categoria al posto dell'icona, e i nomi delle azioni nello stesso corpo e colore di quelli dei blocchi
-- **changed**: anche il pannello dei blocchi segue l'editor nuovo: fondo bianco, blocchi raccolti in due sezioni -- quelli rinominati e quelli col nome di default -- separatori che attraversano tutta la larghezza, e i segni del blocco di avvio e del fallback a contorno, verde e rosso
-- **added**: nell'elenco dei blocchi tornano visibili anche i blocchi a cui non e' stato dato un nome
-- **changed**: passando sopra un'azione, un blocco o un subagent la riga si accende con un fondo invece di sollevarsi con un'ombra: l'ombra non si leggeva sui grigi chiari e faceva ballare le voci una dopo l'altra mentre si scorreva l'elenco
-- **fixed**: l'icona della lente nelle ricerche dei pannelli non e' piu' sgranata
-- **changed**: a sinistra si apre una scheda per volta — chat AI, subagent, blocchi, azioni — scelte da linguette verticali appoggiate al bordo del flusso, visibili anche a pannello chiuso: sono anche il modo di riaprirlo. Ripremere la scheda che stai guardando la chiude e lascia tutto lo spazio al canvas, e riaprendo si torna su quella di prima. Aprendo un agente si parte sempre dalla chat
-- **changed**: le azioni non sono piu' un cassetto che compariva passando col mouse sul bordo del canvas, ma una scheda con la ricerca in cima e le categorie che si aprono al suo interno. Trascinarle sul flusso funziona come prima
-- **added**: ogni azione ha una *i* che ne mostra la descrizione dopo un istante, e il riquadro resta aperto il tempo di raggiungerlo e premere il collegamento che contiene
-- **changed**: il pulsante della chat AI non e' piu' nell'intestazione: la chat si apre dalla sua linguetta, come le altre schede. Prima i due punti potevano raccontare cose diverse, e il pulsante restava li' anche a chat aperta
-- **changed**: i tre pannelli hanno ora le stesse misure, gli stessi colori e le stesse animazioni, decisi in un posto solo invece che copiati in tre: le righe erano di tre dimensioni diverse e i grigi non coincidevano
-- **fixed**: aprire e chiudere la chat AI non scatta piu' quando la conversazione e' piena. Il riquadro della conversazione veniva ridisegnato per intero a ogni fotogramma dell'animazione; ora si muove solo la finestra che lo mostra
-- **fixed**: aprendo un agente su cui erano state lasciate aperte due cose insieme, la sinistra si apre su una sola
+# 1.40.16-rc14
+- **added**: a flow can start on a schedule: drag *Scheduled* from *Start points*, choose when it repeats (every N minutes or hours, daily, weekly, monthly) and in which timezone, and the data each run receives. The schedule goes live when the agent is published, and the box shows whether what you see is live
 
-# this branch 29/09/2026
-- **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare
-- **fixed**: negli agenti V3 il blocco che contiene la condizione a piu' casi non mostra piu' il proprio punto di uscita. Le sue uscite sono i casi e l'*altrimenti*: un collegamento partito dal blocco non verrebbe mai percorso. Era gia' cosi' e si era perso rimettendo insieme i branch
-- **changed**: la chat AI conosce la condizione a piu' casi e la usa quando le vie sono piu' di due, invece di incatenare una condizione per ramo. Sa anche cosa la fa sbagliare: l'ordine decide, un caso senza condizioni non scatta mai, e un confronto negativo messo presto rende irraggiungibile tutto il resto
-- **changed**: la chat AI non puo' piu' mettere in un agente precedente un'azione che esiste solo nell'editor V3: la richiesta viene rifiutata spiegando perche'. Modificare un'azione gia' presente resta possibile, per non lasciarla li' senza poterla piu' toccare
-- **fixed**: i casi scritti dalla chat ricevono l'identita' su cui pende il loro connettore anche quando la chat non la manda, e una destinazione che non esiste sul canvas viene rifiutata invece di essere salvata e cancellata in silenzio al primo aggiornamento
+# 1.40.16-rc13
+- **changed**: the left side opens one tab at a time -- AI chat, subagents, blocks, actions -- from vertical tabs on the flow's edge, which stay visible while the panel is closed and are how it reopens. Pressing the open tab closes it and gives the canvas the full width. The AI chat button has left the header: the chat opens from its own tab
+- **changed**: opening an agent always starts on the AI chat. Moving between an agent and its subagents keeps the tab you are working in, and creating a subagent comes back to the subagents list
+- **changed**: actions are a panel with a search box and categories that expand inside it, instead of a drawer that appeared on mouse-over at the canvas edge. Dragging onto the flow works as before
+- **added**: every action carries an *i* that shows its description after a moment, and the box stays open long enough to reach it and follow the link inside
+- **changed**: blocks, actions and subagents share one look -- rows, icons, colours, spacing and animations decided in one place instead of three -- and the left panel is as wide as the AI chat
+- **added**: blocks that were never renamed are listed again, in a section of their own
+- **fixed**: the stage no longer comes back with every tab closed, and opening or closing the AI chat no longer stutters on a full conversation
 
 # 1.40.16-rc12
 - **changed**: the requester name of conversations started by a webhook defaults to the chatbot name: a new Webhook start box saves it as source name, and an empty source name shows it and uses it
