@@ -705,11 +705,11 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
   });
 });
 
-describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un agente', () => {
+describe("CdsDashboardComponent — com'e' la sinistra aprendo un agente", () => {
 
   // Si guarda lo stato condiviso e non le chiamate al controller: e' li' che vive la risposta
   // "cosa e' aperto a sinistra", e un test sulle chiamate direbbe solo che il codice fa i
-  // passi che fa, non che l'utente si ritrova la chat davanti.
+  // passi che fa, non che l'utente si ritrova il VC davanti.
   function build(isV3: boolean, configured = true, stageService?: any) {
     const leftPanelState = new LeftPanelStateService();
     const dashboardService: any = {
@@ -723,11 +723,12 @@ describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un a
       dashboardService,
       leftPanelState,
       stageService: stageService ?? {
-        getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'chat' }),
+        getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'blocks' }),
         savePanelState: () => {}
       },
       agentChatHostService: {
-        setFlowNavigator: () => {}, clearFlowNavigator: () => {}, isConfigured: () => configured
+        setFlowNavigator: () => {}, clearFlowNavigator: () => {}, isConfigured: () => configured,
+        notifyFlowSwitched: () => {}
       },
       intentService: { getAllIntents: () => Promise.resolve(true) },
       router: {
@@ -739,85 +740,74 @@ describe('CdsDashboardComponent — quale scheda si apre a sinistra aprendo un a
         }
       }
     });
-    // L'avvio e' gia' avvenuto: questi casi descrivono il passaggio da un flusso all'altro,
-    // dove la scheda scelta deve restare. La regola "al caricamento si parte dalla chat" ha il
-    // suo caso a parte, qui sotto.
-    leftPanelState.hydrate({ isOpen: false, activeTab: 'blocks' });
-    leftPanelState.finishBootNow();
     return { component, leftPanelState };
   }
 
-  it('al caricamento della pagina si parte dalla chat, qualunque cosa fosse salvata', async () => {
-    const leftPanelState = new LeftPanelStateService();   // appena creato: sta avviando
-    const component = makeDashboard({
-      dashboardService: {
-        projectID: 'p1', id_faq_kb: 'kb1', isV3: true,
-        selectedChatbot: { _id: 'kb1', name: 'Parent' },
-        getBotById: () => Promise.resolve(true)
-      },
-      leftPanelState,
-      stageService: {
-        getLeftPanelSnapshot: () => ({ isOpen: false, activeTab: 'subagents' }),
-        savePanelState: () => {}
-      },
-      agentChatHostService: { setFlowNavigator: () => {}, isConfigured: () => true },
-      intentService: { getAllIntents: () => Promise.resolve(true) },
-      router: { url: '/project/p1/chatbot/kb1/blocks', events: new Subject(), navigate: () => Promise.resolve(true) }
-    });
-    await component.openFlow('kb2');
-    expect(leftPanelState.isTabVisible('chat')).toBe(true);
+  /** L'avvio: e' la sequenza di apertura dello studio a chiamarlo, una volta sola, appena
+   *  l'agente e' in mano. Chiamato qui direttamente perche' quella sequenza passa per
+   *  traduzioni, progetto e rotte, che non sono cio' che questi casi descrivono. */
+  function avvia(component: any) { component.restoreLeftPanels(); }
+
+  it('il VC si apre sempre, anche se era stato chiuso', () => {
+    const { component, leftPanelState } = build(true);
+    leftPanelState.closeChat();
+    avvia(component);
+    expect(leftPanelState.isChatOpen).toBe(true);
   });
 
-  // V3: dopo il caricamento la scheda non si rimescola piu'. Chi apre un subagent lo fa dalla
-  // scheda dei subagent, e ritrovarsene un'altra davanti vorrebbe dire perdere l'elenco da cui
-  // sta navigando -- proprio quando serve per tornare indietro.
-  it('in V3 la scheda dei subagent resta aperta aprendo un subagent', async () => {
+  it('le tre schede tornano come erano state lasciate su questo agente', () => {
+    const { component, leftPanelState } = build(true, true, {
+      getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'actions' }),
+      savePanelState: () => {}
+    });
+    avvia(component);
+    expect(leftPanelState.isTabVisible('actions')).toBe(true);
+  });
+
+  it('senza preferenze si apre il solo VC', () => {
+    const { component, leftPanelState } = build(true, true, {
+      getLeftPanelSnapshot: () => ({ isOpen: false, activeTab: 'subagents' }),
+      savePanelState: () => {}
+    });
+    avvia(component);
+    expect(leftPanelState.isChatOpen).toBe(true);
+    expect(leftPanelState.isOpen).toBe(false);
+  });
+
+  // Dove la chat non e' configurata non c'e' niente da aprire: la colonna resterebbe un
+  // riquadro bianco, e il pulsante per richiuderla non viene disegnato.
+  it('non apre il VC dove il VC non c\'e\'', () => {
+    const { component, leftPanelState } = build(false, false);
+    avvia(component);
+    expect(leftPanelState.isChatOpen).toBe(false);
+  });
+
+  // Il confine fra le due regole: ricostruire il canvas non e' aprire un agente.
+  it('cambiando flusso non si tocca niente: ne\' le schede ne\' il VC', async () => {
     const { component, leftPanelState } = build(true);
+    leftPanelState.finishBootNow();
     leftPanelState.selectTab('subagents');
+    leftPanelState.closeChat();
     await component.openFlow('kb2');
     expect(leftPanelState.isTabVisible('subagents')).toBe(true);
+    expect(leftPanelState.isChatOpen).toBe(false);
   });
 
-  // La stessa regola vista dall'altra parte: nemmeno la chat viene imposta, e la preferenza
-  // salvata -- che qui direbbe 'chat' -- non viene nemmeno letta.
-  it('in V3 cambiare flusso non riporta in primo piano la chat', async () => {
-    const { component, leftPanelState } = build(true);
+  it('chiudere il VC non chiude la scheda aperta accanto', () => {
+    const { leftPanelState } = build(true);
     leftPanelState.selectTab('blocks');
-    await component.openFlow('kb2');
+    leftPanelState.closeChat();
     expect(leftPanelState.isTabVisible('blocks')).toBe(true);
   });
 
-  it('apre la chat su un agente precedente', async () => {
-    const { component, leftPanelState } = build(false);
-    await component.openFlow('kb2');
-    expect(leftPanelState.isTabVisible('chat')).toBe(true);
-  });
-
-  it('riapre la sinistra chiusa, se cosi\' era stato lasciato questo agente', async () => {
-    const { component, leftPanelState } = build(false, true, {
-      getLeftPanelSnapshot: () => ({ isOpen: false, activeTab: 'chat' }),
-      savePanelState: () => {}
-    });
-    await component.openFlow('kb2');
-    expect(leftPanelState.isOpen).toBe(false);
-    expect(leftPanelState.isTabVisible('chat')).toBe(false);
-  });
-
-  // La scheda della chat non esiste dove la chat non e' configurata: lasciarcela sopra
-  // significherebbe una sinistra ferma su una scheda che nessuna linguetta puo' riaprire.
   // Uscire verso l'elenco degli agenti e rientrare su un altro non ricarica la pagina, ma e'
-  // comunque un'apertura: la scheda dell'agente di prima non deve sopravvivergli.
-  it('uscendo dallo studio il prossimo agente riparte dall\'avvio', async () => {
+  // comunque un'apertura: lo stato dell'agente di prima non deve sopravvivergli.
+  it('uscendo dallo studio il prossimo agente riparte dall\'avvio', () => {
     const { component, leftPanelState } = build(true);
+    leftPanelState.finishBootNow();
     leftPanelState.selectTab('actions');
     component.ngOnDestroy();
     expect(leftPanelState.isBooting).toBe(true);
-  });
-
-  it('non lascia la sinistra sulla chat dove la chat non c\'e\'', async () => {
-    const { component, leftPanelState } = build(false, false);
-    await component.openFlow('kb2');
-    expect(leftPanelState.activeTab).not.toBe('chat');
   });
 });
 
@@ -842,9 +832,9 @@ describe('Creare un subagent — la scheda dei subagent resta aperta', () => {
       dashboardService,
       leftPanelState,
       stageService: {
-        // Direbbe "riapri la chat": e' la preferenza salvata su questo agente, e creando un
+        // Direbbe "riapri i blocchi": e' la preferenza salvata su questo agente, e creando un
         // subagent non deve avere voce.
-        getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'chat' }),
+        getLeftPanelSnapshot: () => ({ isOpen: true, activeTab: 'blocks' }),
         savePanelState: () => {}
       },
       agentChatHostService: {
@@ -867,8 +857,7 @@ describe('Creare un subagent — la scheda dei subagent resta aperta', () => {
       { get: () => of('') },
       { showWidgetStyleUpdatedNotification: () => {} },
       { rootId: () => 'kb1' },
-      leftPanelState,
-      { saveActiveLeftPanel: () => {} }
+      leftPanelState
     );
     panel.currentId = 'kb1';
     panel.familyParentId = 'kb1';
@@ -881,7 +870,7 @@ describe('Creare un subagent — la scheda dei subagent resta aperta', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
   }
 
-  it('in V3 resta sui subagent, anche se la preferenza salvata direbbe la chat', async () => {
+  it('in V3 resta sui subagent, anche se la preferenza salvata direbbe un\'altra scheda', async () => {
     const { panel, leftPanelState, dashboardService } = build(true);
     leftPanelState.selectTab('subagents');
     panel.onNewSubagent();
@@ -910,9 +899,26 @@ describe('LeftPanelStateService — una scheda per volta', () => {
     expect(state.isOpen).toBe(true);
     expect(state.isTabVisible('blocks')).toBe(true);
 
-    state.selectTab('chat');
-    expect(state.isTabVisible('chat')).toBe(true);
+    state.selectTab('actions');
+    expect(state.isTabVisible('actions')).toBe(true);
     expect(state.isTabVisible('blocks')).toBe(false);
+  });
+
+  // Il VC non e' una di queste schede: ha una colonna sua, e le due si aprono insieme.
+  it('il VC si apre e si chiude per conto suo', () => {
+    const state = new LeftPanelStateService();
+    state.selectTab('blocks');
+    state.closeChat();
+    expect(state.isChatOpen).toBe(false);
+    expect(state.isTabVisible('blocks')).toBe(true);
+
+    state.toggleChat();
+    expect(state.isChatOpen).toBe(true);
+    expect(state.isTabVisible('blocks')).toBe(true);
+
+    state.toggleTab('blocks');
+    expect(state.isOpen).toBe(false);
+    expect(state.isChatOpen).toBe(true);
   });
 
   // Il gesto della freccia di prima, spostato sulla linguetta.
@@ -937,42 +943,43 @@ describe('LeftPanelStateService — una scheda per volta', () => {
   });
 });
 
-describe('StageService — le preferenze salvate quando i pannelli erano due booleani', () => {
+describe('StageService — com\'e\' la colonna delle tre schede, letta dalla memoria', () => {
 
   function stage(stored: Record<string, string>) {
     const storage: any = { getItem: (k: string) => stored[k] ?? null, setItem: () => {} };
     return new StageService(storage, {} as any);
   }
 
-  // Chat e blocchi potevano essere aperti insieme: adesso e' una scelta sola, e va fatta
-  // senza chiedere niente a chi torna su un agente.
-  it('con entrambi aperti vince la chat, che era il default di allora', () => {
-    const s = stage({ 'cds_panels_kb1': JSON.stringify({ agentChat: true, blocks: true }) });
-    expect(s.getLeftPanelSnapshot('fam1', 'kb1')).toEqual({ isOpen: true, activeTab: 'chat' });
-  });
-
-  it('con la sola lista dei blocchi aperta si riapre sui blocchi', () => {
+  it('aperta se cosi\' era stata lasciata su questo agente', () => {
     const s = stage({ 'cds_panels_kb1': JSON.stringify({ agentChat: false, blocks: true }) });
-    expect(s.getLeftPanelSnapshot('fam1', 'kb1')).toEqual({ isOpen: true, activeTab: 'blocks' });
+    expect(s.getLeftPanelSnapshot('fam1', 'kb1')).toEqual({ isOpen: true, activeTab: 'subagents' });
   });
 
-  it('con entrambi chiusi la sinistra resta chiusa', () => {
-    const s = stage({ 'cds_panels_kb1': JSON.stringify({ agentChat: false, blocks: false }) });
+  it('chiusa se era stata chiusa', () => {
+    const s = stage({ 'cds_panels_kb1': JSON.stringify({ agentChat: true, blocks: false }) });
     expect(s.getLeftPanelSnapshot('fam1', 'kb1').isOpen).toBe(false);
   });
 
   // La scheda si ricorda per famiglia: navigando fra parent e subagent cambia l'id dell'agente,
   // e ripartire ogni volta dalla scheda di default e' il fastidio da evitare.
-  it('una scheda scelta per la famiglia vince sulla conversione', () => {
+  it('la scheda e\' quella scelta per la famiglia', () => {
     const s = stage({
-      'cds_left_panel_fam1': 'subagents',
-      'cds_panels_kb1': JSON.stringify({ agentChat: true, blocks: false })
+      'cds_left_panel_fam1': 'actions',
+      'cds_panels_kb1': JSON.stringify({ agentChat: false, blocks: true })
     });
+    expect(s.getLeftPanelSnapshot('fam1', 'kb1').activeTab).toBe('actions');
+  });
+
+  // Il VC era una scheda come le altre, e la sua preferenza e' ancora in memoria: lasciarla
+  // passare vorrebbe dire una colonna aperta su una scheda che nessuna linguetta mostra.
+  it('ignora una preferenza che nomina il VC', () => {
+    const s = stage({ 'cds_left_panel_fam1': 'chat' });
+    expect(s.getActiveLeftPanel('fam1')).toBeNull();
     expect(s.getLeftPanelSnapshot('fam1', 'kb1').activeTab).toBe('subagents');
   });
 
-  it('senza niente di salvato si parte dalla scheda di default, aperta', () => {
+  it('senza niente di salvato la colonna e\' chiusa', () => {
     const s = stage({});
-    expect(s.getLeftPanelSnapshot('fam1', 'kb1')).toEqual({ isOpen: true, activeTab: 'subagents' });
+    expect(s.getLeftPanelSnapshot('fam1', 'kb1')).toEqual({ isOpen: false, activeTab: 'subagents' });
   });
 });

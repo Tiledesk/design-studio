@@ -6,11 +6,10 @@ import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
 import { IntentService } from '../../services/intent.service';
-import { StageService, DEFAULT_PANELS_STATE } from '../../services/stage.service';
+import { StageService } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
 import { LeftPanelStateService, LeftPanelTab } from '../../services/left-panel-state.service';
-import { AgentChatHostService } from '../../agent-chat/agent-chat-host.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
@@ -116,12 +115,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   /**
-   * Pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab).
-   * Default 'subagents': e' la tab che si apre quando l'agente non ha ancora una preferenza
-   * salvata. Se l'utente ne ha scelta una, vince la sua (vedi resolveActiveLeftPanel).
+   * Quale delle tre schede occupa lo slot di sinistra: una per volta, scelta dalle linguette.
+   * Chi la sceglie e' il dashboard all'apertura dell'agente, leggendo la memoria; da li' in
+   * avanti la scelgono le linguette.
    */
   get activeLeftPanel(): LeftPanelTab { return this.leftPanelState.activeTab; }
   set activeLeftPanel(value: LeftPanelTab) { this.leftPanelState.hydrate({ activeTab: value }); }
+
+  /** Scrive in memoria com'e' la colonna di sinistra; vedi rememberLeftPanel(). */
+  private subscriptionLeftPanel: Subscription;
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -213,7 +215,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly connectorService: ConnectorService,
     private readonly controllerService: ControllerService,
     public readonly leftPanelState: LeftPanelStateService,
-    private readonly agentChatHostService: AgentChatHostService,
     private readonly translate: TranslateService,
     public dashboardService: DashboardService,
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -233,18 +234,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
-    // In V3 cosa e' aperto a sinistra non lo decide il canvas: lo decide il dashboard, che
-    // ospita la chat e sa se c'e'. Al caricamento si parte dalla chat, e da li' in avanti resta
-    // la scheda che hai scelto.
-    //
-    // Il canvas qui non ha voce perche' rinasce a ogni cambio di flusso, e la sua parola sarebbe
-    // sempre l'ultima: aprendo un subagent dal suo pannello la scheda cambierebbe da sola
-    // sotto il clic che l'ha appena usata. Nemmeno la chiusura al primo disegno serve piu': con
-    // la chat come scheda attiva `box-left` nasce gia' stretto, perche' non ospita quella scheda.
-    if (!this.dashboardService.isV3) {
-      this.resolveActiveLeftPanel();
-    }
+    // Cosa e' aperto a sinistra non lo decide il canvas: lo decide il dashboard, una volta sola
+    // all'apertura dell'agente, leggendo la memoria. Il canvas rinasce a ogni cambio di flusso e
+    // la sua parola sarebbe sempre l'ultima: aprendo un subagent dal suo pannello la scheda
+    // cambierebbe da sola sotto il clic che l'ha appena usata.
     this.initialize();
+    this.rememberLeftPanel();
   }
 
 
@@ -267,6 +262,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.executeSaveNoteDetail();
     }
 
+    if (this.subscriptionLeftPanel) {
+      this.subscriptionLeftPanel.unsubscribe();
+    }
     if (this.subscriptionChangedConnectorAttributes) {
       this.subscriptionChangedConnectorAttributes.unsubscribe();
     }
@@ -336,24 +334,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
     this.observeHostWidth();
-    // Come questo agent e' stato lasciato l'ultima volta.
-    //
-    // Prima erano due regole diverse: i V3 sempre chiusi, gli altri con la preferenza
-    // dentro `<id>_stage` e default aperto. Ora la regola e' una sola per tutti, e la
-    // vecchia preferenza non si legge piu': due sorgenti per la stessa domanda, con
-    // default opposti, sono esattamente cio' che questa chiave toglie.
-    //
-    // In V3 no: la sinistra la decide il dashboard, come in ngOnInit. E qui il danno era
-    // peggiore, perche' questa riga arriva DOPO il primo disegno e aveva l'ultima parola su
-    // tutti. Il valore che applica e' una preferenza nata quando questo flag voleva dire
-    // "l'elenco dei blocchi e' aperto" e conviveva con la chat; oggi vuol dire "la sinistra e'
-    // aperta", e il suo default -- blocchi chiusi -- chiude l'intero pannello. Su un agent
-    // senza preferenze, come un subagent appena creato, era l'unico esito possibile: lo stage
-    // si ricostruiva con tutte le schede chiuse.
-    if (!this.dashboardService.isV3) {
-      const panels = this.stageService.getPanelsState(this.id_faq_kb);
-      this.IS_OPEN_INTENTS_LIST = panels ? panels.blocks : DEFAULT_PANELS_STATE.blocks;
-    }
+    // Qui non si legge piu' come era stata lasciata la sinistra: lo fa il dashboard, prima del
+    // primo disegno. Questa riga arrivava DOPO, e quindi aveva l'ultima parola su tutti:
+    // e' da li' che veniva lo stage ricostruito con le schede chiuse.
     // this.stageService.initStageSettings(this.id_faq_kb);
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
@@ -1296,7 +1279,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ')
     this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
     this.removeConnectorDraftAndCloseFloatMenu();
-    this.stageService.savePanelState(this.id_faq_kb, 'blocks', this.IS_OPEN_INTENTS_LIST);
+    // La memoria la scrive rememberLeftPanel(), che ascolta lo stato: qui c'era una chiamata
+    // che valeva solo per questo gesto, e la freccia dentro il pannello -- che chiude lo stesso
+    // pannello -- non ne aveva nessuna. Chiudendo da li' e ricaricando, il pannello tornava
+    // aperto.
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
   }
 
@@ -1313,16 +1299,21 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   /**
-   * Decide la tab del pannello sinistro all'apertura dell'agente: vince la preferenza
-   * salvata per la famiglia, altrimenti si apre 'subagents'.
+   * Ricorda com'e' la colonna delle tre schede: aperta o no, e su quale.
    *
-   * Sta in ngOnInit e non in ngAfterViewInit: risolvendola dopo il primo render il
-   * pannello Blocks verrebbe montato e subito distrutto (i due pannelli sono in
-   * mutua esclusione via *ngIf), con lo sfarfallio che ne consegue.
+   * Una sottoscrizione sola, e non una chiamata su ogni pulsante: questo e' il punto in cui lo
+   * stato cambia davvero, quindi un gesto nuovo -- un altro pulsante, una scorciatoia -- viene
+   * ricordato senza che nessuno se ne debba occupare. E' il motivo per cui la freccia dentro
+   * l'intestazione del pannello ora conta quanto la linguetta: prima salvava solo la linguetta.
+   *
+   * Gli id si leggono quando serve e non alla sottoscrizione: cambiano sotto, perche' il primo
+   * valore arriva all'istante e i servizi potrebbero non avere ancora in mano il nuovo flusso.
    */
-  private resolveActiveLeftPanel(): void {
-    const saved = this.stageService.getActiveLeftPanel(this.getLeftPanelFamilyId());
-    this.activeLeftPanel = saved ? saved : 'subagents';
+  private rememberLeftPanel(): void {
+    this.subscriptionLeftPanel = this.leftPanelState.state$.subscribe(({ isOpen, activeTab }) => {
+      this.stageService.savePanelState(this.dashboardService.id_faq_kb, 'blocks', isOpen);
+      this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), activeTab);
+    });
   }
 
   /** L'identita' della lista che riceve le azioni rilasciate sullo stage.
@@ -1342,18 +1333,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     return this.leftPanelState.isTabVisible(tab);
   }
 
-  /** La chat ha una linguetta solo dove esiste: senza indirizzo configurato non c'e' niente da
-   *  aprire, e una linguetta che non apre nulla e' peggio di una linguetta in meno. */
-  get IS_AGENT_CHAT_AVAILABLE(): boolean {
-    return !!this.agentChatHostService?.isConfigured?.();
-  }
-
-  /** Lo slot dentro il canvas si apre solo per le schede che vivono qui.
-   *
-   *  Quando la scheda attiva e' la chat, il pannello sta nel dashboard, fuori dal canvas: se
-   *  `box-left` restasse largo, resterebbe una colonna vuota fra la chat e le linguette. */
+  /** La colonna delle tre schede. La chat non la riguarda: e' un'altra colonna, sua sorella
+   *  nella stessa riga, e le due si aprono e si chiudono per conto proprio. */
   get IS_BOX_LEFT_OPEN(): boolean {
-    return this.leftPanelState.isOpen && this.leftPanelState.activeTab !== 'chat';
+    return this.leftPanelState.isOpen;
   }
 
   /** Apre la scheda; se era gia' quella aperta, chiude tutto e lascia la striscia.
@@ -1366,12 +1349,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       return;
     }
     this.leftPanelState.selectTab(panel);
-    // La scelta si ricorda solo per le schede che hanno una preferenza per famiglia; le altre
-    // arrivano qui senza che ci sia niente da salvare.
-    if (panel === 'blocks' || panel === 'subagents') {
-      this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), panel);
-    }
-    this.stageService.savePanelState(this.id_faq_kb, 'blocks', true);
+    // Niente da salvare qui: ci pensa rememberLeftPanel(). Prima la scheda delle azioni era
+    // esclusa dal salvataggio, e lasciandola aperta si tornava su un'altra.
   }
 
   /** onDroppedElementToStage **

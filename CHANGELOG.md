@@ -8,6 +8,13 @@
 *Tiledesk SRL*
 
 # this branch 02/10/2026
+- **changed**: a sinistra la chat AI e uno degli altri tre pannelli -- subagent, blocchi, azioni -- stanno aperti insieme, affiancati. Prima si alternavano, e tenere d'occhio l'elenco dei blocchi voleva dire chiudere la chat; il pannello dei tre e' piu' stretto di prima, perche' ogni pixel in piu' li' e' un pixel in meno di flusso
+- **changed**: la chat AI non ha piu' una linguetta nella striscia: si chiude dalla freccia nella sua intestazione e si riapre dal pulsante in alto, che compare solo mentre e' chiusa
+- **changed**: aprendo un agente la chat AI c'e' sempre, qualunque cosa fosse stata lasciata, e gli altri tre tornano come li avevi lasciati su quell'agente. Spostandosi su un subagent o su un altro flusso non cambia niente di quello che stai guardando, chat compresa
+- **fixed**: chiudendo uno dei tre pannelli dalla freccia nella sua intestazione la scelta viene ricordata. Prima la ricordava solo la linguetta: chiudendo dalla freccia e ricaricando, il pannello tornava aperto. Lo stesso per la scheda delle azioni, che non veniva ricordata affatto
+- **fixed**: la freccia per chiudere i tre pannelli si vede. Era disegnata come se fosse un'icona a contorno, come la lente della ricerca, e di un'icona piena quel modo lascia solo il filo: un pulsante vuoto
+- **changed**: i tre pannelli si aprono e si chiudono scorrendo, con la stessa andatura della chat che hanno accanto
+- **changed**: passando su un'azione la sua icona si colora, come succede gia' nell'elenco dei blocchi. Le azioni che il piano non comprende restano spente, perche' li' non c'e' niente da prendere
 - **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
 - **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
 
@@ -16,20 +23,16 @@
 - **changed**: creando un subagent si riparte con la scheda dei subagent sotto gli occhi, dove il nuovo e' appena comparso
 - **changed**: il pannello dei subagent ha la grafica degli altri due: la sua intestazione con la freccia per chiudere, le stesse righe, gli stessi grigi e le stesse spaziature. Prima aveva una tavolozza sua, e il salto fra le tre schede si vedeva tutto
 - **changed**: passando su un subagent non compare piu' il riquadro col suo nome, che copriva la riga accanto per ripetere un nome gia' scritto li'
-- **changed**: negli agenti V3 il pannello di sinistra e la chat AI sono larghi uguale, e trascinando il bordo della chat il pannello la segue: le schede si alternano nello stesso spazio, e due misure diverse si leggevano come un salto del flusso a ogni cambio di scheda
-- **changed**: aprendo un agente si parte sempre dalla chat AI, mentre passando a un suo subagent resta aperta la scheda da cui stai navigando. Prima il cambio di flusso riportava in primo piano l'ultima scheda salvata su quell'agente, e chi apriva un subagent dal suo elenco se lo vedeva sparire sotto il clic. Anche uscire verso l'elenco degli agenti e rientrare conta come una nuova apertura
 - **changed**: il pannello delle azioni ha preso la grafica dell'editor nuovo: in cima il titolo con la freccia per chiudere, la stessa ricerca del pannello dei blocchi, un pallino colorato per categoria al posto dell'icona, e i nomi delle azioni nello stesso corpo e colore di quelli dei blocchi
 - **changed**: anche il pannello dei blocchi segue l'editor nuovo: fondo bianco, blocchi raccolti in due sezioni -- quelli rinominati e quelli col nome di default -- separatori che attraversano tutta la larghezza, e i segni del blocco di avvio e del fallback a contorno, verde e rosso
 - **added**: nell'elenco dei blocchi tornano visibili anche i blocchi a cui non e' stato dato un nome
 - **changed**: passando sopra un'azione, un blocco o un subagent la riga si accende con un fondo invece di sollevarsi con un'ombra: l'ombra non si leggeva sui grigi chiari e faceva ballare le voci una dopo l'altra mentre si scorreva l'elenco
 - **fixed**: l'icona della lente nelle ricerche dei pannelli non e' piu' sgranata
-- **changed**: a sinistra si apre una scheda per volta — chat AI, subagent, blocchi, azioni — scelte da linguette verticali appoggiate al bordo del flusso, visibili anche a pannello chiuso: sono anche il modo di riaprirlo. Ripremere la scheda che stai guardando la chiude e lascia tutto lo spazio al canvas, e riaprendo si torna su quella di prima. Aprendo un agente si parte sempre dalla chat
+- **changed**: a sinistra si apre una scheda per volta — subagent, blocchi, azioni — scelte da linguette verticali appoggiate al bordo del flusso, visibili anche a pannello chiuso: sono anche il modo di riaprirlo. Ripremere la scheda che stai guardando la chiude e lascia tutto lo spazio al canvas, e riaprendo si torna su quella di prima
 - **changed**: le azioni non sono piu' un cassetto che compariva passando col mouse sul bordo del canvas, ma una scheda con la ricerca in cima e le categorie che si aprono al suo interno. Trascinarle sul flusso funziona come prima
 - **added**: ogni azione ha una *i* che ne mostra la descrizione dopo un istante, e il riquadro resta aperto il tempo di raggiungerlo e premere il collegamento che contiene
-- **changed**: il pulsante della chat AI non e' piu' nell'intestazione: la chat si apre dalla sua linguetta, come le altre schede. Prima i due punti potevano raccontare cose diverse, e il pulsante restava li' anche a chat aperta
 - **changed**: i tre pannelli hanno ora le stesse misure, gli stessi colori e le stesse animazioni, decisi in un posto solo invece che copiati in tre: le righe erano di tre dimensioni diverse e i grigi non coincidevano
 - **fixed**: aprire e chiudere la chat AI non scatta piu' quando la conversazione e' piena. Il riquadro della conversazione veniva ridisegnato per intero a ogni fotogramma dell'animazione; ora si muove solo la finestra che lo mostra
-- **fixed**: aprendo un agente su cui erano state lasciate aperte due cose insieme, la sinistra si apre su una sola
 
 # this branch 29/09/2026
 - **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare

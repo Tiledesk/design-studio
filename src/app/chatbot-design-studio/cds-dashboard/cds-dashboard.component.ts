@@ -58,10 +58,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   /** panel agent chat -- mounted here (not in cds-canvas) so it survives a
    *  canvas rebuild on flow switch; see cds-dashboard.component.html. */
   private subscriptionAgentChatPanel: Subscription;
-  /** La chat e' una delle schede di sinistra: e' visibile quando e' lei quella attiva.
+  /** La chat ha una colonna sua, che si apre insieme a una delle tre schede e non al loro posto.
    *  Il pannello resta montato comunque -- vedi il commento nel template. */
   get IS_OPEN_PANEL_AGENT_CHAT(): boolean {
-    return this.leftPanelState.isTabVisible('chat');
+    return this.leftPanelState.isChatOpen;
   }
 
   /** Gates the chat panel to the blocks section. It reads only the URL's last
@@ -178,14 +178,11 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     /** SUBSCRIBE TO THE STATE AGENT CHAT PANEL */
     this.subscriptionAgentChatPanel = this.controllerService.isOpenAgentChatPanel$
       .subscribe((isOpen: boolean) => {
-        // Il canale resta per i punti che aprono la chat da fuori (l'intestazione, la
-        // creazione da descrizione): ora muove la scheda attiva invece di un booleano suo.
-        if (isOpen) { this.leftPanelState.selectTab('chat'); }
-        else if (this.leftPanelState.activeTab === 'chat') { this.leftPanelState.close(); }
-        // Si salva qui e non su ogni pulsante che apre o chiude: questo e' il punto in
-        // cui lo stato cambia davvero, quindi un domani anche un pulsante nuovo viene
-        // ricordato senza che nessuno se ne debba occupare.
-        this.stageService?.savePanelState?.(this.dashboardService.id_faq_kb, 'agentChat', isOpen);
+        // Il canale resta per i punti che aprono la chat da fuori (la creazione da descrizione):
+        // muove la colonna della chat, che ha uno stato suo.
+        if (isOpen) { this.leftPanelState.openChat(); } else { this.leftPanelState.closeChat(); }
+        // Non si salva: la chat si apre a ogni ricaricamento qualunque cosa sia salvata, quindi
+        // ricordarla sarebbe uno stato che nessuno interroga.
       });
   }
 
@@ -213,65 +210,44 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Reopens the AI chat as this agent was left, at the first load and at every switch.
+  /** Decide com'e' la sinistra aprendo un agente, e cosa non toccare cambiando flusso.
    *
-   *  It used to open it unconditionally, which was not a default but a decision taken
-   *  again every time: closing the chat and then moving to a subagent brought it back.
-   *  With no preference stored for this agent the chat opens -- that is the state you
-   *  start building a flow in. */
-  private restoreAgentChatPanel(): void {
-    const canChat = !!this.agentChatHostService.isConfigured?.();
+   *  Due eventi diversi, due regole diverse, ed e' `isBooting` a distinguerli:
+   *
+   *  - **ricaricare il chatbot** (refresh della pagina, o un agente aperto dall'elenco): la chat
+   *    si apre sempre, qualunque cosa sia salvata -- e' da li' che si comincia a lavorare a un
+   *    flusso, e ritrovarsi la colonna chiusa perche' giorni prima si era chiusa non aiuta
+   *    nessuno. Le tre schede invece tornano come erano state lasciate su questo agente;
+   *  - **ricostruire il canvas** (aprire un subagent, un `open_flow` chiesto dalla chat, un
+   *    subagent appena creato): non si tocca niente. Lo stato vive in un servizio che dura quanto
+   *    l'applicazione, non quanto il canvas, quindi "mantenere" vuol dire non intervenire. Chi
+   *    apre un subagent lo fa dalla scheda dei subagent, e ritrovarsene un'altra davanti vorrebbe
+   *    dire perdere l'elenco da cui si sta navigando -- proprio quando serve per tornare indietro.
+   *    Vale anche per la chat: chiusa prima di spostarsi, resta chiusa.
+   */
+  private restoreLeftPanels(): void {
+    if (!this.leftPanelState.isBooting) { return; }
 
-    // Al caricamento della pagina si apre sempre la chat, qualunque cosa sia salvata: e' da
-    // li' che si comincia a lavorare a un flusso, e ritrovarsi sull'ultima scheda aperta
-    // giorni prima non aiuta nessuno. La memoria qui non viene nemmeno letta.
-    //
-    // `isBooting` e' vero solo per il primo giro. Questa funzione viene richiamata anche
-    // passando da un flusso all'altro senza ricaricare, e li' la scheda che hai scelto deve
-    // restare: forzare la chat a ogni cambio di flusso sarebbe un'altra cosa.
-    if (this.leftPanelState.isBooting) {
-      this.leftPanelState.hydrate(canChat
-        ? { isOpen: true, activeTab: 'chat' }
-        : { isOpen: true, activeTab: 'blocks' });   // senza chat, la scheda successiva
-      this.leftPanelState.finishBoot();
-      return;
-    }
-
-    // Da qui in poi siamo in un cambio di flusso senza ricaricare la pagina: aprire un subagent
-    // dal suo pannello, o un `open_flow` chiesto dalla chat.
-    //
-    // In V3 la scheda non si tocca. Chi apre un subagent lo fa dalla scheda dei subagent, e
-    // ritrovarsene un'altra davanti vorrebbe dire perdere l'elenco da cui si sta navigando --
-    // proprio quando serve per tornare indietro o passare al prossimo. Vale per tutte: la chat
-    // che sposta il canvas con `open_flow` resta aperta, perche' e' lei che stai usando.
-    //
-    // La preferenza salvata non viene nemmeno letta: descrive com'era questo agente l'ultima
-    // volta, non cosa stai guardando adesso, e qui l'unica risposta giusta e' "quello che c'e'".
-    if (this.dashboardService.isV3) { return; }
-
+    // Chiamate facoltative, come le altre su questo servizio: una preferenza che non si riesce a
+    // leggere vale quanto una che non c'e'. Rinunciare ad aprire la sinistra perche' la memoria
+    // non ha risposto sarebbe un guasto travestito da scelta.
     const current: any = this.dashboardService.selectedChatbot;
     const familyId = current?.subtype === 'subagent'
       ? current?.parent_id
       : this.dashboardService.id_faq_kb;
-
-    // Chiamata facoltativa, come le altre su questo servizio: una preferenza che non si riesce
-    // a leggere vale quanto una che non c'e'. Rinunciare ad aprire la sinistra perche' la
-    // memoria non ha risposto sarebbe un guasto travestito da scelta.
-    let snapshot: { isOpen: boolean; activeTab: LeftPanelTab } =
-      this.stageService?.getLeftPanelSnapshot?.(familyId, this.dashboardService.id_faq_kb)
-      || { isOpen: true, activeTab: 'chat' };
-
-    // Dove la chat non e' configurata quella scheda non esiste, e una preferenza che la nomina
-    // lascerebbe la sinistra ferma su una scheda che nessuna linguetta puo' riaprire.
-    if (snapshot.activeTab === 'chat' && !canChat) {
-      snapshot = { isOpen: snapshot.isOpen, activeTab: 'blocks' };
-    }
+    const snapshot = this.stageService?.getLeftPanelSnapshot?.(familyId, this.dashboardService.id_faq_kb)
+      || { isOpen: false, activeTab: 'subagents' as LeftPanelTab };
 
     this.leftPanelState.hydrate(snapshot);
+    // La chat esiste solo dove e' configurata: altrove una colonna aperta sarebbe un riquadro
+    // bianco, e il pulsante per riaprirla non c'e'.
+    if (this.agentChatHostService.isConfigured?.()) { this.leftPanelState.openChat(); }
+    else { this.leftPanelState.closeChat(); }
+    this.leftPanelState.finishBoot();
   }
 
   onCloseAgentChat(): void {
-    this.leftPanelState.close();
+    this.leftPanelState.closeChat();
   }
 
   /** Open another flow of this family without reloading the page.
@@ -380,9 +356,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.flowVisible = true;
       this.changeDetectorRef.detectChanges();
     }
-    // After the load, never inside it: a failure here must not be reported as a flow that
-    // could not be opened.
-    this.restoreAgentChatPanel();
+    // Qui non si rimescola la sinistra: ricostruire il canvas non e' aprire un agente, e cosa
+    // sta aperto a sinistra e' quello che l'utente sta guardando adesso. La preferenza salvata
+    // descrive com'era questo agente l'ultima volta, che qui non e' la domanda.
   }
 
   /** Reloads the open flow in place -- its blocks, its attributes -- as a page
@@ -458,7 +434,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
-      this.restoreAgentChatPanel();
+      this.restoreLeftPanels();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
       this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
