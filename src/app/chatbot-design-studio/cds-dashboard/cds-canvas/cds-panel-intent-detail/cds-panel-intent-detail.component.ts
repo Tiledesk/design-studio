@@ -17,7 +17,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 import { startPointTypeOf, startPointPanelState } from 'src/app/chatbot-design-studio/utils-start-points';
 import { PayloadRow, Weekday, WEEKDAYS } from 'src/app/chatbot-design-studio/utils-schedule';
-import { ScheduledPanelModel, ScheduledRepeat, ScheduledStatusLine, scheduledStatusLine, timezoneList, browserTimezone, MINUTE_STEPS, HOUR_STEPS, DAYS_OF_MONTH, SCHEDULED_UNAVAILABLE_MESSAGE } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
+import { ScheduledPanelModel, ScheduledRepeat, ScheduledStatusLine, scheduledStatusLine, timezoneList, browserTimezone, MINUTE_STEPS, HOUR_STEPS, DAYS_OF_MONTH, scheduledLoadOutcome } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 
 const swal = require('sweetalert');
@@ -60,7 +60,6 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
   readonly minuteSteps = MINUTE_STEPS;
   readonly hourSteps = HOUR_STEPS;
   readonly daysOfMonth = DAYS_OF_MONTH;
-  /** Retry flag while the sync is running */
   private webhookSubscription: Subscription;
 
   // Connector management
@@ -251,27 +250,32 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
       }
     }, this.intent.intent_id, tz);
     this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
-    this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
-      this.webhook = resp;
-      this.scheduled.load(resp, tz);
-      this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
-      this.scheduledStatusLine = scheduledStatusLine(resp);
-      // later updates (after a save, a sync, a publish) only refresh the status: the form is the user's draft
+    // later updates (after a save, a sync, a publish) only refresh the status: the form is the user's draft
+    const followWebhook = () => {
       this.webhookSubscription = this.webhookService.webhook$.subscribe(webhook => {
         if (webhook) {
           this.webhook = webhook;
           this.scheduledStatusLine = scheduledStatusLine(webhook);
         }
       });
+    };
+    this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
+      this.webhook = resp;
+      this.scheduled.load(resp, tz);
+      this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
+      this.scheduledStatusLine = scheduledStatusLine(resp);
+      followWebhook();
     }, error: (error) => {
-      if (error?.status === 503) {
-        this.scheduledUnavailable = error?.error?.error || SCHEDULED_UNAVAILABLE_MESSAGE;
+      const outcome = scheduledLoadOutcome(error);
+      if (outcome.state === 'unavailable') {
+        this.scheduledUnavailable = outcome.message;
         return;
       }
-      if (error?.status === 404) {
+      if (outcome.state === 'no_webhook') {
         // no webhook yet (imported, forked or redone box): the defaults, switched off
         this.scheduled.load(null, tz);
         this.scheduledStatusLine = scheduledStatusLine(null);
+        followWebhook();
         return;
       }
       this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
@@ -305,7 +309,12 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
       return;
     }
     // the draft the user sees: wait for a pending save
-    await this.scheduled.flushAndWait();
+    const saved = await this.scheduled.flushAndWait();
+    if (!saved) {
+      // the server draft is stale: never test it
+      this.showMessage(this.translate.instant('CDSCanvas.ScheduledPanel.SaveError'));
+      return;
+    }
     this.controllerService.requestWebhookStartTest('scheduled');
   }
 

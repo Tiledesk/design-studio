@@ -92,6 +92,31 @@ export function browserTimezone(): string {
   }
 }
 
+export type ScheduledLoadOutcome = { state: 'unavailable', message: string } | { state: 'no_webhook' } | { state: 'error' };
+
+/** What a failed GET of the webhook means for the panel: 503 -> the unavailable message instead of the form; 404 -> no webhook yet (defaults, switched off) */
+export function scheduledLoadOutcome(error: any): ScheduledLoadOutcome {
+  if (error?.status === 503) {
+    return { state: 'unavailable', message: error?.error?.error || SCHEDULED_UNAVAILABLE_MESSAGE };
+  }
+  if (error?.status === 404) {
+    return { state: 'no_webhook' };
+  }
+  return { state: 'error' };
+}
+
+/** Toast of a failed "Test scheduled start": the server message when there is one, else a key per status */
+export function scheduledTestError(error: any): { message?: string, key?: string } {
+  const server = error?.error?.error;
+  if (error?.status === 503) {
+    return { message: server || SCHEDULED_UNAVAILABLE_MESSAGE };
+  }
+  if (error?.status === 404) {
+    return { key: 'CDSCanvas.ScheduledPanel.TestNoDraft' };
+  }
+  return server ? { message: server } : { key: 'CDSCanvas.ScheduledPanel.TestFailed' };
+}
+
 export interface ScheduledPanelDeps {
   upsert: (body: any) => Observable<any>;
   sync: () => Observable<any>;
@@ -116,7 +141,10 @@ export class ScheduledPanelModel {
 
   private timer: any = null;
   private again = false;
-  private idleWaiters: (() => void)[] = [];
+  private idleWaiters: ((ok: boolean) => void)[] = [];
+  /** the last save failed and nothing has been saved since: the server draft is stale */
+  private saveFailed = false;
+  private syncing = false;
 
   constructor(private readonly deps: ScheduledPanelDeps, private readonly blockId: string, timezone: string) {
     this.schedule = defaultSchedule(timezone);
@@ -294,11 +322,13 @@ export class ScheduledPanelModel {
     this.saving = true;
     this.deps.upsert(body).subscribe({
       next: () => {
+        this.saveFailed = false;
         this.finishSave();
         this.deps.refresh();
       },
       error: (err) => {
         this.again = false;
+        this.saveFailed = true;
         this.finishSave(true);
         this.deps.onError(err);
       }
@@ -314,7 +344,7 @@ export class ScheduledPanelModel {
     }
     const waiters = this.idleWaiters;
     this.idleWaiters = [];
-    waiters.forEach(w => w());
+    waiters.forEach(w => w(!this.saveFailed));
   }
 
   /** Drops a pending edit (the start point is being deleted: a late PUT would re-create it) */
@@ -331,20 +361,24 @@ export class ScheduledPanelModel {
     }
   }
 
-  /** Resolves once no edit is pending or in flight: "Test scheduled start" runs the draft the user sees */
-  flushAndWait(): Promise<void> {
+  /** Resolves once no edit is pending or in flight, true when the draft on the server is the form (false: the last save failed): "Test scheduled start" runs the draft the user sees */
+  flushAndWait(): Promise<boolean> {
     this.flush();
     if (!this.saving && !this.timer) {
-      return Promise.resolve();
+      return Promise.resolve(!this.saveFailed);
     }
-    return new Promise<void>(resolve => this.idleWaiters.push(resolve));
+    return new Promise<boolean>(resolve => this.idleWaiters.push(resolve));
   }
 
   /** Retry of a failed live sync: sync, then reload so the status line and the box badge refresh */
   retrySync() {
+    if (this.syncing) {
+      return;
+    }
+    this.syncing = true;
     this.deps.sync().subscribe({
-      next: () => this.deps.refresh(),
-      error: (err) => this.deps.onError(err)
+      next: () => { this.syncing = false; this.deps.refresh(); },
+      error: (err) => { this.syncing = false; this.deps.onError(err); }
     });
   }
 }

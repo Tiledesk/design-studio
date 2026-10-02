@@ -690,7 +690,9 @@
             "DeleteTitle": "Delete the scheduled start",
             "DeleteText": "The schedule will stop starting conversations and the box will be deleted. Continue?",
             "DeleteHelp": "A live schedule stops at the next publish.",
-            "SaveError": "Unable to update the scheduled start"
+            "SaveError": "Unable to update the scheduled start",
+            "TestNoDraft": "Save the Scheduled start first",
+            "TestFailed": "Unable to test the scheduled start"
         },
         "StartWebhookError": "Unable to update the webhook",
         "StartWebhookTest": "Test webhook start",

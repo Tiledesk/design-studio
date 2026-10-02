@@ -184,7 +184,7 @@
             <ng-container *ngIf="!scheduledUnavailable && scheduled">
                 <p *ngIf="scheduledStatusLine" class="scheduled-status" [ngClass]="'status-' + scheduledStatusLine.status">
                     {{ 'CDSCanvas.ScheduledPanel.Status.' + scheduledStatusLine.key | translate: scheduledStatusLine.params }}
-                    <a *ngIf="scheduledStatusLine.status === 'error'" class="scheduled-retry" (click)="onRetryScheduledSync()">{{ 'CDSCanvas.ScheduledPanel.Retry' | translate }}</a>
+                    <button *ngIf="scheduledStatusLine.status === 'error'" type="button" class="scheduled-retry" (click)="onRetryScheduledSync()">{{ 'CDSCanvas.ScheduledPanel.Retry' | translate }}</button>
                 </p>
 
                 <div class="nw-onoffswitch-wrapper">

@@ -21,6 +21,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { environment } from 'src/environments/environment';
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
 import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
+import { scheduledTestError } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
@@ -436,6 +437,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.logService.closeLog();
   }
 
+  private notifyScheduledTestError(error: any){
+    const { message, key } = scheduledTestError(error);
+    this.notify.showWidgetStyleUpdateNotification(message || this.translate.instant(key), 4, 'report_problem');
+  }
+
   async onOpenWebhookStartTest(kind: 'webhook' | 'scheduled' = 'webhook'){
     if (this.webhookStartTestStarting) {
       return;
@@ -453,6 +459,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
         const test = await lastValueFrom(this.webhookService.testScheduledStart(chatbot_id));
         if (!test?.request_id) {
           this.logger.warn("[CDS-header] scheduled test request_id not found");
+          this.notifyScheduledTestError(null);
           return;
         }
         this.webhookUrl = '';
@@ -484,6 +491,9 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.isPlaying = true;
     } catch (error) {
       this.logger.error("[CDS-header] onOpenWebhookStartTest error:", error);
+      if (kind === 'scheduled') {
+        this.notifyScheduledTestError(error);
+      }
     } finally {
       this.webhookStartTestStarting = false;
     }

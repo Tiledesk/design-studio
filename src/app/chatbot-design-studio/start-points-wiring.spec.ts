@@ -1,6 +1,6 @@
 import { of, Subject, throwError } from 'rxjs';
 import { fakeAsync, tick as ngTick } from '@angular/core/testing';
-import { ScheduledPanelModel, scheduledStatusLine, formatNextRun, timezoneList, SCHEDULED_SAVE_DEBOUNCE_MS } from './utils-scheduled-panel';
+import { ScheduledPanelModel, scheduledLoadOutcome, scheduledTestError, scheduledStatusLine, formatNextRun, timezoneList, SCHEDULED_SAVE_DEBOUNCE_MS } from './utils-scheduled-panel';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { SavingStateService } from 'src/app/services/saving-state.service';
 import { IntentService } from './services/intent.service';
@@ -303,5 +303,66 @@ describe('scheduled panel', () => {
     model.retrySync();
     expect(sync).toHaveBeenCalledTimes(1);
     expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  describe('load, errors and test', () => {
+    it('GET 503 -> unavailable with the server message, or the default one', () => {
+      expect(scheduledLoadOutcome({ status: 503, error: { error: 'Scheduled starts are not available on this installation' } }))
+        .toEqual({ state: 'unavailable', message: 'Scheduled starts are not available on this installation' });
+      expect(scheduledLoadOutcome({ status: 503 })).toEqual({ state: 'unavailable', message: 'Scheduled starts are not available on this installation' });
+      expect(scheduledLoadOutcome({ status: 404 })).toEqual({ state: 'no_webhook' });
+      expect(scheduledLoadOutcome({ status: 500 })).toEqual({ state: 'error' });
+    });
+
+    it('invalid fields show the scheduleError / payload message on the model', fakeAsync(() => {
+      const { model } = make();
+      model.setRepeat('monthly');
+      model.setDayOfMonth(31);
+      expect(model.scheduleErrorText).toBe("schedule.day_of_month must be an integer between 1 and 28 or 'last'");
+      model.setDayOfMonth(5);
+      expect(model.scheduleErrorText).toBeNull();
+      model.addRow();
+      expect(model.payloadErrorText).toContain('invalid');
+      ngTick(2000);
+    }));
+
+    it('test error toast: 404 key, 503 message, server message, generic key', () => {
+      expect(scheduledTestError({ status: 404 })).toEqual({ key: 'CDSCanvas.ScheduledPanel.TestNoDraft' });
+      expect(scheduledTestError({ status: 503, error: { error: 'nope' } })).toEqual({ message: 'nope' });
+      expect(scheduledTestError({ status: 503 }).message).toBe('Scheduled starts are not available on this installation');
+      expect(scheduledTestError({ status: 400, error: { error: 'bad' } })).toEqual({ message: 'bad' });
+      expect(scheduledTestError(null)).toEqual({ key: 'CDSCanvas.ScheduledPanel.TestFailed' });
+    });
+
+    it('flushAndWait resolves true after a successful save and false after a failed one', fakeAsync(() => {
+      const { model, upsert } = make();
+      let result: boolean;
+      model.setEnabled(false);
+      model.flushAndWait().then(r => result = r);
+      ngTick(0);
+      expect(result).toBeTrue();
+      upsert.and.returnValue(throwError(() => ({ status: 500 })));
+      model.setEnabled(true);
+      model.flushAndWait().then(r => result = r);
+      ngTick(0);
+      expect(result).toBeFalse();
+      // nothing pending but the last save failed: still stale
+      model.flushAndWait().then(r => result = r);
+      ngTick(0);
+      expect(result).toBeFalse();
+    }));
+
+    it('retrySync ignores clicks while a sync is running', () => {
+      const pending = new Subject<any>();
+      const { model, sync, refresh } = make();
+      sync.and.returnValue(pending);
+      model.retrySync();
+      model.retrySync();
+      expect(sync).toHaveBeenCalledTimes(1);
+      pending.next({}); pending.complete();
+      expect(refresh).toHaveBeenCalledTimes(1);
+      model.retrySync();
+      expect(sync).toHaveBeenCalledTimes(2);
+    });
   });
 });
