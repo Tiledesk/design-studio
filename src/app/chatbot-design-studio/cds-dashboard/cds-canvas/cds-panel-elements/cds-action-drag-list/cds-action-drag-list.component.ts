@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
+import { ACTION_DRAG_MIME } from '../../../../utils';
 import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -11,22 +11,11 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 })
 export class CdsActionDragListComponent {
   @Input() items: Array<any> = [];
-  /** La lista che riceve i rilasci sullo stage.
-   *
-   *  Questa lista vive nel pannello di sinistra, fuori dal contenitore dello stage: li' il
-   *  cdkDropListGroup non le unisce piu', e il collegamento va dichiarato per nome. Senza, si
-   *  trascina un'azione e non succede niente -- senza errori, che e' il modo peggiore in cui
-   *  una cosa puo' non funzionare. */
-  @Input() stageDropListId: string;
   @Output() isDragging = new EventEmitter<boolean>();
-  @Output() hideActionPlaceholder = new EventEmitter<boolean>();
   @Output() hoverItem = new EventEmitter<{ element: HTMLElement; value: any }>();
   @Output() itemClick = new EventEmitter<any>();
   /** Il puntatore ha lasciato la *i*: chi ascolta decide quando chiudere la descrizione. */
   @Output() leaveItem = new EventEmitter<void>();
-
-  dragging = false;
-  indexDrag: number;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -43,37 +32,26 @@ export class CdsActionDragListComponent {
     this.hoverItem.emit({ element, value });
   }
 
-  onDragStarted(event: CdkDragStart, currentIndex: number) {
+  /**
+   * Comincia il trascinamento di una voce verso il flusso.
+   *
+   * Nel pacchetto viaggia solo il tipo: e' quanto basta al flusso per creare il blocco, e tenerlo
+   * a una stringa evita di far passare oggetti vivi attraverso un meccanismo del browser.
+   * L'etichetta del contenuto e' quella che il flusso riconosce: senza, un file trascinato dal
+   * desktop e una voce di qui sarebbero la stessa cosa.
+   */
+  onDragStart(event: DragEvent, item: any) {
+    if (!event.dataTransfer || item?.value?.disabled) { return; }
+    // Non il solo tipo: una voce puo' essere un punto di partenza, oppure un'azione portata da un
+    // connettore installato, e il flusso ha bisogno di saperlo per creare la cosa giusta. Viaggia
+    // come testo perche' e' l'unica forma che il meccanismo del browser sa trasportare.
+    event.dataTransfer.setData(ACTION_DRAG_MIME, JSON.stringify({
+      type: item.value.type,
+      start_point: item.value.start_point,
+      connectorEntry: item.value.connectorEntry
+    }));
+    event.dataTransfer.effectAllowed = 'copy';
     this.controllerService.closeActionDetailPanel();
-    this.dragging = true;
-    this.indexDrag = currentIndex;
     this.isDragging.emit(true);
-
-    // Bug fix (preserved): keep the drag placeholder full-width during drag.
-    const actionDragPlaceholder = <HTMLElement>document.querySelector('.action-drag-placeholder');
-    const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
-    const myObserver = new ResizeObserver(entries => {
-      entries.forEach(entry => {
-        const width = entry.contentRect.width;
-        if (width === 258) {
-          this.hideActionPlaceholder.emit(false);
-          if (actionDragPlaceholder) { actionDragPlaceholder.style.opacity = '1'; }
-          if (addActionPlaceholderEl) { addActionPlaceholderEl.style.opacity = '0'; }
-        } else {
-          this.hideActionPlaceholder.emit(true);
-          if (actionDragPlaceholder) { actionDragPlaceholder.style.opacity = '0'; }
-          if (addActionPlaceholderEl) { addActionPlaceholderEl.style.opacity = '1'; }
-        }
-      });
-    });
-    if (actionDragPlaceholder) { myObserver.observe(actionDragPlaceholder); }
-  }
-
-  onDragMoved(event: CdkDragMove) {}
-
-  onDragEnd(event: CdkDragEnd) {
-    this.dragging = false;
-    this.indexDrag = null;
-    this.isDragging.emit(false);
   }
 }

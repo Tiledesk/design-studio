@@ -1,15 +1,13 @@
-<div class="action-list" cdkDropList [cdkDropListData]="items"
-    [cdkDropListConnectedTo]="stageDropListId ? [stageDropListId] : []">
-  <div [style.display]="dragging?'none':'block'" class="menu-dragging">
+<!-- Le voci si trascinano col meccanismo del browser, non con quello del CDK: la riga non viene
+     staccata dall'elenco, resta dov'e' per tutto il gesto, e quello che segue il puntatore e'
+     una sua istantanea. Il rilascio lo raccoglie il flusso. -->
+<div class="action-list">
+  <div class="menu-dragging">
     <div class="action-box" *ngFor="let item of items; let i = index;"
-        cdkDrag
-        (cdkDragStarted)="onDragStarted($event, i)"
-        (cdkDragMoved)="onDragMoved($event)"
-        (cdkDragEnded)="onDragEnd($event)"
-        [cdkDragData]="item"
-        [cdkDragDisabled]="item.value.disabled">
-
-      <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+        [class.is-disabled]="item.value.disabled"
+        [draggable]="!item.value.disabled"
+        (dragstart)="onDragStart($event, item)"
+        (dragend)="isDragging.emit(false)">
 
       <div class="actions-btns-wpr" #divAction
           [class.disabled]="item.value.disabled"

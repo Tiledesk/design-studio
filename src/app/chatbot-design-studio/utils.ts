@@ -325,6 +325,21 @@ export enum TYPE_OF_MENU {
     QUESTION    = 'question'
 }
 
+/**
+ * Il contenuto che viaggia quando si trascina un'azione dalla tavolozza al flusso: il tipo
+ * dell'azione, sotto un'etichetta tutta nostra.
+ *
+ * L'etichetta e' quello che distingue il nostro gesto da qualunque altra cosa si possa
+ * trascinare dentro una pagina -- un file dal desktop, un'immagine, del testo da un'altra
+ * finestra. Lo stage accetta il rilascio solo quando la riconosce, cosi' trascinare un file sul
+ * flusso non crea blocchi.
+ *
+ * Sta qui, e non in uno dei due componenti, perche' chi la scrive (la tavolozza) e chi la legge
+ * (il canvas) devono per forza dire la stessa stringa, e una stringa ripetuta in due punti prima
+ * o poi diverge.
+ */
+export const ACTION_DRAG_MIME = 'application/x-tiledesk-action-type';
+
 
 export enum TYPE_UPDATE_ACTION {
     CONNECTOR   = 'connector',

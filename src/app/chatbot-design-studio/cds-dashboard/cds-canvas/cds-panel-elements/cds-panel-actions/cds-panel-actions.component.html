@@ -3,9 +3,7 @@
     <!-- ACTION: shared draggable list -->
     <cds-action-drag-list *ngIf="menuType === TYPE_OF_MENU.ACTION"
         [items]="menuItemsList"
-        [stageDropListId]="stageDropListId"
         (isDragging)="onChildDragging($event)"
-        (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
         (hoverItem)="openInfo($event.element, $event.value)"
         (leaveItem)="closeInfo()"
         (itemClick)="onItemClick($event)">
@@ -42,9 +40,7 @@
                     </div>
                     <cds-action-drag-list
                         [items]="sg.items"
-                        [stageDropListId]="stageDropListId"
                         (isDragging)="onChildDragging($event)"
-                        (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
                         (hoverItem)="openInfo($event.element, $event.value)"
                         (leaveItem)="closeInfo()">
                     </cds-action-drag-list>
@@ -55,9 +51,7 @@
         <ng-template #flatConnectorList>
             <cds-action-drag-list
                 [items]="activeItems"
-                [stageDropListId]="stageDropListId"
                 (isDragging)="onChildDragging($event)"
-                (hideActionPlaceholder)="hideActionPlaceholderOfActionPanel.emit($event)"
                 (hoverItem)="openInfo($event.element, $event.value)"
                 (leaveItem)="closeInfo()">
             </cds-action-drag-list>
@@ -65,16 +59,11 @@
     </div>
 
     <!-- EVENT: unchanged -->
-    <div *ngIf="menuType === TYPE_OF_MENU.EVENT" class="action-list" id="action_list_drop_connect"
-        cdkDropList [cdkDropListData]="menuItemsList">
-        <div [style.display]="isDragging?'none':'block'" class="menu-dragging">
+    <div *ngIf="menuType === TYPE_OF_MENU.EVENT" class="action-list" id="action_list_drop_connect">
+        <div class="menu-dragging">
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
-                cdkDrag
-                (cdkDragStarted)="onDragStarted($event, i)"
-                (cdkDragMoved)="onDragMoved($event)"
-                (cdkDragEnded)="onDragEnd($event)">
-
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+                [draggable]="true"
+                (dragstart)="onDragStart($event, item)">
 
                 <div class="actions-btns-wpr">
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">

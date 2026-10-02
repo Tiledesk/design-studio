@@ -29,8 +29,6 @@ const START_POINTS_CATEGORY = 'START_POINTS';
 export class CdsPanelElementsComponent implements OnInit, OnChanges {
 
 
-  /** La lista che riceve i rilasci sullo stage, da collegare alla tavolozza. */
-  @Input() stageDropListId: string;
   /** blocks of the flow: a block carrying a start point marker makes that start point present */
   @Input() intents: Array<any> = [];
   /** true while a start box is being created: its palette item stays disabled */
@@ -39,7 +37,6 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
   @Output() addNewElement = new EventEmitter();
   // @Output() showPanelActions = new EventEmitter();
   @Output() onMouseOverActionMenuSx = new EventEmitter();
-  @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
   isDraggingMenuElement: boolean = false;
   TYPE_OF_MENU = TYPE_OF_MENU;
 
@@ -92,9 +89,6 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
     this.focusStartPoint.emit(type);
   }
 
-  onHideActionPlaceholderOfActionPanel(event) {
-    this.hideActionPlaceholderOfActionPanel.emit(event)
-  }
 
   onDraggingMenuElement(event) {
     this.isDraggingMenuElement = event;

@@ -29,12 +29,10 @@
          il cdkDropListGroup che le univa quando erano vicine. -->
     <cds-panel-elements *ngIf="activeLeftPanel === 'actions' && IS_OPEN_INTENTS_LIST"
         class="panel-actions"
-        [stageDropListId]="STAGE_DROP_LIST_ID"
         [intents]="listOfIntents"
         [startPointPending]="startPointPending"
         (focusStartPoint)="onFocusStartPoint($event)"
-        (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
-        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+        (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)">
     </cds-panel-elements>
 
 </div>
@@ -42,7 +40,13 @@
 
 
 
-<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
+<!-- `dragover` non e' un di piu': finche' nessuno lo ferma, il browser rifiuta il rilascio e
+     `drop` non arriva mai. Entrambi guardano l'etichetta del contenuto, cosi' un file trascinato
+     dal desktop attraversa il flusso senza creare niente. -->
+<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup
+    (dragover)="onActionDragOverStage($event)"
+    (drop)="onActionDroppedOnStage($event)"
+    (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
 
     <!-- Loading Mask: visibile solo durante il caricamento, copre solo lo stage -->
     <div id="masck-canv" [class.disabled]="renderedAllElements">

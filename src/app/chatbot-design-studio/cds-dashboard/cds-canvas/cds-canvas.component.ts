@@ -26,7 +26,7 @@ import { NoteType } from 'src/app/models/note-types';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // UTILS //
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
+import { ACTION_DRAG_MIME, INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 import { TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 
@@ -105,7 +105,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   listOfIntents: Array<Intent> = [];
   listOfEvents: Array<Intent> = [];
   hasClickedAddAction: boolean = false;
-  hideActionPlaceholderOfActionPanel: boolean;
 
   // ============================================================
   // NOTES
@@ -1299,21 +1298,66 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   // ============================================================
   // EVENT HANDLERS - DROP & CREATE INTENT
   // ============================================================
+  /**
+   * Il puntatore attraversa il flusso con un'azione in mano.
+   *
+   * Fermare l'evento non e' una formalita': finche' nessuno lo fa, il browser considera l'area
+   * non adatta a ricevere e il rilascio non arriva mai. Si ferma solo per cio' che riconosciamo,
+   * cosi' un file trascinato dal desktop continua a non essere affare nostro.
+   */
+  onActionDragOverStage(event: DragEvent) {
+    if (!event.dataTransfer?.types?.includes(ACTION_DRAG_MIME)) { return; }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  /**
+   * Un'azione e' stata lasciata sul flusso: nasce il blocco che la contiene.
+   *
+   * Il punto del rilascio e' in coordinate dello schermo e va portato in quelle del flusso, che
+   * si sposta e si ingrandisce sotto di esso -- lo fa `logicPoint`, la stessa conversione che usa
+   * il rilascio di un'azione spostata da un blocco. Lo scostamento di 132px mette il blocco sotto
+   * il puntatore invece che col suo spigolo sinistro.
+   */
+  onActionDroppedOnStage(event: DragEvent) {
+    const payload = event.dataTransfer?.getData(ACTION_DRAG_MIME);
+    if (!payload) { return; }
+    event.preventDefault();
+
+    let dropped: any;
+    try {
+      dropped = JSON.parse(payload);
+    } catch (error) {
+      // Il pacchetto arriva da noi e non da fuori -- il tipo di contenuto lo garantisce -- ma
+      // leggere senza rete qualcosa che e' passato per il browser non si fa: meglio non creare
+      // niente che creare un blocco a partire da un contenuto che non capiamo.
+      this.logger.error('[CDS-CANVAS] rilascio non leggibile sullo stage: ', payload, error);
+      return;
+    }
+    if (!dropped?.type) { return; }
+
+    const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+    pos.x = pos.x - 132;
+    this.logger.log('[CDS-CANVAS] voce lasciata sullo stage dalla tavolozza: ', dropped, pos);
+    this.closeAllPanels();
+    this.closeActionDetailPanel();
+    // Gli stessi tre casi che distingueva il rilascio di prima: un punto di partenza, un'azione
+    // portata da un connettore installato, o un'azione come tutte le altre.
+    if (dropped.start_point) {
+      this.createStartPointFromPanelElement(pos, dropped.start_point);
+      return;
+    }
+    this.createNewIntentFromPanelElement(pos, dropped.type, dropped.connectorEntry);
+  }
+
   async onDroppedElementToStage(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
     let pos = this.connectorService.tiledeskConnectors.logicPoint(event.dropPoint);
     pos.x = pos.x - 132;
     let action: any = event.previousContainer.data[event.previousIndex];
-    if (action.value && action.value.type) {
-      this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
-      this.closeAllPanels();
-      this.closeActionDetailPanel();
-      if (action.value.start_point) {
-        this.createStartPointFromPanelElement(pos, action.value.start_point);
-      } else {
-        this.createNewIntentFromPanelElement(pos, action.value.type, action.value.connectorEntry);
-      }
-    } else if (action) {
+    // Qui arrivano soltanto le azioni che vengono da un blocco: dalla tavolozza si trascina col
+    // meccanismo del browser, e quel rilascio lo raccoglie onActionDroppedOnStage.
+    if (action) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
       let prevIntentOfaction = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
       prevIntentOfaction.actions = prevIntentOfaction.actions.filter((act) => act._tdActionId !== action._tdActionId);

@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 02/10/2026
+- **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
+- **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
+
 # this branch 01/10/2026
 - **fixed**: lo stage non si ricostruisce piu' con la sinistra chiusa. Creando un subagent -- o aprendo un agente su cui non si era mai scelto niente -- la scheda appena aperta veniva richiusa un istante dopo da una preferenza di quando a sinistra potevano stare aperte due cose insieme
 - **changed**: creando un subagent si riparte con la scheda dei subagent sotto gli occhi, dove il nuovo e' appena comparso

@@ -56,13 +56,11 @@
                          porta su quello scelto. -->
                     <cds-panel-actions
                         [actionsList]="visibleActions(category.type)"
-                        [stageDropListId]="stageDropListId"
                         [menuType]="TYPE_OF_MENU.ACTION"
                         [menuCategory]="category.type"
                         [connectorGroups]="category.type === INTEGRATIONS_CATEGORY_KEY ? connectorGroups : []"
                         (startPointClick)="onStartPointClick($event)"
-                        (isDraggingMenuElement)="onDraggingMenuElement($event)"
-                        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+                        (isDraggingMenuElement)="onDraggingMenuElement($event)">
                     </cds-panel-actions>
                 </div>
 
