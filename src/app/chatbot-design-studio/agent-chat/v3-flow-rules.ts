@@ -30,7 +30,10 @@ export const V3_FLOW_RULES: string[] = [
   'V3-T3: a flow ends with its last useful block (a message the user can read, or a handoff) and ' +
   'WITHOUT a `close` block. Add a `close` block only when the user explicitly asks to end the ' +
   'conversation with a button (e.g. "Do you want to close the conversation?" -> "Yes, close"): the ' +
-  'close block is the destination of that button only, and nothing comes after it.',
+  'close block is the destination of that button only, and nothing comes after it. Exception: in a ' +
+  'flow entered by a Webhook or Scheduled start box (`attributes.start_point`), nobody is on the other ' +
+  'side: there every path that ends with no person in it ends with a `close` block, reached from the ' +
+  'exit of the action or block before it.',
   'V3-U6: to route more than two ways on an exact value, use ONE `jsonconditionmulti` block ' +
   'instead of chaining a `jsoncondition2` per branch. Its `cases` are evaluated IN ORDER and the ' +
   'first one that matches wins, so put the most specific first; a case left without conditions ' +

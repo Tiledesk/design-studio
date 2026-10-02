@@ -537,7 +537,12 @@ export class FlowOpsService implements OnDestroy {
       const name = nameOf(intentId);
       return name === RESERVED_INTENT_NAMES.START || name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK;
     };
-    const isCloseBlock = (intentId: string): boolean =>
+    // V3-T3 is written for a visitor, who can always type again. A flow entered by a Webhook or
+    // Scheduled start box runs with nobody on the other side: a path that ends with no person in
+    // it must close its conversation, or every run leaves one open. Such flows may route to close.
+    const unattended = (this.intentService.listOfIntents || [])
+      .some((intent: any) => ['webhook', 'scheduled'].includes(startPointTypeOf(intent)));
+    const isCloseBlock = (intentId: string): boolean => !unattended &&
       (this.intentService.getIntentFromId(intentId)?.actions || [])
         .some((action: any) => action?._tdActionType === TYPE_ACTION.CLOSE);
     const oneActionError = (block: string): string => v3RuleError('V3-S1',

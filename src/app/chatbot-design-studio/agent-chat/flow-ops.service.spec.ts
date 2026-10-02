@@ -3914,6 +3914,28 @@ describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () =>
     expect(report.results[0].error).toContain('V3-T3');
   });
 
+  it('lets a flow entered by a Scheduled start box route an exit to a close block', async () => {
+    const box = withActions('sched', 'Scheduled start', 'intent');
+    (box as any).attributes = { start_point: 'scheduled' };
+    intentService.listOfIntents.push(box);
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'cond', action_id: 'cond-a0', fields: { trueIntent: '#bye' } },
+      { op: 'connect', from_intent_id: 'welcome', to_intent_id: 'bye' }
+    ]);
+    expect((report.results[0].error || '')).not.toContain('V3-T3');
+    expect((report.results[1].error || '')).not.toContain('V3-T3');
+  });
+
+  it('lets a flow entered by a Webhook start box route an exit to a close block', async () => {
+    const box = withActions('hook', 'Webhook start', 'intent');
+    (box as any).attributes = { start_point: 'webhook' };
+    intentService.listOfIntents.push(box);
+    const report = await service.apply([
+      { op: 'update_action', intent_id: 'cond', action_id: 'cond-a0', fields: { trueIntent: '#bye' } }
+    ]);
+    expect((report.results[0].error || '')).not.toContain('V3-T3');
+  });
+
   it('does not treat a reply button to a close block as a V3-T3 violation', async () => {
     const report = await service.apply([{
       op: 'update_action', intent_id: 'welcome', action_id: 'welcome-a0',
