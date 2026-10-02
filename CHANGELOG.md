@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# 1.40.16-rc14
+- **added**: a flow can start on a schedule: drag *Scheduled* from *Start points*, choose when it repeats (every N minutes or hours, daily, weekly, monthly) and in which timezone, and the data each run receives. The schedule goes live when the agent is published, and the box shows whether what you see is live
+
 # 1.40.16-rc13
 - **changed**: the left side opens one tab at a time -- AI chat, subagents, blocks, actions -- from vertical tabs on the flow's edge, which stay visible while the panel is closed and are how it reopens. Pressing the open tab closes it and gives the canvas the full width. The AI chat button has left the header: the chat opens from its own tab
 - **changed**: opening an agent always starts on the AI chat. Moving between an agent and its subagents keeps the tab you are working in, and creating a subagent comes back to the subagents list
