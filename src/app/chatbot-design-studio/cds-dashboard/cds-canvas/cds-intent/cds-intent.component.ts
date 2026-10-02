@@ -570,7 +570,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** Blocks that get the "live start" highlight: the webhook block, or the webhook start box (by marker) during a webhook start test */
   private isLiveStartBlock(): boolean {
     const name = this.intent?.intent_display_name;
-    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && startPointTypeOf(this.intent) === 'webhook');
+    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && ['webhook', 'scheduled'].includes(startPointTypeOf(this.intent)));
   }
 
   ngOnDestroy() {

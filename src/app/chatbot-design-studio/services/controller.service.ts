@@ -30,11 +30,12 @@ export class ControllerService {
   private testItOutPlaying = new Subject<any>();
   public isTestItOutPlaying$ = this.testItOutPlaying.asObservable();
 
-  private webhookStartTestSource = new Subject<void>();
+  private webhookStartTestSource = new Subject<'webhook' | 'scheduled'>();
   public webhookStartTestRequested$ = this.webhookStartTestSource.asObservable();
 
-  public requestWebhookStartTest(){
-    this.webhookStartTestSource.next();
+  /** "Test webhook start" / "Test scheduled start" of a start box panel: the header opens the conversation and the logs */
+  public requestWebhookStartTest(kind: 'webhook' | 'scheduled' = 'webhook'){
+    this.webhookStartTestSource.next(kind);
   }
 
   private publishPanelStatusSubject = new Subject<any>();

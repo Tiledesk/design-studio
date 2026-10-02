@@ -172,8 +172,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       });
 
       /** SUBSCRIBE TO WEBHOOK START TEST REQUESTS (start block panel) */
-      this.subscriptionWebhookStartTest = this.controllerService.webhookStartTestRequested$.subscribe(() => {
-        this.onOpenWebhookStartTest();
+      this.subscriptionWebhookStartTest = this.controllerService.webhookStartTestRequested$.subscribe((kind) => {
+        this.onOpenWebhookStartTest(kind);
       });
 
       /** SUBSCRIBE TO THE GLOBAL SAVING STATE */
@@ -436,7 +436,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.logService.closeLog();
   }
 
-  async onOpenWebhookStartTest(){
+  async onOpenWebhookStartTest(kind: 'webhook' | 'scheduled' = 'webhook'){
     if (this.webhookStartTestStarting) {
       return;
     }
@@ -447,26 +447,39 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     const chatbot_id = this.dashboardService.id_faq_kb;
     this.webhookStartTestStarting = true;
     try {
-      const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
-      if (!isWebhookStartPointActive(webhook)) {
-        this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
-        return;
-      }
-      this.webhookId = webhook.webhook_id;
-      this.webhookUrl = `${this.serverBaseURL}webhook/${webhook.webhook_id}`;
-      const preload = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
-      if (!preload?.request_id) {
-        this.logger.warn("[CDS-header] preload request_id not found");
-        return;
+      let requestId: string;
+      if (kind === 'scheduled') {
+        // the draft schedule, now: no URL, only the conversation and its logs
+        const test = await lastValueFrom(this.webhookService.testScheduledStart(chatbot_id));
+        if (!test?.request_id) {
+          this.logger.warn("[CDS-header] scheduled test request_id not found");
+          return;
+        }
+        this.webhookUrl = '';
+        requestId = test.request_id;
+      } else {
+        const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+        if (!isWebhookStartPointActive(webhook)) {
+          this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
+          return;
+        }
+        this.webhookId = webhook.webhook_id;
+        this.webhookUrl = `${this.serverBaseURL}webhook/${webhook.webhook_id}`;
+        const preload = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
+        if (!preload?.request_id) {
+          this.logger.warn("[CDS-header] preload request_id not found");
+          return;
+        }
+        requestId = preload.request_id;
       }
       this.logService.initialize(null);
-      const tokenResp = await this.getToken(preload.request_id);
+      const tokenResp = await this.getToken(requestId);
       if (!tokenResp) {
         return;
       }
       this.isWebhookStartTest = true;
       this.intentService.webhookStartTest = true;
-      this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || preload.request_id);
+      this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || requestId);
       this.openTestSiteInPopupWindow();
       this.isPlaying = true;
     } catch (error) {
