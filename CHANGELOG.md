@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 
+# this branch
+- **changed**: the block list shows an icon for the start boxes too -- the webhook's own yellow, and the clock of the scheduled one -- so the places a conversation can begin are told apart at a glance, as they already are on the flow
+
 # 1.40.16-rc17
 - **added**: a block takes the colour of the family of the action it holds -- most used green, AI blue, flow orange, integrations purple, special red, start points green -- and the connectors leaving it follow. However the block was created, and a colour picked by hand still wins
 - **changed**: the AI chat and one of the other three panels -- subagents, blocks, actions -- are open side by side instead of one at a time, and those three are narrower to leave the flow more room. The chat has left the tab strip: it closes from its own header and reopens from the button in the header, which is there only while it is closed
