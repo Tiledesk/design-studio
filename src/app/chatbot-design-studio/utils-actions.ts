@@ -129,16 +129,39 @@ export function resolveChatbotSubtype(subtype: string | undefined | null): TYPE_
 }
 
 
+/**
+ * Le famiglie di azioni.
+ *
+ * `color` e' la tinta della famiglia, ed e' anche il colore con cui nasce un blocco che contiene
+ * una sua azione: guardando il flusso si capisce di cosa parla un blocco prima di leggerlo.
+ * E' scritto come terna r,g,b e non in esadecimale perche' e' la forma che usano i blocchi e i
+ * connettori, che lo applicano a opacita' diverse (vedi INTENT_COLORS).
+ */
 export const ACTION_CATEGORY =[
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY),    name: 'CDSActionCategory.MostUsed',     src: 'assets/images/actions_category/most_used.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.AI, TYPE_ACTION_CATEGORY),           name: 'CDSActionCategory.AI',           src: 'assets/images/actions_category/ai.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg'},
-    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE_TWILIO, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/twilio-voice.svg'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.MOST_USED, TYPE_ACTION_CATEGORY),    name: 'CDSActionCategory.MostUsed',     src: 'assets/images/actions_category/most_used.svg',     color: '95,168,50'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.AI, TYPE_ACTION_CATEGORY),           name: 'CDSActionCategory.AI',           src: 'assets/images/actions_category/ai.svg',            color: '42,143,212'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.FLOW, TYPE_ACTION_CATEGORY),         name: 'CDSActionCategory.Flow',         src: 'assets/images/actions_category/flow.svg',          color: '210,130,40'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.INTEGRATIONS, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.Integrations', src: 'assets/images/actions_category/integrations.svg',  color: '138,99,190'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.SPECIAL, TYPE_ACTION_CATEGORY),      name: 'CDSActionCategory.Special',      src: 'assets/images/actions_category/special.svg',       color: '204,68,75'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE, TYPE_ACTION_CATEGORY),        name: 'CDSActionCategory.Voice',        src: 'assets/images/actions_category/voice.svg',         color: '42,143,212'},
+    { type: getKeyByValue(TYPE_ACTION_CATEGORY.VOICE_TWILIO, TYPE_ACTION_CATEGORY), name: 'CDSActionCategory.VoiceTwilio',  src: 'assets/images/actions_category/twilio-voice.svg',  color: '42,143,212'},
     // { type: getKeyByValue(TYPE_ACTION_CATEGORY.NEW, TYPE_ACTION_CATEGORY), name: TYPE_ACTION_CATEGORY.NEW, src: 'assets/images/actions_category/new.svg'}
 ]
+
+/**
+ * Il colore della famiglia a cui appartiene un'azione, o `null` se non si sa dirlo -- un tipo che
+ * non e' nell'elenco, una famiglia senza tinta, o nessun tipo affatto.
+ *
+ * Torna `null` invece di un colore di ripiego di proposito: chi chiama sa gia' qual e' il colore
+ * di un blocco senza famiglia, e deciderlo qui vorrebbe dire averlo scritto in due posti.
+ */
+export function getActionCategoryColor(actionType: string): string | null {
+    if (!actionType) { return null; }
+    const action = Object.values(ACTIONS_LIST).find(entry => entry.type === actionType);
+    if (!action) { return null; }
+    const category = ACTION_CATEGORY.find(cat => TYPE_ACTION_CATEGORY[cat.type] === action.category);
+    return category?.color ?? null;
+}
 
 export function getKeyByValue(value, keys) {
     const indexOfS = Object.values(keys).indexOf(value as unknown as any);

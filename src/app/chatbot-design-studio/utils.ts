@@ -1,6 +1,7 @@
 import { AbstractControl } from "@angular/forms";
 import { Intent } from "src/app/models/intent-model";
 import { v4 as uuidv4 } from 'uuid';
+import { getActionCategoryColor } from "./utils-actions";
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
@@ -646,6 +647,30 @@ export function deleteItemInArrayForKey(key, array, item) {
 
 export function checkInternalIntent(intent: Intent): boolean {
     return (Object.values(TYPE_INTENT_NAME)as string[]).includes(intent.intent_display_name);
+}
+
+
+/**
+ * Il colore con cui un blocco si presenta quando nessuno gliene ha scelto uno: quello della
+ * famiglia della sua azione -- verde per le piu' usate, blu per l'AI, e cosi' via -- cosi' il
+ * flusso si legge a colpo d'occhio prima ancora dei nomi.
+ *
+ * Decide guardando la prima azione che appartenga a una famiglia riconoscibile: un blocco ne
+ * contiene di solito una sola, e dove ce ne fossero piu' d'una comanda quella che lo apre.
+ *
+ * I blocchi riservati -- avvio, webhook, fallback -- restano del colore di sempre: il loro aspetto
+ * dice gia' che cosa sono, e una tinta presa dall'azione che contengono lo direbbe peggio.
+ *
+ * Sta qui, e non in chi disegna, perche' il colore appartiene al blocco: lo chiedono il blocco e
+ * il canvas, che con lo stesso colore disegna i connettori che ne escono.
+ */
+export function getIntentDefaultColor(intent: Intent | any): string {
+    if (!intent || checkInternalIntent(intent)) { return INTENT_COLORS.COLOR1; }
+    for (const action of intent.actions ?? []) {
+        const color = getActionCategoryColor(action?._tdActionType);
+        if (color) { return color; }
+    }
+    return INTENT_COLORS.COLOR1;
 }
 
 

@@ -311,11 +311,8 @@ cds-fulfillment {
     --size-icon-base: 14px;
     --transition-fast: .12s;
 
-    --cat-most-used:        #5fa832;  --cat-most-used-soft:    #e8f6dd;
-    --cat-ai:               #2a8fd4;  --cat-ai-soft:           #dceefa;
-    --cat-flow:             #e08a1e;  --cat-flow-soft:         #fbeed9;
-    --cat-integrations:     #5a2d8f;  --cat-integrations-soft: #ece0f5;
-    --cat-special:          #dcb423;  --cat-special-soft:      #fbf3d7;
+    // Le tinte delle famiglie non stanno piu' qui: le dichiara la famiglia stessa, ed e' la
+    // stessa con cui nasce un blocco che contiene una sua azione. Un elenco solo, non due.
   }
 
   .box-left {

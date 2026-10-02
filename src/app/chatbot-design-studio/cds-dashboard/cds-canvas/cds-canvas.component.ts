@@ -23,7 +23,7 @@ import { Note } from 'src/app/models/note-model';
 import { NoteType } from 'src/app/models/note-types';
 
 // UTILS //
-import { ACTION_DRAG_MIME, INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
+import { ACTION_DRAG_MIME, INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME , getIntentDefaultColor} from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 
 
@@ -869,7 +869,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   setConnectorColor(connector: any){
     const idIntentFrom = connector.id.split('/')[0];
     const intent = this.intentService.getIntentFromId(idIntentFrom);
-    const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
+    // Un blocco a cui nessuno ha scelto un colore porta quello della famiglia della sua azione:
+    // il connettore che ne esce deve uscire di quel colore, non del grigio di prima.
+    const color = intent?.attributes?.color ?? getIntentDefaultColor(intent);
     const opacity = this.stageService.getAlpha()/100;
     //this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
     this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
@@ -987,11 +989,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log("[CDS-CANVAS] ho rilasciato il connettore tratteggiato nello stage (nell'elemento con classe 'receiver_elements_dropped_on_stage') e quindi apro il float menu");
       const intentId = e.detail.fromId.split('/')[0];
       const intent = this.intentService.getIntentFromId(intentId);
-        if(intent.attributes?.color){
-        detail.color = intent.attributes.color;
-      } else {
-        detail.color = INTENT_COLORS.COLOR1;
-      }
+      detail.color = intent.attributes?.color ?? getIntentDefaultColor(intent);
       this.openFloatMenuOnConnectorDraftReleased(detail);
     } else {
       this.logger.log("[CDS-CANVAS] ho rilasciato in un punto qualsiasi del DS ma non sullo stage quindi non devo aprire il menu", detail);

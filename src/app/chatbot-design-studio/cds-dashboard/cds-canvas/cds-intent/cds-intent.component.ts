@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, isReturnStackIntent, ACTIONS_WITH_OWN_OUTPUTS, actionEndsTheFlow } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions, getIntentDefaultColor } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -733,10 +733,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       const nwColor = this.intent.attributes.color;
       this.intentColor = nwColor;
     } else {
-      this.intentColor = INTENT_COLORS.COLOR1;
-      this.intent.attributes.color = INTENT_COLORS.COLOR1;
+      this.intentColor = getIntentDefaultColor(this.intent);
+      this.intent.attributes.color = this.intentColor;
     }
   }
+
 
   private setIntentSelected() {
     this.listOfActions = null;

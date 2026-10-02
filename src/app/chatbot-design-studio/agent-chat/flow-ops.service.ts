@@ -11,7 +11,7 @@ import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from 
 import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
-import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
+import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage, getIntentDefaultColor } from '../utils';
 
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
  *  of the AI chat: once it has paused (the first pass), and again after the connector service's
@@ -1250,6 +1250,12 @@ export class FlowOpsService implements OnDestroy {
         blocksToRedraw.add(intent.intent_id);
       }
     }
+    // Il colore della famiglia va deciso adesso, non quando il blocco e' stato costruito: qui
+    // `createNewIntent` riceve un'azione nulla e l'elenco viene rifatto da capo poco sopra, quindi
+    // al momento della nascita la famiglia non si poteva ancora sapere. La chat non sceglie
+    // colori -- non e' una cosa di cui debba occuparsi: li eredita dall'azione, come succede
+    // trascinandola dalla tavolozza.
+    intent.attributes.color = getIntentDefaultColor(intent);
     this.intentService.addNewIntentToListOfIntents(intent);
     await this.intentService.saveNewIntent(intent, intent, null);
     this.registerDrag(intent.intent_id);

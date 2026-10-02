@@ -49,13 +49,6 @@
     border-bottom: 1px solid var(--ds-border);
     &:last-child { border-bottom: none; }
 
-    &[data-cat="MOST_USED"]    { --cat-color: var(--cat-most-used);    --cat-soft: var(--cat-most-used-soft); }
-    &[data-cat="AI"]           { --cat-color: var(--cat-ai);           --cat-soft: var(--cat-ai-soft); }
-    &[data-cat="FLOW"]         { --cat-color: var(--cat-flow);         --cat-soft: var(--cat-flow-soft); }
-    &[data-cat="INTEGRATIONS"] { --cat-color: var(--cat-integrations); --cat-soft: var(--cat-integrations-soft); }
-    &[data-cat="SPECIAL"]      { --cat-color: var(--cat-special);      --cat-soft: var(--cat-special-soft); }
-    &[data-cat="VOICE"],
-    &[data-cat="VOICE_TWILIO"] { --cat-color: var(--cat-ai);           --cat-soft: var(--cat-ai-soft); }
 }
 
 .cds-actions-cat__header {
@@ -63,14 +56,14 @@
 }
 
 
+/* Tinta e alone arrivano dal template, che li legge dalla famiglia: qui restano forma e misura.
+   L'alone tiene il pallino leggibile anche sul fondo chiaro, senza ingrandirlo. */
 .cds-actions-cat__dot {
     width: var(--space-4);
     height: var(--space-4);
     border-radius: 50%;
     flex-shrink: 0;
-    background: var(--cat-color, var(--ds-muted));
-    // L'alone tiene il pallino leggibile anche sul fondo chiaro, senza ingrandirlo.
-    box-shadow: 0 0 0 3px var(--cat-soft, var(--ds-canvas));
+    background: var(--ds-muted);
 }
 
 .cds-actions-cat__name {

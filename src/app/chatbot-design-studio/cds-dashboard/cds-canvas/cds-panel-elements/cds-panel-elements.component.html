@@ -42,8 +42,13 @@
                     (click)="toggleCategory(category.type)">
                     <!-- Un pallino colorato per categoria, come nel V4: l'icona ripeteva in
                          piccolo quello che dice gia' il nome, il colore invece si ritrova a
-                         colpo d'occhio scorrendo l'elenco. -->
-                    <span class="cds-actions-cat__dot" aria-hidden="true"></span>
+                         colpo d'occhio scorrendo l'elenco.
+                         La tinta e' quella dichiarata dalla famiglia -- la stessa con cui nasce un
+                         blocco che contiene una sua azione -- e non una copia nel foglio di stile:
+                         cosi' il pallino qui e il blocco sul flusso non possono divergere. -->
+                    <span class="cds-actions-cat__dot" aria-hidden="true"
+                        [style.background]="'rgb(' + category.color + ')'"
+                        [style.box-shadow]="'0 0 0 3px rgba(' + category.color + ', .18)'"></span>
                     <span class="cds-actions-cat__name">{{ category.name | translate }}</span>
                     <span class="cds-actions-cat__count">{{ visibleActions(category.type).length }}</span>
                     <span class="cds-actions-cat__chevron" [class.is-open]="isCategoryOpen(category.type)">&rsaquo;</span>

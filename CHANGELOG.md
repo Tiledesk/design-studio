@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch 02/10/2026
+- **added**: un blocco nasce del colore della famiglia dell'azione che contiene -- verde le piu' usate, blu l'AI, arancio il flusso, viola le integrazioni, rosso le speciali -- e i connettori che ne escono prendono la stessa tinta. Vale comunque sia nato: trascinando un'azione sul flusso, spostandola da un altro blocco, tirando un connettore nel vuoto o chiedendolo alla chat AI. Un colore scelto a mano continua a vincere, e i blocchi di avvio e di fallback restano come sono
+- **changed**: nel pannello delle azioni il pallino di ogni famiglia ha la tinta dei blocchi che quella famiglia crea, e passando su un'azione la sua icona si accende come nell'elenco dei blocchi
 - **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
 - **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
 
