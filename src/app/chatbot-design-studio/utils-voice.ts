@@ -416,8 +416,11 @@ export var voiceProviderList: Array<{key: string, label: string, elements?: Arra
             //GET MODELS FROM ELEVENLABS API
         ],
         stt_model: [
-            { model: 'scribe_v1',                   name: 'scribe_v1',                  status: 'active' },
-            { model: 'scribe_v1_experimental',      name: 'scribe_v1_experimental',     status: 'active' },
+            { model: 'scribe_v1',                   name: 'scribe_v1',                  status: 'inactive' },
+            { model: 'scribe_v1_experimental',      name: 'scribe_v1_experimental',     status: 'inactive' },
+            { model: 'scribe_v2',                   name: 'scribe_v2',                  status: 'active' },
+            { model: 'scribe_v2_realtime',          name: 'scribe_v2_realtime',         status: 'active' },
+            { model: 'scribe_v2_medical',           name: 'scribe_v2_medical',          status: 'active' },
         ]
     }
 ]

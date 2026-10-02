@@ -98,6 +98,14 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/new.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions_category/start_points.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/start_points.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions_category/start_point_scheduled.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/start_point_scheduled.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions_category/special.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/special.svg')
     );
@@ -244,6 +252,18 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/online_agents.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/online_agents.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/invite_human.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/invite_human.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/remove_human.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/remove_human.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/remove_current_bot.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/remove_current_bot.svg')
     );
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/open_hours.svg',

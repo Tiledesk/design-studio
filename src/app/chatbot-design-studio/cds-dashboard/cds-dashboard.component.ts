@@ -9,6 +9,7 @@ import { filter } from 'rxjs/operators';
 
 // SERVICES //
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { AiService } from 'src/app/services/ai.service';
 import { ControllerService } from '../services/controller.service';
 
 // MODEL //
@@ -35,11 +36,16 @@ import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storag
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
 import { StageService, DEFAULT_PANELS_STATE } from 'src/app/chatbot-design-studio/services/stage.service';
+import { ReadOnlyService, isReadOnlyRoute } from 'src/app/services/read-only.service';
 import { WebhookService } from '../services/webhook-service.service';
 import { UploadService } from 'src/chat21-core/providers/abstract/upload.service';
 import { AgentChatHostService } from '../agent-chat/agent-chat-host.service';
 import { IntentService } from '../services/intent.service';
 import { LeftPanelStateService, LeftPanelTab } from '../services/left-panel-state.service';
+import { TranslateService } from '@ngx-translate/core';
+import { AgentFromPromptService } from '../agent-chat/agent-chat-from-prompt.service';
+const swal = require('sweetalert');
+
 
 @Component({
   selector: 'appdashboard-cds-dashboard',
@@ -95,6 +101,8 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   activeDetailSection: SETTINGS_SECTION = SETTINGS_SECTION.DETAIL
   isBetaUrl: boolean = false;
   showChangelog: boolean = false;
+  /** Sola lettura: niente header, niente sidebar, banner sempre in vista. */
+  IS_READ_ONLY: boolean = false;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -120,9 +128,117 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     private readonly changeDetectorRef: ChangeDetectorRef,
     // In coda di proposito: agent-chat-flow-switch.spec.ts costruisce il componente a mano con
     // argomenti posizionali, quindi i servizi aggiunti dopo vanno appesi qui e non in mezzo.
-    private readonly leftPanelState: LeftPanelStateService
+    private aiService: AiService,
+    private readonly readOnlyService: ReadOnlyService,
+    private readonly leftPanelState: LeftPanelStateService,
+    // I due facoltativi restano in fondo, e non e' una preferenza: in TypeScript un parametro
+    // obbligatorio non puo' seguirne uno facoltativo, quindi spostarli piu' su non compila.
+    private readonly agentFromPromptService?: AgentFromPromptService,
+    private readonly translate?: TranslateService
   ) {
     this.manageRouteChanges();
+  }
+
+  /** An agent just created from a description in the dashboard: start the build before the chat
+   *  opens.
+   *
+   *  The order is the point. The chat joins a run that is already in progress when it mounts, so
+   *  the run must exist first; started afterwards, it would have nobody to execute its tools and
+   *  would sit waiting. If the runtime refuses, the agent exists all the same: the chat opens
+   *  anyway and the user is handed their own text back rather than being left to rewrite it. */
+  /** True while the AI chat is building the agent that was just described in the dashboard.
+   *
+   *  Only that case, not every turn of the chat: someone typing into the chat can see it
+   *  working and does not need to be told. Someone who described an agent in another page and
+   *  landed on a canvas with three blocks on it has no idea why they are there, whether
+   *  anything is happening, or how long to wait. */
+  IS_BUILDING_FROM_PROMPT: boolean = false;
+  private buildingSubscription: Subscription;
+
+  /** Watches the chat until the build it was given comes to rest.
+   *
+   *  `idle` is the fact to wait for -- the chat says it once per turn, however the turn ended.
+   *  But the first status can arrive before the chat has joined the run that was started for
+   *  it, so an `idle` that no `busy` preceded means "not started yet", not "finished", and
+   *  taking the message down on it would hide it a moment before anything appeared.
+   *
+   *  The timeout is the other half: if the chat never reports anything -- an old build, a
+   *  failure the panel handles on its own -- a banner nobody can dismiss is worse than one
+   *  that leaves too early. */
+  private watchAgentBuild(): void {
+    const STOP_WAITING_AFTER_MS = 5 * 60 * 1000;
+    this.IS_BUILDING_FROM_PROMPT = true;
+    let seenBusy = false;
+
+    const stop = () => {
+      this.IS_BUILDING_FROM_PROMPT = false;
+      this.buildingSubscription?.unsubscribe();
+      this.changeDetectorRef.detectChanges();
+    };
+
+    this.buildingSubscription = this.agentChatHostService.status$.subscribe((state) => {
+      if (state === 'busy') { seenBusy = true; return; }
+      if (seenBusy) { stop(); }
+    });
+    setTimeout(() => { if (this.IS_BUILDING_FROM_PROMPT) { stop(); } }, STOP_WAITING_AFTER_MS);
+  }
+
+  private async sendPendingAgentPrompt(): Promise<void> {
+    const botId = this.dashboardService.selectedChatbot?._id;
+    const pending = botId ? this.agentFromPromptService?.takePending(botId) : null;
+    if (!pending) { return; }
+
+    // Configured is checked after the note is taken, not before: an unconfigured studio has no
+    // way to build the flow, and leaving the note behind would only make it fire on the next
+    // agent opened in this tab.
+    if (!this.agentChatHostService.isConfigured?.()) {
+      this.logger.log('[CDS DSHBRD] a description arrived but the agent chat is not configured');
+      this.handBackAgentPrompt(pending.prompt);
+      return;
+    }
+
+    try {
+      await this.agentFromPromptService.startRun(this.dashboardService.projectID, pending);
+      this.watchAgentBuild();
+    } catch (error) {
+      this.logger.error('[CDS DSHBRD] agent from prompt: run not started', error);
+      this.handBackAgentPrompt(pending.prompt);
+    }
+  }
+
+  /** Gives the user their own words back when nothing is going to build from them.
+   *
+   *  The note is consumed by the time we get here -- it has to be, or it would fire again on the
+   *  next agent opened in this tab. So this is the only copy left: without it the description is
+   *  swallowed and the person is left to rewrite from memory something they already wrote. */
+  private handBackAgentPrompt(prompt: string): void {
+    swal({
+      title: this.translate?.instant('CDSAgentFromPrompt.SendFailedTitle'),
+      text: `${this.translate?.instant('CDSAgentFromPrompt.SendFailedText')}\n\n${prompt}`,
+      icon: 'warning'
+    });
+  }
+
+  /**
+   * Accende la sola lettura se questa e' la rotta di preview.
+   *
+   * Va fatto **prima** che il canvas carichi il flusso, e lo e': il canvas vive dentro
+   * il router-outlet di questo guscio, che lo rende solo a inizializzazione finita.
+   *
+   * La forma di `data` e' insolita -- e' un array di un oggetto, `[{ roles: [...] }]`,
+   * perche' cosi' la legge RoleGuard -- e l'ereditarieta' dei dati di rotta verso il
+   * figlio a percorso vuoto puo' consegnarla come array o come oggetto con chiave `0`.
+   * `data[0]` va bene in entrambi i casi.
+   */
+  private applyReadOnlyFromRoute(): void {
+    // `route?.snapshot?` e non `route.snapshot`: il guscio viene costruito a mano in
+    // alcuni test con una rotta finta, e un errore qui fermerebbe tutta
+    // l'inizializzazione. Senza dati di rotta non e' la preview, quindi si modifica.
+    if (isReadOnlyRoute(this.route?.snapshot?.data)) {
+      this.readOnlyService.enable();
+      this.IS_READ_ONLY = true;
+      this.logger.log('[CDS DSHBRD] read-only: nessuna modifica verra\' salvata');
+    }
   }
 
   /** Checks the current route once at construction time (the initial load may
@@ -163,6 +279,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // ---------------------------------------
     // Changelog alert
     // ---------------------------------------
+    this.applyReadOnlyFromRoute();
     this.showChangelog = this.checkForChangelogNotify();
     this.executeAsyncFunctionsInSequence();
     // Whoever wants to move the studio to another flow of the family -- the
@@ -202,6 +319,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // Senza questo, uscire verso l'elenco e rientrare su un altro agente -- che non ricarica la
     // pagina -- lo aprirebbe sull'ultima scheda guardata su quello di prima.
     this.leftPanelState.restartBoot();
+    this.buildingSubscription?.unsubscribe();
     if (this.subscriptionAgentChatPanel) {
       this.subscriptionAgentChatPanel.unsubscribe();
     }
@@ -434,6 +552,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
+      // Between knowing which agent is open and opening the chat: the run has to exist before
+      // the panel mounts, or the chat attaches to nothing and the description is lost.
+      await this.sendPendingAgentPrompt();
       this.restoreLeftPanels();
       this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
@@ -475,6 +596,7 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.kbService.initialize(serverBaseURL, this.project._id)
     this.dataTableService.initialize(serverBaseURL, this.project._id)
     this.openaiService.initialize(serverBaseURL, this.project._id)
+    this.aiService.initialize(serverBaseURL, this.project._id)
     this.whatsappService.initialize(whatsappBaseUrl, this.project._id)
     this.webhookService.initialize(serverBaseURL, this.project._id);
     this.uploadService.initialize(this.project._id);

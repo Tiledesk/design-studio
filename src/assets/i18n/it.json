@@ -219,7 +219,6 @@
     "WebhookmentUrlMustBeAHttpsUrl": "L'URL del webhook deve essere un URL https o http",
     "WebhookmentUrlMustBeAValidUrl": "L'URL del webhook deve essere un URL valido",
     "CDSCanvas": {
-      "UnsupportedFilterOperator": "Questo operatore non è supportato nei filtri delle reply e blocca il flusso su questo blocco. Apri il filtro e scegli un altro operatore.",
       "DataTableTable": "Tabella dati",
       "DataTableSelectTable": "Seleziona una tabella",
       "DataTableOperation": "Operazione",
@@ -231,6 +230,7 @@
       "DataTableAddCondition": "Aggiungi condizione",
       "DataTableData": "Dati",
       "DataTableAddData": "Aggiungi campo",
+      "UnsupportedFilterOperator": "Questo operatore non è supportato nei filtri delle reply e blocca il flusso su questo blocco. Apri il filtro e scegli un altro operatore.",
       "DeprecationMessage": "Deprecato. Usa la nuova action <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a>.",
       "KBJsonSources": "Assegna le sorgenti KB JSON a",
       "EnterIntentName": "Inserisci il nome del blocco",
@@ -247,6 +247,14 @@
       "EditMCPServer": "Modifica server MCP",
       "EnterServerName": "Inserisci il nome del server",
       "EnterServerURL": "Inserisci l'URL del server",
+      "OAuthFlow": "OAuth 2.0 Flow",
+      "ClientID": "Client ID",
+      "ClientSecret": "Client Secret",
+      "ClientSecretPlaceholder": "Client Secret (opzionale)",
+      "RedirectURL": "Redirect URL",
+      "Scope": "Scope",
+      "ScopePlaceholder": "Scope (separati da spazio)",
+      "ScopeInfo": "Lo Scope definisce quali permessi stai richiedendo (es. read write, separati da spazio).",
       "OnlySupported": "supportato solo",
       "Save": "Salva",
       "Saving": "Salvataggio",
@@ -368,5 +376,10 @@
         "DeleteAgentError": "Non sono riuscito a eliminare l'agente. Riprova.",
         "NoAgents": "Nessun agente in questo progetto",
         "OpenAgentError": "Non è stato possibile aprire l'agente. Riprova."
+    },
+    "CDSAgentFromPrompt": {
+        "SendFailedTitle": "La richiesta non è stata inviata alla chat AI",
+        "SendFailedText": "L'agente è stato creato, ma non è stato possibile inviare la descrizione. Incollala nella chat AI per costruire il flusso:",
+        "Building": "L'IA sta costruendo l'agente: i blocchi compaiono man mano. Ci vuole qualche istante."
     }
 }

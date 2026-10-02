@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
-import { MatTooltip } from '@angular/material/tooltip';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
 import { ACTION_DRAG_MIME, TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -8,6 +7,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
+import { ConnectorGroup, ConnectorSubgroup } from '../../../../connector/connector-catalog.service';
 
 /** Quanto resta aperto il riquadro dopo che il puntatore ha lasciato la riga: il tempo di
  *  raggiungerlo per premere il collegamento che contiene. */
@@ -19,10 +19,6 @@ const CLOSE_INFO_DELAY_MS = 400;
  *  riquadro sbatterebbe aperto e chiuso una voce dopo l'altra. Un secondo e' il tempo di una
  *  intenzione, non di un passaggio. */
 const OPEN_INFO_DELAY_MS = 1000;
-
-/** Quanto bisogna restare sulla riga perche' compaia il nome per intero. Piu' breve dell'attesa
- *  della descrizione: qui si risponde a "cosa c'e' scritto", non si apre un riquadro. */
-const NAME_TOOLTIP_DELAY_MS = 400;
 // import { DragDropService } from 'app/chatbot-design-studio/services/drag-drop.service';
 
 @Component({
@@ -31,25 +27,34 @@ const NAME_TOOLTIP_DELAY_MS = 400;
   styleUrls: ['./cds-panel-actions.component.scss']
 })
 export class CdsPanelActionsComponent implements OnInit {
+  @ViewChild('panel_actions_div') panelDiv: ElementRef;
 
   @Input() actionsList: Array<any>;
   @Input() menuType: string;
   @Input() menuCategory: string;
   @Input() pos: any;
+  @Input() connectorGroups: ConnectorGroup[] = [];
+  @Output() startPointClick = new EventEmitter<string>();
+  @Output() isDraggingMenuElement = new EventEmitter();
 
-  NAME_TOOLTIP_DELAY_MS = NAME_TOOLTIP_DELAY_MS;
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
-  
+
   menuItemsList: any;
+  groupRows: Array<{ group: ConnectorGroup; items: any[] }> = [];
+  activeGroup: ConnectorGroup | null = null;
+  activeItems: any[] = [];
+  activeSubgroups: Array<{ id: string; name: string; icon: string; items: any[] }> = [];
+  activeGroupPos: any = { x: 200, y: 0 };
+  isOverNested = false;
   isDragging: any = false;
   indexDrag: number;
 
   hoveredElement: any;
+  positionMenu: any = {'x': 0, 'y': 0 };
   private closeInfoTimer: any = null;
   private openInfoTimer: any = null;
-  positionMenu: any = {'x': 200, 'y': 0 };
   isOpen: boolean = false;
   // dropList: CdkDropList;
   // connectedLists: CdkDropList[];
@@ -134,6 +139,18 @@ export class CdsPanelActionsComponent implements OnInit {
       this.pos = {'x': 0, 'y':0};
     }
 
+    this.groupRows = (this.connectorGroups || []).map(group => ({
+      group,
+      items: (group.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true }))
+    }));
+
+    if (this.menuType !== TYPE_OF_MENU.ACTION) {
+      this.activeGroup = null;
+      this.activeItems = [];
+      this.activeSubgroups = [];
+      this.isOverNested = false;
+    }
+
   }
 
 
@@ -148,23 +165,6 @@ export class CdsPanelActionsComponent implements OnInit {
     // // this.dragDropService.connectedIDLists;
   }
 
-
-  /**
-   * Il puntatore entra in una riga: il nome per intero si mostra solo se la riga lo taglia.
-   *
-   * La misura si fa adesso e non una volta per tutte: la stessa riga taglia o non taglia a
-   * seconda della lingua, del carattere caricato e della larghezza del pannello, che cambia.
-   * `scrollWidth` e' quanto servirebbe al testo, `clientWidth` quanto gli e' stato dato.
-   *
-   * Si spegne il riquadro invece di non aprirlo: Material ha gia' il suo ascoltatore su questa
-   * riga, e quale dei due arrivi prima non e' una cosa su cui valga la pena scommettere.
-   */
-  onRowEnter(row: HTMLElement, tooltip: MatTooltip): void {
-    const name = row.querySelector('.action-btn-text') as HTMLElement | null;
-    const isTruncated = !!name && name.scrollWidth > name.clientWidth;
-    tooltip.disabled = !isTruncated;
-    if (!isTruncated) { tooltip.hide(0); }
-  }
 
   openInfo(e, element) {
     this.logger.log('[CDS-PANEL-ACTIONS] openInfo!', element);
@@ -184,8 +184,6 @@ export class CdsPanelActionsComponent implements OnInit {
     clearTimeout(this.openInfoTimer);
     this.openInfoTimer = setTimeout(() => {
       this.hoveredElement = element;
-      //this.menuTrigger.openMenu();
-      // let x = e.offsetLeft;
       let y = e.offsetTop;
       this.isOpen = true;
       // Solo l'altezza: il lato lo decide il foglio di stile (`left: 100%`), cosi' il riquadro
@@ -235,23 +233,66 @@ export class CdsPanelActionsComponent implements OnInit {
     this.hoveredElement = null;
   }
 
+  onChildDragging(isDragging: boolean) {
+    this.isDragging = isDragging;
+    if (isDragging) { this.closeInfoNow(); }
+    this.isDraggingMenuElement.emit(isDragging);
+  }
+
+  openGroup(rowEl: HTMLElement, row: { group: ConnectorGroup; items: any[] }) {
+    this.activeGroup = row.group;
+    this.activeItems = row.items;
+    this.activeSubgroups = (row.group.subgroups || []).map(sg => ({
+      id: sg.id,
+      name: sg.name,
+      icon: sg.icon,
+      items: (sg.entries || []).map(entry => ({ type: TYPE_OF_MENU.ACTION, value: entry, canLoad: true })),
+    }));
+    // A connector can expose many actions, so the nested flyout's (max-height-capped,
+    // scrollable) box can be tall. Anchor it to the hovered row, but shift it up if it would
+    // run past the bottom of the viewport — otherwise the scrollable box opens off-screen and
+    // feels unscrollable. Must match the .action-list max-height: min(70vh, 560px).
+    const margin = 8;
+    const maxFlyoutH = Math.min(window.innerHeight * 0.7, 560);
+    const panelTop = this.panelDiv ? this.panelDiv.nativeElement.getBoundingClientRect().top : 0;
+    let screenTop = rowEl.getBoundingClientRect().top;
+    if (screenTop + maxFlyoutH > window.innerHeight - margin) {
+      screenTop = Math.max(margin, window.innerHeight - margin - maxFlyoutH);
+    }
+    this.activeGroupPos = { x: 200, y: Math.max(0, Math.round(screenTop - panelTop)) };
+  }
+
+  closeGroup() {
+    setTimeout(() => { if (!this.isOverNested) { this.activeGroup = null; } }, 0);
+  }
+
+  onOverNested() { this.isOverNested = true; }
+
+  onLeaveNested() { this.isOverNested = false; this.closeGroup(); }
+
+  onItemClick(item: any) {
+    if (item?.value?.start_point && item.value.disabled) {
+      this.startPointClick.emit(item.value.start_point);
+    }
+  }
+
   /**
-   * Comincia il trascinamento di un'azione verso il flusso.
+   * Comincia il trascinamento di una voce dell'elenco degli eventi verso il flusso.
    *
-   * Nel pacchetto viaggia solo il tipo dell'azione: e' tutto quello che serve al canvas per
-   * creare il blocco, e tenerlo a una stringa evita di far passare oggetti vivi attraverso un
-   * meccanismo del browser. L'etichetta del contenuto e' quella che il canvas riconosce: senza,
-   * un file trascinato dal desktop e un'azione sarebbero la stessa cosa.
-   *
-   * La riga non viene toccata: resta nell'elenco, e quello che segue il puntatore e' l'istantanea
-   * che disegna il browser.
+   * E' lo stesso gesto delle azioni (vedi la lista condivisa): viaggia il tipo, sotto l'etichetta
+   * che il flusso riconosce, e la riga resta dov'e'.
    */
   onDragStart(event: DragEvent, item: any) {
     if (!event.dataTransfer || item?.value?.disabled) { return; }
-    event.dataTransfer.setData(ACTION_DRAG_MIME, item.value.type);
+    // Non il solo tipo: una voce puo' essere un punto di partenza, oppure un'azione portata da un
+    // connettore installato, e il flusso ha bisogno di saperlo per creare la cosa giusta. Viaggia
+    // come testo perche' e' l'unica forma che il meccanismo del browser sa trasportare.
+    event.dataTransfer.setData(ACTION_DRAG_MIME, JSON.stringify({
+      type: item.value.type,
+      start_point: item.value.start_point,
+      connectorEntry: item.value.connectorEntry
+    }));
     event.dataTransfer.effectAllowed = 'copy';
-    // Le due cose che si toglievano di mezzo anche prima: il pannello di dettaglio di un'azione
-    // gia' sul flusso, e la descrizione eventualmente aperta su questa riga.
     this.controllerService.closeActionDetailPanel();
     this.closeInfoNow();
   }

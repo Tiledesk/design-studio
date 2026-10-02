@@ -1,0 +1,151 @@
+@use '../../left-panel' as lp;
+
+@import "./src/assets/sass/cds/_variables.scss";
+
+$text-color: var(--blu);
+$text-hover-color: var(--blu);
+$base-padding: 6px;
+
+.action-list {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.action-list .menu-dragging { padding: $base-padding 0px; }
+
+.action-box { padding: 0px $base-padding; }
+
+/* La riga di un'azione: la stessa dei blocchi e dei subagent, dal parziale condiviso. Al posto
+   dell'ombra -- che non si leggeva sui grigi chiari e faceva ballare le voci mentre si scorreva
+   -- al passaggio cambia il fondo. */
+.actions-btns-wpr {
+  width: 100%;
+  @include lp.lp-row;
+  cursor: -webkit-grab;
+  cursor: grab;
+  &:active { cursor: grabbing; }
+}
+
+/* L'icona in una cella squadrata, come nel V4: distingue l'azione dal testo senza colorarla, e
+   tiene i nomi incolonnati anche con icone di forme diverse. */
+.action-btn-icon:first-of-type {
+  @include lp.lp-icon-cell;
+}
+
+.action-btn-icon {
+  display: inline-flex;
+  color: $text-color;
+  padding: 0;
+  vertical-align: middle;
+  .btn-tdblu-no-boxshadow { margin: 0; padding: 0!important; background: transparent !important; height: 20px; display: flex; justify-content: center; align-items: center; box-shadow: none; }
+}
+
+.truncate { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%; }
+
+.trigger-beta-badge {
+  font-weight: 400;
+  background: linear-gradient(45deg, #3167e2, #a736ff);
+  padding: 0px 6px;
+  border-radius: 5px;
+  height: 16px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #fff;
+  position: relative;
+  margin: 0px 3px;
+  display: flex;
+  align-items: center;
+}
+.badge-NEW { background: linear-gradient(45deg, #3167e2, #a736ff); }
+.badge-BETA { background: linear-gradient(45deg, #e23131, #ff8736); }
+.badge-DEP { background: linear-gradient(45deg, #e23131, #640b0b); }
+
+.action-btn-icon img, .drag-btn img { width: 16px; }
+.action-btn-icon img { filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%); }
+
+// Connector action icons are real (multi-colour) logos, not tintable SVGs —
+// keep their original colours through the default, hover and drag-preview states.
+.action-btn-icon .svg-icon {
+  width: 16px;
+  color: var(--gray-light-01);
+  filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+  // Il passaggio accende l'icona invece di scambiarla di colpo. La stessa durata del fondo della
+  // riga, che cambia insieme a lei: due tempi diversi si leggerebbero come due cose.
+  transition: filter var(--transition-fast, .12s), color var(--transition-fast, .12s);
+}
+
+/* Al passaggio l'icona si colora, come nell'elenco dei blocchi.
+   Lo fa un filtro e non `color`: l'icona e' un disegno gia' tinto di grigio da un filtro, e un
+   colore dichiarato sopra non lo toglie -- il filtro e' l'ultimo a parlare. E' lo stesso filtro
+   che l'elenco dei blocchi usa sulle proprie icone, non un azzurro ricalcolato a occhio.
+   I loghi dei connettori restano fuori: hanno colori propri, e la regola che li lascia stare e'
+   scritta dopo questa, perche' a parita' di peso l'ultima vince. */
+.actions-btns-wpr:hover .action-btn-icon:first-of-type .svg-icon {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+}
+
+/* Le azioni che il piano non comprende. Lo stato lo dichiara il template qui accanto
+   (`is-disabled`): senza questa regola la riga sarebbe indistinguibile da una disponibile. */
+.action-box.is-disabled {
+  background: var(--gray-02);
+
+  .actions-btns-wpr,
+  .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; }
+
+  // L'icona resta spenta anche al passaggio: accenderla direbbe "prendimi" proprio dove non si
+  // puo' prendere niente.
+  .actions-btns-wpr:hover .action-btn-icon:first-of-type .svg-icon {
+    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+  }
+}
+
+.action-btn-icon img.connector-action-icon { width: 16px; height: 16px; object-fit: contain; filter: none; }
+.actions-btns-wpr:hover .action-btn-icon img.connector-action-icon,
+.cdk-drag-preview img.connector-action-icon { filter: none; }
+
+.action-btn-text { @include lp.lp-row-name; }
+
+.cdk-drag-preview {
+  .actions-btns-wpr { transform: rotate(-3deg); background-color: white; box-sizing: border-box; border-radius: 6px; box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12); }
+  img { filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%); }
+  // Bianco no: il segnaposto che segue il puntatore tiene il colore della riga.
+}
+.cdk-drag-animating { transition: transform 250ms cubic-bezier(0,0,.2,1); }
+.action-box:last-child { border: none; }
+.action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) { transition: transform 250ms cubic-bezier(0,0,.2,1); }
+.action-drag-placeholder { background: #ccc; border: dotted 3px #999; min-height: 60px; transition: transform 250ms cubic-bezier(0,0,.2,1); border-radius: 8px; }
+.cdk-drag-disabled { background: var(--gray-02); .actions-btns-wpr, .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; } }
+
+/* La *i* che apre la descrizione: compare passando sulla riga, come nel V4. Quadrata e con lo
+   stesso raggio della cella dell'icona a sinistra, cosi' i due estremi della riga si rispondono. */
+.action-info-btn {
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: var(--size-icon-cell, 22px);
+  height: var(--size-icon-cell, 22px);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-md, 6px);
+  background: none;
+  color: var(--ds-muted, #8a8884);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-fast, .12s), background var(--transition-fast, .12s), color var(--transition-fast, .12s);
+
+  // Icona a tratto, come tutte quelle del V4: senza `fill: none` un'icona disegnata a contorni
+  // si riempirebbe di nero.
+  .svg-icon { width: 13px; height: 13px; }
+  ::ng-deep svg { width: 13px; height: 13px; fill: none; stroke: currentColor; }
+
+  &:hover { background: var(--ds-border, #ececea); color: var(--ds-ink, #1a1a19); }
+}
+
+.actions-btns-wpr:hover .action-info-btn { opacity: 1; }
+
+// a disabled start point item stays clickable: the click focuses the start box already in the flow
+.actions-btns-wpr.disabled {
+    opacity: 0.5;
+    &:hover { cursor: pointer; }
+}
