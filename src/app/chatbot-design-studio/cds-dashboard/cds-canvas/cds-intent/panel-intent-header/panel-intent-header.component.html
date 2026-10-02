@@ -1,5 +1,5 @@
 <div class="header"
-     [class.is-start]="isStart || isWebhook"
+     [class.is-start]="isStart || isWebhook || isScheduled"
      (click)="onSelectIntent($event)">
     <div *ngIf="isStart" class="intent-icon">
         <span class="material-icons rocket">rocket_launch</span>
@@ -10,13 +10,16 @@
     <div *ngIf="isWebhook" class="intent-icon">
         <span class="material-icons webhook">webhook</span>
     </div>
+    <div *ngIf="isScheduled" class="intent-icon">
+        <span class="material-icons">schedule</span>
+    </div>
     <div *ngIf="intentName === RESERVED_INTENT_NAMES.CLOSE && intent.attributes.readonly" class="intent-icon">
         <span class="material-icons call_end">call_end</span>
     </div>
 
     <div class="form-group"
          [class.is-error]="!isNotErrorName"
-         [class.is-start]="isStart || isWebhook"
+         [class.is-start]="isStart || isWebhook || isScheduled"
          [class.has-start-label]="!!startLabelKey">
         <div *ngIf="startLabelKey" class="input ellips form-control tds_draggable start-label" [ngStyle]="{'color': 'rgba('+intentColor+', 1)'}">{{ startLabelKey | translate }}</div>
         <input #inputIntentName

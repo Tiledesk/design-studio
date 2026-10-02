@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, availableActionEntries, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
@@ -7,11 +7,12 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { ConnectorCatalogService, ConnectorGroup } from '../../../connector/connector-catalog.service';
 import { ProjectService } from 'src/app/services/projects.service';
 import { environment } from 'src/environments/environment';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
 
@@ -26,7 +27,7 @@ const START_POINTS_CATEGORY = 'START_POINTS';
   // standalone: true,
   // imports: [MatButtonModule, MatMenuModule],
 })
-export class CdsPanelElementsComponent implements OnInit, OnChanges {
+export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
 
 
   /** La lista che riceve i rilasci sullo stage, da collegare alla tavolozza. */
@@ -66,12 +67,36 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
     private readonly connectorCatalogService: ConnectorCatalogService,
     private readonly projectService: ProjectService,
     private readonly readOnlyService: ReadOnlyService,
+    private readonly webhookService: WebhookService,
   ) { }
+
+  /** the server has the scheduler configured (GET webhook → scheduled_available): without it the Scheduled item is not offered */
+  scheduledAvailable = false;
+  private webhookSub: Subscription;
 
   ngOnInit(): void {
     this.createActionListByCategory();
     this.loadConnectorActions();
     this.loadConfiguredConnectors();
+    this.webhookSub = this.webhookService.webhook$.subscribe(webhook => {
+      const available = webhook?.scheduled_available === true;
+      if (available !== this.scheduledAvailable) {
+        this.scheduledAvailable = available;
+        this.refreshStartPointItems();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.webhookSub?.unsubscribe();
+  }
+
+  /** the Start points section lives in actionsByCategory (read by the panel template): rebuild it in place */
+  private refreshStartPointItems() {
+    if (!this.actionsByCategory[START_POINTS_CATEGORY]) {
+      return;
+    }
+    this.actionsByCategory[START_POINTS_CATEGORY] = this.buildStartPointItems();
   }
 
   ngOnChanges(): void {
@@ -85,7 +110,7 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
 
   buildStartPointItems(): Array<any> {
     // Sola lettura: nessun box di partenza si aggiunge, le voci restano disabilitate
-    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending || this.readOnlyService.readOnly);
+    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending || this.readOnlyService.readOnly, this.scheduledAvailable);
   }
 
   onStartPointClick(type: string) {

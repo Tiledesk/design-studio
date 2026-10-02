@@ -2,8 +2,9 @@ import { Observable, lastValueFrom } from 'rxjs';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionIntentConnected } from 'src/app/models/action-model';
 import { TYPE_OF_MENU } from './utils';
+import { defaultSchedule } from './utils-schedule';
 
-export const START_POINT_TYPES = ['web', 'webhook'];
+export const START_POINT_TYPES = ['web', 'webhook', 'scheduled'];
 export const START_POINT_MARKER = 'start_point';
 const WEB_START_BLOCK_NAME = 'start';
 
@@ -14,7 +15,7 @@ export function findStartPoint(webhook: any, type: string): any {
 }
 
 /** `web` is the block named start; any other block is a start point only when it carries the marker */
-export function startPointTypeOf(intent: any): 'web' | 'webhook' | null {
+export function startPointTypeOf(intent: any): 'web' | 'webhook' | 'scheduled' | null {
   if (!intent) {
     return null;
   }
@@ -23,6 +24,25 @@ export function startPointTypeOf(intent: any): 'web' | 'webhook' | null {
   }
   const marker = intent.attributes?.[START_POINT_MARKER];
   return START_POINT_TYPES.includes(marker) && marker !== 'web' ? marker : null;
+}
+
+/** The kind of start test running in the header: a webhook start test or a scheduled one (null: none) */
+export type StartTestKind = 'webhook' | 'scheduled' | null;
+
+/** The start box highlighted during a start test: only the box of the running test's kind */
+export function isLiveStartBox(intent: any, kind: StartTestKind): boolean {
+  const type = startPointTypeOf(intent);
+  return !!kind && (type === 'webhook' || type === 'scheduled') && type === kind;
+}
+
+/** Closing a test deletes the webhook preload for a webhook chatbot or a webhook start test; a scheduled test has no preload */
+export function shouldDeleteWebhookPreload(isWebhookChatbot: boolean, isStartTest: boolean, kind: StartTestKind): boolean {
+  return isWebhookChatbot || (isStartTest && kind !== 'scheduled');
+}
+
+/** Toast key of a failed start box drop */
+export function startPointErrorKey(type: 'webhook' | 'scheduled'): string {
+  return type === 'scheduled' ? 'CDSCanvas.ScheduledPointError' : 'CDSCanvas.StartPointError';
 }
 
 /**
@@ -70,7 +90,10 @@ export function startPointLabelKey(intent: any, subtype: string = 'chatbot'): st
   if (type === 'web') {
     return (subtype || 'chatbot') === 'chatbot' ? 'CDSCanvas.WebStart' : null;
   }
-  return type === 'webhook' ? 'CDSCanvas.WebhookStart' : null;
+  if (type === 'webhook') {
+    return 'CDSCanvas.WebhookStart';
+  }
+  return type === 'scheduled' ? 'CDSCanvas.ScheduledStart' : null;
 }
 
 export interface StartPointPanelState {
@@ -92,12 +115,12 @@ export function startPointPanelState(webhook: any, intent: any, apiUrl: string =
   };
 }
 
-const WEBHOOK_START_BLOCK_NAME = 'Webhook start';
+const START_BLOCK_NAMES = { webhook: 'Webhook start', scheduled: 'Scheduled start' };
 
 /** The block dropped on the canvas for a start point: readonly, marked, ending with an empty connect action like `start` */
-export function createStartPointBlock(type: 'webhook', pos: { x: number, y: number }): Intent {
+export function createStartPointBlock(type: 'webhook' | 'scheduled', pos: { x: number, y: number }): Intent {
   const intent = new Intent();
-  intent.intent_display_name = WEBHOOK_START_BLOCK_NAME;
+  intent.intent_display_name = START_BLOCK_NAMES[type];
   intent.attributes.start_point = type;
   intent.attributes.position = pos;
   intent.attributes.readonly = true;
@@ -107,10 +130,11 @@ export function createStartPointBlock(type: 'webhook', pos: { x: number, y: numb
   return intent;
 }
 
-/** Palette items of the Start points section. Web is always present (the start block); webhook is one per flow */
-export function buildStartPointItems(present: string[], pending: boolean): any[] {
+/** Palette items of the Start points section. Web is always present (the start block); webhook and scheduled are one per flow, scheduled only when the server has it configured */
+export function buildStartPointItems(present: string[], pending: boolean, scheduledAvailable: boolean = false): any[] {
   const webhookPresent = present.includes('webhook');
-  return [
+  const scheduledPresent = present.includes('scheduled');
+  const items = [
     {
       type: TYPE_OF_MENU.ACTION,
       canLoad: true,
@@ -138,6 +162,41 @@ export function buildStartPointItems(present: string[], pending: boolean): any[]
       }
     }
   ];
+  if (scheduledAvailable) {
+    items.push({
+      type: TYPE_OF_MENU.ACTION,
+      canLoad: true,
+      value: {
+        name: 'CDSActionList.NAME.StartPointScheduled',
+        type: 'scheduled',
+        start_point: 'scheduled',
+        src: 'assets/images/actions_category/start_point_scheduled.svg',
+        status: 'active',
+        disabled: scheduledPresent || pending,
+        tooltip: scheduledPresent ? 'CDSCanvas.StartPointPresent' : ''
+      }
+    });
+  }
+  return items;
+}
+
+/**
+ * Body of the PUT that registers a freshly dropped start box. Webhook: the source name only.
+ * Scheduled: enabled, daily 09:00 in the browser timezone, source name = chatbot name, empty payload.
+ */
+export function buildStartPointUpsertBody(type: 'webhook' | 'scheduled', blockId: string, chatbotName: string | undefined, timezone: string, confirm: boolean): any {
+  const body: any = { block_id: blockId };
+  if (type === 'scheduled') {
+    body.enabled = true;
+    body.mapping = { source_name: chatbotName, payload: {} };
+    body.schedule = defaultSchedule(timezone);
+  } else if (chatbotName) {
+    body.mapping = { source_name: chatbotName };
+  }
+  if (confirm) {
+    body.confirm = true;
+  }
+  return body;
 }
 
 export interface StartPointBoxDeps {
@@ -155,11 +214,11 @@ export interface StartPointBoxDeps {
 }
 
 /**
- * Creates the start box on the server, then registers it as the webhook start point, then hands it to the canvas.
+ * Creates the start box on the server, then registers it as the start point of its type (webhook or scheduled), then hands it to the canvas.
  * The PUT runs only after the create response: the server looks the block up by intent_id.
  * A failure after the create deletes the block again (no orphan box); nothing reaches the canvas or the undo history.
  */
-export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhook', pos: { x: number, y: number }): Promise<'created' | 'cancelled' | 'failed' | 'busy'> {
+export async function createStartPointBox(deps: StartPointBoxDeps, type: 'webhook' | 'scheduled', pos: { x: number, y: number }): Promise<'created' | 'cancelled' | 'failed' | 'busy'> {
   if (deps.pending.value) {
     return 'busy';
   }

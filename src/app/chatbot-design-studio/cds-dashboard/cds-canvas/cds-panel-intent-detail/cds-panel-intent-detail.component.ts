@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateService } from '@ngx-translate/core';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
@@ -15,6 +16,8 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 import { startPointTypeOf, startPointPanelState } from 'src/app/chatbot-design-studio/utils-start-points';
+import { PayloadRow, Weekday, WEEKDAYS } from 'src/app/chatbot-design-studio/utils-schedule';
+import { ScheduledPanelModel, ScheduledRepeat, ScheduledStatusLine, scheduledStatusLine, timezoneList, browserTimezone, MINUTE_STEPS, HOUR_STEPS, DAYS_OF_MONTH, scheduledLoadOutcome, scheduledLoadedOutcome, startPointDeleteOutcome } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
 
@@ -25,7 +28,7 @@ const swal = require('sweetalert');
   templateUrl: './cds-panel-intent-detail.component.html',
   styleUrls: ['./cds-panel-intent-detail.component.scss']
 })
-export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
+export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('tooltip') tooltip: MatTooltip;
   @ViewChild(PanelIntentHeaderComponent) panelIntentHeader: PanelIntentHeaderComponent;
   @Input() intent: Intent;
@@ -48,6 +51,19 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
   spSourceName: string = '';
   defaultSourceName: string = '';
   spBusy: boolean = false;
+
+  /** panel of the marker block "Scheduled start" */
+  isScheduledStart: boolean = false;
+  scheduled: ScheduledPanelModel;
+  scheduledStatusLine: ScheduledStatusLine | null = null;
+  /** the server has no scheduler configured (GET scheduled_available false): the message replaces the form, Delete stays */
+  scheduledUnavailable: string = '';
+  timezones: { name: string, value: string }[] = [];
+  readonly weekdays: Weekday[] = WEEKDAYS;
+  readonly minuteSteps = MINUTE_STEPS;
+  readonly hourSteps = HOUR_STEPS;
+  readonly daysOfMonth = DAYS_OF_MONTH;
+  private webhookSubscription: Subscription;
 
   // Connector management
   listOfIntents: Array<{name: string, value: string, icon?:string}> = [];
@@ -84,6 +100,8 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
       this.initializeStart();
     } else if(startPointTypeOf(this.intent) === 'webhook') {
       this.initializeStartPoint();
+    } else if(startPointTypeOf(this.intent) === 'scheduled') {
+      this.initializeScheduledStart();
     } else if(this.intent.intent_display_name === RESERVED_INTENT_NAMES.WEBHOOK) {
       this.initializeWebhook();
     }
@@ -91,9 +109,15 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     this.isReturnStack = isReturnStackIntent(this.intent);
 
     // Inizializza la lista degli intent per la select del connettore
-    if (!this.isStart && !this.isWebhook && !this.isReturnStack && !this.isStartPoint) {
+    if (!this.isStart && !this.isWebhook && !this.isReturnStack && !this.isStartPoint && !this.isScheduledStart) {
       this.initializeConnectorSelect();
     }
+  }
+
+  ngOnDestroy(): void {
+    // an edit still waiting for its debounce is saved, not lost
+    this.scheduled?.flush();
+    this.webhookSubscription?.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -179,34 +203,161 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit {
     if (this.readOnly) {
       return;
     }
+    this.confirmAndDeleteStartPoint('webhook', 'CDSCanvas.StartWebhookDeleteTitle', 'CDSCanvas.StartWebhookDeleteText');
+  }
+
+  /** Delete flow of a start box: confirmation, then the server start point, then the box (a failure keeps the box) */
+  private confirmAndDeleteStartPoint(type: 'webhook' | 'scheduled', titleKey: string, textKey: string){
     swal({
-      title: this.translate.instant('CDSCanvas.StartWebhookDeleteTitle'),
-      text: this.translate.instant('CDSCanvas.StartWebhookDeleteText'),
+      title: this.translate.instant(titleKey),
+      text: this.translate.instant(textKey),
       icon: "warning",
       buttons: [this.translate.instant('CDSCanvas.StartWebhookSwitchCancel'), this.translate.instant('Delete')],
       dangerMode: true,
-    }).then((ok: boolean) => {
+    }).then(async (ok: boolean) => {
       if (!ok || this.spBusy) {
         return;
       }
       this.spBusy = true;
+      if (type === 'scheduled' && this.scheduled) {
+        // no PUT after the DELETE: drop the pending edit and wait for one already sent (it would re-create the start point)
+        this.scheduled.cancelPending();
+        await this.scheduled.whenIdle();
+      }
       // the server first: a failure keeps the box, so the flow never has a start point without its block
-      this.webhookService.deleteStartPoint(this.chatbot_id, 'webhook').subscribe({ next: () => {
+      this.webhookService.deleteStartPoint(this.chatbot_id, type).subscribe({ next: () => {
         this.spBusy = false;
-        this.stopWebhookStartTest();
-        this.deleteStartBox.emit(this.intent);
+        this.onStartPointDeleted(type);
       }, error: (error) => {
         this.spBusy = false;
-        if (error?.status === 404) {
-          // the start point is already gone: the box can still be deleted
-          this.stopWebhookStartTest();
-          this.deleteStartBox.emit(this.intent);
+        if (startPointDeleteOutcome(type, error) === 'delete_box') {
+          // already gone (404), or a scheduled start with no scheduler configured (503): the box can still be deleted
+          this.onStartPointDeleted(type);
           return;
         }
         this.logger.error("[CdsPanelIntentDetailComponent] error deleteStartPoint: ", error);
-        this.showMessage(this.translate.instant('CDSCanvas.StartWebhookError'));
+        this.showMessage(this.startPointErrorMessage(error, type));
       }});
     });
+  }
+
+  private onStartPointDeleted(type: 'webhook' | 'scheduled'){
+    this.stopWebhookStartTest();
+    if (type === 'scheduled') {
+      // drop a pending edit: it would re-create the start point
+      this.scheduled?.cancelPending();
+      this.webhookService.loadWebhook(this.chatbot_id, true);
+    }
+    this.deleteStartBox.emit(this.intent);
+  }
+
+  private startPointErrorMessage(error: any, type: 'webhook' | 'scheduled'): string {
+    if (type === 'scheduled') {
+      return error?.error?.error || this.translate.instant('CDSCanvas.ScheduledPanel.SaveError');
+    }
+    return this.translate.instant('CDSCanvas.StartWebhookError');
+  }
+
+  // ---------------------------------------------------------- scheduled box
+
+  initializeScheduledStart(){
+    this.isScheduledStart = true;
+    this.maximize = true;
+    this.chatbot_id = this.dashboardService.id_faq_kb;
+    this.defaultSourceName = this.dashboardService.selectedChatbot?.name || '';
+    const tz = browserTimezone();
+    this.scheduled = new ScheduledPanelModel({
+      upsert: (body) => this.webhookService.upsertStartPoint(this.chatbot_id, 'scheduled', body),
+      sync: () => this.webhookService.syncScheduledStart(this.chatbot_id),
+      // the canvas box badge and this status line both follow webhook$
+      refresh: () => this.webhookService.loadWebhook(this.chatbot_id, true),
+      onError: (error) => {
+        this.logger.error("[CdsPanelIntentDetailComponent] error scheduled start: ", error);
+        this.showMessage(this.startPointErrorMessage(error, 'scheduled'));
+      }
+    }, this.intent.intent_id, tz);
+    this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
+    // the status line follows webhook$ only (this fresh GET is published there too, and an older answer never overwrites it);
+    // later updates (after a save, a sync, a publish) only refresh the status: the form is the user's draft
+    const followWebhook = () => {
+      this.webhookSubscription?.unsubscribe();
+      this.webhookSubscription = this.webhookService.webhook$.subscribe(webhook => {
+        if (webhook) {
+          this.webhook = webhook;
+          this.scheduledStatusLine = scheduledStatusLine(webhook);
+        }
+      });
+    };
+    this.webhookService.fetchWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
+      const loaded = scheduledLoadedOutcome(resp);
+      if (loaded.state === 'unavailable') {
+        this.scheduledUnavailable = loaded.message;
+        return;
+      }
+      this.webhook = resp;
+      this.scheduled.load(resp, tz);
+      this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
+      this.scheduledStatusLine = scheduledStatusLine(resp);
+      followWebhook();
+    }, error: (error) => {
+      const outcome = scheduledLoadOutcome(error);
+      if (outcome.state === 'unavailable') {
+        this.scheduledUnavailable = outcome.message;
+        return;
+      }
+      if (outcome.state === 'no_webhook') {
+        // no webhook yet (imported, forked or redone box): the defaults, switched off
+        this.scheduled.load(null, tz);
+        this.scheduledStatusLine = scheduledStatusLine(null);
+        followWebhook();
+        return;
+      }
+      this.logger.error("[CdsPanelIntentDetailComponent] error getWebhook: ", error);
+      this.showMessage(this.translate.instant('CDSCanvas.StartWebhookLoadError'));
+    }});
+  }
+
+  get scheduledPayloadHintParams() {
+    // literal {{check}} / {{start_type}} in the copy: pass them as values so the translate interpolation keeps them
+    return { check: '{{check}}', start_type: '{{start_type}}' };
+  }
+
+  onScheduledRepeatChange(value: ScheduledRepeat){
+    this.scheduled.setRepeat(value);
+  }
+
+  onScheduledRowTypeChange(index: number, type: PayloadRow['type']){
+    this.scheduled.setRowType(index, type);
+  }
+
+  trackByIndex(index: number){
+    return index;
+  }
+
+  onRetryScheduledSync(){
+    this.scheduled.retrySync();
+  }
+
+  onRetryScheduledSave(){
+    this.scheduled.retrySave();
+  }
+
+  async onTestScheduledStart(){
+    if (this.scheduled.hasError) {
+      return;
+    }
+    // the draft the user sees: wait for a pending save
+    const saved = await this.scheduled.flushAndWait();
+    if (!saved) {
+      // the server draft is stale: never test it
+      this.showMessage(this.translate.instant('CDSCanvas.ScheduledPanel.SaveError'));
+      return;
+    }
+    this.controllerService.requestWebhookStartTest('scheduled');
+  }
+
+  onDeleteScheduledStart(){
+    this.confirmAndDeleteStartPoint('scheduled', 'CDSCanvas.ScheduledPanel.DeleteTitle', 'CDSCanvas.ScheduledPanel.DeleteText');
   }
 
   initializeWebhook(){

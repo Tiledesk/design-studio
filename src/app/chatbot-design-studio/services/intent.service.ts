@@ -28,7 +28,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
-import { isStartBox } from '../utils-start-points';
+import { isStartBox, StartTestKind } from '../utils-start-points';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -43,6 +43,8 @@ export class IntentService {
   testIntent = new BehaviorSubject<Intent>(null);
   BSTestItOut = new BehaviorSubject<Intent>(null);
   webhookStartTest: boolean = false;
+  /** kind of the running start test (with webhookStartTest): only that kind's box is highlighted, only a webhook test has a preload */
+  startTestKind: StartTestKind = null;
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
   /** Emette quando cambiano intentSelectedID o intentActive; usato da cds-intent per aggiornare stili senza ngDoCheck. */

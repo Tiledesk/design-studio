@@ -463,6 +463,8 @@ export class CdsPanelPublishComponent implements OnInit, OnDestroy {
         this.status = 'success';
         this.HAS_COMPLETED_PUBLISH = true;
         this.HAS_COMPLETED_PUBLISH_SUCCESS = true;
+        // the server syncs the scheduled start after answering: the box badges and the panel status follow webhook$
+        this.webhookService.refreshAfterPublish(this.selectedChatbot._id);
       },
       error: (error) => {
         // Un solo fallimento vale 500, ma `results` arriva comunque: senza leggerlo
@@ -470,6 +472,8 @@ export class CdsPanelPublishComponent implements OnInit, OnDestroy {
         this.logger.error('[PUBLISH-PANEL] publish multi ERROR ', error);
         if (Array.isArray(error?.error?.results)) {
           this.applyResults(error.error.results);
+          // partial publish: the open chatbot may have been published, so its scheduled start may have changed
+          this.webhookService.refreshAfterPublish(this.selectedChatbot._id);
         } else {
           // Nessun esito per elemento: la richiesta non e' nemmeno arrivata al ciclo di
           // pubblicazione (body rifiutato, rete, permessi), quindi non e' stato pubblicato

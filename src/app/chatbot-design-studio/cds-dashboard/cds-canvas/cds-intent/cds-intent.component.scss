@@ -293,6 +293,31 @@
     }
   }
 
+  .cds-scheduled-summary {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-size: 11px;
+    color: #4b5052;
+    .cds-scheduled-summary-text {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cds-scheduled-badge {
+      padding: 1px 6px;
+      border-radius: 8px;
+      background: #e3e5e6;
+      &.badge-live { background: #2e7d32; color: #fff; }
+      &.badge-changes { background: #ed6c02; color: #fff; }
+      &.badge-error { background: #c62828; color: #fff; }
+    }
+  }
+
   .cds-start-content {
     position: absolute;
     display: flex;

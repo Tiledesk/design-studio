@@ -1,17 +1,22 @@
 import { CdsPanelElementsComponent } from './cds-panel-elements.component';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 describe('CdsPanelElementsComponent start points', () => {
+  const webhook$ = new BehaviorSubject<any>(null);
   const build = (subtype?: string, readOnly: ReadOnlyService = new ReadOnlyService()) => {
+    webhook$.next(null);
     LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
     const dashboard: any = { selectedChatbot: { subtype } };
     const plan: any = { checkIfActionIsInChatbotType: () => {}, checkIfCanLoad: () => true };
     // master-pre: connector catalog and projects (no projectID here, so no integrations are loaded)
     const catalog: any = { fetchManifest: () => of(null), getInstalledConnectorEntries: () => [], toConnectorGroup: () => ({ entries: [] }) };
     const projects: any = { getIntegrations: () => of(null) };
-    const c = new CdsPanelElementsComponent(plan, dashboard, catalog, projects, readOnly);
+    // master-pre V3 left panel: translate (search filter) and left panel state (close), unused by the start points
+    const translate: any = { instant: (k: string) => k };
+    const leftPanelState: any = { close: () => {} };
+    const c = new CdsPanelElementsComponent(plan, dashboard, translate, leftPanelState, catalog, projects, readOnly, { webhook$ } as any);
     c.ngOnInit();
     return c;
   };
@@ -21,6 +26,17 @@ describe('CdsPanelElementsComponent start points', () => {
   it('offers the category for chatbot subtype (default too)', () => {
     expect(build('chatbot').actionsByCategory['START_POINTS']).toBeTruthy();
     expect(build(undefined).actionsByCategory['START_POINTS']).toBeTruthy();
+  });
+
+  it('offers Scheduled only once the webhook says scheduled_available, and drops it again when it does not', () => {
+    const c = build('chatbot');
+    const has = () => c.actionsByCategory['START_POINTS'].some(i => i.value.start_point === 'scheduled');
+    expect(has()).toBeFalse();
+    webhook$.next({ scheduled_available: true });
+    expect(has()).toBeTrue();
+    webhook$.next({ scheduled_available: false });
+    expect(has()).toBeFalse();
+    c.ngOnDestroy();
   });
 
   it('hides the category for webhook, copilot and voice subtypes', () => {
@@ -58,20 +74,15 @@ describe('CdsPanelElementsComponent start points', () => {
     expect(c.buildStartPointItems()[1].value.disabled).toBe(true);
   });
 
-  it('opening the start points menu computes the items from the current state', () => {
-    jasmine.clock().install();
-    try {
-      const c = build('chatbot');
-      c.intents = [start];
-      c.onOpenMenu({ offsetTop: 0 }, 'action', 'START_POINTS');
-      jasmine.clock().tick(1);
-      expect(c.actionsList[1].value.disabled).toBe(false);
-      c.startPointPending = true;
-      c.ngOnChanges();
-      expect(c.actionsList[1].value.disabled).toBe(true);
-    } finally {
-      jasmine.clock().uninstall();
-    }
+  // master-pre V3 left panel: no hover menu any more, the section lives in actionsByCategory and ngOnChanges rebuilds it
+  it('ngOnChanges recomputes the start points section from the current state', () => {
+    const c = build('chatbot');
+    c.intents = [start];
+    c.ngOnChanges();
+    expect(c.actionsByCategory['START_POINTS'][1].value.disabled).toBe(false);
+    c.startPointPending = true;
+    c.ngOnChanges();
+    expect(c.actionsByCategory['START_POINTS'][1].value.disabled).toBe(true);
   });
 
   it('a click on a disabled start point item asks the canvas to focus its box', () => {

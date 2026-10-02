@@ -1,4 +1,6 @@
-import { isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
+import { ScheduledStatus } from 'src/app/chatbot-design-studio/utils-schedule';
+import { scheduledBoxView } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
+import { isLiveStartBox, isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import {
   AfterViewInit,
   Component,
@@ -83,6 +85,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   isStart = false;
   /** marker start box (webhook start) */
   isStartPointBox = false;
+  /** scheduled start box: summary line and badge, from the shared webhook (start point + scheduled_live) */
+  isScheduledBox = false;
+  scheduledSummary = '';
+  scheduledStatus: ScheduledStatus | null = null;
   /** the start pill shows a fixed label ("Web start", "Webhook start") and is sized to it */
   hasStartLabel = false;
   isDefaultFallback = false;
@@ -328,12 +334,16 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    */
   async ngOnInit(): Promise<void> {
     this.logger.log('[CDS-INTENT] ngOnInit-->', this.intent, this.questionCount);
-    
+    // before any await: a destroy during the awaits below can't leak the subscription
+    if (startPointTypeOf(this.intent) === 'scheduled') {
+      this.webhookService.webhook$.pipe(takeUntil(this.unsubscribe$)).subscribe(webhook => this.updateScheduledBox(webhook));
+    }
     if(this.chatbotSubtype !== TYPE_CHATBOT.CHATBOT){
       this.showIntentOptions = false;
     }
     // before the await: the toolbar child initialises on the first change detection
-    this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+    const startType = startPointTypeOf(this.intent);
+    this.isStartPointBox = startType === 'webhook' || startType === 'scheduled';
 
     await this.initializeWebhook();
     this.initializeIntentType();
@@ -368,7 +378,9 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
       this.isDefaultFallback = true;
     }
-    this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+    const startType = startPointTypeOf(this.intent);
+    this.isStartPointBox = startType === 'webhook' || startType === 'scheduled';
+    this.isScheduledBox = startType === 'scheduled';
     this.hasStartLabel = !!startPointLabelKey(this.intent, this.dashboardService.selectedChatbot?.subtype);
     if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || this.isStartPointBox){
       this.isStart = true;
@@ -392,6 +404,13 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     setTimeout(() => {
       this.setActionIntent();
     }, 100);
+  }
+
+  /** summary line and badge of the scheduled box; nothing until the webhook is loaded and its scheduled start point is this box */
+  private updateScheduledBox(webhook: any) {
+    const view = scheduledBoxView(webhook, this.intent?.intent_id);
+    this.scheduledSummary = view ? view.summary : '';
+    this.scheduledStatus = view ? view.status : null;
   }
 
   /**
@@ -634,10 +653,10 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   }
 
 
-  /** Blocks that get the "live start" highlight: the webhook block, or the webhook start box (by marker) during a webhook start test */
+  /** Blocks that get the "live start" highlight: the webhook block, or the start box (by marker) of the running start test's kind */
   private isLiveStartBlock(): boolean {
     const name = this.intent?.intent_display_name;
-    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && startPointTypeOf(this.intent) === 'webhook');
+    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && isLiveStartBox(this.intent, this.intentService.startTestKind));
   }
 
   /**
