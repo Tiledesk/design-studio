@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
-import { TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
-import { CdkDropList, CdkDragStart, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
+import { ACTION_DRAG_MIME, TYPE_OF_MENU, TYPE_EVENT_CATEGORY, EVENTS_LIST } from '../../../../utils';
 import { ControllerService } from '../../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -27,21 +26,11 @@ const OPEN_INFO_DELAY_MS = 1000;
   styleUrls: ['./cds-panel-actions.component.scss']
 })
 export class CdsPanelActionsComponent implements OnInit {
-  @ViewChild('action_list_drop_connect') actionListDropConnect: CdkDropList;
-
-  /** La lista che riceve i rilasci sullo stage.
-   *
-   *  La tavolozza sta fuori dal contenitore dello stage, quindi il cdkDropListGroup non le
-   *  unisce piu': il collegamento va dichiarato, altrimenti si puo' trascinare un'azione e non
-   *  succede niente -- senza errori, che e' il modo peggiore in cui una cosa puo' non funzionare. */
-  @Input() stageDropListId: string;
 
   @Input() actionsList: Array<any>;
   @Input() menuType: string;
   @Input() menuCategory: string;
   @Input() pos: any;
-  @Output() isDraggingMenuElement = new EventEmitter();
-  @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
   TYPE_OF_MENU = TYPE_OF_MENU;
@@ -223,74 +212,25 @@ export class CdsPanelActionsComponent implements OnInit {
     this.hoveredElement = null;
   }
 
-  onDragStarted(event:CdkDragStart, currentIndex: number) {
-    this.logger.log('[CDS-PANEL-ACTIONS] Drag started!', event, currentIndex);
+  /**
+   * Comincia il trascinamento di un'azione verso il flusso.
+   *
+   * Nel pacchetto viaggia solo il tipo dell'azione: e' tutto quello che serve al canvas per
+   * creare il blocco, e tenerlo a una stringa evita di far passare oggetti vivi attraverso un
+   * meccanismo del browser. L'etichetta del contenuto e' quella che il canvas riconosce: senza,
+   * un file trascinato dal desktop e un'azione sarebbero la stessa cosa.
+   *
+   * La riga non viene toccata: resta nell'elenco, e quello che segue il puntatore e' l'istantanea
+   * che disegna il browser.
+   */
+  onDragStart(event: DragEvent, item: any) {
+    if (!event.dataTransfer || item?.value?.disabled) { return; }
+    event.dataTransfer.setData(ACTION_DRAG_MIME, item.value.type);
+    event.dataTransfer.effectAllowed = 'copy';
+    // Le due cose che si toglievano di mezzo anche prima: il pannello di dettaglio di un'azione
+    // gia' sul flusso, e la descrizione eventualmente aperta su questa riga.
     this.controllerService.closeActionDetailPanel();
-    this.isDragging = true;
     this.closeInfoNow();
-    this.indexDrag = currentIndex;
-    
-    this.isDraggingMenuElement.emit(this.isDragging);
-
-    // --------------------------------------------------------------------------------------------------
-    // Bug fix: When an action is dragged, the "drag placeholder" moves up and changes size to full width
-    // --------------------------------------------------------------------------------------------------
-    const actionDragPlaceholder = <HTMLElement>document.querySelector('.action-drag-placeholder');
-    this.logger.log('[CDS-PANEL-ACTIONS] onDragStarted actionDragPlaceholder', actionDragPlaceholder)
- 
-    const addActionPlaceholderEl = <HTMLElement>document.querySelector('.add--action-placeholder');
-    this.logger.log('[CDS-PANEL-ACTIONS] onDragStarted addActionPlaceholderEl ', addActionPlaceholderEl)
-
-    const myObserver = new ResizeObserver(entries => {
-      // this will get called whenever div dimension changes
-       entries.forEach(entry => {
-        const actionDragPlaceholderWidth  = entry.contentRect.width
-        this.logger.log('[CDS-PANEL-ACTIONS] actionDragPlaceholderWidth width', actionDragPlaceholderWidth);
-        let hideActionDragPlaceholder = null;
-        if (actionDragPlaceholderWidth === 258) {
-          hideActionDragPlaceholder = false;
-          this.hideActionPlaceholderOfActionPanel.emit(false)
-          this.logger.log('[CDS-PANEL-ACTIONS] Hide action drag placeholder', hideActionDragPlaceholder);
-          if (actionDragPlaceholder) {
-            actionDragPlaceholder.style.opacity = '1';
-          }
-          if (addActionPlaceholderEl) {
-            addActionPlaceholderEl.style.opacity = '0';
-          }
-        } else {
-          hideActionDragPlaceholder = true;
-          this.hideActionPlaceholderOfActionPanel.emit(true)
-          this.logger.log('[CDS-PANEL-ACTIONS] Hide action drag placeholder', hideActionDragPlaceholder);
-          if (actionDragPlaceholder) {
-            actionDragPlaceholder.style.opacity = '0';
-          }
-          if (addActionPlaceholderEl) {
-            addActionPlaceholderEl.style.opacity = '1';
-          }
-        }
-        //  this.logger.log('height', entry.contentRect.height);
-       });
-     });
-  
-     myObserver.observe(actionDragPlaceholder);
- 
-  }
-
-  onDragEnd(event: CdkDragEnd) {
-    this.logger.log('[CDS-PANEL-ACTIONS] Drag End!', event);
-    this.isDragging = false;
-    this.indexDrag = null;
-    this.isDraggingMenuElement.emit(this.isDragging);
-  }
-
-  onDragMoved(event: CdkDragMove) {
-    // this.logger.log('Drag Moved!', event);
-    // const element = event.source.element.nativeElement;
-  }
-
-  onDragOver(event: DragEvent) {
-    this.logger.log('Drag dragOver!', event);
-    // event.preventDefault(); // Annulla l'evento di default che consente il drop
   }
 
   onVideoUrlClick(){

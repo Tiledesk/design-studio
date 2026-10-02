@@ -52,11 +52,8 @@
                 <div class="cds-actions-cat__body" *ngIf="isCategoryOpen(category.type)">
                     <cds-panel-actions
                         [actionsList]="visibleActions(category.type)"
-                        [stageDropListId]="stageDropListId"
                         [menuType]="TYPE_OF_MENU.ACTION"
-                        [menuCategory]="category.type"
-                        (isDraggingMenuElement)="onDraggingMenuElement($event)"
-                        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+                        [menuCategory]="category.type">
                     </cds-panel-actions>
                 </div>
 

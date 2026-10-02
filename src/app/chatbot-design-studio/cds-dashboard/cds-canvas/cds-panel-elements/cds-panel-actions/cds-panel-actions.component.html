@@ -1,9 +1,9 @@
 <div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
-    <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
-        cdkDropList [cdkDropListData]="menuItemsList"
-        [cdkDropListConnectedTo]="stageDropListId ? [stageDropListId] : []">
-        
+    <!-- L'elenco non e' piu' una lista del CDK: le azioni si trascinano col meccanismo del
+         browser, che la riga non la tocca -- resta dov'e', e il flusso riceve il rilascio. -->
+    <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect>
+
 
         <!-- <div [style.display]="isDragging?'block':'none'" class="menu-dragging">
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;">
@@ -22,14 +22,13 @@
 
         <div *ngIf="menuType === TYPE_OF_MENU.ACTION"
             class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
-                (cdkDragEnded)="onDragEnd($event)"
-                [cdkDragDisabled]="item.value.disabled">
-
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+            <!-- Trascinamento del browser: la riga resta nell'elenco per tutto il gesto e quello
+                 che segue il puntatore e' una sua istantanea. Le azioni che il piano non
+                 comprende non si prendono nemmeno. -->
+            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
+                [class.is-disabled]="item.value.disabled"
+                [draggable]="!item.value.disabled"
+                (dragstart)="onDragStart($event, item)">
 
                 <div class="actions-btns-wpr" #divAction
                     [attr.id]="'menu-trigger-' + i">
@@ -59,13 +58,9 @@
 
         <div *ngIf="menuType === TYPE_OF_MENU.EVENT" 
             class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
-                (cdkDragEnded)="onDragEnd($event)">
-
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
+                [draggable]="true"
+                (dragstart)="onDragStart($event, item)">
 
                 <div class="actions-btns-wpr">
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">

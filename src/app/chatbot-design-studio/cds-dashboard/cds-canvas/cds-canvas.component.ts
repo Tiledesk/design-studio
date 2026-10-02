@@ -23,7 +23,7 @@ import { Note } from 'src/app/models/note-model';
 import { NoteType } from 'src/app/models/note-types';
 
 // UTILS //
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
+import { ACTION_DRAG_MIME, INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 
 
@@ -84,7 +84,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // intentSelected: Intent;
   intent_id: string;
   hasClickedAddAction: boolean = false;
-  hideActionPlaceholderOfActionPanel: boolean;
 
   /**  preload */
   totElementsOnTheStage: number = 0;
@@ -1380,18 +1379,47 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * oppure 
    * chiamata quando aggiungo (droppandola) una action sullo stage spostandola da un altro intent  
    * */
+  /**
+   * Il puntatore attraversa il flusso con un'azione in mano.
+   *
+   * Fermare l'evento non e' una formalita': finche' nessuno lo fa, il browser considera l'area
+   * non adatta a ricevere e il rilascio non arriva mai. Si ferma solo per cio' che riconosciamo,
+   * cosi' un file trascinato dal desktop continua a non essere affare nostro.
+   */
+  onActionDragOverStage(event: DragEvent) {
+    if (!event.dataTransfer?.types?.includes(ACTION_DRAG_MIME)) { return; }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  /**
+   * Un'azione e' stata lasciata sul flusso: nasce il blocco che la contiene.
+   *
+   * Il punto del rilascio e' in coordinate dello schermo e va portato in quelle del flusso, che
+   * si sposta e si ingrandisce sotto di esso -- lo fa `logicPoint`, la stessa conversione che
+   * usa il rilascio di un'azione spostata da un blocco. Lo scostamento di 132px mette il blocco
+   * sotto il puntatore invece che col suo spigolo sinistro.
+   */
+  onActionDroppedOnStage(event: DragEvent) {
+    const actionType = event.dataTransfer?.getData(ACTION_DRAG_MIME);
+    if (!actionType) { return; }
+    event.preventDefault();
+    const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+    pos.x = pos.x - 132;
+    this.logger.log('[CDS-CANVAS] azione lasciata sullo stage dalla tavolozza: ', actionType, pos);
+    this.closeAllPanels();
+    this.closeActionDetailPanel();
+    this.createNewIntentFromPanelElement(pos, actionType);
+  }
+
   async onDroppedElementToStage(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
     let pos = this.connectorService.tiledeskConnectors.logicPoint(event.dropPoint);
     pos.x = pos.x - 132;
     let action: any = event.previousContainer.data[event.previousIndex];
-    if (action.value && action.value.type) {
-      this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
-    this.closeAllPanels();
-    this.closeActionDetailPanel();
-      // this.removeConnectorDraftAndCloseFloatMenu();  
-      this.createNewIntentFromPanelElement(pos, action.value.type);
-    } else if (action) {
+    // Qui arrivano soltanto le azioni che vengono da un blocco: dalla tavolozza si trascina col
+    // meccanismo del browser, e quel rilascio lo raccoglie onActionDroppedOnStage.
+    if (action) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
       let prevIntentOfaction = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
       prevIntentOfaction.actions = prevIntentOfaction.actions.filter((act) => act._tdActionId !== action._tdActionId);
@@ -1534,11 +1562,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // }
   }
 
-  /** onHideActionPlaceholderOfActionPanel */
-  onHideActionPlaceholderOfActionPanel(event){
-    this.logger.log('[CDS-CANVAS] onHideActionPlaceholderOfActionPanel event : ', event);
-    // this.hideActionPlaceholderOfActionPanel = event
-  }
   // --------------------------------------------------------- // 
 
 

@@ -50,6 +50,9 @@ $base-padding: 3px;
     @include lp.lp-row;
     cursor: -webkit-grab;
     cursor: grab;
+    // Senza, trascinando si finisce per selezionare il nome dell'azione invece di prenderla:
+    // il trascinamento e' quello del browser, e il browser di suo vorrebbe selezionare il testo.
+    user-select: none;
     &:active { cursor: grabbing; }
 }
 
@@ -210,7 +213,9 @@ $base-padding: 3px;
     border-radius: 8px;
 }
 
-.cdk-drag-disabled{
+/* Le azioni che il piano non comprende: prima lo stato lo segnava il CDK con una classe sua,
+   ora lo dichiara il template -- e' la stessa riga, con un nome che diciamo noi. */
+.action-box.is-disabled{
     background: var(--gray-02);
     .actions-btns-wpr,
     .actions-btns-wpr:hover{

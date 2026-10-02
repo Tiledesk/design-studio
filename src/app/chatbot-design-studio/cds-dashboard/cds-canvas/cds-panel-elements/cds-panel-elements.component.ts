@@ -22,14 +22,9 @@ export class CdsPanelElementsComponent implements OnInit {
   @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
 
 
-    /** La lista che riceve i rilasci sullo stage, da collegare alla tavolozza. */
-  @Input() stageDropListId: string;
-
-@Output() addNewElement = new EventEmitter();
+  @Output() addNewElement = new EventEmitter();
   // @Output() showPanelActions = new EventEmitter();
   @Output() onMouseOverActionMenuSx = new EventEmitter();
-  @Output() hideActionPlaceholderOfActionPanel = new EventEmitter();
-  isDraggingMenuElement: boolean = false;
   TYPE_OF_MENU = TYPE_OF_MENU;
 
   TYPE_ACTION_CATEGORY = TYPE_ACTION_CATEGORY;
@@ -51,14 +46,6 @@ export class CdsPanelElementsComponent implements OnInit {
 
   ngOnInit(): void {
     this.createActionListByCategory();
-  }
-
-  onHideActionPlaceholderOfActionPanel(event) {
-    this.hideActionPlaceholderOfActionPanel.emit(event)
-  }
-
-  onDraggingMenuElement(event) {
-    this.isDraggingMenuElement = event;
   }
 
   

@@ -20,15 +20,12 @@
         [IS_OPEN]="IS_OPEN_INTENTS_LIST">
     </cds-panel-subagents>
 
-    <!-- La tavolozza delle azioni, ora una scheda come le altre invece di un cassetto agganciato
-         al bordo del canvas. Trascinare da qui allo stage continua a funzionare grazie al
-         collegamento esplicito fra le due liste: stando fuori da #tds_container non basta piu'
-         il cdkDropListGroup che le univa quando erano vicine. -->
+    <!-- La tavolozza delle azioni, una scheda come le altre invece del cassetto agganciato al
+         bordo del canvas. Da qui le azioni si trascinano col meccanismo del browser: la riga
+         resta nell'elenco e il flusso, piu' sotto, accetta il rilascio. -->
     <cds-panel-elements *ngIf="activeLeftPanel === 'actions' && IS_OPEN_INTENTS_LIST"
         class="panel-actions"
-        [stageDropListId]="STAGE_DROP_LIST_ID"
-        (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)"
-        (hideActionPlaceholderOfActionPanel)="onHideActionPlaceholderOfActionPanel($event)">
+        (onMouseOverActionMenuSx)="onMouseOverActionMenuSx($event)">
     </cds-panel-elements>
 
 </div>
@@ -36,7 +33,13 @@
 
 
 
-<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
+<!-- `dragover` non e' un di piu': finche' nessuno lo ferma, il browser rifiuta il rilascio e
+     `drop` non arriva mai. Entrambi guardano l'etichetta del contenuto, cosi' un file trascinato
+     dal desktop attraversa il flusso senza creare niente. -->
+<div id="tds_container" class="box-right tds-drag-container" [class.note-mode-active]="isNoteModeActive" cdkDropListGroup
+    (dragover)="onActionDragOverStage($event)"
+    (drop)="onActionDroppedOnStage($event)"
+    (contextmenu)="onShowContextMenu($event)" (click)="onStageClick($event)">
 
     <!-- Le linguette, verticali, subito a destra del pannello e sempre visibili: sono anche il modo
          di riaprire dopo aver chiuso, per questo non stanno dentro `.box-left`, che si stringe a
