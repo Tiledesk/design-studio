@@ -6,6 +6,9 @@ $width-card-tools: 160px;
 $margin-left-card: 30px;
 $margin-top-card: 30px;
 $box-left-width: 230px;
+// In V3 la colonna delle tre schede e' piu' stretta di quella della chat perche' le due stanno
+// aperte insieme: qui ci sono righe di un elenco, non una conversazione.
+$box-left-width-v3: 265px;
 $box-left-width-closed: 0px;
 $toogle-sidebar-width: 22px;
 
@@ -345,6 +348,19 @@ cds-fulfillment {
     // lo spazio restante e scrolla internamente (niente altezze fisse -> ultimo elemento sempre visibile).
     display: flex;
     flex-direction: column;
+    // Si apre e si chiude scorrendo, con la stessa curva e la stessa durata della chat: le due
+    // colonne stanno una accanto all'altra, e due andature diverse si noterebbero subito.
+    // Tutte e tre le misure, non la sola `width`: sono dichiarate tutte e tre, e animarne una
+    // sola lascerebbe le altre a scattare.
+    transition: width .26s cubic-bezier(0.22, 0.61, 0.36, 1),
+                min-width .26s cubic-bezier(0.22, 0.61, 0.36, 1),
+                max-width .26s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+    // All'avvio no: lo stato arriva dalla memoria e va applicato, non recitato. Senza, a ogni
+    // apertura di un agente la colonna si vedrebbe scorrere in posizione come se qualcuno la
+    // stesse aprendo in quel momento. E' lo stesso motivo per cui la striscia delle linguette
+    // ha questa classe.
+    &.is-booting { transition: none; }
     // NB: niente overflow:hidden qui, altrimenti taglia il toggle handle che sporge a destra
     // (right: -11px). Il contenimento verticale è già gestito dal pannello (overflow-y:auto + min-height:0).
 
@@ -399,16 +415,15 @@ cds-fulfillment {
       min-width: $box-left-width-closed;
     }
 
-    /* In V3 la sinistra e' larga quanto la chat, e non per un numero copiato: le schede si
-       alternano nello stesso slot, e due misure diverse si leggono come un salto del canvas a
-       ogni cambio di linguetta. La variabile e' quella che la chat scrive sulla riga che le due
-       colonne condividono, quindi trascinando il bordo della chat questo pannello la segue da
-       solo -- restando uguale anche dopo un ridimensionamento, che e' il punto.
-       Solo in V3: sugli agenti precedenti la chat non c'e' e la sinistra resta com'era. */
+    /* In V3 questa colonna ha una misura sua, e non piu' quella della chat: le due si aprono
+       insieme, affiancate, e non si alternano piu' nello stesso slot -- che era la ragione per
+       cui dovevano essere larghe uguale. Piu' stretta della chat di proposito: con entrambe
+       aperte ogni pixel qui e' un pixel in meno di flusso.
+       Solo in V3: sugli agenti precedenti la sinistra resta com'era. */
     &.is-v3 {
-      width: var(--agent-chat-width);
-      max-width: var(--agent-chat-width);
-      min-width: var(--agent-chat-width);
+      width: $box-left-width-v3;
+      max-width: $box-left-width-v3;
+      min-width: $box-left-width-v3;
 
       // Tre classi contro due: senza questo vincerebbe la regola qui sopra, che viene dopo.
       &.is_closed {

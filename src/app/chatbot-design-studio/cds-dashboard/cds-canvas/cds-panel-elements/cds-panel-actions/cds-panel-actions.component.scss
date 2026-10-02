@@ -151,6 +151,22 @@ $base-padding: 3px;
     width: 16px;
     color: var(--gray-light-01);
     filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    // Il passaggio accende l'icona invece di scambiarla di colpo. La stessa durata del fondo
+    // della riga, che cambia insieme a lei: due tempi diversi si leggerebbero come due cose.
+    transition: filter var(--transition-fast, .12s), color var(--transition-fast, .12s);
+}
+
+/* Al passaggio l'icona si colora, come nell'elenco dei blocchi.
+   Lo fa un filtro e non `color`: l'icona e' un disegno gia' tinto di grigio da un filtro, e un
+   colore dichiarato sopra non lo toglie -- il filtro e' l'ultimo a parlare. E' lo stesso filtro
+   che l'elenco dei blocchi usa sulle proprie icone, non un azzurro ricalcolato a occhio. */
+.actions-btns-wpr:hover .action-btn-icon:first-of-type {
+    color: var(--blu);
+
+    .svg-icon,
+    img {
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
 }
 
 
@@ -234,6 +250,12 @@ $base-padding: 3px;
         cursor: not-allowed;
         user-select: none;
         box-shadow: none;
+    }
+
+    // L'icona resta spenta anche al passaggio: accenderla direbbe "prendimi" proprio dove non
+    // si puo' prendere niente.
+    .actions-btns-wpr:hover .action-btn-icon:first-of-type .svg-icon {
+        filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
     }
 }
 

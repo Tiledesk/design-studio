@@ -29,6 +29,8 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
+import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
+import { LeftPanelStateService } from '../../services/left-panel-state.service';
 
 const swal = require('sweetalert');
 
@@ -107,6 +109,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
+    private readonly agentChatHostService: AgentChatHostService,
+    private readonly leftPanelState: LeftPanelStateService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -114,6 +118,20 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
   /** The button exists only where the feature is configured, exactly as
    *  connector base URLs gate the connector catalogue. */
+  get isAgentChatAvailable(): boolean {
+    return this.agentChatHostService.isConfigured();
+  }
+
+  /** Letto dal servizio dove lo stato vive davvero: il pulsante deve sparire nel momento in cui
+   *  la chat si apre, anche quando non e' stato lui ad aprirla. */
+  get isAgentChatPanelOpen(): boolean {
+    return this.leftPanelState.isChatOpen;
+  }
+
+  onToggleAgentChat(){
+    this.leftPanelState.toggleChat();
+  }
+
   manageRouteChanges(){
     /** check INIT ROUTE */
     const urlWithoutParams = this.router.url.split('?')[0];

@@ -373,7 +373,11 @@ export class StageService {
   public getActiveLeftPanel(familyId: string): LeftPanelTab | null {
     if (!familyId) { return null; }
     const value = this.appStorageService.getItem(this.LEFT_PANEL_KEY_PREFIX + familyId);
-    if (value === 'subagents' || value === 'blocks' || value === 'chat' || value === 'actions') {
+    // 'chat' non e' piu' una di queste schede: ha una colonna sua, che si apre insieme a loro.
+    // Le preferenze scritte quando lo era esistono ancora, e vanno ignorate: lasciarle passare
+    // vorrebbe dire una colonna aperta su una scheda che nessuna linguetta puo' mostrare ne'
+    // richiudere.
+    if (value === 'subagents' || value === 'blocks' || value === 'actions') {
       return value;
     }
     // Nessuna preferenza salvata: null, non 'blocks'. Il chiamante deve poter
@@ -411,7 +415,12 @@ export class StageService {
     }
   }
 
-  /** Aggiorna uno dei due pannelli lasciando l'altro com'era. */
+  /** Aggiorna uno dei due pannelli lasciando l'altro com'era.
+   *
+   *  `agentChat` non viene piu' scritto da nessuno: la chat si apre a ogni ricaricamento
+   *  qualunque cosa sia salvata, quindi ricordarla sarebbe uno stato che nessuno interroga. La
+   *  chiave resta leggibile perche' le preferenze vecchie la contengono, e il formato salvato
+   *  vuole entrambi i campi. */
   public savePanelState(id_faq_kb: string, panel: 'agentChat' | 'blocks', isOpen: boolean): void {
     if (!id_faq_kb) { return; }
     const current = this.getPanelsState(id_faq_kb) || DEFAULT_PANELS_STATE;
@@ -426,36 +435,33 @@ export class StageService {
 
 
   /**
-   * Quale scheda mostrare a sinistra aprendo un agente, e se il pannello va aperto.
+   * Com'e' la colonna delle tre schede aprendo un agente: aperta o no, e su quale scheda.
    *
    * La scheda si ricorda per **famiglia** (parent e suoi subagent) perche' navigando fra i due
    * cambia l'id dell'agente, e ripartire ogni volta dalla scheda di default e' esattamente il
    * fastidio da evitare. L'apertura invece si ricorda per **agente**: e' una scelta su quanto
    * spazio dare al canvas di quel flusso.
    *
-   * Converte anche le preferenze salvate quando i pannelli erano due booleani indipendenti e
-   * potevano essere aperti insieme. In quel caso vince la chat, che era il default di allora:
-   * senza questa conversione chi torna su un agente si ritroverebbe la scheda di default invece
-   * della sua.
+   * La chat non c'e' dentro, e non e' una dimenticanza: si apre a ogni ricaricamento qualunque
+   * cosa sia salvata, quindi di lei non c'e' niente da leggere.
+   *
+   * Senza preferenze la colonna e' **chiusa**: e' il default che la chiave aveva gia'
+   * (DEFAULT_PANELS_STATE.blocks), e il canvas nasce con tutto lo spazio tranne la chat.
    */
   public getLeftPanelSnapshot(familyId: string, agentId: string): { isOpen: boolean; activeTab: LeftPanelTab } {
     const savedTab = this.getActiveLeftPanel(familyId);
-    let legacy: { agentChat: boolean; blocks: boolean } | null = null;
+    let panels: { agentChat: boolean; blocks: boolean } | null = null;
     try {
-      legacy = this.getPanelsState(agentId);
+      panels = this.getPanelsState(agentId);
     } catch (error) {
       // Una preferenza illeggibile vale quanto una che non c'e': si ricade sul default.
-      legacy = null;
+      panels = null;
     }
 
-    if (savedTab) {
-      const isOpen = legacy ? (legacy.agentChat || legacy.blocks) : true;
-      return { isOpen, activeTab: savedTab };
-    }
-    if (legacy && legacy.agentChat) { return { isOpen: true, activeTab: 'chat' }; }
-    if (legacy && legacy.blocks) { return { isOpen: true, activeTab: 'blocks' }; }
-    if (legacy) { return { isOpen: false, activeTab: 'subagents' }; }
-    return { isOpen: true, activeTab: 'subagents' };
+    return {
+      isOpen: panels ? panels.blocks : DEFAULT_PANELS_STATE.blocks,
+      activeTab: savedTab ? savedTab : 'subagents'
+    };
   }
 
   public saveActiveLeftPanel(familyId: string, panel: LeftPanelTab){
