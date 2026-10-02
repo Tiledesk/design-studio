@@ -56,4 +56,44 @@ describe('WebhookService', () => {
     expect(req.request.headers.get('Authorization')).toBe('JWT test-token');
     req.flush({});
   });
+
+  it('testScheduledStart posts to the scheduled test route', () => {
+    service.testScheduledStart('bot1').subscribe(r => expect(r.request_id).toBe('r1'));
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/scheduled/test');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.headers.get('Authorization')).toBe('JWT test-token');
+    req.flush({ request_id: 'r1' });
+  });
+
+  it('syncScheduledStart posts to the scheduled sync route', () => {
+    service.syncScheduledStart('bot1').subscribe();
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/scheduled/sync');
+    expect(req.request.method).toBe('POST');
+    req.flush({});
+  });
+
+  it('upsertStartPoint accepts scheduled with schedule and payload', () => {
+    const body = { block_id: 'b1', schedule: { frequency: 'daily' as const, time: '09:00', timezone: 'Europe/Rome' }, mapping: { payload: {} } };
+    service.upsertStartPoint('bot1', 'scheduled', body).subscribe();
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1/start_points/scheduled');
+    expect(req.request.method).toBe('PUT');
+    expect(JSON.parse(req.request.body)).toEqual(body);
+    req.flush({});
+  });
+
+  it('loadWebhook shares one GET between callers and publishes it on webhook$', () => {
+    const seen: any[] = [];
+    service.webhook$.subscribe(w => seen.push(w));
+    service.loadWebhook('bot1');
+    service.loadWebhook('bot1');
+    const req = httpMock.expectOne('https://api.test/project1/webhooks/bot1');
+    req.flush({ scheduled_available: true });
+    expect(seen).toEqual([null, { scheduled_available: true }]);
+  });
+
+  it('loadWebhook keeps the previous value when the GET fails', () => {
+    service.loadWebhook('bot1');
+    httpMock.expectOne('https://api.test/project1/webhooks/bot1').flush('x', { status: 503, statusText: 'no' });
+    expect(service.webhook$.value).toBeNull();
+  });
 });

@@ -1,4 +1,5 @@
-import { isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
+import { describeSchedule, scheduleError, scheduledStatus, ScheduledStatus } from 'src/app/chatbot-design-studio/utils-schedule';
+import { findStartPoint, isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
@@ -73,6 +74,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isStart = false;
   /** marker start box (webhook start) */
   isStartPointBox = false;
+  /** scheduled start box: summary line and badge, from the shared webhook (start point + scheduled_live) */
+  isScheduledBox = false;
+  scheduledSummary = '';
+  scheduledStatus: ScheduledStatus | null = null;
+  private webhookSub: Subscription;
   /** the start pill shows a fixed label ("Web start", "Webhook start") and is sized to it */
   hasStartLabel = false;
   isDefaultFallback = false;
@@ -278,9 +284,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if(this.intent.intent_display_name === TYPE_INTENT_NAME.DEFAULT_FALLBACK){
         this.isDefaultFallback = true;
       }
-      this.isStartPointBox = startPointTypeOf(this.intent) === 'webhook';
+      const startType = startPointTypeOf(this.intent);
+      this.isStartPointBox = startType === 'webhook' || startType === 'scheduled';
+      this.isScheduledBox = startType === 'scheduled';
+      if (this.isScheduledBox) {
+        this.webhookSub = this.webhookService.webhook$.subscribe(webhook => this.updateScheduledBox(webhook));
+      }
       this.hasStartLabel = !!startPointLabelKey(this.intent, this.dashboardService.selectedChatbot?.subtype);
-      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || startPointTypeOf(this.intent) === 'webhook'){
+      if(this.intent.intent_display_name === TYPE_INTENT_NAME.START || this.intent.intent_display_name === TYPE_INTENT_NAME.WEBHOOK || this.isStartPointBox){
         this.isStart = true;
         if(this.intent.actions.length === 0){
           let action = new Action;
@@ -312,6 +323,18 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.initConnectorsInSubscription();
   }
 
+
+  /** summary line and badge of the scheduled box; nothing until the webhook is loaded and has a scheduled start point */
+  private updateScheduledBox(webhook: any) {
+    const sp = findStartPoint(webhook, 'scheduled');
+    if (!sp || !sp.schedule) {
+      this.scheduledSummary = '';
+      this.scheduledStatus = null;
+      return;
+    }
+    this.scheduledSummary = scheduleError(sp.schedule) ? '' : describeSchedule(sp.schedule);
+    this.scheduledStatus = scheduledStatus(sp, webhook?.scheduled_live);
+  }
 
   async getWebhook(): Promise<string | null> {
     try {
@@ -550,6 +573,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnDestroy() {
+    this.webhookSub?.unsubscribe();
     this.unsubscribe();
   }
 

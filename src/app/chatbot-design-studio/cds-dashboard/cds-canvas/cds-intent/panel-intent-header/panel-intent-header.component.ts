@@ -32,6 +32,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
   isWebhook: boolean = false;
   /** i18n key of the fixed label of a start box (never editable, the block name is not shown) */
   startLabelKey: string | null = null;
+  isScheduled = false;
   isNotErrorName: boolean = true;
 
   intentNameAlreadyExist: boolean = false
@@ -88,6 +89,7 @@ export class PanelIntentHeaderComponent implements OnInit, OnChanges {
     if(startPointTypeOf(this.intent) === 'webhook'){
       this.isWebhook = true;
     }
+    this.isScheduled = startPointTypeOf(this.intent) === 'scheduled';
     if(!this.intentColor){
       this.intentColor = INTENT_COLORS.COLOR1;
     }

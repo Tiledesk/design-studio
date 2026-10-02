@@ -1,12 +1,15 @@
 import { CdsPanelElementsComponent } from './cds-panel-elements.component';
+import { BehaviorSubject } from 'rxjs';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 describe('CdsPanelElementsComponent start points', () => {
+  const webhook$ = new BehaviorSubject<any>(null);
   const build = (subtype?: string) => {
+    webhook$.next(null);
     LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
     const dashboard: any = { selectedChatbot: { subtype } };
     const plan: any = { checkIfActionIsInChatbotType: () => {}, checkIfCanLoad: () => true };
-    const c = new CdsPanelElementsComponent(plan, dashboard);
+    const c = new CdsPanelElementsComponent(plan, dashboard, { webhook$ } as any);
     c.ngOnInit();
     return c;
   };
@@ -16,6 +19,17 @@ describe('CdsPanelElementsComponent start points', () => {
   it('offers the category for chatbot subtype (default too)', () => {
     expect(build('chatbot').actionsByCategory['START_POINTS']).toBeTruthy();
     expect(build(undefined).actionsByCategory['START_POINTS']).toBeTruthy();
+  });
+
+  it('offers Scheduled only once the webhook says scheduled_available, and drops it again when it does not', () => {
+    const c = build('chatbot');
+    const has = () => c.actionsByCategory['START_POINTS'].some(i => i.value.start_point === 'scheduled');
+    expect(has()).toBeFalse();
+    webhook$.next({ scheduled_available: true });
+    expect(has()).toBeTrue();
+    webhook$.next({ scheduled_available: false });
+    expect(has()).toBeFalse();
+    c.ngOnDestroy();
   });
 
   it('hides the category for webhook, copilot and voice subtypes', () => {

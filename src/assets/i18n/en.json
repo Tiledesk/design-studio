@@ -645,6 +645,13 @@
         "StartWebhookDeleteText": "The webhook will stop starting conversations from this box and the box will be deleted. Continue?",
         "WebStart": "Web start",
         "WebhookStart": "Webhook start",
+        "ScheduledStart": "Scheduled start",
+        "ScheduledBadge": {
+            "live": "Live",
+            "changes": "Changes not live",
+            "not_live": "Not live",
+            "error": "Changes not live"
+        },
         "StartWebhookError": "Unable to update the webhook",
         "StartWebhookTest": "Test webhook start",
         "StartWebhookLoadError": "Unable to load the webhook settings",
@@ -929,6 +936,7 @@
             "ChangeDept": "Change department",
             "StartPointWeb": "Web",
             "StartPointWebhook": "Webhook",
+            "StartPointScheduled": "Scheduled",
             "Code": "Code",
             "SetFunction": "Set function",
             "CaptureUserReply": "Capture user reply",

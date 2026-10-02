@@ -1,9 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { TYPE_ACTION } from '../utils-actions';
+import { Schedule } from '../utils-schedule';
 import { IntentService } from './intent.service';
 
 @Injectable({
@@ -16,6 +18,10 @@ export class WebhookService {
   WEBHOOK_URL: any;
   thereIsWebhook: boolean = false;
   thereIsWebResponse: boolean;
+
+  /** the chatbot webhook (start_points, scheduled_live, scheduled_available, next_runs), loaded once and shared by the palette and the start boxes */
+  webhook$ = new BehaviorSubject<any>(null);
+  private loading: Subscription | null = null;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -48,6 +54,21 @@ export class WebhookService {
     let url = this.WEBHOOK_URL + '/webhooks/' + chatbot_id;
     this.logger.log('[WEBHOOK_URL.SERV] - URL ', url);
     return this._httpClient.get<any>(url, httpOptions);
+  }
+
+  /** one GET at a time (a call while one is in flight reuses it unless forced); the result goes to webhook$, a failure leaves the previous value */
+  loadWebhook(chatbot_id: string, force: boolean = false){
+    if (this.loading && !this.loading.closed) {
+      if (!force) {
+        return;
+      }
+      // a newer state is needed (e.g. right after a drop): the in-flight response would be stale
+      this.loading.unsubscribe();
+    }
+    this.loading = this.getWebhook(chatbot_id).subscribe({
+      next: (webhook) => this.webhook$.next(webhook),
+      error: (err) => this.logger.log('[WEBHOOK_URL.SERV] loadWebhook error', err)
+    });
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean, copilot: boolean){
@@ -185,7 +206,7 @@ export class WebhookService {
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
   }
 
-  upsertStartPoint(chatbot_id: string, type: 'webhook', body: { block_id: string, enabled?: boolean, mapping?: { source_name?: string }, confirm?: boolean }){
+  upsertStartPoint(chatbot_id: string, type: 'webhook' | 'scheduled', body: { block_id: string, enabled?: boolean, mapping?: { source_name?: string, payload?: { [key: string]: any } }, schedule?: Schedule, confirm?: boolean }){
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] upsertStartPoint', type);
     const httpOptions = {
@@ -199,7 +220,32 @@ export class WebhookService {
     return this._httpClient.put<any>(url, JSON.stringify(body), httpOptions);
   }
 
-  deleteStartPoint(chatbot_id: string, type: 'webhook'){
+  /** POST …/start_points/scheduled/test → { request_id } (404 when there is no scheduled draft) */
+  testScheduledStart(chatbot_id: string){
+    return this._httpClient.post<any>(this.scheduledUrl(chatbot_id) + '/test', '{}', this.jsonOptions());
+  }
+
+  /** POST …/start_points/scheduled/sync → scheduled_live */
+  syncScheduledStart(chatbot_id: string){
+    return this._httpClient.post<any>(this.scheduledUrl(chatbot_id) + '/sync', '{}', this.jsonOptions());
+  }
+
+  private scheduledUrl(chatbot_id: string){
+    return this.WEBHOOK_URL + '/webhooks/' + chatbot_id + '/start_points/scheduled';
+  }
+
+  private jsonOptions(){
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    return {
+      headers: new HttpHeaders({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.tiledeskToken
+      })
+    };
+  }
+
+  deleteStartPoint(chatbot_id: string, type: 'webhook' | 'scheduled'){
     this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
     this.logger.log('[WEBHOOK_URL.SERV] deleteStartPoint', type);
     const httpOptions = {

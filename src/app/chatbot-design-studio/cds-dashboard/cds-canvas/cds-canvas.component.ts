@@ -34,7 +34,7 @@ import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { v4 as uuidv4 } from 'uuid';
-import { createStartPointBox, isStartBox, startPointTypeOf } from '../../utils-start-points';
+import { buildStartPointUpsertBody, createStartPointBox, isStartBox, startPointTypeOf } from '../../utils-start-points';
 import { NotifyService } from 'src/app/services/notify.service';
 
 const swal = require('sweetalert');
@@ -613,6 +613,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // console.log('[CDS-CANVAS] projectID ::', this.projectID);
     this.id_faq_kb = this.dashboardService.id_faq_kb;
     this.listOfIntents = [];
+    this.webhookService.loadWebhook(this.id_faq_kb);
     
     // Pulisci la coda di retry dei connettori prima di inizializzare un nuovo bot
     this.connectorService.clearRetryQueue();
@@ -1249,12 +1250,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** Drop of a Start points item: create the marker block, then register it as the start point */
   async createStartPointFromPanelElement(pos, type: string) {
-    if (type !== 'webhook') {
+    if (type !== 'webhook' && type !== 'scheduled') {
       return;
     }
     if (this.startPointPendingRef.value) {
       return;
     }
+    const spType = type as 'webhook' | 'scheduled';
     const chatbot_id = this.id_faq_kb;
     const setPending = (v: boolean) => { this.startPointPending = v; this.changeDetectorRef.detectChanges(); };
     const flag = this.startPointPendingRef;
@@ -1270,11 +1272,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           deleteBlock: (block) => this.intentService.deleteSavedIntentWithoutHistory(block),
           upsert: (block, confirm) => {
             // the source name starts as the chatbot name, so the requester is never a generic "Webhook"
-            const source_name = this.dashboardService.selectedChatbot?.name;
-            const body: any = { block_id: block.intent_id };
-            if (source_name) body.mapping = { source_name };
-            if (confirm) body.confirm = true;
-            return this.webhookService.upsertStartPoint(chatbot_id, 'webhook', body);
+            const body = buildStartPointUpsertBody(spType, block.intent_id, this.dashboardService.selectedChatbot?.name, Intl.DateTimeFormat().resolvedOptions().timeZone, confirm);
+            return this.webhookService.upsertStartPoint(chatbot_id, spType, body);
           },
           confirmSwitch: () => this.confirmStartWebhookSwitch(),
           onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSCanvas.StartPointError'), 4, 'report_problem'),
@@ -1285,8 +1284,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
             this.intentService.setDragAndListnerEventToElement(block.intent_id);
             this.intentService.setIntentSelected(block.intent_id);
             this.closeExtraPanels();
+            // the box renders its summary/badge from the shared webhook
+            this.webhookService.loadWebhook(chatbot_id, true);
           }
-        }, 'webhook', pos);
+        }, spType, pos);
       } finally {
         setPending(false);
       }

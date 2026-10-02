@@ -47,6 +47,11 @@
 
 
         
+        <div *ngIf="isScheduledBox && scheduledStatus" class="cds-scheduled-summary tds_draggable">
+            <span class="cds-scheduled-summary-text ellips">{{ scheduledSummary }}</span>
+            <span class="cds-scheduled-badge" [ngClass]="'badge-' + scheduledStatus">{{ 'CDSCanvas.ScheduledBadge.' + scheduledStatus | translate }}</span>
+        </div>
+
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
             <div class="option" 
                 (click)="onSelectQuestion(HAS_SELECTED_TYPE.QUESTION)"

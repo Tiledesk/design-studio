@@ -2,6 +2,7 @@ import { Observable, lastValueFrom } from 'rxjs';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionIntentConnected } from 'src/app/models/action-model';
 import { TYPE_OF_MENU } from './utils';
+import { defaultSchedule } from './utils-schedule';
 
 export const START_POINT_TYPES = ['web', 'webhook', 'scheduled'];
 export const START_POINT_MARKER = 'start_point';
@@ -150,7 +151,7 @@ export function buildStartPointItems(present: string[], pending: boolean, schedu
         name: 'CDSActionList.NAME.StartPointScheduled',
         type: 'scheduled',
         start_point: 'scheduled',
-        src: 'assets/images/actions_category/start_points.svg',
+        src: 'assets/images/actions_category/start_point_scheduled.svg',
         status: 'active',
         disabled: scheduledPresent || pending,
         tooltip: scheduledPresent ? 'CDSCanvas.StartPointPresent' : ''
@@ -158,6 +159,25 @@ export function buildStartPointItems(present: string[], pending: boolean, schedu
     });
   }
   return items;
+}
+
+/**
+ * Body of the PUT that registers a freshly dropped start box. Webhook: the source name only.
+ * Scheduled: enabled, daily 09:00 in the browser timezone, source name = chatbot name, empty payload.
+ */
+export function buildStartPointUpsertBody(type: 'webhook' | 'scheduled', blockId: string, chatbotName: string | undefined, timezone: string, confirm: boolean): any {
+  const body: any = { block_id: blockId };
+  if (type === 'scheduled') {
+    body.enabled = true;
+    body.mapping = { source_name: chatbotName, payload: {} };
+    body.schedule = defaultSchedule(timezone);
+  } else if (chatbotName) {
+    body.mapping = { source_name: chatbotName };
+  }
+  if (confirm) {
+    body.confirm = true;
+  }
+  return body;
 }
 
 export interface StartPointBoxDeps {

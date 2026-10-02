@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
@@ -7,6 +7,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { Subscription } from 'rxjs';
+import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
 
@@ -19,7 +21,7 @@ const START_POINTS_CATEGORY = 'START_POINTS';
   // standalone: true,
   // imports: [MatButtonModule, MatMenuModule],
 })
-export class CdsPanelElementsComponent implements OnInit, OnChanges {
+export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
   @ViewChild('menuElement', { static: false }) private menuElement: ElementRef;
 
@@ -52,11 +54,37 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
   
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly webhookService: WebhookService
   ) { }
+
+  /** the server has the scheduler configured (GET webhook → scheduled_available): without it the Scheduled item is not offered */
+  scheduledAvailable = false;
+  private webhookSub: Subscription;
 
   ngOnInit(): void {
     this.createActionListByCategory();
+    this.webhookSub = this.webhookService.webhook$.subscribe(webhook => {
+      const available = webhook?.scheduled_available === true;
+      if (available !== this.scheduledAvailable) {
+        this.scheduledAvailable = available;
+        this.refreshStartPointItems();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.webhookSub?.unsubscribe();
+  }
+
+  private refreshStartPointItems() {
+    if (!this.actionsByCategory[START_POINTS_CATEGORY]) {
+      return;
+    }
+    this.actionsByCategory[START_POINTS_CATEGORY] = this.buildStartPointItems();
+    if (this.menuCategory === START_POINTS_CATEGORY) {
+      this.actionsList = this.actionsByCategory[START_POINTS_CATEGORY];
+    }
   }
 
   ngOnChanges(): void {
@@ -67,7 +95,7 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges {
   }
 
   buildStartPointItems(): Array<any> {
-    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending);
+    return buildStartPointItems(presentStartPointTypes(this.intents), this.startPointPending, this.scheduledAvailable);
   }
 
   onStartPointClick(type: string) {
