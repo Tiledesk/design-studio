@@ -2,9 +2,14 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-/** Le schede del pannello di sinistra, nell'ordine in cui stanno nella striscia. */
-export type LeftPanelTab = 'chat' | 'blocks' | 'subagents' | 'actions';
+/** Le schede del pannello di sinistra, nell'ordine in cui stanno nella striscia.
+ *
+ *  La chat non e' fra queste: ha una colonna sua, che si apre insieme a una di queste e non al
+ *  loro posto. Finche' era una scheda come le altre, "una per volta" valeva anche per lei. */
+export type LeftPanelTab = 'blocks' | 'subagents' | 'actions';
 
+/** Com'e' la colonna delle tre schede: aperta o no, e su quale. La chat non e' qui dentro --
+ *  si apre sempre a ogni ricaricamento, quindi non c'e' niente da ricordare di lei. */
 export interface LeftPanelSnapshot {
   readonly isOpen: boolean;
   readonly activeTab: LeftPanelTab;
@@ -21,6 +26,11 @@ export interface LeftPanelSnapshot {
  * `isOpen` e `activeTab` restano **separati** di proposito: chiudendo il pannello la scheda non
  * si dimentica, così riaprendo si torna dov'eri invece di dover riscegliere.
  *
+ * La chat ha un suo stato, `isChatOpen`, indipendente dagli altri due: le due colonne stanno
+ * affiancate e nessuna delle due esclude l'altra. È l'unica risposta alla domanda "la chat è
+ * aperta?", e il pulsante nell'intestazione legge questa -- non un booleano suo, che è esattamente
+ * il modo in cui i due erano finiti a raccontare cose diverse.
+ *
  * Lo stato vive qui solo finché la pagina è aperta. Dove va ricordato fra una sessione e
  * l'altra -- per agente, o per famiglia di agenti -- lo decide chi chiama, perché la chiave non
  * è la stessa per tutte le schede.
@@ -28,8 +38,9 @@ export interface LeftPanelSnapshot {
 @Injectable({ providedIn: 'root' })
 export class LeftPanelStateService {
 
-  private readonly _isOpen$ = new BehaviorSubject<boolean>(true);
+  private readonly _isOpen$ = new BehaviorSubject<boolean>(false);
   private readonly _activeTab$ = new BehaviorSubject<LeftPanelTab>('subagents');
+  private readonly _isChatOpen$ = new BehaviorSubject<boolean>(true);
 
   /** Vero finché il primo disegno non è finito.
    *
@@ -47,10 +58,12 @@ export class LeftPanelStateService {
   );
 
   readonly isOpen$: Observable<boolean> = this._isOpen$.asObservable();
+  readonly isChatOpen$: Observable<boolean> = this._isChatOpen$.asObservable();
   readonly activeTab$: Observable<LeftPanelTab> = this._activeTab$.asObservable();
   readonly isBooting$: Observable<boolean> = this._isBooting$.asObservable();
 
   get isOpen(): boolean { return this._isOpen$.value; }
+  get isChatOpen(): boolean { return this._isChatOpen$.value; }
   get activeTab(): LeftPanelTab { return this._activeTab$.value; }
   get isBooting(): boolean { return this._isBooting$.value; }
 
@@ -74,6 +87,11 @@ export class LeftPanelStateService {
   public open(): void { this._isOpen$.next(true); }
   public close(): void { this._isOpen$.next(false); }
   public toggle(): void { this._isOpen$.next(!this._isOpen$.value); }
+
+  /** La colonna della chat, che si apre e si chiude per conto suo. */
+  public openChat(): void { this._isChatOpen$.next(true); }
+  public closeChat(): void { this._isChatOpen$.next(false); }
+  public toggleChat(): void { this._isChatOpen$.next(!this._isChatOpen$.value); }
 
   /** Applica lo stato letto dalla memoria, una volta sola all'apertura dell'agente. */
   public hydrate(snapshot: Partial<LeftPanelSnapshot>): void {

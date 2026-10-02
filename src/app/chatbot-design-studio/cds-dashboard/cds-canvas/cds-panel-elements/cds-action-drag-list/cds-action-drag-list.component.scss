@@ -63,12 +63,30 @@ $base-padding: 6px;
 .action-btn-icon img, .drag-btn img { width: 16px; }
 .action-btn-icon img { filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%); }
 
+.action-btn-icon .svg-icon {
+  width: 16px;
+  color: var(--gray-light-01);
+  filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+  // Il passaggio accende l'icona invece di scambiarla di colpo. La stessa durata del fondo della
+  // riga, che cambia insieme a lei: due tempi diversi si leggerebbero come due cose.
+  transition: filter var(--transition-fast, .12s), color var(--transition-fast, .12s);
+}
+
+/* Al passaggio l'icona si colora, come nell'elenco dei blocchi.
+   Lo fa un filtro e non `color`: l'icona e' un disegno gia' tinto di grigio da un filtro, e un
+   colore dichiarato sopra non lo toglie -- il filtro e' l'ultimo a parlare. E' lo stesso filtro
+   che l'elenco dei blocchi usa sulle proprie icone, non un azzurro ricalcolato a occhio.
+   I loghi dei connettori restano fuori: hanno colori propri, e la regola che li lascia stare e'
+   qui sopra -- scritta dopo questa, perche' a parita' di peso l'ultima vince. */
+.actions-btns-wpr:hover .action-btn-icon:first-of-type .svg-icon {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+}
+
 // Connector action icons are real (multi-colour) logos, not tintable SVGs —
 // keep their original colours through the default, hover and drag-preview states.
 .action-btn-icon img.connector-action-icon { width: 16px; height: 16px; object-fit: contain; filter: none; }
 .actions-btns-wpr:hover .action-btn-icon img.connector-action-icon,
 .cdk-drag-preview img.connector-action-icon { filter: none; }
-.action-btn-icon .svg-icon { width: 16px; color: var(--gray-light-01); filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%); }
 
 .action-btn-text { @include lp.lp-row-name; }
 
@@ -82,6 +100,22 @@ $base-padding: 6px;
 .action-list.cdk-drop-list-dragging .action-box:not(.cdk-drag-placeholder) { transition: transform 250ms cubic-bezier(0,0,.2,1); }
 .action-drag-placeholder { background: #ccc; border: dotted 3px #999; min-height: 60px; transition: transform 250ms cubic-bezier(0,0,.2,1); border-radius: 8px; }
 .cdk-drag-disabled { background: var(--gray-02); .actions-btns-wpr, .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; } }
+
+/* Le azioni che il piano non comprende. Lo stato lo dichiara il template qui accanto
+   (`is-disabled`), mentre la sua grafica era rimasta nel pannello che queste righe non le
+   disegna piu': da li' non raggiungeva piu' niente. */
+.action-box.is-disabled {
+  background: var(--gray-02);
+
+  .actions-btns-wpr,
+  .actions-btns-wpr:hover { cursor: not-allowed; user-select: none; box-shadow: none; }
+
+  // L'icona resta spenta anche al passaggio: accenderla direbbe "prendimi" proprio dove non si
+  // puo' prendere niente.
+  .actions-btns-wpr:hover .action-btn-icon:first-of-type .svg-icon {
+    filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+  }
+}
 
 /* La *i* che apre la descrizione: compare passando sulla riga, come nel V4. Quadrata e con lo
    stesso raggio della cella dell'icona a sinistra, cosi' i due estremi della riga si rispondono. */

@@ -6,7 +6,9 @@
 <!-- In sola lettura non c'e': l'elenco dei subagent porterebbe ai flussi CORRENTI, non
      a quelli pubblicati con questa release, e sarebbe una promessa che la preview non
      puo' mantenere. -->
-<div class="box-left" *ngIf="!readOnlyService.readOnly" [class.is_closed]="!IS_BOX_LEFT_OPEN" [class.is-v3]="isV3">
+<div class="box-left" *ngIf="!readOnlyService.readOnly"
+     [class.is_closed]="!IS_BOX_LEFT_OPEN" [class.is-v3]="isV3"
+     [class.is-booting]="leftPanelState.isBooting">
 
     <cds-panel-intent-list *ngIf="activeLeftPanel === 'blocks' && IS_OPEN_INTENTS_LIST"
         id="cdsPanelIntentList"
@@ -59,15 +61,10 @@
 
     <!-- Le linguette, verticali, subito a destra del pannello e sempre visibili: sono anche il modo
          di riaprire dopo aver chiuso, per questo non stanno dentro `.box-left`, che si stringe a
-         zero. Chiusa mostra la sola icona, quella attiva icona e nome. -->
+         zero. Chiusa mostra la sola icona, quella attiva icona e nome.
+         La chat non e' fra queste: ha una colonna sua, che si apre insieme a una di queste e non
+         al loro posto, e si riapre dal pulsante nell'intestazione. -->
     <nav class="cds-left-rail" [class.is-booting]="leftPanelState.isBooting">
-        <button type="button" class="cds-left-rail__tab" *ngIf="IS_AGENT_CHAT_AVAILABLE"
-            [class.is-active]="isLeftTabVisible('chat')"
-            [attr.title]="'CDSCanvas.AgentChat' | translate"
-            (click)="onSelectLeftPanel('chat')">
-            <mat-icon class="cds-left-rail__icon" svgIcon="agent_chat" aria-hidden="true"></mat-icon>
-            <span class="cds-left-rail__label">{{ 'CDSCanvas.AgentChat' | translate }}</span>
-        </button>
         <button type="button" class="cds-left-rail__tab"
             [class.is-active]="isLeftTabVisible('subagents')"
             [attr.title]="'CDSCanvas.Subagents' | translate"

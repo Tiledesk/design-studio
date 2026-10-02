@@ -8,8 +8,16 @@
 *Tiledesk SRL*
 
 # this branch 02/10/2026
+- **changed**: a sinistra la chat AI e uno degli altri tre pannelli -- subagent, blocchi, azioni -- stanno aperti insieme, affiancati. Prima si alternavano, e tenere d'occhio l'elenco dei blocchi voleva dire chiudere la chat; il pannello dei tre e' piu' stretto di prima, perche' ogni pixel in piu' li' e' un pixel in meno di flusso
+- **changed**: la chat AI non ha piu' una linguetta nella striscia: si chiude dalla freccia nella sua intestazione e si riapre dal pulsante in alto, che compare solo mentre e' chiusa
+- **changed**: aprendo un agente la chat AI c'e' sempre, qualunque cosa fosse stata lasciata, e gli altri tre tornano come li avevi lasciati su quell'agente. Spostandosi su un subagent o su un altro flusso non cambia niente di quello che stai guardando, chat compresa
+- **fixed**: chiudendo uno dei tre pannelli dalla freccia nella sua intestazione la scelta viene ricordata. Prima la ricordava solo la linguetta: chiudendo dalla freccia e ricaricando, il pannello tornava aperto. Lo stesso per la scheda delle azioni, che non veniva ricordata affatto
+- **fixed**: la freccia per chiudere i tre pannelli si vede. Era disegnata come se fosse un'icona a contorno, come la lente della ricerca, e di un'icona piena quel modo lascia solo il filo: un pulsante vuoto
+- **changed**: i tre pannelli si aprono e si chiudono scorrendo, con la stessa andatura della chat che hanno accanto
+- **changed**: passando su un'azione la sua icona si colora, come succede gia' nell'elenco dei blocchi. Le azioni che il piano non comprende restano spente, perche' li' non c'e' niente da prendere
 - **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
 - **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
+
 
 # 1.40.16-rc14
 - **added**: a flow can start on a schedule: drag *Scheduled* from *Start points*, choose when it repeats (every N minutes or hours, daily, weekly, monthly) and in which timezone, and the data each run receives. The schedule goes live when the agent is published, and the box shows whether what you see is live

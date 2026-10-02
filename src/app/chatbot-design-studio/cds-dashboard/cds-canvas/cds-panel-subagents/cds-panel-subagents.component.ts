@@ -12,7 +12,6 @@ import { NotifyService } from 'src/app/services/notify.service';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { AgentChatFamilyService, sortSubagentsByName } from '../../../agent-chat/agent-chat-family.service';
 import { LeftPanelStateService } from '../../../services/left-panel-state.service';
-import { StageService } from '../../../services/stage.service';
 
 export interface SubagentItem {
   _id: string;
@@ -94,7 +93,6 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
     private notify: NotifyService,
     private family: AgentChatFamilyService,
     private readonly leftPanelState: LeftPanelStateService,
-    private readonly stageService: StageService,
     private readonly readOnlyService: ReadOnlyService
   ) { }
 
@@ -169,13 +167,12 @@ export class CdsPanelSubagentsComponent implements OnInit, OnDestroy {
    * Tiene aperta questa scheda attraverso lo spostamento su un altro flusso della famiglia.
    *
    * Lo spostamento ricostruisce il canvas, e con esso questo pannello: la scheda da riaprire va
-   * detta, non lasciata al fatto che nessuno la cambi per strada. Due scritture perche' sono due
-   * domande diverse: quale scheda e' aperta adesso, e quale ritrovera' chi tornera' su questa
-   * famiglia -- la seconda la rilegge il canvas degli agenti precedenti quando viene ricostruito.
+   * detta, non lasciata al fatto che nessuno la cambi per strada. Basta dirla allo stato
+   * condiviso, che sopravvive alla ricostruzione; la memoria la scrive il canvas, che ascolta
+   * quello stato -- la scrittura che c'era qui diceva la stessa cosa una seconda volta.
    */
   private keepSubagentsTabOpen(): void {
     this.leftPanelState.selectTab('subagents');
-    this.stageService.saveActiveLeftPanel(this.familyParentId, 'subagents');
   }
 
   onSearch(value: string): void {
