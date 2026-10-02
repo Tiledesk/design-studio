@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc16
+- **fixed**: in an agent started by a webhook or a schedule, the AI chat can end a path by closing the conversation. The V3 rule against close blocks used to refuse it, so a periodic check that found nothing wrong left its conversation open
+
 # 1.40.16-rc15
 - **fixed**: dragging an item onto the flow no longer leaves a gap in the palette: the row stays where it is for the whole gesture
 - **changed**: the palette no longer reorders itself while you drag, and what follows the pointer is the row as the browser draws it
