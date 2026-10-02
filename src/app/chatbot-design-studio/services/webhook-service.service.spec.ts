@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { WebhookService } from './webhook-service.service';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
@@ -118,4 +118,66 @@ describe('WebhookService', () => {
     httpMock.expectOne('https://api.test/project1/webhooks/botB').flush({ id: 'B' });
     expect(seen).toEqual([null, { id: 'B' }]);
   });
+  describe('no webhook record (404 with scheduled_available)', () => {
+    const URL = 'https://api.test/project1/webhooks/bot1';
+
+    it('loadWebhook publishes an empty webhook carrying scheduled_available', () => {
+      service.loadWebhook('bot1');
+      httpMock.expectOne(URL).flush({ success: false, error: 'Webhook not found for chatbot bot1', scheduled_available: true }, { status: 404, statusText: 'Not Found' });
+      expect(service.webhook$.value).toEqual({ scheduled_available: true, start_points: [] });
+    });
+
+    it('a 404 without scheduled_available (older server) publishes nothing', () => {
+      service.loadWebhook('bot1');
+      httpMock.expectOne(URL).flush({ success: false }, { status: 404, statusText: 'Not Found' });
+      expect(service.webhook$.value).toBeNull();
+    });
+
+    it('fetchWebhook hands the 404 to the caller and publishes the empty webhook', () => {
+      service.loadWebhook('bot1');
+      httpMock.expectOne(URL).flush({ start_points: [{ type: 'scheduled' }], scheduled_available: true });
+      let status: number;
+      service.fetchWebhook('bot1').subscribe({ error: (e) => status = e.status });
+      httpMock.expectOne(URL).flush({ success: false, scheduled_available: false }, { status: 404, statusText: 'Not Found' });
+      expect(status).toBe(404);
+      expect(service.webhook$.value).toEqual({ scheduled_available: false, start_points: [] });
+    });
+  });
+
+  describe('fresh data wins (publish, panel GET)', () => {
+    const URL = 'https://api.test/project1/webhooks/bot1';
+
+    it('fetchWebhook publishes its answer on webhook$ and returns it', () => {
+      service.loadWebhook('bot1');
+      httpMock.expectOne(URL).flush({ v: 1 });
+      let got: any;
+      service.fetchWebhook('bot1').subscribe(w => got = w);
+      httpMock.expectOne(URL).flush({ v: 2 });
+      expect(got).toEqual({ v: 2 });
+      expect(service.webhook$.value).toEqual({ v: 2 });
+    });
+
+    it('an older GET answering after a newer one never overwrites it', () => {
+      service.loadWebhook('bot1');
+      service.fetchWebhook('bot1').subscribe();
+      const [older, newer] = httpMock.match(URL);
+      newer.flush({ v: 'new' });
+      older.flush({ v: 'old' });
+      expect(service.webhook$.value).toEqual({ v: 'new' });
+    });
+
+    it('refreshAfterPublish reloads now and again after 3000 ms', fakeAsync(() => {
+      service.loadWebhook('bot1');
+      httpMock.expectOne(URL).flush({ v: 0 });
+      service.refreshAfterPublish('bot1');
+      httpMock.expectOne(URL).flush({ v: 1 });
+      expect(service.webhook$.value).toEqual({ v: 1 });
+      tick(2999);
+      httpMock.expectNone(URL);
+      tick(1);
+      httpMock.expectOne(URL).flush({ v: 2 });
+      expect(service.webhook$.value).toEqual({ v: 2 });
+    }));
+  });
 });
+

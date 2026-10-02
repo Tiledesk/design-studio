@@ -124,6 +124,14 @@ describe('utils-schedule', () => {
       expect(scheduledStatus({ ...sp, mapping: { source_name: 'Bot', payload: { a: 2, b: 'x' } } }, live)).toBe('changes');
       expect(scheduledStatus({ ...sp, schedule: { ...daily, time: '10:00' } }, live)).toBe('changes');
     });
+    it('off when the published version is switched off and the draft equals it', () => {
+      const off = { ...sp, enabled: false };
+      expect(scheduledStatus(off, JSON.parse(JSON.stringify(off)))).toBe('off');
+    });
+    it('a switched-off draft never published stays not_live; a draft differing from a switched-off live is changes', () => {
+      expect(scheduledStatus({ ...sp, enabled: false }, null)).toBe('not_live');
+      expect(scheduledStatus(sp, { ...live, enabled: false })).toBe('changes');
+    });
     it('error whenever live.error is set (live may be {error} only)', () => {
       expect(scheduledStatus(sp, { error: 'x' })).toBe('error');
       expect(scheduledStatus(sp, { ...live, error: 'x' })).toBe('error');

@@ -7,7 +7,7 @@ import {
 
 /** Quiet period after the last edit before the draft is saved */
 export const SCHEDULED_SAVE_DEBOUNCE_MS = 600;
-/** The server answers 503 with this message when DolphinScheduler is not configured */
+/** Shown in place of the form when the server has no scheduler configured (GET scheduled_available false); the 503 message of the scheduled routes */
 export const SCHEDULED_UNAVAILABLE_MESSAGE = 'Scheduled starts are not available on this installation';
 
 export type ScheduledRepeat = 'interval_minutes' | 'interval_hours' | 'daily' | 'weekly' | 'monthly';
@@ -94,15 +94,43 @@ export function browserTimezone(): string {
 
 export type ScheduledLoadOutcome = { state: 'unavailable', message: string } | { state: 'no_webhook' } | { state: 'error' };
 
-/** What a failed GET of the webhook means for the panel: 503 -> the unavailable message instead of the form; 404 -> no webhook yet (defaults, switched off) */
+/** What a webhook GET answered with 200 means for the panel: the scheduler is not configured (scheduled_available false) -> the message instead of the form */
+export function scheduledLoadedOutcome(webhook: any): { state: 'unavailable', message: string } | { state: 'ready' } {
+  return webhook?.scheduled_available === false ? { state: 'unavailable', message: SCHEDULED_UNAVAILABLE_MESSAGE } : { state: 'ready' };
+}
+
+/**
+ * What a failed GET of the webhook means for the panel: 404 -> no webhook yet (defaults, switched off), unless its
+ * scheduled_available says the scheduler is not configured; anything else is a load error (the GET never answers 503).
+ */
 export function scheduledLoadOutcome(error: any): ScheduledLoadOutcome {
-  if (error?.status === 503) {
-    return { state: 'unavailable', message: error?.error?.error || SCHEDULED_UNAVAILABLE_MESSAGE };
-  }
   if (error?.status === 404) {
-    return { state: 'no_webhook' };
+    return error?.error?.scheduled_available === false ? { state: 'unavailable', message: SCHEDULED_UNAVAILABLE_MESSAGE } : { state: 'no_webhook' };
   }
   return { state: 'error' };
+}
+
+/**
+ * A failed DELETE of a start point: 404 (already gone) deletes the box; for a scheduled box 503 too (no scheduler
+ * configured: nothing can be live, a delete would otherwise be impossible). Anything else keeps the box.
+ */
+export function startPointDeleteOutcome(type: 'webhook' | 'scheduled', error: any): 'delete_box' | 'keep_box' {
+  if (error?.status === 404 || (type === 'scheduled' && error?.status === 503)) {
+    return 'delete_box';
+  }
+  return 'keep_box';
+}
+
+/** Summary line and badge of a scheduled box: only when the scheduled start point points at this box */
+export function scheduledBoxView(webhook: any, intentId: string): { summary: string, status: ScheduledStatus } | null {
+  const sp = findStartPoint(webhook, 'scheduled');
+  if (!sp || !sp.schedule || sp.block_id !== intentId) {
+    return null;
+  }
+  return {
+    summary: scheduleError(sp.schedule) ? '' : describeSchedule(sp.schedule),
+    status: scheduledStatus(sp, webhook?.scheduled_live)
+  };
 }
 
 /** Toast of a failed "Test scheduled start": the server message when there is one, else a key per status */
@@ -143,7 +171,7 @@ export class ScheduledPanelModel {
   private again = false;
   private idleWaiters: ((ok: boolean) => void)[] = [];
   /** the last save failed and nothing has been saved since: the server draft is stale */
-  private saveFailed = false;
+  private lastSaveFailed = false;
   private syncing = false;
 
   constructor(private readonly deps: ScheduledPanelDeps, private readonly blockId: string, timezone: string) {
@@ -165,6 +193,11 @@ export class ScheduledPanelModel {
       this.rows = [];
     }
     this.validate();
+  }
+
+  /** the last save failed and nothing has saved since: the panel shows "Not saved — Retry" */
+  get saveFailed(): boolean {
+    return this.lastSaveFailed;
   }
 
   get hasError(): boolean {
@@ -322,13 +355,13 @@ export class ScheduledPanelModel {
     this.saving = true;
     this.deps.upsert(body).subscribe({
       next: () => {
-        this.saveFailed = false;
+        this.lastSaveFailed = false;
         this.finishSave();
         this.deps.refresh();
       },
       error: (err) => {
         this.again = false;
-        this.saveFailed = true;
+        this.lastSaveFailed = true;
         this.finishSave(true);
         this.deps.onError(err);
       }
@@ -344,13 +377,33 @@ export class ScheduledPanelModel {
     }
     const waiters = this.idleWaiters;
     this.idleWaiters = [];
-    waiters.forEach(w => w(!this.saveFailed));
+    waiters.forEach(w => w(!this.lastSaveFailed));
   }
 
-  /** Drops a pending edit (the start point is being deleted: a late PUT would re-create it) */
+  /**
+   * Drops a pending edit (the start point is being deleted: a late PUT would re-create it). A flush waiting for it
+   * (Test) is released with false: the draft it waited for is not going to be saved.
+   */
   cancelPending() {
     this.cancelTimer();
     this.again = false;
+    const waiters = this.idleWaiters;
+    this.idleWaiters = [];
+    waiters.forEach(w => w(false));
+  }
+
+  /** Resolves once no PUT is in flight (sends nothing): the DELETE goes out only after a PUT already sent */
+  whenIdle(): Promise<void> {
+    if (!this.saving) {
+      return Promise.resolve();
+    }
+    return new Promise<void>(resolve => this.idleWaiters.push(() => resolve()));
+  }
+
+  /** Retry of a failed save: sends the current form now (an invalid form is flagged, not sent) */
+  retrySave() {
+    this.cancelTimer();
+    this.save();
   }
 
   /** Sends a pending edit right away (the panel is closing) */
@@ -365,7 +418,7 @@ export class ScheduledPanelModel {
   flushAndWait(): Promise<boolean> {
     this.flush();
     if (!this.saving && !this.timer) {
-      return Promise.resolve(!this.saveFailed);
+      return Promise.resolve(!this.lastSaveFailed);
     }
     return new Promise<boolean>(resolve => this.idleWaiters.push(resolve));
   }

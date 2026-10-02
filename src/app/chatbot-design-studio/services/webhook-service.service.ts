@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -23,6 +24,11 @@ export class WebhookService {
   webhook$ = new BehaviorSubject<any>(null);
   private loading: Subscription | null = null;
   private loadedChatbotId: string | null = null;
+  /** every GET that feeds webhook$ gets a number at start: an answer older than the last published one is dropped */
+  private requestSeq = 0;
+  private publishedSeq = 0;
+  /** delay of the second reload after a publish: the server syncs the scheduled start after answering the publish */
+  static readonly PUBLISH_SYNC_DELAY_MS = 3000;
 
   private tiledeskToken: string;
   private project_id: string;
@@ -61,7 +67,8 @@ export class WebhookService {
    * Loads the webhook of a chatbot into webhook$. webhook$ always belongs to the last chatbot asked for:
    * a different id cancels the in-flight GET and resets webhook$ to null first; a failed load for a new id leaves null.
    * Same id: a call while one is in flight reuses it unless forced (a forced one cancels the stale response);
-   * a failed reload keeps the previous value.
+   * a failed reload keeps the previous value. A 404 carrying scheduled_available (no webhook record yet) publishes
+   * an empty webhook `{ scheduled_available, start_points: [] }`, so the palette can still offer the Scheduled start.
    */
   loadWebhook(chatbot_id: string, force: boolean = false){
     const sameChatbot = this.loadedChatbotId === chatbot_id;
@@ -72,16 +79,58 @@ export class WebhookService {
     if (inFlight) {
       this.loading.unsubscribe();
     }
-    if (!sameChatbot) {
+    this.switchTo(chatbot_id);
+    this.loading = this.trackedGet(chatbot_id).subscribe({
+      error: (err) => this.logger.log('[WEBHOOK_URL.SERV] loadWebhook error', err)
+    });
+  }
+
+  /**
+   * A fresh GET for a caller that needs the answer itself (the Scheduled panel: 404 / not configured / form), whose
+   * answer is also published on webhook$ like a forced load: webhook$ stays the one source of the status.
+   */
+  fetchWebhook(chatbot_id: string): Observable<any> {
+    this.switchTo(chatbot_id);
+    return this.trackedGet(chatbot_id);
+  }
+
+  /** After a publish or a restore: reload now, and again once the server's asynchronous scheduled sync is done */
+  refreshAfterPublish(chatbot_id: string){
+    this.loadWebhook(chatbot_id, true);
+    setTimeout(() => this.loadWebhook(chatbot_id, true), WebhookService.PUBLISH_SYNC_DELAY_MS);
+  }
+
+  private switchTo(chatbot_id: string){
+    if (this.loadedChatbotId !== chatbot_id) {
+      if (this.loading && !this.loading.closed) {
+        this.loading.unsubscribe();
+      }
       this.loadedChatbotId = chatbot_id;
       if (this.webhook$.value !== null) {
         this.webhook$.next(null);
       }
     }
-    this.loading = this.getWebhook(chatbot_id).subscribe({
-      next: (webhook) => this.webhook$.next(webhook),
-      error: (err) => this.logger.log('[WEBHOOK_URL.SERV] loadWebhook error', err)
-    });
+  }
+
+  /** GET whose answer (or 404 with scheduled_available) is published on webhook$ unless a newer answer was already published or the chatbot changed */
+  private trackedGet(chatbot_id: string): Observable<any> {
+    const seq = ++this.requestSeq;
+    const publish = (webhook: any) => {
+      if (this.loadedChatbotId !== chatbot_id || seq < this.publishedSeq) {
+        return;
+      }
+      this.publishedSeq = seq;
+      this.webhook$.next(webhook);
+    };
+    return this.getWebhook(chatbot_id).pipe(tap({
+      next: (webhook) => publish(webhook),
+      error: (err) => {
+        const available = err?.status === 404 ? err?.error?.scheduled_available : undefined;
+        if (typeof available === 'boolean') {
+          publish({ scheduled_available: available, start_points: [] });
+        }
+      }
+    }));
   }
 
   createWebhook(chatbot_id: string, intent_id: string, thereIsWebResponse: boolean, copilot: boolean){

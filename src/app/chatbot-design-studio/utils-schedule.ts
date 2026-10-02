@@ -20,7 +20,8 @@ export interface PayloadRow {
   value: any;
 }
 
-export type ScheduledStatus = 'live' | 'changes' | 'not_live' | 'error';
+/** off: the published version is switched off (and the draft equals it): nothing runs, publishing changes nothing */
+export type ScheduledStatus = 'live' | 'off' | 'changes' | 'not_live' | 'error';
 
 const FREQUENCIES = ['interval', 'daily', 'weekly', 'monthly'];
 const MINUTE_STEPS = [5, 10, 15, 20, 30];
@@ -211,6 +212,7 @@ function comparable(sp: any): string {
 
 /**
  * Draft vs what the scheduler runs. `live` may be `{ error }` only (error whenever set) or absent (not live).
+ * Equal to a switched-off live version: off (a disabled draft never published stays not_live).
  * Payload is compared key-order-insensitively; schedule through cleanSchedule.
  */
 export function scheduledStatus(startPoint: any, live: any): ScheduledStatus {
@@ -220,5 +222,8 @@ export function scheduledStatus(startPoint: any, live: any): ScheduledStatus {
   if (!live) {
     return 'not_live';
   }
-  return comparable(startPoint) === comparable(live) ? 'live' : 'changes';
+  if (comparable(startPoint) !== comparable(live)) {
+    return 'changes';
+  }
+  return live.enabled === false ? 'off' : 'live';
 }

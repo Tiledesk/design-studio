@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import { AppConfigService } from 'src/app/services/app-config';
 import { avatarPlaceholder, getColorBck } from 'src/chat21-core/utils/utils-user';
 import { TranslateService } from '@ngx-translate/core';
+import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
 
 
 
@@ -63,7 +64,8 @@ export class CdsPublishHistoryComponent implements OnInit {
     private faqKbService: FaqKbService,
     private dashboardService: DashboardService,
     public appConfigService: AppConfigService,
-     private translate: TranslateService
+     private translate: TranslateService,
+    private readonly webhookService: WebhookService
   ) { }
 
   ngOnInit(): void {
@@ -216,32 +218,37 @@ export class CdsPublishHistoryComponent implements OnInit {
     })
       .then((WillRestore) => {
         if (WillRestore) {
-
-          this.faqKbService.publish(this.selectedChatbot, release._id, null).subscribe({
-            next: (data) => {
-              this.logger.log('[CDS DSBRD] publish  - RES ', data)
-            },
-            error: (error) => {
-
-              swal('An error has occurred', {
-                icon: "error",
-              });
-              this.logger.error('[CDS-PUBLISH-HISTORY] publish ERROR ', error);
-            },
-            complete: () => {
-              this.getReleaseHistory(this.selectedChatbot._id)
-              this.logger.log('[CDS-PUBLISH-HISTORY] publish * COMPLETE *');
-              swal("Done!", `The Flow has been successfully restored to ${release['formattedDate']} version.`, {
-                icon: "success",
-                className: "swal-restore"
-              }).then((okpressed) => {
-
-              });
-
-            }
-          });
+          this.publishRestore(release);
         }
       });
+  }
+
+  /** Publishes the release: on success the shared webhook is reloaded (the restored flow may change the scheduled start) */
+  publishRestore(release: Chatbot) {
+    this.faqKbService.publish(this.selectedChatbot, release._id, null).subscribe({
+      next: (data) => {
+        this.logger.log('[CDS DSBRD] publish  - RES ', data)
+        this.webhookService.refreshAfterPublish(this.selectedChatbot._id);
+      },
+      error: (error) => {
+
+        swal('An error has occurred', {
+          icon: "error",
+        });
+        this.logger.error('[CDS-PUBLISH-HISTORY] publish ERROR ', error);
+      },
+      complete: () => {
+        this.getReleaseHistory(this.selectedChatbot._id)
+        this.logger.log('[CDS-PUBLISH-HISTORY] publish * COMPLETE *');
+        swal("Done!", `The Flow has been successfully restored to ${release['formattedDate']} version.`, {
+          icon: "success",
+          className: "swal-restore"
+        }).then((okpressed) => {
+
+        });
+
+      }
+    });
   }
 
 

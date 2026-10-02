@@ -34,7 +34,8 @@ import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { v4 as uuidv4 } from 'uuid';
-import { buildStartPointUpsertBody, createStartPointBox, isStartBox, startPointTypeOf } from '../../utils-start-points';
+import { buildStartPointUpsertBody, createStartPointBox, isStartBox, startPointErrorKey, startPointTypeOf } from '../../utils-start-points';
+import { browserTimezone } from '../../utils-scheduled-panel';
 import { NotifyService } from 'src/app/services/notify.service';
 
 const swal = require('sweetalert');
@@ -1272,11 +1273,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
           deleteBlock: (block) => this.intentService.deleteSavedIntentWithoutHistory(block),
           upsert: (block, confirm) => {
             // the source name starts as the chatbot name, so the requester is never a generic "Webhook"
-            const body = buildStartPointUpsertBody(spType, block.intent_id, this.dashboardService.selectedChatbot?.name, Intl.DateTimeFormat().resolvedOptions().timeZone, confirm);
+            const body = buildStartPointUpsertBody(spType, block.intent_id, this.dashboardService.selectedChatbot?.name, browserTimezone(), confirm);
             return this.webhookService.upsertStartPoint(chatbot_id, spType, body);
           },
           confirmSwitch: () => this.confirmStartWebhookSwitch(),
-          onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSCanvas.StartPointError'), 4, 'report_problem'),
+          onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant(startPointErrorKey(spType)), 4, 'report_problem'),
           onCreated: (block) => {
             // same steps as a block created through ops_update, minus the save (already done)
             block.id = INTENT_TEMP_ID;

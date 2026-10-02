@@ -26,6 +26,25 @@ export function startPointTypeOf(intent: any): 'web' | 'webhook' | 'scheduled' |
   return START_POINT_TYPES.includes(marker) && marker !== 'web' ? marker : null;
 }
 
+/** The kind of start test running in the header: a webhook start test or a scheduled one (null: none) */
+export type StartTestKind = 'webhook' | 'scheduled' | null;
+
+/** The start box highlighted during a start test: only the box of the running test's kind */
+export function isLiveStartBox(intent: any, kind: StartTestKind): boolean {
+  const type = startPointTypeOf(intent);
+  return !!kind && (type === 'webhook' || type === 'scheduled') && type === kind;
+}
+
+/** Closing a test deletes the webhook preload for a webhook chatbot or a webhook start test; a scheduled test has no preload */
+export function shouldDeleteWebhookPreload(isWebhookChatbot: boolean, isStartTest: boolean, kind: StartTestKind): boolean {
+  return isWebhookChatbot || (isStartTest && kind !== 'scheduled');
+}
+
+/** Toast key of a failed start box drop */
+export function startPointErrorKey(type: 'webhook' | 'scheduled'): string {
+  return type === 'scheduled' ? 'CDSCanvas.ScheduledPointError' : 'CDSCanvas.StartPointError';
+}
+
 /**
  * A start box (the `start` block or a marker block, whatever its name): no delete, copy, color or
  * "Start test from here" on the canvas, only its panel. The webhook box is deleted from its panel only,
@@ -195,7 +214,7 @@ export interface StartPointBoxDeps {
 }
 
 /**
- * Creates the start box on the server, then registers it as the webhook start point, then hands it to the canvas.
+ * Creates the start box on the server, then registers it as the start point of its type (webhook or scheduled), then hands it to the canvas.
  * The PUT runs only after the create response: the server looks the block up by intent_id.
  * A failure after the create deletes the block again (no orphan box); nothing reaches the canvas or the undo history.
  */

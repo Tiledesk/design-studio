@@ -320,6 +320,8 @@ export class CdsPanelPublishComponent implements OnInit, OnDestroy {
         if (data) {
           this.status = 'success';
         }
+        // the server syncs the scheduled start after answering: the box badges and the panel status follow webhook$
+        this.webhookService.refreshAfterPublish(this.selectedChatbot._id);
         // const elapsed = (Date.now() - startTime) / 1000;
         // this.animationDuration = elapsed + 1; // Progress + 1s buffer
         // this.rocketExitDelay = this.animationDuration;

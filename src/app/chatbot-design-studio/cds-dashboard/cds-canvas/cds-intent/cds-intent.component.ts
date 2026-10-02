@@ -1,5 +1,6 @@
-import { describeSchedule, scheduleError, scheduledStatus, ScheduledStatus } from 'src/app/chatbot-design-studio/utils-schedule';
-import { findStartPoint, isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
+import { ScheduledStatus } from 'src/app/chatbot-design-studio/utils-schedule';
+import { scheduledBoxView } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
+import { isLiveStartBox, isStartBox, isStartPointPaletteItem, startPointLabelKey, startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import { Renderer2, Component, OnInit, Input, Output, EventEmitter, SimpleChanges, ViewChild, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { takeUntil, timeInterval } from 'rxjs/operators';
@@ -325,16 +326,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  /** summary line and badge of the scheduled box; nothing until the webhook is loaded and has a scheduled start point */
+  /** summary line and badge of the scheduled box; nothing until the webhook is loaded and its scheduled start point is this box */
   private updateScheduledBox(webhook: any) {
-    const sp = findStartPoint(webhook, 'scheduled');
-    if (!sp || !sp.schedule) {
-      this.scheduledSummary = '';
-      this.scheduledStatus = null;
-      return;
-    }
-    this.scheduledSummary = scheduleError(sp.schedule) ? '' : describeSchedule(sp.schedule);
-    this.scheduledStatus = scheduledStatus(sp, webhook?.scheduled_live);
+    const view = scheduledBoxView(webhook, this.intent?.intent_id);
+    this.scheduledSummary = view ? view.summary : '';
+    this.scheduledStatus = view ? view.status : null;
   }
 
   async getWebhook(): Promise<string | null> {
@@ -567,10 +563,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  /** Blocks that get the "live start" highlight: the webhook block, or the webhook start box (by marker) during a webhook start test */
+  /** Blocks that get the "live start" highlight: the webhook block, or the start box (by marker) of the running start test's kind */
   private isLiveStartBlock(): boolean {
     const name = this.intent?.intent_display_name;
-    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && ['webhook', 'scheduled'].includes(startPointTypeOf(this.intent)));
+    return name === TYPE_CHATBOT.WEBHOOK || (this.intentService.webhookStartTest === true && isLiveStartBox(this.intent, this.intentService.startTestKind));
   }
 
   ngOnDestroy() {

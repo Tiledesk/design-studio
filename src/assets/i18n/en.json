@@ -637,6 +637,7 @@
         "StartWebhookSourceName": "Source name",
         "StartPointPresent": "Already in this flow",
         "StartPointError": "Unable to add the webhook start",
+        "ScheduledPointError": "Unable to add the scheduled start",
         "StartWebhookSwitchTitle": "Switch webhook",
         "StartWebhookSwitchText": "This chatbot already has a webhook that runs a block without a conversation. Switching it will make calls start conversations from the start block. Continue?",
         "StartWebhookSwitchConfirm": "Switch",
@@ -650,6 +651,7 @@
             "live": "Live",
             "changes": "Changes not live",
             "not_live": "Not live",
+            "off": "Off",
             "error": "Sync error"
         },
         "ScheduledPanel": {
@@ -657,10 +659,12 @@
                 "live": "Live — {{summary}} · next run {{next}}",
                 "live_no_next": "Live — {{summary}}",
                 "not_live": "Not live — publish to activate",
+                "off": "Off — switched off in the published version",
                 "changes": "Changes not live — publish to apply",
                 "error": "Couldn't update the live schedule —"
             },
             "Retry": "Retry",
+            "NotSaved": "Not saved —",
             "Enabled": "Start on a schedule",
             "EnabledHint": "Takes effect when you publish",
             "Repeat": "Repeat",

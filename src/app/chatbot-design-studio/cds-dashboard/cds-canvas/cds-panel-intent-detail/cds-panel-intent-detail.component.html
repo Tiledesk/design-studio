@@ -179,12 +179,22 @@
         <!-- scheduled start box -->
         <!-- ---------------------------------------------------------- -->
         <div *ngIf="isScheduledStart" class="row start-point scheduled-start">
-            <p *ngIf="scheduledUnavailable" class="scheduled-unavailable">{{ scheduledUnavailable }}</p>
+            <ng-container *ngIf="scheduledUnavailable">
+                <p class="scheduled-unavailable">{{ scheduledUnavailable }}</p>
+                <!-- no scheduler: nothing can be live, the box can still be deleted -->
+                <div class="webhook-buttons">
+                    <button type="button" class="btn btn-danger" [disabled]="spBusy" (click)="onDeleteScheduledStart()">{{ 'Delete' | translate }}</button>
+                </div>
+            </ng-container>
 
             <ng-container *ngIf="!scheduledUnavailable && scheduled">
                 <p *ngIf="scheduledStatusLine" class="scheduled-status" [ngClass]="'status-' + scheduledStatusLine.status">
                     {{ 'CDSCanvas.ScheduledPanel.Status.' + scheduledStatusLine.key | translate: scheduledStatusLine.params }}
                     <button *ngIf="scheduledStatusLine.status === 'error'" type="button" class="scheduled-retry" (click)="onRetryScheduledSync()">{{ 'CDSCanvas.ScheduledPanel.Retry' | translate }}</button>
+                </p>
+                <p *ngIf="scheduled.saveFailed" class="scheduled-save-failed">
+                    {{ 'CDSCanvas.ScheduledPanel.NotSaved' | translate }}
+                    <button type="button" class="scheduled-retry" (click)="onRetryScheduledSave()">{{ 'CDSCanvas.ScheduledPanel.Retry' | translate }}</button>
                 </p>
 
                 <div class="nw-onoffswitch-wrapper">

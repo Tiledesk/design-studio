@@ -30,7 +30,7 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
-import { isWebhookStartPointActive } from '../../utils-start-points';
+import { isWebhookStartPointActive, shouldDeleteWebhookPreload } from '../../utils-start-points';
 
 const swal = require('sweetalert');
 
@@ -159,6 +159,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.subscriptionIsSavingVisible?.unsubscribe();
     this.subscriptionWebhookStartTest?.unsubscribe();
     this.intentService.webhookStartTest = false;
+    this.intentService.startTestKind = null;
   }
 
 
@@ -426,7 +427,8 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
   onCloseTestItOut(){
-    if(this.isWebhook || this.isWebhookStartTest){
+    // a scheduled start test has no webhook preload to delete
+    if(shouldDeleteWebhookPreload(this.isWebhook, this.isWebhookStartTest, this.intentService.startTestKind)){
       this.stopWebhook();
     }
     this.intentService.closeTestItOut();
@@ -434,6 +436,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.intentService.resetLiveActiveIntent();
     this.isWebhookStartTest = false;
     this.intentService.webhookStartTest = false;
+    this.intentService.startTestKind = null;
     this.logService.closeLog();
   }
 
@@ -486,6 +489,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       }
       this.isWebhookStartTest = true;
       this.intentService.webhookStartTest = true;
+      this.intentService.startTestKind = kind;
       this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || requestId);
       this.openTestSiteInPopupWindow();
       this.isPlaying = true;

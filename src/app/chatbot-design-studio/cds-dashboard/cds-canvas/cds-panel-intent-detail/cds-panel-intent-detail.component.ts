@@ -17,7 +17,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { PanelIntentHeaderComponent } from '../cds-intent/panel-intent-header/panel-intent-header.component';
 import { startPointTypeOf, startPointPanelState } from 'src/app/chatbot-design-studio/utils-start-points';
 import { PayloadRow, Weekday, WEEKDAYS } from 'src/app/chatbot-design-studio/utils-schedule';
-import { ScheduledPanelModel, ScheduledRepeat, ScheduledStatusLine, scheduledStatusLine, timezoneList, browserTimezone, MINUTE_STEPS, HOUR_STEPS, DAYS_OF_MONTH, scheduledLoadOutcome } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
+import { ScheduledPanelModel, ScheduledRepeat, ScheduledStatusLine, scheduledStatusLine, timezoneList, browserTimezone, MINUTE_STEPS, HOUR_STEPS, DAYS_OF_MONTH, scheduledLoadOutcome, scheduledLoadedOutcome, startPointDeleteOutcome } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
 import { ControllerService } from 'src/app/chatbot-design-studio/services/controller.service';
 
 const swal = require('sweetalert');
@@ -53,7 +53,7 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
   isScheduledStart: boolean = false;
   scheduled: ScheduledPanelModel;
   scheduledStatusLine: ScheduledStatusLine | null = null;
-  /** the server has no scheduler configured (503): the message replaces the form */
+  /** the server has no scheduler configured (GET scheduled_available false): the message replaces the form, Delete stays */
   scheduledUnavailable: string = '';
   timezones: { name: string, value: string }[] = [];
   readonly weekdays: Weekday[] = WEEKDAYS;
@@ -192,19 +192,24 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
       icon: "warning",
       buttons: [this.translate.instant('CDSCanvas.StartWebhookSwitchCancel'), this.translate.instant('Delete')],
       dangerMode: true,
-    }).then((ok: boolean) => {
+    }).then(async (ok: boolean) => {
       if (!ok || this.spBusy) {
         return;
       }
       this.spBusy = true;
+      if (type === 'scheduled' && this.scheduled) {
+        // no PUT after the DELETE: drop the pending edit and wait for one already sent (it would re-create the start point)
+        this.scheduled.cancelPending();
+        await this.scheduled.whenIdle();
+      }
       // the server first: a failure keeps the box, so the flow never has a start point without its block
       this.webhookService.deleteStartPoint(this.chatbot_id, type).subscribe({ next: () => {
         this.spBusy = false;
         this.onStartPointDeleted(type);
       }, error: (error) => {
         this.spBusy = false;
-        if (error?.status === 404) {
-          // the start point is already gone: the box can still be deleted
+        if (startPointDeleteOutcome(type, error) === 'delete_box') {
+          // already gone (404), or a scheduled start with no scheduler configured (503): the box can still be deleted
           this.onStartPointDeleted(type);
           return;
         }
@@ -250,8 +255,10 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
       }
     }, this.intent.intent_id, tz);
     this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
+    // the status line follows webhook$ only (this fresh GET is published there too, and an older answer never overwrites it);
     // later updates (after a save, a sync, a publish) only refresh the status: the form is the user's draft
     const followWebhook = () => {
+      this.webhookSubscription?.unsubscribe();
       this.webhookSubscription = this.webhookService.webhook$.subscribe(webhook => {
         if (webhook) {
           this.webhook = webhook;
@@ -259,7 +266,12 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
         }
       });
     };
-    this.webhookService.getWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
+    this.webhookService.fetchWebhook(this.chatbot_id).subscribe({ next: (resp: any) => {
+      const loaded = scheduledLoadedOutcome(resp);
+      if (loaded.state === 'unavailable') {
+        this.scheduledUnavailable = loaded.message;
+        return;
+      }
       this.webhook = resp;
       this.scheduled.load(resp, tz);
       this.timezones = timezoneList(this.scheduled.schedule.timezone, tz);
@@ -302,6 +314,10 @@ export class CdsPanelIntentDetailComponent implements OnInit, AfterViewInit, OnD
 
   onRetryScheduledSync(){
     this.scheduled.retrySync();
+  }
+
+  onRetryScheduledSave(){
+    this.scheduled.retrySave();
   }
 
   async onTestScheduledStart(){

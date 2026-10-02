@@ -1,11 +1,13 @@
 import { of, Subject, throwError } from 'rxjs';
 import { fakeAsync, tick as ngTick } from '@angular/core/testing';
-import { ScheduledPanelModel, scheduledLoadOutcome, scheduledTestError, scheduledStatusLine, formatNextRun, timezoneList, SCHEDULED_SAVE_DEBOUNCE_MS } from './utils-scheduled-panel';
+import { ScheduledPanelModel, scheduledLoadOutcome, scheduledLoadedOutcome, scheduledTestError, scheduledStatusLine, scheduledBoxView, startPointDeleteOutcome, formatNextRun, timezoneList, SCHEDULED_SAVE_DEBOUNCE_MS, SCHEDULED_UNAVAILABLE_MESSAGE } from './utils-scheduled-panel';
+import { CdsPanelPublishComponent } from './cds-dashboard/cds-canvas/cds-panel-publish/cds-panel-publish.component';
+import { CdsPublishHistoryComponent } from './cds-publish-history/cds-publish-history.component';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { SavingStateService } from 'src/app/services/saving-state.service';
 import { IntentService } from './services/intent.service';
 import { CdsIntentComponent } from './cds-dashboard/cds-canvas/cds-intent/cds-intent.component';
-import { createStartPointBox, createStartPointBlock, buildStartPointItems, buildStartPointUpsertBody } from './utils-start-points';
+import { createStartPointBox, createStartPointBlock, buildStartPointItems, buildStartPointUpsertBody, startPointErrorKey, isLiveStartBox, shouldDeleteWebhookPreload } from './utils-start-points';
 
 const tick = () => new Promise(r => setTimeout(r, 0));
 
@@ -183,7 +185,7 @@ describe('scheduled panel', () => {
       expect(l.status).toBe('live');
       expect(l.key).toBe('live');
       expect(l.params.summary).toBe('Daily at 09:00 (Europe/Rome)');
-      expect(l.params.next).toContain('08:30'.replace('08', '08'));
+      expect(l.params.next).toBe('Tue, Oct 6, 08:30');
     });
     it('formatNextRun converts an instant to the timezone; a wall-clock string is kept', () => {
       expect(formatNextRun('2026-10-06T06:30:00.000Z', 'Europe/Rome', 'en-US')).toContain('08:30');
@@ -199,6 +201,12 @@ describe('scheduled panel', () => {
       expect(scheduledStatusLine(wh(sp(), undefined)).key).toBe('not_live');
       expect(scheduledStatusLine(wh(sp(), sp({ schedule: { frequency: 'daily', time: '10:00', timezone: 'Europe/Rome' } }))).key).toBe('changes');
       expect(scheduledStatusLine(wh(sp(), { error: 'x' })).key).toBe('error');
+    });
+    it('off: switched off in the published version', () => {
+      const off = sp({ enabled: false });
+      const l = scheduledStatusLine(wh(off, sp({ enabled: false })));
+      expect(l.status).toBe('off');
+      expect(l.key).toBe('off');
     });
     it('draft equal to live except payload key order is live', () => {
       const a = sp({ mapping: { source_name: 'Bot', payload: { a: 1, b: 2 } } });
@@ -306,12 +314,28 @@ describe('scheduled panel', () => {
   });
 
   describe('load, errors and test', () => {
-    it('GET 503 -> unavailable with the server message, or the default one', () => {
-      expect(scheduledLoadOutcome({ status: 503, error: { error: 'Scheduled starts are not available on this installation' } }))
-        .toEqual({ state: 'unavailable', message: 'Scheduled starts are not available on this installation' });
-      expect(scheduledLoadOutcome({ status: 503 })).toEqual({ state: 'unavailable', message: 'Scheduled starts are not available on this installation' });
+    it('GET 200 with scheduled_available false -> unavailable (no form); true or absent -> the form', () => {
+      expect(scheduledLoadedOutcome({ start_points: [], scheduled_available: false })).toEqual({ state: 'unavailable', message: SCHEDULED_UNAVAILABLE_MESSAGE });
+      expect(scheduledLoadedOutcome({ start_points: [], scheduled_available: true })).toEqual({ state: 'ready' });
+      expect(scheduledLoadedOutcome({ start_points: [] })).toEqual({ state: 'ready' });
+    });
+
+    it('GET 404: no webhook yet, unless it says the scheduler is not configured; other errors -> error', () => {
+      expect(scheduledLoadOutcome({ status: 404, error: { scheduled_available: true } })).toEqual({ state: 'no_webhook' });
       expect(scheduledLoadOutcome({ status: 404 })).toEqual({ state: 'no_webhook' });
+      expect(scheduledLoadOutcome({ status: 404, error: { scheduled_available: false } })).toEqual({ state: 'unavailable', message: SCHEDULED_UNAVAILABLE_MESSAGE });
       expect(scheduledLoadOutcome({ status: 500 })).toEqual({ state: 'error' });
+      // the server never answers 503 on GET: a 503 (e.g. a proxy) is a load error, not "not configured"
+      expect(scheduledLoadOutcome({ status: 503 })).toEqual({ state: 'error' });
+    });
+
+    it('DELETE: 404 deletes the box; 503 deletes a scheduled box (nothing can be live without a scheduler) but keeps a webhook box', () => {
+      expect(startPointDeleteOutcome('scheduled', { status: 503 })).toBe('delete_box');
+      expect(startPointDeleteOutcome('scheduled', { status: 404 })).toBe('delete_box');
+      expect(startPointDeleteOutcome('scheduled', { status: 500 })).toBe('keep_box');
+      expect(startPointDeleteOutcome('webhook', { status: 404 })).toBe('delete_box');
+      expect(startPointDeleteOutcome('webhook', { status: 503 })).toBe('keep_box');
+      expect(startPointDeleteOutcome('webhook', { status: 500 })).toBe('keep_box');
     });
 
     it('invalid fields show the scheduleError / payload message on the model', fakeAsync(() => {
@@ -364,5 +388,148 @@ describe('scheduled panel', () => {
       model.retrySync();
       expect(sync).toHaveBeenCalledTimes(2);
     });
+  });
+});
+
+describe('scheduled final review fixes', () => {
+  beforeAll(() => {
+    LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
+  });
+
+  const sp = (over: any = {}) => ({
+    type: 'scheduled', block_id: 'b1', enabled: true,
+    mapping: { source_name: 'Bot', payload: {} },
+    schedule: { frequency: 'daily', time: '09:00', timezone: 'Europe/Rome' }, ...over
+  });
+
+  function make() {
+    const upsert = jasmine.createSpy('upsert').and.callFake(() => of({}));
+    const sync = jasmine.createSpy('sync').and.callFake(() => of({}));
+    const refresh = jasmine.createSpy('refresh');
+    const onError = jasmine.createSpy('onError');
+    const model = new ScheduledPanelModel({ upsert, sync, refresh, onError }, 'b1', 'Europe/Rome');
+    model.load({ start_points: [sp()] }, 'Europe/Rome');
+    return { model, upsert, refresh, onError };
+  }
+
+  describe('I1 publish / restore refresh the shared webhook', () => {
+    it('a successful publish refreshes the webhook (now and after the async sync)', () => {
+      const webhookService = jasmine.createSpyObj('webhookService', ['refreshAfterPublish']);
+      const ctx: any = {
+        isSaving: false, PUBLISH_PENDING: false, selectedChatbot: { _id: 'bot1' },
+        faqKbService: { publish: () => of({ ok: true }) }, webhookService, logger: { log() {}, error() {} }
+      };
+      CdsPanelPublishComponent.prototype.onClickPublish.call(ctx);
+      expect(webhookService.refreshAfterPublish).toHaveBeenCalledOnceWith('bot1');
+    });
+
+    it('a failed publish does not refresh', () => {
+      const webhookService = jasmine.createSpyObj('webhookService', ['refreshAfterPublish']);
+      const ctx: any = {
+        isSaving: false, PUBLISH_PENDING: false, selectedChatbot: { _id: 'bot1' },
+        faqKbService: { publish: () => throwError(() => ({ status: 500 })) }, webhookService, logger: { log() {}, error() {} }
+      };
+      CdsPanelPublishComponent.prototype.onClickPublish.call(ctx);
+      expect(webhookService.refreshAfterPublish).not.toHaveBeenCalled();
+    });
+
+    it('a successful restore refreshes the webhook', () => {
+      const webhookService = jasmine.createSpyObj('webhookService', ['refreshAfterPublish']);
+      const answer = new Subject<any>();
+      const ctx: any = { selectedChatbot: { _id: 'bot1' }, faqKbService: { publish: () => answer }, webhookService, logger: { log() {}, error() {} } };
+      CdsPublishHistoryComponent.prototype.publishRestore.call(ctx, { _id: 'rel1' });
+      expect(webhookService.refreshAfterPublish).not.toHaveBeenCalled();
+      answer.next({});
+      expect(webhookService.refreshAfterPublish).toHaveBeenCalledOnceWith('bot1');
+    });
+  });
+
+  describe('I3 start test kind', () => {
+    const box = (type: string) => ({ intent_id: 'x', intent_display_name: 'x', attributes: { start_point: type } } as any);
+
+    it('highlights only the box of the running test kind', () => {
+      expect(isLiveStartBox(box('webhook'), 'webhook')).toBeTrue();
+      expect(isLiveStartBox(box('scheduled'), 'webhook')).toBeFalse();
+      expect(isLiveStartBox(box('scheduled'), 'scheduled')).toBeTrue();
+      expect(isLiveStartBox(box('webhook'), 'scheduled')).toBeFalse();
+      expect(isLiveStartBox(box('webhook'), null)).toBeFalse();
+      expect(isLiveStartBox({ intent_id: 'y', intent_display_name: 'start' } as any, 'webhook')).toBeFalse();
+    });
+
+    it('the webhook preload is deleted for a webhook chatbot or a webhook start test, never for a scheduled test', () => {
+      expect(shouldDeleteWebhookPreload(true, false, null)).toBeTrue();
+      expect(shouldDeleteWebhookPreload(false, true, 'webhook')).toBeTrue();
+      expect(shouldDeleteWebhookPreload(false, true, 'scheduled')).toBeFalse();
+      expect(shouldDeleteWebhookPreload(false, false, null)).toBeFalse();
+    });
+  });
+
+  describe('minors', () => {
+    it('the scheduled drop failure has its own toast key; the webhook one is unchanged', () => {
+      expect(startPointErrorKey('webhook')).toBe('CDSCanvas.StartPointError');
+      expect(startPointErrorKey('scheduled')).toBe('CDSCanvas.ScheduledPointError');
+    });
+
+    it('box summary and badge only for the box the scheduled start point points at', () => {
+      const webhook = { start_points: [sp()], scheduled_live: sp() };
+      expect(scheduledBoxView(webhook, 'b1')).toEqual({ summary: 'Daily at 09:00 (Europe/Rome)', status: 'live' });
+      expect(scheduledBoxView(webhook, 'other')).toBeNull();
+      expect(scheduledBoxView({ start_points: [] }, 'b1')).toBeNull();
+      expect(scheduledBoxView(null, 'b1')).toBeNull();
+    });
+
+    it('cancelPending releases a waiting flush (false) and whenIdle waits for the in-flight PUT', fakeAsync(() => {
+      const inFlight = new Subject<any>();
+      const { model, upsert } = make();
+      upsert.and.returnValue(inFlight);
+      model.setEnabled(false);
+      let tested: boolean;
+      model.flushAndWait().then(r => tested = r);
+      ngTick(0);
+      expect(upsert).toHaveBeenCalledTimes(1);
+      model.setEnabled(true);
+      model.cancelPending();
+      ngTick(0);
+      expect(tested).toBeFalse();
+      let idle = false;
+      model.whenIdle().then(() => idle = true);
+      ngTick(0);
+      expect(idle).toBeFalse();
+      inFlight.next({}); inFlight.complete();
+      ngTick(0);
+      expect(idle).toBeTrue();
+      ngTick(2000);
+      // the edit dropped by cancelPending is never sent
+      expect(upsert).toHaveBeenCalledTimes(1);
+    }));
+
+    it('whenIdle resolves at once when nothing is in flight', fakeAsync(() => {
+      const { model } = make();
+      let idle = false;
+      model.whenIdle().then(() => idle = true);
+      ngTick(0);
+      expect(idle).toBeTrue();
+    }));
+
+    it('a failed PUT leaves a persistent "not saved" state; Retry re-sends the current form until it saves', fakeAsync(() => {
+      const { model, upsert } = make();
+      upsert.and.returnValue(throwError(() => ({ status: 500 })));
+      model.setEnabled(false);
+      ngTick(700);
+      expect(model.saveFailed).toBeTrue();
+      ngTick(10000);
+      expect(model.saveFailed).toBeTrue();
+      model.setSourceName('Nightly');
+      model.retrySave();
+      expect(upsert).toHaveBeenCalledTimes(2);
+      expect(upsert.calls.argsFor(1)[0].mapping.source_name).toBe('Nightly');
+      expect(model.saveFailed).toBeTrue();
+      upsert.and.returnValue(of({}));
+      model.retrySave();
+      expect(model.saveFailed).toBeFalse();
+      ngTick(2000);
+      // the debounce of the edit was replaced by the retry
+      expect(upsert).toHaveBeenCalledTimes(3);
+    }));
   });
 });
