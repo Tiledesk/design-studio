@@ -939,12 +939,21 @@ export class IntentService {
     return this.intentSelected;
   }
 
-  /** selectAction */
+  /** selectAction
+   *
+   *  Scegliere un'action non toglie piu' la selezione al blocco: l'evidenziazione e' una
+   *  sola, ed e' quella del blocco. Prima le due si escludevano -- premere su un'action
+   *  spegneva il contorno del blocco e ne accendeva uno attorno all'action -- e cosi' lo
+   *  stesso gesto diceva due cose diverse a seconda di dove cadeva il puntatore.
+   *
+   *  `actionSelectedID` resta, perche' non e' uno stato visivo: dice a chi apre il pannello
+   *  di dettaglio, e a chi cancella, di quale action si parla.
+   */
   public selectAction(intentID, actionId){
-    this.intentSelectedID = null;
-    this.intentActive = false;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
+    this.intentActive = !!this.intentSelected;
     this.listActions = this.intentSelected?.actions;
     this.selectedAction = this.listActions?.find(action => action._tdActionId === actionId);
     this.behaviorIntent.next(this.intentSelected);

@@ -116,8 +116,16 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   newActionCreated: Action;
   dragDisabled: boolean = true;
   connectorIsOverAnIntent: boolean = false;
-  /** Usato per distinguere click da drag (es. apertura pannello intent). */
+  /** Quanto deve spostarsi la pressione perche' il gesto sia un trascinamento e non un clic.
+   *  E' la stessa soglia del motore di trascinamento (`dragThreshold`, `tiledesk-stage.js`):
+   *  sotto quel valore il blocco non si muove, quindi nemmeno qui e' successo niente. */
+  private static readonly DRAG_THRESHOLD_PX = 4;
+
+  /** Vero quando la pressione in corso e' diventata un trascinamento: serve a distinguere un
+   *  click da un drag (apertura del pannello dell'intent e di quello dell'action). */
   private hasMouseMoved: boolean = false;
+  /** Dove e' cominciata la pressione, per misurare quanto si e' spostata. */
+  private pressOrigin: { x: number, y: number } | null = null;
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
@@ -925,8 +933,14 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
   /**
    * Chiamata dal template al click su un’action nel blocco.
    * Notifica IntentService della selezione, imposta elementTypeSelected e emette actionSelected verso il parent (canvas) per aprire il pannello dettaglio.
+   *
+   * Solo al clic, non alla fine di un trascinamento: il blocco ora si sposta anche afferrandolo
+   * da un'action, e il `click` che il browser manda dopo un trascinamento apriva il pannello di
+   * quell'action ogni volta che si spostava il blocco. Il blocco resta comunque selezionato --
+   * di quello se ne occupa la pressione.
    */
   onSelectAction(action: Action, index: number, idAction: HAS_SELECTED_TYPE): void {
+    if (this.hasMouseMoved) { return; }
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
@@ -1222,18 +1236,48 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
   /**
    * Chiamata dal template (mousedown) sul blocco intent.
-   * Resetta hasMouseMoved per distinguere un click da un drag quando poi si riceve il click.
+   * Resetta hasMouseMoved per distinguere un click da un drag quando poi si riceve il click,
+   * e seleziona il blocco.
+   *
+   * La selezione sta qui e non piu' solo sul trascinamento. Prima la faceva `start-dragging`,
+   * che il motore di trascinamento emette solo dove il gesto parte: premendo su un campo, su
+   * un pulsante o su un punto che non si trascina, il blocco non risultava selezionato. Questo
+   * gestore sta sulla radice del blocco e l'evento gli risale da qualunque discendente, quindi
+   * vale per ogni punto -- campi compresi, dove il trascinamento giustamente non parte.
    */
   onIntentMouseDown(event: MouseEvent): void {
     this.hasMouseMoved = false;
+    this.pressOrigin = { x: event.clientX, y: event.clientY };
+    // Solo se non e' gia' questo il blocco selezionato: rifarlo a ogni pressione sarebbe
+    // lavoro inutile, e soprattutto azzererebbe l'action scelta (lo fa setIntentSelected) a
+    // ogni clic dentro un blocco che la sta gia' mostrando nel pannello di dettaglio.
+    const alreadySelected = this.intentService.intentSelectedID === this.intent.intent_id
+      && this.intentService.intentActive;
+    if (!alreadySelected) {
+      this.intentService.setIntentSelected(this.intent.intent_id);
+    }
   }
 
   /**
    * Chiamata dal template (mousemove) sul blocco intent.
-   * Imposta hasMouseMoved a true così onOpenIntentPanel non aprirà il pannello se l’utente stava trascinando.
+   *
+   * Dichiara il gesto un trascinamento, cosi' al rilascio non si aprono i pannelli: ne' quello
+   * dell'intent, ne' quello dell'action. Il browser manda un `click` anche alla fine di un
+   * trascinamento -- il blocco segue il puntatore, quindi pressione e rilascio cadono sullo
+   * stesso elemento -- ed e' da li' che il pannello si apriva mentre si spostava il blocco.
+   *
+   * Serve il tasto premuto e una distanza, non il semplice movimento: passare sopra un blocco
+   * non e' un gesto, e la mano che trema di un pixel su un clic non deve diventarlo. La soglia
+   * e' la stessa del motore di trascinamento (`dragThreshold` in `tiledesk-stage.js`), cosi' il
+   * pannello non si apre esattamente quando il blocco si e' mosso.
    */
   onIntentMouseMove(event: MouseEvent): void {
-    this.hasMouseMoved = true;
+    if (!this.pressOrigin || event.buttons === 0) { return; }
+    const dx = event.clientX - this.pressOrigin.x;
+    const dy = event.clientY - this.pressOrigin.y;
+    if (Math.sqrt(dx * dx + dy * dy) >= CdsIntentComponent.DRAG_THRESHOLD_PX) {
+      this.hasMouseMoved = true;
+    }
   }
 
   /**

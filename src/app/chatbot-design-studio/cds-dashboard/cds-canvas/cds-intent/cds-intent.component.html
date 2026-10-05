@@ -36,8 +36,7 @@
             class="pic-title-text tds_draggable" 
             [class.isStart]="isStart"
             [intentColor]="intentColor"
-            [intent]="intent"
-            (click)="onIntentOptionClick($event)">
+            [intent]="intent">
         </cds-panel-intent-header>
         <div *ngIf="showIntentOptions" class="cds-intent-options tds_draggable">
             <div class="option" 
@@ -106,7 +105,7 @@
 
             <div class="csd-open-action-menu-btn-wpr">
                 <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="cds-add-action-btn">
+                    class="cds-add-action-btn tds_no_drag">
                     + {{ labelAddAction }}
                 </div>
             </div>
@@ -114,7 +113,10 @@
 
         <!-- <div class="tds-drop-element tds_draggable"></div> -->
 
-        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
+        <!-- Niente contorno attorno all'action scelta: l'evidenziazione e' una sola, quella del
+             blocco, e si accende premendo in un punto qualsiasi. Prima le due si alternavano, e
+             lo stesso gesto diceva due cose diverse a seconda di dove cadeva il puntatore. -->
+        <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;"
             cdkDrag
             [cdkDragDisabled]="isV3"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
@@ -126,11 +128,8 @@
             [ngClass]="{
                 'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
                 'cds-last-action': last
-            }" 
-            [ngStyle]="{
-                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
             }"
-            (keydown)="onKeydown($event)" 
+            (keydown)="onKeydown($event)"
             (click)="onSelectAction(action, i, action._tdActionId)">
             <!-- [class.isFirst]="first" -->
             <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
@@ -138,8 +137,10 @@
             <!-- <span *ngIf="!first" class="action-element"> -->
 
             <!-- handle di riordino: SOLO questo (il drag_indicator) trascina/riordina l'azione;
-                 trascinando qualsiasi altro punto si sposta il blocco intent (tds_draggable) -->
-            <div class="action-reorder-handle" cdkDragHandle [title]="'CDSCanvas.Drag' | translate">
+                 trascinando qualsiasi altro punto si sposta il blocco intent (tds_draggable).
+                 `tds_no_drag` tiene fuori questa presa dal trascinamento del blocco: ha gia' un
+                 trascinamento suo, e senza il motore la contenderebbe al riordino. -->
+            <div class="action-reorder-handle tds_no_drag" cdkDragHandle [title]="'CDSCanvas.Drag' | translate">
                 <img class="active-icon" src="assets/images/icons/drag_indicator.svg" alt="">
             </div>
 
@@ -617,7 +618,7 @@
     <div class="footer-intent">
         <div *ngIf="!isStart && !isReturnStack && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="cds-add-action-btn">
+                class="cds-add-action-btn tds_no_drag">
                 + {{ labelAddAction }}
             </div>
         </div>

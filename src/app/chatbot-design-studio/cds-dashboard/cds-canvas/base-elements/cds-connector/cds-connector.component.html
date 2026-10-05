@@ -3,7 +3,10 @@
   - mostra il punto di connessione (vuoto/pieno)
   - mostra il “contract connector” con menu su hover, solo se connesso
 -->
-<div class="action-connector" (mouseenter)="showConnector()" (mouseleave)="hideConnector()">
+<!-- `tds_no_drag`: da qui si tira un connettore, e il gesto e' quello. Senza, premendo sul
+     pallino partirebbe anche il trascinamento del blocco, che da quando si trascina da ogni
+     punto arriva fin qui. -->
+<div class="action-connector tds_no_drag" (mouseenter)="showConnector()" (mouseleave)="hideConnector()">
     <!-- Line placeholder (attualmente non usata) -->
     <div class="block-line"></div>
   

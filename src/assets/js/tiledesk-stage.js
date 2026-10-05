@@ -23,6 +23,13 @@ export class TiledeskStage {
      *  lo sposta di un paio di pixel. */
     dragThreshold = 4;
 
+    /** Cosa non trascina mai, quando il punto premuto non dichiara nulla di suo e
+     *  la classe arriva da un antenato: ci si scrive, ci si preme sopra, non si
+     *  trascina. `.tds_no_drag` e' la via d'uscita per il markup che deve
+     *  chiamarsi fuori pur non essendo un campo -- una maniglia di riordino, per
+     *  dire, che ha gia' un trascinamento suo. */
+    notDraggableSelector = 'input, textarea, select, button, a, [contenteditable=""], [contenteditable="true"], [role="button"], .tds_no_drag';
+
 
     isDragging = false;
     position = {x: 0, y: 0};
@@ -185,19 +192,33 @@ export class TiledeskStage {
         let pos_mouse_x;
         let pos_mouse_y;
         element.onmousedown = (function(event) {
-            // Il confronto esatto sul target resta la regola storica. La risalita
-            // e' opt-in: si attiva solo dove il markup dichiara classDraggableDeep,
-            // quindi i blocchi che non la portano si comportano esattamente come prima.
+            // Due regole, in quest'ordine.
+            //
+            // 1. Il confronto esatto sul target: l'elemento premuto porta lui la
+            //    classe. E' la regola storica, e resta senza eccezioni e senza
+            //    soglia -- da qui passa tutto cio' che oggi si trascina, compreso
+            //    il campo del nome del blocco, che si trascina e si modifica con
+            //    un doppio clic.
+            //
+            // 2. Altrimenti si risale ai genitori. Serve perche' la classe la
+            //    dichiara il contenitore, mentre il puntatore cade su cio' che
+            //    c'e' dentro -- un'icona, un testo, il markup di un componente
+            //    figlio -- che non puo' portarla e che senza risalita non
+            //    trascinava niente. Qui le esclusioni valgono: dentro un campo si
+            //    scrive, un pulsante si preme.
             const target = event.target;
+            const canClosest = typeof target.closest === 'function';
             const isExact = target.classList && target.classList.contains(this.classDraggable);
-            const isDeep = !isExact && typeof target.closest === 'function'
-                && target.closest('.' + this.classDraggableDeep);
+            const isDeep = !isExact && canClosest
+                && !target.closest(this.notDraggableSelector)
+                && target.closest('.' + this.classDraggable + ', .' + this.classDraggableDeep);
             if (!isExact && !isDeep) {
                 return false;
             }
-            // La soglia vale solo per il gesto introdotto in V3 (presa dall'header
-            // dell'action, area ampia e facile da urtare). Le maniglie storiche e le
-            // note restano immediate, esattamente come prima.
+            // La soglia vale per la presa larga, quella che arriva dalla risalita:
+            // e' un'area facile da urtare, e senza soglia un clic impreciso
+            // sposterebbe il blocco di un paio di pixel. Le maniglie storiche e le
+            // note, che dichiarano la classe sul punto premuto, restano immediate.
             const useThreshold = !!isDeep;
             event = event || window.event;
             event.preventDefault();
