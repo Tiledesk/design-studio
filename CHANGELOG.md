@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc20
+- **fixed**: V3 block exit dot sits on the block's edge again, aligned with the last action
+
 # 1.40.16-rc19
 - **changed**: V3 empty default fallback styled like the start block
 - **fixed**: V3 iteration block shows again its "list done" exit, which the AI chat can connect
