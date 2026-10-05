@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# this branch
+# 1.40.16-rc18
 - **fixed**: an agent created from a prompt does its job on every message, not only on the first one. The AI chat was told to connect the fallback to a block with a fixed message, and did: after the first answer every new message got only that sentence. It is now told to follow the default fallback pattern, which puts the job that repeats in the fallback's branch
 - **fixed**: a block moves by grabbing it anywhere -- the body of its actions included -- and it is selected wherever you press it, fields and buttons included. Both used to need the exact spot to say so, which every redesign of the block left a little smaller
 - **changed**: selecting an action no longer unselects its block: the highlight is one, the block's, and clicking an action opens its detail panel as before -- but only on a click, not at the end of a drag
