@@ -7,23 +7,19 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 05/10/2026
-- **fixed**: un blocco si sposta afferrandolo in un punto qualsiasi -- il corpo delle sue azioni compreso -- e si seleziona premendo ovunque, campi e pulsanti compresi. Prima servivano i punti giusti perche' succedesse, e ogni ridisegno del blocco ne lasciava qualcuno in meno
-- **changed**: scegliere un'azione non toglie piu' la selezione al blocco: l'evidenziazione e' una sola, quella del blocco, e il clic su un'azione ne apre il dettaglio come prima -- ma solo al clic, non alla fine di un trascinamento
 
-# this branch 02/10/2026
-- **added**: passando su un'azione il cui nome non entra nella riga, il nome compare per intero accanto. Solo dove la riga lo taglia davvero, e non mentre si sta sulla *i* della descrizione: li' sparisce subito
-- **added**: un blocco nasce del colore della famiglia dell'azione che contiene -- verde le piu' usate, blu l'AI, arancio il flusso, viola le integrazioni, rosso le speciali -- e i connettori che ne escono prendono la stessa tinta. Vale comunque sia nato: trascinando un'azione sul flusso, spostandola da un altro blocco, tirando un connettore nel vuoto o chiedendolo alla chat AI. Un colore scelto a mano continua a vincere, e i blocchi di avvio e di fallback restano come sono
-- **changed**: nel pannello delle azioni il pallino di ogni famiglia ha la tinta dei blocchi che quella famiglia crea, e passando su un'azione la sua icona si accende come nell'elenco dei blocchi
-- **changed**: a sinistra la chat AI e uno degli altri tre pannelli -- subagent, blocchi, azioni -- stanno aperti insieme, affiancati. Prima si alternavano, e tenere d'occhio l'elenco dei blocchi voleva dire chiudere la chat; il pannello dei tre e' piu' stretto di prima, perche' ogni pixel in piu' li' e' un pixel in meno di flusso
-- **changed**: la chat AI non ha piu' una linguetta nella striscia: si chiude dalla freccia nella sua intestazione e si riapre dal pulsante in alto, che compare solo mentre e' chiusa
-- **changed**: aprendo un agente la chat AI c'e' sempre, qualunque cosa fosse stata lasciata, e gli altri tre tornano come li avevi lasciati su quell'agente. Spostandosi su un subagent o su un altro flusso non cambia niente di quello che stai guardando, chat compresa
-- **fixed**: chiudendo uno dei tre pannelli dalla freccia nella sua intestazione la scelta viene ricordata. Prima la ricordava solo la linguetta: chiudendo dalla freccia e ricaricando, il pannello tornava aperto. Lo stesso per la scheda delle azioni, che non veniva ricordata affatto
-- **fixed**: la freccia per chiudere i tre pannelli si vede. Era disegnata come se fosse un'icona a contorno, come la lente della ricerca, e di un'icona piena quel modo lascia solo il filo: un pulsante vuoto
-- **changed**: i tre pannelli si aprono e si chiudono scorrendo, con la stessa andatura della chat che hanno accanto
-- **changed**: passando su un'azione la sua icona si colora, come succede gia' nell'elenco dei blocchi. Le azioni che il piano non comprende restano spente, perche' li' non c'e' niente da prendere
-- **fixed**: trascinando un'azione sul flusso l'elenco resta intero: la riga non lascia piu' un vuoto al suo posto, ne' mentre il puntatore e' ancora sul pannello ne' dopo averlo lasciato. Prima spariva per tutta la durata del gesto e tornava solo al rilascio
-- **changed**: mentre trascini, quello che segue il puntatore e' l'immagine della riga disegnata dal browser, e le voci dell'elenco non si spostano piu' sotto il puntatore: da li' le azioni si prendono, non si risistemano
+# this branch
+- **fixed**: an agent created from a prompt does its job on every message, not only on the first one. The AI chat was told to connect the fallback to a block with a fixed message, and did: after the first answer every new message got only that sentence. It is now told to follow the default fallback pattern, which puts the job that repeats in the fallback's branch
+- **fixed**: a block moves by grabbing it anywhere -- the body of its actions included -- and it is selected wherever you press it, fields and buttons included. Both used to need the exact spot to say so, which every redesign of the block left a little smaller
+- **changed**: selecting an action no longer unselects its block: the highlight is one, the block's, and clicking an action opens its detail panel as before -- but only on a click, not at the end of a drag
+- **changed**: the block list shows an icon for the start boxes too -- the webhook's own yellow, and the clock of the scheduled one -- so the places a conversation can begin are told apart at a glance, as they already are on the flow
+
+# 1.40.16-rc17
+- **added**: a block takes the colour of the family of the action it holds -- most used green, AI blue, flow orange, integrations purple, special red, start points green -- and the connectors leaving it follow. However the block was created, and a colour picked by hand still wins
+- **changed**: the AI chat and one of the other three panels -- subagents, blocks, actions -- are open side by side instead of one at a time, and those three are narrower to leave the flow more room. The chat has left the tab strip: it closes from its own header and reopens from the button in the header, which is there only while it is closed
+- **changed**: opening an agent brings the three panels back as they were left on it, while the AI chat always opens whatever was saved
+- **added**: hovering an action whose name does not fit shows it in full -- but not while on the *i* -- and its icon lights up as in the block list, except where the plan does not include it. Each category dot carries its family's colour
+- **fixed**: closing a panel from the arrow in its header is remembered, and so is the actions tab; the arrow itself is visible again, and the three panels slide open and closed
 
 # 1.40.16-rc16
 - **fixed**: in an agent started by a webhook or a schedule, the AI chat can end a path by closing the conversation. The V3 rule against close blocks used to refuse it, so a periodic check that found nothing wrong left its conversation open
