@@ -115,11 +115,11 @@
 
             <div class="csd-open-action-menu-btn-wpr">
                 <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="cds-add-action-btn">    
+                    class="cds-add-action-btn tds_no_drag">    
                     + {{ 'CDSCanvas.AddAction' | translate}}
                 </div>
                 <!-- <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
+                    class="btn cds-add-action-btn csd-add-action-btn-wpr-element tds_no_drag">
                     + Add action
                 </button> -->
             </div>
@@ -140,9 +140,6 @@
                 'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
                 'cds-last-action': last
             }" 
-            [ngStyle]="{
-                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
-            }"
             (keydown)="onKeydown($event)" 
             (click)="onSelectAction(action, i, action._tdActionId)">
             <!-- [class.isFirst]="first" -->
@@ -583,7 +580,7 @@
 
             <!-- <div *ngIf="last" class="csd-open-action-menu-btn-wpr">
                 <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="btn cds-add-action-btn">
+                    class="btn cds-add-action-btn tds_no_drag">
                     <span class="material-icons">
                         add
                     </span>
@@ -605,7 +602,7 @@
     <div class="footer-intent">
         <div *ngIf="!isStart && !isReturnStack && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="cds-add-action-btn">    
+                class="cds-add-action-btn tds_no_drag">    
                 + {{ 'CDSCanvas.AddAction' | translate}}
             </div>
         </div>

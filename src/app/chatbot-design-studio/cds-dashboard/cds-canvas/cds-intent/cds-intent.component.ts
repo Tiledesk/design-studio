@@ -97,8 +97,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // Track mouse movement to distinguish click from drag
   private mouseDownX: number = 0;
   private mouseDownY: number = 0;
+  /** Vero quando la pressione in corso e' diventata un trascinamento: serve a distinguere un
+   *  click da un drag (apertura del pannello dell'intent e di quello dell'action). */
   private hasMouseMoved: boolean = false;
-  private readonly MOUSE_MOVE_THRESHOLD: number = 5; // pixels threshold to consider as drag
+  /** Quanto deve spostarsi la pressione perche' il gesto sia un trascinamento e non un clic.
+   *  E' la stessa soglia del motore di trascinamento (`dragThreshold`, `tiledesk-stage.js`), e
+   *  non puo' essere piu' alta: un gesto che muove il blocco senza arrivare qui aprirebbe anche
+   *  il pannello. */
+  private readonly MOUSE_MOVE_THRESHOLD: number = 4;
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
@@ -837,7 +843,16 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   //   }
   // }
 
+  /**
+   * Clic su un'action del blocco: la sceglie e ne apre il pannello di dettaglio.
+   *
+   * Solo al clic, non alla fine di un trascinamento: il blocco ora si sposta anche afferrandolo
+   * da un'action, e il `click` che il browser manda dopo un trascinamento apriva il pannello di
+   * quell'action ogni volta che si spostava il blocco. Il blocco resta comunque selezionato --
+   * di quello se ne occupa la pressione.
+   */
   onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
+    if (this.hasMouseMoved) { return; }
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
@@ -1162,12 +1177,46 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Pressione sul blocco: azzera la misura del gesto e seleziona il blocco.
+   *
+   * La selezione sta qui e non piu' solo sul trascinamento. Prima la faceva `start-dragging`,
+   * che il motore di trascinamento emette solo dove il gesto parte: premendo su un campo, su
+   * un pulsante o su un punto che non si trascina, il blocco non risultava selezionato. Questo
+   * gestore sta sulla radice del blocco e l'evento gli risale da qualunque discendente, quindi
+   * vale per ogni punto -- campi compresi, dove il trascinamento giustamente non parte.
+   *
+   * Solo se non e' gia' questo il blocco selezionato: rifarlo a ogni pressione sarebbe lavoro
+   * inutile, e soprattutto azzererebbe l'action scelta (lo fa setIntentSelected) a ogni clic
+   * dentro un blocco che la sta gia' mostrando nel pannello di dettaglio.
+   */
   onIntentMouseDown(event: MouseEvent): void {
     this.hasMouseMoved = false;
+    this.mouseDownX = event.clientX;
+    this.mouseDownY = event.clientY;
+    const alreadySelected = this.intentService.intentSelectedID === this.intent.intent_id
+      && this.intentService.intentActive;
+    if (!alreadySelected) {
+      this.intentService.setIntentSelected(this.intent.intent_id);
+    }
   }
 
+  /**
+   * Dichiara il gesto un trascinamento, cosi' al rilascio non si aprono i pannelli: ne' quello
+   * dell'intent, ne' quello dell'action. Il browser manda un `click` anche alla fine di un
+   * trascinamento -- il blocco segue il puntatore, quindi pressione e rilascio cadono sullo
+   * stesso elemento -- ed e' da li' che il pannello si apriva mentre si spostava il blocco.
+   *
+   * Serve il tasto premuto e una distanza, non il semplice movimento: passare sopra un blocco
+   * non e' un gesto, e la mano che trema di un pixel su un clic non deve diventarlo.
+   */
   onIntentMouseMove(event: MouseEvent): void {
-    this.hasMouseMoved = true;
+    if (event.buttons === 0) { return; }
+    const dx = event.clientX - this.mouseDownX;
+    const dy = event.clientY - this.mouseDownY;
+    if (Math.sqrt(dx * dx + dy * dy) >= this.MOUSE_MOVE_THRESHOLD) {
+      this.hasMouseMoved = true;
+    }
   }
   /** ******************************
    * intent controls options: START

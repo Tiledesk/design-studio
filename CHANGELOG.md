@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 05/10/2026
+- **fixed**: un blocco si sposta afferrandolo in un punto qualsiasi -- il corpo delle sue azioni compreso -- e si seleziona premendo ovunque, campi e pulsanti compresi. Prima servivano i punti giusti perche' succedesse, e ogni ridisegno del blocco ne lasciava qualcuno in meno
+- **changed**: scegliere un'azione non toglie piu' la selezione al blocco: l'evidenziazione e' una sola, quella del blocco, e il clic su un'azione ne apre il dettaglio come prima -- ma solo al clic, non alla fine di un trascinamento
+
 # this branch 02/10/2026
 - **added**: passando su un'azione il cui nome non entra nella riga, il nome compare per intero accanto. Solo dove la riga lo taglia davvero, e non mentre si sta sulla *i* della descrizione: li' sparisce subito
 - **added**: un blocco nasce del colore della famiglia dell'azione che contiene -- verde le piu' usate, blu l'AI, arancio il flusso, viola le integrazioni, rosso le speciali -- e i connettori che ne escono prendono la stessa tinta. Vale comunque sia nato: trascinando un'azione sul flusso, spostandola da un altro blocco, tirando un connettore nel vuoto o chiedendolo alla chat AI. Un colore scelto a mano continua a vincere, e i blocchi di avvio e di fallback restano come sono

@@ -1,5 +1,8 @@
 <!--   -->
-<div class="action-connector" (mouseenter)="showConnector()" (mouseleave)="hideConnector()">
+<!-- `tds_no_drag`: da qui si tira un connettore, e il gesto e' quello. Senza, premendo sul
+     pallino partirebbe anche il trascinamento del blocco, che da quando si trascina da ogni
+     punto arriva fin qui. -->
+<div class="action-connector tds_no_drag" (mouseenter)="showConnector()" (mouseleave)="hideConnector()">
     <div class="block-line">
         <!-- <svg shape-rendering="geometricPrecision" class="pre-line"><path d="M 0 4 L 13 4" class="sc-eGiIjr kEjIty sc-bTQVhO kjXfPj"></path></svg> -->
     </div>
