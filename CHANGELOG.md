@@ -7,10 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 05/10/2026
-- **changed**: negli agenti V3 la defaultFallback ancora vuota ha la stessa grafica dello start: fondo scuro, titolo e icona bianchi. I due estremi fissi del flusso si riconoscono a colpo d'occhio; appena le si mette dentro un'azione torna un blocco come gli altri
-- **fixed**: negli agenti V3 il blocco con l'iterazione ha di nuovo un'uscita per quando la lista e' finita. Il pallino verde del blocco era nascosto e la chat AI non poteva collegarlo, cosi' un ciclo, finiti gli elementi, si fermava senza proseguire. Ora sotto il "Vai al blocco" una barra e l'etichetta *Al termine dell'iterazione* indicano quel pallino, e la chat AI sa che ogni ramo torna al ciclo e che il flusso prosegue da li'
-- **changed**: negli agenti V3 la chat AI sa che dopo qualunque percorso il messaggio successivo arriva alla defaultFallback, e che il suo ramo deve rispondere ogni volta, di solito con un AI Prompt sul messaggio ricevuto. Quando legge o modifica il flusso riceve un avviso, mai un rifiuto, se la defaultFallback non e' collegata, punta a un blocco che non esiste o comincia aspettando una risposta
+# 1.40.16-rc19
+- **changed**: V3 empty default fallback styled like the start block
+- **fixed**: V3 iteration block shows again its "list done" exit, which the AI chat can connect
+- **changed**: in V3 the AI chat makes the default fallback answer every message, with a warning when it is not wired
 
 # 1.40.16-rc18
 - **fixed**: an agent created from a prompt does its job on every message, not only on the first one. The AI chat was told to connect the fallback to a block with a fixed message, and did: after the first answer every new message got only that sentence. It is now told to follow the default fallback pattern, which puts the job that repeats in the fallback's branch
