@@ -7,8 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 05/10/2026
-- **fixed**: un collegamento scritto dalla chat AI senza il `#` davanti all'id del blocco si vedeva sul canvas ma non portava da nessuna parte, e il flusso si fermava li': cosi' un'iterazione con dentro un AI Prompt non passava mai all'allegato successivo e non rispondeva. Ora quei collegamenti si salvano sempre nella forma giusta, e quelli gia' salvati male si riparano all'apertura dell'agente
+# 1.40.16-rc21
+- **fixed**: AI chat links saved without `#` no longer stop the flow; broken ones are repaired on load
 
 # 1.40.16-rc20
 - **fixed**: V3 block exit dot sits on the block's edge again, aligned with the last action
