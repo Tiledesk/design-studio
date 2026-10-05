@@ -219,6 +219,7 @@
     "WebhookmentUrlMustBeAHttpsUrl": "L'URL del webhook deve essere un URL https o http",
     "WebhookmentUrlMustBeAValidUrl": "L'URL del webhook deve essere un URL valido",
     "CDSCanvas": {
+      "IterationDone": "Al termine dell'iterazione",
       "DataTableTable": "Tabella dati",
       "DataTableSelectTable": "Seleziona una tabella",
       "DataTableOperation": "Operazione",

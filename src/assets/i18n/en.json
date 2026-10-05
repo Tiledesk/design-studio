@@ -411,6 +411,7 @@
         "QuestionPlaceholderNew": "Add user expression and press enter or click ADD",
         "Success": "Success",
         "Else": "else",
+        "IterationDone": "When the list is done",
         "CaseIf": "If",
         "CaseElseIf": "Else if",
         "CaseEmpty": "no condition yet",

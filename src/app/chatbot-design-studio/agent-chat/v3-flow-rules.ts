@@ -18,12 +18,24 @@ export const V3_FLOW_RULES: string[] = [
   'V3-U5: `capture_user_reply` has no connector of its own: never set its `goToIntent`. The flow ' +
   'continues from the BLOCK connector, so `connect` the capture block to the next block.',
   'V3-S2: connect `start` to the first block of the flow.',
-  'V3-S3: `defaultFallback` stays empty: never add actions to it. To handle a message the agent did ' +
-  'not understand, `connect` `defaultFallback` to a block that holds the fallback message.',
+  'V3-S3: `defaultFallback` stays empty: never add actions to it. `connect` it to the block that ' +
+  'serves the message (V3-S8).',
   'V3-S4: `start` and `defaultFallback` are never deleted, renamed or used as a destination: nothing ' +
   'connects to them.',
+  'V3-S8: the agent never runs out. When a path ends, the conversation is free again and the next ' +
+  'message lands on `defaultFallback`: its branch must SERVE that message, every time, so the agent ' +
+  'keeps answering however many times the visitor writes. The usual branch is an `ai_prompt` that ' +
+  'answers `{{lastUserText}}` with a context saying what this agent is for (or `askgptv2` when there ' +
+  'is a knowledge base), its true exit to a block showing the reply variable, its false exit to a ' +
+  'message with a way forward. If the agent does the same job on every message (summarise, ' +
+  'translate, process what the visitor sends), that job IS the fallback\'s branch. No ' +
+  '`capture_user_reply` in it, and nothing connected after the answer. A block with only a fixed ' +
+  'message is right only for an agent with no job to repeat, and it offers a way forward (menu, person).',
   'V3-U2: a block whose action has its own exits (conditions, AI, knowledge base, web request, data ' +
-  'table, iteration, ...) is routed through the destination fields of that action, never with `connect`.',
+  'table, ...) is routed through the destination fields of that action, never with `connect`. The one ' +
+  'exception is `iteration`: its `goToIntent` runs the blocks for each element, the last block of that ' +
+  'branch `connect`s back to the iteration block, and the iteration block itself is `connect`ed to where ' +
+  'the flow goes when the list is done.',
   'V3-U3: a block that ends the flow (`close`, `agent`, `move_to_unassigned`, `replacebot`, ' +
   '`replacebotv2`, `replacebotv3`, or `department` unless `triggerBot` is false) has no exit: never ' +
   '`connect` from it.',

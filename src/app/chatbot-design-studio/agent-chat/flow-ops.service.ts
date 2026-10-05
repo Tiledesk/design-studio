@@ -359,7 +359,8 @@ export class FlowOpsService implements OnDestroy {
     }
     this.redrawMovedAfterRender(movedIds, this.dashboardService.id_faq_kb);
     this.scheduleConnectorCheck(this.dashboardService.id_faq_kb);
-    return { ok, rejected_before_applying: false, results };
+    const warnings = this.fallbackWarnings();
+    return { ok, rejected_before_applying: false, results, ...(warnings.length ? { warnings } : {}) };
   }
 
   /** Whether the batch adds, removes or reconnects blocks. */
@@ -589,8 +590,9 @@ export class FlowOpsService implements OnDestroy {
         }
         case 'add_action': {
           if (nameOf(op.intent_id) === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK) {
-            return v3RuleError('V3-S3', `defaultFallback stays empty. Put the fallback message in ` +
-              `its own block and \`connect\` defaultFallback to it.`);
+            return v3RuleError('V3-S3', `defaultFallback stays empty. Build the block that serves ` +
+              `the message -- usually an ai_prompt answering {{lastUserText}} (V3-S8) -- and ` +
+              `\`connect\` defaultFallback to it.`);
           }
           if (capturesWithDestination(op.type, op.fields)) { return captureError(); }
           const closeTarget = routesToClose(op.fields);
@@ -965,6 +967,10 @@ export class FlowOpsService implements OnDestroy {
   ): { action: any; fields: string[] } | null {
     for (const action of actions || []) {
       if (!action) { continue; }
+      // An iteration's goToIntent is the body of the loop, not the block's way
+      // out: when the list is done the engine goes on from the block's own dot
+      // (its fallbackIntent is ignored), so `connect` is how that exit is set.
+      if (action._tdActionType === TYPE_ACTION.ITERATION) { continue; }
       const fields = FlowOpsService.CONDITIONAL_ROUTER_FIELDS[action._tdActionType];
       if (!fields) { continue; }
       const configured = fields.some(f => !!action[f])
@@ -2388,6 +2394,47 @@ export class FlowOpsService implements OnDestroy {
       }
     } catch (error) {
       // Diagnostica: non deve poter rompere la fine di un turno.
+    }
+  }
+
+  /**
+   * Cosa non va nel ramo di `defaultFallback`, per la regola V3-S8: l'agente non
+   * si esaurisce mai, e ogni messaggio che nessun percorso aspetta arriva li'.
+   *
+   * Solo avvisi, mai rifiuti: fra la prima e la seconda chiamata di una costruzione
+   * il fallback e' legittimamente scollegato. Viaggiano con `get_flow` e con il
+   * report di `apply_flow_patch`, cosi' la chat li legge prima di dire di aver finito.
+   * Controlla la forma, non il senso: se il lavoro giusto sta nel ramo lo decide il
+   * modello, qui si vede solo se il ramo c'e' e se comincia con una capture.
+   * Agenti V3 soltanto; per un legacy la lista e' vuota.
+   */
+  public fallbackWarnings(): string[] {
+    if (!this.dashboardService.isV3) { return []; }
+    try {
+      const intents: any[] = (this.intentService.listOfIntents || []).filter(intent => !!intent?.intent_id);
+      const fallback = intents.find(intent =>
+        intent.intent_display_name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK);
+      if (!fallback) { return []; }
+      const targets = this.outgoingTargets(fallback);
+      if (targets.length === 0) {
+        return ['V3-S8: `defaultFallback` is not connected, so every message no path is waiting for ' +
+          'gets no answer and the agent stops responding after its first path ends. Connect it to ' +
+          'the block that serves the message (usually an `ai_prompt` on `{{lastUserText}}`).'];
+      }
+      const first = intents.find(intent => intent.intent_id === targets[0]);
+      if (!first) {
+        return [`V3-S8: \`defaultFallback\` points at "${targets[0]}", which is not on the canvas: ` +
+          `messages no path is waiting for get no answer.`];
+      }
+      if ((first.actions || []).some((action: any) => action?._tdActionType === TYPE_ACTION.CAPTURE_USER_REPLY)) {
+        return [`V3-S8: the branch of \`defaultFallback\` starts with a \`capture_user_reply\` ` +
+          `("${first.intent_display_name}"): the message that reached the fallback is thrown away ` +
+          `and the visitor has to write it again. Act on \`{{lastUserText}}\` instead.`];
+      }
+      return [];
+    } catch (error) {
+      // Diagnostica: non deve poter rompere get_flow ne' un batch gia' applicato.
+      return [];
     }
   }
 

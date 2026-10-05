@@ -253,6 +253,24 @@ describe('AgentChatHostService', () => {
     expect(v3.intents).toEqual([]);
   });
 
+  // V3-S8: a flow read before anything is built already says that its
+  // fallback goes nowhere, and a legacy agent never hears about it.
+  it('adds the fallback warnings to get_flow only on a V3 agent, and only when there are some', async () => {
+    flowOps.fallbackWarnings = jasmine.createSpy('fallbackWarnings')
+      .and.returnValue(['V3-S8: `defaultFallback` is not connected']);
+    await service.attach(document.createElement('iframe'));
+    const legacy = await registered['get_flow']({});
+    expect(legacy.v3_warnings).toBeUndefined();
+
+    dashboardService.isV3 = true;
+    const v3 = await registered['get_flow']({});
+    expect(v3.v3_warnings).toEqual(['V3-S8: `defaultFallback` is not connected']);
+
+    flowOps.fallbackWarnings.and.returnValue([]);
+    const clean = await registered['get_flow']({});
+    expect(clean.v3_warnings).toBeUndefined();
+  });
+
   // The version decides which rules the agent builds by, and it reaches the
   // model only inside a tool result. Sent once, in the first get_flow, it is a
   // fact the model has to remember -- and the runtime summarises old messages

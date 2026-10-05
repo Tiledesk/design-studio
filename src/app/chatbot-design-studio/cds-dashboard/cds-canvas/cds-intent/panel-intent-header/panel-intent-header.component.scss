@@ -12,6 +12,19 @@
     padding-top: 2px;
 }
 
+/* V3 - la defaultFallback vuota ha il fondo scuro dello start: l'icona e' bianca
+   come il razzo, il rosso su quel fondo si spegne. */
+:host-context(.tds-v3-intent.cds-fallback-locked) .intent-icon span.undo {
+    color: #ffffff;
+}
+
+/* Il titolo bianco come quello dello start: il !important batte il colore
+   inline di [ngStyle] (il colore del blocco), il filtro lo scurirebbe. */
+:host-context(.tds-v3-intent.cds-fallback-locked) .form-group input {
+    color: #ffffff !important;
+    filter: none;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
