@@ -321,6 +321,9 @@ export function isReturnStackIntent(intent: any): boolean {
  * - CAPTURE_USER_REPLY: il suo <cds-connector> compare solo su una capture che
  *   porta ancora la vecchia destinazione in goToIntent; l'uscita e' il pallino del
  *   blocco, che il CSS V3 porta sul bordo in basso a destra accanto alla action.
+ * - ITERATION: il suo goToIntent porta ai blocchi eseguiti per ogni elemento, ma
+ *   finita la lista il motore prosegue dal pallino del blocco (fallbackIntent e'
+ *   ignorato e il suo selettore e' spento): il pallino e' l'uscita "lista finita".
  * - le action voice (TYPE_ACTION_VXML): montano i connettori tramite elementi
  *   condivisi ma non tutte hanno un ramo nel connector service.
  *
@@ -351,7 +354,6 @@ export const ACTIONS_WITH_OWN_OUTPUTS: Array<TYPE_ACTION> = [
     TYPE_ACTION.BREVO,
     TYPE_ACTION.N8N,
     TYPE_ACTION.QAPLA,
-    TYPE_ACTION.ITERATION,
 ];
 
 /**

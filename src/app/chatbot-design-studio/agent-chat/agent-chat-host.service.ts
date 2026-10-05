@@ -178,11 +178,16 @@ export class AgentChatHostService {
       // The rules travel with the flow: the runtime's prompt describes the
       // legacy editor, and only the studio knows which editor this agent uses.
       const isV3 = !!this.dashboardService.isV3;
+      // Same warnings apply_flow_patch reports, so a flow read before building
+      // anything already says that its fallback goes nowhere (V3-S8). Optional
+      // call: a stand-in FlowOpsService without it reads as "nothing to say".
+      const v3Warnings: string[] = isV3 ? (this.flowOps.fallbackWarnings?.() || []) : [];
       return {
         ...this.flowOps.readFlow(),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
-        ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {})
+        ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),
+        ...(v3Warnings.length ? { v3_warnings: v3Warnings } : {})
       };
     });
 

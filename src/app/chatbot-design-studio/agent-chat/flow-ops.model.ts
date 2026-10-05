@@ -51,6 +51,12 @@ export interface FlowOpsReport {
   /** True when validation refused the batch and nothing at all was applied. */
   rejected_before_applying: boolean;
   results: FlowOpResult[];
+  /** V3 only, and only when there is something to say: what is still wrong
+   *  with the flow as a whole after the batch (V3-S8, the default fallback's
+   *  branch). Never a refusal -- a build in two calls is legitimately
+   *  incomplete after the first -- but the agent reads it before it says it
+   *  is done. */
+  warnings?: string[];
 }
 
 /** What `get_flow` returns. */

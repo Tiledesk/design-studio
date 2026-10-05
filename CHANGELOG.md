@@ -7,11 +7,16 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 05/10/2026
+- **changed**: negli agenti V3 la defaultFallback ancora vuota ha la stessa grafica dello start: fondo scuro, titolo e icona bianchi. I due estremi fissi del flusso si riconoscono a colpo d'occhio; appena le si mette dentro un'azione torna un blocco come gli altri
+- **fixed**: negli agenti V3 il blocco con l'iterazione ha di nuovo un'uscita per quando la lista e' finita. Il pallino verde del blocco era nascosto e la chat AI non poteva collegarlo, cosi' un ciclo, finiti gli elementi, si fermava senza proseguire. Ora sotto il "Vai al blocco" una barra e l'etichetta *Al termine dell'iterazione* indicano quel pallino, e la chat AI sa che ogni ramo torna al ciclo e che il flusso prosegue da li'
+- **changed**: negli agenti V3 la chat AI sa che dopo qualunque percorso il messaggio successivo arriva alla defaultFallback, e che il suo ramo deve rispondere ogni volta, di solito con un AI Prompt sul messaggio ricevuto. Quando legge o modifica il flusso riceve un avviso, mai un rifiuto, se la defaultFallback non e' collegata, punta a un blocco che non esiste o comincia aspettando una risposta
+
 # this branch 30/09/2026
+- **added**: mentre l'agente descritto viene costruito, sul canvas compare un avviso che lo dice e chiede di attendere, e sparisce quando la chat ha finito. Non compare per le modifiche chieste a voce nella chat, dove si vede gia' che sta lavorando
 - **added**: un agente creato dalla dashboard descrivendo cosa deve fare si apre con la chat AI che ne sta gia' costruendo il flusso. La descrizione viaggia dalla creazione fino all'editor e il lavoro parte prima che la chat compaia, cosi' la chat si aggancia a qualcosa di gia' avviato e i blocchi si vedono nascere invece di apparire finiti
 - **added**: se la chat AI non e' raggiungibile o rifiuta la richiesta, la descrizione non va persa: viene rimessa davanti a chi l'ha scritta, pronta da incollare nella chat. L'agente resta creato in ogni caso
 - **changed**: una descrizione vale una volta sola e solo per l'agente a cui era destinata: ricaricare la pagina non fa ripartire una seconda costruzione sopra la prima, e una descrizione rimasta indietro da un tentativo interrotto viene ignorata invece di rimettersi in moto piu' tardi
-- **added**: mentre l'agente descritto viene costruito, sul canvas compare un avviso che lo dice e chiede di attendere, e sparisce quando la chat ha finito. Non compare per le modifiche chieste a voce nella chat, dove si vede gia' che sta lavorando
 
 # this branch 29/09/2026
 - **fixed**: il canvas non resta piu' fermo sulla schermata di caricamento quando l'agente contiene una condizione a piu' casi. Prima di disegnare, il canvas deduce quali collegamenti dovranno esistere e attende che ci siano tutti: le uscite dei casi e dell'*altrimenti* non erano fra quelle che sapeva riconoscere, e ne restava una attesa che nessun collegamento reale poteva soddisfare
