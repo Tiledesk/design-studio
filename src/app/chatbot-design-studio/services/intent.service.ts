@@ -10,6 +10,7 @@ import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
+import { fixActionDestinationHashes } from '../utils-connectors';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -361,7 +362,17 @@ export class IntentService {
    * perchè generati dal server. In questo caso è necessario assegnarne uno.
    */
   public patchActionId(faqs){
+    // Una destinazione salvata senza '#' (l'id nudo di un blocco) il motore la
+    // cerca come NOME di blocco, non la trova e ferma il flusso, mentre il canvas
+    // la disegna collegata. Qui si ripara al caricamento: solo se il valore e'
+    // l'id di un blocco del flusso e non il nome di un altro, cosi' un flusso
+    // vecchio che punta a un blocco per nome resta com'e'. Si salva con il
+    // primo salvataggio del blocco.
+    const intentIds = new Set((faqs || []).map(faq => faq?.intent_id).filter(id => !!id));
+    const intentNames = new Set((faqs || []).map(faq => faq?.intent_display_name).filter(name => !!name));
+    const isIntentId = (id: string) => intentIds.has(id) && !intentNames.has(id);
     faqs.forEach(element => {
+      (element.actions || []).forEach(action => fixActionDestinationHashes(action, isIntentId));
       element.actions.forEach(action => {
         if(!action._tdActionId || action._tdActionId === "UUIDV4"){
           action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();

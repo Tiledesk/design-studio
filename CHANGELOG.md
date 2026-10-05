@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch 05/10/2026
+- **fixed**: un collegamento scritto dalla chat AI senza il `#` davanti all'id del blocco si vedeva sul canvas ma non portava da nessuna parte, e il flusso si fermava li': cosi' un'iterazione con dentro un AI Prompt non passava mai all'allegato successivo e non rispondeva. Ora quei collegamenti si salvano sempre nella forma giusta, e quelli gia' salvati male si riparano all'apertura dell'agente
 - **changed**: negli agenti V3 la defaultFallback ancora vuota ha la stessa grafica dello start: fondo scuro, titolo e icona bianchi. I due estremi fissi del flusso si riconoscono a colpo d'occhio; appena le si mette dentro un'azione torna un blocco come gli altri
 - **fixed**: negli agenti V3 il blocco con l'iterazione ha di nuovo un'uscita per quando la lista e' finita. Il pallino verde del blocco era nascosto e la chat AI non poteva collegarlo, cosi' un ciclo, finiti gli elementi, si fermava senza proseguire. Ora sotto il "Vai al blocco" una barra e l'etichetta *Al termine dell'iterazione* indicano quel pallino, e la chat AI sa che ogni ramo torna al ciclo e che il flusso prosegue da li'
 - **changed**: negli agenti V3 la chat AI sa che dopo qualunque percorso il messaggio successivo arriva alla defaultFallback, e che il suo ramo deve rispondere ogni volta, di solito con un AI Prompt sul messaggio ricevuto. Quando legge o modifica il flusso riceve un avviso, mai un rifiuto, se la defaultFallback non e' collegata, punta a un blocco che non esiste o comincia aspettando una risposta

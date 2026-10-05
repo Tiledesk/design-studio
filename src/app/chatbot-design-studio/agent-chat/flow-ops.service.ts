@@ -11,6 +11,7 @@ import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from 
 import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
+import { withDestinationHash } from '../utils-connectors';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage } from '../utils';
 
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
@@ -1585,20 +1586,36 @@ export class FlowOpsService implements OnDestroy {
    *  `add_intent`'s inline action loop. */
   private normalizeStoredDestinations(action: any, fields?: Record<string, any>): void {
     if (!action || !fields) { return; }
+    // A destination the agent sent as a bare id is stored as '#' + id, the form
+    // every panel and `connect` write: the engine resolves a destination to a
+    // block id only when it starts with '#', and otherwise looks it up as a
+    // block NAME -- finds nothing and stops the flow, while the canvas still
+    // draws the connector. Seen live: an AI Prompt inside an iteration whose
+    // exits had no '#', so no element ever led back to the loop.
+    const isIntentId = (id: string) => !!this.intentService.getIntentFromId(id);
+    const normalize = (value: any): any => {
+      if (typeof value !== 'string') { return value; }
+      if (this.normalizedDestinationId(value) === '') { return ''; }
+      return withDestinationHash(value, isIntentId);
+    };
     const destinationFields = FlowOpsService.DESTINATION_FIELDS[action._tdActionType] || [];
     for (const field of destinationFields) {
       if (!(field in fields)) { continue; }
-      if (typeof action[field] === 'string' && this.normalizedDestinationId(action[field]) === '') {
-        action[field] = '';
-      }
+      action[field] = normalize(action[field]);
     }
     if (action._tdActionType === TYPE_ACTION.AI_CONDITION
         && Array.isArray(fields.intents) && Array.isArray(action.intents)) {
-      for (let i = 0; i < action.intents.length; i++) {
-        const entry = action.intents[i];
-        if (entry && typeof entry.conditionIntentId === 'string'
-            && this.normalizedDestinationId(entry.conditionIntentId) === '') {
-          entry.conditionIntentId = '';
+      for (const entry of action.intents) {
+        if (entry && typeof entry === 'object' && 'conditionIntentId' in entry) {
+          entry.conditionIntentId = normalize(entry.conditionIntentId);
+        }
+      }
+    }
+    if (action._tdActionType === TYPE_ACTION.JSON_CONDITION_MULTI
+        && Array.isArray(fields.cases) && Array.isArray(action.cases)) {
+      for (const branch of action.cases) {
+        if (branch && typeof branch === 'object' && 'intent' in branch) {
+          branch.intent = normalize(branch.intent);
         }
       }
     }
