@@ -92,7 +92,7 @@ cds-connector.connector-isLast {
    lista di action. Delimitato da .tds-v3-intent, presente solo sui blocchi V3:
    i chatbot delle versioni precedenti restano come sono. */
 .tds-v3-intent cds-connector.connector-isLast {
-    right: -17px;
+    right: var(--v3-block-exit-right);
     top: auto;
     bottom: 17px;
 
@@ -184,13 +184,50 @@ cds-connector.connector-isLast {
 
 cds-connector.button-connector {
     position: absolute;
-    right: -19px;
+    right: -13px;
     top: calc(50% - 10px);
 }
 
 cds-connector.connector-true,
 cds-connector.connector-false {
     position: absolute;
-    right: -28px;
+    right: -13px;
     top: calc(50% - 10px);
+}
+
+/* V3 - tutti i connettori di un blocco col centro sul bordo del blocco.
+   Ogni connettore e' una scatola di 20px posizionata con `right` rispetto al
+   proprio contenitore, e i contenitori non arrivano tutti al bordo:
+   - le uscite delle azioni (vero/falso, "vai a" di capture e connect block)
+     stanno nella riga dentro la scheda dell'azione, rientrata di circa 18px
+     (2px di padding del blocco, scheda larga 4px in meno, 2px di bordo, 10px
+     di padding della scheda);
+   - il pallino del blocco (cds-action-intent) sta subito dentro il padding del
+     blocco, rientrato di 2px.
+   Con una sola distanza per tutti cadevano a x diverse. Qui ognuno compensa il
+   proprio rientro piu' meta' della scatola, e il pallino e' centrato nella
+   scatola, cosi' pallini di misura diversa hanno lo stesso centro. Se il bordo
+   del blocco o della scheda cambia, si toccano solo le due variabili di rientro.
+   I bottoni delle reply restano come sono: il loro riferimento e' la riga del
+   bottone. Solo nei blocchi V3: le versioni precedenti restano come sono. */
+.tds-v3-intent {
+    --v3-connector-half: 10px;
+    --v3-card-inset: 13px;
+    --v3-block-inset: 2px;
+    --v3-action-exit-right: calc(-1 * (var(--v3-card-inset) + var(--v3-connector-half)));
+    --v3-block-exit-right: calc(-1 * (var(--v3-block-inset) + var(--v3-connector-half)));
+
+    cds-connector.connector,
+    cds-connector.connector-true,
+    cds-connector.connector-false {
+        right: var(--v3-action-exit-right);
+    }
+
+    cds-action-intent cds-connector.connector {
+        right: var(--v3-block-exit-right);
+    }
+
+    cds-connector .action-connector {
+        justify-content: center;
+    }
 }

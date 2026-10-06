@@ -651,7 +651,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         if (element.type) {
           this.closeAllPanels();
           this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-          this.intentService.inactiveIntent();
+          // Il blocco resta selezionato mentre il pannello mostra una sua action: e' il blocco
+          // che il pannello sta modificando, e l'evidenziazione e' una sola (selectAction).
+          // Spegnerlo qui toglieva il contorno appena acceso e faceva riselezionare il blocco
+          // -- azzerando l'action scelta -- al primo clic dentro di esso.
           this.removeConnectorDraftAndCloseFloatMenu();
         // setTimeout(() => {
         //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
