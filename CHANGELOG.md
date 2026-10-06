@@ -8,98 +8,98 @@
 *Tiledesk SRL*
 
 # 1.40.16-rc21
-- **fixed**: AI chat links saved without `#` no longer stop the flow; broken ones are repaired on load
+- **fixed** (V3/vc-new-agent): AI chat links saved without `#` no longer stop the flow; broken ones are repaired on load
 
 # 1.40.16-rc20
-- **fixed**: V3 block exit dot sits on the block's edge again, aligned with the last action
+- **fixed** (master-pre): V3 block exit dot sits on the block's edge again, aligned with the last action
 
 # 1.40.16-rc19
-- **changed**: V3 empty default fallback styled like the start block
-- **fixed**: V3 iteration block shows again its "list done" exit, which the AI chat can connect
-- **changed**: in V3 the AI chat makes the default fallback answer every message, with a warning when it is not wired
+- **changed** (V3/vc-new-agent): V3 empty default fallback styled like the start block
+- **fixed** (V3/vc-new-agent): V3 iteration block shows again its "list done" exit, which the AI chat can connect
+- **changed** (V3/vc-new-agent): in V3 the AI chat makes the default fallback answer every message, with a warning when it is not wired
 
 # 1.40.16-rc18
-- **fixed**: an agent created from a prompt does its job on every message, not only on the first one. The AI chat was told to connect the fallback to a block with a fixed message, and did: after the first answer every new message got only that sentence. It is now told to follow the default fallback pattern, which puts the job that repeats in the fallback's branch
-- **fixed**: a block moves by grabbing it anywhere -- the body of its actions included -- and it is selected wherever you press it, fields and buttons included. Both used to need the exact spot to say so, which every redesign of the block left a little smaller
-- **changed**: selecting an action no longer unselects its block: the highlight is one, the block's, and clicking an action opens its detail panel as before -- but only on a click, not at the end of a drag
-- **changed**: the block list shows an icon for the start boxes too -- the webhook's own yellow, and the clock of the scheduled one -- so the places a conversation can begin are told apart at a glance, as they already are on the flow
+- **fixed** (master-pre): an agent created from a prompt does its job on every message, not only on the first one. The AI chat was told to connect the fallback to a block with a fixed message, and did: after the first answer every new message got only that sentence. It is now told to follow the default fallback pattern, which puts the job that repeats in the fallback's branch
+- **fixed** (V3/new-blocks-actions-design): a block moves by grabbing it anywhere -- the body of its actions included -- and it is selected wherever you press it, fields and buttons included. Both used to need the exact spot to say so, which every redesign of the block left a little smaller
+- **changed** (V3/new-blocks-actions-design): selecting an action no longer unselects its block: the highlight is one, the block's, and clicking an action opens its detail panel as before -- but only on a click, not at the end of a drag
+- **changed** (V3/new-blocks-actions-design): the block list shows an icon for the start boxes too -- the webhook's own yellow, and the clock of the scheduled one -- so the places a conversation can begin are told apart at a glance, as they already are on the flow
 
 # 1.40.16-rc17
-- **added**: a block takes the colour of the family of the action it holds -- most used green, AI blue, flow orange, integrations purple, special red, start points green -- and the connectors leaving it follow. However the block was created, and a colour picked by hand still wins
-- **changed**: the AI chat and one of the other three panels -- subagents, blocks, actions -- are open side by side instead of one at a time, and those three are narrower to leave the flow more room. The chat has left the tab strip: it closes from its own header and reopens from the button in the header, which is there only while it is closed
-- **changed**: opening an agent brings the three panels back as they were left on it, while the AI chat always opens whatever was saved
-- **added**: hovering an action whose name does not fit shows it in full -- but not while on the *i* -- and its icon lights up as in the block list, except where the plan does not include it. Each category dot carries its family's colour
-- **fixed**: closing a panel from the arrow in its header is remembered, and so is the actions tab; the arrow itself is visible again, and the three panels slide open and closed
+- **added** (V3/new-blocks-actions-design): a block takes the colour of the family of the action it holds -- most used green, AI blue, flow orange, integrations purple, special red, start points green -- and the connectors leaving it follow. However the block was created, and a colour picked by hand still wins
+- **changed** (V3/new-box-left): the AI chat and one of the other three panels -- subagents, blocks, actions -- are open side by side instead of one at a time, and those three are narrower to leave the flow more room. The chat has left the tab strip: it closes from its own header and reopens from the button in the header, which is there only while it is closed
+- **changed** (V3/new-box-left): opening an agent brings the three panels back as they were left on it, while the AI chat always opens whatever was saved
+- **added** (V3/new-blocks-actions-design): hovering an action whose name does not fit shows it in full -- but not while on the *i* -- and its icon lights up as in the block list, except where the plan does not include it. Each category dot carries its family's colour
+- **fixed** (V3/new-box-left): closing a panel from the arrow in its header is remembered, and so is the actions tab; the arrow itself is visible again, and the three panels slide open and closed
 
 # 1.40.16-rc16
-- **fixed**: in an agent started by a webhook or a schedule, the AI chat can end a path by closing the conversation. The V3 rule against close blocks used to refuse it, so a periodic check that found nothing wrong left its conversation open
+- **fixed** (master-pre): in an agent started by a webhook or a schedule, the AI chat can end a path by closing the conversation. The V3 rule against close blocks used to refuse it, so a periodic check that found nothing wrong left its conversation open
 
 # 1.40.16-rc15
-- **fixed**: dragging an item onto the flow no longer leaves a gap in the palette: the row stays where it is for the whole gesture
-- **changed**: the palette no longer reorders itself while you drag, and what follows the pointer is the row as the browser draws it
+- **fixed** (V3/new-box-left): dragging an item onto the flow no longer leaves a gap in the palette: the row stays where it is for the whole gesture
+- **changed** (V3/new-box-left): the palette no longer reorders itself while you drag, and what follows the pointer is the row as the browser draws it
 
 # 1.40.16-rc14
-- **added**: a flow can start on a schedule: drag *Scheduled* from *Start points*, choose when it repeats (every N minutes or hours, daily, weekly, monthly) and in which timezone, and the data each run receives. The schedule goes live when the agent is published, and the box shows whether what you see is live
+- **added** (feature/scheduled-start-point): a flow can start on a schedule: drag *Scheduled* from *Start points*, choose when it repeats (every N minutes or hours, daily, weekly, monthly) and in which timezone, and the data each run receives. The schedule goes live when the agent is published, and the box shows whether what you see is live
 
 # 1.40.16-rc13
-- **changed**: the left side opens one tab at a time -- AI chat, subagents, blocks, actions -- from vertical tabs on the flow's edge, which stay visible while the panel is closed and are how it reopens. Pressing the open tab closes it and gives the canvas the full width. The AI chat button has left the header: the chat opens from its own tab
-- **changed**: opening an agent always starts on the AI chat. Moving between an agent and its subagents keeps the tab you are working in, and creating a subagent comes back to the subagents list
-- **changed**: actions are a panel with a search box and categories that expand inside it, instead of a drawer that appeared on mouse-over at the canvas edge. Dragging onto the flow works as before
-- **added**: every action carries an *i* that shows its description after a moment, and the box stays open long enough to reach it and follow the link inside
-- **changed**: blocks, actions and subagents share one look -- rows, icons, colours, spacing and animations decided in one place instead of three -- and the left panel is as wide as the AI chat
-- **added**: blocks that were never renamed are listed again, in a section of their own
-- **fixed**: the stage no longer comes back with every tab closed, and opening or closing the AI chat no longer stutters on a full conversation
+- **changed** (V3/new-box-left): the left side opens one tab at a time -- AI chat, subagents, blocks, actions -- from vertical tabs on the flow's edge, which stay visible while the panel is closed and are how it reopens. Pressing the open tab closes it and gives the canvas the full width. The AI chat button has left the header: the chat opens from its own tab
+- **changed** (V3/new-box-left): opening an agent always starts on the AI chat. Moving between an agent and its subagents keeps the tab you are working in, and creating a subagent comes back to the subagents list
+- **changed** (V3/new-box-left): actions are a panel with a search box and categories that expand inside it, instead of a drawer that appeared on mouse-over at the canvas edge. Dragging onto the flow works as before
+- **added** (V3/new-box-left): every action carries an *i* that shows its description after a moment, and the box stays open long enough to reach it and follow the link inside
+- **changed** (V3/new-box-left): blocks, actions and subagents share one look -- rows, icons, colours, spacing and animations decided in one place instead of three -- and the left panel is as wide as the AI chat
+- **added** (V3/new-box-left): blocks that were never renamed are listed again, in a section of their own
+- **fixed** (V3/new-box-left): the stage no longer comes back with every tab closed, and opening or closing the AI chat no longer stutters on a full conversation
 
 # 1.40.16-rc12
-- **changed**: the requester name of conversations started by a webhook defaults to the chatbot name: a new Webhook start box saves it as source name, and an empty source name shows it and uses it
+- **changed** (feature/webhook-chatbot-hitl): the requester name of conversations started by a webhook defaults to the chatbot name: a new Webhook start box saves it as source name, and an empty source name shows it and uses it
 
 # 1.40.16-rc11
-- **changed**: system variable `voiceStreaming` renamed to `voice_mode` (chatbot and voice agents)
+- **changed** (features/voiceStreaming_attribute): system variable `voiceStreaming` renamed to `voice_mode` (chatbot and voice agents)
 
 # 1.40.16-rc10
-- **fixed**: the Webhook start box shows only the button that opens its panel, like the Web start box: it can no longer be deleted, duplicated, recoloured or tested from the block toolbar, so its start point stays in step with the flow. It is deleted from its panel
+- **fixed** (feature/webhook-chatbot-hitl): the Webhook start box shows only the button that opens its panel, like the Web start box: it can no longer be deleted, duplicated, recoloured or tested from the block toolbar, so its start point stays in step with the flow. It is deleted from its panel
 
 # 1.40.16-rc9
-- **added**: a flow can be started by a webhook: drag *Webhook* from the new *Start points* section of the palette, connect the box to the flow, and copy its production or development URL. The box panel sets the name the conversations show as requester, turns the start point on and off, and runs *Test webhook start*
-- **added**: *Invite human*, *Remove human* and *Remove current bot* actions, so a flow started by a webhook can bring operators in, let them go when it no longer needs them, or hand the conversation over to them completely
-- **changed**: the start block is shown as *Web start*; a flow keeps working as before when it is started from the widget
+- **added** (feature/webhook-chatbot-hitl): a flow can be started by a webhook: drag *Webhook* from the new *Start points* section of the palette, connect the box to the flow, and copy its production or development URL. The box panel sets the name the conversations show as requester, turns the start point on and off, and runs *Test webhook start*
+- **added** (feature/webhook-chatbot-hitl): *Invite human*, *Remove human* and *Remove current bot* actions, so a flow started by a webhook can bring operators in, let them go when it no longer needs them, or hand the conversation over to them completely
+- **changed** (feature/webhook-chatbot-hitl): the start block is shown as *Web start*; a flow keeps working as before when it is started from the widget
 
 # 1.40.16-rc8
-- **added**: while the described agent is being built the canvas says so and asks you to wait, and the message goes when the chat is done. It does not appear for edits asked in the chat, where the work is already visible
+- **added** (V3/vc-new-agent): while the described agent is being built the canvas says so and asks you to wait, and the message goes when the chat is done. It does not appear for edits asked in the chat, where the work is already visible
 
 # 1.40.16-rc7
-- **fixed**: *exists* and *does not exist* tell the truth about a variable set to null, and stay the same operator when the condition is reopened — *does not exist* used to read back as *is not defined*. A filter saved in the previous form is rewritten on the next save
+- **fixed** (V3/reply-filter-operators): *exists* and *does not exist* tell the truth about a variable set to null, and stay the same operator when the condition is reopened — *does not exist* used to read back as *is not defined*. A filter saved in the previous form is rewritten on the next save
 
 # 1.40.16-rc6
-- **changed**: the comparisons added in 1.40.16-rc5 stay in the reply filters only. The editor of filters saved earlier and the previous condition go back to the options they had, being evaluated another way
+- **changed** (V3/reply-filter-operators): the comparisons added in 1.40.16-rc5 stay in the reply filters only. The editor of filters saved earlier and the previous condition go back to the options they had, being evaluated another way
 
 # 1.40.16-rc5
-- **added**: an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
-- **changed**: when the AI chat cannot be reached the description is handed back instead of lost, and it is used once only: reloading the page does not start a second build
-- **added**: reply filters and conditions offer every comparison again — exists, does not contain, true/false, before and after a date, list contents and length — after 1.40.16-rc2 cut the picker down to 16
+- **added** (V3/vc-new-agent): an agent created from the dashboard with a description of what it should do opens with the AI chat already building its flow, block by block
+- **changed** (V3/vc-new-agent): when the AI chat cannot be reached the description is handed back instead of lost, and it is used once only: reloading the page does not start a second build
+- **added** (V3/reply-filter-operators): reply filters and conditions offer every comparison again — exists, does not contain, true/false, before and after a date, list contents and length — after 1.40.16-rc2 cut the picker down to 16
 
 # 1.40.16-rc4
-- **added**: system variable `voiceStreaming` (chatbot and voice agents) — true while voice is streaming, false otherwise
-- **changed**: ElevenLabs STT models — `scribe_v2`, `scribe_v2_realtime` and `scribe_v2_medical` are active; legacy `scribe_v1` / `scribe_v1_experimental` are inactive
-- **changed**: ElevenLabs TTS model list only includes models with `can_do_text_to_speech: true`
+- **added** (features/voiceStreaming_attribute): system variable `voiceStreaming` (chatbot and voice agents) — true while voice is streaming, false otherwise
+- **changed** (features/voiceStreaming_attribute): ElevenLabs STT models — `scribe_v2`, `scribe_v2_realtime` and `scribe_v2_medical` are active; legacy `scribe_v1` / `scribe_v1_experimental` are inactive
+- **changed** (features/voiceStreaming_attribute): ElevenLabs TTS model list only includes models with `can_do_text_to_speech: true`
 
 # 1.40.16-rc3
-- **fixed**: the canvas no longer stays on the loading screen when the agent holds a condition with several cases. It waits for every connection it expects, and the exits of the cases and of the *else* were not among the ones it knew how to recognise
-- **changed**: the AI chat knows the multi-case condition and uses it when there are more than two ways out, instead of chaining one condition per branch. It is also told what goes wrong: the order decides, and an empty case or an early negative test leaves everything below it unreachable
-- **changed**: the AI chat can no longer put an action that exists only in the V3 editor into an older agent; the request is refused with the reason. Editing one already on the agent stays possible
-- **fixed**: a case written by the chat gets the identity its connector hangs off, and a destination that does not exist on the canvas is refused instead of being saved and silently cleared later
+- **fixed** (V3/vibe-coder-multi-conditions): the canvas no longer stays on the loading screen when the agent holds a condition with several cases. It waits for every connection it expects, and the exits of the cases and of the *else* were not among the ones it knew how to recognise
+- **changed** (V3/vibe-coder-multi-conditions): the AI chat knows the multi-case condition and uses it when there are more than two ways out, instead of chaining one condition per branch. It is also told what goes wrong: the order decides, and an empty case or an early negative test leaves everything below it unreachable
+- **changed** (V3/vibe-coder-multi-conditions): the AI chat can no longer put an action that exists only in the V3 editor into an older agent; the request is refused with the reason. Editing one already on the agent stays possible
+- **fixed** (V3/vibe-coder-multi-conditions): a case written by the chat gets the identity its connector hangs off, and a destination that does not exist on the canvas is refused instead of being saved and silently cleared later
 
 # 1.40.16-rc2
-- **fixed**: the reply filter picker offers again only the 16 operators the server evaluates. It had regressed to all 38, and a filter using one of the others was never evaluated: the message it guarded vanished with nothing said
-- **fixed**: *contains ignore case* and *starts with ignore case* are selectable again in the legacy filter and condition, after being dropped although the server evaluates them
+- **fixed** (features-2026/ds-JSONCondition-V1-V2): the reply filter picker offers again only the 16 operators the server evaluates. It had regressed to all 38, and a filter using one of the others was never evaluated: the message it guarded vanished with nothing said
+- **fixed** (features-2026/ds-generic-bug-fix-41): *contains ignore case* and *starts with ignore case* are selectable again in the legacy filter and condition, after being dropped although the server evaluates them
 
 # 1.40.16-rc1
-- **changed**: on V3 agents the block holding a condition with several cases no longer shows its own outgoing point. The action's exits are its cases and the *else*, so a connector started from the block would never be travelled at runtime — the same behaviour the other conditions already have
-- **added**: a condition can hold several cases instead of a single test with two exits. They are evaluated in order, the first one that matches sends the conversation to its own block, and when none matches the flow takes the *else* branch. Cases are numbered and can be reordered, because the order decides what below them stays reachable; one left without a condition never fires and says so. It replaces the chain of one-condition blocks, one per branch
-- **added**: a text comparison can ignore uppercase and lowercase — a checkbox on text operators only, off by default, so every condition already saved keeps comparing exactly as it did
-- **changed**: **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why
-- **fixed**: comparing text against a value written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened and lost its quotes at the next save, quietly changing what it tested. It affects the condition already in use, not only the new one
-- **fixed**: *esiste* e *non esiste* dicono il vero su una variabile messa a null, e restano lo stesso operatore quando la condizione si riapre: *non esiste* si rileggeva come *non e' definita*. Un filtro salvato con la forma precedente viene riscritto al primo salvataggio
+- **changed** (V3/master-V3-multi-conditions): on V3 agents the block holding a condition with several cases no longer shows its own outgoing point. The action's exits are its cases and the *else*, so a connector started from the block would never be travelled at runtime — the same behaviour the other conditions already have
+- **added** (V3/multi-conditions): a condition can hold several cases instead of a single test with two exits. They are evaluated in order, the first one that matches sends the conversation to its own block, and when none matches the flow takes the *else* branch. Cases are numbered and can be reordered, because the order decides what below them stays reachable; one left without a condition never fires and says so. It replaces the chain of one-condition blocks, one per branch
+- **added** (V3/multi-conditions): a text comparison can ignore uppercase and lowercase — a checkbox on text operators only, off by default, so every condition already saved keeps comparing exactly as it did
+- **changed** (V3/multi-conditions): **ends with** now compares case exactly, like *starts with* and *contains* beside it. On its own it used to ignore case, so a flow could take a branch nobody intended and nothing on the screen said why
+- **fixed** (V3/multi-conditions): comparing text against a value written only in digits, such as *is equal to 1*, turned into a comparison between numbers when the condition was reopened and lost its quotes at the next save, quietly changing what it tested. It affects the condition already in use, not only the new one
+- **fixed** (V3/reply-filter-operators): *esiste* e *non esiste* dicono il vero su una variabile messa a null, e restano lo stesso operatore quando la condizione si riapre: *non esiste* si rileggeva come *non e' definita*. Un filtro salvato con la forma precedente viene riscritto al primo salvataggio
 
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
