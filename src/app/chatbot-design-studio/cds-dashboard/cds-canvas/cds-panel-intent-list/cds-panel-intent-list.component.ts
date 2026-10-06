@@ -10,6 +10,7 @@ import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
 import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
+import { startPointTypeOf } from 'src/app/chatbot-design-studio/utils-start-points';
 import { ACTIONS_LIST } from '../../../utils-actions';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -60,6 +61,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   ICON_UNDO = 'undo';
   ICON_CLOSE = 'call_end';
   ICON_WEBHOOK = 'webhook';
+  ICON_SCHEDULE = 'schedule';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
@@ -183,6 +185,12 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     let name = intent.intent_display_name;
     let readonly = intent.attributes.readonly;
     let icon = this.ICON_DEFAULT;
+    // I box di partenza si riconoscono dal marcatore che portano addosso, non dal nome: il nome
+    // ("Webhook start", "Scheduled start") e' un'etichetta, il marcatore e' cio' che li rende
+    // punti di partenza -- ed e' quello che il resto dell'editor legge per riconoscerli.
+    const startPoint = startPointTypeOf(intent);
+    if (startPoint === 'webhook') { return this.ICON_WEBHOOK; }
+    if (startPoint === 'scheduled') { return this.ICON_SCHEDULE; }
     if (name.trim() === TYPE_INTENT_NAME.START && readonly) {
       icon = this.ICON_ROCKET;
     } else if (name.trim() === TYPE_INTENT_NAME.DEFAULT_FALLBACK && readonly) {

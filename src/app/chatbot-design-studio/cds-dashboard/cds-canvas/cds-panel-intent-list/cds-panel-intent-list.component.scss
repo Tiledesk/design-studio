@@ -528,6 +528,11 @@ mat-icon.agents-available {
 .topic-internal .intent .icon-container {
     &[data-reserved="rocket_launch"] { color: #2e9e6b; }
     &[data-reserved="undo"]          { color: #d8502f; }
+    // Il giallo con cui il webhook si riconosce sul flusso, dove la stessa icona e' dichiarata
+    // cosi' nell'intestazione del blocco: due tinte diverse per la stessa cosa sarebbero due cose.
+    &[data-reserved="webhook"]       { color: var(--color-yellow-hex); }
+    // L'orologio non ha un colore suo nemmeno sul flusso: prende quello del testo attorno. Qui
+    // fa lo stesso, e per questo non c'e' nessuna regola -- e' una scelta, non una dimenticanza.
 
     .material-icons-outlined {
         font-size: var(--size-icon-base, 14px);

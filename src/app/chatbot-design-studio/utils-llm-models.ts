@@ -38,6 +38,7 @@ export interface LlmModel {
   multiplier?: string;
   min_tokens?: number;
   max_output_tokens?: number;
+  reasoning?: boolean;
   /** Nome del server dell'integration a cui il modello appartiene (solo provider multi-server). */
   server?: string;
 }
@@ -260,6 +261,56 @@ export async function getIntegrationModels(
   }
 }
 
+/** 
+ * Manages GPT-5 model specific settings
+ * @param modelName The model name to check
+ * @param action The action object to update
+ * @param ai_setting The AI settings object to update
+ */
+export function manageGpt5ModelSettings(
+  action: any,
+  ai_setting: any
+): void {
+  let modelName = action?.model;
+  if (!modelName || !action || !ai_setting) {
+    return;
+  }
+
+  const isGpt5 = modelName.toLowerCase().startsWith('gpt-5');
+  
+  if (isGpt5) {
+    action.temperature = 1;
+    ai_setting['temperature'].disabled = true;
+    // if (ai_setting['max_tokens']) {
+    //   ai_setting['max_tokens'].max = 100000;
+    // }
+  } else {
+    ai_setting['temperature'].disabled = false;
+    // if (ai_setting['max_tokens']) {
+    //   ai_setting['max_tokens'].max = 8192;
+    //   if (action.max_tokens > 8192) {
+    //     action.max_tokens = 8192;
+    //   }
+    // }
+  }
+}
+
+/**
+ * Filters models to keep only those present in the aiModels configuration.
+ * @param models Array of models to filter
+ * @param aiModelsParsed Parsed aiModels config from loadTokenMultiplier
+ * @param getModelKey Function to extract the model key from each item
+ * @returns Filtered array of models
+ */
+export function filterModelsByAiModelsConfig<T>(
+  models: T[],
+  aiModelsParsed: Record<string, number | null>,
+  getModelKey: (model: T) => string
+): T[] {
+  const allowedKeys = Object.keys(aiModelsParsed || {});
+  return models.filter(m => allowedKeys.includes(getModelKey(m)));
+}
+
 /**
  * Sets the selected model and updates related properties
  * @param modelName The label of the model to set
@@ -281,6 +332,10 @@ export function setModel(
 export interface ActionWithServer {
   llm?: string;
   vllmServer?: string;
+  llmServer?: string;
+  /** @deprecated Nome precedente di `llmServer`, ancora presente sulle action
+   *  salvate prima del rename: si legge per non perderne il server, e viene
+   *  rimosso al primo salvataggio che passa di qui. */
   agentPlatformServer?: string;
 }
 
@@ -291,6 +346,9 @@ export interface ActionWithServer {
  */
 export function applySelectedServerToAction(action: ActionWithServer, model: LlmModel | undefined): void {
   delete action.vllmServer;
+  delete action.llmServer;
+  // Anche il nome vecchio, o su un'action salvata prima del rename resterebbe
+  // accanto a quello nuovo e il backend leggerebbe due server diversi.
   delete action.agentPlatformServer;
   if (!model?.server) {
     return;
@@ -298,7 +356,7 @@ export function applySelectedServerToAction(action: ActionWithServer, model: Llm
   if (model.llm === 'vllm') {
     action.vllmServer = model.server;
   } else if (model.llm === 'agentplatform') {
-    action.agentPlatformServer = model.server;
+    action.llmServer = model.server;
   }
 }
 
@@ -309,8 +367,14 @@ export function applySelectedServerToAction(action: ActionWithServer, model: Llm
 export function appendSelectedServerToPayload(action: ActionWithServer, data: any): void {
   if (action?.llm === 'vllm' && action.vllmServer) {
     data.vllmServer = action.vllmServer;
-  } else if (action?.llm === 'agentplatform' && action.agentPlatformServer) {
-    data.agentPlatformServer = action.agentPlatformServer;
+  } else if (action?.llm === 'agentplatform') {
+    // `agentPlatformServer` e' il nome che l'action portava prima del rename:
+    // un agente salvato allora deve continuare a funzionare senza essere
+    // riaperto e risalvato.
+    const server = action.llmServer ?? action.agentPlatformServer;
+    if (server) {
+      data.llmServer = server;
+    }
   }
 }
 
