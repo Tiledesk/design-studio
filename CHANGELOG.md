@@ -7,10 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# V3/design-vibe-coder 06/10/2026
-- **changed**: negli agenti V3 tutti i connettori di un blocco -- pallino del blocco, uscite delle azioni -- hanno il centro sul bordo del blocco, invece di cadere a distanze diverse
-- **changed**: selezionando un'azione il blocco resta evidenziato anche mentre il pannello di dettaglio e' aperto, e il clic dentro il blocco non azzera piu' l'azione mostrata
-- **changed**: negli agenti V3 la defaultFallback ancora vuota ha fondo grigio, titolo e icona bianchi, e quando e' selezionata la circonda un anello grigio staccato dal bordo. Il suo aspetto sta tutto nel foglio di stile invece di arrivare dal colore del blocco
+# 1.40.16-rc22
+- **changed**: V3 connectors all centred on the block edge
+- **changed**: the block stays highlighted while its action's detail panel is open
+- **changed**: V3 empty default fallback: grey, white title and icon, grey ring when selected
 
 # 1.40.16-rc21
 - **fixed** (V3/vc-new-agent): AI chat links saved without `#` no longer stop the flow; broken ones are repaired on load
