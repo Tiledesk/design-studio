@@ -341,7 +341,7 @@
   .pic-title-text {
     transition: background 0.15s ease;
     padding: 4px 8px;
-    border-radius: 5px;
+    border-radius: var(--base-border-radius-preview);
     font-size: 15px;
     font-weight: 600;
     cursor: grab;
@@ -833,7 +833,7 @@ cds-panel-intent-header.isStart ::ng-deep {
     width: 200px;
     /* Fondo e contorno stanno qui e non inline: il template non passa [ngStyle]
        alla defaultFallback vuota dei V3, che non prende il colore del blocco. */
-    background-color: rgb(168 168 174);
+    background-color: var(--blu);
     outline: none;
     /* Selezionata: un anello grigio staccato dal bordo, al posto del contorno
        inline che questo blocco non riceve. */

@@ -62,9 +62,16 @@
     <!-- Le linguette, verticali, subito a destra del pannello e sempre visibili: sono anche il modo
          di riaprire dopo aver chiuso, per questo non stanno dentro `.box-left`, che si stringe a
          zero. Chiusa mostra la sola icona, quella attiva icona e nome.
-         La chat non e' fra queste: ha una colonna sua, che si apre insieme a una di queste e non
-         al loro posto, e si riapre dal pulsante nell'intestazione. -->
+         La chat ha la sua linguetta, in cima: la sua colonna si apre insieme a una delle altre
+         schede e non al loro posto, quindi la linguetta apre e chiude solo la chat. -->
     <nav class="cds-left-rail" [class.is-booting]="leftPanelState.isBooting">
+        <button *ngIf="isAgentChatAvailable" type="button" class="cds-left-rail__tab"
+            [class.is-active]="leftPanelState.isChatOpen"
+            [attr.title]="'CDSCanvas.AgentChat' | translate"
+            (click)="leftPanelState.toggleChat()">
+            <mat-icon class="cds-left-rail__icon cds-left-rail__icon--stroke" svgIcon="vibe_coder" aria-hidden="true"></mat-icon>
+            <span class="cds-left-rail__label">{{ 'CDSCanvas.AgentChat' | translate }}</span>
+        </button>
         <button type="button" class="cds-left-rail__tab"
             [class.is-active]="isLeftTabVisible('subagents')"
             [attr.title]="'CDSCanvas.Subagents' | translate"

@@ -485,6 +485,8 @@ mat-icon.agents-available {
     display: grid;
     place-items: center;
     font-size: 0;
+    display: flex;
+    place-items: center;
 
     &::before {
         content: "";
