@@ -19,17 +19,10 @@
     filter: none;
 }
 
-/* V3 - la defaultFallback vuota ha il fondo scuro dello start: l'icona e' bianca
-   come il razzo, il rosso su quel fondo si spegne. */
+/* V3 - icona bianca sulla defaultFallback vuota: solo qui, gli altri blocchi e
+   gli agenti legacy tengono il rosso della regola .intent-icon. */
 :host-context(.tds-v3-intent.cds-fallback-locked) .intent-icon span.undo {
-    color: #ffffff;
-}
-
-/* Il titolo bianco come quello dello start: il !important batte il colore
-   inline di [ngStyle] (il colore del blocco), il filtro lo scurirebbe. */
-:host-context(.tds-v3-intent.cds-fallback-locked) .form-group input {
-    color: #ffffff !important;
-    filter: none;
+    color: var(--color-white-hex);
 }
 
 .header {
@@ -402,7 +395,7 @@ $circle-size: 40px;
   }
   span.undo,
   span.call_end {
-    color: var(--color-white-hex)
+    color: var(--color-red-hex);
   }
   span.webhook {
     color: var(--color-yellow-hex)

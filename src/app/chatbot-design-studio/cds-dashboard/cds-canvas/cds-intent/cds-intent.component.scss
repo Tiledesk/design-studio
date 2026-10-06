@@ -882,16 +882,6 @@ cds-panel-intent-header.isStart ::ng-deep{
          non raggiunge. Sta in panel-intent-header.component.scss. */
     }
 
-    /* La stessa grafica dello start (.cds-start): fondo scuro, ombra interna,
-       testo chiaro (il titolo e l'icona bianchi stanno in
-       panel-intent-header.component.scss). I due blocchi sono i due estremi fissi del flusso e si
-       devono leggere come una coppia. Il !important batte il background-color
-       inline di [ngStyle], come per .isReturnStack. */
-    background-color: #4b5052 !important;
-    box-shadow: #00000052 0 -1px inset;
-    .intent-background-overlay {
-      display: none !important;
-    }
   }
   .pic-header {
     padding: 0px;
