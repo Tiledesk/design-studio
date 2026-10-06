@@ -7,8 +7,9 @@
     [class.isReturnStack]="isReturnStack"
     [class.tds-v3-intent]="isV3"
     [class.cds-fallback-locked]="isDefaultFallbackLocked"
+    [class.cds-intent-selected]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive"
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{
+    [ngStyle]="isV3 && isDefaultFallbackLocked ? null : {
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
         'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
       }">

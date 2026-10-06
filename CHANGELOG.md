@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 06/10/2026
+- **changed**: negli agenti V3 la defaultFallback ancora vuota ha fondo grigio, titolo e icona bianchi, e quando e' selezionata la circonda un anello grigio staccato dal bordo. Il suo aspetto sta tutto nel foglio di stile invece di arrivare dal colore del blocco
+
 # this branch 05/10/2026
 - **fixed**: un blocco si sposta afferrandolo in un punto qualsiasi -- il corpo delle sue azioni compreso -- e si seleziona premendo ovunque, campi e pulsanti compresi. Prima servivano i punti giusti perche' succedesse, e ogni ridisegno del blocco ne lasciava qualcuno in meno
 - **changed**: scegliere un'azione non toglie piu' la selezione al blocco: l'evidenziazione e' una sola, quella del blocco, e il clic su un'azione ne apre il dettaglio come prima -- ma solo al clic, non alla fine di un trascinamento

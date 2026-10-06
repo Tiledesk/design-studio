@@ -852,8 +852,18 @@ cds-panel-intent-header.isStart ::ng-deep{
      di una scheda. Il padding in cima la centra dentro la pastiglia. */
   &.cds-fallback-locked {
     padding: 0px;
-    border-radius: 22px;
+    border-radius: 10px;
     width: 200px;
+    /* Fondo e contorno stanno qui e non inline: il template non passa [ngStyle]
+       alla defaultFallback vuota dei V3, che non prende il colore del blocco. */
+    background-color: rgb(168 168 174);
+    outline: none;
+    /* Selezionata: un anello grigio staccato dal bordo, al posto del contorno
+       inline che questo blocco non riceve. */
+    &.cds-intent-selected {
+      outline: rgb(184 186 201) solid 2px;
+      outline-offset: 2px;
+    }
     /* Il fondo bianco del blocco e' uno span a tutta area con gli angoli vivi,
        e l'ombra e' uno pseudo-elemento arrotondato a 10px: senza questi due,
        la pastiglia mostra quattro angoli quadrati che le spuntano da sotto.

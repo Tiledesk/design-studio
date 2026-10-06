@@ -9,7 +9,14 @@
    scritta in cds-intent.component.scss non lo raggiunge, la view encapsulation
    la limita agli elementi di quel template. */
 :host-context(.tds-v3-intent.cds-fallback-locked) .header {
-    padding-top: 2px;
+    padding-top: 0px;
+}
+
+/* V3 - il titolo della defaultFallback vuota: bianco e senza il filtro che lo
+   scurisce. Il !important batte il colore inline di [ngStyle] (il colore del blocco). */
+:host-context(.tds-v3-intent.cds-fallback-locked) .form-group input {
+    color: rgb(255 255 255) !important;
+    filter: none;
 }
 
 .header {
@@ -382,7 +389,7 @@ $circle-size: 40px;
   }
   span.undo,
   span.call_end {
-    color: var(--color-red-hex)
+    color: var(--color-white-hex)
   }
   span.webhook {
     color: var(--color-yellow-hex)
