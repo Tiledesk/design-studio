@@ -34,16 +34,15 @@
         </cds-connector>
     </div>
 
-    <!-- <hr class="preview-divider">
-
-    <div class="previewContent">
-        <label class="title-preview-label">{{'CDSCanvas.Fallback' | translate }}</label>
-        <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFallback"
-            [idConnection] = "idConnectionFallback"
-            [isConnected] = "isConnectedFallback">
-        </cds-connector>
-    </div> -->
+    <!-- V3: il blocco esce dal suo pallino quando la lista e' finita (il motore
+         ignora fallbackIntent). La riga da' un nome a quell'uscita: il pallino
+         del blocco, in basso a destra, le sta accanto. -->
+    <ng-container *ngIf="isV3">
+        <hr class="preview-divider">
+        <div class="previewContent iteration-done">
+            <label class="title-preview-label">{{'CDSCanvas.IterationDone' | translate }}</label>
+        </div>
+    </ng-container>
 
 </div>
 

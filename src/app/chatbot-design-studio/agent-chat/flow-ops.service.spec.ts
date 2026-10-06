@@ -3045,6 +3045,10 @@ describe('FlowOpsService — connect refuses a block that already routes conditi
         ]),
         intentWithActions('i8', 'configured capture_user_reply', [
           { _tdActionId: 'cap1', _tdActionType: 'capture_user_reply', goToIntent: '#i2' }
+        ]),
+        intentWithActions('i9', 'configured iteration', [
+          { _tdActionId: 'iter1', _tdActionType: 'iteration', iterable: 'attachments',
+            assignOutputTo: 'attachment', goToIntent: '#i2' }
         ])
       ],
       getIntentFromId(id: string) {
@@ -3103,6 +3107,16 @@ describe('FlowOpsService — connect refuses a block that already routes conditi
     expect(report.ok).toBe(true);
     const from = intentService.getIntentFromId('i4');
     expect(from.attributes.nextBlockAction.intentName).toBe('#i2');
+  });
+
+  it('allows connect from a block whose iteration already has a goToIntent: the dot is where the flow goes when the list is done', async () => {
+    const report = await service.apply([
+      { op: 'connect', from_intent_id: 'i9', to_intent_id: 'i3' }
+    ]);
+    expect(report.ok).toBe(true);
+    const from = intentService.getIntentFromId('i9');
+    expect(from.attributes.nextBlockAction.intentName).toBe('#i3');
+    expect(from.actions[0].goToIntent).toBe('#i2');
   });
 
   it('leaves an ordinary block\'s connect unaffected', async () => {
@@ -3942,6 +3956,56 @@ describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () =>
     const report = await service.apply([{ op: 'add_action', intent_id: 'welcome', type: 'reply' }]);
     expect(report.ok).toBe(true);
     expect(intentService.getIntentFromId('welcome').actions.length).toBe(2);
+  });
+
+  // V3-S8: the agent never runs out. Warnings, never refusals: a build in two
+  // calls leaves the fallback unconnected after the first, legitimately.
+  function connectFallbackTo(intentId: string) {
+    intentService.getIntentFromId('fallback').attributes.nextBlockAction =
+      { _tdActionType: 'intent', intentName: `#${intentId}` };
+  }
+
+  it('warns, after an applied batch, that defaultFallback goes nowhere', async () => {
+    const report = await service.apply([{ op: 'add_action', intent_id: 'empty', type: 'reply' }]);
+    expect(report.ok).toBe(true);
+    expect(report.warnings?.length).toBe(1);
+    expect(report.warnings[0]).toContain('V3-S8');
+    expect(report.warnings[0]).toContain('not connected');
+  });
+
+  it('says nothing once defaultFallback reaches a block that acts', async () => {
+    connectFallbackTo('welcome');
+    expect(service.fallbackWarnings()).toEqual([]);
+    const report = await service.apply([{ op: 'add_action', intent_id: 'empty', type: 'reply' }]);
+    expect(report.warnings).toBeUndefined();
+  });
+
+  it('warns when the fallback\'s branch starts by asking again', () => {
+    connectFallbackTo('ask');
+    const warnings = service.fallbackWarnings();
+    expect(warnings.length).toBe(1);
+    expect(warnings[0]).toContain('capture_user_reply');
+    expect(warnings[0]).toContain('{{lastUserText}}');
+  });
+
+  it('warns when defaultFallback points at a block that is not there', () => {
+    connectFallbackTo('gone');
+    expect(service.fallbackWarnings()[0]).toContain('not on the canvas');
+  });
+
+  it('never warns a legacy agent about its fallback', async () => {
+    dashboardService.isV3 = false;
+    expect(service.fallbackWarnings()).toEqual([]);
+    const report = await service.apply([{ op: 'add_action', intent_id: 'welcome', type: 'reply' }]);
+    expect(report.warnings).toBeUndefined();
+  });
+
+  it('tells the agent how to serve the message when it tries to fill defaultFallback', async () => {
+    const report = await service.apply([{ op: 'add_action', intent_id: 'fallback', type: 'reply' }]);
+    expectV3Refusal(report, 0);
+    expect(report.results[0].error).toContain('V3-S3');
+    expect(report.results[0].error).toContain('{{lastUserText}}');
+    expect(report.results[0].error).not.toContain('fallback message');
   });
 });
 
