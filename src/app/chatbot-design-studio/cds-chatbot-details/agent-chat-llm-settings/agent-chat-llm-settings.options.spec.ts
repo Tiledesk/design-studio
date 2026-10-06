@@ -14,9 +14,9 @@ const m = (o: Partial<RuntimeModel> & { id: string; label: string }): RuntimeMod
 });
 const def = m({ id: 'deepseek:v4-flash', label: 'DeepSeek V4 Flash', provider: 'deepseek', default: true,
   pricing: { input_per_mtok: 0.0264, output_per_mtok: 1.28 }, context_length: 1048576 });
-const sonnet = m({ id: 'anthropic:sonnet', label: 'Claude Sonnet 5.5', provider: 'anthropic',
+const sonnet = m({ id: 'openai:anthropic/claude-sonnet-5.5', label: 'Claude Sonnet 5.5', provider: 'anthropic',
   pricing: { input_per_mtok: 2, output_per_mtok: 10 }, context_length: 1000000, group: 'curated' });
-const qwenMax = m({ id: 'openrouter:qwen/max', label: 'Qwen Max', provider: 'Qwen', group: 'openrouter',
+const qwenMax = m({ id: 'openai:qwen/max', label: 'Qwen Max', provider: 'Qwen', group: 'openrouter',
   pricing: { input_per_mtok: 1.475, output_per_mtok: 3 }, context_length: 262144 });
 const noPrice = m({ id: 'x:x', label: 'X', context_length: 200000 });
 const noCtx = m({ id: 'y:y', label: 'Y', pricing: { input_per_mtok: 0.0264, output_per_mtok: 1.28 } });
@@ -57,6 +57,19 @@ describe('buildModelOptions', () => {
     expect(s).toContain('anthropic');
     expect(s).toContain('claude sonnet');
     expect(s).toBe(s.toLowerCase());
+  });
+  it('does not match the transport prefix of the id', () => {
+    const o = buildModelOptions([def, sonnet, qwenMax], '', TEXTS);
+    expect(byId(o, sonnet.id).searchText).not.toContain('openai');
+    expect(byId(o, sonnet.id).searchText).toContain('anthropic/claude-sonnet-5.5');
+    expect(byId(o, qwenMax.id).searchText).not.toContain('openai');
+  });
+  it('splits name and meta, keeping label as the full line', () => {
+    const o = buildModelOptions([def, sonnet], 'openai:gone/model', TEXTS);
+    expect(o[0]).toEqual(jasmine.objectContaining({ name: 'DeepSeek V4 Flash — default', meta: '$0.0264 / $1.28 · 1M' }));
+    expect(byId(o, sonnet.id)).toEqual(jasmine.objectContaining({ name: 'Claude Sonnet 5.5', meta: '$2 / $10 · 1M' }));
+    expect(o[1]).toEqual(jasmine.objectContaining({ name: 'openai:gone/model',
+      meta: 'no longer available — the default is used' }));
   });
   it('adds the saved model as unavailable when it is not listed', () => {
     const o = buildModelOptions([def, sonnet], 'openai:gone/model', TEXTS);

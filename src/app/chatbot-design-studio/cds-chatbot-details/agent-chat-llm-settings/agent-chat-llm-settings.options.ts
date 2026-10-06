@@ -3,6 +3,10 @@ import { RuntimeModel, RuntimePricing } from '../../agent-chat/agent-chat-settin
 export interface ModelOption {
   id: string;
   label: string;
+  /** Line 1 of the two-line rendering. */
+  name: string;
+  /** Line 2: price / context, or the unavailable explanation. */
+  meta: string;
   group: string;
   searchText: string;
   disabled: boolean;
@@ -34,27 +38,35 @@ function describe(m: RuntimeModel, texts: OptionTexts): string {
   return [formatPrice(m.pricing, texts.priceUnknown), ctx].filter(s => !!s).join(' · ');
 }
 
-function option(id: string, label: string, group: string, m: RuntimeModel | null): ModelOption {
-  const searchText = `${label} ${m ? m.id : id} ${m ? m.provider : ''}`.toLowerCase();
-  return { id, label, group, searchText, disabled: false };
+function option(id: string, name: string, meta: string, group: string, m: RuntimeModel): ModelOption {
+  const label = `${name} · ${meta}`;
+  // The id's `<prefix>:` is a runtime transport prefix (every OpenRouter id
+  // starts with `openai:`); searching it would match the whole group.
+  const bare = m.id.includes(':') ? m.id.split(':').slice(1).join(':') : m.id;
+  const searchText = `${label} ${bare} ${m.provider}`.toLowerCase();
+  return { id, label, name, meta, group, searchText, disabled: false };
 }
 
 export function buildModelOptions(models: RuntimeModel[], storedId: string, texts: OptionTexts): ModelOption[] {
   const out: ModelOption[] = [];
   const def = models.find(m => m.default);
   if (def) {
-    out.push(option('', `${def.label} — ${texts.defaultMarker} · ${describe(def, texts)}`, texts.curated, def));
+    const name = `${def.label} — ${texts.defaultMarker}`;
+    const meta = describe(def, texts);
+    const o = option('', name, meta, texts.curated, def);
+    o.label = `${name} · ${meta}`;
+    out.push(o);
   }
   if (storedId !== '' && storedId !== def?.id && !models.some(m => m.id === storedId)) {
-    out.push({ id: storedId, label: `${storedId} (${texts.unavailable})`, group: texts.curated,
-      searchText: storedId.toLowerCase(), disabled: true });
+    out.push({ id: storedId, label: `${storedId} (${texts.unavailable})`, name: storedId, meta: texts.unavailable,
+      group: texts.curated, searchText: storedId.toLowerCase(), disabled: true });
   }
   const rest = models.filter(m => !m.default);
   for (const m of rest.filter(x => x.group !== 'openrouter')) {
-    out.push(option(m.id, `${m.label} · ${describe(m, texts)}`, texts.curated, m));
+    out.push(option(m.id, m.label, describe(m, texts), texts.curated, m));
   }
   for (const m of rest.filter(x => x.group === 'openrouter')) {
-    out.push(option(m.id, `${m.label} · ${describe(m, texts)}`, texts.openRouter, m));
+    out.push(option(m.id, m.label, describe(m, texts), texts.openRouter, m));
   }
   return out;
 }

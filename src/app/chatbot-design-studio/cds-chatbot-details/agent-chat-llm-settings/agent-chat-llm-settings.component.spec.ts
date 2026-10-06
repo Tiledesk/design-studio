@@ -163,7 +163,7 @@ describe('AgentChatLlmSettingsComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const shown: HTMLElement =
-      fixture.nativeElement.querySelector('#llm-model .ng-value-label');
+      fixture.nativeElement.querySelector('#llm-model-select .ng-value');
     expect(shown).withContext('nothing is selected at all').not.toBeNull();
     expect(shown.textContent).toContain('Opus 5');
 
@@ -298,7 +298,7 @@ describe('AgentChatLlmSettingsComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('#llm-model')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#llm-model-select')).toBeNull();
     expect(fixture.nativeElement.textContent.trim()).toBe('');
     // And the parent is told, so the tab goes away rather than sitting there
     // opening onto an empty panel.
@@ -319,14 +319,14 @@ describe('AgentChatLlmSettingsComponent', () => {
     await setup2(settings);
     expect(fixture.componentInstance.readOnly).toBe(true);
     expect(fixture.componentInstance.error).toBe('LlmSettingsForbidden');
-    expect(fixture.nativeElement.querySelector('#llm-model')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#llm-model-select')).toBeNull();
   });
 
   describe('searchable picker', () => {
-    const sonnet = { id: 'anthropic:claude-sonnet-5', label: 'Sonnet 5', provider: 'anthropic',
+    const sonnet = { id: 'openai:anthropic/claude-sonnet-5.5', label: 'Claude Sonnet 5.5', provider: 'anthropic',
       vision: true, pricing: { input_per_mtok: 3, output_per_mtok: 15 }, default: false,
       group: 'curated', context_length: 200000 };
-    const qwen = { id: 'openrouter:qwen/qwen-max', label: 'Qwen Max', provider: 'qwen',
+    const qwen = { id: 'openai:qwen/qwen-max', label: 'Qwen Max', provider: 'qwen',
       vision: false, pricing: null, default: false, group: 'openrouter',
       context_length: 32768 };
 
@@ -342,7 +342,7 @@ describe('AgentChatLlmSettingsComponent', () => {
       const o = fixture.componentInstance.options;
       expect(o.map(x => x.group)).toEqual(
         ['LlmSettingsGroupCurated', 'LlmSettingsGroupCurated', 'LlmSettingsGroupOpenRouter']);
-      expect(o[2].id).toBe('openrouter:qwen/qwen-max');
+      expect(o[2].id).toBe('openai:qwen/qwen-max');
     });
 
     it('filters by provider through the search function', async () => {
@@ -351,6 +351,34 @@ describe('AgentChatLlmSettingsComponent', () => {
       const sonnetOption = c.options.find(x => x.id === sonnet.id)!;
       expect(c.searchOption('ANTHROPIC', sonnetOption)).toBeTrue();
       expect(c.searchOption('qwen', sonnetOption)).toBeFalse();
+    });
+
+    it('searches the id without its transport prefix', async () => {
+      await setupCatalog();
+      const c = fixture.componentInstance;
+      const claude = c.options.find(x => x.id === sonnet.id)!;
+      expect(c.searchOption('anthropic', claude)).toBeTrue();
+      expect(c.searchOption('claude', claude)).toBeTrue();
+      expect(c.searchOption('gpt', claude)).toBeFalse();
+      expect(c.searchOption('openai', claude)).toBeFalse();
+    });
+
+    it('renders the unavailable explanation in the selected value', async () => {
+      await setupCatalog({ project_id: 'p1', updated_at: 't', updated_by: 'u',
+                           model: { id: 'openai:gone/model', params: {} } });
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const shown: HTMLElement = fixture.nativeElement.querySelector('#llm-model-select .ng-value');
+      expect(shown).withContext('nothing is selected').not.toBeNull();
+      expect(shown.textContent).toContain('openai:gone/model');
+      expect(shown.textContent).toContain('LlmSettingsUnavailable');
+    });
+
+    it('labels the select through labelForId', async () => {
+      await setupCatalog();
+      const input = fixture.nativeElement.querySelector('label[for="llm-model"]');
+      expect(input).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('input#llm-model')).not.toBeNull();
     });
 
     it('shows a saved model that is no longer listed and disables save while it is selected',

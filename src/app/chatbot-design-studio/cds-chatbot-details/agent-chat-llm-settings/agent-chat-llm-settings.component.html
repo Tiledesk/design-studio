@@ -49,10 +49,24 @@
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
         <!-- The sentinel option ('') is the deployment's own model; the
              options list already carries it once, marked. -->
-        <ng-select id="llm-model" class="csd-chatbot-dtls-input" [items]="options" bindLabel="label"
+        <ng-select id="llm-model-select" labelForId="llm-model" class="csd-chatbot-dtls-input" [items]="options" bindLabel="label"
                    bindValue="id" groupBy="group" [searchFn]="searchOption" [clearable]="false"
                    [ngModel]="selectedModelId" name="model" (ngModelChange)="onModelChange($event)"
                    [placeholder]="'LlmSettingsSearch' | translate">
+          <!-- Two lines, both allowed to wrap: ng-select truncates a single
+               nowrap line, which cut the price and the unavailable text. -->
+          <ng-template ng-label-tmp let-item="item">
+            <div class="llm-opt" [title]="item.label">
+              <div class="llm-opt-name">{{ item.name }}</div>
+              <div class="llm-opt-meta">{{ item.meta }}</div>
+            </div>
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item">
+            <div class="llm-opt" [title]="item.label">
+              <div class="llm-opt-name">{{ item.name }}</div>
+              <div class="llm-opt-meta">{{ item.meta }}</div>
+            </div>
+          </ng-template>
         </ng-select>
       </div>
     </div>
