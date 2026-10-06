@@ -9,8 +9,18 @@ export interface RuntimeModel {
   label: string;
   provider: string;
   vision: boolean;
-  pricing: unknown | null;
+  pricing: RuntimePricing | null;
   default: boolean;
+  group?: 'curated' | 'openrouter';
+  context_length?: number;
+}
+
+export interface RuntimePricing {
+  input_per_mtok: number;
+  output_per_mtok: number;
+  cache_read_per_mtok?: number;
+  cache_write_per_mtok?: number;
+  currency?: string;
 }
 
 export interface ProjectModelSettings {
