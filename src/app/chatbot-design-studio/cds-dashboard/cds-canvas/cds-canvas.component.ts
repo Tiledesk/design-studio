@@ -14,6 +14,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
 import { FlowOpsService } from '../../agent-chat/flow-ops.service';
+import { AgentChatHostService } from '../../agent-chat/agent-chat-host.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -225,7 +226,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     private readonly noteService: NoteService,
     public noteResizeState: NoteResizeStateService,
     private readonly flowOpsService: FlowOpsService,
-    private readonly hostElement: ElementRef<HTMLElement>
+    private readonly hostElement: ElementRef<HTMLElement>,
+    private readonly agentChatHostService: AgentChatHostService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -1330,6 +1332,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   get isV3(): boolean { return !!this.dashboardService.isV3; }
 
   /** Vero se quella linguetta e' quella che si sta guardando: pannello aperto E scheda attiva. */
+  /** La linguetta della chat AI c'e' solo dove la chat c'e': senza configurazione non si apre. */
+  get isAgentChatAvailable(): boolean {
+    return this.agentChatHostService.isConfigured();
+  }
+
   isLeftTabVisible(tab: LeftPanelTab): boolean {
     return this.leftPanelState.isTabVisible(tab);
   }

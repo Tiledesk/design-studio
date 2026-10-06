@@ -116,22 +116,6 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.setSubscriptions();
   }
 
-  /** The button exists only where the feature is configured, exactly as
-   *  connector base URLs gate the connector catalogue. */
-  get isAgentChatAvailable(): boolean {
-    return this.agentChatHostService.isConfigured();
-  }
-
-  /** Letto dal servizio dove lo stato vive davvero: il pulsante deve sparire nel momento in cui
-   *  la chat si apre, anche quando non e' stato lui ad aprirla. */
-  get isAgentChatPanelOpen(): boolean {
-    return this.leftPanelState.isChatOpen;
-  }
-
-  onToggleAgentChat(){
-    this.leftPanelState.toggleChat();
-  }
-
   manageRouteChanges(){
     /** check INIT ROUTE */
     const urlWithoutParams = this.router.url.split('?')[0];

@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 # this branch 06/10/2026
+- **changed**: la chat AI si apre e si chiude da una sua linguetta, in cima alla striscia di sinistra sopra i subagent, con un'icona nuova: il pulsante nell'intestazione non c'e' piu'
+- **changed**: negli agenti V3 tutti i connettori di un blocco -- pallino del blocco, uscite delle azioni -- hanno il centro sul bordo del blocco, invece di cadere a distanze diverse
+- **changed**: selezionando un'azione il blocco resta evidenziato anche mentre il pannello di dettaglio e' aperto, e il clic dentro il blocco non azzera piu' l'azione mostrata
 - **changed**: negli agenti V3 la defaultFallback ancora vuota ha fondo grigio, titolo e icona bianchi, e quando e' selezionata la circonda un anello grigio staccato dal bordo. Il suo aspetto sta tutto nel foglio di stile invece di arrivare dal colore del blocco
 
 # this branch 05/10/2026

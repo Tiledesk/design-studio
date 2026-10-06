@@ -27,6 +27,11 @@ export class IconService {
       'agent_chat',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/agent_chat.svg')
     );
+    // La linguetta della chat AI (il vibe coder): codice dentro un fumetto, con le scintille.
+    this.matIconRegistry.addSvgIcon(
+      'vibe_coder',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/vibe_coder.svg')
+    );
 
     // ai prompt //
     this.matIconRegistry.addSvgIcon(

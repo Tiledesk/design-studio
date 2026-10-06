@@ -283,7 +283,12 @@
     cursor: pointer;
     transition: background var(--transition-fast, .12s), color var(--transition-fast, .12s);
 
-    .icon { width: var(--size-icon-base, 14px); height: var(--size-icon-base, 14px); }
+    .icon { 
+      width: var(--size-icon-base, 14px); 
+      height: var(--size-icon-base, 14px); 
+      display: flex;
+      align-items: center;
+    }
     // Riempita, non a contorno: la freccia e' un'icona piena (un solo tracciato chiuso), e
     // `fill: none` la riduceva al filo del suo contorno -- a 14px, un pulsante vuoto. La regola
     // a contorno vale per le icone disegnate cosi', come la lente qui accanto, e non per tutte.
