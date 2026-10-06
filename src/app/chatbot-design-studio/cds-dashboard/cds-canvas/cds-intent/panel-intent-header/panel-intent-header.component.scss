@@ -22,7 +22,19 @@
 /* V3 - icona bianca sulla defaultFallback vuota: solo qui, gli altri blocchi e
    gli agenti legacy tengono il rosso della regola .intent-icon. */
 :host-context(.tds-v3-intent.cds-fallback-locked) .intent-icon span.undo {
-    color: var(--color-white-hex);
+    /* Azzurro: nei V3 il suo ramo e' quasi sempre un AI Prompt che risponde al messaggio
+       (V3-S8). Lo stesso nel pannello dei blocchi. */
+    color: rgb(50, 172, 255);
+}
+
+/* V3 - il razzo del Web start: il suo verde, lo stesso nel pannello dei blocchi. */
+:host-context(.tds-v3-intent) .intent-icon span.rocket {
+    color: rgb(52, 187, 126);
+}
+
+/* V3 - l'icona del Webhook start: viola invece del giallo, che resta sui chatbot legacy. */
+:host-context(.tds-v3-intent) .intent-icon span.webhook {
+    color: #ba86ff;
 }
 
 .header {
@@ -389,9 +401,7 @@ $circle-size: 40px;
   position: relative;
   top: 0px;
   span.rocket {
-    /* Bianco pieno con il profilo verde: il razzo sta su una pastiglia scura,
-       dove il verde pieno si chiude e perde la forma. */
-    color: #ffffff;
+    color: var(--color-green-hex);
   }
   span.undo,
   span.call_end {

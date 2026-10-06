@@ -538,3 +538,11 @@ mat-icon.agents-available {
         line-height: 1;
     }
 }
+
+/* V3 - gli stessi colori del flusso V3: il razzo verde, il webhook viola, e la defaultFallback vuota col blu
+   della famiglia "AI". Sui legacy, o con un'azione dentro la fallback, restano quelli sopra. */
+.topic-internal.is-v3 .intent .icon-container {
+    &[data-reserved="rocket_launch"]             { color: rgb(52, 187, 126); }
+    &[data-reserved="webhook"]                   { color: #ba86ff; }
+    &[data-reserved="undo"].is-v3-empty-fallback { color: rgb(50, 172, 255); }
+}

@@ -16,7 +16,7 @@
     </div>
 
     <div class="intents-list">
-        <div class="topic-internal">
+        <div class="topic-internal" [class.is-v3]="IS_V3">
 
             <div class="intents">
                 <div *ngFor="let intent of internalIntents; let id = index" id="intent_{{id}}" class="intent"
@@ -28,7 +28,7 @@
                          questa misura, e' una macchia del colore invece di un simbolo. Nel V4
                          sono contorni, e il colore resta leggibile perche' corre lungo una
                          linea sottile anziche' riempire tutto. -->
-                    <div class="icon-container" [attr.data-reserved]="onGetIconForName(intent)">
+                    <div class="icon-container" [attr.data-reserved]="onGetIconForName(intent)" [class.is-v3-empty-fallback]="isV3EmptyFallback(intent)">
                         <span class="material-icons-outlined">{{onGetIconForName(intent)}}</span>
                     </div>
 

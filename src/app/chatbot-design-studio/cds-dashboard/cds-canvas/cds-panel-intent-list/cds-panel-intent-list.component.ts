@@ -9,7 +9,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
-import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
+import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from '../../../utils';
 import { ACTIONS_LIST } from '../../../utils-actions';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -177,6 +177,12 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
 
   /** EVENTS  */
+
+  /** La defaultFallback vuota di un agent V3: sullo stage la sua icona prende il blu delle
+   *  azioni AI, e qui deve avere lo stesso colore. Con un'azione dentro, o sui legacy, resta rossa. */
+  isV3EmptyFallback(intent: Intent): boolean {
+    return this.IS_V3 && isDefaultFallbackWithoutActions(intent);
+  }
 
   /** onGetIconForName */
   onGetIconForName(intent: Intent){
