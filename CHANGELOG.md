@@ -7,11 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# V3/design-vibe-coder 06/10/2026
-- **changed**: la chat AI si apre e si chiude da una sua linguetta, in cima alla striscia di sinistra sopra i subagent, con un'icona nuova: il pulsante nell'intestazione non c'e' piu'
-- **changed**: negli agenti V3 tutti i connettori di un blocco -- pallino del blocco, uscite delle azioni -- hanno il centro sul bordo del blocco, invece di cadere a distanze diverse
-- **changed**: selezionando un'azione il blocco resta evidenziato anche mentre il pannello di dettaglio e' aperto, e il clic dentro il blocco non azzera piu' l'azione mostrata
-- **changed**: negli agenti V3 la defaultFallback ancora vuota ha fondo grigio, titolo e icona bianchi, e quando e' selezionata la circonda un anello grigio staccato dal bordo. Il suo aspetto sta tutto nel foglio di stile invece di arrivare dal colore del blocco
+# 1.40.16-rc22
+- **changed** (V3/design-vibe-coder): the AI chat opens from its own tab, on top of the left rail, with a new icon; the header button is gone
+- **changed** (V3/design-vibe-coder): V3 connectors all centred on the block edge
+- **changed** (V3/design-vibe-coder): the block stays highlighted while its action's detail panel is open
+- **changed** (V3/new-blocks-actions-design): V3 empty default fallback: grey, white title and icon, grey ring when selected
 
 # 1.40.16-rc21
 - **fixed** (V3/vc-new-agent): AI chat links saved without `#` no longer stop the flow; broken ones are repaired on load
