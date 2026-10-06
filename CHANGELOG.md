@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# V3/design-vibe-coder 06/10/2026
+- **changed**: V3 start and fallback icons share one colour on the flow and in the blocks panel: web start green, webhook start violet, scheduled start orange, empty default fallback light blue
+- **changed**: V3 empty default fallback is dark like the start block, with a white title
+- **changed**: the labels of the three start boxes are white
+
 # 1.40.16-rc22
 - **changed** (V3/design-vibe-coder): the AI chat opens from its own tab, on top of the left rail, with a new icon; the header button is gone
 - **changed** (V3/design-vibe-coder): V3 connectors all centred on the block edge

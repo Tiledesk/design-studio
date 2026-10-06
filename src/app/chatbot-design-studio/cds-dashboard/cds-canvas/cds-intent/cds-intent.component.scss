@@ -833,7 +833,7 @@ cds-panel-intent-header.isStart ::ng-deep {
     width: 200px;
     /* Fondo e contorno stanno qui e non inline: il template non passa [ngStyle]
        alla defaultFallback vuota dei V3, che non prende il colore del blocco. */
-    background-color: var(--blu);
+    background-color: #4b5052;
     outline: none;
     /* Selezionata: un anello grigio staccato dal bordo, al posto del contorno
        inline che questo blocco non riceve. */

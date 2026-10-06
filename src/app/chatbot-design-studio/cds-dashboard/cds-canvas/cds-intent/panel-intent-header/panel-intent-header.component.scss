@@ -22,7 +22,19 @@
 /* V3 - icona bianca sulla defaultFallback vuota: solo qui, gli altri blocchi e
    gli agenti legacy tengono il rosso della regola .intent-icon. */
 :host-context(.tds-v3-intent.cds-fallback-locked) .intent-icon span.undo {
-    color: var(--color-white-hex);
+    /* Azzurro: nei V3 il suo ramo e' quasi sempre un AI Prompt che risponde al messaggio
+       (V3-S8). Lo stesso nel pannello dei blocchi. */
+    color: rgb(50, 172, 255);
+}
+
+/* V3 - il razzo del Web start: il suo verde, lo stesso nel pannello dei blocchi. */
+:host-context(.tds-v3-intent) .intent-icon span.rocket {
+    color: rgb(52, 187, 126);
+}
+
+/* V3 - l'icona del Webhook start: viola invece del giallo, che resta sui chatbot legacy. */
+:host-context(.tds-v3-intent) .intent-icon span.webhook {
+    color: #ba86ff;
 }
 
 .header {
@@ -348,9 +360,7 @@ $circle-size: 40px;
   top: 0;
 
   span.rocket {
-    /* Bianco pieno con il profilo verde: il razzo sta su una pastiglia scura,
-       dove il verde pieno si chiude e perde la forma. */
-    color: #ffffff;
+    color: var(--color-green-hex);
   }
 
   span.undo,
@@ -360,6 +370,11 @@ $circle-size: 40px;
 
   span.webhook {
     color: var(--color-yellow-hex);
+  }
+
+  /* Lo Scheduled start: il suo arancione, lo stesso nel pannello dei blocchi. */
+  span.schedule {
+    color: rgb(255, 158, 50);
   }
 }
 // fixed label of a start box: the pill is sized to it. Left padding clears the type icon (the form-group
@@ -377,4 +392,8 @@ $circle-size: 40px;
     background: transparent;
     border: none;
     font-weight: 500;
+    /* Bianco su tutti e tre i box di partenza (web, webhook, scheduled): stanno su una
+       pastiglia scura, e il colore del blocco che arriva inline da [ngStyle] li rendeva
+       lilla. Il !important batte lo stile inline. */
+    color: #ffffff !important;
 }
