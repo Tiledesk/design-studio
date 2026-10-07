@@ -5,6 +5,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { McpService } from 'src/app/services/mcp.service';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST } from '../utils-actions';
+import { StartPointManagerService } from '../services/start-point-manager.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 describe('AgentChatCapabilitiesService', () => {
@@ -13,6 +14,7 @@ describe('AgentChatCapabilitiesService', () => {
   let mcpService: any;
   let planUtils: any;
   let planUtilsBuilt: number;
+  let startPoints: any;
   let savedList: string;
   let llmLoader: any;
   let loaderBuilt: number;
@@ -72,6 +74,10 @@ describe('AgentChatCapabilitiesService', () => {
     } })) };
     translate = { instant: jasmine.createSpy('instant').and.callFake((key: string) =>
       key === 'TYPE_GPT_MODEL.gpt-4o.description' ? 'Fast and capable' : key) };
+    startPoints = { describe: jasmine.createSpy('describe').and.returnValue(Promise.resolve([
+      { type: 'web', status: 'present', removable: true, settings: {}, intent_id: 'start1', current: {} },
+      { type: 'webhook', status: 'available', removable: true, settings: { enabled: 'boolean' } }
+    ])) };
     TestBed.configureTestingModule({
       providers: [
         AgentChatCapabilitiesService,
@@ -79,12 +85,28 @@ describe('AgentChatCapabilitiesService', () => {
         { provide: McpService, useValue: mcpService },
         { provide: AgentChatLlmModelsLoader, useFactory: () => { loaderBuilt++; return llmLoader; } },
         { provide: TranslateService, useValue: translate },
+        { provide: StartPointManagerService, useFactory: () => startPoints },
         { provide: ProjectPlanUtils, useFactory: () => { planUtilsBuilt++; return planUtils; } }
       ]
     });
     planUtilsBuilt = 0;
     loaderBuilt = 0;
     service = TestBed.inject(AgentChatCapabilitiesService);
+  });
+
+  it('lists the start points the manager describes', async () => {
+    const snap = await service.snapshot();
+    expect(snap.capabilities.start_points.map(d => d.type)).toEqual(['web', 'webhook']);
+    expect(snap.capabilities.start_points[0].current).toEqual({});
+    expect(snap.capabilities.start_points_error).toBeUndefined();
+  });
+
+  it('still answers when describing the start points fails', async () => {
+    startPoints.describe.and.returnValue(Promise.reject(new Error('no webhook')));
+    const snap = await service.snapshot();
+    expect(snap.capabilities.start_points).toBeUndefined();
+    expect(snap.capabilities.start_points_error).toBe('no webhook');
+    expect(snap.capabilities.actions.length).toBeGreaterThan(0);
   });
 
   // ProjectPlanUtils reads the current project in its constructor. This

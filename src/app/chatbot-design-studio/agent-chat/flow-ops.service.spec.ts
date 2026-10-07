@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Subject } from 'rxjs';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
@@ -8,6 +8,7 @@ import { AgentChatFamilyService } from './agent-chat-family.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { V3_FLOW_RULES } from './v3-flow-rules';
 
 function anIntent(intentId: string, name: string): Intent {
   const intent = new Intent();
@@ -95,7 +96,7 @@ describe('FlowOpsService — intent operations', () => {
     undoStack = [];
     intentService = {
       listOfIntents: [
-        anIntent('i1', 'start'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
+        anIntent('i1', 'Entry'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
       ],
       arrayUNDO: undoStack,
       getIntentFromId(id: string) {
@@ -118,7 +119,8 @@ describe('FlowOpsService — intent operations', () => {
       setDragAndListnerEventToElement: jasmine.createSpy('setDragAndListnerEventToElement')
         .and.returnValue(Promise.resolve()),
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
-        .and.callFake(() => { undoStack.pop(); })
+        .and.callFake(() => { undoStack.pop(); }),
+      undoHistoryPruned$: new Subject<void>()
     };
     dashboardService = { id_faq_kb: 'kb1' };
 
@@ -244,6 +246,40 @@ describe('FlowOpsService — intent operations', () => {
     service.undoLast();
     expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(3);
     expect(undoStack.length).toBe(0);
+  });
+
+  // A start_point remove/disable saves or deletes a block without history, and IntentService then
+  // prunes the entries holding that block from the middle of arrayUNDO. The depth counted when the
+  // batch applied no longer describes the top of the stack: popping it would take back older,
+  // unrelated user changes.
+  it('after a start_point remove prunes the batch\'s entry, Undo never pops an older unrelated entry', async () => {
+    const older = { undo: [], redo: [], older: true };
+    undoStack.push(older);
+    // the batch connects start: one entry, holding start
+    await service.apply([{ op: 'update_intent', intent_id: 'i1', intent_display_name: 'start target' }]);
+    expect(undoStack.length).toBe(2);
+    const batchEntry = undoStack[1];
+    // start_point remove web: saveIntentWithoutHistory filters out the entry holding start
+    intentService.arrayUNDO = undoStack.filter(e => e !== batchEntry);
+    intentService.undoHistoryPruned$.next();
+
+    expect(service.undoLast()).toBe(false);
+    expect(intentService.restoreLastUNDO).not.toHaveBeenCalled();
+    expect(intentService.arrayUNDO).toEqual([older]);
+  });
+
+  it('a prune that leaves the batch\'s entries on top keeps its Undo', async () => {
+    const older = { undo: [], redo: [], older: true };
+    undoStack.push(older);
+    await service.apply([{ op: 'update_intent', intent_id: 'i1', intent_display_name: 'a' }]);
+    const batchEntry = undoStack[1];
+    // a scheduled box removed: only the older entry held it
+    undoStack.splice(0, 1);
+    intentService.undoHistoryPruned$.next();
+
+    expect(service.undoLast()).toBe(true);
+    expect(intentService.restoreLastUNDO).toHaveBeenCalledTimes(1);
+    expect(undoStack).not.toContain(batchEntry);
   });
 
   it('undoes only what the last batch applied, never a previous batch too', async () => {
@@ -407,7 +443,7 @@ describe('FlowOpsService — display names obey the studio\'s own rules', () => 
       { op: 'update_intent', intent_id: 'i1', intent_display_name: 'entry point' }
     ]);
     expect(report.ok).toBe(false);
-    expect(report.results[0].error).toContain('reserved');
+    expect(report.results[0].error).toContain('start_point');
     expect(intentService.getIntentFromId('i1').intent_display_name).toBe('start');
   });
 
@@ -450,7 +486,7 @@ describe('FlowOpsService — action operations', () => {
   let connectorService: any;
 
   beforeEach(() => {
-    const withAction = anIntent('i1', 'start');
+    const withAction = anIntent('i1', 'Entry');
     withAction.actions = [{ _tdActionId: 'a1', _tdActionType: 'reply', text: 'hi' } as any];
 
     intentService = {
@@ -886,7 +922,7 @@ describe('FlowOpsService — connect retargets whichever mechanism is actually l
   beforeEach(() => {
     intentService = {
       listOfIntents: [
-        intentWithActionIntent('i1', 'start'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
+        intentWithActionIntent('i1', 'Entry'), anIntent('i2', 'welcome'), anIntent('i3', 'checkout')
       ],
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
@@ -1011,7 +1047,7 @@ describe('FlowOpsService — add_intent with inline actions', () => {
   beforeEach(() => {
     actionIdCounter = 0;
     intentService = {
-      listOfIntents: [anIntent('i1', 'start')],
+      listOfIntents: [anIntent('i1', 'Entry')],
       arrayUNDO: [],
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
@@ -1254,7 +1290,7 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
     } as any);
 
     intentService = {
-      listOfIntents: [anIntent('i1', 'start'), anIntent('i2', 'welcome')],
+      listOfIntents: [anIntent('i1', 'Entry'), anIntent('i2', 'welcome')],
       arrayUNDO: [],
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
@@ -1797,7 +1833,7 @@ describe('FlowOpsService — connect actually draws, and clears a retarget\'s st
     const edgeToI3 = `${fromId}/i3`;
 
     beforeEach(() => {
-      const from = anIntent('i1', 'start');
+      const from = anIntent('i1', 'Entry');
       from.actions = [{ _tdActionId: 'act-intent-1', _tdActionType: 'intent', intentName: '' } as any];
       intentService = {
         listOfIntents: [from, anIntent('i2', 'Answer Found'), anIntent('i3', 'Transfer')],
@@ -1903,7 +1939,7 @@ describe('FlowOpsService — refusing to destroy the scaffold\'s structure', () 
   }
 
   beforeEach(() => {
-    const withAction = anIntent('i1', 'start');
+    const withAction = anIntent('i1', 'Entry');
     // The existing action already carries a sub-key (`operation.type`) that a
     // freshly built setattribute-v2 would not have -- exactly what saving a
     // valid edit through the studio's own panel would leave behind.
@@ -2151,7 +2187,7 @@ describe('FlowOpsService — a reply\'s requested text lands where the studio re
   let intentService: any;
 
   beforeEach(() => {
-    const withReply = anIntent('i1', 'start');
+    const withReply = anIntent('i1', 'Entry');
     withReply.actions = [replyScaffold('reply')];
     withReply.actions[0]._tdActionId = 'reply-1';
 
@@ -2512,7 +2548,7 @@ describe('FlowOpsService — reply buttons get the wiring only the studio can su
 
   beforeEach(() => {
     intentService = {
-      listOfIntents: [anIntent('i1', 'start'), anIntent('i2', 'Menu'), anIntent('i3', 'Fatture')],
+      listOfIntents: [anIntent('i1', 'Entry'), anIntent('i2', 'Menu'), anIntent('i3', 'Fatture')],
       arrayUNDO: [],
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
@@ -3209,7 +3245,7 @@ describe('FlowOpsService — an action\'s own destination fields must resolve on
     actionIdCounter = 0;
     intentService = {
       listOfIntents: [
-        anIntent('i1', 'start'), anIntent('i2', 'kb_trovata'), anIntent('i3', 'valuta_urgenza')
+        anIntent('i1', 'Entry'), anIntent('i2', 'kb_trovata'), anIntent('i3', 'valuta_urgenza')
       ],
       arrayUNDO: [],
       getIntentFromId(id: string) {
@@ -3381,7 +3417,7 @@ describe('FlowOpsService — a bare \'#\' destination is an empty one, not an in
     actionIdCounter = 0;
     intentService = {
       listOfIntents: [
-        anIntent('i1', 'start'), anIntent('i2', 'kb_trovata'), anIntent('i3', 'valuta_urgenza')
+        anIntent('i1', 'Entry'), anIntent('i2', 'kb_trovata'), anIntent('i3', 'valuta_urgenza')
       ],
       arrayUNDO: [],
       getIntentFromId(id: string) {
@@ -3546,7 +3582,7 @@ describe('FlowOpsService — the call to a subagent', () => {
 
   beforeEach(() => {
     intentService = {
-      listOfIntents: [anIntent('i1', 'start')],
+      listOfIntents: [anIntent('i1', 'Entry')],
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
       },
@@ -3910,9 +3946,97 @@ describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () =>
     expectV3Refusal(await service.apply([{ op: 'delete_intent', intent_id: 'fallback' }]), 0);
   });
 
+  describe('start boxes belong to the start_point tool', () => {
+    beforeEach(() => {
+      const hook = withActions('hook', 'Webhook start', 'intent');
+      (hook as any).attributes = { start_point: 'webhook' };
+      intentService.listOfIntents.push(hook);
+    });
+
+    function expectRefusedNaming(report: any, index = 0) {
+      expect(report.ok).toBe(false);
+      expect(report.rejected_before_applying).toBe(true);
+      expect(report.results[index].ok).toBe(false);
+      expect(report.results[index].error).toContain('start_point');
+      expect(intentService.updateIntent).not.toHaveBeenCalled();
+      expect(intentService.saveNewIntent).not.toHaveBeenCalled();
+    }
+
+    it('refuses renaming a start box and names start_point', async () => {
+      expectRefusedNaming(await service.apply([
+        { op: 'update_intent', intent_id: 'hook', intent_display_name: 'My hook' }]));
+    });
+
+    it('still lets a start box be moved', async () => {
+      const report = await service.apply([
+        { op: 'update_intent', intent_id: 'hook', position: { x: 10, y: 10 } } as any]);
+      expect(report.results[0].error || '').not.toContain('start_point');
+    });
+
+    it('refuses adding an action to a start box', async () => {
+      expectRefusedNaming(await service.apply([{ op: 'add_action', intent_id: 'hook', type: 'reply' }]));
+      expectRefusedNaming(await service.apply([{ op: 'add_action', intent_id: 'start', type: 'reply' }]));
+    });
+
+    it('refuses connecting into a start box (start included)', async () => {
+      expectRefusedNaming(await service.apply([{ op: 'connect', from_intent_id: 'welcome', to_intent_id: 'hook' }]));
+      expectRefusedNaming(await service.apply([{ op: 'connect', from_intent_id: 'welcome', to_intent_id: 'start' }]));
+    });
+
+    it('still allows connecting from a start box', async () => {
+      const report = await service.apply([{ op: 'connect', from_intent_id: 'hook', to_intent_id: 'empty' }]);
+      expect(report.results[0].error || '').not.toContain('start_point');
+      const fromStart = await service.apply([{ op: 'connect', from_intent_id: 'start', to_intent_id: 'empty' }]);
+      expect(fromStart.results[0].error || '').not.toContain('start_point');
+    });
+
+    it('refuses connecting from start while Web start is disabled, telling to re-enable it', async () => {
+      (intentService.getIntentFromId('start') as any).attributes = { web_start_disabled: true };
+      const report = await service.apply([{ op: 'connect', from_intent_id: 'start', to_intent_id: 'empty' }]);
+      expectRefusedNaming(report);
+      expect(report.results[0].error).toContain('"add"');
+      expect(report.results[0].error).toContain('"web"');
+    });
+
+    it('does not require start to be connected when web start is disabled', async () => {
+      (intentService.getIntentFromId('start') as any).attributes = { web_start_disabled: true };
+      const report = await service.apply([{ op: 'connect', from_intent_id: 'welcome', to_intent_id: 'empty' }]);
+      expect(report.results[0].error || '').not.toContain('V3-S2');
+      expect(report.results[0].error || '').not.toContain('start');
+      expect(V3_FLOW_RULES.find(r => r.startsWith('V3-S2'))).toContain('web_start_disabled');
+    });
+
+    it('refuses update_action and delete_action on a start box (start included), naming start_point', async () => {
+      expectRefusedNaming(await service.apply([
+        { op: 'update_action', intent_id: 'start', action_id: 'start-a0', fields: { intentName: '#empty' } } as any]));
+      expectRefusedNaming(await service.apply([{ op: 'delete_action', intent_id: 'start', action_id: 'start-a0' } as any]));
+      expectRefusedNaming(await service.apply([
+        { op: 'update_action', intent_id: 'hook', action_id: 'hook-a0', fields: { intentName: '#empty' } } as any]));
+      expectRefusedNaming(await service.apply([{ op: 'delete_action', intent_id: 'hook', action_id: 'hook-a0' } as any]));
+      expect(intentService.getIntentFromId('start').actions.length).toBe(1);
+    });
+
+    it('update_action cannot connect a disabled start (no bypass of the connect guard)', async () => {
+      const start: any = intentService.getIntentFromId('start');
+      start.attributes = { web_start_disabled: true };
+      const report = await service.apply([
+        { op: 'update_action', intent_id: 'start', action_id: 'start-a0', fields: { intentName: '#empty' } } as any]);
+      expectRefusedNaming(report);
+      expect(start.actions[0].intentName).toBeUndefined();
+    });
+
+    it('still refuses deleting a start box and names start_point remove', async () => {
+      const report = await service.apply([{ op: 'delete_intent', intent_id: 'hook' }]);
+      expectRefusedNaming(report);
+      expect(report.results[0].error).toContain('"remove"');
+    });
+  });
+
   it('refuses a connection into start or defaultFallback', async () => {
-    expectV3Refusal(await service.apply([
-      { op: 'connect', from_intent_id: 'welcome', to_intent_id: 'start' }]), 0);
+    // `start` is a start box: refused before the V3 batch, naming the start_point tool
+    const intoStart = await service.apply([{ op: 'connect', from_intent_id: 'welcome', to_intent_id: 'start' }]);
+    expect(intoStart.ok).toBe(false);
+    expect(intoStart.results[0].error).toContain('start_point');
     expectV3Refusal(await service.apply([
       { op: 'connect', from_intent_id: 'welcome', to_intent_id: 'fallback' }]), 0);
   });
@@ -4354,6 +4478,22 @@ describe('FlowOpsService — the flow is laid out again once the chat stops chan
     expect(laidOut).toEqual([]);
   }));
 
+  it('lays a flow with Web start disabled out from its Scheduled box, leaving the hidden start where it is', fakeAsync(() => {
+    const start = intentService.getIntentFromId('s');
+    start.attributes = { position: { x: 10, y: 20 }, web_start_disabled: true, nextBlockAction: { intentName: '' } };
+    const scheduled = anIntent('sc', 'Scheduled start');
+    scheduled.attributes = { start_point: 'scheduled', position: { x: -400, y: 300 }, nextBlockAction: { intentName: '#a' } } as any;
+    intentService.listOfIntents.push(scheduled);
+    service.apply(deleteOld());
+    flushMicrotasks();
+    tick(5000);
+    expect(intentService.updateIntentPositions).toHaveBeenCalledTimes(1);
+    const moves: any[] = intentService.updateIntentPositions.calls.argsFor(0)[0];
+    expect(moves.find(m => m.intent_id === 's')).toBeUndefined();
+    expect(moves.find(m => m.intent_id === 'sc')).toBeUndefined();
+    expect(moves.find(m => m.intent_id === 'a').position).toEqual({ x: -76, y: 300 });
+  }));
+
   it('announces the layout even when every block is already in place, so the view still fits the flow', fakeAsync(() => {
     intentService.getIntentFromId('a').attributes.position = { x: 334, y: 20 };
     service.apply(deleteOld());
@@ -4468,7 +4608,7 @@ describe('FlowOpsService — azioni riservate all\'editor V3', () => {
 
   function build(isV3: boolean, intents?: Intent[]): void {
     intentService = {
-      listOfIntents: intents || [anIntent('i1', 'start'), anIntent('i2', 'welcome')],
+      listOfIntents: intents || [anIntent('i1', 'Entry'), anIntent('i2', 'welcome')],
       arrayUNDO: [],
       getIntentFromId(id: string) {
         return this.listOfIntents.find((i: Intent) => i.intent_id === id);
@@ -4543,7 +4683,7 @@ describe('FlowOpsService — azioni riservate all\'editor V3', () => {
     // Deliberato: l'azione e' gia' sull'agente. Rifiutare la modifica la lascerebbe
     // li', irraggiungibile dalla chat e comunque presente. Si blocca l'ingresso,
     // non la manutenzione.
-    const intent = anIntent('i1', 'start');
+    const intent = anIntent('i1', 'Entry');
     intent.actions = [{ _tdActionId: 'a1', _tdActionType: SOLO_V3, cases: [{ _tdCaseId: 'c1' }], elseIntent: '' } as any];
     build(false, [intent, anIntent('i2', 'welcome')]);
     const report = await service.apply([
@@ -4607,7 +4747,7 @@ describe('FlowOpsService — condizione a piu\' casi scritta dalla chat', () => 
   }
 
   beforeEach(() => {
-    build([anIntent('i1', 'start'), anIntent('i2', 'uno'), anIntent('i3', 'due')]);
+    build([anIntent('i1', 'Entry'), anIntent('i2', 'uno'), anIntent('i3', 'due')]);
   });
 
   it('rifiuta la destinazione di un caso che non esiste sul canvas', async () => {

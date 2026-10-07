@@ -1,5 +1,6 @@
 import { McpServer } from 'src/app/models/mcp.model';
 import { LlmModel } from '../utils-llm-models';
+import type { StartPointDescriptor } from '../services/start-point-manager.service';
 
 /** What `get_project_capabilities` answers: what the open flow can be built
  *  with in this project. `actions` is the element panel's own list (see
@@ -71,6 +72,10 @@ export interface ProjectCapabilities {
   llm_models: LlmModelCapability[];
   /** Set when the project's models could not be read; llm_models is then empty. */
   llm_models_error?: string;
+  /** The start boxes (web, webhook, scheduled) this flow has or could add. */
+  start_points?: StartPointDescriptor[];
+  /** Set when the start points could not be described; start_points is then absent. */
+  start_points_error?: string;
 }
 
 /** The capabilities plus what FlowOpsService needs to store an attached custom

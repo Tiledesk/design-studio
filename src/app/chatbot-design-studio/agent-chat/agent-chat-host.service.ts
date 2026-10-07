@@ -11,6 +11,7 @@ import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
 import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
+import { StartPointManagerService, StartPointResult, StartPointType } from '../services/start-point-manager.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 import { withoutLiteralSecrets } from './agent-chat-secrets';
 
@@ -20,7 +21,7 @@ import { withoutLiteralSecrets } from './agent-chat-secrets';
  *  the model a tool nobody answers. The host spec keeps the two in step. */
 export const AGENT_CHAT_CLIENT_TOOLS: string[] = [
   'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent',
-  'get_project_capabilities'
+  'get_project_capabilities', 'start_point'
 ];
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -110,7 +111,8 @@ export class AgentChatHostService {
     private tiledeskAuthService: TiledeskAuthService,
     private flowOps: FlowOpsService,
     private family: AgentChatFamilyService,
-    private capabilities: AgentChatCapabilitiesService
+    private capabilities: AgentChatCapabilitiesService,
+    private startPoints: StartPointManagerService
   ) {
     this.config = readAgentChatConfig(this.appConfigService.getConfig());
     // The chat is handed the token once, at `hello`, and then talks to the
@@ -290,6 +292,53 @@ export class AgentChatHostService {
         report.results.filter(r => !r.ok).map(r => r.error).join(' | '));
       this.appliedSource.next(report);
       return report;
+    });
+
+    // The start boxes (web, webhook, scheduled) are not blocks of the flow, so
+    // apply_flow_patch cannot reach them: StartPointManagerService is the one
+    // place that adds, configures and removes them, the palette's own too.
+    this.registerTool('start_point', async (args) => {
+      const declared = args?.['faq_kb_id'] as string | undefined;
+      const open = this.dashboardService.id_faq_kb;
+      const action = args?.['action'];
+      const type = args?.['type'] as StartPointType;
+      this.logger.log('[AGENT-CHAT-HOST] ddp <- start_point su', declared, ':', action, type);
+      const refuse = (code: 'invalid' | 'unavailable', error: string): StartPointResult =>
+        ({ ok: false, code, error });
+      // Same rule as apply_flow_patch: the canvas can move under a running turn.
+      if (!declared || declared !== open) {
+        return refuse('invalid', declared
+          ? `start_point is for "${open}", not "${declared}". Read the open flow with get_flow, `
+            + `or open the one you meant with open_flow, then retry.`
+          : `start_point must declare the faq_kb_id it edits. The open flow is "${open}".`);
+      }
+      if (action !== 'add' && action !== 'update' && action !== 'remove') {
+        return refuse('invalid', `Unknown action "${action}": use add, update or remove.`);
+      }
+      let known: StartPointType[];
+      try {
+        known = (await this.startPoints.describe()).map(d => d.type);
+      } catch (error) {
+        this.logger.error('[AGENT-CHAT-HOST] ddp start_point: describe failed:', error);
+        return refuse('unavailable', 'The start points of this flow could not be read: '
+          + ((error as any)?.message || 'unknown error'));
+      }
+      if (!known.includes(type)) {
+        return refuse('invalid', `Unknown start point type "${type}": use ${known.join(', ')}.`);
+      }
+      const settings = args?.['settings'] as Record<string, unknown> | undefined;
+      const position = args?.['position'] as { x: number; y: number } | undefined;
+      if (position !== undefined && position !== null
+        && !(typeof position === 'object' && Number.isFinite(position.x) && Number.isFinite(position.y))) {
+        return refuse('invalid', 'position must be an object {x, y} of numbers.');
+      }
+      const result = action === 'add'
+        ? await this.startPoints.add(type, settings, position || undefined)
+        : action === 'update'
+          ? await this.startPoints.update(type, settings as Record<string, unknown>)
+          : await this.startPoints.remove(type);
+      this.logger.log('[AGENT-CHAT-HOST] ddp -> start_point:', result.ok ? 'ok' : (result as any).code);
+      return result;
     });
 
     this.registerTool('open_flow', async (args) => {

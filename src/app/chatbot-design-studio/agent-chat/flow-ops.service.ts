@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { firstValueFrom, Subject } from 'rxjs';
+import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -10,11 +10,11 @@ import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
-import { computeFlowLayout } from './flow-ops-layout';
+import { computeFlowLayout, flowLayoutIntents, flowLayoutRoots } from './flow-ops-layout';
 import { literalSecretFields, literalSecretRefusal } from './agent-chat-secrets';
 import { withDestinationHash } from '../utils-connectors';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage, getIntentDefaultColor } from '../utils';
-import { startPointTypeOf } from '../utils-start-points';
+import { startPointTypeOf, isStartBox, isWebStartDisabled } from '../utils-start-points';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import {
   actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, usesLlmModel, withDefaultLlmModel
@@ -129,6 +129,14 @@ export class FlowOpsService implements OnDestroy {
    *  So the depth is only ever spent on the flow that earned it. null means
    *  there is nothing to undo. */
   private lastBatchFaqKbId: string | null = null;
+
+  /** The entries themselves that `lastBatchUndoDepth` counts, oldest first (the top of the stack when the batch
+   *  applied). IntentService prunes entries from the middle of the stack when a start box is saved or deleted
+   *  without history (`start_point` remove/disable): the depth then no longer describes the top, and popping it
+   *  would take back older, unrelated user changes. On every prune the batch is kept only while these entries are
+   *  still, untouched, the top of the stack. */
+  private lastBatchEntries: any[] = [];
+  private historyPrunedSubscription: Subscription | undefined;
   /** Timers of the connector check scheduled after the last batch; reset by every new batch. */
   private connectorCheckTimers: any[] = [];
 
@@ -201,7 +209,21 @@ export class FlowOpsService implements OnDestroy {
     private dashboardService: DashboardService,
     private family: AgentChatFamilyService,
     private faqService: FaqService
-  ) {}
+  ) {
+    this.historyPrunedSubscription = this.intentService.undoHistoryPruned$?.subscribe(() => this.onUndoHistoryPruned());
+  }
+
+  /** Entries left the middle of the undo stack: the last batch stays undoable only if it is still the top of it. */
+  private onUndoHistoryPruned(): void {
+    const stack = this.intentService.arrayUNDO;
+    const entries = this.lastBatchEntries;
+    const n = entries.length;
+    const onTop = n > 0 && n === this.lastBatchUndoDepth && Array.isArray(stack) && stack.length >= n
+      && entries.every((entry, i) => stack[stack.length - n + i] === entry);
+    if (!onTop) {
+      this.forgetLastBatch();
+    }
+  }
 
   public readFlow(): FlowSnapshot {
     return {
@@ -344,6 +366,8 @@ export class FlowOpsService implements OnDestroy {
     // only spendable on the flow that was open when the batch was applied.
     this.lastBatchFaqKbId = this.lastBatchUndoDepth > 0
       ? this.dashboardService.id_faq_kb : null;
+    this.lastBatchEntries = this.lastBatchUndoDepth > 0
+      ? this.intentService.arrayUNDO.slice(-this.lastBatchUndoDepth) : [];
     this.redrawBlocks(blocksToRedraw);
     // A block the agent moved cannot be redrawn here: `move` only writes
     // `attributes.position`, and the card is placed by the canvas template
@@ -408,6 +432,7 @@ export class FlowOpsService implements OnDestroy {
   private forgetLastBatch(): void {
     this.lastBatchUndoDepth = 0;
     this.lastBatchFaqKbId = null;
+    this.lastBatchEntries = [];
   }
 
   /** Block names, per subagent, for every `callsubagent` this batch mentions.
@@ -665,22 +690,68 @@ export class FlowOpsService implements OnDestroy {
         const startType = target ? startPointTypeOf(target) : null;
         if (startType === 'webhook' || startType === 'scheduled') {
           return { op: op.op, ok: false, error: `"${target.intent_display_name}" is the ${startType} start box: ` +
-            `it is removed from its own panel (Delete), not by delete_intent.` };
+            `it is removed with the \`start_point\` tool (action: "remove"), not by delete_intent.` };
         }
         return needsIntent(op.intent_id) ?? this.validateShape(op);
       }
       case 'update_intent':
-      case 'move':
-      case 'add_action':
+      case 'add_action': {
+        const missing = needsIntent(op.intent_id);
+        if (missing) { return missing; }
+        // A start box is managed by the `start_point` tool: its name is its identity and it holds no action.
+        const box = this.intentService.getIntentFromId(op.intent_id);
+        if (isStartBox(box)) {
+          if (op.op === 'add_action') {
+            return { op: op.op, ok: false, error: `"${box.intent_display_name}" is a start box and holds no ` +
+              `action: connect it to the first block instead. Start boxes are managed with the \`start_point\` tool.` };
+          }
+          if (op.intent_display_name !== undefined && String(op.intent_display_name).trim() !== (box.intent_display_name ?? '').trim()) {
+            return { op: op.op, ok: false, error: `"${box.intent_display_name}" is a start box and cannot be renamed. ` +
+              `Start boxes are managed with the \`start_point\` tool.` };
+          }
+        }
+        return this.validateShape(op);
+      }
       case 'update_action':
-      case 'delete_action':
+      case 'delete_action': {
+        const missing = needsIntent((op as any).intent_id);
+        if (missing) { return missing; }
+        // The start box's action is its connection: written only by connect (which refuses a disabled start),
+        // never edited or removed here -- update_action's intentName would bypass that guard.
+        const box = this.intentService.getIntentFromId((op as any).intent_id);
+        if (isStartBox(box)) {
+          return { op: op.op, ok: false, error: `"${box.intent_display_name}" is a start box: its actions are not ` +
+            `edited or deleted. Use connect to change where it leads. Start boxes are managed with the \`start_point\` tool.` };
+        }
+        return this.validateShape(op);
+      }
+      case 'move':
         return needsIntent((op as any).intent_id) ?? this.validateShape(op);
-      case 'connect':
+      case 'connect': {
+        const startError = this.validateConnectStartBoxes(op);
         return needsIntent(op.from_intent_id)
             ?? needsIntent(op.to_intent_id)
+            ?? startError
             ?? this.validateConnectRouting(op)
             ?? { op: op.op, ok: true };
+      }
     }
+  }
+
+  /** Start boxes (the `start` block and every block with `attributes.start_point`) only lead out of the
+   *  flow's entry: nothing connects into one, and `start` leads nowhere while Web start is disabled. */
+  private validateConnectStartBoxes(op: any): FlowOpResult | null {
+    const to = this.intentService.getIntentFromId(op.to_intent_id);
+    if (isStartBox(to)) {
+      return { op: op.op, ok: false, error: `"${to.intent_display_name}" is a start box: nothing connects ` +
+        `into it. Connect to the block that should run instead. Start boxes are managed with the \`start_point\` tool.` };
+    }
+    const from = this.intentService.getIntentFromId(op.from_intent_id);
+    if (isWebStartDisabled(from)) {
+      return { op: op.op, ok: false, error: `Web start is disabled, so \`start\` cannot be connected. ` +
+        `Re-enable it first with the \`start_point\` tool (action: "add", type: "web"), then connect.` };
+    }
+    return null;
   }
 
   /** Action types whose own fields already decide where the block they live
@@ -2331,6 +2402,7 @@ export class FlowOpsService implements OnDestroy {
    *  still working is harmless -- it only completes blocks, and the next batch schedules another.
    *  It stops if the canvas moves to another flow. */
   ngOnDestroy(): void {
+    this.historyPrunedSubscription?.unsubscribe();
     this.connectorCheckTimers.forEach(timer => clearTimeout(timer));
     this.connectorCheckTimers = [];
   }
@@ -2510,16 +2582,15 @@ export class FlowOpsService implements OnDestroy {
   private layoutFlow(faqKbId: string): boolean {
     if (this.layoutPendingFaqKbId !== faqKbId) { return false; }
     this.layoutPendingFaqKbId = null;
-    const intents: any[] = (this.intentService.listOfIntents || []).filter(intent => !!intent?.intent_id);
+    // a disabled Web start is hidden: it neither moves nor anchors the layout
+    const intents: any[] = flowLayoutIntents(this.intentService.listOfIntents || []);
     const nodes = intents.map(intent => ({
       id: intent.intent_id,
       height: this.blockHeightPx(intent.intent_id),
       position: this.positionOf(intent)
     }));
     const edges = new Map<string, string[]>(intents.map(intent => [intent.intent_id, this.outgoingTargets(intent)]));
-    const roots = [RESERVED_INTENT_NAMES.START, RESERVED_INTENT_NAMES.WEBHOOK, RESERVED_INTENT_NAMES.DEFAULT_FALLBACK]
-      .map(name => intents.find(intent => intent.intent_display_name === name)?.intent_id)
-      .filter(id => !!id);
+    const roots = flowLayoutRoots(intents);
     const changed = computeFlowLayout(nodes, edges, roots, {
       columnStep: NEW_BLOCK_HORIZONTAL_STEP_PX,
       verticalGap: CANVAS_BLOCK_VERTICAL_GAP_PX
@@ -2529,6 +2600,8 @@ export class FlowOpsService implements OnDestroy {
     movedIds.forEach(id => this.autoPlacedPositions.set(id, changed.get(id)));
     if (movedIds.length > 0 && this.lastBatchUndoDepth > 0 && this.lastBatchFaqKbId === faqKbId) {
       this.lastBatchUndoDepth++;
+      const stack = this.intentService.arrayUNDO;
+      this.lastBatchEntries = this.lastBatchEntries.concat(Array.isArray(stack) && stack.length ? [stack[stack.length - 1]] : []);
     }
     // The blocks the agent moved itself ride along: the layout may well have left one
     // of them exactly where the agent put it, and then nothing else would redraw the

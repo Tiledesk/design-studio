@@ -10,6 +10,7 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import {
   TYPE_CHATBOT, availableActionEntries, isSubagentSubtype, resolveChatbotSubtype
 } from '../utils-actions';
+import { StartPointDescriptor, StartPointManagerService } from '../services/start-point-manager.service';
 import { DYNAMIC_MODEL_PROVIDERS, LlmModel, getIntegrationByName, initLLMModels } from '../utils-llm-models';
 import {
   ActionCapability, CapabilitiesSnapshot, LlmModelCapability, McpServerCapability
@@ -148,7 +149,7 @@ export class AgentChatCapabilitiesService {
       .map(a => a.canLoad
         ? { type: a.type, status: 'available' as const }
         : { type: a.type, status: 'needs_upgrade' as const, plan: String(a.plan) });
-    const [mcp, llm] = await Promise.all([this.mcpPart(), this.llmPart()]);
+    const [mcp, llm, startPoints] = await Promise.all([this.mcpPart(), this.llmPart(), this.startPointsPart()]);
     return {
       capabilities: {
         chatbot_subtype: resolveChatbotSubtype(subtype),
@@ -157,11 +158,24 @@ export class AgentChatCapabilitiesService {
         mcp_servers: mcp.servers,
         ...(mcp.error ? { mcp_error: mcp.error } : {}),
         llm_models: llm.capabilities,
-        ...(llm.error ? { llm_models_error: llm.error } : {})
+        ...(llm.error ? { llm_models_error: llm.error } : {}),
+        ...(startPoints.error ? { start_points_error: startPoints.error } : { start_points: startPoints.list })
       },
       customServerConfigs: mcp.configs,
       llmModels: llm.models
     };
+  }
+
+  /** Resolved here, not injected, like ProjectPlanUtils: the manager reads
+   *  the open flow, and this service is built before any is open. A failure
+   *  costs the answer its start points, not the rest of it. */
+  private async startPointsPart(): Promise<{ list?: StartPointDescriptor[]; error?: string }> {
+    try {
+      return { list: await this.injector.get(StartPointManagerService).describe() };
+    } catch (error) {
+      LoggerInstance.getInstance().error('[AGENT-CHAT-CAPABILITIES] start points not described:', error);
+      return { error: (error as any)?.message || 'the start points could not be described' };
+    }
   }
 
   public invalidate(): void {

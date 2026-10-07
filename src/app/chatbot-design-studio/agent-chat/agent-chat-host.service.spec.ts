@@ -7,6 +7,7 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { StartPointManagerService } from '../services/start-point-manager.service';
 import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -17,6 +18,7 @@ describe('AgentChatHostService', () => {
   let flowOps: any;
   let familyService: any;
   let capabilitiesService: any;
+  let startPoints: any;
   let registered: Record<string, Function>;
   let created: any;
   let createdHosts: any[];
@@ -78,9 +80,20 @@ describe('AgentChatHostService', () => {
     })), invalidate: jasmine.createSpy('invalidate'),
       configureNativeServers: jasmine.createSpy('configureNativeServers').and.returnValue(Promise.resolve()) };
 
+    startPoints = {
+      describe: jasmine.createSpy('describe').and.returnValue(Promise.resolve([
+        { type: 'web', status: 'present', removable: true, settings: {} },
+        { type: 'webhook', status: 'available', removable: true, settings: {} },
+        { type: 'scheduled', status: 'available', removable: true, settings: {} }])),
+      add: jasmine.createSpy('add').and.returnValue(Promise.resolve(
+        { ok: true, intent_id: 'wh1', type: 'webhook', settings: { enabled: true } })),
+      update: jasmine.createSpy('update').and.returnValue(Promise.resolve({ ok: true, settings: { enabled: false } })),
+      remove: jasmine.createSpy('remove').and.returnValue(Promise.resolve({ ok: true }))
+    };
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
+        { provide: StartPointManagerService, useValue: startPoints },
         { provide: FlowOpsService, useValue: flowOps },
         { provide: IntentService, useValue: { intentSelected: { intent_id: 'i1' } } },
         { provide: DashboardService, useValue: dashboardService },
@@ -156,11 +169,92 @@ describe('AgentChatHostService', () => {
     expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
   });
 
-  it('registers exactly the six client tools', async () => {
+  it('registers exactly the seven client tools', async () => {
     await service.attach(document.createElement('iframe'));
     expect(Object.keys(registered).sort())
       .toEqual(['apply_flow_patch', 'create_subagent', 'get_canvas_selection', 'get_flow',
-                'get_project_capabilities', 'open_flow']);
+                'get_project_capabilities', 'open_flow', 'start_point']);
+  });
+
+  it('lists start_point among the client tools', () => {
+    expect(AGENT_CHAT_CLIENT_TOOLS).toContain('start_point');
+  });
+
+  it('start_point add calls the manager with type, settings and position', async () => {
+    await service.attach(document.createElement('iframe'));
+    const settings = { source_name: 'crm' };
+    const answer = await registered['start_point']({
+      faq_kb_id: 'kb1', action: 'add', type: 'webhook', settings, position: { x: 10, y: 20 } });
+    expect(startPoints.add).toHaveBeenCalledWith('webhook', settings, { x: 10, y: 20 });
+    expect(answer.ok).toBeTrue();
+    expect(answer.intent_id).toBe('wh1');
+  });
+
+  it('start_point update and remove call the manager', async () => {
+    await service.attach(document.createElement('iframe'));
+    await registered['start_point']({ faq_kb_id: 'kb1', action: 'update', type: 'webhook', settings: { enabled: false } });
+    expect(startPoints.update).toHaveBeenCalledWith('webhook', { enabled: false });
+    await registered['start_point']({ faq_kb_id: 'kb1', action: 'remove', type: 'scheduled' });
+    expect(startPoints.remove).toHaveBeenCalledWith('scheduled');
+  });
+
+  it('start_point passes a manager failure through unchanged', async () => {
+    startPoints.add.and.returnValue(Promise.resolve({ ok: false, code: 'exists', error: 'already there' }));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['start_point']({ faq_kb_id: 'kb1', action: 'add', type: 'webhook' });
+    expect(answer.ok).toBeFalse();
+    expect(answer.code).toBe('exists');
+  });
+
+  it('start_point refuses a faq_kb_id that is not the open flow', async () => {
+    await service.attach(document.createElement('iframe'));
+    const wrong = await registered['start_point']({ faq_kb_id: 'other', action: 'add', type: 'webhook' });
+    expect(wrong.ok).toBeFalse();
+    expect(wrong.code).toBe('invalid');
+    expect(wrong.error).toContain('"other"');
+    expect(wrong.error).toContain('"kb1"');
+    const missing = await registered['start_point']({ action: 'add', type: 'webhook' });
+    expect(missing.code).toBe('invalid');
+    expect(startPoints.add).not.toHaveBeenCalled();
+  });
+
+  it('start_point refuses an unknown action or type', async () => {
+    await service.attach(document.createElement('iframe'));
+    const action = await registered['start_point']({ faq_kb_id: 'kb1', action: 'move', type: 'webhook' });
+    expect(action.code).toBe('invalid');
+    const type = await registered['start_point']({ faq_kb_id: 'kb1', action: 'add', type: 'telegram' });
+    expect(type.code).toBe('invalid');
+    expect(type.error).toContain('web, webhook, scheduled');
+    expect(startPoints.add).not.toHaveBeenCalled();
+  });
+
+  it('start_point answers unavailable when the start points cannot be described', async () => {
+    startPoints.describe.and.returnValue(Promise.reject(new Error('boom')));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['start_point']({ faq_kb_id: 'kb1', action: 'add', type: 'webhook' });
+    expect(answer.ok).toBeFalse();
+    expect(answer.code).toBe('unavailable');
+  });
+
+  it('get_project_capabilities includes start_points', async () => {
+    const list = [{ type: 'web', status: 'present', removable: true, settings: {}, current: {} }];
+    capabilitiesService.snapshot.and.returnValue(Promise.resolve({
+      capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [], start_points: list },
+      customServerConfigs: {} }));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['get_project_capabilities']({});
+    expect(answer.start_points).toEqual(list);
+  });
+
+  it('get_project_capabilities still answers when describing start points fails', async () => {
+    capabilitiesService.snapshot.and.returnValue(Promise.resolve({
+      capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [],
+        start_points_error: 'no webhook' },
+      customServerConfigs: {} }));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['get_project_capabilities']({});
+    expect(answer.start_points).toBeUndefined();
+    expect(answer.start_points_error).toBe('no webhook');
   });
 
   // A session the studio opens by itself declares AGENT_CHAT_CLIENT_TOOLS:
@@ -371,7 +465,7 @@ describe('AgentChatHostService', () => {
     const iframe = document.createElement('iframe');
     await service.attach(iframe);
     expect(iframe.getAttribute('src')).toBeNull();
-    expect(Object.keys(registered).length).toBe(6);
+    expect(Object.keys(registered).length).toBe(7);
   });
 
   it('emits the flow ops report on applied$ after apply_flow_patch', async () => {
@@ -442,6 +536,7 @@ describe('AgentChatHostService', () => {
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
+        { provide: StartPointManagerService, useValue: {} },
         { provide: FlowOpsService, useValue: flowOps },
         { provide: IntentService, useValue: {} },
         { provide: DashboardService, useValue: { selectedChatbot$: new BehaviorSubject(null) } },

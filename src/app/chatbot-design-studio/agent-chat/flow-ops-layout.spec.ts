@@ -1,4 +1,4 @@
-import { computeFlowLayout, LayoutNode } from './flow-ops-layout';
+import { computeFlowLayout, flowLayoutRoots, flowLayoutIntents, LayoutNode } from './flow-ops-layout';
 import { FlowPosition } from './flow-ops.model';
 
 const OPTIONS = { columnStep: 324, verticalGap: 40 };
@@ -124,5 +124,34 @@ describe('computeFlowLayout', () => {
     const at = positions(nodes, computeFlowLayout(nodes, edges({ a: ['b'] }), ['start'], OPTIONS));
     expect(at['a']).toEqual({ x: 0, y: 0 });
     expect(at['b']).toEqual({ x: 324, y: 0 });
+  });
+});
+
+describe('flowLayoutRoots', () => {
+  const block = (id: string, name: string, attributes: any = {}) => ({ intent_id: id, intent_display_name: name, attributes });
+  const start = block('s', 'start');
+  const hidden = block('s', 'start', { web_start_disabled: true });
+  const hook = block('wh', 'webhook');
+  const fallback = block('f', 'defaultFallback');
+  const scheduled = block('sc', 'Scheduled start', { start_point: 'scheduled' });
+  const webhookBox = block('wb', 'Webhook start', { start_point: 'webhook' });
+  const plain = block('p', 'welcome');
+
+  it('roots start first, then the start boxes, the webhook and the fallback', () => {
+    expect(flowLayoutRoots([plain, fallback, scheduled, hook, start])).toEqual(['s', 'sc', 'wh', 'f']);
+  });
+
+  it('skips a disabled start: the first start box leads the layout', () => {
+    expect(flowLayoutRoots([plain, fallback, hidden, scheduled, webhookBox])).toEqual(['sc', 'wb', 'f']);
+  });
+
+  it('keeps the old roots when there is no start box', () => {
+    expect(flowLayoutRoots([plain, start, fallback])).toEqual(['s', 'f']);
+    expect(flowLayoutRoots([])).toEqual([]);
+  });
+
+  it('flowLayoutIntents leaves the hidden start out of the layout', () => {
+    expect(flowLayoutIntents([hidden, plain, { attributes: {} }])).toEqual([plain]);
+    expect(flowLayoutIntents([start, plain])).toEqual([start, plain]);
   });
 });

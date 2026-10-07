@@ -17,7 +17,8 @@ export const V3_FLOW_RULES: string[] = [
   'connected to a block with one `capture_user_reply`, which is then connected to the next step.',
   'V3-U5: `capture_user_reply` has no connector of its own: never set its `goToIntent`. The flow ' +
   'continues from the BLOCK connector, so `connect` the capture block to the next block.',
-  'V3-S2: connect `start` to the first block of the flow.',
+  'V3-S2: connect `start` to the first block of the flow. Exception: while Web start is disabled ' +
+  '(`start` has `attributes.web_start_disabled`), `start` stays unconnected and cannot be connected.',
   'V3-S3: `defaultFallback` stays empty: never add actions to it. `connect` it to the block that ' +
   'serves the message (V3-S8).',
   'V3-S4: `start` and `defaultFallback` are never deleted, renamed or used as a destination: nothing ' +

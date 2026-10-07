@@ -78,7 +78,7 @@ describe('FlowOpsService — project capabilities', () => {
     LoggerInstance.setInstance({
       log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
     } as any);
-    const withLegacy = anIntent('i1', 'start');
+    const withLegacy = anIntent('i1', 'ask_ai');
     withLegacy.actions = [
       { _tdActionId: 'old', _tdActionType: 'gpt_task', question: 'q' } as any,
       { _tdActionId: 'ai1', _tdActionType: 'ai_prompt', question: 'q' } as any,
