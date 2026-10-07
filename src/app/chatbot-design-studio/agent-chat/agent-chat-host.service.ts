@@ -11,6 +11,7 @@ import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
+import { withoutLiteralSecrets } from './agent-chat-secrets';
 
 /** The client tools this host registers on the chat. A session opened on the
  *  runtime by the studio itself (see AgentFromPromptService) must declare the
@@ -183,7 +184,8 @@ export class AgentChatHostService {
       // call: a stand-in FlowOpsService without it reads as "nothing to say".
       const v3Warnings: string[] = isV3 ? (this.flowOps.fallbackWarnings?.() || []) : [];
       return {
-        ...this.flowOps.readFlow(),
+        // A key written into a web request never reaches the model.
+        ...withoutLiteralSecrets(this.flowOps.readFlow()),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),

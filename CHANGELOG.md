@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 07/10/2026
+- **changed**: la chat AI non può più scrivere una chiave API in chiaro in una web request, né nelle intestazioni né nell'indirizzo né nel corpo: l'operazione viene rifiutata prima di toccare il canvas, e la chat riceve l'indicazione di mettere la chiave in una Global dell'agente e di richiamarla per nome (es. `Bearer {{openrouter_api_key}}`), chiedendo all'utente di crearla. Vale per tutti gli agenti, V3 e legacy, e solo per le modifiche fatte dalla chat: l'editor resta com'è
+- **changed**: quando la chat AI legge il flusso, le chiavi già scritte in chiaro nelle web request le arrivano mascherate, così non finiscono più al modello a ogni lettura; se prova a rimandare indietro la maschera al posto della chiave, l'operazione viene rifiutata e il flusso non si rompe
+
 # this branch 06/10/2026
 - **changed**: negli agenti V3 le icone dei blocchi riservati hanno un colore ciascuno, uguale sul flusso e nel pannello dei blocchi: il razzo del Web start verde, il Webhook start viola e la freccia della defaultFallback vuota azzurra. Sugli agenti legacy restano i colori di prima
 - **changed**: la chat AI si apre e si chiude da una sua linguetta, in cima alla striscia di sinistra sopra i subagent, con un'icona nuova: il pulsante nell'intestazione non c'e' piu'

@@ -11,6 +11,7 @@ import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from 
 import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
+import { literalSecretFields, literalSecretRefusal } from './agent-chat-secrets';
 import { withDestinationHash } from '../utils-connectors';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage, getIntentDefaultColor } from '../utils';
 
@@ -970,6 +971,14 @@ export class FlowOpsService implements OnDestroy {
    *  object -- no DOM, no network, no list mutation -- so calling it here to
    *  check and then discarding the result is safe. Returns null when every
    *  action (or no `actions` at all) is fine. */
+  /** A web request whose fields carry a literal API key (see
+   *  `agent-chat-secrets.ts`): refused, with the way to do it through a
+   *  Global. Every agent, legacy too: a key in the flow leaks either way. */
+  private validateLiteralSecrets(actionType: string, fields?: Record<string, any>): string | null {
+    const found = literalSecretFields(actionType, fields);
+    return found.length ? literalSecretRefusal(actionType, found) : null;
+  }
+
   private validateAddIntentActions(op: Extract<FlowOp, { op: 'add_intent' }>): FlowOpResult | null {
     if (op.actions === undefined) { return null; }
     if (!Array.isArray(op.actions)) {
@@ -1007,6 +1016,10 @@ export class FlowOpsService implements OnDestroy {
       const destinationViolation = this.validateActionDestinations(action.type, action.fields);
       if (destinationViolation) {
         return { op: op.op, ok: false, error: destinationViolation };
+      }
+      const secretViolation = this.validateLiteralSecrets(action.type, action.fields);
+      if (secretViolation) {
+        return { op: op.op, ok: false, error: secretViolation };
       }
     }
     return null;
@@ -1132,7 +1145,8 @@ export class FlowOpsService implements OnDestroy {
           const subagentViolation = this.validateSubagentCall(op.fields);
           if (subagentViolation) { return fail(subagentViolation); }
         }
-        const destinationViolation = this.validateActionDestinations(op.type, op.fields);
+        const destinationViolation = this.validateActionDestinations(op.type, op.fields)
+          ?? this.validateLiteralSecrets(op.type, op.fields);
         return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
       case 'update_action': {
@@ -1154,7 +1168,8 @@ export class FlowOpsService implements OnDestroy {
           if (subagentViolation) { return fail(subagentViolation); }
         }
         const destinationViolation =
-          this.validateActionDestinations(action._tdActionType, (op as any).fields);
+          this.validateActionDestinations(action._tdActionType, (op as any).fields)
+          ?? this.validateLiteralSecrets(action._tdActionType, (op as any).fields);
         return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
       case 'delete_action': {

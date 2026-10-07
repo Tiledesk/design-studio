@@ -509,6 +509,39 @@ describe('FlowOpsService — action operations', () => {
     expect(report.results[0].error).toContain('nonsense');
   });
 
+  it('refuses a web request that writes an API key into its header, and applies nothing', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'webrequestv2',
+      fields: { url: 'https://openrouter.ai/api/v1/chat/completions', method: 'POST',
+        headersString: { Authorization: 'Bearer sk-or-v1-0123456789abcdef0123456789abcdef' } }
+    }]);
+    expect(report.ok).toBe(false);
+    expect(report.rejected_before_applying).toBe(true);
+    expect(report.results[0].error).toContain('headersString');
+    expect(report.results[0].error).toContain('Global');
+    expect(intentService.getIntentFromId('i2').actions.length).toBe(0);
+  });
+
+  it('accepts a web request whose key is a Global', async () => {
+    const report = await service.apply([{
+      op: 'add_action', intent_id: 'i2', type: 'webrequestv2',
+      fields: { url: 'https://openrouter.ai/api/v1/chat/completions', method: 'POST',
+        headersString: { Authorization: 'Bearer {{openrouter_api_key}}' } }
+    }]);
+    expect(report.ok).toBe(true);
+  });
+
+  it('refuses an update_action that writes a key into a web request already on the canvas', async () => {
+    intentService.getIntentFromId('i2').actions =
+      [{ _tdActionId: 'w1', _tdActionType: 'webrequestv2', headersString: {}, url: '', jsonBody: '' } as any];
+    const report = await service.apply([{
+      op: 'update_action', intent_id: 'i2', action_id: 'w1',
+      fields: { headersString: { 'x-api-key': 'a1b2c3d4e5f6a7b8c9d0' } }
+    } as any]);
+    expect(report.ok).toBe(false);
+    expect(report.results[0].error).toContain('headersString');
+  });
+
   it('never lets fields overwrite an action identity', async () => {
     await service.apply([{
       op: 'add_action', intent_id: 'i2', type: 'reply',
