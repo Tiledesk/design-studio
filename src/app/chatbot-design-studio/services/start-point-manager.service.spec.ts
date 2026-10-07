@@ -1,5 +1,6 @@
 import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { IntentService } from './intent.service';
 import { StartPointManagerService } from './start-point-manager.service';
 
@@ -14,6 +15,7 @@ describe('StartPointManagerService', () => {
   let webhookService: any;
   let intentService: any;
   let dashboardService: any;
+  let readOnly: ReadOnlyService;
   let translate: any;
   let connectorService: any;
   let service: StartPointManagerService;
@@ -42,8 +44,9 @@ describe('StartPointManagerService', () => {
     };
     connectorService = { deleteConnectorsOutOfBlock: jasmine.createSpy('deleteConnectorsOutOfBlock') };
     dashboardService = { id_faq_kb: 'bot1', selectedChatbot: { name: 'My bot', subtype: 'chatbot' } };
+    readOnly = new ReadOnlyService();
     translate = { instant: (k: string) => k };
-    service = new StartPointManagerService(webhookService, intentService, dashboardService, translate, undefined, connectorService);
+    service = new StartPointManagerService(webhookService, intentService, dashboardService, readOnly, translate, undefined, connectorService);
   });
 
   const putBody = (i = 0) => webhookService.upsertStartPoint.calls.argsFor(i)[2];
@@ -498,6 +501,18 @@ describe('StartPointManagerService', () => {
     });
   });
 
+  it('returns readonly when the flow is read-only', async () => {
+    readOnly.enable();
+    intentService.listOfIntents = [START, WEBHOOK_BOX];
+    const ask = spyOn<any>(service, 'confirmDialog');
+    expect(((await service.add('scheduled')) as any).code).toBe('readonly');
+    expect(((await service.update('webhook', { enabled: false })) as any).code).toBe('readonly');
+    expect(((await service.remove('webhook')) as any).code).toBe('readonly');
+    expect(ask).not.toHaveBeenCalled();
+    expect(intentService.createIntentWithoutHistory).not.toHaveBeenCalled();
+    expect(webhookService.upsertStartPoint).not.toHaveBeenCalled();
+    expect(webhookService.deleteStartPoint).not.toHaveBeenCalled();
+  });
 
   describe('web start', () => {
     const webStart = (extra: any = {}) => ({
@@ -647,6 +662,15 @@ describe('StartPointManagerService', () => {
       });
     }
 
+    it('is readonly on a read-only flow', async () => {
+      readOnly.enable();
+      const ask = spyOn<any>(service, 'confirmDialog');
+      expect(((await service.remove('web')) as any).code).toBe('readonly');
+      start.attributes.web_start_disabled = true;
+      expect(((await service.add('web')) as any).code).toBe('readonly');
+      expect(ask).not.toHaveBeenCalled();
+      expect(intentService.saveIntentWithoutHistory).not.toHaveBeenCalled();
+    });
   });
 
   it('saving a block without history prunes the undo/redo entries that hold it (undo cannot restore the old start)', async () => {
@@ -693,7 +717,7 @@ describe('StartPointManagerService', () => {
 
   describe('IntentService default selection with Web start disabled', () => {
     const intentServiceWith = (intents: any[]) => {
-      const svc: any = new IntentService(null, null, null, null, null, { selectedChatbot: { subtype: 'chatbot' } } as any, null, null);
+      const svc: any = new IntentService(null, null, null, null, null, { selectedChatbot: { subtype: 'chatbot' } } as any, null, null, null, new ReadOnlyService());
       svc.listOfIntents = intents;
       return svc;
     };
@@ -714,7 +738,7 @@ describe('StartPointManagerService', () => {
 
     it('centres the stage on the visible start box when Web start is off, not on the hidden start', async () => {
       const stage = { centerStageOnHorizontalPosition: jasmine.createSpy('centerStageOnHorizontalPosition') };
-      const svc: any = new IntentService(null, null, null, null, stage as any, { id_faq_kb: 'bot1', selectedChatbot: { subtype: 'chatbot' } } as any, null, null);
+      const svc: any = new IntentService(null, null, null, null, stage as any, { id_faq_kb: 'bot1', selectedChatbot: { subtype: 'chatbot' } } as any, null, null, null, new ReadOnlyService());
       svc.listOfIntents = [hidden(), SCHEDULED_BOX, block];
       const el = document.createElement('div');
       el.id = 'sc-box';
@@ -725,8 +749,7 @@ describe('StartPointManagerService', () => {
         el.remove();
       }
       expect(svc.intentSelected.intent_id).toBe('sc-box');
-      // this branch centres with a left offset (the block list width; 0 here, no list in the DOM)
-      expect(stage.centerStageOnHorizontalPosition).toHaveBeenCalledOnceWith('bot1', el, 0);
+      expect(stage.centerStageOnHorizontalPosition).toHaveBeenCalledOnceWith('bot1', el);
     });
 
     it('selects the first block when Web start is off and there is no other start box', () => {

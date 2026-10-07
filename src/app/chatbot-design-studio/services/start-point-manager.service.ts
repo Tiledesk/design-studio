@@ -3,6 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject, lastValueFrom, tap } from 'rxjs';
 import { Intent } from 'src/app/models/intent-model';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { cleanSchedule, defaultSchedule, payloadToRows, rowsToPayload, scheduleError } from '../utils-schedule';
@@ -102,6 +103,7 @@ const SCHEDULER_NOT_CONFIGURED = 'Scheduled starts are not available on this ins
 const NOT_CONVERSATIONAL = 'Start points exist only for conversational chatbots (subtype chatbot)';
 /** the sentence of a flow whose subtype has no start points: names the subtype */
 const notConversational = (subtype: string) => NOT_CONVERSATIONAL + '; this flow is subtype ' + subtype;
+const READ_ONLY = 'This flow is read-only (a published copy, or no rights to edit it)';
 /** horizontal room left free between the leftmost block and a start box placed by the service */
 const START_BOX_GAP_X = 500;
 const START_BOX_GAP_Y = 250;
@@ -238,6 +240,7 @@ export class StartPointManagerService {
     private readonly webhookService: WebhookService,
     private readonly intentService: IntentService,
     private readonly dashboardService: DashboardService,
+    private readonly readOnlyService: ReadOnlyService,
     private readonly translate: TranslateService,
     @Optional() private readonly controllerService?: ControllerService,
     @Optional() private readonly connectorService?: ConnectorService
@@ -294,6 +297,9 @@ export class StartPointManagerService {
   }
 
   async add(type: StartPointType, settings?: Record<string, unknown>, position?: { x: number; y: number }, options: StartPointAddOptions = {}): Promise<StartPointResult> {
+    if (this.readOnlyService.readOnly) {
+      return fail('readonly', READ_ONLY);
+    }
     if (type === 'web') {
       return this.enableWebStart(settings);
     }
@@ -380,6 +386,9 @@ export class StartPointManagerService {
   }
 
   async update(type: StartPointType, settings: Record<string, unknown>): Promise<StartPointResult> {
+    if (this.readOnlyService.readOnly) {
+      return fail('readonly', READ_ONLY);
+    }
     if (type === 'web') {
       return fail('invalid', 'the web start has no settings: add or remove it only');
     }
@@ -460,6 +469,9 @@ export class StartPointManagerService {
   }
 
   async remove(type: StartPointType): Promise<StartPointResult> {
+    if (this.readOnlyService.readOnly) {
+      return fail('readonly', READ_ONLY);
+    }
     if (type === 'web') {
       return this.disableWebStart();
     }
@@ -528,7 +540,7 @@ export class StartPointManagerService {
 
   /**
    * The panel's own debounced save (Scheduled form) and switch/name edits (Webhook): same body and PUT as before,
-   * through the one service.
+   * through the one service. Read-only answers null (WebhookService guard).
    */
   put(type: ServerType, body: any): Observable<any> {
     return this.webhookService.upsertStartPoint(this.chatbotId, type, body);
