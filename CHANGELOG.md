@@ -7,10 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 07/10/2026
-- **added**: la chat AI sa quali integrazioni ha il progetto (solo il nome e se hanno una chiave, mai il valore, nemmeno mascherato) e quali Global ha l'agente (solo i nomi): così sceglie da sola il servizio di un'azione, per esempio OpenRouter per leggere un allegato, e sa se la Global con la chiave esiste già o va creata
-- **added**: dopo ogni modifica fatta dalla chat AI, se una web request legge per autenticarsi una Global che l'agente non ha, la chat riceve un avviso che le dice di far creare quella Global all'utente prima di provare il flusso. Avviso, non rifiuto, e vale per tutti gli agenti
-- **changed**: la chat AI riceve anche la lingua dell'agente, così può scrivere nella lingua giusta i testi che il flusso mostra
+# 1.40.16-rc26
+- **added** (V3/vibe-coder-ocr-guards): the AI chat knows the project's integrations (name and whether a key is set, never the value) and the agent's Global names, so it picks the service for an action by itself, e.g. OpenRouter to read an attachment, and knows whether the Global holding the key still has to be created
+- **added** (V3/vibe-coder-ocr-guards): after each AI chat edit, a web request that authenticates through a Global the agent does not have gets a warning telling the chat to have the user create it before testing the flow. A warning, not a refusal; all agents
+- **changed** (V3/vibe-coder-ocr-guards): the AI chat also receives the agent's language, so the texts the flow shows can be written in it
 
 # 1.40.16-rc25
 - **changed** (V3/vibe-coder-ocr-guards): the AI chat can no longer write a plain-text API key into a web request (headers, url or body); it is told to use an agent Global instead, e.g. `Bearer {{openrouter_api_key}}`. All agents, chat edits only
