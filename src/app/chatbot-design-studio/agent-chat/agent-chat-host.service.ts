@@ -10,6 +10,7 @@ import { AgentChatConfig, readAgentChatConfig } from './agent-chat.config';
 import { loadAgentChatAdapter } from './agent-chat-loader';
 import { AgentChatHost, HostConfig } from './agent-chat-adapter.types';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 import { withoutLiteralSecrets } from './agent-chat-secrets';
 
@@ -18,7 +19,8 @@ import { withoutLiteralSecrets } from './agent-chat-secrets';
  *  same list the chat declares when it attaches, or the runtime would offer
  *  the model a tool nobody answers. The host spec keeps the two in step. */
 export const AGENT_CHAT_CLIENT_TOOLS: string[] = [
-  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent'
+  'get_flow', 'get_canvas_selection', 'apply_flow_patch', 'open_flow', 'create_subagent',
+  'get_project_capabilities'
 ];
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -32,6 +34,25 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
  *  guaranteed to be there. */
 function stripTokenScheme(token: string): string {
   return token.replace(/^\s*jwt\s+/i, '');
+}
+
+/** A copy of the flow without the address and headers of attached MCP
+ *  servers: for the project's own servers they are credentials, and neither
+ *  the chat nor its model needs them to read or edit the flow. */
+function withoutServerCredentials<T>(flow: T): T {
+  const copy = JSON.parse(JSON.stringify(flow));
+  for (const intent of Array.isArray(copy?.intents) ? copy.intents : []) {
+    for (const action of Array.isArray(intent?.actions) ? intent.actions : []) {
+      if (!Array.isArray(action?.servers)) { continue; }
+      for (const server of action.servers) {
+        if (server && typeof server === 'object') {
+          delete server.url;
+          delete server.customHeaders;
+        }
+      }
+    }
+  }
+  return copy;
 }
 
 /** Owns the chat iframe's host side.
@@ -88,7 +109,8 @@ export class AgentChatHostService {
     private intentService: IntentService,
     private tiledeskAuthService: TiledeskAuthService,
     private flowOps: FlowOpsService,
-    private family: AgentChatFamilyService
+    private family: AgentChatFamilyService,
+    private capabilities: AgentChatCapabilitiesService
   ) {
     this.config = readAgentChatConfig(this.appConfigService.getConfig());
     // The chat is handed the token once, at `hello`, and then talks to the
@@ -130,6 +152,8 @@ export class AgentChatHostService {
     // is after a failure -- and a failed attach() left no host behind.
     this.host?.destroy();
     this.host = null;
+    // A new chat session reads the project's MCP servers afresh.
+    this.capabilities.invalidate();
     let adapter;
     try {
       adapter = await loadAgentChatAdapter(this.config.chatUrl);
@@ -184,8 +208,9 @@ export class AgentChatHostService {
       // call: a stand-in FlowOpsService without it reads as "nothing to say".
       const v3Warnings: string[] = isV3 ? (this.flowOps.fallbackWarnings?.() || []) : [];
       return {
-        // A key written into a web request never reaches the model.
-        ...withoutLiteralSecrets(this.flowOps.readFlow()),
+        // Neither a server's credentials nor a key written into a web
+        // request reach the model.
+        ...withoutLiteralSecrets(withoutServerCredentials(this.flowOps.readFlow())),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),
@@ -197,6 +222,18 @@ export class AgentChatHostService {
       const selected = this.intentService.intentSelected;
       return { intent_ids: selected ? [selected.intent_id] : [] };
     });
+
+    // What this project can build with: the element panel's own action list
+    // and the MCP servers an ai_prompt may attach. The agent reads it; flow-ops
+    // enforces the same answer, so a patch the tool would not have suggested
+    // is refused rather than applied.
+    this.registerTool('get_project_capabilities', async () =>
+      (await this.capabilities.snapshot()).capabilities);
+    this.flowOps.setCapabilitiesSource(() => this.capabilities.snapshot());
+    // A native flow-ops finds unconfigured in an attached ai_prompt is added
+    // to the project's own MCP integration through here, before the patch
+    // that attaches it is applied -- see FlowOpsService.apply().
+    this.flowOps.setNativeConfigurer(ids => this.capabilities.configureNativeServers(ids));
 
     this.registerTool('apply_flow_patch', async (args) => {
       const declared = args?.['faq_kb_id'] as string | undefined;
