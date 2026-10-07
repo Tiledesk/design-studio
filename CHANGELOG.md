@@ -100,6 +100,7 @@
 
 
 # this branch 21/09/2026
+- **changed**: AI actions on Gemini Agent Platform models pass the server to the backend under its new field name; agents saved before the change keep working and realign themselves the first time the model is changed
 
 - **changed**: le tendine di scelta si chiudono da sole appena si scorre la pagina o un pannello: prima restavano aperte, staccate dal campo a cui appartengono. Scorrendo dentro l'elenco delle opzioni la tendina resta aperta
 - **changed**: nell'intestazione delle impostazioni AI l'anteprima si vede sempre per intero, aperta o chiusa, e il system context sta in fondo su una riga sola che finisce con i puntini, senza l'etichetta davanti. Il titolo non viene piu' coperto quando le opzioni sono tante
