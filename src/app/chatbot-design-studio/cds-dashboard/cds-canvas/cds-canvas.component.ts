@@ -33,8 +33,8 @@ import { TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-stud
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
 import { WebhookService } from '../../services/webhook-service.service';
-import { buildStartPointUpsertBody, createStartPointBox, isStartBox, startPointErrorKey, startPointTypeOf } from '../../utils-start-points';
-import { browserTimezone } from '../../utils-scheduled-panel';
+import { isStartBox, isWebStartDisabled, startPointErrorKey, startPointTypeOf } from '../../utils-start-points';
+import { StartPointManagerService, startPointFailure } from '../../services/start-point-manager.service';
 import { NotifyService } from 'src/app/services/notify.service';
 
 const swal = require('sweetalert');
@@ -89,7 +89,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   chatbotSubtype: string;
   /** true while a start box is being created */
   startPointPending = false;
-  private readonly startPointPendingRef = { value: false };
   selectedChatbot: Chatbot;
   projectID: string;
 
@@ -235,7 +234,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     private readonly hostElement: ElementRef<HTMLElement>,
     public readonly readOnlyService: ReadOnlyService,
     private readonly notify: NotifyService,
-    private readonly agentChatHostService: AgentChatHostService
+    private readonly agentChatHostService: AgentChatHostService,
+    private readonly startPointManager: StartPointManagerService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -377,6 +377,25 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   }
 
   private setSubscriptions() {
+    // start boxes added or removed by the start point service (palette drop, box panel, agent chat tool)
+    this.startPointManager.boxCreated$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(block => this.onStartBoxCreated(block));
+    this.startPointManager.boxRemoved$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.onStartBoxRemoved());
+    this.startPointManager.webStartChanged$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(change => this.onWebStartChanged(change.intent, change.disabled));
+    this.startPointManager.pending$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(pending => {
+        if (pending !== this.startPointPending) {
+          this.startPointPending = pending;
+          this.changeDetectorRef.detectChanges();
+        }
+      });
+
     this.subscriptionLayoutApplied = this.flowOpsService.layoutApplied$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(layout => this.onFlowLaidOut(layout));
@@ -1094,18 +1113,40 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     this.closeActionDetailPanel();
   }
 
-  /** the panel already deleted the webhook start point on the server: delete the box (palette item enabled again) */
-  async onDeleteStartBox(intent: Intent) {
-    // Sola lettura: il box di partenza non si cancella
-    if (this.readOnlyService.readOnly) {
-      return;
-    }
+  /** the start point service removed a start box's server start point: close the panels before it deletes the block (palette item enabled again) */
+  onStartBoxRemoved() {
     this.removeConnectorDraftAndCloseFloatMenu();
     this.closeAllPanels();
     this.closeActionDetailPanel();
     this.intentService.setIntentSelectedById();
-    // no undo entry: undoing would bring back a box whose start point no longer exists
-    await this.intentService.deleteIntentWithoutHistory(intent);
+  }
+
+  /** Web start was disabled or enabled: the `start` block stays, its pill is hidden or shown (class on the block) */
+  onWebStartChanged(intent: Intent, disabled: boolean) {
+    this.removeConnectorDraftAndCloseFloatMenu();
+    this.closeAllPanels();
+    this.closeActionDetailPanel();
+    if (disabled) {
+      this.intentService.setIntentSelectedById();
+    } else {
+      this.intentService.setIntentSelected(intent.intent_id);
+    }
+    this.changeDetectorRef.detectChanges();
+  }
+
+  /** class of a block: the `start` block with Web start disabled is not drawn */
+  isWebStartHidden(intent: Intent): boolean {
+    return isWebStartDisabled(intent);
+  }
+
+  /** the start point service saved and registered a start box: add it to the canvas as a dropped block */
+  onStartBoxCreated(block: Intent) {
+    // same steps as a block created through ops_update, minus the save (already done)
+    block.id = INTENT_TEMP_ID;
+    this.intentService.addSavedIntentToListOfIntents(block);
+    this.intentService.setDragAndListnerEventToElement(block.intent_id);
+    this.intentService.setIntentSelected(block.intent_id);
+    this.closeExtraPanels();
   }
 
   onDeleteIntent(intent: Intent) {
@@ -1383,51 +1424,24 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     const newIntent = await this.settingAndSaveNewIntent(pos, intent, null, null);
   }
 
-  /** Drop of a Start points item: create the marker block, then register it as the start point */
+  /** Drop of a Start points item: create the marker block, then register it as the start point (the start point service) */
   async createStartPointFromPanelElement(pos, type: string) {
     // Sola lettura: nessun box di partenza si crea (la palette e' nascosta, questo e' il guard)
-    if (this.readOnlyService.readOnly || (type !== 'webhook' && type !== 'scheduled')) {
+    if (this.readOnlyService.readOnly || (type !== 'web' && type !== 'webhook' && type !== 'scheduled')) {
       return;
     }
-    if (this.startPointPendingRef.value) {
+    if (type === 'web') {
+      // re-enable Web start: the existing `start` block is shown again, wherever the item was dropped
+      await this.startPointManager.add('web');
       return;
     }
     const spType = type as 'webhook' | 'scheduled';
-    const chatbot_id = this.id_faq_kb;
-    const setPending = (v: boolean) => { this.startPointPending = v; this.changeDetectorRef.detectChanges(); };
-    const flag = this.startPointPendingRef;
-    await (async () => {
-      setPending(true);
-      try {
-        return await createStartPointBox({
-          pending: flag,
-          createBlock: (block) => {
-            block.id_faq_kb = chatbot_id;
-            return this.intentService.createIntentWithoutHistory(block);
-          },
-          deleteBlock: (block) => this.intentService.deleteSavedIntentWithoutHistory(block),
-          upsert: (block, confirm) => {
-            // the source name starts as the chatbot name, so the requester is never a generic "Webhook"
-            const body = buildStartPointUpsertBody(spType, block.intent_id, this.dashboardService.selectedChatbot?.name, browserTimezone(), confirm);
-            return this.webhookService.upsertStartPoint(chatbot_id, spType, body);
-          },
-          confirmSwitch: () => this.confirmStartWebhookSwitch(),
-          onError: () => this.notify.showWidgetStyleUpdateNotification(this.translate.instant(startPointErrorKey(spType)), 4, 'report_problem'),
-          onCreated: (block) => {
-            // same steps as a block created through ops_update, minus the save (already done)
-            block.id = INTENT_TEMP_ID;
-            this.intentService.addSavedIntentToListOfIntents(block);
-            this.intentService.setDragAndListnerEventToElement(block.intent_id);
-            this.intentService.setIntentSelected(block.intent_id);
-            this.closeExtraPanels();
-            // the box renders its summary/badge from the shared webhook
-            this.webhookService.loadWebhook(chatbot_id, true);
-          }
-        }, spType, pos);
-      } finally {
-        setPending(false);
-      }
-    })();
+    // the palette asks the user to confirm the 409 switch of an automation webhook itself
+    const result = await this.startPointManager.add(spType, undefined, pos, { confirmConflict: () => this.confirmStartWebhookSwitch() });
+    const failure = startPointFailure(result);
+    if (failure && failure.code !== 'declined' && failure.code !== 'exists') {
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant(startPointErrorKey(spType)), 4, 'report_problem');
+    }
   }
 
   private async confirmStartWebhookSwitch(): Promise<boolean> {

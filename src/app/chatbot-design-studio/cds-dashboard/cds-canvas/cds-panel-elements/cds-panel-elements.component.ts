@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, OnDestroy, Optional } from '@angular/core';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY, isSubagentSubtype, resolveChatbotSubtype, availableActionEntries, getKeyByValue } from 'src/app/chatbot-design-studio/utils-actions';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
@@ -13,6 +13,7 @@ import { ProjectService } from 'src/app/services/projects.service';
 import { environment } from 'src/environments/environment';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
+import { StartPointManagerService } from 'src/app/chatbot-design-studio/services/start-point-manager.service';
 import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
 
@@ -65,16 +66,20 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
     private readonly projectService: ProjectService,
     private readonly readOnlyService: ReadOnlyService,
     private readonly webhookService: WebhookService,
+    @Optional() private readonly startPointManager?: StartPointManagerService,
   ) { }
 
   /** the server has the scheduler configured (GET webhook → scheduled_available): without it the Scheduled item is not offered */
   scheduledAvailable = false;
   private webhookSub: Subscription;
+  private webStartSub: Subscription;
 
   ngOnInit(): void {
     this.createActionListByCategory();
     this.loadConnectorActions();
     this.loadConfiguredConnectors();
+    // Web start is turned off or on by changing an attribute of the `start` block in place: no ngOnChanges
+    this.webStartSub = this.startPointManager?.webStartChanged$.subscribe(() => this.refreshStartPointItems());
     this.webhookSub = this.webhookService.webhook$.subscribe(webhook => {
       const available = webhook?.scheduled_available === true;
       if (available !== this.scheduledAvailable) {
@@ -86,6 +91,7 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.webhookSub?.unsubscribe();
+    this.webStartSub?.unsubscribe();
   }
 
   /** the Start points section lives in actionsByCategory (read by the panel template): rebuild it in place */

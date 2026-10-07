@@ -2,7 +2,7 @@ import { Observable, lastValueFrom } from 'rxjs';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionIntentConnected } from 'src/app/models/action-model';
 import { TYPE_OF_MENU } from './utils';
-import { defaultSchedule } from './utils-schedule';
+import { cleanSchedule, defaultSchedule } from './utils-schedule';
 
 export const START_POINT_TYPES = ['web', 'webhook', 'scheduled'];
 export const START_POINT_MARKER = 'start_point';
@@ -55,19 +55,56 @@ export function isStartBox(intent: any): boolean {
 }
 
 /**
- * Web is always present; any other type is present when a block carries its marker, whether or not the server
- * start point exists. A marker block without a start point (imported, forked, redone) is recovered from its panel
- * switch, and the palette never offers a second box that would clash on the block name.
+ * Web is present unless the `start` block carries `web_start_disabled` (Web start removed by the user or the
+ * agent: the block stays, hidden). Any other type is present when a block carries its marker, whether or not the
+ * server start point exists. A marker block without a start point (imported, forked, redone) is recovered from its
+ * panel switch, and the palette never offers a second box that would clash on the block name.
  */
 export function presentStartPointTypes(intents: any[]): string[] {
-  const present = ['web'];
+  const present = (intents || []).some(i => isWebStartDisabled(i)) ? [] : ['web'];
   (intents || []).forEach(i => {
     const type = startPointTypeOf(i);
-    if (type && !present.includes(type)) {
+    if (type && type !== 'web' && !present.includes(type)) {
       present.push(type);
     }
   });
   return present;
+}
+
+/** The `start` block with Web start turned off (kept in the flow, hidden, unconnected) */
+export function isWebStartDisabled(intent: any): boolean {
+  return startPointTypeOf(intent) === 'web' && intent?.attributes?.web_start_disabled === true;
+}
+
+/**
+ * Start points (Web start disable/enable included) exist only for conversational chatbots: subtype `chatbot`, or
+ * no subtype at all. A voice bot, a subagent or any other subtype keeps its entry block as it is.
+ */
+export function supportsStartPoints(subtype: string | null | undefined): boolean {
+  return (subtype || 'chatbot') === 'chatbot';
+}
+
+/**
+ * The block the studio opens on (selection, centring): the Web start; when it is disabled the first visible start
+ * box (webhook/scheduled), else the first other block. Never the hidden start. A flow without a `start` block
+ * (another subtype's entry) gives undefined: the caller keeps its own choice.
+ */
+export function defaultEntryIntent(intents: any[], startName: string = WEB_START_BLOCK_NAME): any | undefined {
+  const list = (intents || []).filter(i => !!i);
+  const start = list.find(i => (i.intent_display_name || '').trim() === startName);
+  if (!start) {
+    return undefined;
+  }
+  if (!isWebStartDisabled(start)) {
+    return start;
+  }
+  const box = list.find(i => { const t = startPointTypeOf(i); return t === 'webhook' || t === 'scheduled'; });
+  return box || list.find(i => !isWebStartDisabled(i));
+}
+
+/** Blocks the left block list shows: a disabled Web start is hidden on the canvas, so it is not listed either */
+export function listedIntents(intents: any[]): any[] {
+  return (intents || []).filter(i => !isWebStartDisabled(i));
 }
 
 /** Palette items of the Start points section are dropped on the canvas only, never into a block */
@@ -130,8 +167,9 @@ export function createStartPointBlock(type: 'webhook' | 'scheduled', pos: { x: n
   return intent;
 }
 
-/** Palette items of the Start points section. Web is always present (the start block); webhook and scheduled are one per flow, scheduled only when the server has it configured */
+/** Palette items of the Start points section. Web is offered only when Web start is disabled (not in `present`); webhook and scheduled are one per flow, scheduled only when the server has it configured */
 export function buildStartPointItems(present: string[], pending: boolean, scheduledAvailable: boolean = false): any[] {
+  const webPresent = present.includes('web');
   const webhookPresent = present.includes('webhook');
   const scheduledPresent = present.includes('scheduled');
   const items = [
@@ -144,8 +182,8 @@ export function buildStartPointItems(present: string[], pending: boolean, schedu
         start_point: 'web',
         src: 'assets/images/actions_category/start_points.svg',
         status: 'active',
-        disabled: true,
-        tooltip: 'CDSCanvas.StartPointPresent'
+        disabled: webPresent || pending,
+        tooltip: webPresent ? 'CDSCanvas.StartPointPresent' : ''
       }
     },
     {
@@ -180,18 +218,35 @@ export function buildStartPointItems(present: string[], pending: boolean, schedu
   return items;
 }
 
+/** Settings of a start box as the agent tool gives them (validated by the caller): every field optional */
+export interface StartPointSettingsInput {
+  enabled?: boolean;
+  source_name?: string;
+  schedule?: any;
+  payload?: { [key: string]: string | number | boolean };
+}
+
 /**
  * Body of the PUT that registers a freshly dropped start box. Webhook: the source name only.
  * Scheduled: enabled, daily 09:00 in the browser timezone, source name = chatbot name, empty payload.
+ * With `settings` (the agent tool), the given fields replace those defaults in the same PUT; a webhook then also
+ * sends `enabled` (default true) and a schedule without timezone gets the browser one.
  */
-export function buildStartPointUpsertBody(type: 'webhook' | 'scheduled', blockId: string, chatbotName: string | undefined, timezone: string, confirm: boolean): any {
+export function buildStartPointUpsertBody(type: 'webhook' | 'scheduled', blockId: string, chatbotName: string | undefined, timezone: string, confirm: boolean, settings?: StartPointSettingsInput): any {
   const body: any = { block_id: blockId };
+  const given = settings || {};
+  const sourceName = given.source_name !== undefined ? given.source_name : chatbotName;
   if (type === 'scheduled') {
-    body.enabled = true;
-    body.mapping = { source_name: chatbotName, payload: {} };
-    body.schedule = defaultSchedule(timezone);
-  } else if (chatbotName) {
-    body.mapping = { source_name: chatbotName };
+    body.enabled = given.enabled !== undefined ? given.enabled : true;
+    body.mapping = { source_name: sourceName, payload: given.payload || {} };
+    body.schedule = given.schedule ? cleanSchedule({ timezone, ...given.schedule }) : defaultSchedule(timezone);
+  } else {
+    if (settings) {
+      body.enabled = given.enabled !== undefined ? given.enabled : true;
+    }
+    if (given.source_name !== undefined || chatbotName) {
+      body.mapping = { source_name: sourceName };
+    }
   }
   if (confirm) {
     body.confirm = true;

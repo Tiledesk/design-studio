@@ -37,6 +37,19 @@
         </div>
 
         <!-- ---------------------------------------------------------- -->
+        <!-- web start box: Delete hides it (the start block stays); the palette adds it back -->
+        <!-- ---------------------------------------------------------- -->
+        <div *ngIf="isStart" class="row start-point web-start">
+            <!-- start points (Web start disable included) exist only on subtype chatbot -->
+            <div *ngIf="canDeleteWebStart" class="webhook-buttons">
+                <button type="button" class="btn btn-danger" [disabled]="spBusy" (click)="onDeleteWebStart()">{{ 'Delete' | translate }}</button>
+            </div>
+            <p *ngIf="messageText" class="webhook-message fade-in-out">
+                {{ messageText }}
+            </p>
+        </div>
+
+        <!-- ---------------------------------------------------------- -->
         <!-- webhook -->
         <!-- ---------------------------------------------------------- -->
         <div *ngIf="isWebhook" class="row">
