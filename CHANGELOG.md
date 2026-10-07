@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc27
+- **added** (start-boxes-manager): the AI chat manages the flow's start boxes with the new `start_point` tool: adds, configures and removes the Webhook and Scheduled boxes, and can disable the Web start. Removing a box asks the user to confirm; the answer of `get_project_capabilities` lists each start box with its status and settings
+- **changed** (start-boxes-manager): AI chat edits that touch start boxes are guarded (no duplicate box, no edits to a box being changed, read-only flows refused) and placed by the layout next to the other start boxes
+
 # 1.40.16-rc26
 - **added** (V3/vibe-coder-ocr-guards): the AI chat knows the project's integrations (name and whether a key is set, never the value) and the agent's Global names, so it picks the service for an action by itself, e.g. OpenRouter to read an attachment, and knows whether the Global holding the key still has to be created
 - **added** (V3/vibe-coder-ocr-guards): after each AI chat edit, a web request that authenticates through a Global the agent does not have gets a warning telling the chat to have the user create it before testing the flow. A warning, not a refusal; all agents
