@@ -24,7 +24,7 @@ export const REDACTED_SECRET = '<redacted: literal key, move it to a Global>';
 const KEY_IN_TEXT = /\bsk-[A-Za-z0-9_-]{16,}|\bBearer\s+(?!\{\{)[A-Za-z0-9._~+\/=-]{16,}/;
 
 /** Headers whose value is a credential by name: any literal value there is a key. */
-const CREDENTIAL_HEADER = /authorization|api[-_]?key|token|secret|password/i;
+export const CREDENTIAL_HEADER = /authorization|api[-_]?key|token|secret|password/i;
 
 /** A key passed in the query string (`?key=...`, `&api_key=...`). */
 const KEY_IN_QUERY = /[?&](?:api[-_]?key|key|token|access_token|secret)=(?!\{\{)[^&#\s]{16,}/i;

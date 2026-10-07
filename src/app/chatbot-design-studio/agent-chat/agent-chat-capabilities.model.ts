@@ -61,6 +61,18 @@ export interface LlmModelCapability {
   max_output_tokens?: number;
 }
 
+/** A project integration (the dashboard's Integrations page: openai,
+ *  openrouter, anthropic, hubspot, ...). Only the name and whether a key is
+ *  stored: no value, not even masked. The agent uses it to pick the provider
+ *  a web request authenticates with, and names the Global that holds the
+ *  key (`<name>_api_key`); the key itself never reaches the flow. */
+export interface IntegrationCapability {
+  name: string;
+  /** Whether the integration holds a key (`value.apikey`, or a server with
+   *  one). An integration saved without a key is listed but unusable. */
+  configured: boolean;
+}
+
 export interface ProjectCapabilities {
   chatbot_subtype: string;
   subagent: boolean;
@@ -71,6 +83,14 @@ export interface ProjectCapabilities {
   llm_models: LlmModelCapability[];
   /** Set when the project's models could not be read; llm_models is then empty. */
   llm_models_error?: string;
+  integrations: IntegrationCapability[];
+  /** Set when the integrations could not be read; integrations is then empty. */
+  integrations_error?: string;
+  /** The names of this agent's Globals (Design Studio -> Globals), values
+   *  left out. The agent checks here whether the Global a web request reads
+   *  (`{{openrouter_api_key}}`) already exists, or has to be created by the
+   *  user. */
+  globals: string[];
 }
 
 /** The capabilities plus what FlowOpsService needs to store an attached custom

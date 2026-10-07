@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 # this branch 07/10/2026
+- **added**: la chat AI sa quali integrazioni ha il progetto (solo il nome e se hanno una chiave, mai il valore, nemmeno mascherato) e quali Global ha l'agente (solo i nomi): così sceglie da sola il servizio di un'azione, per esempio OpenRouter per leggere un allegato, e sa se la Global con la chiave esiste già o va creata
+- **added**: dopo ogni modifica fatta dalla chat AI, se una web request legge per autenticarsi una Global che l'agente non ha, la chat riceve un avviso che le dice di far creare quella Global all'utente prima di provare il flusso. Avviso, non rifiuto, e vale per tutti gli agenti
+- **changed**: la chat AI riceve anche la lingua dell'agente, così può scrivere nella lingua giusta i testi che il flusso mostra
 - **changed**: la chat AI non può più scrivere una chiave API in chiaro in una web request, né nelle intestazioni né nell'indirizzo né nel corpo: l'operazione viene rifiutata prima di toccare il canvas, e la chat riceve l'indicazione di mettere la chiave in una Global dell'agente e di richiamarla per nome (es. `Bearer {{openrouter_api_key}}`), chiedendo all'utente di crearla. Vale per tutti gli agenti, V3 e legacy, e solo per le modifiche fatte dalla chat: l'editor resta com'è
 - **changed**: quando la chat AI legge il flusso, le chiavi già scritte in chiaro nelle web request le arrivano mascherate, così non finiscono più al modello a ogni lettura; se prova a rimandare indietro la maschera al posto della chiave, l'operazione viene rifiutata e il flusso non si rompe
 

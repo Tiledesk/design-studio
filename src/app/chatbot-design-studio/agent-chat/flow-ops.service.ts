@@ -11,7 +11,7 @@ import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from 
 import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
 import { computeFlowLayout } from './flow-ops-layout';
-import { literalSecretFields, literalSecretRefusal } from './agent-chat-secrets';
+import { CREDENTIAL_HEADER, WEB_REQUEST_TYPES, literalSecretFields, literalSecretRefusal } from './agent-chat-secrets';
 import { withDestinationHash } from '../utils-connectors';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage, getIntentDefaultColor } from '../utils';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
@@ -360,7 +360,7 @@ export class FlowOpsService implements OnDestroy {
     }
     this.redrawMovedAfterRender(movedIds, this.dashboardService.id_faq_kb);
     this.scheduleConnectorCheck(this.dashboardService.id_faq_kb);
-    const warnings = this.fallbackWarnings();
+    const warnings = [...this.fallbackWarnings(), ...this.missingGlobalWarnings(ops)];
     return { ok, rejected_before_applying: false, results, ...(warnings.length ? { warnings } : {}) };
   }
 
@@ -2450,6 +2450,110 @@ export class FlowOpsService implements OnDestroy {
       // Diagnostica: non deve poter rompere get_flow ne' un batch gia' applicato.
       return [];
     }
+  }
+
+  /**
+   * Le Global che le web request di questo lotto leggono per autenticarsi e che
+   * l'agente non ha: `Bearer {{openrouter_api_key}}` in un header credenziale, o
+   * `{{key}}` nell'url. Solo avvisi: la chiave non si scrive mai nel flusso
+   * (rifiuto in `validateLiteralSecrets`), quindi la Global e' l'unica via, e la
+   * crea l'utente -- la chat deve dirglielo prima di dichiarare finito il lavoro.
+   * Senza, l'engine riempie la variabile con una stringa vuota e ogni chiamata
+   * fallisce in silenzio sul ramo d'errore. Vale per ogni agente, V3 e legacy.
+   */
+  public missingGlobalWarnings(ops: FlowOp[]): string[] {
+    try {
+      const globals = new Set(this.globalNames());
+      const assigned = this.assignedVariableNames();
+      const warnings: string[] = [];
+      for (const written of this.webRequestsWrittenBy(ops)) {
+        for (const [where, name] of this.credentialTemplates(written.fields)) {
+          if (globals.has(name) || assigned.has(name)) { continue; }
+          warnings.push(`Block "${written.block}": ${where} reads {{${name}}}, which is not a Global ` +
+            `of this agent and is not set anywhere in the flow. Tell the user to create the Global ` +
+            `"${name}" (Design Studio -> Globals) with the key of the matching integration before ` +
+            `testing the flow: until then the call goes out without a key and fails.`);
+        }
+      }
+      return warnings;
+    } catch (error) {
+      // Diagnostica: non deve poter rompere un batch gia' applicato.
+      return [];
+    }
+  }
+
+  private globalNames(): string[] {
+    const globals = this.dashboardService.selectedChatbot?.attributes?.globals;
+    return Array.isArray(globals)
+      ? globals.map((g: any) => typeof g?.key === 'string' ? g.key.trim() : '').filter(Boolean)
+      : [];
+  }
+
+  /** Every variable some action of the flow writes: a `{{name}}` that one of
+   *  these sets is not a Global the user has to create. */
+  private assignedVariableNames(): Set<string> {
+    const names = new Set<string>();
+    const fields = ['assignResultTo', 'assignReplyTo', 'assignStatusTo', 'assignErrorTo',
+      'assignOutputTo', 'destination', 'assignTo'];
+    for (const intent of this.intentService.listOfIntents || []) {
+      for (const action of intent?.actions || []) {
+        for (const field of fields) {
+          if (typeof action?.[field] === 'string' && action[field].trim()) { names.add(action[field].trim()); }
+        }
+      }
+    }
+    return names;
+  }
+
+  /** The web requests this batch wrote or changed, with the fields it sent
+   *  and the block's name for the warning. */
+  private webRequestsWrittenBy(ops: FlowOp[]): Array<{ block: string; fields: Record<string, any> }> {
+    const out: Array<{ block: string; fields: Record<string, any> }> = [];
+    const blockName = (intentId: string): string =>
+      this.intentService.getIntentFromId(intentId)?.intent_display_name || intentId;
+    for (const op of ops) {
+      if (op?.op === 'add_intent') {
+        for (const action of op.actions || []) {
+          if (WEB_REQUEST_TYPES.indexOf(action?.type) !== -1 && action.fields) {
+            out.push({ block: op.intent_display_name || '', fields: action.fields });
+          }
+        }
+      } else if (op?.op === 'add_action') {
+        if (WEB_REQUEST_TYPES.indexOf(op.type) !== -1 && op.fields) {
+          out.push({ block: blockName(op.intent_id), fields: op.fields });
+        }
+      } else if (op?.op === 'update_action' && (op as any).fields) {
+        const intent = this.intentService.getIntentFromId((op as any).intent_id);
+        const action = (intent?.actions || []).find((a: any) => a._tdActionId === (op as any).action_id);
+        if (action && WEB_REQUEST_TYPES.indexOf(action._tdActionType) !== -1) {
+          out.push({ block: blockName((op as any).intent_id), fields: (op as any).fields });
+        }
+      }
+    }
+    return out;
+  }
+
+  /** The `{{name}}`s a web request reads where a key goes: the value of a
+   *  credential header (Authorization, x-api-key, ...) and the url. Pairs of
+   *  (where, name). */
+  private credentialTemplates(fields: Record<string, any>): Array<[string, string]> {
+    const out: Array<[string, string]> = [];
+    const names = (text: string): string[] => {
+      const found: string[] = [];
+      const re = /\{\{\s*([A-Za-z0-9_]+)\s*(?:\|[^}]*)?\}\}/g;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(text)) !== null) { found.push(m[1]); }
+      return found;
+    };
+    const headers = fields.headersString && typeof fields.headersString === 'object' ? fields.headersString : {};
+    for (const [key, value] of Object.entries(headers)) {
+      if (typeof value !== 'string' || !CREDENTIAL_HEADER.test(key)) { continue; }
+      for (const name of names(value)) { out.push([`the header "${key}"`, name]); }
+    }
+    if (typeof fields.url === 'string') {
+      for (const name of names(fields.url)) { out.push(['the url', name]); }
+    }
+    return out;
   }
 
   private scheduleConnectorCheck(faqKbId: string): void {
