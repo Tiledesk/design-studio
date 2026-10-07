@@ -1,4 +1,4 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@import "./src/assets/sass/cds/slider-styles.scss"; 
 
 
 :host {
@@ -632,12 +632,11 @@ cds-select#model-condition.not-configured ::ng-deep {
     margin-bottom: 10px;
 }
 
-.mcp-servers-grid {
-    display: flex;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
-    flex-wrap: wrap;
+.checkbox-reasoning{
+    margin-top: -20px;
+}
+.checkbox-reasoning .reasoning-checkbox-disabled ::ng-deep .mat-checkbox-background {
+    background-color: #e0e0e0 !important;
 }
 
 .mcp-server-button {

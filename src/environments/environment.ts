@@ -7,8 +7,7 @@ export const environment = {
      *  Nessun rapporto con VERSION, che e' la versione del pacchetto. */
     CHATBOT_VERSION: 'v3',
     remoteConfig: true, 
-    // remoteConfigUrl: './design-studio-config.json',
-    remoteConfigUrl: './environments/real_data/cds-config-aws-stage.json',
+    remoteConfigUrl: './design-studio-config.json',
     apiUrl: 'CHANGEIT',
     widgetBaseUrl: 'CHANGEIT',
     dashboardBaseUrl: 'CHANGEIT',

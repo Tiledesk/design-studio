@@ -959,14 +959,14 @@ export var OLLAMA_MODEL: Array<{ name: string, value: string, description:string
 export var VLLM_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
-// Filled at runtime from the project's OpenRouter integration: the models and
-// the providers that serve them are chosen in the dashboard, not listed here.
-export var OPENROUTER_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
-]
-
 // Gemini Agent Platform: come vLLM, i modelli arrivano solo dall'integration di progetto
 // (GET /integration/name/agentplatform -> value.servers[].models), mai da questa lista.
 export var AGENTPLATFORM_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
+]
+
+// Filled at runtime from the project's OpenRouter integration: the models and
+// the providers that serve them are chosen in the dashboard, not listed here.
+export var OPENROUTER_MODEL: Array<{ name: string, value: string, description:string, status: "active" | "inactive"}> = [
 ]
 
 

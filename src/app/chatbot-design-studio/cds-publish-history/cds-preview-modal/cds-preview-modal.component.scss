@@ -1,0 +1,67 @@
+.cds-preview-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: white;
+  overflow: hidden;
+}
+
+/* Barra sottile: dice cosa si sta guardando e come uscirne. L'avviso che le modifiche
+   non vengono salvate resta dentro l'iframe, dove sta il canvas: vale anche se quella
+   pagina viene aperta per conto suo. */
+.cds-preview-modal__bar {
+  flex: 0 0 auto;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 8px 0 16px;
+  background: var(--blu-light-04, #f5f7fb);
+  border-bottom: 1px solid var(--gray-light-02, #e0e0e0);
+  font-family: var(--font-family-poppins);
+  color: var(--blu);
+  font-size: 14px;
+}
+
+.cds-preview-modal__title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cds-preview-modal__date {
+  font-weight: 400;
+  color: var(--grey-06, #6e6e6e);
+}
+
+.cds-preview-modal__close {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--blu);
+  cursor: pointer;
+
+  .material-icons {
+    font-size: 22px;
+  }
+
+  &:hover {
+    background: rgba(25, 29, 34, 0.06);
+  }
+}
+
+.cds-preview-modal__frame {
+  flex: 1 1 auto;
+  width: 100%;
+  border: 0;
+  display: block;
+}
