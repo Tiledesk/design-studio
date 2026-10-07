@@ -4179,6 +4179,59 @@ describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () =>
     expect(report.warnings).toBeUndefined();
   });
 
+  // A web request authenticates through a Global the user creates: the chat
+  // is told, after the batch, which one is still missing. Warnings only, for
+  // V3 and legacy alike -- the key itself is refused (see literal secrets).
+  const OPENROUTER_CALL = {
+    url: 'https://openrouter.ai/api/v1/chat/completions', method: 'POST',
+    headersString: { 'Content-Type': 'application/json', 'X-Trace': '{{conversation_id}}',
+      Authorization: 'Bearer {{openrouter_api_key}}' }
+  };
+  const globalWarnings = (report: any) => (report.warnings || []).filter((w: string) => w.includes('Global'));
+
+  it('warns, after an applied batch, that the Global a web request reads does not exist', async () => {
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'empty', type: 'webrequestv2', fields: OPENROUTER_CALL }]);
+    expect(report.ok).toBe(true);
+    const warnings = globalWarnings(report);
+    expect(warnings.length).toBe(1);
+    expect(warnings[0]).toContain('"empty"');
+    expect(warnings[0]).toContain('{{openrouter_api_key}}');
+    expect(warnings[0]).toContain('create the Global "openrouter_api_key"');
+    expect(warnings[0]).not.toContain('conversation_id');
+  });
+
+  it('says nothing about a Global the agent already has', async () => {
+    dashboardService.selectedChatbot = { attributes: { globals: [{ key: 'openrouter_api_key', value: 'sk-x' }] } };
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'empty', type: 'webrequestv2', fields: OPENROUTER_CALL }]);
+    expect(globalWarnings(report)).toEqual([]);
+  });
+
+  it('says nothing about a variable some block of the flow sets', async () => {
+    const setter = withActions('set', 'set', 'setattribute-v2');
+    (setter.actions[0] as any).destination = 'openrouter_api_key';
+    intentService.listOfIntents.push(setter);
+    const report = await service.apply([
+      { op: 'add_action', intent_id: 'empty', type: 'webrequestv2', fields: OPENROUTER_CALL }]);
+    expect(globalWarnings(report)).toEqual([]);
+  });
+
+  it('warns about a missing Global on a legacy agent too, and on inline and updated web requests', async () => {
+    dashboardService.isV3 = false;
+    const added = await service.apply([{ op: 'add_intent', intent_display_name: 'Read PDF',
+      actions: [{ type: 'webrequestv2', fields: { url: 'https://ocr.example.com?key={{ocr_key}}', method: 'GET' } }] }]);
+    expect(globalWarnings(added).length).toBe(1);
+    expect(globalWarnings(added)[0]).toContain('"Read PDF"');
+    expect(globalWarnings(added)[0]).toContain('{{ocr_key}}');
+    const hidden = withActions('wr', 'wr', 'webrequestv2');
+    intentService.listOfIntents.push(hidden);
+    const updated = await service.apply([{ op: 'update_action', intent_id: 'wr', action_id: 'wr-a0',
+      fields: { headersString: { 'x-api-key': '{{vision_api_key}}' } } } as any]);
+    expect(globalWarnings(updated).length).toBe(1);
+    expect(globalWarnings(updated)[0]).toContain('{{vision_api_key}}');
+  });
+
   it('tells the agent how to serve the message when it tries to fill defaultFallback', async () => {
     const report = await service.apply([{ op: 'add_action', intent_id: 'fallback', type: 'reply' }]);
     expectV3Refusal(report, 0);

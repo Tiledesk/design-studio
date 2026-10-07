@@ -45,6 +45,7 @@ function aSnapshot(models: LlmModel[] = MODELS): CapabilitiesSnapshot {
   return {
     capabilities: {
       chatbot_subtype: 'chatbot', subagent: false,
+      integrations: [], globals: [],
       actions: [
         { type: 'reply', status: 'available' },
         { type: 'ai_prompt', status: 'available' },

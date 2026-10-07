@@ -332,6 +332,13 @@ describe('AgentChatHostService', () => {
     });
   });
 
+  it('adds the agent\'s language to get_flow when the bot declares one', async () => {
+    dashboardService.selectedChatbot = { language: 'it' };
+    await service.attach(document.createElement('iframe'));
+    const result = await registered['get_flow']({});
+    expect(result.language).toBe('it');
+  });
+
   // The runtime's prompt describes the legacy editor: on a V3 agent the rules
   // of the V3 editor have to reach the agent with the flow it is about to edit.
   it('adds the V3 rules to get_flow only on a V3 agent', async () => {

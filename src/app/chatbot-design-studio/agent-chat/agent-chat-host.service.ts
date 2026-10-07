@@ -224,6 +224,11 @@ export class AgentChatHostService {
         // request reach the model.
         ...withoutLiteralSecrets(withoutServerCredentials(this.flowOps.readFlow())),
         family,
+        // The agent's own language (the bot's `language`), so a message the
+        // flow shows -- or a warning meant for its users -- can be written
+        // in it when the request asks for that.
+        ...(this.dashboardService.selectedChatbot?.language
+          ? { language: this.dashboardService.selectedChatbot.language } : {}),
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),
         ...(v3Warnings.length ? { v3_warnings: v3Warnings } : {})
