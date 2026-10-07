@@ -1,5 +1,5 @@
 import { of, throwError, Subject, lastValueFrom } from 'rxjs';
-import { START_POINT_TYPES, isStartBox, findStartPoint, presentStartPointTypes, isStartPointPaletteItem, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey } from './utils-start-points';
+import { START_POINT_TYPES, isStartBox, findStartPoint, presentStartPointTypes, isStartPointPaletteItem, startPointTypeOf, isWebhookStartPointActive, createStartPointBlock, buildStartPointItems, createStartPointBox, startPointPanelState, startPointLabelKey, supportsStartPoints, defaultEntryIntent, listedIntents } from './utils-start-points';
 
 describe('utils-start-points', () => {
   const start = { intent_id: 's', intent_display_name: 'start' };
@@ -19,6 +19,21 @@ describe('utils-start-points', () => {
     // marker block ⇒ present (imported, forked or redone box without a start point: recovered from its panel)
     expect(presentStartPointTypes([start, marked])).toEqual(['web', 'webhook']);
     expect(presentStartPointTypes([marked, { ...marked, intent_id: 'b3' }])).toEqual(['web', 'webhook']);
+  });
+
+  it('presentStartPointTypes drops web while the start block has web_start_disabled', () => {
+    const disabled = { intent_id: 's', intent_display_name: 'start', attributes: { web_start_disabled: true } };
+    expect(presentStartPointTypes([disabled])).toEqual([]);
+    expect(presentStartPointTypes([disabled, marked])).toEqual(['webhook']);
+    expect(presentStartPointTypes([start])).toEqual(['web']);
+  });
+
+  it('buildStartPointItems offers Web start only when it is not present', () => {
+    const web = (present: string[]) => buildStartPointItems(present, false).find(i => i.value.start_point === 'web');
+    expect(web(['web']).value.disabled).toBe(true);
+    expect(web([]).value.disabled).toBe(false);
+    expect(web([]).value.tooltip).toBe('');
+    expect(buildStartPointItems([], true).find(i => i.value.start_point === 'web').value.disabled).toBe(true);
   });
 
   it('presentStartPointTypes ignores unmarked blocks, even named Webhook start', () => {
@@ -272,5 +287,46 @@ describe('utils-start-points', () => {
     expect(presentStartPointTypes([start, marked])).toEqual(['web', 'webhook']);
     expect(isWebhookStartPointActive(serverResponse)).toBeTrue();
     expect(startPointPanelState(serverResponse, { intent_id: 'b1' }, 'u/')).toEqual({ enabled: true, sourceName: 'crm', url: 'u/webhook/w9', devUrl: 'u/webhook/w9/dev' });
+  });
+
+  describe('start points only on subtype chatbot', () => {
+    it('supportsStartPoints is true for chatbot and a missing subtype, false for any other subtype', () => {
+      expect(supportsStartPoints('chatbot')).toBeTrue();
+      expect(supportsStartPoints(undefined)).toBeTrue();
+      expect(supportsStartPoints(null)).toBeTrue();
+      expect(supportsStartPoints('')).toBeTrue();
+      expect(supportsStartPoints('voice')).toBeFalse();
+      expect(supportsStartPoints('subagent')).toBeFalse();
+      expect(supportsStartPoints('webhook')).toBeFalse();
+      expect(supportsStartPoints('copilot')).toBeFalse();
+    });
+  });
+
+  describe('a disabled Web start drives no selection or list', () => {
+    const hidden = { intent_id: 's', intent_display_name: 'start', attributes: { web_start_disabled: true } };
+    const scheduled = { intent_id: 'sc', intent_display_name: 'Scheduled start', attributes: { start_point: 'scheduled' } };
+    const block = { intent_id: 'b', intent_display_name: 'welcome', attributes: {} };
+
+    it('defaultEntryIntent is the start block while Web start is on', () => {
+      expect(defaultEntryIntent([block, scheduled, start])).toBe(start);
+    });
+
+    it('defaultEntryIntent is the first visible start box when Web start is off', () => {
+      expect(defaultEntryIntent([block, hidden, scheduled, marked])).toBe(scheduled);
+    });
+
+    it('defaultEntryIntent falls back to the first block, never the hidden start', () => {
+      expect(defaultEntryIntent([hidden, block])).toBe(block);
+      expect(defaultEntryIntent([hidden])).toBeUndefined();
+      expect(defaultEntryIntent([])).toBeUndefined();
+      // no start block at all (a webhook/copilot flow's entry is its own): the caller keeps its choice
+      expect(defaultEntryIntent([block, scheduled])).toBeUndefined();
+      expect(defaultEntryIntent(null)).toBeUndefined();
+    });
+
+    it('listedIntents drops only the disabled start', () => {
+      expect(listedIntents([hidden, block, scheduled])).toEqual([block, scheduled]);
+      expect(listedIntents([start, block])).toEqual([start, block]);
+    });
   });
 });

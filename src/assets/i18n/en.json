@@ -645,6 +645,8 @@
         "StartWebhookDeleteTitle": "Delete the webhook start",
         "StartWebhookDeleteText": "The webhook will stop starting conversations from this box and the box will be deleted. Continue?",
         "WebStart": "Web start",
+        "WebStartDeleteTitle": "Delete the web start",
+        "WebStartDeleteText": "The chatbot will no longer start from the web (widget, chat, preview) and its connection will be removed. You can add the Web start back from the Start points section. Continue?",
         "WebhookStart": "Webhook start",
         "ScheduledStart": "Scheduled start",
         "ScheduledBadge": {

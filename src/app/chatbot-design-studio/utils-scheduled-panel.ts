@@ -173,6 +173,10 @@ export class ScheduledPanelModel {
   /** the last save failed and nothing has been saved since: the server draft is stale */
   private lastSaveFailed = false;
   private syncing = false;
+  /** a change from outside the panel (agent chat) is being applied: no save starts until resume() */
+  private suspended = false;
+  /** an edit was held back by suspend() (or made while suspended) */
+  private heldBack = false;
 
   constructor(private readonly deps: ScheduledPanelDeps, private readonly blockId: string, timezone: string) {
     this.schedule = defaultSchedule(timezone);
@@ -180,6 +184,8 @@ export class ScheduledPanelModel {
 
   /** The form of the draft start point of this block; a box without a start point (imported, redone) starts off with the defaults */
   load(webhook: any, timezone: string) {
+    // the form is replaced: an edit held back while suspended is gone with it
+    this.heldBack = false;
     const sp = findStartPoint(webhook, 'scheduled');
     if (sp && sp.block_id === this.blockId && sp.schedule) {
       this.enabled = sp.enabled !== false;
@@ -327,6 +333,10 @@ export class ScheduledPanelModel {
   private changed() {
     this.cancelTimer();
     this.validate();
+    if (this.suspended) {
+      this.heldBack = true;
+      return;
+    }
     if (this.hasError) {
       return;
     }
@@ -344,6 +354,10 @@ export class ScheduledPanelModel {
   }
 
   private save() {
+    if (this.suspended) {
+      this.heldBack = true;
+      return;
+    }
     if (this.saving) {
       this.again = true;
       return;
@@ -390,6 +404,33 @@ export class ScheduledPanelModel {
     const waiters = this.idleWaiters;
     this.idleWaiters = [];
     waiters.forEach(w => w(false));
+  }
+
+  /**
+   * A change from outside the panel (the agent chat start_point tool) is about to be saved: hold every save back
+   * (a pending debounce, a re-send queued behind the PUT in flight, new edits) until resume(), so nothing the user
+   * types meanwhile overwrites it. whenIdle() still waits for a PUT already sent.
+   */
+  suspend() {
+    if (this.timer || this.again) {
+      this.heldBack = true;
+    }
+    this.cancelTimer();
+    this.again = false;
+    this.suspended = true;
+  }
+
+  /**
+   * Saves start again. `resave`: an edit held back is saved now (the outside change failed, the form is still the
+   * user's); false: dropped (the form was reloaded from the server, or the reload failed and must not revert it).
+   */
+  resume(resave: boolean) {
+    this.suspended = false;
+    const held = this.heldBack;
+    this.heldBack = false;
+    if (held && resave) {
+      this.changed();
+    }
   }
 
   /** Resolves once no PUT is in flight (sends nothing): the DELETE goes out only after a PUT already sent */

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, Optional } from '@angular/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_OF_MENU } from '../../../utils';
 import { TYPE_CHATBOT, ACTIONS_LIST, TYPE_ACTION_CATEGORY, ACTION_CATEGORY } from 'src/app/chatbot-design-studio/utils-actions';
@@ -9,6 +9,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Subscription } from 'rxjs';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
+import { StartPointManagerService } from 'src/app/chatbot-design-studio/services/start-point-manager.service';
 import { buildStartPointItems, presentStartPointTypes } from 'src/app/chatbot-design-studio/utils-start-points';
 
 
@@ -55,15 +56,19 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private readonly projectPlanUtils: ProjectPlanUtils,
     private readonly dashboardService: DashboardService,
-    private readonly webhookService: WebhookService
+    private readonly webhookService: WebhookService,
+    @Optional() private readonly startPointManager?: StartPointManagerService,
   ) { }
 
   /** the server has the scheduler configured (GET webhook → scheduled_available): without it the Scheduled item is not offered */
   scheduledAvailable = false;
   private webhookSub: Subscription;
+  private webStartSub: Subscription;
 
   ngOnInit(): void {
     this.createActionListByCategory();
+    // Web start is turned off or on by changing an attribute of the `start` block in place: no ngOnChanges
+    this.webStartSub = this.startPointManager?.webStartChanged$.subscribe(() => this.refreshStartPointItems());
     this.webhookSub = this.webhookService.webhook$.subscribe(webhook => {
       const available = webhook?.scheduled_available === true;
       if (available !== this.scheduledAvailable) {
@@ -75,6 +80,7 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.webhookSub?.unsubscribe();
+    this.webStartSub?.unsubscribe();
   }
 
   private refreshStartPointItems() {
@@ -88,10 +94,9 @@ export class CdsPanelElementsComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(): void {
-    // keep an open Start points menu in sync (item enabled/disabled) with the flow state
-    if (this.menuCategory === START_POINTS_CATEGORY && this.actionsByCategory[START_POINTS_CATEGORY]) {
-      this.actionsList = this.buildStartPointItems();
-    }
+    // the Start points items say which start points the flow already has (Web start disabled included)
+    // and whether one is being created: rebuild them when the flow changes, and keep an open menu in sync
+    this.refreshStartPointItems();
   }
 
   buildStartPointItems(): Array<any> {

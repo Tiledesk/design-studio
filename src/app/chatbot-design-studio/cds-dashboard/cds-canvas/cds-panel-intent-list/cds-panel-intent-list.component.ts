@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter, Optional } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 // SERVICES //
@@ -9,6 +9,8 @@ import { Intent } from 'src/app/models/intent-model';
 
 // UTILS //
 import { RESERVED_INTENT_NAMES, moveItemToPosition, TYPE_INTENT_NAME, UNTITLED_BLOCK_PREFIX } from '../../../utils';
+import { listedIntents, isWebStartDisabled } from 'src/app/chatbot-design-studio/utils-start-points';
+import { StartPointManagerService } from '../../../services/start-point-manager.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -22,6 +24,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   private subscriptionListOfIntents: Subscription;
   private subscriptionIntent: Subscription;
+  private subscriptionWebStart: Subscription;
   
   
   @Input() IS_OPEN: boolean;
@@ -48,7 +51,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
   private readonly logger: LoggerService = LoggerInstance.getInstance()
   
   constructor(
-    private intentService: IntentService
+    private intentService: IntentService,
+    @Optional() private readonly startPointManager?: StartPointManagerService
   ) { 
     this.setSubscriptions();
   }
@@ -70,6 +74,7 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
     if (this.subscriptionIntent) {
       this.subscriptionIntent.unsubscribe();
     }
+    this.subscriptionWebStart?.unsubscribe();
     
   }
 
@@ -87,10 +92,19 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
       }
     });
 
+    /** Web start disabled/enabled: the start block stays in the flow, only its row goes or comes back */
+    this.subscriptionWebStart = this.startPointManager?.webStartChanged$.subscribe(() => {
+      const intents = this.intentService.listOfIntents;
+      if(intents && intents.length>0){
+        this.initialize(intents);
+      }
+    });
+
     /** SUBSCRIBE TO THE INTENT SELECTED */
     this.subscriptionIntent = this.intentService.behaviorIntent.subscribe((intent: Intent) => {
       this.logger.log('[cds-panel-intent-list] --- AGGIORNATO INTENT ',intent);
-      if (intent) {
+      // a disabled Web start is hidden: never the selected row
+      if (intent && !isWebStartDisabled(intent)) {
         if (!intent['attributesChanged']) {
           this.idSelectedIntent = intent.intent_id;
         }
@@ -100,6 +114,8 @@ export class CdsPanelIntentListComponent implements OnInit, OnChanges {
 
   /** initialize */
   private initialize(intents){
+    // a disabled Web start is hidden on the canvas: not listed here either
+    intents = listedIntents(intents);
     // // intents = this.intentService.hiddenEmptyIntents(intents);
     // // this.internalIntents = intents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START || obj.intent_display_name.trim() === TYPE_INTENT_NAME.DEFAULT_FALLBACK));
     this.internalIntents = intents.filter(obj => obj.attributes && obj.attributes.readonly === true && !obj.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX));

@@ -22,7 +22,7 @@ import { SavingStateService } from 'src/app/services/saving-state.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
-import { isStartBox, StartTestKind } from '../utils-start-points';
+import { isStartBox, StartTestKind, defaultEntryIntent, isWebStartDisabled } from '../utils-start-points';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -77,6 +77,11 @@ export class IntentService {
 
   public arrayUNDO: Array<any> = [];
   public arrayREDO: Array<any> = [];
+  /**
+   * Entries were removed from the middle of arrayUNDO (a start box saved or deleted without history). Whoever
+   * counted entries on the stack (the agent chat's Undo of its last batch) must count again or forget them.
+   */
+  public readonly undoHistoryPruned$ = new Subject<void>();
   public lastActionUndoRedo: boolean;
 
   public arrayCOPYPAST: Array<any> = [];
@@ -135,10 +140,10 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
-      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
-      // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
-      if(startIntent && startIntent.length>0){
-        this.intentSelected = startIntent[0];
+      // the start block; with Web start disabled (hidden) the first visible start box, else the first block
+      const entry = defaultEntryIntent(this.listOfIntents, TYPE_INTENT_NAME.START);
+      if(entry){
+        this.intentSelected = entry;
       }
     }
     // this.logger.log('[INTENT SERVICE] ::: setDefaultIntentSelected ::: ', this.intentSelected);
@@ -884,7 +889,11 @@ export class IntentService {
     this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
-      //** center stage on 'start' intent */
+      //** center stage on the selected entry: 'start', or a visible start box when Web start is disabled (hidden) */
+      if (isWebStartDisabled(this.intentSelected)) {
+        // nothing visible to centre on (a flow made of the hidden start only)
+        return;
+      }
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
         /// let id_faq_kb = this.dashboardService.id_faq_kb;
@@ -1730,14 +1739,42 @@ export class IntentService {
     }
     
 
+    /**
+     * Saves one block with a direct put and no undo entry (Web start disable/enable): undoing would bring back a
+     * connection the start no longer offers. The block must already be changed in listOfIntents; opsUpdate then
+     * takes the new baseline of the next undo entry. Rejects when the save fails.
+     */
+    public async saveIntentWithoutHistory(intent: Intent): Promise<boolean> {
+      const saved = await this.opsUpdate({
+        id_faq_kb: intent.id_faq_kb,
+        operations: [{ type: 'put', intent: JSON.parse(JSON.stringify(intent)) }]
+      });
+      // older undo/redo entries hold full snapshots of this block: restoring one would bring back the old state
+      // (and show a hidden start again without the canvas knowing)
+      const touches = (op: any) => (op?.undo || []).concat(op?.redo || []).some((o: any) => o?.intent?.intent_id === intent.intent_id);
+      const undoDepth = this.arrayUNDO.length;
+      this.arrayUNDO = this.arrayUNDO.filter(op => !touches(op));
+      this.arrayREDO = this.arrayREDO.filter(op => !touches(op));
+      this.setBehaviorUndoRedo();
+      if (this.arrayUNDO.length !== undoDepth) {
+        this.undoHistoryPruned$?.next();
+      }
+      this.refreshIntent(intent);
+      return saved;
+    }
+
     /** Deletes a start box without leaving history: undoing would bring back a box whose start point no longer exists */
     public async deleteIntentWithoutHistory(intent: Intent){
       try {
         await this.deleteIntentNew(intent);
       } finally {
+        const undoDepth = this.arrayUNDO.length;
         this.arrayUNDO = this.arrayUNDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
         this.arrayREDO = this.arrayREDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
         this.setBehaviorUndoRedo();
+        if (this.arrayUNDO.length !== undoDepth) {
+          this.undoHistoryPruned$?.next();
+        }
       }
     }
 

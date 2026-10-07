@@ -13,7 +13,8 @@
     "start": "ng serve",
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:start-points": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-start-points.ts --ts-config=tsconfig.spec.start-points.json"
   },
   "private": false,
   "dependencies": {

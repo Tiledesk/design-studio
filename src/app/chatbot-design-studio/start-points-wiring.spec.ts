@@ -1,4 +1,6 @@
-import { of, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
+import { StartPointManagerService } from './services/start-point-manager.service';
+import { CdsCanvasComponent } from './cds-dashboard/cds-canvas/cds-canvas.component';
 import { fakeAsync, tick as ngTick } from '@angular/core/testing';
 import { ScheduledPanelModel, scheduledLoadOutcome, scheduledLoadedOutcome, scheduledTestError, scheduledStatusLine, scheduledBoxView, startPointDeleteOutcome, formatNextRun, timezoneList, SCHEDULED_SAVE_DEBOUNCE_MS, SCHEDULED_UNAVAILABLE_MESSAGE } from './utils-scheduled-panel';
 import { CdsPanelPublishComponent } from './cds-dashboard/cds-canvas/cds-panel-publish/cds-panel-publish.component';
@@ -7,6 +9,8 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { SavingStateService } from 'src/app/services/saving-state.service';
 import { IntentService } from './services/intent.service';
 import { CdsIntentComponent } from './cds-dashboard/cds-canvas/cds-intent/cds-intent.component';
+import { CdsPanelIntentDetailComponent } from './cds-dashboard/cds-canvas/cds-panel-intent-detail/cds-panel-intent-detail.component';
+import { CdsPanelIntentListComponent } from './cds-dashboard/cds-canvas/cds-panel-intent-list/cds-panel-intent-list.component';
 import { createStartPointBox, createStartPointBlock, buildStartPointItems, buildStartPointUpsertBody, startPointErrorKey, isLiveStartBox, shouldDeleteWebhookPreload } from './utils-start-points';
 
 const tick = () => new Promise(r => setTimeout(r, 0));
@@ -531,5 +535,228 @@ describe('scheduled final review fixes', () => {
       // the debounce of the edit was replaced by the retry
       expect(upsert).toHaveBeenCalledTimes(3);
     }));
+  });
+});
+
+describe('start point service wiring (fix round 1)', () => {
+  beforeAll(() => {
+    LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
+  });
+
+  describe('ScheduledPanelModel suspend / resume', () => {
+    const webhook = { start_points: [{ type: 'scheduled', block_id: 'b1', enabled: true, mapping: { source_name: 'Bot', payload: {} },
+      schedule: { frequency: 'daily', time: '09:00', timezone: 'Europe/Rome' } }] };
+    const make = () => {
+      const upsert = jasmine.createSpy('upsert').and.callFake(() => of({}));
+      const model = new ScheduledPanelModel({ upsert, sync: () => of({}), refresh: () => {}, onError: () => {} }, 'b1', 'Europe/Rome');
+      model.load(webhook, 'Europe/Rome');
+      return { model, upsert };
+    };
+
+    it('while suspended no save starts: the pending debounce and new keystrokes are held back', fakeAsync(() => {
+      const { model, upsert } = make();
+      model.setSourceName('typed before');
+      model.suspend();
+      model.setSourceName('typed during');
+      model.retrySave();
+      model.flush();
+      ngTick(2000);
+      expect(upsert).not.toHaveBeenCalled();
+    }));
+
+    it('resume(false) after the reload drops the held edit; the next edit saves normally', fakeAsync(() => {
+      const { model, upsert } = make();
+      model.suspend();
+      model.setSourceName('typed during');
+      model.load(webhook, 'Europe/Rome');
+      model.resume(false);
+      ngTick(2000);
+      expect(upsert).not.toHaveBeenCalled();
+      expect(model.sourceName).toBe('Bot');
+      model.setSourceName('after');
+      ngTick(700);
+      expect(upsert).toHaveBeenCalledTimes(1);
+      expect(upsert.calls.argsFor(0)[0].mapping.source_name).toBe('after');
+    }));
+
+    it('resume(true) (the outside update failed) saves the held edit', fakeAsync(() => {
+      const { model, upsert } = make();
+      model.setSourceName('typed before');
+      model.suspend();
+      model.resume(true);
+      ngTick(700);
+      expect(upsert).toHaveBeenCalledTimes(1);
+      expect(upsert.calls.argsFor(0)[0].mapping.source_name).toBe('typed before');
+    }));
+
+    it('a re-send queued behind the PUT in flight is held back too; whenIdle still waits for that PUT', fakeAsync(() => {
+      const inFlight = new Subject<any>();
+      const { model, upsert } = make();
+      upsert.and.returnValue(inFlight);
+      model.setSourceName('one');
+      ngTick(700);
+      model.setSourceName('two');
+      ngTick(700);
+      expect(upsert).toHaveBeenCalledTimes(1);
+      model.suspend();
+      let idle = false;
+      model.whenIdle().then(() => idle = true);
+      inFlight.next({}); inFlight.complete();
+      ngTick(2000);
+      expect(idle).toBeTrue();
+      expect(upsert).toHaveBeenCalledTimes(1);
+    }));
+  });
+
+  describe('panel delete toast', () => {
+    const panelCtx = (manager: any) => {
+      const ctx: any = Object.assign(Object.create(CdsPanelIntentDetailComponent.prototype), {
+        startPointManager: manager,
+        translate: { instant: (k: string) => k },
+        spBusy: false,
+      });
+      ctx.showMessage = jasmine.createSpy('showMessage');
+      return ctx;
+    };
+    const realManager = (status: number) => {
+      const webhookService: any = {
+        webhook$: new BehaviorSubject<any>({ scheduled_available: true, start_points: [] }),
+        deleteStartPoint: () => throwError(() => ({ status, error: { error: 'Forbidden by the server' } })),
+        loadWebhook: () => {},
+      };
+      const intentService: any = {
+        listOfIntents: [
+          { intent_id: 'w', intent_display_name: 'Webhook start', attributes: { start_point: 'webhook' } },
+          { intent_id: 's', intent_display_name: 'Scheduled start', attributes: { start_point: 'scheduled' } },
+        ],
+        deleteIntentWithoutHistory: jasmine.createSpy('deleteIntentWithoutHistory'),
+      };
+      const manager = new StartPointManagerService(webhookService, intentService, { id_faq_kb: 'bot1', selectedChatbot: { subtype: 'chatbot' } } as any,
+        { instant: (k: string) => k } as any);
+      spyOn<any>(manager, 'confirmDialog').and.resolveTo(true);
+      return { manager, intentService };
+    };
+
+    it('a 403 DELETE keeps the box and shows the toast (scheduled: the server sentence; webhook: its own text)', async () => {
+      const { manager, intentService } = realManager(403);
+      const ctx = panelCtx(manager);
+      await ctx.confirmAndDeleteStartPoint('scheduled', 'CDSCanvas.ScheduledPanel.DeleteTitle', 'CDSCanvas.ScheduledPanel.DeleteText');
+      expect(ctx.showMessage).toHaveBeenCalledOnceWith('Forbidden by the server');
+      ctx.showMessage.calls.reset();
+      await ctx.confirmAndDeleteStartPoint('webhook', 'CDSCanvas.StartWebhookDeleteTitle', 'CDSCanvas.StartWebhookDeleteText');
+      expect(ctx.showMessage).toHaveBeenCalledOnceWith('CDSCanvas.StartWebhookError');
+      expect(intentService.deleteIntentWithoutHistory).not.toHaveBeenCalled();
+      expect(ctx.spBusy).toBeFalse();
+    });
+
+    it('no toast when the user cancels or the box is already being removed; a toast for a missing box', async () => {
+      const results: any[] = [
+        { ok: false, code: 'declined', error: 'declined by the user' },
+        { ok: false, code: 'missing', error: 'already being removed', in_progress: true },
+        { ok: true },
+      ];
+      for (const r of results) {
+        const ctx = panelCtx({ remove: jasmine.createSpy('remove').and.resolveTo(r) });
+        await ctx.confirmAndDeleteStartPoint('scheduled');
+        expect(ctx.showMessage).withContext(JSON.stringify(r)).not.toHaveBeenCalled();
+      }
+      const ctx = panelCtx({ remove: async () => ({ ok: false, code: 'missing', error: 'there is no scheduled start box in the flow' }) });
+      await ctx.confirmAndDeleteStartPoint('scheduled');
+      expect(ctx.showMessage).toHaveBeenCalledOnceWith('there is no scheduled start box in the flow');
+    });
+  });
+
+  describe('canvas palette drop toast', () => {
+    const canvasCtx = (result: any) => ({
+      startPointManager: { add: jasmine.createSpy('add').and.resolveTo(result) },
+      notify: { showWidgetStyleUpdateNotification: jasmine.createSpy('toast') },
+      translate: { instant: (k: string) => k },
+      confirmStartWebhookSwitch: jasmine.createSpy('confirmStartWebhookSwitch').and.resolveTo(true),
+    });
+
+    it('toasts any failure except declined and exists (busy / already there), as before', async () => {
+      const cases: [any, boolean][] = [
+        [{ ok: true, intent_id: 'b' }, false],
+        [{ ok: false, code: 'declined', error: 'x' }, false],
+        [{ ok: false, code: 'exists', error: 'x' }, false],
+        [{ ok: false, code: 'unavailable', error: 'x' }, true],
+        [{ ok: false, code: 'invalid', error: 'x' }, true],
+        [{ ok: false, code: 'conflict', error: 'x' }, true],
+      ];
+      for (const [result, toast] of cases) {
+        const c: any = canvasCtx(result);
+        await CdsCanvasComponent.prototype.createStartPointFromPanelElement.call(c, { x: 1, y: 2 }, 'scheduled');
+        expect(c.notify.showWidgetStyleUpdateNotification.calls.count()).withContext(JSON.stringify(result)).toBe(toast ? 1 : 0);
+        if (toast) {
+          expect(c.notify.showWidgetStyleUpdateNotification).toHaveBeenCalledWith('CDSCanvas.ScheduledPointError', 4, 'report_problem');
+        }
+      }
+    });
+
+    it('the palette passes its own 409 confirmation to the service', async () => {
+      const c: any = canvasCtx({ ok: true });
+      await CdsCanvasComponent.prototype.createStartPointFromPanelElement.call(c, { x: 1, y: 2 }, 'webhook');
+      const [type, settings, pos, options] = c.startPointManager.add.calls.argsFor(0);
+      expect([type, settings, pos]).toEqual(['webhook', undefined, { x: 1, y: 2 }]);
+      await options.confirmConflict();
+      expect(c.confirmStartWebhookSwitch).toHaveBeenCalled();
+    });
+
+  });
+});
+
+describe('Web start on other subtypes and when disabled', () => {
+  beforeAll(() => {
+    LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
+  });
+
+  const panel = (subtype: string | undefined) => Object.assign(Object.create(CdsPanelIntentDetailComponent.prototype), {
+    dashboardService: { selectedChatbot: { subtype } },
+  });
+
+  it('the start panel offers Delete only on subtype chatbot', () => {
+    expect(panel('chatbot').canDeleteWebStart).toBeTrue();
+    expect(panel(undefined).canDeleteWebStart).toBeTrue();
+    expect(panel('voice').canDeleteWebStart).toBeFalse();
+    expect(panel('subagent').canDeleteWebStart).toBeFalse();
+  });
+
+  it('onDeleteWebStart does nothing on another subtype', () => {
+    const ctx: any = panel('voice');
+    ctx.confirmAndDeleteStartPoint = jasmine.createSpy('confirmAndDeleteStartPoint');
+    ctx.onDeleteWebStart();
+    expect(ctx.confirmAndDeleteStartPoint).not.toHaveBeenCalled();
+    const chatbot: any = panel('chatbot');
+    chatbot.confirmAndDeleteStartPoint = jasmine.createSpy('confirmAndDeleteStartPoint');
+    chatbot.onDeleteWebStart();
+    expect(chatbot.confirmAndDeleteStartPoint).toHaveBeenCalledWith('web');
+  });
+
+  describe('left block list', () => {
+    const start = (disabled: boolean) => ({ intent_id: 's', intent_display_name: 'start', attributes: { readonly: true, ...(disabled ? { web_start_disabled: true } : {}) } });
+    const fallback = { intent_id: 'f', intent_display_name: 'defaultFallback', attributes: { readonly: true } };
+    const welcome = { intent_id: 'w', intent_display_name: 'welcome', attributes: {} };
+    const list = () => {
+      const c: any = Object.create(CdsPanelIntentListComponent.prototype);
+      c.intentService = { setDefaultIntentSelected() {}, intentSelected: welcome };
+      c.logger = { log() {} };
+      c.idSelectedIntent = null;
+      return c;
+    };
+
+    it('lists the start block while Web start is on', () => {
+      const c = list();
+      c.initialize([start(false), fallback, welcome]);
+      expect(c.internalIntents.map((i: any) => i.intent_id)).toEqual(['s', 'f']);
+    });
+
+    it('does not list a disabled start, and drops it from the selection', () => {
+      const c = list();
+      c.idSelectedIntent = 's';
+      c.initialize([start(true), fallback, welcome]);
+      expect(c.internalIntents.map((i: any) => i.intent_id)).toEqual(['f']);
+      expect(c.listOfIntents.map((i: any) => i.intent_id)).toEqual(['f', 'w']);
+      expect(c.idSelectedIntent).toBeNull();
+    });
   });
 });
