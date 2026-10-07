@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc24
+- **added** (master-pre): the Vibe Coder model setting is a searchable picker grouped into Curated and All OpenRouter models, each with its price and context size; a saved model that is no longer available is shown and must be replaced before saving
+
 # 1.40.16-rc23
 - **changed** (V3/design-vibe-coder): V3 start and fallback icons share one colour on the flow and in the blocks panel: web start green, webhook start violet, scheduled start orange, empty default fallback light blue
 - **changed** (V3/design-vibe-coder): V3 empty default fallback is dark like the start block, with a white title
