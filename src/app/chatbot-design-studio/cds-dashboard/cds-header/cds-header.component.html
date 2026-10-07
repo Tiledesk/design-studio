@@ -119,7 +119,7 @@
             </button>
         </div>
 
-        <div *ngIf="webhookUrl && isPlaying && isWebhook" class="btn-group box-url" 
+        <div *ngIf="webhookUrl && isPlaying && (isWebhook || isWebhookStartTest)" class="btn-group box-url"
                 matTooltipClass="cds-mat-tooltip"
                 matTooltip="{{ 'Copy Dev url' | translate}}" #tooltip="matTooltip" matTooltipPosition='below'
                 matTooltipHideDelay="100"

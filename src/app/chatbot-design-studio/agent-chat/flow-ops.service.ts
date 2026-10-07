@@ -14,6 +14,7 @@ import { computeFlowLayout } from './flow-ops-layout';
 import { CREDENTIAL_HEADER, WEB_REQUEST_TYPES, literalSecretFields, literalSecretRefusal } from './agent-chat-secrets';
 import { withDestinationHash } from '../utils-connectors';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage, getIntentDefaultColor } from '../utils';
+import { startPointTypeOf } from '../utils-start-points';
 import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
 import {
   actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, usesLlmModel, withDefaultLlmModel
@@ -539,7 +540,12 @@ export class FlowOpsService implements OnDestroy {
       const name = nameOf(intentId);
       return name === RESERVED_INTENT_NAMES.START || name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK;
     };
-    const isCloseBlock = (intentId: string): boolean =>
+    // V3-T3 is written for a visitor, who can always type again. A flow entered by a Webhook or
+    // Scheduled start box runs with nobody on the other side: a path that ends with no person in
+    // it must close its conversation, or every run leaves one open. Such flows may route to close.
+    const unattended = (this.intentService.listOfIntents || [])
+      .some((intent: any) => ['webhook', 'scheduled'].includes(startPointTypeOf(intent)));
+    const isCloseBlock = (intentId: string): boolean => !unattended &&
       (this.intentService.getIntentFromId(intentId)?.actions || [])
         .some((action: any) => action?._tdActionType === TYPE_ACTION.CLOSE);
     const oneActionError = (block: string): string => v3RuleError('V3-S1',
@@ -652,8 +658,18 @@ export class FlowOpsService implements OnDestroy {
           : this.validateDisplayName(op, op.intent_display_name);
         return nameError ?? this.validateAddIntentActions(op) ?? { op: op.op, ok: true };
       }
+      case 'delete_intent': {
+        // A start box (attributes.start_point) is registered on the server webhook: deleting it here
+        // would leave a start point without its block. It is removed from its own panel only.
+        const target = this.intentService.getIntentFromId(op.intent_id);
+        const startType = target ? startPointTypeOf(target) : null;
+        if (startType === 'webhook' || startType === 'scheduled') {
+          return { op: op.op, ok: false, error: `"${target.intent_display_name}" is the ${startType} start box: ` +
+            `it is removed from its own panel (Delete), not by delete_intent.` };
+        }
+        return needsIntent(op.intent_id) ?? this.validateShape(op);
+      }
       case 'update_intent':
-      case 'delete_intent':
       case 'move':
       case 'add_action':
       case 'update_action':
@@ -721,6 +737,8 @@ export class FlowOpsService implements OnDestroy {
     [TYPE_ACTION.AI_CONDITION]: ['fallbackIntent', 'errorIntent'],
     [TYPE_ACTION.ONLINE_AGENTS]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.ONLINE_AGENTSV2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.INVITE_HUMAN]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.REMOVE_HUMAN]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.OPEN_HOURS]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.WEB_REQUESTV2]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.ASKGPT]: ['trueIntent', 'falseIntent'],

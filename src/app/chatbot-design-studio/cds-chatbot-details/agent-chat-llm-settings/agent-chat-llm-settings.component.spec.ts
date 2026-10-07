@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { TranslateModule } from '@ngx-translate/core';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { AgentChatSettingsService } from '../../agent-chat/agent-chat-settings.service';
@@ -33,7 +34,7 @@ describe('AgentChatLlmSettingsComponent', () => {
     if (current) { settings.current = current; }
     await TestBed.configureTestingModule({
       declarations: [AgentChatLlmSettingsComponent],
-      imports: [FormsModule, TranslateModule.forRoot()],
+      imports: [FormsModule, NgSelectModule, TranslateModule.forRoot()],
       providers: [
         { provide: AgentChatSettingsService, useValue: settings },
         { provide: DashboardService, useValue: { projectID: 'p1' } },
@@ -136,20 +137,14 @@ describe('AgentChatLlmSettingsComponent', () => {
   // exists to prevent. So this asserts the DOM, where the defect lived.
   it('lists the deployment default exactly once, and marks it', async () => {
     await setup();
-    const options: HTMLOptionElement[] =
-      Array.from(fixture.nativeElement.querySelectorAll('#llm-model option'));
-
+    const options = fixture.componentInstance.options;
     expect(options.length).toBe(2);
-    const forDefault = options.filter(o => (o.textContent || '').includes('Opus 5'));
+    const forDefault = options.filter(o => o.label.includes('Opus 5'));
     expect(forDefault.length).toBe(1);
     // TranslateModule.forRoot() with no translations renders the key itself.
-    expect(forDefault[0].textContent).toContain('LlmSettingsDefault');
-    // The marker used to be a `<span *ngIf>` INSIDE the `<option>`, which a
-    // browser does not render -- so the option text must be a plain string
-    // with no child markup at all.
-    options.forEach(o => expect(o.children.length).toBe(0));
+    expect(forDefault[0].label).toContain('LlmSettingsDefault');
     // The sentinel is still what "the deployment's own model" carries.
-    expect(forDefault[0].value).toBe('');
+    expect(forDefault[0].id).toBe('');
   });
 
   // Fix round 3, residual: with the duplicate option removed, a stored
@@ -163,14 +158,14 @@ describe('AgentChatLlmSettingsComponent', () => {
     await setup({ project_id: 'p1', updated_at: 't', updated_by: 'u',
                   model: { id: 'anthropic:claude-opus-5',
                            params: { temperature: 0.5, max_tokens: 900 } } });
-    const select: HTMLSelectElement =
-      fixture.nativeElement.querySelector('#llm-model');
-
-    const selected = Array.from(select.options).filter(o => o.selected);
-    expect(selected.length).withContext('nothing is selected at all').toBe(1);
-    expect(select.selectedIndex).toBe(0);
-    expect(select.value).toBe('');
-    expect(selected[0].textContent).toContain('Opus 5');
+    expect(fixture.componentInstance.selectedModelId).toBe('');
+    // ngModel writes into ng-select asynchronously.
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const shown: HTMLElement =
+      fixture.nativeElement.querySelector('#llm-model-select .ng-value');
+    expect(shown).withContext('nothing is selected at all').not.toBeNull();
+    expect(shown.textContent).toContain('Opus 5');
 
     // The sentinel carries no params, so the panel must not keep showing
     // numbers it is about to discard.
@@ -290,7 +285,7 @@ describe('AgentChatLlmSettingsComponent', () => {
     await TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       declarations: [AgentChatLlmSettingsComponent],
-      imports: [FormsModule, TranslateModule.forRoot()],
+      imports: [FormsModule, NgSelectModule, TranslateModule.forRoot()],
       providers: [
         { provide: AgentChatSettingsService, useValue: fake },
         { provide: DashboardService, useValue: { projectID: 'p1' } },
@@ -303,7 +298,7 @@ describe('AgentChatLlmSettingsComponent', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('#llm-model')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#llm-model-select')).toBeNull();
     expect(fixture.nativeElement.textContent.trim()).toBe('');
     // And the parent is told, so the tab goes away rather than sitting there
     // opening onto an empty panel.
@@ -324,13 +319,116 @@ describe('AgentChatLlmSettingsComponent', () => {
     await setup2(settings);
     expect(fixture.componentInstance.readOnly).toBe(true);
     expect(fixture.componentInstance.error).toBe('LlmSettingsForbidden');
-    expect(fixture.nativeElement.querySelector('#llm-model')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#llm-model-select')).toBeNull();
   });
+
+  describe('searchable picker', () => {
+    const sonnet = { id: 'openai:anthropic/claude-sonnet-5.5', label: 'Claude Sonnet 5.5', provider: 'anthropic',
+      vision: true, pricing: { input_per_mtok: 3, output_per_mtok: 15 }, default: false,
+      group: 'curated', context_length: 200000 };
+    const qwen = { id: 'openai:qwen/qwen-max', label: 'Qwen Max', provider: 'qwen',
+      vision: false, pricing: null, default: false, group: 'openrouter',
+      context_length: 32768 };
+
+    async function setupCatalog(current?: any) {
+      settings = new FakeSettings();
+      settings.models = [settings.models[0], sonnet as any, qwen as any];
+      if (current) { settings.current = current; }
+      await setupWith(settings);
+    }
+
+    it('offers the OpenRouter models in their own group', async () => {
+      await setupCatalog();
+      const o = fixture.componentInstance.options;
+      expect(o.map(x => x.group)).toEqual(
+        ['LlmSettingsGroupCurated', 'LlmSettingsGroupCurated', 'LlmSettingsGroupOpenRouter']);
+      expect(o[2].id).toBe('openai:qwen/qwen-max');
+    });
+
+    it('filters by provider through the search function', async () => {
+      await setupCatalog();
+      const c = fixture.componentInstance;
+      const sonnetOption = c.options.find(x => x.id === sonnet.id)!;
+      expect(c.searchOption('ANTHROPIC', sonnetOption)).toBeTrue();
+      expect(c.searchOption('qwen', sonnetOption)).toBeFalse();
+    });
+
+    it('searches the id without its transport prefix', async () => {
+      await setupCatalog();
+      const c = fixture.componentInstance;
+      const claude = c.options.find(x => x.id === sonnet.id)!;
+      expect(c.searchOption('anthropic', claude)).toBeTrue();
+      expect(c.searchOption('claude', claude)).toBeTrue();
+      expect(c.searchOption('gpt', claude)).toBeFalse();
+      expect(c.searchOption('openai', claude)).toBeFalse();
+    });
+
+    it('renders the unavailable explanation in the selected value', async () => {
+      await setupCatalog({ project_id: 'p1', updated_at: 't', updated_by: 'u',
+                           model: { id: 'openai:gone/model', params: {} } });
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const shown: HTMLElement = fixture.nativeElement.querySelector('#llm-model-select .ng-value');
+      expect(shown).withContext('nothing is selected').not.toBeNull();
+      expect(shown.textContent).toContain('openai:gone/model');
+      expect(shown.textContent).toContain('LlmSettingsUnavailable');
+    });
+
+    it('labels the select through labelForId', async () => {
+      await setupCatalog();
+      const input = fixture.nativeElement.querySelector('label[for="llm-model"]');
+      expect(input).not.toBeNull();
+      expect(fixture.nativeElement.querySelector('input#llm-model')).not.toBeNull();
+    });
+
+    it('shows a saved model that is no longer listed and disables save while it is selected',
+       async () => {
+      await setupCatalog({ project_id: 'p1', updated_at: 't', updated_by: 'u',
+                           model: { id: 'openai:gone/model', params: {} } });
+      const c = fixture.componentInstance;
+      expect(c.selectedModelId).toBe('openai:gone/model');
+      const gone = c.options.find(x => x.id === 'openai:gone/model')!;
+      expect(gone.disabled).toBeTrue();
+      expect(c.selectedUnavailable).toBeTrue();
+      const save: HTMLButtonElement =
+        fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(save.disabled).toBeTrue();
+    });
+
+    it('enables save again once another model is chosen', async () => {
+      await setupCatalog({ project_id: 'p1', updated_at: 't', updated_by: 'u',
+                           model: { id: 'openai:gone/model', params: {} } });
+      const c = fixture.componentInstance;
+      c.onModelChange(sonnet.id);
+      fixture.detectChanges();
+      const save: HTMLButtonElement =
+        fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(save.disabled).toBeFalse();
+      c.onModelChange('');
+      fixture.detectChanges();
+      expect(save.disabled).toBeFalse();
+    });
+  });
+
+  async function setupWith(fake: FakeSettings) {
+    await TestBed.configureTestingModule({
+      declarations: [AgentChatLlmSettingsComponent],
+      imports: [FormsModule, NgSelectModule, TranslateModule.forRoot()],
+      providers: [
+        { provide: AgentChatSettingsService, useValue: fake },
+        { provide: DashboardService, useValue: { projectID: 'p1' } },
+      ],
+    }).compileComponents();
+    fixture = TestBed.createComponent(AgentChatLlmSettingsComponent);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+  }
 
   async function setup2(fake: FakeSettings) {
     await TestBed.configureTestingModule({
       declarations: [AgentChatLlmSettingsComponent],
-      imports: [FormsModule, TranslateModule.forRoot()],
+      imports: [FormsModule, NgSelectModule, TranslateModule.forRoot()],
       providers: [
         { provide: AgentChatSettingsService, useValue: fake },
         { provide: DashboardService, useValue: { projectID: 'p1' } },

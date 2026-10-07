@@ -200,9 +200,7 @@ function modelLimitFields(type: string, entry: LlmModel, current: Record<string,
  *  does not support reasoning turns the action's reasoning off (the panel
  *  then disables the checkbox, so it could not be turned back on). */
 function reasoningFields(type: string, entry: LlmModel): Record<string, any> {
-  // generateLlmModelsFlat() sets `reasoning`, which LlmModel does not declare on this line.
-  const supportsReasoning = (entry as LlmModel & { reasoning?: boolean }).reasoning === true;
-  return type === TYPE_ACTION.AI_PROMPT && !supportsReasoning ? { reasoning: false } : {};
+  return type === TYPE_ACTION.AI_PROMPT && entry.reasoning !== true ? { reasoning: false } : {};
 }
 
 /** Everything a pick of `entry` stores: the model fields, then the limits. */

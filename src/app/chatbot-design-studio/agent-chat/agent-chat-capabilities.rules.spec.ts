@@ -194,7 +194,7 @@ function whatThePanelStores(type: string, model: LlmModel, existing: Record<stri
   } else {
     action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
   }
-  if (type === 'ai_prompt' && (model as any)?.reasoning !== true) {
+  if (type === 'ai_prompt' && model?.reasoning !== true) {
     action.reasoning = false;
   }
   return action;
