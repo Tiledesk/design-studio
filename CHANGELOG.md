@@ -7,9 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 07/10/2026
-- **changed**: la chat AI non può più scrivere una chiave API in chiaro in una web request, né nelle intestazioni né nell'indirizzo né nel corpo: l'operazione viene rifiutata prima di toccare il canvas, e la chat riceve l'indicazione di mettere la chiave in una Global dell'agente e di richiamarla per nome (es. `Bearer {{openrouter_api_key}}`), chiedendo all'utente di crearla. Vale per tutti gli agenti, V3 e legacy, e solo per le modifiche fatte dalla chat: l'editor resta com'è
-- **changed**: quando la chat AI legge il flusso, le chiavi già scritte in chiaro nelle web request le arrivano mascherate, così non finiscono più al modello a ogni lettura; se prova a rimandare indietro la maschera al posto della chiave, l'operazione viene rifiutata e il flusso non si rompe
+# 1.40.16-rc25
+- **changed** (V3/vibe-coder-ocr-guards): the AI chat can no longer write a plain-text API key into a web request (headers, url or body); it is told to use an agent Global instead, e.g. `Bearer {{openrouter_api_key}}`. All agents, chat edits only
+- **changed** (V3/vibe-coder-ocr-guards): keys already in a web request reach the AI chat masked, and sending the mask back is refused
 
 # 1.40.16-rc24
 - **added** (master-pre): the Vibe Coder model setting is a searchable picker grouped into Curated and All OpenRouter models, each with its price and context size; a saved model that is no longer available is shown and must be replaced before saving
