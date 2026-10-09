@@ -6,6 +6,7 @@
     [class.isReturnStack]="isReturnStack"
     [class.tds-v3-intent]="isV3"
     [class.cds-fallback-locked]="isDefaultFallbackLocked"
+    [class.cds-start-card]="isStartCard"
     [class.cds-intent-selected]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive"
     [id]="'intent-content-'+ intent?.intent_id"
     [style.background-color]="vm.backgroundColor"
@@ -28,7 +29,66 @@
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
+    <!-- ======================================================================================= -->
+    <!-- V3 - BLOCCO DI PARTENZA: Web start, Webhook start e defaultFallback ancora vuota.          -->
+    <!-- Una scheda a due righe: sopra icona, titolo e connettore in uscita; sotto una riga di     -->
+    <!-- testo. E' una struttura sua, non il blocco generico con gli stili forzati: tutto quello    -->
+    <!-- che serve al blocco generico sta nel template legacyBlock piu' in basso e qui non entra.   -->
+    <!-- ======================================================================================= -->
+    <ng-container *ngIf="isStartCard; else legacyBlock">
+        <div class="start-card tds_draggable">
 
+            <div class="start-card__header tds_draggable">
+                <span class="start-card__icon tds_draggable" [ngClass]="startCardIcon.classes" aria-hidden="true">{{ startCardIcon.name }}</span>
+                <span class="start-card__title tds_draggable">{{ startCardTitleKey | translate }}</span>
+                <!-- Il connettore in uscita. Per Web start e Webhook start e' l'action "intent"
+                     dello start: da li' parte il flusso. Per la defaultFallback vuota e' il
+                     connettore del blocco (nextBlockAction), lo stesso che il blocco generico
+                     mostra in fondo a destra: e' quello che la porta al blocco col messaggio. -->
+                <cds-action-intent *ngIf="isStart"
+                    class="start-card__connector"
+                    [isStart]="true"
+                    [intentSelected]="intent"
+                    [action]="startAction"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-intent>
+                <cds-action-intent *ngIf="!isStart && actionIntent && !isActionIntent && !hideBlockConnector"
+                    class="start-card__connector start-card__connector--block"
+                    [intentSelected]="intent"
+                    [action]="actionIntent"
+                    [isLast]="true"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-intent>
+            </div>
+
+            <div class="start-card__body tds_draggable">
+                <!-- Scheduled start: il riassunto della pianificazione e il suo stato. Webhook:
+                     metodo e percorso dell'indirizzo appena arriva, con l'indirizzo intero nel
+                     title. Per gli altri, una frase che dice da dove si parte. -->
+                <ng-container *ngIf="isScheduledStart && scheduledStatus; else webhookOrText">
+                    <span class="start-card__text tds_draggable" [title]="scheduledSummary">{{ scheduledSummary }}</span>
+                    <span class="start-card__badge tds_draggable" [ngClass]="'start-card__badge--' + scheduledStatus">
+                        {{ 'CDSCanvas.ScheduledBadge.' + scheduledStatus | translate }}
+                    </span>
+                </ng-container>
+                <ng-template #webhookOrText>
+                    <span *ngIf="isWebhookStart && webhookPath; else startCardText"
+                        class="start-card__text start-card__text--code tds_draggable" [title]="webhookUrl">
+                        <b class="tds_draggable">POST</b> {{ webhookPath }}
+                    </span>
+                    <ng-template #startCardText>
+                        <span class="start-card__text tds_draggable">{{ startCardTextKey | translate }}</span>
+                    </ng-template>
+                </ng-template>
+            </div>
+
+        </div>
+    </ng-container>
+
+    <!-- ======================================================================================= -->
+    <!-- BLOCCO GENERICO (e start, webhook e fallback dei legacy)                                   -->
+    <!-- ======================================================================================= -->
+    <ng-template #legacyBlock>
     <div [id]="'block-header-'+ intent?.intent_id"
         *ngIf="!isReturnStack"
         class="pic-header"
@@ -625,4 +685,10 @@
             </div>
         </div>
     </div>
+    </ng-template>
+    
+
+
+   
+
 </div>

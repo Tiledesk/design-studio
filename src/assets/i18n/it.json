@@ -235,6 +235,15 @@
       "DeprecationMessage": "Deprecato. Usa la nuova action <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a>.",
       "KBJsonSources": "Assegna le sorgenti KB JSON a",
       "EnterIntentName": "Inserisci il nome del blocco",
+      "StartCard": {
+        "WebTitle": "Web start",
+        "WebText": "Avvio dal widget web",
+        "WebhookTitle": "Webhook start",
+        "WebhookText": "Avvio da una chiamata HTTP",
+        "FallbackTitle": "Default fallback",
+        "FallbackText": "Dove arriva ogni messaggio successivo",
+        "ScheduledText": "Avvio a orario programmato"
+      },
       "ErrorBlockName": "Il nome del blocco deve essere univoco",
       "ErrorBlockCharacter": "Il nome del blocco non può contenere caratteri speciali",
       "DragAnImageOrClick": "trascina un'immagine qui o fai clic per selezionarla",

@@ -44,6 +44,14 @@ $base-padding: 6px;
 .action-btn-text { color: var(--blu); font-size: 10px; font-weight: 400; }
 .menu-dragging { overflow: hidden; padding: 6px 0px; }
 
+/* La copia della riga che segue il puntatore durante il trascinamento di un evento (la crea
+   onDragStart e sta nel documento per un istante solo). Nasce dalla riga sotto il puntatore:
+   fondo bianco al posto di quello del passaggio, gli angoli dei blocchi del flusso, nessuna
+   transizione. Le azioni hanno la loro in cds-action-drag-list. */
+.actions-btns-wpr.action-drag-ghost {
+  &, &:hover { background: var(--ds-surface, #fff); border-radius: var(--border-radius-base-preview, 8px); transition: none; }
+}
+
 
 #menuInfo {
     min-width: 100px;

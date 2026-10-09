@@ -109,6 +109,59 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
     return this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
   }
 
+  /**
+   * V3: i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota --
+   * hanno tutti la stessa scheda a due righe: sopra icona e titolo, sotto una riga di testo.
+   * Solo sugli agenti V3: sui legacy restano le pastiglie di sempre.
+   */
+  public get isStartCard(): boolean {
+    return this.isV3 && (this.isStart || this.isDefaultFallbackLocked);
+  }
+
+  /** Qui i punti di partenza li distingue il marcatore del blocco, non il nome: un Webhook start
+   *  puo' chiamarsi come vuole. */
+  public get isWebhookStart(): boolean {
+    return startPointTypeOf(this.intent) === 'webhook';
+  }
+
+  public get isScheduledStart(): boolean {
+    return this.isScheduledBox;
+  }
+
+  /** L'icona della scheda: la stessa che il blocco ha nel pannello dei blocchi, col suo colore. */
+  public get startCardIcon(): { name: string; classes: string } {
+    if (this.isWebhookStart) { return { name: 'webhook', classes: 'material-icons start-card__icon--webhook' }; }
+    if (this.isScheduledStart) { return { name: 'schedule', classes: 'material-icons start-card__icon--scheduled' }; }
+    if (this.isStart) { return { name: 'rocket_launch', classes: 'material-icons-outlined start-card__icon--web' }; }
+    return { name: 'undo', classes: 'material-icons start-card__icon--fallback' };
+  }
+
+  /** La chiave del titolo che la scheda mostra al posto del nome riservato del blocco. */
+  public get startCardTitleKey(): string {
+    if (this.isWebhookStart) { return 'CDSCanvas.StartCard.WebhookTitle'; }
+    if (this.isScheduledStart) { return 'CDSCanvas.ScheduledStart'; }
+    if (this.isStart) { return 'CDSCanvas.StartCard.WebTitle'; }
+    return 'CDSCanvas.StartCard.FallbackTitle';
+  }
+
+  /** La chiave della riga di testo sotto il titolo; per webhook e scheduled vale solo finche'
+   *  non ci sono l'indirizzo o la pianificazione. */
+  public get startCardTextKey(): string {
+    if (this.isWebhookStart) { return 'CDSCanvas.StartCard.WebhookText'; }
+    if (this.isScheduledStart) { return 'CDSCanvas.StartCard.ScheduledText'; }
+    if (this.isStart) { return 'CDSCanvas.StartCard.WebText'; }
+    return 'CDSCanvas.StartCard.FallbackText';
+  }
+
+  /**
+   * Il percorso dell'indirizzo del webhook, senza host: e' la parte che dice qualcosa, e in una
+   * riga sola l'indirizzo intero non ci starebbe. L'indirizzo intero resta nel title.
+   */
+  public get webhookPath(): string {
+    if (!this.webhookUrl) { return ''; }
+    try { return new URL(this.webhookUrl).pathname; } catch { return this.webhookUrl; }
+  }
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -1092,11 +1145,12 @@ export class CdsIntentComponent implements OnInit, OnChanges, AfterViewInit, OnD
    * Evita oggetti ngStyle nel template e riduce checkStylingProperty durante CD.
    */
   private updateIntentStyleVm(): void {
-    // V3: la defaultFallback vuota prende fondo e contorno dal foglio di stile
-    // (.tds-v3-intent.cds-fallback-locked), non dal colore del blocco: niente stile inline.
-    if (!this.intent?.attributes?.color || (this.isV3 && this.isDefaultFallbackLocked)) {
+    // V3: la scheda dei blocchi di partenza (start, webhook, scheduled e defaultFallback vuota)
+    // prende fondo e contorno dal foglio di stile (.tds-v3-intent.cds-start-card), non dal
+    // colore del blocco: niente stile inline.
+    if (!this.intent?.attributes?.color || this.isStartCard) {
       this.vm.backgroundColor = '';
-      this.vm.outline = this.isV3 && this.isDefaultFallbackLocked ? '' : 'none';
+      this.vm.outline = this.isStartCard ? '' : 'none';
       this._lastSelectedId = this.intentService.intentSelectedID;
       this._lastIntentActive = this.intentService.intentActive;
       return;

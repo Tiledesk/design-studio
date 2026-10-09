@@ -9,6 +9,16 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
  *  della descrizione: qui si risponde a "cosa c'e' scritto", non si apre un riquadro. */
 const NAME_TOOLTIP_DELAY_MS = 400;
 
+/** La classe della copia della riga che segue il puntatore durante il trascinamento. */
+const DRAG_GHOST_CLASS = 'action-drag-ghost';
+/** I valori di disegno che la riga eredita dal pannello e che la copia, attaccata al body, non
+ *  avrebbe piu': si copiano sulla copia, cosi' resta uguale alla riga da cui nasce. */
+const DRAG_GHOST_INHERITED_PROPS = [
+  '--ds-surface', '--ds-border', '--ds-ink', '--ds-ink-2', '--ds-canvas',
+  '--space-3', '--space-5', '--space-6', '--fs-md', '--size-icon-cell',
+  '--border-radius-base-preview', '--gray-light-01', '--blu',
+];
+
 @Component({
   selector: 'cds-action-drag-list',
   templateUrl: './cds-action-drag-list.component.html',
@@ -78,7 +88,46 @@ export class CdsActionDragListComponent {
       connectorEntry: item.value.connectorEntry
     }));
     event.dataTransfer.effectAllowed = 'copy';
+    this.setDragGhost(event, event.currentTarget as HTMLElement);
     this.controllerService.closeActionDetailPanel();
     this.isDragging.emit(true);
+  }
+
+  /**
+   * Da' al browser l'immagine che deve seguire il puntatore: una copia della riga, bianca e
+   * con gli angoli dei blocchi del flusso.
+   *
+   * Lasciata a se', la foto che il browser scatta alla riga esce com'e' la riga in quel momento
+   * -- ancora sotto il puntatore, col fondo grigio del passaggio -- e con gli spigoli vivi
+   * dell'elenco, che una classe messa all'ultimo momento non riesce ad arrotondare. La copia
+   * invece e' nostra: sta nel documento per il solo istante in cui il browser la disegna, al
+   * posto esatto della riga cosi' da non comparire mai da un'altra parte, e sparisce al primo
+   * giro successivo. E' attaccata al body, fuori dalla colonna di sinistra, perche' li' dentro
+   * ci sono trasformazioni e ritagli che la taglierebbero; per questo i valori di disegno che
+   * eredita dal pannello le vengono copiati addosso, insieme al carattere.
+   */
+  private setDragGhost(event: DragEvent, box: HTMLElement | null) {
+    const row = box?.querySelector<HTMLElement>('.actions-btns-wpr');
+    if (!row || typeof event.dataTransfer?.setDragImage !== 'function') { return; }
+    const rect = row.getBoundingClientRect();
+    const rowStyle = getComputedStyle(row);
+    const ghost = row.cloneNode(true) as HTMLElement;
+    ghost.removeAttribute('id');
+    ghost.classList.add(DRAG_GHOST_CLASS);
+    for (const prop of DRAG_GHOST_INHERITED_PROPS) {
+      const value = rowStyle.getPropertyValue(prop);
+      if (value) { ghost.style.setProperty(prop, value); }
+    }
+    ghost.style.fontFamily = rowStyle.fontFamily;
+    ghost.style.position = 'fixed';
+    ghost.style.top = `${rect.top}px`;
+    ghost.style.left = `${rect.left}px`;
+    ghost.style.width = `${rect.width}px`;
+    ghost.style.margin = '0';
+    ghost.style.pointerEvents = 'none';
+    document.body.appendChild(ghost);
+    // Il punto della riga sotto il puntatore resta lo stesso sulla copia: non salta sotto la mano.
+    event.dataTransfer.setDragImage(ghost, event.clientX - rect.left, event.clientY - rect.top);
+    setTimeout(() => ghost.remove(), 0);
   }
 }

@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# V3/design-vibe-coder 09/10/2026
+- **changed**: negli agenti V3 i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota -- hanno tutti la stessa scheda: larghezza fissa, due righe di altezza fissa. Sopra, su fondo blu, icona, titolo e il pallino del connettore in uscita, in coda e staccato dal bordo; sotto, su fondo bianco, una riga che dice da dove si parte: per il Webhook start il metodo e il percorso dell'indirizzo, con l'indirizzo intero al passaggio del puntatore. Le pastiglie scure restano agli agenti legacy
+- **changed**: negli agenti V3 i blocchi di partenza mostrano un titolo leggibile -- *Web start*, *Webhook start*, *Default fallback* -- al posto del nome riservato, che tanto non si puo' cambiare
+- **changed**: l'intestazione del pannello di dettaglio di un blocco ha la stessa altezza per ogni blocco e il titolo nel blu della palette. Prima nei blocchi di partenza usciva piu' bassa, col titolo del colore del blocco e spostato di lato
+- **fixed**: trascinando un'azione sul flusso, l'immagine che segue il puntatore e' bianca, con gli angoli arrotondati dei blocchi, senza il fondo grigio del passaggio ne' l'icona accesa ne' il pulsante della descrizione. Prima era la foto della riga cosi' com'era sotto il puntatore
+
 # V3/design-vibe-coder 06/10/2026
 - **changed**: V3 start and fallback icons share one colour on the flow and in the blocks panel: web start green, webhook start violet, scheduled start orange, empty default fallback light blue
 - **changed**: V3 empty default fallback is dark like the start block, with a white title
