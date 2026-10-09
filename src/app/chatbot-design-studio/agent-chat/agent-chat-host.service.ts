@@ -185,8 +185,12 @@ export class AgentChatHostService {
       // What the studio repaired when it opened the flow (missing `#`, dangling links, the
       // connectors list): the agent reads it as data, not as something to redo.
       const repair = this.intentService.lastRepairReport;
+      // The flow's connectors as one normalized list (from which block and outlet, to which
+      // block): the same links the action fields carry, ready to read without deriving them.
+      const connectors = this.intentService.connectorRecords?.() || [];
       return {
         ...this.flowOps.readFlow(),
+        ...(connectors.length ? { connectors } : {}),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),

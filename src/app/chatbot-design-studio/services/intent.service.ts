@@ -108,6 +108,11 @@ export class IntentService {
   /** Il rapporto delle riparazioni fatte all'ultima apertura del flusso (vedi flow-normalizer). */
   public lastRepairReport: RepairReport | null = null;
 
+  /** La lista dei connettori del flusso aperto, nel formato normalizzato (una copia). */
+  public connectorRecords(): any[] {
+    return JSON.parse(JSON.stringify(this.connectorStore?.records || []));
+  }
+
 
 
    public setIntentColor(color){

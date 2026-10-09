@@ -539,6 +539,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private showStageForLimitTime(){
     //if (this.stageService.loaded == false) {
+      // Should not fire any more: the expected connectors come from the same catalogue as the
+      // drawing. If it does, say which ones never appeared instead of a bare timeout.
+      try {
+        const missing = this.connectorService.missingConnectorIds(this.listOfIntents || []);
+        this.logger.warn('[CDS-CANVAS] stage shown after the time limit; connectors still missing:', missing);
+      } catch (error) {
+        this.logger.warn('[CDS-CANVAS] stage shown after the time limit', error);
+      }
       this.labelInfoLoading = 'CDSCanvas.loadingCompleteWithErrors';
       this.stageService.loaded = true;
       this.loadingProgress = 100;
