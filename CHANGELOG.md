@@ -8,6 +8,10 @@
 *Tiledesk SRL*
 
 # this branch 09/10/2026
+- **changed**: i connettori si disegnano dal catalogo delle uscite: le 850 righe con un ramo per tipo di action sono sparite, e la previsione dei connettori attesi all'apertura e' la stessa del disegno. Chiuso il difetto per cui un flusso con una Capture User Reply collegata restava sulla schermata di caricamento fino al timeout
+- **changed**: un connettore verso un blocco non ancora disegnato aspetta il segnale del blocco invece di un polling a 0 ms e di una coda ritentata ogni mezzo secondo
+- **changed**: la lista dei connettori dell'agente si riallinea alle action dopo ogni salvataggio, da qualunque strada arrivi la modifica, e si salva da sola
+- **fixed**: cancellare e ridisegnare un connettore non lascia piu' nel canvas un'area cliccabile fantasma e un'etichetta vuota; e la cancellazione di un connettore per id, che chiamava il servizio con gli argomenti sbagliati, ora funziona
 - **added**: all'apertura di un agente il flusso viene riparato in un passaggio solo (`#` mancanti su ogni destinazione, pallino e bottoni compresi; id mancanti; collegamenti verso blocchi che non esistono piu'; pallino stantio dei blocchi Return; attributi visivi orfani) e le riparazioni vengono salvate subito, solo per i blocchi toccati. I collegamenti per nome dei flussi vecchi non vengono piu' cancellati: restano e vengono segnalati
 - **added**: l'agente ha una lista unica dei suoi connettori, salvata nei suoi attributi (`connectors`), costruita dalle action all'apertura e riconciliata a ogni apertura: se non coincide con le action, vincono le action e la differenza finisce nel rapporto. L'aspetto dei connettori (nascosto, etichetta) viaggia nella lista. La chat AI riceve il rapporto delle riparazioni con `get_flow`
 - **fixed**: incollando un blocco non si azzera piu' ogni testo che comincia per `#`, solo le destinazioni; e la cancellazione di un blocco non si ferma piu' su un attributo visivo senza id

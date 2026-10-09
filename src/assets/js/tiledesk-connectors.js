@@ -255,14 +255,26 @@ export class TiledeskConnectors {
     // // console.log('[JS] this.connectorElement: ', connectorElement);
     if (connectorElement) {
       connectorElement.remove();
+      // The hitbox and the label group were left behind: every delete-and-redraw piled up a
+      // dead click area and an empty <g> in the SVG.
+      const hitboxElement = document.getElementById(connectorId + "_hitbox");
+      if (hitboxElement) {
+        hitboxElement.remove();
+      }
+      const groupElement = labelElement && labelElement.parentElement && labelElement.parentElement.tagName === "g"
+        ? labelElement.parentElement : null;
       if (labelElement) {
         labelElement.remove();
       }
       if (rectElement) {
         rectElement.remove();
       }
+      if (groupElement && groupElement.childNodes.length === 0) {
+        groupElement.remove();
+      }
       const connectorDeleted = this.connectors[connectorId];
       delete this.connectors[connectorId];
+      this.deleteConnectorInBlock(connectorId);
       if (connectorDeleted && notify) {
         connectorDeleted["save"] = save;
         // // this.#removeConnector(connectorDeleted, );

@@ -199,22 +199,10 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     }
   }
 
-  // 7. La lista: dalle action, con l'aspetto preso dal record precedente o dagli attributi del blocco.
+  // 7. La lista: dalle action, con l'aspetto preso dagli attributi del blocco o dal record precedente.
   const previous = isCollection(collection) ? collection : null;
-  const previousById = new Map<string, ConnectorRecord>((previous?.items || []).map(r => [r.id, r]));
-  const items: ConnectorRecord[] = edges.records.map(record => {
-    const props = propsFor(record, previousById.get(record.id), list);
-    return props ? { ...record, props } : { ...record };
-  });
-  const derivedIds = new Set(items.map(r => r.id));
-  const missing = previous ? previous.items.map(r => r.id).filter(id => !derivedIds.has(id)) : [];
-  const extra = previous ? items.map(r => r.id).filter(id => !previousById.has(id)) : [];
-  const collectionChanged = !previous || missing.length > 0 || extra.length > 0 || items.some(r => !sameProps(r.props, previousById.get(r.id)?.props));
-  const built: ConnectorsCollection = {
-    version: CONNECTORS_COLLECTION_VERSION,
-    updatedAt: collectionChanged || !previous ? (opts.now ? opts.now() : new Date().toISOString()) : previous.updatedAt,
-    items,
-  };
+  const built = buildCollection(list, previous, opts.now);
+  const collectionChanged = built.changed;
 
   const changedIntentIds = [...rec.changed];
   const report: RepairReport = {
@@ -224,9 +212,38 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     changedIntentIds,
     unresolved,
     items: rec.items,
-    collection: { existed: !!previous, changed: collectionChanged, records: items.length, missing, extra },
+    collection: { existed: !!previous, changed: collectionChanged, records: built.collection.items.length, missing: built.missing, extra: built.extra },
   };
-  return { intents: list, changedIntentIds, collection: built, collectionChanged, report };
+  return { intents: list, changedIntentIds, collection: built.collection, collectionChanged, report };
+}
+
+/**
+ * La lista dei connettori che le action descrivono, con l'aspetto di ognuno. E' la regola
+ * "vincono le action", in una funzione sola: la usa il normalizzatore all'apertura e lo store
+ * dopo ogni salvataggio, cosi' la lista non puo' restare indietro rispetto al flusso.
+ *
+ * L'aspetto (`props`) viene prima dagli attributi visivi del blocco (`intent.attributes.connectors`,
+ * che oggi e' dove il menu del connettore scrive), poi dal record precedente con lo stesso id.
+ */
+export function buildCollection(intents: any[], previous: ConnectorsCollection | null, now?: () => string): {
+  collection: ConnectorsCollection; changed: boolean; missing: string[]; extra: string[];
+} {
+  const edges = edgesOfFlow(intents || []);
+  const previousById = new Map<string, ConnectorRecord>((previous?.items || []).map(r => [r.id, r]));
+  const items: ConnectorRecord[] = edges.records.map(record => {
+    const props = propsFor(record, previousById.get(record.id), intents || []);
+    return props ? { ...record, props } : { ...record };
+  });
+  const derivedIds = new Set(items.map(r => r.id));
+  const missing = previous ? previous.items.map(r => r.id).filter(id => !derivedIds.has(id)) : [];
+  const extra = previous ? items.map(r => r.id).filter(id => !previousById.has(id)) : [];
+  const changed = !previous || missing.length > 0 || extra.length > 0 || items.some(r => !sameProps(r.props, previousById.get(r.id)?.props));
+  const collection: ConnectorsCollection = {
+    version: CONNECTORS_COLLECTION_VERSION,
+    updatedAt: changed || !previous ? (now ? now() : new Date().toISOString()) : previous.updatedAt,
+    items,
+  };
+  return { collection, changed, missing, extra };
 }
 
 export function isCollection(value: any): value is ConnectorsCollection {
@@ -234,16 +251,18 @@ export function isCollection(value: any): value is ConnectorsCollection {
 }
 
 function propsFor(record: ConnectorRecord, previous: ConnectorRecord | undefined, intents: any[]): ConnectorProps | null {
-  if (previous?.props && Object.keys(previous.props).length > 0) { return { ...previous.props }; }
   const intent = intents.find(i => i?.intent_id === record.from.intentId);
   const fromId = record.id.substring(0, record.id.lastIndexOf('/'));
   const legacy = intent?.attributes?.connectors?.[fromId];
-  if (!legacy || typeof legacy !== 'object') { return null; }
-  const props: ConnectorProps = {};
-  if (typeof legacy.display === 'boolean') { props.display = legacy.display; }
-  if (typeof legacy.label === 'string' && legacy.label !== '') { props.label = legacy.label; }
-  if (typeof legacy.color === 'string' && legacy.color !== '') { props.color = legacy.color; }
-  return Object.keys(props).length > 0 ? props : null;
+  if (legacy && typeof legacy === 'object') {
+    const props: ConnectorProps = {};
+    if (typeof legacy.display === 'boolean') { props.display = legacy.display; }
+    if (typeof legacy.label === 'string' && legacy.label !== '') { props.label = legacy.label; }
+    if (typeof legacy.color === 'string' && legacy.color !== '') { props.color = legacy.color; }
+    if (Object.keys(props).length > 0) { return props; }
+  }
+  if (previous?.props && Object.keys(previous.props).length > 0) { return { ...previous.props }; }
+  return null;
 }
 
 function sameProps(a?: ConnectorProps, b?: ConnectorProps): boolean {

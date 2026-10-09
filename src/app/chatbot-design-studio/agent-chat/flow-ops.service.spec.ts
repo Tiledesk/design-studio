@@ -1597,7 +1597,7 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
     from.remove(); toOld.remove(); toNew.remove();
   });
 
-  it('finds the real cause -- the vendored library\'s delete leaves an orphaned _hitbox element behind, which redrawBlockConnectors now cleans up', () => {
+  it('the vendored library\'s delete now removes the _hitbox and the label group too (the defect redrawBlockConnectors used to clean up after)', () => {
     const from = document.createElement('div');
     from.id = 'start-id/act-1';
     document.body.appendChild(from);
@@ -1613,25 +1613,20 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
     const connectorId = 'start-id/act-1/welcome-id';
     expect(document.getElementById(connectorId)).not.toBeNull();
     expect(document.getElementById(`${connectorId}_hitbox`)).not.toBeNull();
+    expect(document.getElementById(`label_${connectorId}`)).not.toBeNull();
 
-    // The bare vendored call, exactly what deleteConnectorsOutOfBlock uses
-    // internally -- no workaround involved yet.
+    // The bare vendored call, exactly what deleteConnectorsOutOfBlock uses internally.
     (connectors as any).tiledeskConnectors.deleteConnector(connectorId, false, false);
 
-    // The registry entry and the main path are correctly gone...
+    // Registry entry, main path, hitbox and label are all gone: the library's own delete was
+    // fixed (src/assets/js/tiledesk-connectors.js), so an id-counting measurement that dedupes
+    // by stripping "_hitbox" no longer finds a ghost. FlowOpsService's cleanup step is now a
+    // safety net with nothing to do.
     expect((connectors as any).tiledeskConnectors.connectors[connectorId]).toBeUndefined();
     expect(document.getElementById(connectorId)).toBeNull();
-    // ...but the library never looked up or removed the hitbox sibling.
-    // This is the actual defect: an id-counting measurement that dedupes by
-    // stripping "_hitbox" (exactly what the coordinator's own live count
-    // did) still finds this id and reports the edge as present.
-    expect(document.getElementById(`${connectorId}_hitbox`)).not.toBeNull();
-
-    // Now go through the real fix: FlowOpsService's own cleanup step,
-    // called the way redrawBlockConnectors calls it (after
-    // deleteConnectorsOutOfBlock, on the same block prefix).
-    document.querySelectorAll('[id^="start-id/"][id$="_hitbox"]').forEach(el => el.remove());
     expect(document.getElementById(`${connectorId}_hitbox`)).toBeNull();
+    expect(document.getElementById(`label_${connectorId}`)).toBeNull();
+    expect(document.getElementById(`rect_${connectorId}`)).toBeNull();
 
     from.remove(); toOld.remove();
   });

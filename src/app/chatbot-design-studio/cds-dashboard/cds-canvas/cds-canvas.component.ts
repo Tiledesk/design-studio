@@ -383,6 +383,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * @param intentID 
    */
   onIntentRendered(intentID) {
+    // The connectors waiting for this block can be drawn now (see ConnectorService.blockRendered).
+    if (intentID) { this.connectorService.blockRendered(intentID); }
     if (this.renderedAllIntents === true && intentID && !this.renderedIntentIds.has(intentID)) {
       this.onNewIntentRendered(intentID);
       return;
@@ -887,7 +889,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     let debounceTimeout: any;
     this.listnerMovedAndScaled = (e: CustomEvent) => {
       const el = e.detail;
-      this.connectorService.tiledeskConnectors.scale = e.detail.scale;
+      this.connectorService.setScale(e.detail.scale);
       this.removeConnectorDraftAndCloseFloatMenu();
   
       clearTimeout(debounceTimeout);
@@ -1391,7 +1393,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     const actionType = event.dataTransfer?.getData(ACTION_DRAG_MIME);
     if (!actionType) { return; }
     event.preventDefault();
-    const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+    const pos = this.connectorService.logicPoint({ x: event.clientX, y: event.clientY });
     pos.x = pos.x - 132;
     this.logger.log('[CDS-CANVAS] azione lasciata sullo stage dalla tavolozza: ', actionType, pos);
     this.closeAllPanels();
@@ -1401,7 +1403,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   async onDroppedElementToStage(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
-    let pos = this.connectorService.tiledeskConnectors.logicPoint(event.dropPoint);
+    let pos = this.connectorService.logicPoint(event.dropPoint);
     pos.x = pos.x - 132;
     let action: any = event.previousContainer.data[event.previousIndex];
     // Qui arrivano soltanto le azioni che vengono da un blocco: dalla tavolozza si trascina col
@@ -1849,7 +1851,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   onNoteDroppedOnStage(evt: { noteType: NoteType; clientX: number; clientY: number }): void {
     try {
-      const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: evt.clientX, y: evt.clientY });
+      const pos = this.connectorService.logicPoint({ x: evt.clientX, y: evt.clientY });
       const newNote = new Note(this.id_faq_kb, pos);
       newNote.type = evt.noteType || 'text';
       if (newNote.type !== 'text') {

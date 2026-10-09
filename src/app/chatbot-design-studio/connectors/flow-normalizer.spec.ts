@@ -143,15 +143,20 @@ describe('flow-normalizer', () => {
       expect(r.changedIntentIds).toEqual([]);
     });
 
-    it('conserva l\'aspetto per id dal record precedente, e lo preferisce agli attributi del blocco', () => {
+    it('conserva l\'aspetto per id dal record precedente, ma gli attributi del blocco, se ci sono, vincono', () => {
       const prima = normalizeFlow(flusso(), null, opts());
       const salvata = clone(prima.collection);
       salvata.items[0].props = { label: 'dalla lista' };
+      salvata.items[1].props = { display: false };
       const intents = flusso();
       intents[0].attributes.connectors = { 'a/n_a': { id: 'a/n_a/b', label: 'dal blocco' } };
       const r = normalizeFlow(intents, salvata, opts());
-      expect(r.collection.items[0].props).toEqual({ label: 'dalla lista' });
-      expect(r.collectionChanged).toBeFalse();
+      expect(r.collection.items[0].props).toEqual({ label: 'dal blocco' });
+      expect(r.collection.items[1].props).toEqual({ display: false });
+      expect(r.collectionChanged).toBeTrue();
+      const r2 = normalizeFlow(flusso(), salvata, opts());
+      expect(r2.collection.items[0].props).toEqual({ label: 'dalla lista' });
+      expect(r2.collectionChanged).toBeFalse();
     });
 
     it('una lista di un\'altra versione o malformata vale come assente', () => {

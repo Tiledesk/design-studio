@@ -95,7 +95,11 @@ export class IntentService {
     private savingStateService: SavingStateService,
     private connectorStore?: ConnectorStore
   ) {
-
+    // La lista dei connettori si salva da sola quando cambia: lo store sa cosa, qui si sa come.
+    this.connectorStore?.bindPersistence(collection => {
+      const id = this.dashboardService?.id_faq_kb;
+      return id ? this.saveConnectorsCollection(collection, id) : Promise.resolve();
+    });
   }
 
   /** Il rapporto delle riparazioni fatte all'ultima apertura del flusso (vedi flow-normalizer). */
@@ -1945,6 +1949,8 @@ export class IntentService {
         this.savingStateService.track(this.faqService.opsUpdate(payload)).subscribe((resp: any) => {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+          // Il flusso e' salvato: la lista dei connettori si riallinea alle action (e si salva se cambia).
+          this.connectorStore?.syncFromIntents(this.listOfIntents);
           // this.setDragAndListnerEventToElement(intent.intent_id);
           this.dashboardService.selectedChatbot.modified = true;
           resolve(true);

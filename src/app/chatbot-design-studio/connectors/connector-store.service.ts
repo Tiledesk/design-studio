@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ConnectorRecord } from './connector-catalog';
-import { ConnectorsCollection, RepairReport } from './flow-normalizer';
+import { ConnectorsCollection, RepairReport, buildCollection } from './flow-normalizer';
 
 /**
  * Lo stato dei connettori del chatbot aperto: la lista (`attributes.connectors` del bot) e il
@@ -45,8 +45,43 @@ export class ConnectorStore {
   }
 
   reset(): void {
+    clearTimeout(this.saveTimer);
+    this.saveTimer = null;
     this.load(null);
     this.lastRepairReport = null;
+  }
+
+  private save: ((collection: ConnectorsCollection) => Promise<void>) | null = null;
+  private saveTimer: any = null;
+  private static readonly SAVE_DEBOUNCE_MS = 400;
+
+  /** Chi sa salvare la lista sul server (IntentService) si registra qui: lo store non conosce HTTP. */
+  bindPersistence(save: (collection: ConnectorsCollection) => Promise<void>): void {
+    this.save = save;
+  }
+
+  /**
+   * Riallinea la lista alle action (vincono le action), dopo ogni salvataggio del flusso: un
+   * collegamento scritto da qualunque strada -- trascinamento, pannello, chat AI, undo --
+   * finisce nella lista senza che nessuno debba ricordarsene. Se cambia, la salva, con un
+   * breve ritardo che raccoglie le modifiche vicine in una scrittura sola.
+   */
+  syncFromIntents(intents: any[]): boolean {
+    const built = buildCollection(intents || [], this.collection);
+    if (!built.changed) { return false; }
+    this.load(built.collection);
+    this.scheduleSave();
+    return true;
+  }
+
+  private scheduleSave(): void {
+    if (!this.save) { return; }
+    clearTimeout(this.saveTimer);
+    this.saveTimer = setTimeout(() => {
+      this.saveTimer = null;
+      const collection = this.collection;
+      if (collection && this.save) { this.save(collection).catch(() => {}); }
+    }, ConnectorStore.SAVE_DEBOUNCE_MS);
   }
 
   recordById(id: string): ConnectorRecord | null {
