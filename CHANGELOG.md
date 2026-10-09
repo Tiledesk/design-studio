@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch 09/10/2026
+- **changed**: prova della gestione nuova dei connettori: se l'agente ha gia' la lista nei suoi attributi, il canvas disegna dalla lista, altrimenti dalle action e la lista viene creata per la prossima apertura; in entrambi i casi action, attributi del blocco e lista si aggiornano insieme. In console una riga dice quale gestione e' attiva
 - **changed**: la chat AI riceve con `get_flow` anche la lista normalizzata dei connettori del flusso, e il riordino automatico dei rami vede anche i casi della condizione a piu' uscite
 - **changed**: se il canvas resta in attesa fino al limite di tempo, in console compare l'elenco dei connettori mai comparsi invece di un semplice timeout
 - **changed**: le action non sanno piu' nulla di connettori: il pallino di ogni uscita (`cds-connector`) ricava da solo dal catalogo a quale uscita appartiene e se e' collegato, e un connettore nato o morto sul canvas scrive il campo della action in un posto solo invece che in trentatre' componenti. Migrate la famiglia true/false, le reply coi loro bottoni, intent, connect block, capture, iterazione e condizione a piu' casi; le action voice e l'AI Condition seguono

@@ -20,6 +20,13 @@ export class ConnectorStore {
   /** Il rapporto dell'ultima normalizzazione; null finche' nessun flusso e' stato aperto. */
   lastRepairReport: RepairReport | null = null;
 
+  /** Da dove parte il disegno del flusso aperto: dalla lista (il bot ce l'aveva all'apertura) o dalle action. */
+  mode: 'collection' | 'actions' = 'actions';
+
+  get drawsFromCollection(): boolean {
+    return this.mode === 'collection' && !!this.collection;
+  }
+
   private byId = new Map<string, ConnectorRecord>();
   private outOf = new Map<string, ConnectorRecord[]>();
   private into = new Map<string, ConnectorRecord[]>();
@@ -79,6 +86,8 @@ export class ConnectorStore {
     if (!slot) { return result; }
     const toId = change.deleted ? null : (change.toId || null);
     result.written = writeSlot(slot, toId);
+    // La lista segue subito, senza aspettare il salvataggio: chi disegna dalla lista la vede gia' giusta.
+    this.applyToRecords(slot, toId);
     if (slot.kind === 'button' && slot.item) {
       // Un bottone collegato e' un bottone "action"; scollegato torna di testo. E lo stato che
       // il suo template legge (`__isConnected`, `__idConnection`) segue, come faceva ogni
@@ -108,6 +117,20 @@ export class ConnectorStore {
     this.load(built.collection);
     this.scheduleSave();
     return true;
+  }
+
+  /** Aggiorna i record di un'uscita: via quelli che partivano da li', dentro quello nuovo se collegata. */
+  private applyToRecords(slot: { fromId: string; intentId: string; actionId: string; key: string; kind: ConnectorRecord['kind'] }, toId: string | null): void {
+    const current = this.collection;
+    if (!current) { return; }
+    const items = current.items.filter(r => !r.id.startsWith(slot.fromId + '/'));
+    if (toId) {
+      const previous = current.items.find(r => r.id === slot.fromId + '/' + toId);
+      items.push({ id: slot.fromId + '/' + toId, from: { intentId: slot.intentId, actionId: slot.actionId, slot: slot.key }, to: { intentId: toId }, kind: slot.kind, ...(previous?.props ? { props: previous.props } : {}) });
+    }
+    if (items.length === current.items.length && items.every((r, i) => r.id === current.items[i].id)) { return; }
+    this.load({ ...current, items, updatedAt: new Date().toISOString() });
+    this.scheduleSave();
   }
 
   private scheduleSave(): void {

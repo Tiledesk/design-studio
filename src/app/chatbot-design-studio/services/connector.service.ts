@@ -275,7 +275,8 @@ export class ConnectorService {
     this.listOfConnectors = {};
     this.existingIntentIds = new Set((intents || []).map((item) => item.intent_id));
     this.listOfIntents = intents;
-    for (const record of edgesOfFlow(intents || []).records) {
+    const records = this.store?.drawsFromCollection ? this.store.records : edgesOfFlow(intents || []).records;
+    for (const record of records) {
       this.mapOfConnectors[record.id] = { shown: 'false' };
     }
     return this.mapOfConnectors;
@@ -323,6 +324,16 @@ export class ConnectorService {
    */
   public async createConnectorsOfIntent(intent: any): Promise<void> {
     if (!intent) { return; }
+    if (this.store?.drawsFromCollection) {
+      // Gestione nuova: si disegna dalla lista. Prima la si riallinea alle action del flusso, cosi'
+      // una modifica appena scritta sul modello (per esempio dalla chat AI) e' gia' nella lista.
+      this.store.syncFromIntents(this.listOfIntents || []);
+      for (const record of this.store.recordsOut(intent.intent_id)) {
+        const parsed = parseRecordId(record.id);
+        if (parsed) { await this.createConnector(intent, parsed.fromId, parsed.toId); }
+      }
+      return;
+    }
     const index = indexFlow(this.listOfIntents || []);
     for (const slot of slotsOfIntent(intent)) {
       if (!slot.toId) { continue; }
@@ -702,6 +713,9 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
    *  answer, the same the drawing uses. A "Return to parent agent" block draws nothing from its dot. */
   public expectedConnectorIds(intent: any): string[] {
     if (!intent?.intent_id) { return []; }
+    if (this.store?.drawsFromCollection) {
+      return this.store.recordsOut(intent.intent_id).map(record => record.id);
+    }
     return edgesOfIntent(intent, indexFlow(this.listOfIntents || [])).records.map(record => record.id);
   }
 

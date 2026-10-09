@@ -97,6 +97,28 @@ describe('ConnectorStore', () => {
     });
   });
 
+  it('la lista segue subito un connettore nato o morto sul canvas, e la modalita\' dice da dove si disegna', fakeAsync(() => {
+    const store = new ConnectorStore();
+    const saved: any[] = [];
+    store.bindPersistence({ saveCollection: async collection => { saved.push(collection); } });
+    const intents = flusso();
+    store.load(normalizeFlow(intents, null, opts).collection);
+    expect(store.drawsFromCollection).toBeFalse();
+    store.mode = 'collection';
+    expect(store.drawsFromCollection).toBeTrue();
+
+    store.applyRendererChange({ fromId: 'a/x/false', toId: 'a', save: false }, intents);  // ritargettato da c ad a
+    expect(store.recordsOut('a').map(r => r.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/x/false/a']);
+    expect(store.recordsIn('c').map(r => r.id)).toEqual(['b/n_b/c']);
+    store.applyRendererChange({ fromId: 'b/n_b', toId: 'c', deleted: true }, intents);
+    expect(store.recordsIn('c')).toEqual([]);
+    tick(400);
+    expect(saved.length).toBe(1);
+    expect(saved[0].items.map((r: any) => r.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/x/false/a']);
+    // e le action dicono la stessa cosa: un riallineamento non cambia nulla
+    expect(store.syncFromIntents(intents)).toBeFalse();
+  }));
+
   it('senza chi salva, il riallineamento aggiorna solo lo stato', fakeAsync(() => {
     const store = new ConnectorStore();
     const intents = flusso();

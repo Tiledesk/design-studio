@@ -385,6 +385,9 @@ export class IntentService {
     if (this.connectorStore) {
       this.connectorStore.lastRepairReport = result.report;
       this.connectorStore.load(CONNECTORS_CONFIG.useCollection ? result.collection : null);
+      // PROVA: il bot aveva gia' la lista -> si disegna dalla lista; altrimenti dalle action.
+      this.connectorStore.mode = CONNECTORS_CONFIG.drawFromCollection && result.report.collection.existed ? 'collection' : 'actions';
+      this.logger.info('[CONNECTORS] gestione dei connettori per', id_faq_kb + ':', this.connectorStore.mode === 'collection' ? 'NUOVA (dalla lista negli attributi del bot)' : 'VECCHIA (dalle action; la lista viene creata per la prossima apertura)');
     }
     const r = result.report;
     this.logger.info('[FLOW-REPAIR]', id_faq_kb, 'riparazioni:', r.counts, 'blocchi da salvare:', r.changedIntentIds.length,
