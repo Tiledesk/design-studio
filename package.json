@@ -15,7 +15,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:agent-chat": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-agent-chat.ts --ts-config=tsconfig.spec.agent-chat.json",
-    "test:condition": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-condition.ts --ts-config=tsconfig.spec.condition.json"
+    "test:condition": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-condition.ts --ts-config=tsconfig.spec.condition.json",
+    "test:connectors": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-connectors.ts --ts-config=tsconfig.spec.connectors.json"
   },
   "private": false,
   "dependencies": {
