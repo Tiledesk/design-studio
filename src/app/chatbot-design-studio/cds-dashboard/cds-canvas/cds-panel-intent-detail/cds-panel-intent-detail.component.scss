@@ -46,47 +46,67 @@
     display: flex;
     align-items: center;
 
-    /* Il titolo e' cds-panel-intent-header, pensato per il blocco sul canvas: qui si riporta
-       a una riga centrata, col testo nel blu della palette al posto del colore del blocco
-       (che arriva inline, da cui l'!important) e senza il rientro negativo dei blocchi di
-       partenza. ::ng-deep perche' quegli elementi stanno nella view del componente del
-       titolo; resta delimitato da .header-panel. */
-    ::ng-deep .header,
-    ::ng-deep .header.is-start {
-        height: 100%;
-        max-height: none;
-        padding: 0;
-        align-items: center;
-        gap: 8px;
-    }
-    ::ng-deep .form-group,
-    ::ng-deep .form-group.is-start {
-        margin: 0;
-        input {
+    /* Il titolo e' cds-panel-intent-header, pensato per il blocco sul canvas: qui si riporta a
+       una riga centrata, col testo e le icone nel blu della palette al posto del colore del
+       blocco (che arriva inline, da cui l'!important) e senza i rientri della pastiglia dei
+       box di partenza. ::ng-deep perche' quegli elementi stanno nella view del componente del
+       titolo; resta delimitato da .header-panel. Il selettore parte dall'elemento del componente
+       con la sua classe perche' le regole di quel componente -- `.header .form-group.is-start`,
+       `.intent-icon span.webhook` -- pesano cinque classi: con meno di cosi' vincono loro, e
+       restano il rientro negativo che sovrappone il titolo all'icona e il giallo del webhook. */
+    ::ng-deep cds-panel-intent-header.pic-title-text {
+        .header,
+        .header.is-start {
+            height: 100%;
+            max-height: none;
+            padding: 0;
+            align-items: center;
+            gap: 8px;
+        }
+        .header .form-group,
+        .header .form-group.is-start,
+        .header .form-group.has-start-label {
+            width: 100%;
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+            input {
+                padding: 0;
+                color: var(--blu) !important;
+                filter: none;
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 1.3;
+            }
+        }
+        /* Nei box di partenza il titolo non e' il campo ma un'etichetta fissa, bianca perche'
+           sul canvas sta su una pastiglia scura e coi rientri della pastiglia. */
+        .header .form-group .start-label {
+            width: auto;
+            margin: 0;
             padding: 0;
             color: var(--blu) !important;
-            filter: none;
             font-size: 14px;
             font-weight: 500;
             line-height: 1.3;
         }
-    }
-    ::ng-deep .intent-icon {
-        position: relative;
-        top: 0px;
-        display: flex;
-        align-items: center;
-        span {
-            font-size: 20px;
-        }
-        span.rocket {
-            color: var(--blu);
-        }
-        span.undo {
-            color: var(--blu);
-        }
-        span.webhook {
-            color: var(--blu);
+        /* Le icone: sempre dello stesso colore del titolo, qualunque colore abbiano sul canvas. */
+        .header .intent-icon {
+            position: relative;
+            top: 0px;
+            display: flex;
+            align-items: center;
+            flex: 0 0 auto;
+            span,
+            span.rocket,
+            span.undo,
+            span.webhook,
+            span.schedule,
+            span.call_end {
+                font-size: 20px;
+                color: var(--blu);
+            }
         }
     }
     cds-action-description{
@@ -333,10 +353,30 @@
     margin: 0;
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
     padding: 0;
-    .cds-blue-button {
-        margin-left: 10px;
-    }    
+}
+
+/* I pulsanti delle sezioni dei punti di partenza: compatti come i campi che hanno sopra. Senza
+   questo prendono le misure del tema Material (padding largo, maiuscole, margini), e il
+   pulsante blu del DS corregge solo il suo colore e non quello rosso. */
+.start-point .btn,
+.webhook-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: 30px;
+    margin: 0;
+    padding: 0 12px;
+    border-radius: 6px;
+    box-shadow: none;
+    font-family: var(--font-family-poppins);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .webhook-message {
