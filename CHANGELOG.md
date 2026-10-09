@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 09/10/2026
+# V3/connectors-refactor 09/10/2026
 - **added**: l'agente ha una lista unica dei suoi connettori, salvata nei suoi attributi, costruita dalle action alla prima apertura e riconciliata a ogni apertura: se lista e action non coincidono vincono le action e la differenza finisce in un rapporto. L'aspetto dei connettori (nascosto, etichetta) viaggia nella lista. La lista si riallinea e si salva da sola dopo ogni modifica, da qualunque strada arrivi
 - **changed**: prova della gestione nuova dei connettori: se l'agente ha gia' la lista nei suoi attributi, il canvas disegna e si prepara dalla lista; altrimenti dalle action, e la lista viene creata per la prossima apertura. In entrambi i casi action, attributi del blocco e lista si aggiornano insieme, e una riga in console dice quale gestione e' attiva
 - **added**: all'apertura di un agente il flusso viene riparato in un passaggio solo -- `#` mancanti su ogni destinazione, pallino e bottoni compresi; id mancanti; collegamenti verso blocchi che non esistono piu'; pallino stantio dei blocchi Return; attributi visivi orfani -- e le riparazioni vengono salvate subito, solo per i blocchi toccati. I collegamenti per nome dei flussi vecchi non vengono piu' cancellati: restano e vengono segnalati. La chat AI riceve il rapporto delle riparazioni e la lista dei connettori con `get_flow`
