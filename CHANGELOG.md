@@ -7,7 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# V3/design-vibe-coder 09/10/2026
+# this branch 09/10/2026
+- **fixed**: nel pannello di dettaglio dei blocchi di partenza il titolo sta accanto all'icona senza sovrapporsi, nel blu della palette come l'icona, e i pulsanti hanno le misure compatte degli altri campi invece di quelle larghe del tema. Vale anche sugli agenti legacy: il pannello e' lo stesso
 - **changed**: negli agenti V3 i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota -- hanno tutti la stessa scheda: larghezza fissa, due righe di altezza fissa. Sopra, su fondo blu, icona, titolo e il pallino del connettore in uscita, in coda e staccato dal bordo; sotto, su fondo bianco, una riga che dice da dove si parte: per il Webhook start il metodo e il percorso dell'indirizzo, con l'indirizzo intero al passaggio del puntatore. Le pastiglie scure restano agli agenti legacy
 - **changed**: negli agenti V3 i blocchi di partenza mostrano un titolo leggibile -- *Web start*, *Webhook start*, *Default fallback* -- al posto del nome riservato, che tanto non si puo' cambiare
 - **changed**: l'intestazione del pannello di dettaglio di un blocco ha la stessa altezza per ogni blocco e il titolo nel blu della palette. Prima nei blocchi di partenza usciva piu' bassa, col titolo del colore del blocco e spostato di lato
