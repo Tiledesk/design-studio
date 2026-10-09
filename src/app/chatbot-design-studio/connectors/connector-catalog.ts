@@ -304,8 +304,8 @@ function suffixOf(spec: SlotSpec, item?: any): string {
   return typeof spec.suffix === 'function' ? spec.suffix(item) : spec.suffix;
 }
 
-function makeSlot(spec: SlotSpec, intentId: string, actionId: string, holder: any, fieldName: string, item?: any, keyOverride?: string): ResolvedSlot {
-  const raw = holder && isSet(holder[fieldName]) ? holder[fieldName] : '';
+function makeSlot(spec: SlotSpec, intentId: string, actionId: string, holder: any, fieldName: string, item?: any, keyOverride?: string, rawOverride?: string): ResolvedSlot {
+  const raw = rawOverride !== undefined ? rawOverride : (holder && isSet(holder[fieldName]) ? holder[fieldName] : '');
   const parsed = spec.path.kind === 'buttons' ? parseButtonTarget(raw) : { ...parseFieldTarget(raw), attrs: null };
   const slot: ResolvedSlot = {
     spec, key: keyOverride || spec.key, intentId, actionId,
@@ -344,9 +344,13 @@ export function outputsOf(intentId: string, action: any): ResolvedSlot[] {
         break;
       }
       case 'buttons':
+        // Un bottone di testo ha il pallino (vuoto): da li' si puo' trascinare un collegamento, e
+        // il bottone diventa di tipo action. Produce un connettore solo se e' gia' di tipo action
+        // con una destinazione, come sempre. Il bottone url non ha uscita.
         for (const button of findButtons(action)) {
-          if (!button || button.type !== TYPE_BUTTON.ACTION) { continue; }
-          const slot = makeSlot(spec, intentId, actionId, button, 'action', button, 'button:' + (button.uid ?? ''));
+          if (!button || typeof button !== 'object' || button.type === TYPE_BUTTON.URL) { continue; }
+          const slot = makeSlot(spec, intentId, actionId, button, 'action', button, 'button:' + (button.uid ?? ''),
+            button.type === TYPE_BUTTON.ACTION ? undefined : '');
           if (!hasValidUid(button.uid)) { slot.needsId = true; }
           out.push(slot);
         }

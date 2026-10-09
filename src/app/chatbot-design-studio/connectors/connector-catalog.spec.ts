@@ -46,6 +46,12 @@ describe('connector-catalog', () => {
       expect(idsOf(blocco('i', [reply]))).toEqual(['i/a/b1/x', 'i/a/b2/y', 'i/a/noInput/z', 'i/a/noMatch/x']);
       const senzaAncora = outputsOf('i', reply).filter(s => s.spec.anchor === 'none').map(s => s.key);
       expect(senzaAncora).toEqual(['noInput', 'noMatch']);
+      // Il bottone url non ha uscita; quello di testo ha il pallino vuoto, da cui si puo' partire.
+      const testo = { _tdActionId: 'a', _tdActionType: 'reply', attributes: { attachment: { buttons: [
+        { uid: 't1', type: 'text', value: 'solo testo' }, { uid: 't2', type: 'text', action: '#x' }, { uid: 'u1', type: 'url', action: '#x' },
+      ] } } };
+      expect(outputsOf('i', testo).map(s => [s.key, s.toId])).toEqual([['button:t1', null], ['button:t2', null]]);
+      expect(idsOf(blocco('i', [testo]))).toEqual([]);
     });
 
     it('i bottoni si trovano a qualunque profondita\', come findButtons', () => {

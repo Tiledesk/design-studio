@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/internal/Subscription';
 
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { Intent } from 'src/app/models/intent-model';
@@ -45,26 +44,15 @@ export class CdsActionJsonConditionMultiComponent implements OnInit, OnDestroy {
   openCaseId: string = null;
 
   private connector: any;
-  private subscriptionChangedConnector: Subscription;
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(private intentService: IntentService) { }
 
   ngOnInit(): void {
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      const prefix = this.idIntentSelected + '/' + this.action._tdActionId;
-      if (connector && connector.fromId && connector.fromId.startsWith(prefix)) {
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     this.initialize();
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   private initialize(): void {
@@ -114,39 +102,6 @@ export class CdsActionJsonConditionMultiComponent implements OnInit, OnDestroy {
    * Un connettore tirato o cancellato sul canvas. La coda dell'id dice a quale uscita
    * appartiene: `…/case/<caseId>` oppure `…/else`.
    */
-  private updateConnector(): void {
-    const segments = (this.connector.fromId || '').split('/');
-    const last = segments[segments.length - 1];
-    const isCase = segments[segments.length - 2] === 'case';
-
-    if (isCase) {
-      const branch = this.action.cases.find(c => c._tdCaseId === last);
-      if (!branch) return;
-      if (this.connector.deleted) {
-        branch.intent = null;
-        this.listOfConnectors[last] = { idConnector: this.caseConnectorId(branch), idConnection: null, isConnected: false };
-      } else {
-        branch.intent = '#' + this.connector.toId;
-        this.listOfConnectors[last] = { idConnector: this.caseConnectorId(branch), idConnection: this.connector.id, isConnected: true };
-      }
-    } else if (last === 'else') {
-      if (this.connector.deleted) {
-        this.action.elseIntent = null;
-        this.idConnectionElse = null;
-        this.isConnectedElse = false;
-      } else {
-        this.action.elseIntent = '#' + this.connector.toId;
-        this.idConnectionElse = this.connector.id;
-        this.isConnectedElse = true;
-      }
-    } else {
-      return;
-    }
-
-    if (this.connector.save) {
-      this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-    }
-  }
 
   private newCaseId(): string {
     return new ConditionCase()._tdCaseId;

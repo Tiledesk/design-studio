@@ -34,7 +34,7 @@ describe('ConnectorStore', () => {
   it('dopo un salvataggio si riallinea alle action e salva la lista una volta sola, con ritardo', fakeAsync(() => {
     const store = new ConnectorStore();
     const saved: any[] = [];
-    store.bindPersistence(async collection => { saved.push(collection); });
+    store.bindPersistence({ saveCollection: async collection => { saved.push(collection); } });
     const intents = flusso();
     store.load(normalizeFlow(intents, null, opts).collection);
 
@@ -53,6 +53,49 @@ describe('ConnectorStore', () => {
     expect(saved.length).toBe(1);
     expect(saved[0].items.map((r: any) => r.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'b/n_b/a']);
   }));
+
+  describe('un connettore nato o morto sul canvas', () => {
+    it('scrive il campo della action, e salva il blocco solo per i tipi di cui lo store risponde', () => {
+      const store = new ConnectorStore();
+      const saved: any[] = [];
+      store.bindPersistence({ saveCollection: async () => {}, updateIntent: intent => { saved.push(intent.intent_id); } });
+      const intents = flusso();
+      // ai_prompt e' dello store: scrive e salva
+      expect(store.applyRendererChange({ fromId: 'a/x/false', toId: 'b', save: true }, intents)).toEqual({ written: true, saved: true });
+      expect(intents[0].actions[0].falseIntent).toBe('#b');
+      expect(saved).toEqual(['a']);
+      // senza `save` scrive e basta (il pannello, le cancellazioni di passaggio)
+      expect(store.applyRendererChange({ fromId: 'a/x/false', deleted: true, toId: 'b' }, intents)).toEqual({ written: true, saved: false });
+      expect(intents[0].actions[0].falseIntent).toBe('');
+      // il pallino del blocco
+      expect(store.applyRendererChange({ fromId: 'b/n_b', toId: 'a', save: true }, intents)).toEqual({ written: true, saved: true });
+      expect(intents[1].attributes.nextBlockAction.intentName).toBe('#a');
+      // un'ancora che non esiste
+      expect(store.applyRendererChange({ fromId: 'a/zzz', toId: 'b', save: true }, intents)).toEqual({ written: false, saved: false });
+    });
+
+    it('un bottone collegato diventa action e scollegato torna di testo, con lo stato che il template legge', () => {
+      const store = new ConnectorStore();
+      const saved: any[] = [];
+      store.bindPersistence({ saveCollection: async () => {}, updateIntent: intent => { saved.push(intent.intent_id); } });
+      const button = { uid: 'k1', type: 'text', value: 'Uno', action: '' };
+      const intents = [blocco('r', [{ _tdActionId: 'q', _tdActionType: 'reply', attributes: { attachment: { buttons: [button] } } }]), blocco('b')];
+      expect(store.applyRendererChange({ fromId: 'r/q/k1', toId: 'b', save: true }, intents).saved).toBeTrue();
+      expect(button).toEqual(jasmine.objectContaining({ type: 'action', action: '#b', __idConnector: 'r/q/k1', __isConnected: true, __idConnection: 'r/q/k1/b' }));
+      expect(store.applyRendererChange({ fromId: 'r/q/k1', toId: 'b', deleted: true, save: true }, intents).saved).toBeTrue();
+      expect(button).toEqual(jasmine.objectContaining({ type: 'text', action: '', __isConnected: false, __idConnection: null }));
+      expect(saved).toEqual(['r', 'r']);
+    });
+
+    it('per un tipo non ancora dello store scrive il campo ma non salva', () => {
+      const store = new ConnectorStore();
+      const saved: any[] = [];
+      store.bindPersistence({ saveCollection: async () => {}, updateIntent: intent => { saved.push(intent.intent_id); } });
+      const intents = [blocco('v', [{ _tdActionId: 'd', _tdActionType: 'dtmf_form', attributes: { commands: [{ settings: { noInputIntent: '' } }] } }]), blocco('b')];
+      expect(store.applyRendererChange({ fromId: 'v/d/noInput', toId: 'b', save: true }, intents)).toEqual({ written: true, saved: false });
+      expect(intents[0].actions[0].attributes.commands[0].settings.noInputIntent).toBe('#b');
+    });
+  });
 
   it('senza chi salva, il riallineamento aggiorna solo lo stato', fakeAsync(() => {
     const store = new ConnectorStore();

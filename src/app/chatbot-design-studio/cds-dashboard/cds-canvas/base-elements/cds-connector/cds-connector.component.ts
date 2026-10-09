@@ -11,8 +11,19 @@ import { ConnectorService } from 'src/app/chatbot-design-studio/services/connect
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-// import { Intent } from 'src/app/models/intent-model';
+import { outputsOf, blockOutputOf, recordIdOf, BLOCK_SLOT } from 'src/app/chatbot-design-studio/connectors/connector-catalog';
 
+/**
+ * Il pallino di un'uscita, e il riquadro col nome del blocco collegato quando la linea e'
+ * nascosta.
+ *
+ * Due modi di usarlo. Quello nuovo: `[intent]`, `[action]` e `slot` (`true`, `false`,
+ * `noInput`, `button:<uid>`, `case:<id>`, `next`...), e il componente ricava da solo, dal
+ * catalogo delle uscite, l'id della propria ancora e lo stato del collegamento, e li tiene
+ * aggiornati ascoltando i cambi dei connettori: le action non devono piu' sapere niente di
+ * connettori. Quello vecchio: `[idConnector]`, `[idConnection]`, `[isConnected]` calcolati dal
+ * componente padre; resta finche' l'ultima action non e' migrata.
+ */
 @Component({
   selector: 'cds-connector',
   templateUrl: './cds-connector.component.html',
@@ -20,9 +31,19 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 })
 export class CdsConnectorComponent implements OnInit {
   private subscriptionChangeIntent: Subscription;
+  private subscriptionChangedConnector: Subscription;
+
+  // Modo vecchio: lo stato arriva dal padre.
   @Input() idConnector: string;
   @Input() idConnection: string;
   @Input() isConnected: boolean;
+
+  // Modo nuovo: lo stato si ricava dal modello.
+  @Input() intent: any;
+  /** In alternativa a `intent`, per le uscite delle action: basta l'id del blocco. */
+  @Input() intentId: string;
+  @Input() action: any;
+  @Input() slot: string;
 
   @Output() onShowConnector = new EventEmitter();
   @Output() onHideConnector = new EventEmitter();
@@ -31,8 +52,6 @@ export class CdsConnectorComponent implements OnInit {
   idContractConnector: string;
   restoreConnector: boolean = false;
   displayConnector: string;
-  // connectorDisplay: string;
-  // intent: Intent;
   connector: any;
 
   constructor(
@@ -44,10 +63,20 @@ export class CdsConnectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.initSubscriptions();
-    // this.setIdContractConnector();
+    if (this.slot) {
+      this.resolveFromModel();
+      this.setIdContractConnector();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (this.slot) {
+      if (changes.intent || changes.intentId || changes.action || changes.slot) {
+        this.resolveFromModel();
+      }
+      this.setIdContractConnector();
+      return;
+    }
     this.setIdContractConnector();
     if (changes.isConnected?.currentValue === false) {
       this.displayConnector = 'none';
@@ -61,11 +90,31 @@ export class CdsConnectorComponent implements OnInit {
     }
   }
 
-
   ngOnDestroy() {
     if (this.subscriptionChangeIntent) {
       this.subscriptionChangeIntent.unsubscribe();
     }
+    if (this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector.unsubscribe();
+    }
+  }
+
+  /** Lo stato dell'uscita, letto dal modello attraverso il catalogo. */
+  private resolveFromModel(): void {
+    const intentId = this.intent?.intent_id || this.intentId;
+    if (!intentId || !this.slot) { return; }
+    const resolved = this.slot === BLOCK_SLOT.key
+      ? (this.intent ? blockOutputOf(this.intent) : null)
+      : outputsOf(intentId, this.action).find(s => s.key === this.slot) || null;
+    if (!resolved) {
+      this.idConnector = null;
+      this.idConnection = null;
+      this.isConnected = false;
+      return;
+    }
+    this.idConnector = resolved.fromId;
+    this.isConnected = !!resolved.toId;
+    this.idConnection = resolved.toId ? recordIdOf(resolved.fromId, resolved.toId) : null;
   }
 
   initSubscriptions(){
@@ -75,6 +124,16 @@ export class CdsConnectorComponent implements OnInit {
         if (intent?.intent_id && intent.intent_id === idToIntent) {
           this.intent_display_name = intent.intent_display_name;
         }
+      });
+    }
+    // Un connettore di questa uscita e' nato o morto: il campo e' gia' stato scritto dallo
+    // store (ConnectorService lo chiama in cattura, prima di questo ascoltatore); qui si
+    // rilegge e basta. Solo nel modo nuovo: nel vecchio lo fa il componente padre.
+    if (!this.subscriptionChangedConnector) {
+      this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
+        if (!this.slot || !this.idConnector || connector?.fromId !== this.idConnector) { return; }
+        this.resolveFromModel();
+        this.setIdContractConnector();
       });
     }
   }
@@ -97,12 +156,12 @@ export class CdsConnectorComponent implements OnInit {
           this.idContractConnector = 'contract_' + this.idConnector;
           display = this.connector.display;
           if(display)this.connectorService.hideDefaultConnector(this.idConnection);
-          // // this.connectorService.showHideConnectorByIdConnector(this.idConnection, this.connector.display);
         }
-        // // const displayConnector = display ? 'none' : 'flex';
-        // // this.connectorService.setDisplayElementById(this.idContractConnector, displayConnector);
       }
       this.displayConnector = display ? 'none' : 'flex';
+    }
+    if (!this.isConnected) {
+      this.displayConnector = 'none';
     }
   }
 
@@ -117,11 +176,9 @@ export class CdsConnectorComponent implements OnInit {
         this.intent_display_name = intent.intent_display_name;
       }
     }
-    // console.log('getToIntentDisplayName: ', this.idConnection, this.intent_display_name);
   }
 
   public showConnector() {
-    // // console.log('showConnector: ', this.idConnection, this.isConnected);
     if (this.idConnection && this.isConnected) {
       const idConnection = this.idConnection?.replace('#', '');
       const svgElement: HTMLElement = document.getElementById(idConnection);
@@ -151,7 +208,6 @@ export class CdsConnectorComponent implements OnInit {
       if (svgElement) {
         svgElement.setAttribute('opacity', alphaConnector.toString());
       }
-
       const svgElementRec: HTMLElement = document.getElementById(
         'rect_' + idConnection
       );
@@ -200,7 +256,6 @@ export class CdsConnectorComponent implements OnInit {
         const intent = this.intentService.getIntentFromId(intentId);
         if (intent) {
           this.intentService.setIntentSelected(intentId);
-          // Centra lo stage sull'intent selezionato (stessa animazione di cds-panel-intent-list)
           let stageElement = document.getElementById(intentId);
           if (stageElement) {
             let id_faq_kb = this.dashboardService.id_faq_kb;

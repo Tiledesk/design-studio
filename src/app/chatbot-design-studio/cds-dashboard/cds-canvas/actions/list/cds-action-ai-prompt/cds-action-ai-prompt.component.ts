@@ -25,7 +25,6 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
@@ -89,12 +88,6 @@ export class CdsActionAiPromptComponent implements OnInit {
   idIntentSelected: string = '';
   idConnectorTrue: string = '';
   idConnectorFalse: string = '';
-  idConnectionTrue: string = '';
-  idConnectionFalse: string = '';
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   projectPlan: PLAN_NAME;
   PLAN_NAME = PLAN_NAME;
@@ -126,14 +119,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION AI_PROMPT] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -153,9 +138,6 @@ export class CdsActionAiPromptComponent implements OnInit {
 
 
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
 
@@ -193,36 +175,13 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.log('[ACTION AI_PROMPT] idIntentSelected:', this.idIntentSelected);
     this.logger.log('[ACTION AI_PROMPT] idConnectorTrue:', this.idConnectorTrue);
     this.logger.log('[ACTION AI_PROMPT] idConnectorFalse:', this.idConnectorFalse);
-    this.checkConnectionStatus();
     
     // this.logger.log('[ACTION AI_PROMPT] isConnectedFalse:', this.isConnectedFalse);
     // this.logger.log('[ACTION AI_PROMPT] idConnectionTrue:', this.idConnectionTrue);
     // this.logger.log('[ACTION AI_PROMPT] idConnectionFalse:', this.idConnectionFalse);
   }
   
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.logger.log('[ACTION AI_PROMPT] checkConnectionStatusOfAction:',this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-    this.logger.log('[ACTION AI_PROMPT] resp:',resp);
-  }
 
-  private updateConnector(){
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION AI_PROMPT] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
 
 
   private initializeAttributes() {

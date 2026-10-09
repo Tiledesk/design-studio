@@ -28,9 +28,7 @@
         </div>
         <label class="title-preview-label">{{'CDSCanvas.GoToBlock' | translate }}</label>
         <cds-connector class="connector-true"
-            [idConnector] = "idConnectorGoTo"
-            [idConnection] = "idConnectionGoTo"
-            [isConnected] = "isConnectedGoTo">
+            [intent]="intentSelected" [action]="action" slot="goto">
         </cds-connector>
     </div>
 

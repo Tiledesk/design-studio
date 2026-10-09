@@ -96,9 +96,12 @@ export class IntentService {
     private connectorStore?: ConnectorStore
   ) {
     // La lista dei connettori si salva da sola quando cambia: lo store sa cosa, qui si sa come.
-    this.connectorStore?.bindPersistence(collection => {
-      const id = this.dashboardService?.id_faq_kb;
-      return id ? this.saveConnectorsCollection(collection, id) : Promise.resolve();
+    this.connectorStore?.bindPersistence({
+      saveCollection: collection => {
+        const id = this.dashboardService?.id_faq_kb;
+        return id ? this.saveConnectorsCollection(collection, id) : Promise.resolve();
+      },
+      updateIntent: intent => this.updateIntent(intent),
     });
   }
 

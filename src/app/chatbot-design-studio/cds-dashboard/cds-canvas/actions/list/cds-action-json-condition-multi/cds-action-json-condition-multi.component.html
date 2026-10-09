@@ -18,9 +18,7 @@
             </ng-template>
         </div>
         <cds-connector class="connector-true"
-            [idConnector]="listOfConnectors[branch._tdCaseId]?.idConnector"
-            [idConnection]="listOfConnectors[branch._tdCaseId]?.idConnection"
-            [isConnected]="listOfConnectors[branch._tdCaseId]?.isConnected">
+            [intent]="intentSelected" [action]="action" [slot]="'case:' + branch._tdCaseId">
         </cds-connector>
     </div>
 
@@ -29,9 +27,7 @@
     <div class="previewContent">
         <label class="title-preview-label">{{ 'CDSCanvas.Else' | translate | titlecase }}</label>
         <cds-connector class="connector-false"
-            [idConnector]="idConnectorElse"
-            [idConnection]="idConnectionElse"
-            [isConnected]="isConnectedElse">
+            [intent]="intentSelected" [action]="action" slot="else">
         </cds-connector>
     </div>
 

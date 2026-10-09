@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
 import { getOpacityFromRgba, getColorFromRgba } from '../utils';
 import { edgesOfFlow, edgesOfIntent, indexFlow, parseRecordId, slotsOfIntent, writeSlot } from '../connectors/connector-catalog';
 import { TiledeskJsRenderer } from '../connectors/renderer/tiledesk-js-renderer';
+import { ConnectorStore } from '../connectors/connector-store.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
@@ -64,6 +65,7 @@ export class ConnectorService {
   private readonly logger: LoggerService = LoggerInstance.getInstance();
   
   constructor(
+    @Optional() private readonly store?: ConnectorStore
   ) {}
 
   initializeConnectors(){
@@ -90,6 +92,9 @@ export class ConnectorService {
     document.addEventListener("connector-created", (e: CustomEvent) => {
       const connector = e.detail?.connector;
       if (connector?.id) {
+        // In cattura, quindi prima del canvas e dei componenti: il campo della action e' gia'
+        // scritto quando loro rileggono il modello.
+        this.store?.applyRendererChange({ fromId: connector.fromId, toId: connector.toId, save: !!connector.save }, this.listOfIntents || []);
         this.handleConnectorChange(connector.id, 'created');
       }
     }, true); // Capture phase per processare prima degli altri listener
@@ -98,6 +103,7 @@ export class ConnectorService {
     document.addEventListener("connector-deleted", (e: CustomEvent) => {
       const connector = e.detail?.connector;
       if (connector?.id) {
+        this.store?.applyRendererChange({ fromId: connector.fromId, toId: connector.toId, deleted: true, save: !!connector.save }, this.listOfIntents || []);
         this.handleConnectorChange(connector.id, 'deleted');
       }
     }, true); // Capture phase per processare prima degli altri listener

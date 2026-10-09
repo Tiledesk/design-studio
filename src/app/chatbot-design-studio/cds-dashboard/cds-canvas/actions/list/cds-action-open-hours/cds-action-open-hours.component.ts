@@ -5,10 +5,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IntentService } from '../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-open-hours',
@@ -30,12 +28,6 @@ export class CdsActionOpenHoursComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   
   radioOptions: Array<{name: string, category: string, value: string, disabled: boolean, checked: boolean}>= [ 
     {name: 'CDSCanvas.General',               category: 'general',    value: null,            disabled: false, checked: true  }, 
@@ -55,21 +47,11 @@ export class CdsActionOpenHoursComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     this.initialize()
   }
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   // ngOnChanges() {
@@ -94,7 +76,6 @@ export class CdsActionOpenHoursComponent implements OnInit {
     this.falseIntentAttributes = this.action.falseIntentAttributes;
     if(this.intentSelected){
       this.initializeConnector();
-      this.checkConnectionStatus();
     }
 
     this.radioOptionSelected = null;
@@ -114,30 +95,8 @@ export class CdsActionOpenHoursComponent implements OnInit {
   }
 
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
   
-    /** */
-    private updateConnector(){
-      this.logger.log('[ACTION-OPEN-HOURS] updateConnector:');
-      const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-      if(resp){
-        this.isConnectedTrue    = resp.isConnectedTrue;
-        this.isConnectedFalse   = resp.isConnectedFalse;
-        this.idConnectionTrue   = resp.idConnectionTrue;
-        this.idConnectionFalse  = resp.idConnectionFalse;
-        this.logger.log('[ACTION-OPEN-HOURS] updateConnector:', resp);
-        if (resp.emit) {
-          this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-        } 
-      }
-    }
 
   onChangeButtonSelect(event: {label: string, category: string, value: string, disabled: boolean, checked: boolean}){
     this.radioOptions.forEach(el => { el.value ===event.value? el.checked= true: el.checked = false })

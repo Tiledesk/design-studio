@@ -8,6 +8,7 @@
 *Tiledesk SRL*
 
 # this branch 09/10/2026
+- **changed**: le action non sanno piu' nulla di connettori: il pallino di ogni uscita (`cds-connector`) ricava da solo dal catalogo a quale uscita appartiene e se e' collegato, e un connettore nato o morto sul canvas scrive il campo della action in un posto solo invece che in trentatre' componenti. Migrate la famiglia true/false, le reply coi loro bottoni, intent, connect block, capture, iterazione e condizione a piu' casi; le action voice e l'AI Condition seguono
 - **changed**: i connettori si disegnano dal catalogo delle uscite: le 850 righe con un ramo per tipo di action sono sparite, e la previsione dei connettori attesi all'apertura e' la stessa del disegno. Chiuso il difetto per cui un flusso con una Capture User Reply collegata restava sulla schermata di caricamento fino al timeout
 - **changed**: un connettore verso un blocco non ancora disegnato aspetta il segnale del blocco invece di un polling a 0 ms e di una coda ritentata ogni mezzo secondo
 - **changed**: la lista dei connettori dell'agente si riallinea alle action dopo ogni salvataggio, da qualunque strada arrivi la modifica, e si salva da sola

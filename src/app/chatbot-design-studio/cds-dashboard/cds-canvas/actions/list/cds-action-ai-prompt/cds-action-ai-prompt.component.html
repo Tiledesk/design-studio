@@ -65,9 +65,7 @@
         <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label>
         
         <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [idConnection] = "idConnectionTrue"
-            [isConnected] = "isConnectedTrue">
+            [intent]="intentSelected" [action]="action" slot="true">
         </cds-connector>
     </div>
 
@@ -76,9 +74,7 @@
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [idConnection] = "idConnectionFalse"
-            [isConnected] = "isConnectedFalse">
+            [intent]="intentSelected" [action]="action" slot="false">
         </cds-connector>
     </div>
 

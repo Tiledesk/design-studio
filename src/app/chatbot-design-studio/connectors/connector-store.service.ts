@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ConnectorRecord } from './connector-catalog';
+import { ConnectorRecord, slotOfFromId, writeSlot } from './connector-catalog';
+import { STORE_OWNED_TYPES } from './connector-config';
 import { ConnectorsCollection, RepairReport, buildCollection } from './flow-normalizer';
 
 /**
@@ -52,12 +53,47 @@ export class ConnectorStore {
   }
 
   private save: ((collection: ConnectorsCollection) => Promise<void>) | null = null;
+  private updateIntent: ((intent: any) => Promise<any> | void) | null = null;
   private saveTimer: any = null;
   private static readonly SAVE_DEBOUNCE_MS = 400;
 
-  /** Chi sa salvare la lista sul server (IntentService) si registra qui: lo store non conosce HTTP. */
-  bindPersistence(save: (collection: ConnectorsCollection) => Promise<void>): void {
-    this.save = save;
+  /** Chi sa salvare sul server (IntentService) si registra qui: lo store non conosce HTTP. */
+  bindPersistence(persistence: { saveCollection: (collection: ConnectorsCollection) => Promise<void>; updateIntent?: (intent: any) => Promise<any> | void }): void {
+    this.save = persistence.saveCollection;
+    this.updateIntent = persistence.updateIntent || null;
+  }
+
+  /**
+   * Un connettore e' nato o morto sul canvas (trascinamento, tasto Canc, menu, pannello): il
+   * campo della action da cui parte viene scritto qui, in un posto solo, invece che in ognuno
+   * dei trentatre' componenti. Se il cambio va salvato e il tipo e' tra quelli di cui lo store
+   * risponde (STORE_OWNED_TYPES), salva anche il blocco. Restituisce cosa ha fatto.
+   */
+  applyRendererChange(change: { fromId: string; toId: string; deleted?: boolean; save?: boolean }, intents: any[]): { written: boolean; saved: boolean } {
+    const result = { written: false, saved: false };
+    if (!change?.fromId) { return result; }
+    const intentId = change.fromId.split('/')[0];
+    const intent = (intents || []).find((i: any) => i?.intent_id === intentId);
+    if (!intent) { return result; }
+    const slot = slotOfFromId(intent, change.fromId);
+    if (!slot) { return result; }
+    const toId = change.deleted ? null : (change.toId || null);
+    result.written = writeSlot(slot, toId);
+    if (slot.kind === 'button' && slot.item) {
+      // Un bottone collegato e' un bottone "action"; scollegato torna di testo. E lo stato che
+      // il suo template legge (`__isConnected`, `__idConnection`) segue, come faceva ogni
+      // elemento della reply per conto suo.
+      slot.item.type = toId ? 'action' : 'text';
+      slot.item.__idConnector = slot.fromId;
+      slot.item.__isConnected = !!toId;
+      slot.item.__idConnection = toId ? slot.fromId + '/' + toId : null;
+    }
+    const type = slot.kind === 'block' ? 'next' : (intent.actions || []).find((a: any) => a?._tdActionId === slot.actionId)?._tdActionType;
+    if (change.save && this.updateIntent && type && STORE_OWNED_TYPES.has(type)) {
+      void this.updateIntent(intent);
+      result.saved = true;
+    }
+    return result;
   }
 
   /**
