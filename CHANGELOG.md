@@ -7,13 +7,8 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 09/10/2026
-- **fixed**: nel pannello di dettaglio dei blocchi di partenza il titolo sta accanto all'icona senza sovrapporsi, nel blu della palette come l'icona, e i pulsanti hanno le misure compatte degli altri campi invece di quelle larghe del tema. Vale anche sugli agenti legacy: il pannello e' lo stesso
-- **changed**: negli agenti V3 i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota -- hanno tutti la stessa scheda: larghezza fissa, due righe di altezza fissa. Sopra, su fondo blu, icona, titolo e il pallino del connettore in uscita, in coda e staccato dal bordo; sotto, su fondo bianco, una riga che dice da dove si parte: per il Webhook start il metodo e il percorso dell'indirizzo, con l'indirizzo intero al passaggio del puntatore. Le pastiglie scure restano agli agenti legacy
-- **changed**: negli agenti V3 i blocchi di partenza mostrano un titolo leggibile -- *Web start*, *Webhook start*, *Default fallback* -- al posto del nome riservato, che tanto non si puo' cambiare
-- **changed**: l'intestazione del pannello di dettaglio di un blocco ha la stessa altezza per ogni blocco e il titolo nel blu della palette. Prima nei blocchi di partenza usciva piu' bassa, col titolo del colore del blocco e spostato di lato
-- **fixed**: trascinando un'azione sul flusso, l'immagine che segue il puntatore e' bianca, con gli angoli arrotondati dei blocchi, senza il fondo grigio del passaggio ne' l'icona accesa ne' il pulsante della descrizione. Prima era la foto della riga cosi' com'era sotto il puntatore
 # 1.40.16-rc28
+- **fixed** (master-pre): in the start box detail panel the title no longer overlaps its icon, and the icon always takes the title colour
 - **changed** (V3/design-vibe-coder): V3 start boxes (web, webhook, empty default fallback) share one fixed-size two-row card: blue header with icon, readable title and the out connector; white body with a one-line description (webhook: `POST` + path)
 - **changed** (V3/design-vibe-coder): the block detail panel header has a fixed height and a `--blu` title
 - **fixed** (V3/design-vibe-coder): the drag image of an action is white with rounded corners, without the hover background
