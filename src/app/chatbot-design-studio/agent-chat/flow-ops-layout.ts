@@ -1,4 +1,6 @@
 import { FlowPosition } from './flow-ops.model';
+import { RESERVED_INTENT_NAMES } from '../utils';
+import { isWebStartDisabled, startPointTypeOf } from '../utils-start-points';
 
 /** A block to lay out: its id and the height of its card on the canvas. */
 export interface LayoutNode {
@@ -128,4 +130,26 @@ export function computeFlowLayout(
     }
   }
   return changed;
+}
+
+/** The blocks the automatic layout places: every block with an id, except a disabled Web start (hidden on the
+ *  canvas, it stays where it is and is shown there again when re-enabled). */
+export function flowLayoutIntents(intents: any[]): any[] {
+  return (intents || []).filter(intent => !!intent?.intent_id && !isWebStartDisabled(intent));
+}
+
+/** The roots of the automatic layout, in order: `start` (unless Web start is disabled), the start boxes
+ *  (`attributes.start_point`, in flow order), `webhook`, `defaultFallback`. With Web start off the first start box
+ *  leads, so a scheduled-only flow is laid out from its Scheduled box. */
+export function flowLayoutRoots(intents: any[]): string[] {
+  const list = (intents || []).filter(intent => !!intent?.intent_id);
+  const named = (name: string) => list.find(intent => intent.intent_display_name === name);
+  const start = named(RESERVED_INTENT_NAMES.START);
+  const boxes = list.filter(intent => { const type = startPointTypeOf(intent); return type === 'webhook' || type === 'scheduled'; });
+  return [
+    start && !isWebStartDisabled(start) ? start : null,
+    ...boxes,
+    named(RESERVED_INTENT_NAMES.WEBHOOK),
+    named(RESERVED_INTENT_NAMES.DEFAULT_FALLBACK)
+  ].filter(intent => !!intent).map(intent => intent.intent_id);
 }

@@ -540,6 +540,10 @@ $toogle-sidebar-width: 22px;
     z-index: 1;
     user-select: none;
     min-height: 43px;
+    // Web start turned off: the start block stays in the flow but is not drawn
+    &.cds-web-start-disabled {
+      display: none !important;
+    }
   }
 
   .panel-intent-detail-wrapper {

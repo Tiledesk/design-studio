@@ -10,9 +10,12 @@ import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import {
   TYPE_CHATBOT, availableActionEntries, isSubagentSubtype, resolveChatbotSubtype
 } from '../utils-actions';
-import { DYNAMIC_MODEL_PROVIDERS, LlmModel, getIntegrationByName, initLLMModels } from '../utils-llm-models';
+import { StartPointDescriptor, StartPointManagerService } from '../services/start-point-manager.service';
 import {
-  ActionCapability, CapabilitiesSnapshot, LlmModelCapability, McpServerCapability
+  DYNAMIC_MODEL_PROVIDERS, LlmModel, getIntegrationByName, getIntegrations, initLLMModels
+} from '../utils-llm-models';
+import {
+  ActionCapability, CapabilitiesSnapshot, IntegrationCapability, LlmModelCapability, McpServerCapability
 } from './agent-chat-capabilities.model';
 
 interface McpPart {
@@ -33,6 +36,9 @@ interface LlmPart {
   models: LlmModel[];
   capabilities: LlmModelCapability[];
   error?: string;
+  /** The project's integrations, names only (see IntegrationCapability). */
+  integrations: IntegrationCapability[];
+  integrationsError?: string;
 }
 
 /** What AgentChatLlmModelsLoader reads: the picker's models, and for each
@@ -42,6 +48,10 @@ interface LlmPart {
 export interface LoadedLlmModels {
   models: LlmModel[];
   dynamicIntegrations: Record<string, any>;
+  /** Every integration of the project as GET /integration answers it (values
+   *  already masked by the server), or null when the list could not be read
+   *  -- getIntegrations swallows the error and answers null. */
+  integrations: any[] | null;
 }
 
 /** The models the AI actions' own picker lists -- initLLMModels, the call
@@ -72,7 +82,10 @@ export class AgentChatLlmModelsLoader {
       const response = await getIntegrationByName(this.projectService, this.dashboardService, logger, provider);
       dynamicIntegrations[provider] = response?.value ?? null;
     }));
-    return { models, dynamicIntegrations };
+    // The whole list, from the same 60s cache: the agent is told which
+    // integrations exist, to pick the provider a web request authenticates with.
+    const integrations = await getIntegrations(this.projectService, this.dashboardService, logger);
+    return { models, dynamicIntegrations, integrations: Array.isArray(integrations) ? integrations : null };
   }
 }
 
@@ -93,6 +106,45 @@ function listedByIntegration(m: LlmModel, value: any): boolean {
       : (entry?.id ?? '').toString().trim() === m.model);
   }
   return false;
+}
+
+/** Whether an integration holds a key: a top-level `apikey` (openai,
+ *  openrouter, anthropic, ...) or a server with one (vllm, agentplatform).
+ *  The server masks the value but never empties it, so a masked key still
+ *  counts. Ollama's `token` and the MCP integration's headers are not keys a
+ *  web request can use, and are not counted. */
+function integrationIsConfigured(value: any): boolean {
+  if (!value || typeof value !== 'object') { return false; }
+  if (typeof value.apikey === 'string' && value.apikey.trim()) { return true; }
+  return Array.isArray(value.servers)
+    && value.servers.some((server: any) => typeof server?.apikey === 'string' && server.apikey.trim());
+}
+
+/** What the agent is told about the project's integrations: names and
+ *  whether each holds a key. Never a value, not even masked. */
+function integrationCapabilities(integrations: any[]): IntegrationCapability[] {
+  const seen = new Set<string>();
+  const out: IntegrationCapability[] = [];
+  for (const integration of integrations) {
+    const name = typeof integration?.name === 'string' ? integration.name.trim() : '';
+    if (!name || seen.has(name)) { continue; }
+    seen.add(name);
+    out.push({ name, configured: integrationIsConfigured(integration.value) });
+  }
+  return out;
+}
+
+const GLOBAL_NAME = /^[a-zA-Z0-9_]+$/;
+
+/** The names of the agent's Globals, as the Globals panel validates them.
+ *  Values are left out: a Global is where the user keeps a key. */
+function globalNames(chatbot: any): string[] {
+  const globals = chatbot?.attributes?.globals;
+  if (!Array.isArray(globals)) { return []; }
+  const names = globals
+    .map((g: any) => typeof g?.key === 'string' ? g.key.trim() : '')
+    .filter((key: string) => GLOBAL_NAME.test(key));
+  return Array.from(new Set(names));
 }
 
 function messageOf(error: any): string {
@@ -148,7 +200,7 @@ export class AgentChatCapabilitiesService {
       .map(a => a.canLoad
         ? { type: a.type, status: 'available' as const }
         : { type: a.type, status: 'needs_upgrade' as const, plan: String(a.plan) });
-    const [mcp, llm] = await Promise.all([this.mcpPart(), this.llmPart()]);
+    const [mcp, llm, startPoints] = await Promise.all([this.mcpPart(), this.llmPart(), this.startPointsPart()]);
     return {
       capabilities: {
         chatbot_subtype: resolveChatbotSubtype(subtype),
@@ -157,11 +209,27 @@ export class AgentChatCapabilitiesService {
         mcp_servers: mcp.servers,
         ...(mcp.error ? { mcp_error: mcp.error } : {}),
         llm_models: llm.capabilities,
-        ...(llm.error ? { llm_models_error: llm.error } : {})
+        ...(llm.error ? { llm_models_error: llm.error } : {}),
+        integrations: llm.integrations,
+        ...(llm.integrationsError ? { integrations_error: llm.integrationsError } : {}),
+        globals: globalNames(this.dashboardService.selectedChatbot),
+        ...(startPoints.error ? { start_points_error: startPoints.error } : { start_points: startPoints.list })
       },
       customServerConfigs: mcp.configs,
       llmModels: llm.models
     };
+  }
+
+  /** Resolved here, not injected, like ProjectPlanUtils: the manager reads
+   *  the open flow, and this service is built before any is open. A failure
+   *  costs the answer its start points, not the rest of it. */
+  private async startPointsPart(): Promise<{ list?: StartPointDescriptor[]; error?: string }> {
+    try {
+      return { list: await this.injector.get(StartPointManagerService).describe() };
+    } catch (error) {
+      LoggerInstance.getInstance().error('[AGENT-CHAT-CAPABILITIES] start points not described:', error);
+      return { error: (error as any)?.message || 'the start points could not be described' };
+    }
   }
 
   public invalidate(): void {
@@ -251,9 +319,17 @@ export class AgentChatCapabilitiesService {
       const dynamic: readonly string[] = DYNAMIC_MODEL_PROVIDERS;
       const models = loaded.models.filter(m => m.configured === true
         && (dynamic.indexOf(m.llm) === -1 || listedByIntegration(m, loaded.dynamicIntegrations[m.llm])));
-      return { models, capabilities: models.map(m => this.llmCapability(m, translate)) };
+      // The integrations ride on the same load: getIntegrations answers null,
+      // not a throw, when the endpoint fails, and that is the one case the
+      // agent is told about -- an empty list is a project with none.
+      const integrations = loaded.integrations;
+      return {
+        models, capabilities: models.map(m => this.llmCapability(m, translate)),
+        integrations: integrations ? integrationCapabilities(integrations) : [],
+        ...(integrations ? {} : { integrationsError: 'the project\'s integrations could not be read' })
+      };
     } catch (e) {
-      return { models: [], capabilities: [], error: messageOf(e) };
+      return { models: [], capabilities: [], error: messageOf(e), integrations: [], integrationsError: messageOf(e) };
     }
   }
 

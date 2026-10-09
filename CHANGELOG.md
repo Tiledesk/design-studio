@@ -17,6 +17,26 @@
 - **changed**: V3 start and fallback icons share one colour on the flow and in the blocks panel: web start green, webhook start violet, scheduled start orange, empty default fallback light blue
 - **changed**: V3 empty default fallback is dark like the start block, with a white title
 - **changed**: the labels of the three start boxes are white
+# 1.40.16-rc27
+- **added** (start-boxes-manager): the AI chat manages the flow's start boxes with the new `start_point` tool: adds, configures and removes the Webhook and Scheduled boxes, and can disable the Web start. Removing a box asks the user to confirm; the answer of `get_project_capabilities` lists each start box with its status and settings
+- **changed** (start-boxes-manager): AI chat edits that touch start boxes are guarded (no duplicate box, no edits to a box being changed, read-only flows refused) and placed by the layout next to the other start boxes
+
+# 1.40.16-rc26
+- **added** (V3/vibe-coder-ocr-guards): the AI chat knows the project's integrations (name and whether a key is set, never the value) and the agent's Global names, so it picks the service for an action by itself, e.g. OpenRouter to read an attachment, and knows whether the Global holding the key still has to be created
+- **added** (V3/vibe-coder-ocr-guards): after each AI chat edit, a web request that authenticates through a Global the agent does not have gets a warning telling the chat to have the user create it before testing the flow. A warning, not a refusal; all agents
+- **changed** (V3/vibe-coder-ocr-guards): the AI chat also receives the agent's language, so the texts the flow shows can be written in it
+
+# 1.40.16-rc25
+- **changed** (V3/vibe-coder-ocr-guards): the AI chat can no longer write a plain-text API key into a web request (headers, url or body); it is told to use an agent Global instead, e.g. `Bearer {{openrouter_api_key}}`. All agents, chat edits only
+- **changed** (V3/vibe-coder-ocr-guards): keys already in a web request reach the AI chat masked, and sending the mask back is refused
+
+# 1.40.16-rc24
+- **added** (master-pre): the Vibe Coder model setting is a searchable picker grouped into Curated and All OpenRouter models, each with its price and context size; a saved model that is no longer available is shown and must be replaced before saving
+
+# 1.40.16-rc23
+- **changed** (V3/design-vibe-coder): V3 start and fallback icons share one colour on the flow and in the blocks panel: web start green, webhook start violet, scheduled start orange, empty default fallback light blue
+- **changed** (V3/design-vibe-coder): V3 empty default fallback is dark like the start block, with a white title
+- **changed** (V3/design-vibe-coder): the labels of the three start boxes are white
 
 # 1.40.16-rc22
 - **changed** (V3/design-vibe-coder): the AI chat opens from its own tab, on top of the left rail, with a new icon; the header button is gone

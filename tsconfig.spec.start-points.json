@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-start-points",
+    "types": ["jasmine", "node"]
+  },
+  "files": ["src/test-start-points.ts", "src/polyfills.ts"],
+  "include": [
+    "src/app/chatbot-design-studio/utils-start-points*.spec.ts",
+    "src/app/chatbot-design-studio/utils-schedule*.spec.ts",
+    "src/app/chatbot-design-studio/utils-scheduled-panel*.spec.ts",
+    "src/app/chatbot-design-studio/start-box-controls.spec.ts",
+    "src/app/chatbot-design-studio/start-points-wiring.spec.ts",
+    "src/app/chatbot-design-studio/services/start-point-manager.service.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

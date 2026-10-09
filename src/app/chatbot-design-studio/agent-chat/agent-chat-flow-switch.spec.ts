@@ -6,6 +6,7 @@ import {
 import { BehaviorSubject, of } from 'rxjs';
 import { AgentChatHostService } from './agent-chat-host.service';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { StartPointManagerService } from '../services/start-point-manager.service';
 import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
@@ -573,6 +574,7 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
+        { provide: StartPointManagerService, useValue: {} },
         // The real one: get_flow's answer must come through the real read
         // path, or the staleness this test is about could not appear.
         { provide: FlowOpsService,

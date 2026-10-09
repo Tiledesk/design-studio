@@ -114,6 +114,7 @@
             [id]="intent.intent_id"
             [IS_OPEN_PANEL_INTENT_DETAIL]="IS_OPEN_PANEL_INTENT_DETAIL"
             class="panel-intent tds_input_block" 
+            [class.cds-web-start-disabled]="isWebStartHidden(intent)"
             [style.top.px]="getIntentPosition(intent.intent_id).y"
             [style.left.px]="getIntentPosition(intent.intent_id).x" 
             [intent]="intent"
@@ -210,7 +211,6 @@
     [project_id]="projectID"
     [intent]="elementIntentSelected"
     (closePanel)="closeAllPanels()"
-    (deleteStartBox)="onDeleteStartBox($event)"
     (savePanelIntentDetail)="onSavePanelIntentDetail($event)">
 </cds-panel-intent-detail>
 

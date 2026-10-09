@@ -5,6 +5,7 @@ import { DashboardService } from 'src/app/services/dashboard.service';
 import { McpService } from 'src/app/services/mcp.service';
 import { ProjectPlanUtils } from 'src/app/utils/project-utils';
 import { ACTIONS_LIST } from '../utils-actions';
+import { StartPointManagerService } from '../services/start-point-manager.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 describe('AgentChatCapabilitiesService', () => {
@@ -13,6 +14,7 @@ describe('AgentChatCapabilitiesService', () => {
   let mcpService: any;
   let planUtils: any;
   let planUtilsBuilt: number;
+  let startPoints: any;
   let savedList: string;
   let llmLoader: any;
   let loaderBuilt: number;
@@ -69,9 +71,20 @@ describe('AgentChatCapabilitiesService', () => {
     ], dynamicIntegrations: {
       vllm: { servers: [{ name: 'gpu-a', url: 'https://secret.example.com/v1', models: ['llama-3'] }] },
       ollama: null, agentplatform: null, openrouter: null
-    } })) };
+    }, integrations: [
+      // As GET /integration answers: values already masked by the server.
+      { _id: 'i1', name: 'openai', value: { apikey: 'sk-****abcd', organization: '' } },
+      { _id: 'i2', name: 'openrouter', value: { apikey: 'sk-****wxyz', models: [] } },
+      { _id: 'i3', name: 'anthropic', value: { apikey: '' } },
+      { _id: 'i4', name: 'vllm', value: { servers: [{ name: 'gpu-a', url: 'https://secret.example.com/v1', apikey: 'secret' }] } },
+      { _id: 'i5', name: 'mcp', value: { servers: [{ name: 'Acme CRM', url: 'https://crm.example.com/mcp' }] } }
+    ] })) };
     translate = { instant: jasmine.createSpy('instant').and.callFake((key: string) =>
       key === 'TYPE_GPT_MODEL.gpt-4o.description' ? 'Fast and capable' : key) };
+    startPoints = { describe: jasmine.createSpy('describe').and.returnValue(Promise.resolve([
+      { type: 'web', status: 'present', removable: true, settings: {}, intent_id: 'start1', current: {} },
+      { type: 'webhook', status: 'available', removable: true, settings: { enabled: 'boolean' } }
+    ])) };
     TestBed.configureTestingModule({
       providers: [
         AgentChatCapabilitiesService,
@@ -79,12 +92,28 @@ describe('AgentChatCapabilitiesService', () => {
         { provide: McpService, useValue: mcpService },
         { provide: AgentChatLlmModelsLoader, useFactory: () => { loaderBuilt++; return llmLoader; } },
         { provide: TranslateService, useValue: translate },
+        { provide: StartPointManagerService, useFactory: () => startPoints },
         { provide: ProjectPlanUtils, useFactory: () => { planUtilsBuilt++; return planUtils; } }
       ]
     });
     planUtilsBuilt = 0;
     loaderBuilt = 0;
     service = TestBed.inject(AgentChatCapabilitiesService);
+  });
+
+  it('lists the start points the manager describes', async () => {
+    const snap = await service.snapshot();
+    expect(snap.capabilities.start_points.map(d => d.type)).toEqual(['web', 'webhook']);
+    expect(snap.capabilities.start_points[0].current).toEqual({});
+    expect(snap.capabilities.start_points_error).toBeUndefined();
+  });
+
+  it('still answers when describing the start points fails', async () => {
+    startPoints.describe.and.returnValue(Promise.reject(new Error('no webhook')));
+    const snap = await service.snapshot();
+    expect(snap.capabilities.start_points).toBeUndefined();
+    expect(snap.capabilities.start_points_error).toBe('no webhook');
+    expect(snap.capabilities.actions.length).toBeGreaterThan(0);
   });
 
   // ProjectPlanUtils reads the current project in its constructor. This
@@ -178,6 +207,57 @@ describe('AgentChatCapabilitiesService', () => {
     const { capabilities } = await service.snapshot();
     expect(JSON.stringify(capabilities.llm_models)).not.toContain('secret');
     expect(JSON.stringify(capabilities.llm_models)).not.toContain('https://');
+  });
+
+  // A web request authenticates with a key the user keeps in a Global named
+  // after the integration: the agent has to know which integrations exist,
+  // and which Globals the agent already has, to name it and to say whether
+  // it still has to be created.
+  it('lists the project\'s integrations by name, with whether each holds a key', async () => {
+    const { capabilities } = await service.snapshot();
+    expect(capabilities.integrations).toEqual([
+      { name: 'openai', configured: true },
+      { name: 'openrouter', configured: true },
+      { name: 'anthropic', configured: false },
+      { name: 'vllm', configured: true },
+      { name: 'mcp', configured: false }
+    ]);
+    expect(capabilities.integrations_error).toBeUndefined();
+  });
+
+  it('never puts an integration\'s value in what the agent is sent, not even masked', async () => {
+    const { capabilities } = await service.snapshot();
+    const sent = JSON.stringify(capabilities.integrations);
+    expect(sent).not.toContain('sk-');
+    expect(sent).not.toContain('****');
+    expect(sent).not.toContain('secret');
+    expect(sent).not.toContain('https://');
+  });
+
+  it('reports integrations_error when the list could not be read, and keeps the models', async () => {
+    const loaded = await llmLoader.load();
+    llmLoader.load.and.returnValue(Promise.resolve({ ...loaded, integrations: null }));
+    const { capabilities } = await service.snapshot();
+    expect(capabilities.integrations).toEqual([]);
+    expect(capabilities.integrations_error).toContain('could not be read');
+    expect(capabilities.llm_models.length).toBe(3);
+  });
+
+  it('lists the names of the agent\'s Globals, never their values', async () => {
+    dashboardService.selectedChatbot = { subtype: 'chatbot', attributes: { globals: [
+      { key: 'openrouter_api_key', value: 'sk-or-v1-secret' },
+      { key: 'VOICE_PROVIDER', value: 'elevenlabs', visible: true },
+      { key: 'bad name', value: 'x' },
+      { key: 'openrouter_api_key', value: 'dup' }
+    ] } };
+    const { capabilities } = await service.snapshot();
+    expect(capabilities.globals).toEqual(['openrouter_api_key', 'VOICE_PROVIDER']);
+    expect(JSON.stringify(capabilities)).not.toContain('sk-or-v1-secret');
+  });
+
+  it('lists no Globals when the agent has none', async () => {
+    const { capabilities } = await service.snapshot();
+    expect(capabilities.globals).toEqual([]);
   });
 
   it('reads the models again on every call', async () => {

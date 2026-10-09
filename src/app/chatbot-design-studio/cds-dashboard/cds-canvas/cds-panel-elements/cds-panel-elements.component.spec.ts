@@ -1,11 +1,11 @@
 import { CdsPanelElementsComponent } from './cds-panel-elements.component';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, Subject, of } from 'rxjs';
 
 describe('CdsPanelElementsComponent start points', () => {
   const webhook$ = new BehaviorSubject<any>(null);
-  const build = (subtype?: string, readOnly: ReadOnlyService = new ReadOnlyService()) => {
+  const build = (subtype?: string, readOnly: ReadOnlyService = new ReadOnlyService(), manager?: any) => {
     webhook$.next(null);
     LoggerInstance.setInstance({ log() {}, warn() {}, error() {}, debug() {}, info() {} } as any);
     const dashboard: any = { selectedChatbot: { subtype } };
@@ -16,7 +16,7 @@ describe('CdsPanelElementsComponent start points', () => {
     // master-pre V3 left panel: translate (search filter) and left panel state (close), unused by the start points
     const translate: any = { instant: (k: string) => k };
     const leftPanelState: any = { close: () => {} };
-    const c = new CdsPanelElementsComponent(plan, dashboard, translate, leftPanelState, catalog, projects, readOnly, { webhook$ } as any);
+    const c = new CdsPanelElementsComponent(plan, dashboard, translate, leftPanelState, catalog, projects, readOnly, { webhook$ } as any, manager);
     c.ngOnInit();
     return c;
   };
@@ -45,12 +45,35 @@ describe('CdsPanelElementsComponent start points', () => {
     });
   });
 
-  it('items: Web always disabled, Webhook enabled when absent', () => {
+  it('items: Web disabled while the start is on, Webhook enabled when absent', () => {
     const c = build('chatbot');
     c.intents = [start];
     const items = c.buildStartPointItems();
     expect(items[0].value.disabled).toBe(true);
     expect(items[1].value.disabled).toBe(false);
+  });
+
+  it('palette offers Web start only when it is disabled, and follows the manager', () => {
+    const c = build('chatbot');
+    const web = () => c.actionsByCategory['START_POINTS'][0].value;
+    const disabledStart = { ...start, attributes: { web_start_disabled: true } };
+    c.intents = [start];
+    c.ngOnChanges();
+    expect(web().disabled).toBe(true);
+    c.intents = [disabledStart];
+    c.ngOnChanges();
+    expect(web().disabled).toBe(false);
+    // the intent is mutated in place (no ngOnChanges): the manager's event rebuilds the items
+    const changed$ = new Subject<any>();
+    const c2 = build('chatbot', new ReadOnlyService(), { webStartChanged$: changed$ });
+    const live: any = { ...start, attributes: {} };
+    c2.intents = [live];
+    c2.ngOnChanges();
+    expect(c2.actionsByCategory['START_POINTS'][0].value.disabled).toBe(true);
+    live.attributes.web_start_disabled = true;
+    changed$.next({ intent: live, disabled: true });
+    expect(c2.actionsByCategory['START_POINTS'][0].value.disabled).toBe(false);
+    c2.ngOnDestroy();
   });
 
   it('Webhook disabled with tooltip when a marker block is present', () => {
