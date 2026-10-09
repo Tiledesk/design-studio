@@ -182,12 +182,19 @@ export class AgentChatHostService {
       // anything already says that its fallback goes nowhere (V3-S8). Optional
       // call: a stand-in FlowOpsService without it reads as "nothing to say".
       const v3Warnings: string[] = isV3 ? (this.flowOps.fallbackWarnings?.() || []) : [];
+      // What the studio repaired when it opened the flow (missing `#`, dangling links, the
+      // connectors list): the agent reads it as data, not as something to redo.
+      const repair = this.intentService.lastRepairReport;
       return {
         ...this.flowOps.readFlow(),
         family,
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),
-        ...(v3Warnings.length ? { v3_warnings: v3Warnings } : {})
+        ...(v3Warnings.length ? { v3_warnings: v3Warnings } : {}),
+        ...(repair ? { repair_report: {
+          counts: repair.counts, changed_intent_ids: repair.changedIntentIds,
+          unresolved: repair.unresolved, connectors: repair.collection, saved: repair.saved ?? null,
+        } } : {})
       };
     });
 

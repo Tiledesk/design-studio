@@ -8,6 +8,9 @@
 *Tiledesk SRL*
 
 # this branch 09/10/2026
+- **added**: all'apertura di un agente il flusso viene riparato in un passaggio solo (`#` mancanti su ogni destinazione, pallino e bottoni compresi; id mancanti; collegamenti verso blocchi che non esistono piu'; pallino stantio dei blocchi Return; attributi visivi orfani) e le riparazioni vengono salvate subito, solo per i blocchi toccati. I collegamenti per nome dei flussi vecchi non vengono piu' cancellati: restano e vengono segnalati
+- **added**: l'agente ha una lista unica dei suoi connettori, salvata nei suoi attributi (`connectors`), costruita dalle action all'apertura e riconciliata a ogni apertura: se non coincide con le action, vincono le action e la differenza finisce nel rapporto. L'aspetto dei connettori (nascosto, etichetta) viaggia nella lista. La chat AI riceve il rapporto delle riparazioni con `get_flow`
+- **fixed**: incollando un blocco non si azzera piu' ogni testo che comincia per `#`, solo le destinazioni; e la cancellazione di un blocco non si ferma piu' su un attributo visivo senza id
 - **added**: il catalogo delle uscite dei connettori: un'unica tabella, per tipo di action, da cui si ricavano i connettori di un blocco e di un flusso intero nello stesso formato, con una spec di parita' che dimostra sui flussi di prova che produce gli stessi connettori del codice attuale. Non cambia ancora nulla sul canvas
 - **fixed**: negli agenti V3 il blocco con un Sub Agent nasconde il pallino di uscita come le altre action con uscite proprie: mancava dall'elenco
 - **added**: infrastruttura dei test per il lavoro sui connettori (`npm run test:connectors`), con la cartella delle fixture e il documento di fase del refactor dei connettori

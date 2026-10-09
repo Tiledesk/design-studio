@@ -10,7 +10,11 @@ import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
 import { LLM_MODEL } from '../utils-ai_models';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
-import { fixActionDestinationHashes } from '../utils-connectors';
+import { firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { ConnectorStore } from '../connectors/connector-store.service';
+import { CONNECTORS_CONFIG } from '../connectors/connector-config';
+import { NormalizeResult, RepairReport, normalizeFlow, preparedPastedIntent } from '../connectors/flow-normalizer';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -88,10 +92,14 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService,
-    private savingStateService: SavingStateService
+    private savingStateService: SavingStateService,
+    private connectorStore?: ConnectorStore
   ) {
 
   }
+
+  /** Il rapporto delle riparazioni fatte all'ultima apertura del flusso (vedi flow-normalizer). */
+  public lastRepairReport: RepairReport | null = null;
 
 
 
@@ -318,17 +326,22 @@ export class IntentService {
   public async getAllIntents(id_faq_kb): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.faqService.getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
+        let normalized: NormalizeResult | null = null;
         if (faqs) {
-          this.patchActionId(faqs);
-          this.listOfIntents = JSON.parse(JSON.stringify(faqs));
-          this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
-          this.intentAnalyzer();
+          // Il flusso viene riparato e la lista dei connettori costruita PRIMA di entrare nello
+          // stato: il canvas disegna gia' dati puliti. Il salvataggio delle riparazioni parte
+          // dopo, senza far aspettare chi ha chiesto il flusso.
+          normalized = this.normalizeLoadedFlow(faqs, id_faq_kb);
+          this.listOfIntents = JSON.parse(JSON.stringify(normalized.intents));
+          this.prevListOfIntent = JSON.parse(JSON.stringify(normalized.intents));
         } else {
           this.listOfIntents = [];
           this.prevListOfIntent = [];
+          this.connectorStore?.load(null);
         }
         this.refreshIntents();
         resolve(true);
+        if (normalized) { void this.persistRepairs(normalized, id_faq_kb); }
       }, (error) => {
         this.logger.error('ERROR: ', error);
         reject(false);
@@ -344,53 +357,96 @@ export class IntentService {
   }
 
   
-  private intentAnalyzer() {
-    this.listOfIntents.forEach(intent => {
-      if (intent.actions) {
-        intent.actions = intent.actions.filter(obj => obj !== null);
+  /**
+   * Ripara il flusso appena caricato e costruisce la lista dei connettori del bot.
+   *
+   * E' il normalizzatore (connectors/flow-normalizer.ts) a fare il lavoro: `#` mancanti, id
+   * tecnici, riferimenti a blocchi che non esistono, pallino dei blocchi Return, attributi
+   * visivi orfani; poi la lista, riconciliata con quella salvata negli attributi del bot
+   * (se non coincidono vincono le action). Il rapporto resta a disposizione di chi lo chiede
+   * (la chat AI lo riceve con get_flow) e finisce in console in una riga.
+   */
+  private normalizeLoadedFlow(faqs: any[], id_faq_kb: string): NormalizeResult {
+    const stored = CONNECTORS_CONFIG.useCollection ? this.dashboardService?.selectedChatbot?.attributes?.connectors : null;
+    const result = normalizeFlow(faqs, stored, { uid: generateShortUID, isV3: !!this.dashboardService?.isV3, faqKbId: id_faq_kb });
+    this.lastRepairReport = result.report;
+    if (this.connectorStore) {
+      this.connectorStore.lastRepairReport = result.report;
+      this.connectorStore.load(CONNECTORS_CONFIG.useCollection ? result.collection : null);
+    }
+    const r = result.report;
+    this.logger.info('[FLOW-REPAIR]', id_faq_kb, 'riparazioni:', r.counts, 'blocchi da salvare:', r.changedIntentIds.length,
+      'irrisolti:', r.unresolved.length, 'lista:', r.collection.existed ? (r.collection.changed ? 'ricostruita' : 'invariata') : 'costruita', r.collection.records);
+    this.logger.log('[FLOW-REPAIR] dettaglio', r);
+    return result;
+  }
+
+  /**
+   * Salva sul server quello che il normalizzatore ha cambiato: i soli blocchi toccati, in
+   * blocco (`faq/ops_update`, senza passare da undo/redo: l'utente non ha fatto nulla da
+   * annullare) e la lista dei connettori negli attributi del bot. Salvaguardie, in ordine:
+   * niente da salvare, interruttore spento, un salvataggio dell'utente in corso (si aspetta),
+   * il flusso aperto e' cambiato nel frattempo (si lascia perdere), errore HTTP (riferito,
+   * nessun ritentativo: il primo salvataggio manuale del blocco lo porta su comunque).
+   */
+  private async persistRepairs(result: NormalizeResult, id_faq_kb: string): Promise<void> {
+    const report = result.report;
+    const needIntents = result.changedIntentIds.length > 0;
+    const needCollection = CONNECTORS_CONFIG.useCollection && result.collectionChanged;
+    if (!needIntents && !needCollection) { return; }
+    if (!CONNECTORS_CONFIG.repairSaveAtOpen) {
+      this.logger.info('[FLOW-REPAIR] salvataggio all\'apertura spento: riparazioni solo in memoria');
+      return;
+    }
+    report.saved = { intents: false, collection: false };
+    try {
+      if (this.savingStateService?.isSaving) {
+        await firstValueFrom(this.savingStateService.isSaving$.pipe(filter(saving => !saving)));
       }
-      if (this.isReservedIntent(intent.intent_display_name)) {
-        intent.attributes.readonly = true;
+      if (this.dashboardService?.id_faq_kb !== id_faq_kb) { return; }
+      if (needIntents) {
+        await this.saveRepairedIntents(result.changedIntentIds, id_faq_kb);
+        report.saved.intents = true;
       }
-    });
+      if (needCollection) {
+        await this.saveConnectorsCollection(result.collection, id_faq_kb);
+        report.saved.collection = true;
+      }
+      this.logger.info('[FLOW-REPAIR] salvato:', report.saved);
+    } catch (error: any) {
+      report.saveError = String(error?.message || error);
+      this.logger.error('[FLOW-REPAIR] salvataggio fallito:', error);
+    }
+  }
+
+  private async saveRepairedIntents(intentIds: string[], id_faq_kb: string): Promise<void> {
+    const size = Math.max(1, CONNECTORS_CONFIG.repairSaveChunk);
+    for (let i = 0; i < intentIds.length; i += size) {
+      const operations = intentIds.slice(i, i + size)
+        .map(id => this.listOfIntents.find(intent => intent.intent_id === id))
+        .filter(intent => !!intent)
+        .map(intent => ({ type: 'put', intent: JSON.parse(JSON.stringify(intent)) }));
+      if (operations.length === 0) { continue; }
+      await this.opsUpdate({ id_faq_kb, operations }, false);
+    }
+  }
+
+  private async saveConnectorsCollection(collection: any, id_faq_kb: string): Promise<void> {
+    await firstValueFrom(this.faqKbService.patchAttributes(id_faq_kb, { connectors: collection }));
+    const chatbot = this.dashboardService?.selectedChatbot;
+    if (chatbot) {
+      chatbot.attributes = { ...(chatbot.attributes || {}), connectors: collection };
+    }
   }
 
   /**
    * patchActionId
-   * @param faqs 
-   * quando creo un nuovo bot gli elementi welcome e defaultfallback non hanno un _tdActionId
-   * perchè generati dal server. In questo caso è necessario assegnarne uno.
+   * @param faqs
+   * La vecchia riparazione all'apertura (`#` mancanti, `_tdActionId`, `_tdCaseId`): oggi e' un
+   * nome per il normalizzatore, che fa anche il resto. Resta perche' qualcuno la chiama ancora.
    */
   public patchActionId(faqs){
-    // Una destinazione salvata senza '#' (l'id nudo di un blocco) il motore la
-    // cerca come NOME di blocco, non la trova e ferma il flusso, mentre il canvas
-    // la disegna collegata. Qui si ripara al caricamento: solo se il valore e'
-    // l'id di un blocco del flusso e non il nome di un altro, cosi' un flusso
-    // vecchio che punta a un blocco per nome resta com'e'. Si salva con il
-    // primo salvataggio del blocco.
-    const intentIds = new Set((faqs || []).map(faq => faq?.intent_id).filter(id => !!id));
-    const intentNames = new Set((faqs || []).map(faq => faq?.intent_display_name).filter(name => !!name));
-    const isIntentId = (id: string) => intentIds.has(id) && !intentNames.has(id);
-    faqs.forEach(element => {
-      (element.actions || []).forEach(action => fixActionDestinationHashes(action, isIntentId));
-      element.actions.forEach(action => {
-        if(!action._tdActionId || action._tdActionId === "UUIDV4"){
-          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
-        }
-        // Stessa ragione, un livello piu' sotto: il connettore di un caso della
-        // condizione a piu' uscite e' ancorato a `_tdCaseId`. Un flusso importato,
-        // scritto a mano o generato dalla chat puo' non averlo, e senza id il
-        // connettore nasce agganciato a `undefined`. Chi ce l'ha se lo tiene:
-        // e' cosi' che riordinare i casi non stacca i collegamenti.
-        if(Array.isArray(action.cases)){
-          action.cases.forEach(branch => {
-            if(branch && !branch._tdCaseId){
-              branch._tdCaseId = generateShortUID();
-            }
-          });
-        }
-      });
-    });
+    normalizeFlow(faqs, null, { uid: generateShortUID });
   }
  
 
@@ -1809,7 +1865,7 @@ export class IntentService {
       const connectorsList = intent.attributes?.connectors;
       if(!connectorsList) return;
       const filteredData = Object.keys(connectorsList)
-      .filter(key => !connectorsList[key].id.endsWith(intentId))
+      .filter(key => !connectorsList[key]?.id?.endsWith(intentId))
       .reduce((acc, key) => {
         acc[key] = connectorsList[key];
         return acc;
@@ -2064,9 +2120,10 @@ export class IntentService {
 
 
   private pasteIntentOntoStage(newIntent, prevIntent_id, newIntent_id){
-    let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
-    let intent = JSON.parse(elementJson);
-    intent = this.resetConnectors(intent);
+    // Nuovo id, nessun collegamento e nessun attributo visivo ereditato: lo fa il normalizzatore
+    // sulle sole destinazioni (prima si azzerava OGNI stringa che cominciava per `#`, e il
+    // nuovo id si scriveva con un `.replace` sul JSON che toccava solo la prima occorrenza).
+    let intent = preparedPastedIntent(JSON.parse(JSON.stringify(newIntent)), newIntent_id);
     // this.connectorService.createConnectorsOfIntent(intent);
     // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
     this.addNewIntentToListOfIntents(intent);
@@ -2074,25 +2131,6 @@ export class IntentService {
     this.setIntentSelected(intent.intent_id);
     this.saveNewIntent(intent, null, null);
     this.logger.log('[INTENT SERVICE] -> listOfIntents, ', intent);
-  }
-
-
-  private resetConnectors(json) {
-    let results = [];
-    function exploreObject(obj) {
-        if (typeof obj === 'object' && obj !== null) {
-            for (let key in obj) {
-                if (typeof obj[key] === 'string' && obj[key].startsWith("#")) {
-                    results.push({ key: key, value: obj[key] });
-                    obj[key] = "";
-                }
-                exploreObject(obj[key]);
-            }
-        }
-    }
-    exploreObject(json);
-    return json;
-    //return results;
   }
 
 
