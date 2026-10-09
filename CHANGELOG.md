@@ -7,6 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# this branch 09/10/2026
+- **changed**: negli agenti V3 i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota -- hanno tutti la stessa scheda: larghezza fissa, due righe di altezza fissa. Sopra, su fondo blu, icona, titolo e il pallino del connettore in uscita, in coda e staccato dal bordo; sotto, su fondo bianco, una riga che dice da dove si parte: per il Webhook start il metodo e il percorso dell'indirizzo, con l'indirizzo intero al passaggio del puntatore. Le pastiglie scure restano agli agenti legacy
+- **changed**: negli agenti V3 i blocchi di partenza mostrano un titolo leggibile -- *Web start*, *Webhook start*, *Default fallback* -- al posto del nome riservato, che tanto non si puo' cambiare
+- **changed**: l'intestazione del pannello di dettaglio di un blocco ha la stessa altezza per ogni blocco e il titolo nel blu della palette. Prima nei blocchi di partenza usciva piu' bassa, col titolo del colore del blocco e spostato di lato
+- **fixed**: trascinando un'azione sul flusso, l'immagine che segue il puntatore e' bianca, con gli angoli arrotondati dei blocchi, senza il fondo grigio del passaggio ne' l'icona accesa ne' il pulsante della descrizione. Prima era la foto della riga cosi' com'era sotto il puntatore
+
 # this branch 06/10/2026
 - **changed**: negli agenti V3 le icone dei blocchi riservati hanno un colore ciascuno, uguale sul flusso e nel pannello dei blocchi: il razzo del Web start verde, il Webhook start viola e la freccia della defaultFallback vuota azzurra. Sugli agenti legacy restano i colori di prima
 - **changed**: la chat AI si apre e si chiude da una sua linguetta, in cima alla striscia di sinistra sopra i subagent, con un'icona nuova: il pulsante nell'intestazione non c'e' piu'

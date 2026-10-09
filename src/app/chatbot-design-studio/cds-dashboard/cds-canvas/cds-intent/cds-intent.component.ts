@@ -87,6 +87,49 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     return this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
   }
 
+  /**
+   * V3: i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota --
+   * hanno tutti la stessa scheda a due righe: sopra icona e titolo, sotto una riga di testo.
+   * Solo sugli agenti V3: sui legacy restano le pastiglie di sempre.
+   */
+  public get isStartCard(): boolean {
+    return this.isV3 && (this.isStart || this.isDefaultFallbackLocked);
+  }
+
+  public get isWebhookStart(): boolean {
+    return this.intent?.intent_display_name === TYPE_INTENT_NAME.WEBHOOK;
+  }
+
+  /** L'icona della scheda: la stessa che il blocco ha nel pannello dei blocchi, col suo colore. */
+  public get startCardIcon(): { name: string; classes: string } {
+    if (this.isWebhookStart) { return { name: 'webhook', classes: 'material-icons start-card__icon--webhook' }; }
+    if (this.isStart) { return { name: 'rocket_launch', classes: 'material-icons-outlined start-card__icon--web' }; }
+    return { name: 'undo', classes: 'material-icons start-card__icon--fallback' };
+  }
+
+  /** La chiave del titolo che la scheda mostra al posto del nome riservato del blocco. */
+  public get startCardTitleKey(): string {
+    if (this.isWebhookStart) { return 'CDSCanvas.StartCard.WebhookTitle'; }
+    if (this.isStart) { return 'CDSCanvas.StartCard.WebTitle'; }
+    return 'CDSCanvas.StartCard.FallbackTitle';
+  }
+
+  /** La chiave della riga di testo sotto il titolo; per il webhook vale solo finche' l'indirizzo non c'e'. */
+  public get startCardTextKey(): string {
+    if (this.isWebhookStart) { return 'CDSCanvas.StartCard.WebhookText'; }
+    if (this.isStart) { return 'CDSCanvas.StartCard.WebText'; }
+    return 'CDSCanvas.StartCard.FallbackText';
+  }
+
+  /**
+   * Il percorso dell'indirizzo del webhook, senza host: e' la parte che dice qualcosa, e in una
+   * riga sola l'indirizzo intero non ci starebbe. L'indirizzo intero resta nel title.
+   */
+  public get webhookPath(): string {
+    if (!this.webhookUrl) { return ''; }
+    try { return new URL(this.webhookUrl).pathname; } catch { return this.webhookUrl; }
+  }
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;

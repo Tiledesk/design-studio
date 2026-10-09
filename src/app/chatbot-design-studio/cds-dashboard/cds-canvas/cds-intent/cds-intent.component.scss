@@ -847,53 +847,176 @@ cds-panel-intent-header.isStart ::ng-deep{
 /** V3 INTENT - blocco a una sola action, senza controlli inline **/
 .tds-v3-intent {
   padding: 2px;
-  /* La defaultFallback vuota e' una pastiglia, come lo start e come il ritorno
-     all'agente padre: non ha contenuto sotto il titolo, quindi non ha la forma
-     di una scheda. Il padding in cima la centra dentro la pastiglia. */
-  &.cds-fallback-locked {
-    padding: 0px;
-    border-radius: 10px;
-    width: 200px;
-    /* Fondo e contorno stanno qui e non inline: il template non passa [ngStyle]
-       alla defaultFallback vuota dei V3, che non prende il colore del blocco. */
-    background-color: #4b5052;
-    outline: none;
-    /* Selezionata: un anello grigio staccato dal bordo, al posto del contorno
-       inline che questo blocco non riceve. */
+  /* ------------------------------------------------------------------------------------
+     V3 - BLOCCO DI PARTENZA (.start-card): Web start, Webhook start e defaultFallback vuota.
+     Scheda a larghezza fissa e due righe di altezza fissa: intestazione scura con icona,
+     titolo e connettore in uscita; corpo bianco con una riga di testo. Il template della
+     scheda e' suo (vedi cds-intent.component.html), quindi qui non c'e' niente da forzare
+     del blocco generico: solo il contenitore .panel-intent-content va riportato a zero.
+     Misure e colori stanno in queste proprieta', cosi' si regolano in un punto solo.
+     Tutto vale solo dentro .tds-v3-intent: sui legacy restano le pastiglie.
+     ------------------------------------------------------------------------------------ */
+  --start-card-width: 264px;
+  --start-card-row: 36px;
+  --start-card-radius: 10px;
+  --start-card-border: #d6d8e3;
+  --start-card-header: var(--blu);     /* il blu della palette: dice "da qui si parte" */
+  --start-card-on-header: #ffffff;     /* titolo e icona sull'intestazione */
+  --start-card-surface: #ffffff;
+  --start-card-text: #3d3d3d;
+  --start-card-code-bg: #f1f2f7;
+  --start-card-ring: #b9bdd6;
+  --start-card-icon-web: rgb(52, 187, 126);     /* gli stessi del pannello dei blocchi */
+  --start-card-icon-webhook: #ba86ff;
+  --start-card-icon-fallback: rgb(50, 172, 255);
+
+  /* Il contenitore del blocco, azzerato: la scheda si disegna da sola. */
+  &.cds-start-card {
+    position: relative;
+    width: var(--start-card-width);
+    max-width: none;
+    height: auto;
+    padding: 0;
+    border-radius: var(--start-card-radius);
+    /* .isStart dichiara ancora i suoi unset!important: qui si vince con la stessa forza. */
+    background-color: var(--start-card-surface) !important;
+    outline: none !important;
+    cursor: grab;
+
     &.cds-intent-selected {
-      outline: rgb(184 186 201) solid 2px;
+      outline: 2px solid var(--start-card-ring) !important;
       outline-offset: 2px;
     }
-    /* Il fondo bianco del blocco e' uno span a tutta area con gli angoli vivi,
-       e l'ombra e' uno pseudo-elemento arrotondato a 10px: senza questi due,
-       la pastiglia mostra quattro angoli quadrati che le spuntano da sotto.
-       E' lo stesso inciampo annotato su .isReturnStack, che la' si risolve
-       nascondendo l'overlay -- qui il fondo bianco serve, quindi si arrotonda. */
-    .intent-background-overlay {
-      border-radius: 22px;
+    &.outline-border,
+    &.ripple-effect,
+    &.live-start-intent,
+    &.live-active-intent-pulse {
+      border-radius: var(--start-card-radius);
+      min-height: 0;
     }
     &::before {
-      border-radius: 22px;
+      border-radius: var(--start-card-radius);
     }
-    .pic-title-text {
-      padding: 9px;
-      /* Il padding in cima del titolo non si puo' dettare da qui: quel div e'
-         contenuto di cds-panel-intent-header, che lo stile di questo componente
-         non raggiunge. Sta in panel-intent-header.component.scss. */
+    /* Il fondo bianco del blocco generico e la maniglia di trascinamento: il bianco lo da' la
+       scheda, e la maniglia coprirebbe il connettore -- la scheda si trascina da ogni suo punto. */
+    .intent-background-overlay,
+    .header-draggable {
+      display: none !important;
+    }
+  }
+
+  .start-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border: 1px solid var(--start-card-border);
+    border-radius: var(--start-card-radius);
+    font-family: var(--font-family-poppins);
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: var(--start-card-row);
+      padding: 0 10px 0 12px;
+      background: var(--start-card-header);
+      color: var(--start-card-on-header);
+      /* Gli angoli in alto seguono quelli della scheda; niente overflow hidden, che taglierebbe
+         il riquadro col nome del blocco collegato che il connettore apre al passaggio. */
+      border-radius: calc(var(--start-card-radius) - 1px) calc(var(--start-card-radius) - 1px) 0 0;
     }
 
+    &__icon {
+      flex: 0 0 auto;
+      font-size: 18px;
+      line-height: 1;
+      color: inherit;
+      &--web      { color: var(--start-card-icon-web); }
+      &--webhook  { color: var(--start-card-icon-webhook); }
+      &--fallback { color: var(--start-card-icon-fallback); }
+    }
+
+    &__title {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Il connettore in uscita, in coda all'intestazione: staccato dal bordo dal padding
+       dell'intestazione, centrato sulla sua altezza. */
+    &__connector {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+
+      /* Il connettore del blocco (defaultFallback vuota) arriva con la regola globale di
+         connector-styles.scss che lo mette assoluto fuori dal blocco, in basso a destra, e col
+         pallino piccolo: qui sta in coda all'intestazione come quello dello start, con lo stesso
+         pallino. ::ng-deep perche' cds-connector e' nella view di cds-action-intent; resta
+         delimitato dal selettore della scheda. */
+      &--block ::ng-deep cds-connector.connector-isLast {
+        position: static;
+        .point-connector-empty {
+          width: 18px;
+          height: 18px;
+          border: 1px solid rgb(255, 255, 255);
+          background: rgb(168, 168, 174);
+          color: inherit;
+        }
+        .point-connector {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgb(255, 255, 255);
+          margin: 0;
+        }
+      }
+    }
+
+    &__body {
+      display: flex;
+      align-items: center;
+      height: var(--start-card-row);
+      padding: 0 12px;
+      background: var(--start-card-surface);
+      border-radius: 0 0 calc(var(--start-card-radius) - 1px) calc(var(--start-card-radius) - 1px);
+      overflow: hidden;
+    }
+
+    &__text {
+      flex: 1;
+      min-width: 0;
+      font-size: 12px;
+      line-height: 1.3;
+      color: var(--start-card-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      /* Metodo e percorso del webhook: a caratteri fissi, in un riquadro chiaro. */
+      &--code {
+        flex: 0 1 auto;
+        max-width: 100%;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: var(--start-card-code-bg);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 11px;
+        b { font-weight: 600; margin-right: 2px; }
+      }
+    }
   }
+
   .pic-header {
     padding: 0px;
   }
   .pic-title-text {
     padding: 4px 8px 10px;
-  }
-  /* Lo start e' una pastiglia col solo titolo dentro: i 10px di coda qui sopra
-     servono a staccare il titolo dall'action che lo segue, e dove non c'e'
-     nessuna action sbilanciano il blocco verso il basso. */
-  .pic-title-text.isStart {
-    padding: 4px 8px 4px;
   }
   /* In V3 il footer resta nel DOM ma non contiene nulla di cliccabile:
      niente altezza residua, niente margine negativo, niente cursore da bottone. */

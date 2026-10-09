@@ -306,6 +306,14 @@
     "CDSCanvas": {
         "DeprecationMessage": "Deprecated. Use the new <a href=\"{{aiPromptUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\"><b>{{aiPrompt}}</b></a> action.",
         "EnterIntentName": "Enter block name",
+        "StartCard": {
+            "WebTitle": "Web start",
+            "WebText": "Starts from the web widget",
+            "WebhookTitle": "Webhook start",
+            "WebhookText": "Starts from an HTTP call",
+            "FallbackTitle": "Default fallback",
+            "FallbackText": "Where every next message lands"
+        },
         "ErrorBlockName": "The block name must be unique",
         "ErrorBlockCharacter": "The block name cannot contain special characters",
         "DragAnImageOrClick": "drag an image here or click to select them",

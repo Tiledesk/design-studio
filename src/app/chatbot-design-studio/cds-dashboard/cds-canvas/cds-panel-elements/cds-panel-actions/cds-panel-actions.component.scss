@@ -241,6 +241,41 @@ $base-padding: 3px;
     border-radius: 8px;
 }
 
+/* La copia della riga che segue il puntatore durante il trascinamento (la crea onDragStart e
+   sta nel documento per un istante solo). Nasce dalla riga sotto il puntatore, quindi qui si
+   spengono tutti i segni del passaggio -- fondo grigio, icona accesa, pulsante della
+   descrizione -- e si dichiarano fondo bianco e gli angoli dei blocchi del flusso: nell'elenco
+   la riga ha gli spigoli vivi, arrotondata e' solo la copia, che viaggia da sola sul canvas.
+   Il token e' quello globale, non l'alias che il blocco si dichiara sul proprio host. */
+.actions-btns-wpr.action-drag-ghost {
+    &,
+    &:hover {
+        background: var(--ds-surface, #fff);
+        border-radius: var(--border-radius-base-preview, 8px);
+        overflow: hidden;
+        transition: none;
+    }
+
+    // L'icona come a riposo: grigia dal suo filtro, perche' a riposo e' quel filtro a tingerla
+    // e toglierlo del tutto la farebbe nera.
+    .action-btn-icon:first-of-type,
+    &:hover .action-btn-icon:first-of-type {
+        color: var(--ds-ink-2, #4a4a47);
+
+        .svg-icon,
+        img {
+            filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+            transition: none;
+        }
+    }
+
+    .action-info-btn,
+    &:hover .action-info-btn {
+        opacity: 0;
+        transition: none;
+    }
+}
+
 /* Le azioni che il piano non comprende: prima lo stato lo segnava il CDK con una classe sua,
    ora lo dichiara il template -- e' la stessa riga, con un nome che diciamo noi. */
 .action-box.is-disabled{
