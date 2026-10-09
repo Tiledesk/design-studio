@@ -13,11 +13,14 @@
 - **changed**: negli agenti V3 i blocchi di partenza mostrano un titolo leggibile -- *Web start*, *Webhook start*, *Default fallback* -- al posto del nome riservato, che tanto non si puo' cambiare
 - **changed**: l'intestazione del pannello di dettaglio di un blocco ha la stessa altezza per ogni blocco e il titolo nel blu della palette. Prima nei blocchi di partenza usciva piu' bassa, col titolo del colore del blocco e spostato di lato
 - **fixed**: trascinando un'azione sul flusso, l'immagine che segue il puntatore e' bianca, con gli angoli arrotondati dei blocchi, senza il fondo grigio del passaggio ne' l'icona accesa ne' il pulsante della descrizione. Prima era la foto della riga cosi' com'era sotto il puntatore
+# 1.40.16-rc28
+- **changed** (V3/design-vibe-coder): V3 start boxes (web, webhook, empty default fallback) share one fixed-size two-row card: blue header with icon, readable title and the out connector; white body with a one-line description (webhook: `POST` + path)
+- **changed** (V3/design-vibe-coder): the block detail panel header has a fixed height and a `--blu` title
+- **fixed** (V3/design-vibe-coder): the drag image of an action is white with rounded corners, without the hover background
+- **changed** (V3/design-vibe-coder-STAGE): the Scheduled start uses the same card, with its schedule summary and status badge
+- **changed** (V3/design-vibe-coder-STAGE): the white drag image also covers the shared action list and the events list
+- **fixed** (master-pre): in the start box detail panel the title is `--blu` and centred, every icon is `--blu` and the buttons are compact
 
-# V3/design-vibe-coder 06/10/2026
-- **changed**: V3 start and fallback icons share one colour on the flow and in the blocks panel: web start green, webhook start violet, scheduled start orange, empty default fallback light blue
-- **changed**: V3 empty default fallback is dark like the start block, with a white title
-- **changed**: the labels of the three start boxes are white
 # 1.40.16-rc27
 - **added** (start-boxes-manager): the AI chat manages the flow's start boxes with the new `start_point` tool: adds, configures and removes the Webhook and Scheduled boxes, and can disable the Web start. Removing a box asks the user to confirm; the answer of `get_project_capabilities` lists each start box with its status and settings
 - **changed** (start-boxes-manager): AI chat edits that touch start boxes are guarded (no duplicate box, no edits to a box being changed, read-only flows refused) and placed by the layout next to the other start boxes
