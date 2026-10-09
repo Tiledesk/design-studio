@@ -8,6 +8,8 @@
 *Tiledesk SRL*
 
 # this branch 09/10/2026
+- **added**: il catalogo delle uscite dei connettori: un'unica tabella, per tipo di action, da cui si ricavano i connettori di un blocco e di un flusso intero nello stesso formato, con una spec di parita' che dimostra sui flussi di prova che produce gli stessi connettori del codice attuale. Non cambia ancora nulla sul canvas
+- **fixed**: negli agenti V3 il blocco con un Sub Agent nasconde il pallino di uscita come le altre action con uscite proprie: mancava dall'elenco
 - **added**: infrastruttura dei test per il lavoro sui connettori (`npm run test:connectors`), con la cartella delle fixture e il documento di fase del refactor dei connettori
 - **fixed**: nel pannello di dettaglio dei blocchi di partenza il titolo sta accanto all'icona senza sovrapporsi, nel blu della palette come l'icona, e i pulsanti hanno le misure compatte degli altri campi invece di quelle larghe del tema. Vale anche sugli agenti legacy: il pannello e' lo stesso
 - **changed**: negli agenti V3 i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota -- hanno tutti la stessa scheda: larghezza fissa, due righe di altezza fissa. Sopra, su fondo blu, icona, titolo e il pallino del connettore in uscita, in coda e staccato dal bordo; sotto, su fondo bianco, una riga che dice da dove si parte: per il Webhook start il metodo e il percorso dell'indirizzo, con l'indirizzo intero al passaggio del puntatore. Le pastiglie scure restano agli agenti legacy

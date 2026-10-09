@@ -1,0 +1,226 @@
+[
+ {
+  "intent_id": "start",
+  "intent_display_name": "start",
+  "actions": [
+   {
+    "_tdActionId": "a_start",
+    "_tdActionType": "intent",
+    "intentName": "#welcome"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "defaultFallback",
+  "intent_display_name": "defaultFallback",
+  "actions": [],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_defaultFallback",
+    "_tdActionType": "intent",
+    "intentName": "#welcome"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "welcome",
+  "intent_display_name": "welcome",
+  "actions": [
+   {
+    "_tdActionId": "a_reply",
+    "_tdActionType": "reply",
+    "text": "Ciao",
+    "attributes": {
+     "attachment": {
+      "type": "template",
+      "buttons": [
+       {
+        "uid": "b1",
+        "type": "action",
+        "value": "Uno",
+        "action": "#blk1"
+       },
+       {
+        "uid": "b2",
+        "type": "action",
+        "value": "Due",
+        "action": "#blk2{\"k\":\"v\"}"
+       },
+       {
+        "uid": "b3",
+        "type": "url",
+        "value": "Sito",
+        "link": "https://example.com"
+       },
+       {
+        "uid": "b4",
+        "type": "text",
+        "value": "Testo"
+       },
+       {
+        "uid": "b5",
+        "type": "action",
+        "value": "Vuoto",
+        "action": ""
+       }
+      ]
+     }
+    },
+    "settings": {
+     "noInputIntent": "#blk3",
+     "noMatchIntent": "#blk1"
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_welcome",
+    "_tdActionType": "intent",
+    "intentName": "#blk1"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "rnd",
+  "intent_display_name": "random",
+  "actions": [
+   {
+    "_tdActionId": "a_rnd",
+    "_tdActionType": "randomreply",
+    "attributes": {
+     "attachment": {
+      "buttons": [
+       {
+        "uid": "b6",
+        "type": "action",
+        "value": "Tre",
+        "action": "#blk3"
+       }
+      ]
+     }
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_rnd",
+    "_tdActionType": "intent",
+    "intentName": ""
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "blk1",
+  "intent_display_name": "blocco uno",
+  "actions": [
+   {
+    "_tdActionId": "a_r1",
+    "_tdActionType": "reply",
+    "text": "uno"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_blk1",
+    "_tdActionType": "intent",
+    "intentName": "#blk2"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "blk2",
+  "intent_display_name": "blocco due",
+  "actions": [
+   {
+    "_tdActionId": "a_r2",
+    "_tdActionType": "reply",
+    "text": "due"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_blk2",
+    "_tdActionType": "intent",
+    "intentName": ""
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "blk3",
+  "intent_display_name": "blocco tre",
+  "actions": [
+   {
+    "_tdActionId": "a_r3",
+    "_tdActionType": "reply",
+    "text": "tre"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ }
+]
