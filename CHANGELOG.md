@@ -7,10 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# V3/connectors-refactor 12/10/2026
-- **changed**: the V3 agent JSON keeps no trace of V2-style connectors: destination keys of actions and of the block dot are removed (no longer emptied), button destinations too (their parameter tail travels in the list) and the per-block visual attributes (looks live in the list). Blocks still carrying them are saved clean after the list, and the in-memory model is rebuilt from the list on open. Requires the engine that also fills buttons from the list
-- **fixed**: in V3 agents the contracted connector (hidden line, block name box in its place) was off: the box showed even with the line visible, on button and fallback dots, and when really contracted it dragged the dot inside the block. The box now shows only for a hidden line and the dot stays on the block edge in both states
-- **fixed**: in V3 agents a block created by dragging a connector onto the canvas was connected and the list saved, but the block itself was not: drawing did not wait for the new block to enter the DOM. It now waits, as in production, and the block is saved
+# 1.40.16-rc30
+- **changed** (V3/connectors-refactor): the V3 agent JSON keeps no trace of V2-style connectors: destination keys of actions and block dot are removed (not emptied), buttons included (their parameter tail travels in the list), as are the per-block visual attributes (looks live in the list). Blocks still carrying them are saved clean after the list; the in-memory model is rebuilt from the list on open. Requires the engine that also fills buttons from the list
+- **fixed** (V3/connectors-refactor): in V3 agents the contracted connector box showed even with the line visible, and when really contracted it dragged the dot inside the block; the box now shows only for a hidden line and the dot stays on the block edge
+- **fixed** (V3/connectors-refactor): in V3 agents a block created by dragging a connector onto the canvas was connected but not saved, since drawing did not wait for the new block to enter the DOM; it now waits, as in production
 
 # 1.40.16-rc29
 - **changed** (V3/connectors-refactor): V3 agents keep their connectors in a list saved in the agent attributes, built from the actions on first open. On open the list wins (every exit read from it, links to deleted blocks dropped) and the agent JSON is cleaned of V2 destinations: blocks saved with empty fields, buttons excluded, after the list. After every save the list realigns and destination fields leave empty. A switch, on, controls the cleanup and requires the engine that reads the list. The AI chat gets the list and the repair report for V3 agents only
