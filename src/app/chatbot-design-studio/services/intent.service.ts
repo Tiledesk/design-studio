@@ -408,7 +408,7 @@ export class IntentService {
    */
   private normalizeLoadedFlow(faqs: any[], id_faq_kb: string): NormalizeResult {
     const stored = this.dashboardService?.selectedChatbot?.attributes?.connectors;
-    const result = normalizeFlow(faqs, stored, { uid: generateShortUID, isV3: true, faqKbId: id_faq_kb, collectionWins: true });
+    const result = normalizeFlow(faqs, stored, { uid: generateShortUID, isV3: true, faqKbId: id_faq_kb, collectionWins: true, cleanDestinations: CONNECTORS_CONFIG.v3CleanDestinations });
     this.lastRepairReport = result.report;
     if (this.connectorStore) {
       this.connectorStore.lastRepairReport = result.report;
@@ -418,8 +418,9 @@ export class IntentService {
     const r = result.report;
     this.logger.info('[CONNECTORS] agente V3', id_faq_kb + ': connettori dalla lista del bot',
       r.collection.existed
-        ? '(lista trovata; uscite riscritte dalla lista: ' + (r.counts['projected-from-collection'] || 0) + ')'
-        : '(lista assente: costruita dalle action, viene salvata)');
+        ? '(lista trovata; uscite riempite dalla lista: ' + r.collection.projected + ')'
+        : '(lista assente: costruita dalle action, viene salvata)',
+      'blocchi da ripulire dalle destinazioni V2:', (r.counts['v2-destination-still-saved'] ? r.changedIntentIds.length : 0));
     this.logger.info('[FLOW-REPAIR]', id_faq_kb, 'riparazioni:', r.counts, 'blocchi da salvare:', r.changedIntentIds.length,
       'irrisolti:', r.unresolved.length, 'lista:', r.collection.existed ? (r.collection.changed ? 'ricostruita' : 'invariata') : 'costruita', r.collection.records);
     this.logger.log('[FLOW-REPAIR] dettaglio', r);
@@ -449,13 +450,15 @@ export class IntentService {
         await firstValueFrom(this.savingStateService.isSaving$.pipe(filter(saving => !saving)));
       }
       if (this.dashboardService?.id_faq_kb !== id_faq_kb) { return; }
-      if (needIntents) {
-        await this.saveRepairedIntents(result.changedIntentIds, id_faq_kb);
-        report.saved.intents = true;
-      }
+      // Prima la lista, poi i blocchi: i blocchi partono con le destinazioni V2 ripulite, e senza
+      // la lista salvata quei collegamenti non esisterebbero piu' da nessuna parte.
       if (needCollection) {
         await this.saveConnectorsCollection(result.collection, id_faq_kb);
         report.saved.collection = true;
+      }
+      if (needIntents) {
+        await this.saveRepairedIntents(result.changedIntentIds, id_faq_kb);
+        report.saved.intents = true;
       }
       this.logger.info('[FLOW-REPAIR] salvato:', report.saved);
     } catch (error: any) {
@@ -1989,7 +1992,7 @@ export class IntentService {
       // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`
       // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
       payload = applyConditionSaveModeToPayload(payload);
-      if (this.dashboardService?.isV3 && CONNECTORS_CONFIG.v3StripDestinationsAtSave) {
+      if (this.dashboardService?.isV3 && CONNECTORS_CONFIG.v3CleanDestinations) {
         // V3: sul server i campi di destinazione vanno vuoti (tranne i bottoni): la verita' e' la
         // lista del bot. Solo sul payload: il modello che il canvas disegna resta pieno.
         stripDestinations((payload?.operations || []).map((op: any) => op?.intent).filter((intent: any) => !!intent));

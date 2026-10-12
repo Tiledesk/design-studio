@@ -27,24 +27,54 @@ describe('ConnectorService — la facciata V2/V3', () => {
     { intent_id: 'b', intent_display_name: 'b', actions: [], attributes: {} },
   ];
 
-  it('per un agente V2 risponde il servizio di master, e cio\' che e\' nato col V3 non fa nulla', async () => {
+  it('per un agente V2 risponde il servizio di master, e il V3 non viene mai chiamato', async () => {
     const { facade, legacy, v3 } = build(false);
     expect(facade.isV3).toBeFalse();
     expect(facade.impl).toBe(legacy);
     spyOn(v3, 'blockRendered');
     spyOn(v3, 'missingConnectorIds');
     spyOn(v3, 'refreshConnectorsAroundIntent');
+    spyOn(v3, 'ensureConnectorsDrawn');
+    spyOn(legacy, 'createConnectorsOfIntent').and.returnValue(Promise.resolve());
+    spyOn(legacy, 'updateConnector').and.returnValue(Promise.resolve());
     facade.blockRendered('a');
-    await facade.refreshConnectorsAroundIntent('a', []);
     const intents = flusso();
     facade.syncIntents(intents);
     expect(legacy.listOfIntents).toBe(intents);
+    // nessun collegamento: niente da aspettarsi, niente da disegnare
     expect(facade.expectedConnectorIds(intents[0])).toEqual([]);
     expect(facade.missingConnectorIds(intents)).toEqual([]);
     expect(await facade.ensureConnectorsDrawn(intents)).toEqual({ missing: [], redrawnBlocks: 0, stillMissing: [] });
+    expect(legacy.createConnectorsOfIntent).not.toHaveBeenCalled();
+    await facade.refreshConnectorsAroundIntent('b', intents);
     expect(v3.blockRendered).not.toHaveBeenCalled();
     expect(v3.missingConnectorIds).not.toHaveBeenCalled();
     expect(v3.refreshConnectorsAroundIntent).not.toHaveBeenCalled();
+    expect(v3.ensureConnectorsDrawn).not.toHaveBeenCalled();
+  });
+
+  it('V2: i connettori mancanti e il ridisegno intorno a un blocco nuovo passano dal legacy, come prima del refactor', async () => {
+    const { facade, legacy } = build(false);
+    const drawn: string[] = [];
+    spyOn(legacy, 'createConnectorsOfIntent').and.callFake(async (intent: any) => { drawn.push(intent.intent_id); });
+    spyOn(legacy, 'updateConnector').and.returnValue(Promise.resolve());
+    const intents = flusso();
+    intents[0].actions[0].trueIntent = '#b';
+    intents[1].attributes = { nextBlockAction: { _tdActionId: 'n_b', _tdActionType: 'intent', intentName: '#a' } };
+    facade.syncIntents(intents);
+    expect(facade.expectedConnectorIds(intents[0])).toEqual(['a/x/true/b']);
+    expect(facade.expectedConnectorIds(intents[1])).toEqual(['b/n_b/a']);
+    expect(facade.missingConnectorIds(intents)).toEqual(['a/x/true/b', 'b/n_b/a']);
+    // il disegno e' finto: dopo i tentativi i connettori mancano ancora, e si dice
+    const result = await facade.ensureConnectorsDrawn(intents);
+    expect(result.missing).toEqual(['a/x/true/b', 'b/n_b/a']);
+    expect(result.stillMissing).toEqual(['a/x/true/b', 'b/n_b/a']);
+    expect(result.redrawnBlocks).toBe(6);                         // 2 blocchi x 3 tentativi
+    drawn.length = 0;
+    // intorno a `b`: il suo blocco, poi `a` che lo punta, poi l'aggiornamento di `b`
+    await facade.refreshConnectorsAroundIntent('b', intents);
+    expect(drawn).toEqual(['b', 'a']);
+    expect(legacy.updateConnector).toHaveBeenCalledWith('b');
   });
 
   it('per un agente V3 risponde il servizio nuovo', () => {

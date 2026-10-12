@@ -128,7 +128,7 @@ describe('flow-normalizer', () => {
       expect(r.collection.updatedAt).toBe(now());
       expect(r.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/x/false/c', 'b/n_b/c']);
       expect(r.collection.items[1]).toEqual({ id: 'a/x/true/b', from: { intentId: 'a', actionId: 'x', slot: 'true' }, to: { intentId: 'b' }, kind: 'action' });
-      expect(r.report.collection).toEqual({ existed: false, changed: true, records: 4, missing: [], extra: [] });
+      expect(r.report.collection).toEqual({ existed: false, changed: true, records: 4, missing: [], extra: [], projected: 0 });
     });
 
     it('quando non coincide con le action, vincono le action e la differenza va nel rapporto', () => {
@@ -139,7 +139,7 @@ describe('flow-normalizer', () => {
       const r = normalizeFlow(flusso(), salvata, opts());
       expect(r.collectionChanged).toBeTrue();
       expect(r.collection.items.map(i => i.id)).toEqual(prima.collection.items.map(i => i.id));
-      expect(r.report.collection).toEqual({ existed: true, changed: true, records: 4, missing: ['c/n_c/a'], extra: ['a/x/false/c'] });
+      expect(r.report.collection).toEqual({ existed: true, changed: true, records: 4, missing: ['c/n_c/a'], extra: ['a/x/false/c'], projected: 0 });
       expect(r.changedIntentIds).toEqual([]);
     });
 
@@ -175,30 +175,56 @@ describe('flow-normalizer', () => {
       blocco('b', [], '#c'), blocco('c'),
     ];
 
-    it('senza lista nasce dalle action, come sempre; con la lista riscrive le uscite da li\'', () => {
-      const prima = normalizeFlow(flusso(), null, opts({ collectionWins: true }));
-      expect(prima.report.counts['projected-from-collection']).toBeUndefined();
+    it('senza lista nasce dalle action, come sempre; con la lista riempie le uscite da li\' e segna da ripulire i blocchi che portano ancora le destinazioni V2', () => {
+      const v3 = { collectionWins: true, cleanDestinations: true };
+      const prima = normalizeFlow(flusso(), null, opts(v3));
+      expect(prima.report.collection.projected).toBe(0);
       expect(prima.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/x/false/c', 'b/n_b/c']);
+      // i quattro campi col # vanno ripuliti sul server: i loro blocchi si salvano
+      expect(prima.report.counts).toEqual({ 'v2-destination-still-saved': 4 });
+      expect(prima.changedIntentIds.sort()).toEqual(['a', 'b']);
 
       const salvata = clone(prima.collection);
       salvata.items = salvata.items.filter((i: any) => i.id !== 'a/x/false/c');   // la lista non ha piu' l'uscita false
       salvata.items.push({ id: 'a/r/k1/c', from: { intentId: 'a', actionId: 'r', slot: 'button:k1' }, to: { intentId: 'c' }, kind: 'button' });   // e collega il bottone
       salvata.items.push({ id: 'b/n_b/zz', from: { intentId: 'b', actionId: 'n_b', slot: 'next' }, to: { intentId: 'zz' }, kind: 'block' });     // verso un blocco che non c'e'
-      const intents = flusso();
-      intents[1].attributes.nextBlockAction.intentName = '#a';   // il campo dice a, la lista (il record buono) dice c
       salvata.items.splice(salvata.items.findIndex((i: any) => i.id === 'b/n_b/c'), 1);
       salvata.items.push({ id: 'b/n_b/c', from: { intentId: 'b', actionId: 'n_b', slot: 'next' }, to: { intentId: 'c' }, kind: 'block' });
 
-      const r = normalizeFlow(intents, salvata, opts({ collectionWins: true }));
+      // il JSON gia' ripulito di un V3: i campi sono vuoti, solo il bottone resta
+      const intents = flusso();
+      stripDestinations(intents);
+      intents[1].attributes.nextBlockAction.intentName = '#a';   // tranne uno, rimasto alla maniera V2 e diverso dalla lista
+      const r = normalizeFlow(intents, salvata, opts(v3));
       expect(intents[0].actions[0]).toEqual(jasmine.objectContaining({ trueIntent: '#b', falseIntent: '' }));
       expect(intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'action', action: '#c' }));
       expect(intents[1].attributes.nextBlockAction.intentName).toBe('#c');
-      expect(r.report.counts['projected-from-collection']).toBe(3);
-      expect(r.changedIntentIds.sort()).toEqual(['a', 'b']);
+      expect(r.report.collection.projected).toBe(4);                       // in memoria, non da salvare
+      expect(r.report.counts).toEqual({ 'v2-destination-still-saved': 1 });  // solo il blocco b si salva, ripulito
+      expect(r.changedIntentIds).toEqual(['b']);
       // la lista che ne esce: senza il record verso il blocco sparito, con il bottone
       expect(r.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/r/k1/c', 'b/n_b/c']);
       expect(r.collectionChanged).toBeTrue();
-      // un secondo passaggio non cambia nulla
+      // l'apertura successiva, sul JSON ripulito, non ha niente da salvare
+      stripDestinations(r.intents);
+      const r2 = normalizeFlow(r.intents, r.collection, opts(v3));
+      expect(r2.report.counts).toEqual({});
+      expect(r2.changedIntentIds).toEqual([]);
+      expect(r2.report.collection.projected).toBe(3);                      // il bottone resta pieno: si riempiono le altre tre
+      expect(r2.collectionChanged).toBeFalse();
+    });
+
+    it('con la pulizia spenta i campi riscritti dalla lista contano come riparazione e si salvano pieni', () => {
+      const prima = normalizeFlow(flusso(), null, opts({ collectionWins: true }));
+      expect(prima.report.counts).toEqual({});
+      const salvata = clone(prima.collection);
+      salvata.items = salvata.items.filter((i: any) => i.id !== 'a/x/false/c');
+      const intents = flusso();
+      const r = normalizeFlow(intents, salvata, opts({ collectionWins: true }));
+      expect(intents[0].actions[0].falseIntent).toBe('');
+      expect(r.report.counts).toEqual({ 'projected-from-collection': 1 });
+      expect(r.changedIntentIds).toEqual(['a']);
+      expect(r.report.collection.projected).toBe(1);
       const r2 = normalizeFlow(r.intents, r.collection, opts({ collectionWins: true }));
       expect(r2.report.counts).toEqual({});
       expect(r2.collectionChanged).toBeFalse();
@@ -208,7 +234,7 @@ describe('flow-normalizer', () => {
       const intents = flusso();
       intents[0].actions[1].attributes.attachment.buttons[0] = { uid: 'k1', type: 'action', value: 'Uno', action: '#b' };
       const lista = normalizeFlow(flusso(), null, opts({ collectionWins: true })).collection;   // senza il bottone
-      normalizeFlow(intents, lista, opts({ collectionWins: true }));
+      normalizeFlow(intents, lista, opts({ collectionWins: true, cleanDestinations: true }));
       expect(intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'text', action: '' }));
     });
 

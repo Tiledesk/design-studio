@@ -1,6 +1,7 @@
 import { Injectable, Optional } from '@angular/core';
 import { Observable, merge } from 'rxjs';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { edgesOfIntent, indexFlow } from '../connectors/connector-catalog';
 import { ConnectorStore } from '../connectors/connector-store.service';
 import { ConnectorServiceLegacy } from './connector-legacy.service';
 import { ConnectorServiceV3 } from './connector-v3.service';
@@ -15,12 +16,23 @@ import { ConnectorServiceV3 } from './connector-v3.service';
  *    uscite e dalla lista `attributes.connectors` del bot. E' la strada degli agenti V3.
  *
  * Quale dei due risponde lo decide `DashboardService.isV3`, cioe' `attributes.dsVersion` del
- * bot aperto. I metodi che il legacy non ha (sono nati con il V3: `blockRendered`,
- * `ensureConnectorsDrawn`, ...) per un V2 non fanno nulla, esattamente come su master dove
- * nessuno li chiamava.
+ * bot aperto. I metodi che il legacy non ha e che la chat AI e il canvas usano anche sui V2
+ * (`ensureConnectorsDrawn`, `refreshConnectorsAroundIntent`, `missingConnectorIds`,
+ * `expectedConnectorIds`: esistevano gia' sulla linea di stage prima del refactor) qui sono
+ * rifatti sopra il legacy, con lo stesso algoritmo di allora; gli id attesi vengono dal
+ * catalogo, che la spec di parita' tiene uguale al disegno del legacy. `blockRendered` per un
+ * V2 non fa nulla: il legacy aspetta i blocchi da solo.
  *
  * Senza un DashboardService (le spec che istanziano i servizi a mano) risponde il V3.
  */
+/** Tentativi e attese di `ensureConnectorsDrawn` per un V2: gli stessi di prima del refactor. */
+const LEGACY_DRAW_ATTEMPTS = 3;
+const LEGACY_DRAW_RETRY_MS = [80, 400];
+
+function waitAFrame(delayMs: number): Promise<void> {
+  return new Promise(resolve => setTimeout(() => requestAnimationFrame(() => resolve()), delayMs));
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -128,18 +140,73 @@ export class ConnectorService {
   updateConnectorLabel(elementID: string, label: string): void { this.impl.updateConnectorLabel(elementID, label); }
   updateLineTextPosition(id: string, label: string): void { this.impl.updateLineTextPosition(id, label); }
 
-  /** V3: gli id che i dati del blocco chiedono. V2: il legacy non li prevede. */
+  /** Gli id dei connettori che i dati del blocco chiedono, verso blocchi che esistono. */
   expectedConnectorIds(intent: any): string[] {
-    return this.isV3 ? this.v3.expectedConnectorIds(intent) : [];
+    if (this.isV3) { return this.v3.expectedConnectorIds(intent); }
+    if (!intent?.intent_id) { return []; }
+    return edgesOfIntent(intent, indexFlow(this.legacy.listOfIntents || [])).records.map(record => record.id);
   }
+
+  /** I connettori che i dati chiedono e che non sono sullo stage. */
   missingConnectorIds(intents: any[]): string[] {
-    return this.isV3 ? this.v3.missingConnectorIds(intents) : [];
+    if (this.isV3) { return this.v3.missingConnectorIds(intents); }
+    this.syncIntents(intents);
+    const missing: string[] = [];
+    for (const intent of intents || []) {
+      for (const id of this.expectedConnectorIds(intent)) {
+        if (!document.getElementById(id)) { missing.push(id); }
+      }
+    }
+    return missing;
   }
+
+  /**
+   * Disegna ogni connettore che i dati chiedono e che manca sullo stage, con qualche tentativo
+   * a distanza crescente (un blocco puo' comparire un fotogramma dopo). Per un V2 e' l'algoritmo
+   * che c'era prima del refactor, sopra il disegno del legacy, che non duplica un connettore
+   * gia' presente.
+   */
   async ensureConnectorsDrawn(intents: any[]): Promise<{ missing: string[]; redrawnBlocks: number; stillMissing: string[] }> {
-    return this.isV3 ? this.v3.ensureConnectorsDrawn(intents) : { missing: [], redrawnBlocks: 0, stillMissing: [] };
+    if (this.isV3) { return this.v3.ensureConnectorsDrawn(intents); }
+    let redrawnBlocks = 0;
+    const missing: string[] = [];
+    for (let attempt = 0; attempt < LEGACY_DRAW_ATTEMPTS; attempt++) {
+      if (attempt > 0) { await waitAFrame(LEGACY_DRAW_RETRY_MS[attempt - 1]); }
+      this.syncIntents(intents);
+      let absentThisPass = 0;
+      for (const intent of intents || []) {
+        const absent = this.expectedConnectorIds(intent).filter(id => !document.getElementById(id));
+        if (absent.length === 0) { continue; }
+        absentThisPass += absent.length;
+        for (const id of absent) { if (!missing.includes(id)) { missing.push(id); } }
+        try {
+          await this.legacy.createConnectorsOfIntent(intent);
+          redrawnBlocks++;
+        } catch (error) {
+          // un blocco che non si lascia disegnare non deve fermare gli altri
+        }
+      }
+      if (absentThisPass === 0) { break; }
+    }
+    const stillMissing = missing.filter(id => !document.getElementById(id));
+    return { missing, redrawnBlocks, stillMissing };
   }
+
+  /** Disegna o aggiorna i connettori da e verso un blocco: i suoi e quelli dei blocchi che lo puntano. */
   async refreshConnectorsAroundIntent(intentId: string, intents: any[]): Promise<void> {
     if (this.isV3) { return this.v3.refreshConnectorsAroundIntent(intentId, intents); }
+    this.syncIntents(intents);
+    const list = Array.isArray(intents) ? intents : [];
+    const target = list.find(intent => intent?.intent_id === intentId);
+    if (!target) { return; }
+    await this.legacy.createConnectorsOfIntent(target);
+    const reference = '#' + intentId;
+    for (const source of list) {
+      if (!source || source.intent_id === intentId) { continue; }
+      const destinations = JSON.stringify([source.actions ?? [], source.attributes?.nextBlockAction ?? null]);
+      if (destinations.includes(reference)) { await this.legacy.createConnectorsOfIntent(source); }
+    }
+    await this.legacy.updateConnector(intentId);
   }
 
   /* ---- cancellazione ---- */

@@ -45,8 +45,10 @@ export type RepairKind =
   | 'next-block-cleared-return-stack'
   | 'stale-connector-attr-removed'
   | 'connector-attr-id-filled'
-  /** V3: un'uscita riscritta dalla lista del bot (la lista vince sui campi). */
-  | 'projected-from-collection';
+  /** V3 senza pulizia: un'uscita riscritta dalla lista del bot (la lista vince sui campi), da salvare. */
+  | 'projected-from-collection'
+  /** V3 con pulizia: il JSON del blocco porta ancora una destinazione alla maniera V2; il blocco va salvato ripulito. */
+  | 'v2-destination-still-saved';
 
 export interface FlowRepair {
   intentId: string;
@@ -68,7 +70,7 @@ export interface RepairReport {
   /** Le riparazioni, una per una (al massimo `MAX_ITEMS`; il resto solo nei conteggi). */
   items: FlowRepair[];
   /** La lista: assente prima, oppure diversa da quella che le action descrivono. */
-  collection: { existed: boolean; changed: boolean; records: number; missing: string[]; extra: string[] };
+  collection: { existed: boolean; changed: boolean; records: number; missing: string[]; extra: string[]; projected: number };
   /** Riempiti da chi salva. */
   saved?: { intents: boolean; collection: boolean };
   saveError?: string;
@@ -79,6 +81,13 @@ export interface NormalizeOptions {
   isV3?: boolean;
   /** La lista salvata nel bot vince sui campi delle action (gli agenti V3). Senza lista non cambia nulla. */
   collectionWins?: boolean;
+  /**
+   * V3: il JSON dell'agente va ripulito dalle destinazioni scritte alla maniera V2. I blocchi che
+   * le portano ancora vengono segnati da salvare (chi salva svuota i campi, bottoni esclusi); il
+   * riempimento dei campi in memoria dalla lista non conta come riparazione. Spento: i campi
+   * riscritti dalla lista contano come riparazione e si salvano pieni.
+   */
+  cleanDestinations?: boolean;
   faqKbId?: string;
   now?: () => string;
 }
@@ -177,11 +186,26 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     }
   }
 
+  // 5a. V3 con pulizia: un blocco che sul server porta ancora una destinazione alla maniera V2
+  //     (campo col `#`, bottoni esclusi) va salvato ripulito: la verita' e' la lista.
+  if (opts.collectionWins && opts.cleanDestinations) {
+    for (const intent of list) {
+      if (!intent) { continue; }
+      for (const slot of slotsOfIntent(intent)) {
+        if (slot.kind === 'button' || !slot.toId || !slot.hasHash) { continue; }
+        rec.add({ intentId: intent.intent_id, kind: 'v2-destination-still-saved', path: pathOf(intent, slot), before: slot.raw, after: '' });
+      }
+    }
+  }
+
   // 5b. V3: la lista salvata nel bot e' la verita', e le uscite si riscrivono da li'. Un record
   //     verso un blocco che non c'e' piu' cade; un'uscita che la lista non conosce si svuota;
-  //     un nome di blocco dei flussi vecchi (senza `#`) non si tocca.
+  //     un nome di blocco dei flussi vecchi (senza `#`) non si tocca. Con la pulizia accesa e'
+  //     solo il riempimento in memoria (i campi sul server restano vuoti); spenta, e' una
+  //     riparazione da salvare.
+  let projected = 0;
   if (opts.collectionWins && isCollection(collection)) {
-    projectCollection(list, collection, index, rec);
+    projected = projectCollection(list, collection, index, opts.cleanDestinations ? null : rec);
   }
 
   // 6. I connettori che le action descrivono, e gli attributi visivi per blocco.
@@ -227,7 +251,7 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     changedIntentIds,
     unresolved,
     items: rec.items,
-    collection: { existed: !!previous, changed: collectionChanged, records: built.collection.items.length, missing: built.missing, extra: built.extra },
+    collection: { existed: !!previous, changed: collectionChanged, records: built.collection.items.length, missing: built.missing, extra: built.extra, projected },
   };
   return { intents: list, changedIntentIds, collection: built.collection, collectionChanged, report };
 }
@@ -284,7 +308,7 @@ function propsFor(record: ConnectorRecord, previous: ConnectorRecord | undefined
  * Riscrive ogni uscita del flusso con la destinazione che la lista le da' (una per uscita: se la
  * lista ne avesse due per la stessa uscita, vale l'ultima). Restituisce quante uscite ha cambiato.
  */
-function projectCollection(list: any[], collection: ConnectorsCollection, index: FlowIndex, rec: Recorder): number {
+function projectCollection(list: any[], collection: ConnectorsCollection, index: FlowIndex, rec: Recorder | null): number {
   const byFromId = new Map<string, ConnectorRecord>();
   for (const record of collection.items) {
     if (!record?.id || !record.to?.intentId) { continue; }
@@ -302,7 +326,7 @@ function projectCollection(list: any[], collection: ConnectorsCollection, index:
       const before = slot.raw;
       writeSlot(slot, wanted);
       if (slot.kind === 'button' && slot.item) { slot.item.type = wanted ? 'action' : 'text'; }
-      rec.add({ intentId: intent.intent_id, kind: 'projected-from-collection', path: pathOf(intent, slot), before, after: slot.holder[slot.field] });
+      if (rec) { rec.add({ intentId: intent.intent_id, kind: 'projected-from-collection', path: pathOf(intent, slot), before, after: slot.holder[slot.field] }); }
       changed++;
     }
   }
