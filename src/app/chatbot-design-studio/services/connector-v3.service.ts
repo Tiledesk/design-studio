@@ -1,6 +1,6 @@
 import { Injectable, Optional } from '@angular/core';
 import { TiledeskConnectors } from 'src/assets/js/tiledesk-connectors.js';
-import { getOpacityFromRgba, getColorFromRgba } from '../utils';
+import { getOpacityFromRgba, getColorFromRgba, isElementOnTheStage } from '../utils';
 import { edgesOfFlow, edgesOfIntent, indexFlow, parseRecordId, slotsOfIntent, writeSlot } from '../connectors/connector-catalog';
 import { TiledeskJsRenderer } from '../connectors/renderer/tiledesk-js-renderer';
 import { ConnectorStore } from '../connectors/connector-store.service';
@@ -291,15 +291,19 @@ export class ConnectorServiceV3 {
   }
 
   /**
-   * Disegna un connettore tra due elementi del DOM. Se uno dei due non c'e' ancora, il
-   * connettore resta in attesa del blocco che manca (vedi `blockRendered`) e torna false.
+   * Disegna un connettore tra due elementi del DOM. Se uno dei due non c'e' ancora, aspetta che
+   * compaia (fino a un secondo, come il servizio di produzione): un blocco appena aggiunto alla
+   * lista, o il pallino di un blocco, entrano nel DOM un attimo dopo, e chi crea il connettore
+   * (il canvas, per un blocco nato trascinando un connettore) salva il blocco solo se la
+   * risposta e' true. Se non compare, il connettore resta in attesa del blocco che manca (vedi
+   * `blockRendered`) e torna false.
    */
   public async createConnectorFromId(fromId: string, toId: string, notify = false, attributes: any = null): Promise<boolean> {
     if (!fromId || !toId) { return false; }
     const connectorID = fromId + '/' + toId;
-    const fromEl = document.getElementById(fromId);
+    const fromEl = document.getElementById(fromId) || await isElementOnTheStage(fromId);
     if (!fromEl) { this.addPending(fromId.split('/')[0], { fromId, toId, notify, attributes }); return false; }
-    const toEl = document.getElementById(toId);
+    const toEl = document.getElementById(toId) || await isElementOnTheStage(toId);
     if (!toEl) { this.addPending(toId, { fromId, toId, notify, attributes }); return false; }
     if (document.getElementById(connectorID)) {
       // Already drawn: refresh its position from the source block. Before, a string was

@@ -44,6 +44,10 @@ describe('connector-catalog', () => {
         { uid: 'b3', type: 'url', action: '#x' }, { uid: 'b4', type: 'action', action: '' },
       ] } }, settings: { noInputIntent: '#z', noMatchIntent: '#x' } };
       expect(idsOf(blocco('i', [reply]))).toEqual(['i/a/b1/x', 'i/a/b2/y', 'i/a/noInput/z', 'i/a/noMatch/x']);
+      // la coda {attrs} del bottone viaggia nel record, cosi' sopravvive quando `action` viene tolto dal JSON
+      const records = edgesOfIntent(blocco('i', [reply]), indexFlow([blocco('x'), blocco('y'), blocco('z')])).records;
+      expect(records.find(r => r.id === 'i/a/b2/y')!.props).toEqual({ params: '{"k":1}' });
+      expect(records.find(r => r.id === 'i/a/b1/x')!.props).toBeUndefined();
       const senzaAncora = outputsOf('i', reply).filter(s => s.spec.anchor === 'none').map(s => s.key);
       expect(senzaAncora).toEqual(['noInput', 'noMatch']);
       // Il bottone url non ha uscita; quello di testo ha il pallino vuoto, da cui si puo' partire.

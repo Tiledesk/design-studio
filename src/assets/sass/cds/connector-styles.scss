@@ -229,5 +229,21 @@ cds-connector.connector-false {
 
     cds-connector .action-connector {
         justify-content: center;
+        position: relative;
+    }
+
+    /* Il riquadro col nome del blocco (connettore contratto) esce dal flusso
+       della scatola: con `justify-content: center` e un contenuto piu' largo
+       della scatola, il flex lo faceva traboccare da entrambi i lati e il
+       pallino scivolava dentro al blocco di meta' riquadro. Ancorato subito a
+       destra del pallino (16px centrati in 20px finiscono a 18px, meno i 4px
+       di sovrapposizione della freccia), il pallino resta sul bordo sia
+       contratto sia esplicito. */
+    cds-connector .block-contract-connector {
+        position: absolute;
+        left: calc(100% - 6px);
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 0;
     }
 }

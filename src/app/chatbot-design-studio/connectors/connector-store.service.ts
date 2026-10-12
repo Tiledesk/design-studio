@@ -120,13 +120,14 @@ export class ConnectorStore {
   }
 
   /** Aggiorna i record di un'uscita: via quelli che partivano da li', dentro quello nuovo se collegata. */
-  private applyToRecords(slot: { fromId: string; intentId: string; actionId: string; key: string; kind: ConnectorRecord['kind'] }, toId: string | null): void {
+  private applyToRecords(slot: { fromId: string; intentId: string; actionId: string; key: string; kind: ConnectorRecord['kind']; attrs?: string | null }, toId: string | null): void {
     const current = this.collection;
     if (!current) { return; }
     const items = current.items.filter(r => !r.id.startsWith(slot.fromId + '/'));
     if (toId) {
       const previous = current.items.find(r => r.id === slot.fromId + '/' + toId);
-      items.push({ id: slot.fromId + '/' + toId, from: { intentId: slot.intentId, actionId: slot.actionId, slot: slot.key }, to: { intentId: toId }, kind: slot.kind, ...(previous?.props ? { props: previous.props } : {}) });
+      const props = { ...(previous?.props || {}), ...(slot.kind === 'button' && slot.attrs ? { params: slot.attrs } : {}) };
+      items.push({ id: slot.fromId + '/' + toId, from: { intentId: slot.intentId, actionId: slot.actionId, slot: slot.key }, to: { intentId: toId }, kind: slot.kind, ...(Object.keys(props).length ? { props } : {}) });
     }
     if (items.length === current.items.length && items.every((r, i) => r.id === current.items[i].id)) { return; }
     this.load({ ...current, items, updatedAt: new Date().toISOString() });

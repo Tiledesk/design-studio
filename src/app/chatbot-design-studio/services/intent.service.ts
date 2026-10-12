@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ConnectorStore } from '../connectors/connector-store.service';
 import { CONNECTORS_CONFIG } from '../connectors/connector-config';
-import { NormalizeResult, RepairReport, normalizeFlow, preparedPastedIntent, stripDestinations } from '../connectors/flow-normalizer';
+import { NormalizeResult, RepairReport, normalizeFlow, preparedPastedIntent, stripV2Connectors } from '../connectors/flow-normalizer';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -420,7 +420,7 @@ export class IntentService {
       r.collection.existed
         ? '(lista trovata; uscite riempite dalla lista: ' + r.collection.projected + ')'
         : '(lista assente: costruita dalle action, viene salvata)',
-      'blocchi da ripulire dalle destinazioni V2:', (r.counts['v2-destination-still-saved'] ? r.changedIntentIds.length : 0));
+      'blocchi da ripulire dalle tracce V2:', ((r.counts['v2-destination-still-saved'] || r.counts['v2-connector-attrs-still-saved']) ? r.changedIntentIds.length : 0));
     this.logger.info('[FLOW-REPAIR]', id_faq_kb, 'riparazioni:', r.counts, 'blocchi da salvare:', r.changedIntentIds.length,
       'irrisolti:', r.unresolved.length, 'lista:', r.collection.existed ? (r.collection.changed ? 'ricostruita' : 'invariata') : 'costruita', r.collection.records);
     this.logger.log('[FLOW-REPAIR] dettaglio', r);
@@ -1993,9 +1993,10 @@ export class IntentService {
       // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
       payload = applyConditionSaveModeToPayload(payload);
       if (this.dashboardService?.isV3 && CONNECTORS_CONFIG.v3CleanDestinations) {
-        // V3: sul server i campi di destinazione vanno vuoti (tranne i bottoni): la verita' e' la
-        // lista del bot. Solo sul payload: il modello che il canvas disegna resta pieno.
-        stripDestinations((payload?.operations || []).map((op: any) => op?.intent).filter((intent: any) => !!intent));
+        // V3: sul server nessuna traccia dei connettori alla maniera V2 (chiavi di destinazione e
+        // attributi visivi per blocco; i bottoni restano): la verita' e' la lista del bot. Solo sul
+        // payload: il modello che il canvas disegna resta pieno.
+        stripV2Connectors((payload?.operations || []).map((op: any) => op?.intent).filter((intent: any) => !!intent));
       }
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {

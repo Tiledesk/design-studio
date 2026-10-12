@@ -85,6 +85,12 @@ describe('ConnectorStore', () => {
       expect(store.applyRendererChange({ fromId: 'r/q/k1', toId: 'b', deleted: true, save: true }, intents).saved).toBeTrue();
       expect(button).toEqual(jasmine.objectContaining({ type: 'text', action: '', __isConnected: false, __idConnection: null }));
       expect(saved).toEqual(['r', 'r']);
+      // con una lista caricata, un bottone con la coda {attrs} la porta nel record
+      store.load({ version: 1, updatedAt: '', items: [] });
+      button.type = 'action'; button.action = '{"k":1}';
+      store.applyRendererChange({ fromId: 'r/q/k1', toId: 'b' }, intents);
+      expect(button.action).toBe('#b{"k":1}');
+      expect(store.records[0].props).toEqual({ params: '{"k":1}' });
     });
 
     it('per un tipo non ancora dello store scrive il campo ma non salva', () => {
