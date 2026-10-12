@@ -1,5 +1,5 @@
 import { IntentService } from '../services/intent.service';
-import { ConnectorService } from '../services/connector.service';
+import { ConnectorServiceV3 } from '../services/connector-v3.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 /** Per-flow state that used to be cleared by a page reload.
@@ -56,7 +56,7 @@ describe('per-flow state does not survive a flow switch', () => {
   });
 
   it('createMapOfConnectors describes the flow now open', async () => {
-    const service = new ConnectorService();
+    const service = new ConnectorServiceV3();
 
     await service.createMapOfConnectors([{ intent_id: 'a1', actions: [] }]);
     const before = Object.keys(service.mapOfConnectors).length;

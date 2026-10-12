@@ -1,4 +1,4 @@
-import { clearAllTargets, isCollection, normalizeFlow, preparedPastedIntent } from './flow-normalizer';
+import { clearAllTargets, isCollection, normalizeFlow, preparedPastedIntent, stripDestinations } from './flow-normalizer';
 import { CONNECTORS_COLLECTION_VERSION } from './connector-config';
 
 /**
@@ -163,6 +163,79 @@ describe('flow-normalizer', () => {
       const r = normalizeFlow(flusso(), { version: 99, updatedAt: '', items: [] } as any, opts());
       expect(r.report.collection.existed).toBeFalse();
       expect(normalizeFlow(flusso(), { foo: 1 } as any, opts()).report.collection.existed).toBeFalse();
+    });
+  });
+
+  describe('V3: la lista del bot vince (collectionWins)', () => {
+    const flusso = () => [
+      blocco('a', [
+        { _tdActionId: 'x', _tdActionType: 'ai_prompt', trueIntent: '#b', falseIntent: '#c' },
+        { _tdActionId: 'r', _tdActionType: 'reply', attributes: { attachment: { buttons: [{ uid: 'k1', type: 'text', value: 'Uno', action: '' }] } } },
+      ], '#b'),
+      blocco('b', [], '#c'), blocco('c'),
+    ];
+
+    it('senza lista nasce dalle action, come sempre; con la lista riscrive le uscite da li\'', () => {
+      const prima = normalizeFlow(flusso(), null, opts({ collectionWins: true }));
+      expect(prima.report.counts['projected-from-collection']).toBeUndefined();
+      expect(prima.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/x/false/c', 'b/n_b/c']);
+
+      const salvata = clone(prima.collection);
+      salvata.items = salvata.items.filter((i: any) => i.id !== 'a/x/false/c');   // la lista non ha piu' l'uscita false
+      salvata.items.push({ id: 'a/r/k1/c', from: { intentId: 'a', actionId: 'r', slot: 'button:k1' }, to: { intentId: 'c' }, kind: 'button' });   // e collega il bottone
+      salvata.items.push({ id: 'b/n_b/zz', from: { intentId: 'b', actionId: 'n_b', slot: 'next' }, to: { intentId: 'zz' }, kind: 'block' });     // verso un blocco che non c'e'
+      const intents = flusso();
+      intents[1].attributes.nextBlockAction.intentName = '#a';   // il campo dice a, la lista (il record buono) dice c
+      salvata.items.splice(salvata.items.findIndex((i: any) => i.id === 'b/n_b/c'), 1);
+      salvata.items.push({ id: 'b/n_b/c', from: { intentId: 'b', actionId: 'n_b', slot: 'next' }, to: { intentId: 'c' }, kind: 'block' });
+
+      const r = normalizeFlow(intents, salvata, opts({ collectionWins: true }));
+      expect(intents[0].actions[0]).toEqual(jasmine.objectContaining({ trueIntent: '#b', falseIntent: '' }));
+      expect(intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'action', action: '#c' }));
+      expect(intents[1].attributes.nextBlockAction.intentName).toBe('#c');
+      expect(r.report.counts['projected-from-collection']).toBe(3);
+      expect(r.changedIntentIds.sort()).toEqual(['a', 'b']);
+      // la lista che ne esce: senza il record verso il blocco sparito, con il bottone
+      expect(r.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/r/k1/c', 'b/n_b/c']);
+      expect(r.collectionChanged).toBeTrue();
+      // un secondo passaggio non cambia nulla
+      const r2 = normalizeFlow(r.intents, r.collection, opts({ collectionWins: true }));
+      expect(r2.report.counts).toEqual({});
+      expect(r2.collectionChanged).toBeFalse();
+    });
+
+    it('un bottone collegato che la lista non conosce torna di testo', () => {
+      const intents = flusso();
+      intents[0].actions[1].attributes.attachment.buttons[0] = { uid: 'k1', type: 'action', value: 'Uno', action: '#b' };
+      const lista = normalizeFlow(flusso(), null, opts({ collectionWins: true })).collection;   // senza il bottone
+      normalizeFlow(intents, lista, opts({ collectionWins: true }));
+      expect(intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'text', action: '' }));
+    });
+
+    it('un nome di blocco dei flussi vecchi non si tocca, e senza collectionWins vincono le action', () => {
+      const vecchio = () => [blocco('a', [{ _tdActionId: 'x', _tdActionType: 'intent', intentName: 'Nome' }]), blocco('b', [], undefined, 'Nome')];
+      const intents = vecchio();
+      const r = normalizeFlow(intents, { version: CONNECTORS_COLLECTION_VERSION, updatedAt: '', items: [] }, opts({ collectionWins: true }));
+      expect(intents[0].actions[0].intentName).toBe('Nome');
+      expect(r.report.unresolved.length).toBe(1);
+      const intents2 = flusso();
+      const lista = normalizeFlow(flusso(), null, opts()).collection;
+      lista.items = lista.items.filter((i: any) => i.id !== 'a/x/false/c');
+      normalizeFlow(intents2, lista, opts());
+      expect(intents2[0].actions[0].falseIntent).toBe('#c');
+    });
+
+    it('al salvataggio stripDestinations svuota pallino e uscite delle action, non i bottoni ne\' i nomi di blocco', () => {
+      const intents = flusso();
+      intents[0].actions[1].attributes.attachment.buttons[0] = { uid: 'k1', type: 'action', value: 'Uno', action: '#c' };
+      intents.push(blocco('d', [{ _tdActionId: 'y', _tdActionType: 'intent', intentName: 'Nome' }]));
+      expect(stripDestinations(intents)).toBe(4);
+      expect(intents[0].attributes.nextBlockAction.intentName).toBe('');
+      expect(intents[0].actions[0]).toEqual(jasmine.objectContaining({ trueIntent: '', falseIntent: '' }));
+      expect(intents[0].actions[1].attributes.attachment.buttons[0].action).toBe('#c');
+      expect(intents[1].attributes.nextBlockAction.intentName).toBe('');
+      expect(intents[3].actions[0].intentName).toBe('Nome');
+      expect(stripDestinations(intents)).toBe(0);
     });
   });
 

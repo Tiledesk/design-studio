@@ -8,11 +8,15 @@
  * Qui coprono ogni uscita del catalogo, vengono riferite una per una nel rapporto, e il chiamante
  * le salva.
  *
- * La lista (`ConnectorsCollection`) si ricava dalle action -- che restano la copia che il motore
- * esegue -- e si riconcilia con quella eventualmente gia' salvata: se non coincidono VINCONO LE
- * ACTION, la lista viene ricostruita e la differenza finisce nel rapporto. L'aspetto dei
- * connettori (`props`) sopravvive per id: dal record precedente, oppure, la prima volta, dagli
- * attributi visivi che ogni blocco teneva in `intent.attributes.connectors`.
+ * La lista (`ConnectorsCollection`) si ricava dalle action e si riconcilia con quella eventualmente
+ * gia' salvata nel bot. Chi vince lo dice il chiamante:
+ *  - `collectionWins` (gli agenti V3, dal 12/10/2026): LA LISTA E' LA VERITA'. Le uscite di ogni
+ *    action e il pallino vengono riscritti dalla lista; i campi delle action sono solo la copia in
+ *    memoria che i componenti leggono (e, finche' il motore V3 non e' in produzione, la copia che
+ *    il motore esegue). Senza lista (prima apertura di un V3) la lista nasce dalle action.
+ *  - altrimenti VINCONO LE ACTION: la lista viene ricostruita e la differenza finisce nel rapporto.
+ * L'aspetto dei connettori (`props`) sopravvive per id: dal record precedente, oppure, la prima
+ * volta, dagli attributi visivi che ogni blocco teneva in `intent.attributes.connectors`.
  *
  * Modulo puro: niente Angular, niente DOM, niente logger. MODIFICA gli intent che riceve
  * (il chiamante li clona se vuole conservare l'originale); `uid` e' iniettato per avere spec
@@ -22,7 +26,7 @@
 import { RESERVED_INTENT_NAMES } from '../utils';
 import { isReturnStackIntent } from '../utils-actions';
 import {
-  ConnectorProps, ConnectorRecord, DanglingRef, edgesOfFlow, ensureTechnicalIds, indexFlow, recordIdOf,
+  ConnectorProps, ConnectorRecord, DanglingRef, FlowIndex, edgesOfFlow, ensureTechnicalIds, indexFlow, recordIdOf,
   slotsOfIntent, writeSlot,
 } from './connector-catalog';
 import { CONNECTORS_COLLECTION_VERSION } from './connector-config';
@@ -40,7 +44,9 @@ export type RepairKind =
   | 'dangling-cleared'
   | 'next-block-cleared-return-stack'
   | 'stale-connector-attr-removed'
-  | 'connector-attr-id-filled';
+  | 'connector-attr-id-filled'
+  /** V3: un'uscita riscritta dalla lista del bot (la lista vince sui campi). */
+  | 'projected-from-collection';
 
 export interface FlowRepair {
   intentId: string;
@@ -71,6 +77,8 @@ export interface RepairReport {
 export interface NormalizeOptions {
   uid: () => string;
   isV3?: boolean;
+  /** La lista salvata nel bot vince sui campi delle action (gli agenti V3). Senza lista non cambia nulla. */
+  collectionWins?: boolean;
   faqKbId?: string;
   now?: () => string;
 }
@@ -169,6 +177,13 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     }
   }
 
+  // 5b. V3: la lista salvata nel bot e' la verita', e le uscite si riscrivono da li'. Un record
+  //     verso un blocco che non c'e' piu' cade; un'uscita che la lista non conosce si svuota;
+  //     un nome di blocco dei flussi vecchi (senza `#`) non si tocca.
+  if (opts.collectionWins && isCollection(collection)) {
+    projectCollection(list, collection, index, rec);
+  }
+
   // 6. I connettori che le action descrivono, e gli attributi visivi per blocco.
   const edges = edgesOfFlow(list);
   for (const intent of list) {
@@ -265,6 +280,35 @@ function propsFor(record: ConnectorRecord, previous: ConnectorRecord | undefined
   return null;
 }
 
+/**
+ * Riscrive ogni uscita del flusso con la destinazione che la lista le da' (una per uscita: se la
+ * lista ne avesse due per la stessa uscita, vale l'ultima). Restituisce quante uscite ha cambiato.
+ */
+function projectCollection(list: any[], collection: ConnectorsCollection, index: FlowIndex, rec: Recorder): number {
+  const byFromId = new Map<string, ConnectorRecord>();
+  for (const record of collection.items) {
+    if (!record?.id || !record.to?.intentId) { continue; }
+    byFromId.set(record.id.substring(0, record.id.lastIndexOf('/')), record);
+  }
+  const isIntentId = (value: string) => index.ids.has(value) && !index.names.has(value);
+  let changed = 0;
+  for (const intent of list) {
+    if (!intent) { continue; }
+    for (const slot of slotsOfIntent(intent)) {
+      const record = byFromId.get(slot.fromId);
+      const wanted = record && index.ids.has(record.to.intentId) ? record.to.intentId : null;
+      if (slot.toId && !slot.hasHash && !isIntentId(slot.toId)) { continue; }   // un nome di blocco: non si tocca
+      if ((slot.toId || null) === wanted) { continue; }
+      const before = slot.raw;
+      writeSlot(slot, wanted);
+      if (slot.kind === 'button' && slot.item) { slot.item.type = wanted ? 'action' : 'text'; }
+      rec.add({ intentId: intent.intent_id, kind: 'projected-from-collection', path: pathOf(intent, slot), before, after: slot.holder[slot.field] });
+      changed++;
+    }
+  }
+  return changed;
+}
+
 function sameProps(a?: ConnectorProps, b?: ConnectorProps): boolean {
   const x = a || {}; const y = b || {};
   return x.display === y.display && x.label === y.label && x.color === y.color;
@@ -301,4 +345,22 @@ export function clearAllTargets(intent: any): number {
 /** L'id del record che un'uscita produce, se collegata. Comodo per chi deve cercare nella lista. */
 export function recordIdOfSlot(fromId: string, toId: string | null): string | null {
   return toId ? recordIdOf(fromId, toId) : null;
+}
+
+/**
+ * V3, al salvataggio: i campi di destinazione delle action e del pallino vanno sul server VUOTI,
+ * perche' il motore V3 legge la lista del bot e non i campi. I bottoni no: `button.action` e' il
+ * testo che il widget manda al bot, e il motore lo riceve cosi'. Un nome di blocco dei flussi
+ * vecchi (senza `#`) non si tocca. Lavora su cio' che riceve: va chiamata sul payload, che e' un
+ * clone, mai sul modello che il canvas disegna. Restituisce quanti campi ha svuotato.
+ */
+export function stripDestinations(intents: any[]): number {
+  let stripped = 0;
+  for (const intent of intents || []) {
+    for (const slot of slotsOfIntent(intent)) {
+      if (slot.kind === 'button' || !slot.toId || !slot.hasHash) { continue; }
+      if (writeSlot(slot, null)) { stripped++; }
+    }
+  }
+  return stripped;
 }

@@ -16,6 +16,7 @@
   "include": [
     "src/app/chatbot-design-studio/connectors/**/*.ts",
     "src/app/chatbot-design-studio/services/connector-map.spec.ts",
+    "src/app/chatbot-design-studio/services/connector.service.spec.ts",
     "src/**/*.d.ts"
   ]
 }

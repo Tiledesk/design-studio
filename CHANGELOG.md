@@ -7,6 +7,13 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# V3/connectors-refactor 12/10/2026
+- **changed**: gli agenti che non sono V3 tornano alla gestione dei connettori di produzione, pari pari: apertura, incolla, salvataggio e disegno come su master, nessuna lista negli attributi dell'agente e nessuna riparazione salvata. La prova con le priorita' invertite del 09/10 e' ritirata. I componenti delle azioni restano condivisi fra le due versioni: il campo di destinazione lo scrive un punto solo anche per loro
+- **changed**: negli agenti V3 la lista dei connettori negli attributi dell'agente e' l'unica verita'. All'apertura ogni uscita -- pallino del blocco, vero/falso, casi, rami, noInput/noMatch, bottoni -- viene riletta dalla lista: un collegamento verso un blocco che non esiste piu' cade, un'uscita che la lista non conosce si scollega, un collegamento per nome dei flussi vecchi non si tocca. Senza lista (prima apertura) la lista nasce dalle action e viene salvata, quindi un agente V3 nuovo la riceve alla prima apertura. Dopo ogni salvataggio la lista si riallinea e, se cambia, si salva
+- **added**: un interruttore, spento, per mandare al server i campi di destinazione delle azioni vuoti negli agenti V3, bottoni esclusi: la lista basta al motore. Va acceso solo quando il motore che legge la lista e' in produzione
+- **changed**: la chat AI riceve l'elenco dei connettori e il rapporto delle riparazioni solo per gli agenti V3
+- **added**: test della scelta fra le due gestioni (V2 su quella di produzione, V3 su quella nuova, anche per un connettore nato o morto sul canvas) e della regola "la lista vince" all'apertura di un V3, compreso lo svuotamento dei campi al salvataggio
+
 # V3/connectors-refactor 09/10/2026
 - **added**: l'agente ha una lista unica dei suoi connettori, salvata nei suoi attributi, costruita dalle action alla prima apertura e riconciliata a ogni apertura: se lista e action non coincidono vincono le action e la differenza finisce in un rapporto. L'aspetto dei connettori (nascosto, etichetta) viaggia nella lista. La lista si riallinea e si salva da sola dopo ogni modifica, da qualunque strada arrivi
 - **changed**: prova della gestione nuova dei connettori: se l'agente ha gia' la lista nei suoi attributi, il canvas disegna e si prepara dalla lista; altrimenti dalle action, e la lista viene creata per la prossima apertura. In entrambi i casi action, attributi del blocco e lista si aggiornano insieme, e una riga in console dice quale gestione e' attiva

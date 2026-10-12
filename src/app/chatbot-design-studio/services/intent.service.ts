@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ConnectorStore } from '../connectors/connector-store.service';
 import { CONNECTORS_CONFIG } from '../connectors/connector-config';
-import { NormalizeResult, RepairReport, normalizeFlow, preparedPastedIntent } from '../connectors/flow-normalizer';
+import { NormalizeResult, RepairReport, normalizeFlow, preparedPastedIntent, stripDestinations } from '../connectors/flow-normalizer';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -108,8 +108,9 @@ export class IntentService {
   /** Il rapporto delle riparazioni fatte all'ultima apertura del flusso (vedi flow-normalizer). */
   public lastRepairReport: RepairReport | null = null;
 
-  /** La lista dei connettori del flusso aperto, nel formato normalizzato (una copia). */
+  /** La lista dei connettori del flusso aperto, nel formato normalizzato (una copia). Solo per un V3: un V2 non ha lista. */
   public connectorRecords(): any[] {
+    if (!this.dashboardService?.isV3) { return []; }
     return JSON.parse(JSON.stringify(this.connectorStore?.records || []));
   }
 
@@ -339,17 +340,24 @@ export class IntentService {
     return new Promise((resolve, reject) => {
       this.faqService.getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
         let normalized: NormalizeResult | null = null;
-        if (faqs) {
-          // Il flusso viene riparato e la lista dei connettori costruita PRIMA di entrare nello
-          // stato: il canvas disegna gia' dati puliti. Il salvataggio delle riparazioni parte
-          // dopo, senza far aspettare chi ha chiesto il flusso.
+        if (faqs && this.dashboardService?.isV3) {
+          // V3: il flusso viene riparato e le uscite riscritte dalla lista del bot PRIMA di
+          // entrare nello stato: il canvas disegna gia' dati puliti. Il salvataggio parte dopo,
+          // senza far aspettare chi ha chiesto il flusso.
           normalized = this.normalizeLoadedFlow(faqs, id_faq_kb);
           this.listOfIntents = JSON.parse(JSON.stringify(normalized.intents));
           this.prevListOfIntent = JSON.parse(JSON.stringify(normalized.intents));
+        } else if (faqs) {
+          // V2: esattamente come master. Nessuna lista, nessuna riparazione salvata.
+          this.patchActionId(faqs);
+          this.listOfIntents = JSON.parse(JSON.stringify(faqs));
+          this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
+          this.intentAnalyzer();
+          this.resetConnectorStore();
         } else {
           this.listOfIntents = [];
           this.prevListOfIntent = [];
-          this.connectorStore?.load(null);
+          this.resetConnectorStore();
         }
         this.refreshIntents();
         resolve(true);
@@ -369,27 +377,49 @@ export class IntentService {
   }
 
   
+  /** Un V2 (o nessun flusso): lo store dei connettori non ha niente da dire. */
+  private resetConnectorStore(): void {
+    this.lastRepairReport = null;
+    this.connectorStore?.reset();
+    if (this.connectorStore) { this.connectorStore.mode = 'actions'; }
+  }
+
+  /** V2, pari pari da master: toglie le action nulle e marca i blocchi riservati. */
+  private intentAnalyzer() {
+    this.listOfIntents.forEach(intent => {
+      if (intent.actions) {
+        intent.actions = intent.actions.filter(obj => obj !== null);
+      }
+      if (this.isReservedIntent(intent.intent_display_name)) {
+        intent.attributes.readonly = true;
+      }
+    });
+  }
+
   /**
-   * Ripara il flusso appena caricato e costruisce la lista dei connettori del bot.
+   * SOLO V3. Ripara il flusso appena caricato e lo allinea alla lista dei connettori del bot.
    *
    * E' il normalizzatore (connectors/flow-normalizer.ts) a fare il lavoro: `#` mancanti, id
    * tecnici, riferimenti a blocchi che non esistono, pallino dei blocchi Return, attributi
-   * visivi orfani; poi la lista, riconciliata con quella salvata negli attributi del bot
-   * (se non coincidono vincono le action). Il rapporto resta a disposizione di chi lo chiede
-   * (la chat AI lo riceve con get_flow) e finisce in console in una riga.
+   * visivi orfani; poi LA LISTA VINCE: ogni uscita viene riscritta dalla lista salvata in
+   * `attributes.connectors` del bot (se il bot non ce l'ha ancora, nasce dalle action e viene
+   * salvata). Il rapporto resta a disposizione di chi lo chiede (la chat AI lo riceve con
+   * get_flow) e finisce in console in una riga.
    */
   private normalizeLoadedFlow(faqs: any[], id_faq_kb: string): NormalizeResult {
-    const stored = CONNECTORS_CONFIG.useCollection ? this.dashboardService?.selectedChatbot?.attributes?.connectors : null;
-    const result = normalizeFlow(faqs, stored, { uid: generateShortUID, isV3: !!this.dashboardService?.isV3, faqKbId: id_faq_kb });
+    const stored = this.dashboardService?.selectedChatbot?.attributes?.connectors;
+    const result = normalizeFlow(faqs, stored, { uid: generateShortUID, isV3: true, faqKbId: id_faq_kb, collectionWins: true });
     this.lastRepairReport = result.report;
     if (this.connectorStore) {
       this.connectorStore.lastRepairReport = result.report;
-      this.connectorStore.load(CONNECTORS_CONFIG.useCollection ? result.collection : null);
-      // PROVA: il bot aveva gia' la lista -> si disegna dalla lista; altrimenti dalle action.
-      this.connectorStore.mode = CONNECTORS_CONFIG.drawFromCollection && result.report.collection.existed ? 'collection' : 'actions';
-      this.logger.info('[CONNECTORS] gestione dei connettori per', id_faq_kb + ':', this.connectorStore.mode === 'collection' ? 'NUOVA (dalla lista negli attributi del bot)' : 'VECCHIA (dalle action; la lista viene creata per la prossima apertura)');
+      this.connectorStore.load(result.collection);
+      this.connectorStore.mode = 'collection';
     }
     const r = result.report;
+    this.logger.info('[CONNECTORS] agente V3', id_faq_kb + ': connettori dalla lista del bot',
+      r.collection.existed
+        ? '(lista trovata; uscite riscritte dalla lista: ' + (r.counts['projected-from-collection'] || 0) + ')'
+        : '(lista assente: costruita dalle action, viene salvata)');
     this.logger.info('[FLOW-REPAIR]', id_faq_kb, 'riparazioni:', r.counts, 'blocchi da salvare:', r.changedIntentIds.length,
       'irrisolti:', r.unresolved.length, 'lista:', r.collection.existed ? (r.collection.changed ? 'ricostruita' : 'invariata') : 'costruita', r.collection.records);
     this.logger.log('[FLOW-REPAIR] dettaglio', r);
@@ -407,7 +437,7 @@ export class IntentService {
   private async persistRepairs(result: NormalizeResult, id_faq_kb: string): Promise<void> {
     const report = result.report;
     const needIntents = result.changedIntentIds.length > 0;
-    const needCollection = CONNECTORS_CONFIG.useCollection && result.collectionChanged;
+    const needCollection = result.collectionChanged;
     if (!needIntents && !needCollection) { return; }
     if (!CONNECTORS_CONFIG.repairSaveAtOpen) {
       this.logger.info('[FLOW-REPAIR] salvataggio all\'apertura spento: riparazioni solo in memoria');
@@ -455,13 +485,20 @@ export class IntentService {
   }
 
   /**
-   * patchActionId
+   * patchActionId (V2, pari pari da master)
    * @param faqs
-   * La vecchia riparazione all'apertura (`#` mancanti, `_tdActionId`, `_tdCaseId`): oggi e' un
-   * nome per il normalizzatore, che fa anche il resto. Resta perche' qualcuno la chiama ancora.
+   * quando creo un nuovo bot gli elementi welcome e defaultfallback non hanno un _tdActionId
+   * perchè generati dal server. In questo caso è necessario assegnarne uno.
+   * Per un V3 fa lo stesso lavoro il normalizzatore (normalizeLoadedFlow).
    */
   public patchActionId(faqs){
-    normalizeFlow(faqs, null, { uid: generateShortUID });
+    faqs.forEach(element => {
+      element.actions.forEach(action => {
+        if(!action._tdActionId || action._tdActionId === "UUIDV4"){
+          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
+        }
+      });
+    });
   }
  
 
@@ -1952,6 +1989,11 @@ export class IntentService {
       // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`
       // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
       payload = applyConditionSaveModeToPayload(payload);
+      if (this.dashboardService?.isV3 && CONNECTORS_CONFIG.v3StripDestinationsAtSave) {
+        // V3: sul server i campi di destinazione vanno vuoti (tranne i bottoni): la verita' e' la
+        // lista del bot. Solo sul payload: il modello che il canvas disegna resta pieno.
+        stripDestinations((payload?.operations || []).map((op: any) => op?.intent).filter((intent: any) => !!intent));
+      }
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         // track(): incrementa alla subscribe, decrementa via finalize su next+complete /
@@ -1960,8 +2002,8 @@ export class IntentService {
         this.savingStateService.track(this.faqService.opsUpdate(payload)).subscribe((resp: any) => {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
-          // Il flusso e' salvato: la lista dei connettori si riallinea alle action (e si salva se cambia).
-          this.connectorStore?.syncFromIntents(this.listOfIntents);
+          // V3: il flusso e' salvato, la lista dei connettori si riallinea alle action (e si salva se cambia).
+          if (this.dashboardService?.isV3) { this.connectorStore?.syncFromIntents(this.listOfIntents); }
           // this.setDragAndListnerEventToElement(intent.intent_id);
           this.dashboardService.selectedChatbot.modified = true;
           resolve(true);
@@ -2137,10 +2179,18 @@ export class IntentService {
 
 
   private pasteIntentOntoStage(newIntent, prevIntent_id, newIntent_id){
-    // Nuovo id, nessun collegamento e nessun attributo visivo ereditato: lo fa il normalizzatore
-    // sulle sole destinazioni (prima si azzerava OGNI stringa che cominciava per `#`, e il
-    // nuovo id si scriveva con un `.replace` sul JSON che toccava solo la prima occorrenza).
-    let intent = preparedPastedIntent(JSON.parse(JSON.stringify(newIntent)), newIntent_id);
+    let intent: any;
+    if (this.dashboardService?.isV3) {
+      // V3: nuovo id, nessun collegamento e nessun attributo visivo ereditato, sulle sole
+      // destinazioni (il V2 azzera OGNI stringa che comincia per `#`, e scrive il nuovo id con
+      // un `.replace` sul JSON che tocca solo la prima occorrenza).
+      intent = preparedPastedIntent(JSON.parse(JSON.stringify(newIntent)), newIntent_id);
+    } else {
+      // V2: esattamente come master.
+      let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
+      intent = JSON.parse(elementJson);
+      intent = this.resetConnectors(intent);
+    }
     // this.connectorService.createConnectorsOfIntent(intent);
     // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
     this.addNewIntentToListOfIntents(intent);
@@ -2150,6 +2200,24 @@ export class IntentService {
     this.logger.log('[INTENT SERVICE] -> listOfIntents, ', intent);
   }
 
+
+  /** V2, pari pari da master: azzera ogni stringa che comincia per `#` nel blocco incollato. */
+  private resetConnectors(json) {
+    let results = [];
+    function exploreObject(obj) {
+        if (typeof obj === 'object' && obj !== null) {
+            for (let key in obj) {
+                if (typeof obj[key] === 'string' && obj[key].startsWith("#")) {
+                    results.push({ key: key, value: obj[key] });
+                    obj[key] = "";
+                }
+                exploreObject(obj[key]);
+            }
+        }
+    }
+    exploreObject(json);
+    return json;
+  }
 
   private replaceId(obj: any, keyToReplace: string) {
     for (const key in obj) {

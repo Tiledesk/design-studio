@@ -1,4 +1,4 @@
-import { ConnectorService } from '../services/connector.service';
+import { ConnectorServiceV3 } from '../services/connector-v3.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { edgesOfFlow, ensureTechnicalIds } from './connector-catalog';
 
@@ -64,7 +64,7 @@ describe('connector-catalog — gli id dei connettori restano quelli di sempre',
 
       it('la previsione del canvas e il disegno chiedono gli stessi connettori', async () => {
         const base = baseOf(fixture.data);
-        const service = new ConnectorService();
+        const service = new ConnectorServiceV3();
         const map = await service.createMapOfConnectors(clone(base));
         expect(Object.keys(map).sort()).toEqual([...fixture.expected].sort());
         expect(Object.keys(map).some(id => id.startsWith('ERROR_') || id.startsWith('DUPLICATE_'))).toBeFalse();

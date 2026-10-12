@@ -1,28 +1,28 @@
 /**
- * Gli interruttori del lavoro sui connettori. Stanno in un posto solo perche' si possano
- * spegnere da una riga, senza cercare nel codice, se qualcosa non torna su un flusso vero.
+ * Gli interruttori del lavoro sui connettori degli agenti V3. Stanno in un posto solo perche' si
+ * possano spegnere da una riga, senza cercare nel codice, se qualcosa non torna su un flusso vero.
+ * Niente qui riguarda gli agenti V2: per loro vale il servizio preso da master, senza interruttori.
  */
 export const CONNECTORS_CONFIG = {
-  /** La lista dei connettori del bot (`attributes.connectors`) e' la fonte del disegno; spenta, si deriva dalle action a ogni apertura senza salvare. */
-  useCollection: true,
-  /**
-   * PROVA (09/10/2026): se il bot ha gia' la lista nei suoi attributi all'apertura, il disegno e la
-   * previsione dei connettori partono dalla LISTA (gestione nuova); se non ce l'ha, dalle action
-   * (gestione vecchia), e la lista viene comunque costruita e salvata per la volta dopo. In tutti e
-   * due i casi ogni modifica aggiorna action, attributi del blocco e lista insieme.
-   */
-  drawFromCollection: true,
-  /** All'apertura, le riparazioni del flusso e la lista vengono salvate sul server. Spento: solo il rapporto in console. */
+  /** All'apertura di un V3, le riparazioni del flusso e la lista del bot vengono salvate sul server. Spento: solo il rapporto in console. */
   repairSaveAtOpen: true,
   /** Quanti blocchi per richiesta quando si salvano le riparazioni in blocco. */
   repairSaveChunk: 50,
+  /**
+   * V3: al salvataggio i campi di destinazione delle action e del pallino (NON i bottoni) vanno sul
+   * server vuoti, perche' la lista `attributes.connectors` del bot e' l'unica verita'.
+   * DA ACCENDERE SOLO QUANDO IL MOTORE V3 (tiledesk-chatbot con la lettura della lista) E' IN
+   * PRODUZIONE: prima, i V3 smetterebbero di funzionare, perche' il motore di oggi legge i campi.
+   * Spento, i campi viaggiano uguali alla lista (dato duplicato, come finora).
+   */
+  v3StripDestinationsAtSave: false,
 };
 
 /**
  * I tipi di action per cui e' lo store a scrivere e SALVARE il campo di destinazione quando un
  * connettore nasce o muore sul canvas. Per gli altri lo store scrive comunque il campo (e' lo
  * stesso valore), ma il salvataggio resta al componente, che ancora si sottoscrive al vecchio
- * stream: cosi' durante la migrazione non ci sono salvataggi doppi. Cresce con la fase 4.
+ * stream: cosi' non ci sono salvataggi doppi. Vale per V2 e V3: i componenti sono condivisi.
  */
 export const STORE_OWNED_TYPES: ReadonlySet<string> = new Set<string>([
   'ifonlineagents', 'ifonlineagentsv2', 'ifopenhours', 'jsoncondition', 'jsoncondition2',
