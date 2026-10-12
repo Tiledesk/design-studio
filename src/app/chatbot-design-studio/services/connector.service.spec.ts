@@ -112,4 +112,22 @@ describe('ConnectorService — la facciata V2/V3', () => {
     expect(store.records).toEqual([]);
     expect(store.collection).toBeNull();
   });
+
+  // Dalla pre: la facciata risponde anche prima che il canvas abbia inizializzato il disegno.
+  it('getConnectorsInByIntent returns empty array when not initialized', () => {
+    const result = build(false).facade.getConnectorsInByIntent('any-intent-id');
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(0);
+  });
+
+  it('connectorsInChanged$ is defined and subscribable', () => {
+    const { facade } = build(false);
+    expect(facade.connectorsInChanged$).toBeDefined();
+    expect(typeof facade.connectorsInChanged$.subscribe).toBe('function');
+  });
+
+  it('clearRetryQueue does not throw', () => {
+    expect(() => build(false).facade.clearRetryQueue()).not.toThrow();
+    expect(() => build(true).facade.clearRetryQueue()).not.toThrow();
+  });
 });

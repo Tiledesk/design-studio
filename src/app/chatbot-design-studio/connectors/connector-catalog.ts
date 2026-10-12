@@ -166,6 +166,8 @@ export const OUTPUT_CATALOG: Readonly<Record<string, ReadonlyArray<SlotSpec>>> =
   [TYPE_ACTION.REPLYV2]:             [BUTTONS, field('noInput', '/noInput', 'noInputIntent'), field('noMatch', '/noMatch', 'noMatchIntent')],
   [TYPE_ACTION.ONLINE_AGENTS]:       TRUE_FALSE,
   [TYPE_ACTION.ONLINE_AGENTSV2]:     TRUE_FALSE,
+  [TYPE_ACTION.INVITE_HUMAN]:        TRUE_FALSE,
+  [TYPE_ACTION.REMOVE_HUMAN]:        TRUE_FALSE,
   [TYPE_ACTION.OPEN_HOURS]:          TRUE_FALSE,
   [TYPE_ACTION.JSON_CONDITION_MULTI]: [
     { key: 'case', suffix: (c: any) => '/case/' + c._tdCaseId, path: { kind: 'array', array: 'cases', idField: '_tdCaseId', field: 'intent' }, anchor: 'case', kind: 'case' },

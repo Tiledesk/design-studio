@@ -224,7 +224,8 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     'matches(text, "^a.*")', '!matches(text, "^a.*")',
     'isEmpty(a)', '!isEmpty(a)',
     'isNull(a)',
-    'isUndefined(a)', '!isUndefined(a)',
+    'isUndefined(a)',
+    'exists(a)', '!exists(a)',
     'dateEqual(d, "2024-01-01")', '!dateEqual(d, "2024-01-01")',
     'isAfter(d, "2024-01-01")', 'isBefore(d, "2024-01-01")',
     'isAfterOrEqual(d, "2024-01-01")', 'isBeforeOrEqual(d, "2024-01-01")',
@@ -289,6 +290,30 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     expect(parseCondition('!isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
     expect(parseCondition('a == true')?.operator as any).toBe(TYPE_OPERATOR_V2.isTrue);
     expect(parseCondition('a == false')?.operator as any).toBe(TYPE_OPERATOR_V2.isFalse);
+  });
+
+  it('esiste / non esiste: un termine solo, che torna indietro intero', () => {
+    // Scritto come `!isUndefined(a)`, "esiste" era vero anche su una variabile messa a null.
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.exists))).toBe('exists(a)');
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.doesNotExist))).toBe('!exists(a)');
+    // Riaperta, la condizione deve tornare l'operatore da cui e' nata. `doesNotExist` non ce la
+    // faceva: veniva salvato come `isUndefined(a)` e si rileggeva come `isUndefined`, cambiando
+    // operatore sotto le mani di chi l'aveva scritto.
+    expect(parseCondition('exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(parseCondition('!exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.doesNotExist);
+    // I filtri salvati prima restano leggibili.
+    expect(parseCondition('isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.isUndefined);
+  });
+
+  it('un filtro salvato con la vecchia forma viene riscritto al primo salvataggio', () => {
+    // `!isUndefined(a)` si rilegge come "esiste" e si riscrive `exists(a)`: non e' un ritorno
+    // identico, ed e' voluto. La vecchia forma diceva che una variabile messa a null esiste, e
+    // riscriverla e' il modo in cui la correzione raggiunge i filtri gia' salvati. Finche'
+    // nessuno li riapre continuano a comportarsi come prima, perche' il motore legge la loro
+    // formula cosi' com'e'.
+    const riletta = parseCondition('!isUndefined(a)');
+    expect(riletta?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(conditionToWhen(riletta!)).toBe('exists(a)');
   });
 
 });
@@ -360,21 +385,23 @@ describe('utils-condition · filtri reply V2', () => {
     expect(td.when).toBeUndefined();
   });
 
-  it('il picker dei filtri reply espone SOLO gli operatori che il server valuta', () => {
-    // i 22 solo-V2 non sono rappresentabili nell'AST V1 -> non devono essere selezionabili
-    const soloV2 = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'isTrue', 'isFalse',
-                    'isAfter', 'arrayContains', 'lengthGreaterThan'];
-    soloV2.forEach(o => {
-      expect(isReplyFilterOperatorSupported(o)).toBe(false);
-      expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeUndefined();
-    });
-    const comuni = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
-                    'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
-    comuni.forEach(o => {
+  it('il picker dei filtri reply espone tutti gli operatori del catalogo', () => {
+    // Il picker e' DERIVATO: tiene le chiavi di OPERATORS_LIST_V2 presenti nell'enum legacy.
+    // Restringerlo non e' piu' il modo di proteggere l'utente da un operatore che il motore
+    // non sa valutare: quella protezione vive nel motore, che ora li implementa tutti.
+    const prima = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
+                   'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
+    const rimessi = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'notEndsWith',
+                     'notMatches', 'isTrue', 'isFalse', 'equalAsDate', 'notEqualAsDate', 'isAfter',
+                     'isBefore', 'isAfterOrEqual', 'isBeforeOrEqual', 'arrayContains',
+                     'arrayNotContains', 'lengthEqualTo', 'lengthNotEqualTo', 'lengthGreaterThan',
+                     'lengthLessThan', 'lengthGreaterThanOrEqual', 'lengthLessThanOrEqual'];
+    [...prima, ...rimessi].forEach(o => {
       expect(isReplyFilterOperatorSupported(o)).toBe(true);
       expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeDefined();
     });
-    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(16);
+    expect(rimessi.length).toBe(22);
+    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(38);
   });
 
   it('hasFilter: riconosce entrambe le forme ed è null-safe', () => {

@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-connector",
+    "types": [
+      "jasmine"
+    ]
+  },
+  "files": [
+    "src/test.connector.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/app/chatbot-design-studio/connector/**/*.ts",
+    "src/**/*.d.ts"
+  ]
+}

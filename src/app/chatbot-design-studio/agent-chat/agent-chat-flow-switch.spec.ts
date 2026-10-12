@@ -6,6 +6,8 @@ import {
 import { BehaviorSubject, of } from 'rxjs';
 import { AgentChatHostService } from './agent-chat-host.service';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { StartPointManagerService } from '../services/start-point-manager.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -257,10 +259,15 @@ function makeDashboard(parts: any): any {
     agentChatHostService,
     intentService,
     parts.changeDetectorRef ?? { detectChanges: () => {} },
+    // ai, sola lettura
+    {}, parts.readOnlyService ?? { readOnly: false },
     // Lo stato dei pannelli di sinistra: quello vero, non un doppione. E' logica pura senza
     // dipendenze, e un finto qui direbbe solo che le chiamate avvengono, non che il pannello
     // finisce sulla scheda giusta.
-    parts.leftPanelState ?? new LeftPanelStateService()
+    parts.leftPanelState ?? new LeftPanelStateService(),
+    // I due facoltativi, in coda come nel costruttore: senza, la creazione da descrizione non
+    // parte -- che e' quello che serve a questi test, che aprono flussi gia' esistenti.
+    parts.agentFromPromptService, parts.translate
   ];
   return new (CdsDashboardComponent as any)(...args);
 }
@@ -567,6 +574,7 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
+        { provide: StartPointManagerService, useValue: {} },
         // The real one: get_flow's answer must come through the real read
         // path, or the staleness this test is about could not appear.
         { provide: FlowOpsService,
@@ -578,7 +586,14 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
         { provide: AppConfigService,
           useValue: { getConfig: () => ({ agentChatUrl: 'https://chat.example.com' }) } },
         { provide: AgentChatFamilyService, useValue: familyServiceStub },
-        { provide: FaqService, useValue: faqServiceStub }
+        { provide: FaqService, useValue: faqServiceStub },
+        // Not what these tests are about -- they never call get_project_capabilities
+        // -- but AgentChatHostService now depends on it, and the real service
+        // would reach for HttpClient, which this module does not provide.
+        { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
+            { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
+              customServerConfigs: {} }), invalidate: () => {},
+            configureNativeServers: () => Promise.resolve() } }
       ]
     });
     host = TestBed.inject(AgentChatHostService);

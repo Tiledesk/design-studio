@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { firstValueFrom, Subject } from 'rxjs';
+import { firstValueFrom, Subject, Subscription } from 'rxjs';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
@@ -10,9 +10,15 @@ import { Command, Wait, Message } from 'src/app/models/action-model';
 import { FlowOp, FlowOpResult, FlowOpsReport, FlowPosition, FlowSnapshot } from './flow-ops.model';
 import { TYPE_ACTION, actionEndsTheFlow, ACTIONS_LIST } from '../utils-actions';
 import { v3RuleError } from './v3-flow-rules';
-import { computeFlowLayout } from './flow-ops-layout';
+import { computeFlowLayout, flowLayoutIntents, flowLayoutRoots } from './flow-ops-layout';
+import { CREDENTIAL_HEADER, WEB_REQUEST_TYPES, literalSecretFields, literalSecretRefusal } from './agent-chat-secrets';
 import { withDestinationHash } from '../utils-connectors';
 import { RESERVED_INTENT_NAMES, UNTITLED_BLOCK_PREFIX, TYPE_COMMAND, TYPE_BUTTON, generateShortUID, isElementOnTheStage, getIntentDefaultColor } from '../utils';
+import { startPointTypeOf, isStartBox, isWebStartDisabled } from '../utils-start-points';
+import { CapabilitiesSnapshot } from './agent-chat-capabilities.model';
+import {
+  actionTypeRefusal, resolveAttachedServers, resolveLlmModel, setsLlmModel, usesLlmModel, withDefaultLlmModel
+} from './agent-chat-capabilities.rules';
 
 /** When the stage is checked for connectors that were never drawn, counted from the last batch
  *  of the AI chat: once it has paused (the first pass), and again after the connector service's
@@ -123,6 +129,14 @@ export class FlowOpsService implements OnDestroy {
    *  So the depth is only ever spent on the flow that earned it. null means
    *  there is nothing to undo. */
   private lastBatchFaqKbId: string | null = null;
+
+  /** The entries themselves that `lastBatchUndoDepth` counts, oldest first (the top of the stack when the batch
+   *  applied). IntentService prunes entries from the middle of the stack when a start box is saved or deleted
+   *  without history (`start_point` remove/disable): the depth then no longer describes the top, and popping it
+   *  would take back older, unrelated user changes. On every prune the batch is kept only while these entries are
+   *  still, untouched, the top of the stack. */
+  private lastBatchEntries: any[] = [];
+  private historyPrunedSubscription: Subscription | undefined;
   /** Timers of the connector check scheduled after the last batch; reset by every new batch. */
   private connectorCheckTimers: any[] = [];
 
@@ -163,13 +177,53 @@ export class FlowOpsService implements OnDestroy {
    *  instead of inside validation. */
   private subagentBlocks = new Map<string, Set<string>>();
 
+  /** Where apply() reads what this project can build with. Set by the host
+   *  when the chat attaches; null means nothing is checked, which is also how
+   *  every spec that predates it runs. */
+  private capabilitiesSource: (() => Promise<CapabilitiesSnapshot>) | null = null;
+
+  /** The capabilities for the batch being applied, read by apply() before
+   *  validation (which is synchronous and cannot fetch them) -- the same
+   *  arrangement as subagentBlocks. Null when the batch needs none. */
+  private capabilities: CapabilitiesSnapshot | null = null;
+
+  public setCapabilitiesSource(source: (() => Promise<CapabilitiesSnapshot>) | null): void {
+    this.capabilitiesSource = source;
+  }
+
+  /** Where apply() hands off, right before applying, the native ids a batch
+   *  attaches that the project has not configured -- so they can be added to
+   *  its own MCP integration first, exactly as the Native Tools dialog would.
+   *  Set by the host when the chat attaches; null means nothing is
+   *  configured, which is also how every spec that predates this feature
+   *  runs. */
+  private nativeConfigurer: ((ids: string[]) => Promise<void>) | null = null;
+
+  public setNativeConfigurer(fn: ((ids: string[]) => Promise<void>) | null): void {
+    this.nativeConfigurer = fn;
+  }
+
   constructor(
     private intentService: IntentService,
     private connectorService: ConnectorService,
     private dashboardService: DashboardService,
     private family: AgentChatFamilyService,
     private faqService: FaqService
-  ) {}
+  ) {
+    this.historyPrunedSubscription = this.intentService.undoHistoryPruned$?.subscribe(() => this.onUndoHistoryPruned());
+  }
+
+  /** Entries left the middle of the undo stack: the last batch stays undoable only if it is still the top of it. */
+  private onUndoHistoryPruned(): void {
+    const stack = this.intentService.arrayUNDO;
+    const entries = this.lastBatchEntries;
+    const n = entries.length;
+    const onTop = n > 0 && n === this.lastBatchUndoDepth && Array.isArray(stack) && stack.length >= n
+      && entries.every((entry, i) => stack[stack.length - n + i] === entry);
+    if (!onTop) {
+      this.forgetLastBatch();
+    }
+  }
 
   public readFlow(): FlowSnapshot {
     return {
@@ -198,11 +252,33 @@ export class FlowOpsService implements OnDestroy {
       };
     }
     this.subagentBlocks = subagentFetch.blocks;
+    this.capabilities = null;
+    if (this.capabilitiesSource && this.batchNeedsCapabilities(ops)) {
+      try {
+        this.capabilities = await this.capabilitiesSource();
+      } catch (err) {
+        this.forgetLastBatch();
+        return {
+          ok: false, rejected_before_applying: true,
+          results: [{ op: '(none)', ok: false,
+            error: `Could not read what this project can use (${String(err?.message ?? err)}). `
+              + `Nothing was applied; retry the call.` }]
+        };
+      }
+    }
     const validation = ops.map(op => this.validate(op));
     // V3 agents only: a legacy flow is validated exactly as before.
     if (this.dashboardService.isV3 && validation.every(r => r.ok)) {
       this.validateV3Batch(ops).forEach((error, i) => {
         if (error) { validation[i] = { op: ops[i].op, ok: false, error }; }
+      });
+    }
+    // After the shape checks, like the V3 rules: a malformed op is reported as
+    // malformed, not as unavailable.
+    if (this.capabilities && validation.every(r => r.ok)) {
+      ops.forEach((op, i) => {
+        const error = this.capabilityError(op);
+        if (error) { validation[i] = { op: op.op, ok: false, error }; }
       });
     }
     if (validation.some(r => !r.ok)) {
@@ -212,6 +288,35 @@ export class FlowOpsService implements OnDestroy {
       this.forgetLastBatch();
       return { ok: false, rejected_before_applying: true, results: validation };
     }
+    // A native this batch attaches may not be in the project's own MCP
+    // integration yet -- get_project_capabilities lists every native from the
+    // global catalogue, not only the ones the project has configured, so the
+    // agent can attach one the Native Tools dialog never saw. Left alone, the
+    // engine would still run it (it resolves natives by id), but neither MCP
+    // dialog could show or manage it. So, before anything is applied, this
+    // adds it to the integration exactly as picking it from Native Tools
+    // would -- validation already proved every server here resolves, so this
+    // only has to find which of them are new. A rejection here (the save
+    // failed) refuses the whole batch, the same as any other pre-apply check:
+    // nothing was applied, so nothing from this batch is on the undo stack.
+    const unconfiguredIds = this.unconfiguredNativeIds(ops);
+    if (unconfiguredIds.length > 0 && this.nativeConfigurer) {
+      try {
+        await this.nativeConfigurer(unconfiguredIds);
+      } catch (err) {
+        this.forgetLastBatch();
+        return {
+          ok: false, rejected_before_applying: true,
+          results: [{ op: '(none)', ok: false,
+            error: `Could not add the MCP server(s) ${unconfiguredIds.join(', ')} to this project ` +
+              `(${String(err?.message ?? err)}). Nothing was applied; retry the call.` }]
+        };
+      }
+    }
+    // What is stored for an attached MCP server, or for an AI action's model,
+    // is built from the capabilities, never taken from the agent: it names a
+    // server and its tools, or a provider and a model, nothing else.
+    ops = this.withResolvedCapabilities(ops);
 
     // Measured rather than assumed: each of updateIntent / saveNewIntent /
     // deleteIntentNew pushes exactly one entry today, but the honest count of
@@ -261,6 +366,8 @@ export class FlowOpsService implements OnDestroy {
     // only spendable on the flow that was open when the batch was applied.
     this.lastBatchFaqKbId = this.lastBatchUndoDepth > 0
       ? this.dashboardService.id_faq_kb : null;
+    this.lastBatchEntries = this.lastBatchUndoDepth > 0
+      ? this.intentService.arrayUNDO.slice(-this.lastBatchUndoDepth) : [];
     this.redrawBlocks(blocksToRedraw);
     // A block the agent moved cannot be redrawn here: `move` only writes
     // `attributes.position`, and the card is placed by the canvas template
@@ -278,7 +385,7 @@ export class FlowOpsService implements OnDestroy {
     }
     this.redrawMovedAfterRender(movedIds, this.dashboardService.id_faq_kb);
     this.scheduleConnectorCheck(this.dashboardService.id_faq_kb);
-    const warnings = this.fallbackWarnings();
+    const warnings = [...this.fallbackWarnings(), ...this.missingGlobalWarnings(ops)];
     return { ok, rejected_before_applying: false, results, ...(warnings.length ? { warnings } : {}) };
   }
 
@@ -325,6 +432,7 @@ export class FlowOpsService implements OnDestroy {
   private forgetLastBatch(): void {
     this.lastBatchUndoDepth = 0;
     this.lastBatchFaqKbId = null;
+    this.lastBatchEntries = [];
   }
 
   /** Block names, per subagent, for every `callsubagent` this batch mentions.
@@ -457,7 +565,12 @@ export class FlowOpsService implements OnDestroy {
       const name = nameOf(intentId);
       return name === RESERVED_INTENT_NAMES.START || name === RESERVED_INTENT_NAMES.DEFAULT_FALLBACK;
     };
-    const isCloseBlock = (intentId: string): boolean =>
+    // V3-T3 is written for a visitor, who can always type again. A flow entered by a Webhook or
+    // Scheduled start box runs with nobody on the other side: a path that ends with no person in
+    // it must close its conversation, or every run leaves one open. Such flows may route to close.
+    const unattended = (this.intentService.listOfIntents || [])
+      .some((intent: any) => ['webhook', 'scheduled'].includes(startPointTypeOf(intent)));
+    const isCloseBlock = (intentId: string): boolean => !unattended &&
       (this.intentService.getIntentFromId(intentId)?.actions || [])
         .some((action: any) => action?._tdActionType === TYPE_ACTION.CLOSE);
     const oneActionError = (block: string): string => v3RuleError('V3-S1',
@@ -570,19 +683,75 @@ export class FlowOpsService implements OnDestroy {
           : this.validateDisplayName(op, op.intent_display_name);
         return nameError ?? this.validateAddIntentActions(op) ?? { op: op.op, ok: true };
       }
+      case 'delete_intent': {
+        // A start box (attributes.start_point) is registered on the server webhook: deleting it here
+        // would leave a start point without its block. It is removed from its own panel only.
+        const target = this.intentService.getIntentFromId(op.intent_id);
+        const startType = target ? startPointTypeOf(target) : null;
+        if (startType === 'webhook' || startType === 'scheduled') {
+          return { op: op.op, ok: false, error: `"${target.intent_display_name}" is the ${startType} start box: ` +
+            `it is removed with the \`start_point\` tool (action: "remove"), not by delete_intent.` };
+        }
+        return needsIntent(op.intent_id) ?? this.validateShape(op);
+      }
       case 'update_intent':
-      case 'delete_intent':
-      case 'move':
-      case 'add_action':
+      case 'add_action': {
+        const missing = needsIntent(op.intent_id);
+        if (missing) { return missing; }
+        // A start box is managed by the `start_point` tool: its name is its identity and it holds no action.
+        const box = this.intentService.getIntentFromId(op.intent_id);
+        if (isStartBox(box)) {
+          if (op.op === 'add_action') {
+            return { op: op.op, ok: false, error: `"${box.intent_display_name}" is a start box and holds no ` +
+              `action: connect it to the first block instead. Start boxes are managed with the \`start_point\` tool.` };
+          }
+          if (op.intent_display_name !== undefined && String(op.intent_display_name).trim() !== (box.intent_display_name ?? '').trim()) {
+            return { op: op.op, ok: false, error: `"${box.intent_display_name}" is a start box and cannot be renamed. ` +
+              `Start boxes are managed with the \`start_point\` tool.` };
+          }
+        }
+        return this.validateShape(op);
+      }
       case 'update_action':
-      case 'delete_action':
+      case 'delete_action': {
+        const missing = needsIntent((op as any).intent_id);
+        if (missing) { return missing; }
+        // The start box's action is its connection: written only by connect (which refuses a disabled start),
+        // never edited or removed here -- update_action's intentName would bypass that guard.
+        const box = this.intentService.getIntentFromId((op as any).intent_id);
+        if (isStartBox(box)) {
+          return { op: op.op, ok: false, error: `"${box.intent_display_name}" is a start box: its actions are not ` +
+            `edited or deleted. Use connect to change where it leads. Start boxes are managed with the \`start_point\` tool.` };
+        }
+        return this.validateShape(op);
+      }
+      case 'move':
         return needsIntent((op as any).intent_id) ?? this.validateShape(op);
-      case 'connect':
+      case 'connect': {
+        const startError = this.validateConnectStartBoxes(op);
         return needsIntent(op.from_intent_id)
             ?? needsIntent(op.to_intent_id)
+            ?? startError
             ?? this.validateConnectRouting(op)
             ?? { op: op.op, ok: true };
+      }
     }
+  }
+
+  /** Start boxes (the `start` block and every block with `attributes.start_point`) only lead out of the
+   *  flow's entry: nothing connects into one, and `start` leads nowhere while Web start is disabled. */
+  private validateConnectStartBoxes(op: any): FlowOpResult | null {
+    const to = this.intentService.getIntentFromId(op.to_intent_id);
+    if (isStartBox(to)) {
+      return { op: op.op, ok: false, error: `"${to.intent_display_name}" is a start box: nothing connects ` +
+        `into it. Connect to the block that should run instead. Start boxes are managed with the \`start_point\` tool.` };
+    }
+    const from = this.intentService.getIntentFromId(op.from_intent_id);
+    if (isWebStartDisabled(from)) {
+      return { op: op.op, ok: false, error: `Web start is disabled, so \`start\` cannot be connected. ` +
+        `Re-enable it first with the \`start_point\` tool (action: "add", type: "web"), then connect.` };
+    }
+    return null;
   }
 
   /** Action types whose own fields already decide where the block they live
@@ -639,6 +808,8 @@ export class FlowOpsService implements OnDestroy {
     [TYPE_ACTION.AI_CONDITION]: ['fallbackIntent', 'errorIntent'],
     [TYPE_ACTION.ONLINE_AGENTS]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.ONLINE_AGENTSV2]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.INVITE_HUMAN]: ['trueIntent', 'falseIntent'],
+    [TYPE_ACTION.REMOVE_HUMAN]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.OPEN_HOURS]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.WEB_REQUESTV2]: ['trueIntent', 'falseIntent'],
     [TYPE_ACTION.ASKGPT]: ['trueIntent', 'falseIntent'],
@@ -970,6 +1141,14 @@ export class FlowOpsService implements OnDestroy {
    *  object -- no DOM, no network, no list mutation -- so calling it here to
    *  check and then discarding the result is safe. Returns null when every
    *  action (or no `actions` at all) is fine. */
+  /** A web request whose fields carry a literal API key (see
+   *  `agent-chat-secrets.ts`): refused, with the way to do it through a
+   *  Global. Every agent, legacy too: a key in the flow leaks either way. */
+  private validateLiteralSecrets(actionType: string, fields?: Record<string, any>): string | null {
+    const found = literalSecretFields(actionType, fields);
+    return found.length ? literalSecretRefusal(actionType, found) : null;
+  }
+
   private validateAddIntentActions(op: Extract<FlowOp, { op: 'add_intent' }>): FlowOpResult | null {
     if (op.actions === undefined) { return null; }
     if (!Array.isArray(op.actions)) {
@@ -1008,6 +1187,10 @@ export class FlowOpsService implements OnDestroy {
       if (destinationViolation) {
         return { op: op.op, ok: false, error: destinationViolation };
       }
+      const secretViolation = this.validateLiteralSecrets(action.type, action.fields);
+      if (secretViolation) {
+        return { op: op.op, ok: false, error: secretViolation };
+      }
     }
     return null;
   }
@@ -1037,6 +1220,146 @@ export class FlowOpsService implements OnDestroy {
     return `"${actionType}" exists only in the V3 editor, and this agent is a legacy one ` +
       `(ds_version "legacy"). Build this step with the actions a legacy agent has: for a ` +
       `multi-way choice, chain one condition per branch.`;
+  }
+
+  /** Whether any op in the batch adds an action, attaches MCP servers or
+   *  picks an AI action's model -- the only things the capabilities decide. A
+   *  batch that only moves, renames, connects or deletes never waits on them. */
+  private batchNeedsCapabilities(ops: FlowOp[]): boolean {
+    return ops.some((op: any) =>
+      op?.op === 'add_action'
+      || (op?.op === 'add_intent' && Array.isArray(op.actions) && op.actions.length > 0)
+      || (op?.op === 'update_action' && op.fields && ('servers' in op.fields || setsLlmModel(op.fields))));
+  }
+
+  private existingAction(op: any): any {
+    const intent = this.intentService.getIntentFromId(op.intent_id);
+    return (intent?.actions || []).find((a: any) => a._tdActionId === op.action_id);
+  }
+
+  private existingActionType(op: any): string | null {
+    return this.existingAction(op)?._tdActionType ?? null;
+  }
+
+  /** Refusal text for an op that breaks the project's capabilities, or null.
+   *  Adding checks the type; any ai_prompt that sets `servers` checks those;
+   *  any AI action that picks a model checks it (resolveLlmModel).
+   *  update_action never checks the type: an action already on the canvas stays
+   *  editable even if the project could no longer add it -- nor the model it
+   *  already has, unless the patch picks another. */
+  private capabilityError(op: FlowOp): string | null {
+    const snapshot = this.capabilities;
+    const check = (type: string, fields: Record<string, any> | undefined, adding: boolean): string | null => {
+      if (adding) {
+        const refusal = actionTypeRefusal(type, snapshot.capabilities);
+        if (refusal) { return refusal; }
+      }
+      if (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields) {
+        const error = resolveAttachedServers(fields.servers, snapshot).error;
+        if (error) { return error; }
+      }
+      return resolveLlmModel(type, fields, snapshot).error ?? null;
+    };
+    switch (op.op) {
+      case 'add_action':
+        return check(op.type, op.fields, true);
+      case 'add_intent':
+        for (const action of op.actions || []) {
+          const error = check(action.type, action.fields, true);
+          if (error) { return error; }
+        }
+        return null;
+      case 'update_action': {
+        const type = this.existingActionType(op);
+        return type ? check(type, op.fields, false) : null;
+      }
+      default:
+        return null;
+    }
+  }
+
+  /** The distinct native ids this batch newly attaches to an ai_prompt --
+   *  via add_action, add_intent's inline actions, or update_action on an
+   *  existing one -- that the project has not configured, per the
+   *  capabilities' own `configured` flag. Walks the same three shapes
+   *  `withResolvedCapabilities` does, and resolves `fields.servers` the same way
+   *  (`resolveAttachedServers`): validation already proved every entry here
+   *  resolves, so this only has to ask which of the resolved natives are new.
+   *  Empty when there is no capabilities snapshot -- nothing can be judged
+   *  configured or not without one. */
+  private unconfiguredNativeIds(ops: FlowOp[]): string[] {
+    const snapshot = this.capabilities;
+    if (!snapshot) { return []; }
+    const ids = new Set<string>();
+    const collect = (type: string, fields?: Record<string, any>): void => {
+      if (type !== TYPE_ACTION.AI_PROMPT || !fields || !('servers' in fields)) { return; }
+      const resolved = resolveAttachedServers(fields.servers, snapshot).servers ?? [];
+      for (const server of resolved) {
+        if (!server.native || !server.id) { continue; }
+        const capability = snapshot.capabilities.mcp_servers.find(s => s.native && s.id === server.id);
+        if (capability?.configured === false) { ids.add(server.id); }
+      }
+    };
+    ops.forEach((op: any) => {
+      switch (op.op) {
+        case 'add_action':
+          collect(op.type, op.fields);
+          break;
+        case 'add_intent':
+          (op.actions || []).forEach((a: any) => collect(a.type, a.fields));
+          break;
+        case 'update_action': {
+          const type = this.existingActionType(op);
+          if (type) { collect(type, op.fields); }
+          break;
+        }
+      }
+    });
+    return [...ids];
+  }
+
+  /** A copy of `ops` whose ai_prompt `servers` are replaced by what
+   *  resolveAttachedServers built, and whose AI actions' model fields by what
+   *  resolveLlmModel built -- plus, on an AI action being added that picks no
+   *  model, the default one (withDefaultLlmModel), so it does not open on the
+   *  panel's GPT-4o fallback whatever the project has. Picking a model also
+   *  adjusts max_tokens / temperature as the panel does, against what the
+   *  fields land on: the existing action, or a fresh createNewAction()
+   *  scaffold for one being added (the same scaffold addAction will build).
+   *  Only called once validation has passed, so every resolution here
+   *  succeeds. */
+  private withResolvedCapabilities(ops: FlowOp[]): FlowOp[] {
+    const snapshot = this.capabilities;
+    if (!snapshot) { return ops; }
+    const resolve = (type: string, fields: Record<string, any> | undefined, base: any)
+      : Record<string, any> | undefined => {
+      const resolved = (type === TYPE_ACTION.AI_PROMPT && fields && 'servers' in fields)
+        ? { ...fields, servers: resolveAttachedServers(fields.servers, snapshot).servers }
+        : fields;
+      return resolveLlmModel(type, resolved, snapshot, base).fields;
+    };
+    const scaffold = (type: string): any =>
+      usesLlmModel(type) ? this.intentService.createNewAction(type as any) : undefined;
+    const add = (type: string, fields: Record<string, any> | undefined): Record<string, any> | undefined => {
+      const base = scaffold(type);
+      return withDefaultLlmModel(type, resolve(type, fields, base), snapshot, base);
+    };
+    return ops.map((op): FlowOp => {
+      switch (op.op) {
+        case 'add_action':
+          return { ...op, fields: add(op.type, op.fields) };
+        case 'add_intent':
+          return op.actions
+            ? { ...op, actions: op.actions.map(a => ({ ...a, fields: add(a.type, a.fields) })) }
+            : op;
+        case 'update_action': {
+          const type = this.existingActionType(op);
+          return type ? { ...op, fields: resolve(type, op.fields, this.existingAction(op)) } : op;
+        }
+        default:
+          return op;
+      }
+    });
   }
 
   /** Whether a `callsubagent` (`TYPE_ACTION.REPLACE_BOTV4`)'s `fields` name a
@@ -1132,7 +1455,8 @@ export class FlowOpsService implements OnDestroy {
           const subagentViolation = this.validateSubagentCall(op.fields);
           if (subagentViolation) { return fail(subagentViolation); }
         }
-        const destinationViolation = this.validateActionDestinations(op.type, op.fields);
+        const destinationViolation = this.validateActionDestinations(op.type, op.fields)
+          ?? this.validateLiteralSecrets(op.type, op.fields);
         return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
       case 'update_action': {
@@ -1154,7 +1478,8 @@ export class FlowOpsService implements OnDestroy {
           if (subagentViolation) { return fail(subagentViolation); }
         }
         const destinationViolation =
-          this.validateActionDestinations(action._tdActionType, (op as any).fields);
+          this.validateActionDestinations(action._tdActionType, (op as any).fields)
+          ?? this.validateLiteralSecrets(action._tdActionType, (op as any).fields);
         return destinationViolation ? fail(destinationViolation) : { op: op.op, ok: true };
       }
       case 'delete_action': {
@@ -2015,6 +2340,7 @@ export class FlowOpsService implements OnDestroy {
    *  still working is harmless -- it only completes blocks, and the next batch schedules another.
    *  It stops if the canvas moves to another flow. */
   ngOnDestroy(): void {
+    this.historyPrunedSubscription?.unsubscribe();
     this.connectorCheckTimers.forEach(timer => clearTimeout(timer));
     this.connectorCheckTimers = [];
   }
@@ -2154,6 +2480,110 @@ export class FlowOpsService implements OnDestroy {
     }
   }
 
+  /**
+   * Le Global che le web request di questo lotto leggono per autenticarsi e che
+   * l'agente non ha: `Bearer {{openrouter_api_key}}` in un header credenziale, o
+   * `{{key}}` nell'url. Solo avvisi: la chiave non si scrive mai nel flusso
+   * (rifiuto in `validateLiteralSecrets`), quindi la Global e' l'unica via, e la
+   * crea l'utente -- la chat deve dirglielo prima di dichiarare finito il lavoro.
+   * Senza, l'engine riempie la variabile con una stringa vuota e ogni chiamata
+   * fallisce in silenzio sul ramo d'errore. Vale per ogni agente, V3 e legacy.
+   */
+  public missingGlobalWarnings(ops: FlowOp[]): string[] {
+    try {
+      const globals = new Set(this.globalNames());
+      const assigned = this.assignedVariableNames();
+      const warnings: string[] = [];
+      for (const written of this.webRequestsWrittenBy(ops)) {
+        for (const [where, name] of this.credentialTemplates(written.fields)) {
+          if (globals.has(name) || assigned.has(name)) { continue; }
+          warnings.push(`Block "${written.block}": ${where} reads {{${name}}}, which is not a Global ` +
+            `of this agent and is not set anywhere in the flow. Tell the user to create the Global ` +
+            `"${name}" (Design Studio -> Globals) with the key of the matching integration before ` +
+            `testing the flow: until then the call goes out without a key and fails.`);
+        }
+      }
+      return warnings;
+    } catch (error) {
+      // Diagnostica: non deve poter rompere un batch gia' applicato.
+      return [];
+    }
+  }
+
+  private globalNames(): string[] {
+    const globals = this.dashboardService.selectedChatbot?.attributes?.globals;
+    return Array.isArray(globals)
+      ? globals.map((g: any) => typeof g?.key === 'string' ? g.key.trim() : '').filter(Boolean)
+      : [];
+  }
+
+  /** Every variable some action of the flow writes: a `{{name}}` that one of
+   *  these sets is not a Global the user has to create. */
+  private assignedVariableNames(): Set<string> {
+    const names = new Set<string>();
+    const fields = ['assignResultTo', 'assignReplyTo', 'assignStatusTo', 'assignErrorTo',
+      'assignOutputTo', 'destination', 'assignTo'];
+    for (const intent of this.intentService.listOfIntents || []) {
+      for (const action of intent?.actions || []) {
+        for (const field of fields) {
+          if (typeof action?.[field] === 'string' && action[field].trim()) { names.add(action[field].trim()); }
+        }
+      }
+    }
+    return names;
+  }
+
+  /** The web requests this batch wrote or changed, with the fields it sent
+   *  and the block's name for the warning. */
+  private webRequestsWrittenBy(ops: FlowOp[]): Array<{ block: string; fields: Record<string, any> }> {
+    const out: Array<{ block: string; fields: Record<string, any> }> = [];
+    const blockName = (intentId: string): string =>
+      this.intentService.getIntentFromId(intentId)?.intent_display_name || intentId;
+    for (const op of ops) {
+      if (op?.op === 'add_intent') {
+        for (const action of op.actions || []) {
+          if (WEB_REQUEST_TYPES.indexOf(action?.type) !== -1 && action.fields) {
+            out.push({ block: op.intent_display_name || '', fields: action.fields });
+          }
+        }
+      } else if (op?.op === 'add_action') {
+        if (WEB_REQUEST_TYPES.indexOf(op.type) !== -1 && op.fields) {
+          out.push({ block: blockName(op.intent_id), fields: op.fields });
+        }
+      } else if (op?.op === 'update_action' && (op as any).fields) {
+        const intent = this.intentService.getIntentFromId((op as any).intent_id);
+        const action = (intent?.actions || []).find((a: any) => a._tdActionId === (op as any).action_id);
+        if (action && WEB_REQUEST_TYPES.indexOf(action._tdActionType) !== -1) {
+          out.push({ block: blockName((op as any).intent_id), fields: (op as any).fields });
+        }
+      }
+    }
+    return out;
+  }
+
+  /** The `{{name}}`s a web request reads where a key goes: the value of a
+   *  credential header (Authorization, x-api-key, ...) and the url. Pairs of
+   *  (where, name). */
+  private credentialTemplates(fields: Record<string, any>): Array<[string, string]> {
+    const out: Array<[string, string]> = [];
+    const names = (text: string): string[] => {
+      const found: string[] = [];
+      const re = /\{\{\s*([A-Za-z0-9_]+)\s*(?:\|[^}]*)?\}\}/g;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(text)) !== null) { found.push(m[1]); }
+      return found;
+    };
+    const headers = fields.headersString && typeof fields.headersString === 'object' ? fields.headersString : {};
+    for (const [key, value] of Object.entries(headers)) {
+      if (typeof value !== 'string' || !CREDENTIAL_HEADER.test(key)) { continue; }
+      for (const name of names(value)) { out.push([`the header "${key}"`, name]); }
+    }
+    if (typeof fields.url === 'string') {
+      for (const name of names(fields.url)) { out.push(['the url', name]); }
+    }
+    return out;
+  }
+
   private scheduleConnectorCheck(faqKbId: string): void {
     this.connectorCheckTimers.forEach(timer => clearTimeout(timer));
     this.connectorCheckTimers = CONNECTOR_CHECK_DELAYS_MS.map((delay, pass) => setTimeout(
@@ -2194,16 +2624,15 @@ export class FlowOpsService implements OnDestroy {
   private layoutFlow(faqKbId: string): boolean {
     if (this.layoutPendingFaqKbId !== faqKbId) { return false; }
     this.layoutPendingFaqKbId = null;
-    const intents: any[] = (this.intentService.listOfIntents || []).filter(intent => !!intent?.intent_id);
+    // a disabled Web start is hidden: it neither moves nor anchors the layout
+    const intents: any[] = flowLayoutIntents(this.intentService.listOfIntents || []);
     const nodes = intents.map(intent => ({
       id: intent.intent_id,
       height: this.blockHeightPx(intent.intent_id),
       position: this.positionOf(intent)
     }));
     const edges = new Map<string, string[]>(intents.map(intent => [intent.intent_id, this.outgoingTargets(intent)]));
-    const roots = [RESERVED_INTENT_NAMES.START, RESERVED_INTENT_NAMES.WEBHOOK, RESERVED_INTENT_NAMES.DEFAULT_FALLBACK]
-      .map(name => intents.find(intent => intent.intent_display_name === name)?.intent_id)
-      .filter(id => !!id);
+    const roots = flowLayoutRoots(intents);
     const changed = computeFlowLayout(nodes, edges, roots, {
       columnStep: NEW_BLOCK_HORIZONTAL_STEP_PX,
       verticalGap: CANVAS_BLOCK_VERTICAL_GAP_PX
@@ -2213,6 +2642,8 @@ export class FlowOpsService implements OnDestroy {
     movedIds.forEach(id => this.autoPlacedPositions.set(id, changed.get(id)));
     if (movedIds.length > 0 && this.lastBatchUndoDepth > 0 && this.lastBatchFaqKbId === faqKbId) {
       this.lastBatchUndoDepth++;
+      const stack = this.intentService.arrayUNDO;
+      this.lastBatchEntries = this.lastBatchEntries.concat(Array.isArray(stack) && stack.length ? [stack[stack.length - 1]] : []);
     }
     // The blocks the agent moved itself ride along: the layout may well have left one
     // of them exactly where the agent put it, and then nothing else would redraw the

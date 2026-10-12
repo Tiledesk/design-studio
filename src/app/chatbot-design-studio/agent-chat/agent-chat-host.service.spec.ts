@@ -7,6 +7,8 @@ import { AppConfigService } from 'src/app/services/app-config';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { moduleImporter } from './agent-chat-loader';
 import { AgentChatFamilyService } from './agent-chat-family.service';
+import { StartPointManagerService } from '../services/start-point-manager.service';
+import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service';
 import { V3_FLOW_RULES } from './v3-flow-rules';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -15,6 +17,8 @@ describe('AgentChatHostService', () => {
   let service: AgentChatHostService;
   let flowOps: any;
   let familyService: any;
+  let capabilitiesService: any;
+  let startPoints: any;
   let registered: Record<string, Function>;
   let created: any;
   let createdHosts: any[];
@@ -58,7 +62,9 @@ describe('AgentChatHostService', () => {
       redrawAfterRun: jasmine.createSpy('redrawAfterRun').and.returnValue(Promise.resolve()),
       readFlow: jasmine.createSpy('readFlow').and.returnValue({ id_faq_kb: 'kb1', intents: [] }),
       apply: jasmine.createSpy('apply').and.returnValue(
-        Promise.resolve({ ok: true, rejected_before_applying: false, results: [] }))
+        Promise.resolve({ ok: true, rejected_before_applying: false, results: [] })),
+      setCapabilitiesSource: jasmine.createSpy('setCapabilitiesSource'),
+      setNativeConfigurer: jasmine.createSpy('setNativeConfigurer')
     };
 
     tokenChanged = new Subject<string>();
@@ -67,9 +73,27 @@ describe('AgentChatHostService', () => {
       projectID: 'p1', id_faq_kb: 'kb1', selectedChatbot$: selectedChatbot
     };
 
+    capabilitiesService = { snapshot: jasmine.createSpy('snapshot').and.returnValue(Promise.resolve({
+      capabilities: { chatbot_subtype: 'chatbot', subagent: false,
+        actions: [{ type: 'reply', status: 'available' }], mcp_servers: [] },
+      customServerConfigs: { 'Acme CRM': { name: 'Acme CRM', url: 'https://crm.example.com/mcp', transport: 'x' } }
+    })), invalidate: jasmine.createSpy('invalidate'),
+      configureNativeServers: jasmine.createSpy('configureNativeServers').and.returnValue(Promise.resolve()) };
+
+    startPoints = {
+      describe: jasmine.createSpy('describe').and.returnValue(Promise.resolve([
+        { type: 'web', status: 'present', removable: true, settings: {} },
+        { type: 'webhook', status: 'available', removable: true, settings: {} },
+        { type: 'scheduled', status: 'available', removable: true, settings: {} }])),
+      add: jasmine.createSpy('add').and.returnValue(Promise.resolve(
+        { ok: true, intent_id: 'wh1', type: 'webhook', settings: { enabled: true } })),
+      update: jasmine.createSpy('update').and.returnValue(Promise.resolve({ ok: true, settings: { enabled: false } })),
+      remove: jasmine.createSpy('remove').and.returnValue(Promise.resolve({ ok: true }))
+    };
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
+        { provide: StartPointManagerService, useValue: startPoints },
         { provide: FlowOpsService, useValue: flowOps },
         { provide: IntentService, useValue: { intentSelected: { intent_id: 'i1' } } },
         { provide: DashboardService, useValue: dashboardService },
@@ -87,7 +111,8 @@ describe('AgentChatHostService', () => {
               subagents: [{ _id: 'sub1', name: 'Alfa' }] }),
             contains: (id: string) => Promise.resolve(['parent1', 'sub1'].includes(id)),
             createSubagent: (name: string) => Promise.resolve({ _id: 'new1', name })
-          } }
+          } },
+        { provide: AgentChatCapabilitiesService, useValue: capabilitiesService }
       ]
     });
     service = TestBed.inject(AgentChatHostService);
@@ -144,11 +169,92 @@ describe('AgentChatHostService', () => {
     expect(created.getConfig().token).toBe('eyJhbGci.abc.def');
   });
 
-  it('registers exactly the five client tools', async () => {
+  it('registers exactly the seven client tools', async () => {
     await service.attach(document.createElement('iframe'));
     expect(Object.keys(registered).sort())
       .toEqual(['apply_flow_patch', 'create_subagent', 'get_canvas_selection', 'get_flow',
-                'open_flow']);
+                'get_project_capabilities', 'open_flow', 'start_point']);
+  });
+
+  it('lists start_point among the client tools', () => {
+    expect(AGENT_CHAT_CLIENT_TOOLS).toContain('start_point');
+  });
+
+  it('start_point add calls the manager with type, settings and position', async () => {
+    await service.attach(document.createElement('iframe'));
+    const settings = { source_name: 'crm' };
+    const answer = await registered['start_point']({
+      faq_kb_id: 'kb1', action: 'add', type: 'webhook', settings, position: { x: 10, y: 20 } });
+    expect(startPoints.add).toHaveBeenCalledWith('webhook', settings, { x: 10, y: 20 });
+    expect(answer.ok).toBeTrue();
+    expect(answer.intent_id).toBe('wh1');
+  });
+
+  it('start_point update and remove call the manager', async () => {
+    await service.attach(document.createElement('iframe'));
+    await registered['start_point']({ faq_kb_id: 'kb1', action: 'update', type: 'webhook', settings: { enabled: false } });
+    expect(startPoints.update).toHaveBeenCalledWith('webhook', { enabled: false });
+    await registered['start_point']({ faq_kb_id: 'kb1', action: 'remove', type: 'scheduled' });
+    expect(startPoints.remove).toHaveBeenCalledWith('scheduled');
+  });
+
+  it('start_point passes a manager failure through unchanged', async () => {
+    startPoints.add.and.returnValue(Promise.resolve({ ok: false, code: 'exists', error: 'already there' }));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['start_point']({ faq_kb_id: 'kb1', action: 'add', type: 'webhook' });
+    expect(answer.ok).toBeFalse();
+    expect(answer.code).toBe('exists');
+  });
+
+  it('start_point refuses a faq_kb_id that is not the open flow', async () => {
+    await service.attach(document.createElement('iframe'));
+    const wrong = await registered['start_point']({ faq_kb_id: 'other', action: 'add', type: 'webhook' });
+    expect(wrong.ok).toBeFalse();
+    expect(wrong.code).toBe('invalid');
+    expect(wrong.error).toContain('"other"');
+    expect(wrong.error).toContain('"kb1"');
+    const missing = await registered['start_point']({ action: 'add', type: 'webhook' });
+    expect(missing.code).toBe('invalid');
+    expect(startPoints.add).not.toHaveBeenCalled();
+  });
+
+  it('start_point refuses an unknown action or type', async () => {
+    await service.attach(document.createElement('iframe'));
+    const action = await registered['start_point']({ faq_kb_id: 'kb1', action: 'move', type: 'webhook' });
+    expect(action.code).toBe('invalid');
+    const type = await registered['start_point']({ faq_kb_id: 'kb1', action: 'add', type: 'telegram' });
+    expect(type.code).toBe('invalid');
+    expect(type.error).toContain('web, webhook, scheduled');
+    expect(startPoints.add).not.toHaveBeenCalled();
+  });
+
+  it('start_point answers unavailable when the start points cannot be described', async () => {
+    startPoints.describe.and.returnValue(Promise.reject(new Error('boom')));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['start_point']({ faq_kb_id: 'kb1', action: 'add', type: 'webhook' });
+    expect(answer.ok).toBeFalse();
+    expect(answer.code).toBe('unavailable');
+  });
+
+  it('get_project_capabilities includes start_points', async () => {
+    const list = [{ type: 'web', status: 'present', removable: true, settings: {}, current: {} }];
+    capabilitiesService.snapshot.and.returnValue(Promise.resolve({
+      capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [], start_points: list },
+      customServerConfigs: {} }));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['get_project_capabilities']({});
+    expect(answer.start_points).toEqual(list);
+  });
+
+  it('get_project_capabilities still answers when describing start points fails', async () => {
+    capabilitiesService.snapshot.and.returnValue(Promise.resolve({
+      capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [],
+        start_points_error: 'no webhook' },
+      customServerConfigs: {} }));
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['get_project_capabilities']({});
+    expect(answer.start_points).toBeUndefined();
+    expect(answer.start_points_error).toBe('no webhook');
   });
 
   // A session the studio opens by itself declares AGENT_CHAT_CLIENT_TOOLS:
@@ -156,6 +262,60 @@ describe('AgentChatHostService', () => {
   it('declares the same tools it registers', async () => {
     await service.attach(document.createElement('iframe'));
     expect([...AGENT_CHAT_CLIENT_TOOLS].sort()).toEqual(Object.keys(registered).sort());
+  });
+
+  it('answers get_project_capabilities with the capabilities and nothing private', async () => {
+    await service.attach(document.createElement('iframe'));
+    const answer = await registered['get_project_capabilities']({});
+    expect(answer.actions).toEqual([{ type: 'reply', status: 'available' }]);
+    expect(answer.mcp_servers).toEqual([]);
+    expect(JSON.stringify(answer)).not.toContain('crm.example.com');
+    expect(answer.customServerConfigs).toBeUndefined();
+  });
+
+  it('hands flow-ops the same capabilities to check patches against', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect(flowOps.setCapabilitiesSource).toHaveBeenCalled();
+    const source = flowOps.setCapabilitiesSource.calls.mostRecent().args[0];
+    const snapshot = await source();
+    expect(snapshot.customServerConfigs['Acme CRM'].url).toBe('https://crm.example.com/mcp');
+  });
+
+  // A native an attached ai_prompt names but the project has not configured
+  // must still end up in the project's own MCP integration, so both MCP
+  // dialogs can show and manage it -- flow-ops calls this to make that happen.
+  it('wires flow-ops with a native configurer that calls capabilities.configureNativeServers', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect(flowOps.setNativeConfigurer).toHaveBeenCalled();
+    const configurer = flowOps.setNativeConfigurer.calls.mostRecent().args[0];
+    await configurer(['tiledesk-data-table']);
+    expect(capabilitiesService.configureNativeServers).toHaveBeenCalledWith(['tiledesk-data-table']);
+  });
+
+  // A new chat session reads the project's MCP servers afresh: one may have
+  // been added or connected since the last session.
+  it('starts every attach with fresh capabilities', async () => {
+    await service.attach(document.createElement('iframe'));
+    expect(capabilitiesService.invalidate).toHaveBeenCalled();
+  });
+
+  // The address and headers of the project's own MCP servers are credentials:
+  // the chat and its model never need them, and never see them.
+  it('leaves the url and headers of attached servers out of get_flow, without touching the canvas', async () => {
+    const flow = { id_faq_kb: 'kb1', intents: [{ intent_id: 'i1', actions: [{
+      _tdActionType: 'ai_prompt',
+      servers: [{ name: 'Acme CRM', native: false, transport: 'streamable_http',
+        url: 'https://crm.example.com/mcp',
+        customHeaders: [{ enabled: true, key: 'x-api-key', value: 'secret' }],
+        tools: ['lookup_customer'] }]
+    }] }] };
+    const before = JSON.stringify(flow);
+    flowOps.readFlow.and.returnValue(flow);
+    await service.attach(document.createElement('iframe'));
+    const result = await registered['get_flow']({});
+    expect(result.intents[0].actions[0].servers).toEqual([{ name: 'Acme CRM', native: false,
+      transport: 'streamable_http', tools: ['lookup_customer'] }]);
+    expect(JSON.stringify(flow)).toBe(before);
   });
 
   it('answers get_flow from the canvas', async () => {
@@ -170,6 +330,13 @@ describe('AgentChatHostService', () => {
       },
       ds_version: 'legacy'
     });
+  });
+
+  it('adds the agent\'s language to get_flow when the bot declares one', async () => {
+    dashboardService.selectedChatbot = { language: 'it' };
+    await service.attach(document.createElement('iframe'));
+    const result = await registered['get_flow']({});
+    expect(result.language).toBe('it');
   });
 
   // The runtime's prompt describes the legacy editor: on a V3 agent the rules
@@ -305,7 +472,7 @@ describe('AgentChatHostService', () => {
     const iframe = document.createElement('iframe');
     await service.attach(iframe);
     expect(iframe.getAttribute('src')).toBeNull();
-    expect(Object.keys(registered).length).toBe(5);
+    expect(Object.keys(registered).length).toBe(7);
   });
 
   it('emits the flow ops report on applied$ after apply_flow_patch', async () => {
@@ -376,12 +543,17 @@ describe('AgentChatHostService', () => {
     TestBed.configureTestingModule({
       providers: [
         AgentChatHostService,
+        { provide: StartPointManagerService, useValue: {} },
         { provide: FlowOpsService, useValue: flowOps },
         { provide: IntentService, useValue: {} },
         { provide: DashboardService, useValue: { selectedChatbot$: new BehaviorSubject(null) } },
         { provide: TiledeskAuthService, useValue: { tiledeskTokenChanged$: new Subject<string>() } },
         { provide: AppConfigService, useValue: { getConfig: () => ({}) } },
-        { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } }
+        { provide: AgentChatFamilyService, useValue: { rootId: () => undefined } },
+        { provide: AgentChatCapabilitiesService, useValue: { snapshot: () => Promise.resolve(
+            { capabilities: { chatbot_subtype: 'chatbot', subagent: false, actions: [], mcp_servers: [] },
+              customServerConfigs: {} }), invalidate: () => {},
+            configureNativeServers: () => Promise.resolve() } }
       ]
     });
     expect(TestBed.inject(AgentChatHostService).isConfigured()).toBe(false);

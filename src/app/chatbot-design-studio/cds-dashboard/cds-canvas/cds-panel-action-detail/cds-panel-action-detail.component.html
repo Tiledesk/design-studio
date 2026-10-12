@@ -20,7 +20,17 @@
                  *ngIf="i === elementSelectedIndex" 
                 -->
                 
-                <div [ngSwitch]="elementSelected._tdActionType" *ngIf="canShowActionByPlan.enabled">
+                <cds-action-connector *ngIf="elementSelected._tdConnectorRef"
+                    class="panel-response"
+                    [intentSelected]="intentSelected"
+                    [action]="elementSelected"
+                    [previewMode]="false"
+                    (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)"
+                    (updateAndSaveAction)="onSaveIntent($event)">
+                </cds-action-connector>
+
+                <div [ngSwitch]="elementSelected._tdActionType"
+                     *ngIf="!elementSelected._tdConnectorRef && canShowActionByPlan.enabled">
 
                     <cds-action-reply *ngSwitchCase="TYPE_ACTION.REPLY"
                         class="panel-response"
@@ -90,6 +100,30 @@
                         (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
                     </cds-action-online-agents-v2>
 
+                    <cds-action-invite-human *ngSwitchCase="TYPE_ACTION.INVITE_HUMAN"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-invite-human>
+
+                    <cds-action-remove-human *ngSwitchCase="TYPE_ACTION.REMOVE_HUMAN"
+                        class="panel-response"
+                        [intentSelected]="intentSelected"
+                        [action]="elementSelected"
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)"
+                        (onConnectorChange)="onConnectorChange($event.type, $event.fromId, $event.toId)">
+                    </cds-action-remove-human>
+
+                    <cds-action-remove-current-bot *ngSwitchCase="TYPE_ACTION.REMOVE_CURRENT_BOT"
+                        class="panel-response"
+                        [action]="elementSelected"
+                        [previewMode]="false">
+                    </cds-action-remove-current-bot>
+
                     <cds-action-open-hours *ngSwitchCase="TYPE_ACTION.OPEN_HOURS"
                         class="panel-response"   
                         [intentSelected]="intentSelected"
@@ -102,7 +136,8 @@
                     <cds-action-agent *ngSwitchCase="TYPE_ACTION.AGENT"
                         class="panel-response"    
                         [action]="elementSelected"
-                        [previewMode]="false">
+                        [previewMode]="false"
+                        (updateAndSaveAction)="onSaveIntent($event)">
                     </cds-action-agent>
 
                     <cds-action-wait *ngSwitchCase="TYPE_ACTION.WAIT"

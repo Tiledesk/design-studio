@@ -448,15 +448,22 @@ export class ConnectorServiceV3 {
    * 
    */
   public deleteConnector(intent, idConnection, save=false, notify=true) {
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
-    const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
-    this.logger.log('[CONNECTOR-SERV] 00000 ', idConnector);
-    if(idConnector && intent?.attributes?.connectors?.[idConnector]){
-      delete intent.attributes.connectors[idConnector];
+    try {
+      this.logger.log('[CONNECTOR-SERV] deleteConnector::  connectorID ', intent, idConnection, save, notify);
+      if (!intent || !idConnection) { return; }
+      if (!intent.attributes) { intent.attributes = {}; }
+      if (!intent.attributes.connectors) { intent.attributes.connectors = {}; }
+      const idConnector = idConnection.substring(0, idConnection.lastIndexOf('/'));
+      if (idConnector && intent.attributes.connectors[idConnector]) {
+        delete intent.attributes.connectors[idConnector];
+      }
+      this.hideContractConnector(idConnection);
+      if (this.tiledeskConnectors && typeof this.tiledeskConnectors.deleteConnector === 'function') {
+        this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
+      }
+    } catch (err) {
+      this.logger.error('[CONNECTOR-SERV] deleteConnector error:', err);
     }
-    this.hideContractConnector(idConnection);
-    this.logger.log('[CONNECTOR-SERV] deleteConnector::  intent ', intent);
-    this.tiledeskConnectors.deleteConnector(idConnection, save, notify);
   }
 
 
@@ -876,6 +883,7 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:true};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    this.notifyConnectorsChanged(idConnection);
   }
 
   showContractConnector(idConnection: string){
@@ -885,8 +893,19 @@ public searchConnectorsInByIntent(intent_id: string): Array<any>{
     // const connector = {id:idConnector, display:false};
     // this.subjectChangedConnectorAttributes.next(connector);
     this.subjectChangedConnectorAttributes.next({id: idConnection, display: true});
+    this.notifyConnectorsChanged(idConnection);
   }
 
+
+  /** Gli attributi di un connettore sono cambiati: chi guarda i connettori in ingresso del blocco di arrivo lo sa. */
+  private notifyConnectorsChanged(connectorId: string): void {
+    const segments = connectorId.split('/');
+    const toIntentId = segments[segments.length - 1];
+    if (toIntentId) {
+      const connectors = this.getConnectorsInByIntent(toIntentId);
+      this.connectorsInChangedSubject.next({ intentId: toIntentId, connectors });
+    }
+  }
 
   setDisplayElementById(elementId: string, displayValue: string): void {
     // this.logger.log('[CONNECTOR-SERV] setDisplayElementById:: ', elementId, displayValue);

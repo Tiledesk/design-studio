@@ -78,12 +78,13 @@ describe('Opening a flow — destinations saved without #', () => {
     expect(flow[3].actions[0].falseIntent).toBe('#f1');
   });
 
-  it('V2: patchActionId is the one from master -- technical ids only, destinations untouched', () => {
+  it('V2: patchActionId is the one of this line (master-pre on the STAGE twin) -- technical ids, and the # repair the pre already had', () => {
     const flow = faqs();
     flow[1].actions.push({ _tdActionType: 'reply' });
     IntentService.prototype.patchActionId.call({}, flow);
-    expect(flow[0].actions[0].trueIntent).toBe('r1');
-    expect(flow[0].actions[0].falseIntent).toBe('f1');
+    expect(flow[0].actions[0].trueIntent).toBe('#r1');
+    expect(flow[0].actions[0].falseIntent).toBe('#f1');
+    expect(flow[3].actions[0].trueIntent).toBe('Add Result');
     expect(flow[1].actions[0]._tdActionId).toBeTruthy();
   });
 });

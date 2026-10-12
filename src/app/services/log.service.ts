@@ -71,7 +71,7 @@ export class LogService {
 
   async starterLog(mqtt_token, request_id){
     this.logger.log('[CdsWidgetLogsComponent] >>> starterLog ', this.mqtt_client);
-    this.logger.log('[CdsWidgetLogsComponent] >>> mqtt_token ok ', mqtt_token, request_id);
+    this.logger.log('[CdsWidgetLogsComponent] >>> mqtt_token ok---> ', mqtt_token, request_id);
     if(this.mqtt_client && mqtt_token && request_id){
       this.mqtt_client.connect(request_id, mqtt_token, (message: any)=>{
         this.logger.log("[CdsWidgetLogsComponent] message: ", message);

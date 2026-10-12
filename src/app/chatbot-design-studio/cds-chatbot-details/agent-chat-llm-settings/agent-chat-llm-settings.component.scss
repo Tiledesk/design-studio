@@ -47,3 +47,42 @@
     }
   }
 }
+
+/* ng-select forces `nowrap; ellipsis` on options and the value, which cut the
+   price/context and the unavailable explanation off. Scoped to this component
+   (same pattern as detail.component.scss). */
+:host ::ng-deep ng-select#llm-model-select {
+  /* The theme pins the closed single-select to 36px with the value clipped, so
+     the selected model's second line (price, or why it is unavailable) never
+     showed. Let the closed control grow with its value. */
+  &.ng-select-single .ng-select-container {
+    height: auto;
+    min-height: 36px;
+  }
+
+  .ng-select-container .ng-value-container {
+    overflow: visible;
+    white-space: normal;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .ng-option,
+  .ng-value,
+  .ng-value-container .ng-value {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  .llm-opt-name {
+    white-space: normal;
+  }
+
+  .llm-opt-meta {
+    white-space: normal;
+    font-size: 11px;
+    color: #9aa0a6;
+    line-height: 1.3;
+  }
+}

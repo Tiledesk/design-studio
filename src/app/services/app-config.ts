@@ -31,7 +31,20 @@ export class AppConfigService {
     return this.http.get(this.appConfig.remoteConfigUrl).toPromise().then((data: any) => {
         // console.log('AppConfigService loadAppConfig data: ', data);
 
-        const allconfig = data
+        const remoteConfig = data || {};
+        const baseConfig = this.appConfig || {};
+
+        // Merge remote config onto environment defaults (keep defaults when remote misses fields).
+        // Also avoid letting remote override build-time values like VERSION.
+        const allconfig: any = {
+          ...baseConfig,
+          ...remoteConfig,
+          firebaseConfig: { ...(baseConfig.firebaseConfig || {}), ...(remoteConfig.firebaseConfig || {}) },
+          chat21Config: { ...(baseConfig.chat21Config || {}), ...(remoteConfig.chat21Config || {}) },
+          VERSION: baseConfig.VERSION,
+          remoteConfig: baseConfig.remoteConfig,
+          remoteConfigUrl: baseConfig.remoteConfigUrl
+        };
         // console.log('[APP-CONFIG-SERVICE] - loadAppConfig allconfig: ', allconfig);
 
         if (allconfig.hasOwnProperty('wsUrlRel')) {

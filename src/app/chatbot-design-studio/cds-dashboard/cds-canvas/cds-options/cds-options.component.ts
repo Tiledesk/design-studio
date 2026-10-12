@@ -1,4 +1,5 @@
 import { Component, EventEmitter, HostListener, OnInit, Input, Output, ViewChild, ElementRef } from '@angular/core';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { CdkDragEnd } from '@angular/cdk/drag-drop';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { OPTIONS } from 'src/app/chatbot-design-studio/utils';
@@ -33,7 +34,8 @@ export class CdsOptionsComponent implements OnInit {
   
 
   constructor(
-    private readonly stageService: StageService
+    private readonly stageService: StageService,
+    public readonly readOnlyService: ReadOnlyService
   ) { }
 
   ngOnInit(): void {

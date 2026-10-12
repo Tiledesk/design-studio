@@ -47,16 +47,27 @@
         {{ 'LlmSettingsModel' | translate }}
       </label>
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-        <select id="llm-model" class="input csd-chatbot-dtls-input" [ngModel]="selectedModelId" name="model"
-                (ngModelChange)="onModelChange($event)">
-          <!-- The sentinel is the deployment's own model, so the loop below
-               skips the entry `GET /v1/models` flags `default: true` -- listing
-               it again would offer the same model twice, and choosing the copy
-               would pin the project to it by name. Option text is a plain
-               string: markup nested in an `<option>` is never rendered. -->
-          <option value="">{{ optionLabel(defaultModel) }}</option>
-          <option *ngFor="let m of selectableModels" [value]="m.id">{{ optionLabel(m) }}</option>
-        </select>
+        <!-- The sentinel option ('') is the deployment's own model; the
+             options list already carries it once, marked. -->
+        <ng-select id="llm-model-select" labelForId="llm-model" class="csd-chatbot-dtls-input" [items]="options" bindLabel="label"
+                   bindValue="id" groupBy="group" [searchFn]="searchOption" [clearable]="false"
+                   [ngModel]="selectedModelId" name="model" (ngModelChange)="onModelChange($event)"
+                   [placeholder]="'LlmSettingsSearch' | translate">
+          <!-- Two lines, both allowed to wrap: ng-select truncates a single
+               nowrap line, which cut the price and the unavailable text. -->
+          <ng-template ng-label-tmp let-item="item">
+            <div class="llm-opt" [title]="item.label">
+              <div class="llm-opt-name">{{ item.name }}</div>
+              <div class="llm-opt-meta">{{ item.meta }}</div>
+            </div>
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item">
+            <div class="llm-opt" [title]="item.label">
+              <div class="llm-opt-name">{{ item.name }}</div>
+              <div class="llm-opt-meta">{{ item.meta }}</div>
+            </div>
+          </ng-template>
+        </ng-select>
       </div>
     </div>
 
@@ -90,7 +101,7 @@
     <div class="row" style="margin-bottom: 16px;">
       <label class="col-sm-2 cds--custom-label"></label>
       <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 llm-settings-actions">
-        <button type="submit" class="btn btn-primary cds-blue-button" [disabled]="saving">
+        <button type="submit" class="btn btn-primary cds-blue-button" [disabled]="saving || selectedUnavailable">
           {{ 'LlmSettingsSave' | translate }}
         </button>
         <span class="saved" *ngIf="saved">{{ 'LlmSettingsSaved' | translate }}</span>

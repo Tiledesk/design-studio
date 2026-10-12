@@ -19,6 +19,7 @@ import { CdsActionControlsComponent } from './actions/shared/cds-action-controls
 import { CdsAddActionMenuComponent } from './actions/shared/cds-add-action-menu/cds-add-action-menu.component';
 import { CdsPanelActionsComponent } from './cds-panel-elements/cds-panel-actions/cds-panel-actions.component';
 import { CdsPanelElementsComponent } from './cds-panel-elements/cds-panel-elements.component';
+import { CdsActionDragListComponent } from './cds-panel-elements/cds-action-drag-list/cds-action-drag-list.component';
 import { MouseTipsComponent } from 'src/app/modals/mouse-tips/mouse-tips.component';
 import { CdsOptionsComponent } from './cds-options/cds-options.component';
 import { CdsPanelButtonConfigurationComponent } from './cds-panel-button-configuration/cds-panel-button-configuration.component';
@@ -28,6 +29,7 @@ import { CdsPanelConnectorMenuComponent } from './cds-panel-connector-menu/cds-p
 import { CdsActionsModule } from './actions/list/cds-actions.module';
 import { CdsActionDetailPanelComponent } from './cds-panel-action-detail/cds-panel-action-detail.component';
 import { CdsPanelIntentDetailComponent } from './cds-panel-intent-detail/cds-panel-intent-detail.component';
+import { CdsTriggerEntrypointComponent } from './actions/list/cds-trigger-entrypoint/cds-trigger-entrypoint.component';
 import { BaseElementModule } from 'src/app/shared/base-element.module';
 import { CdsIntentComponent } from './cds-intent/cds-intent.component';
 import { PanelIntentControlsComponent } from './cds-intent/panel-intent-controls/panel-intent-controls.component';
@@ -79,6 +81,7 @@ const routes: Routes = [
 
     //CDS PANEL INENT DETAIL
     CdsPanelIntentDetailComponent,
+    CdsTriggerEntrypointComponent,
 
     //CDS PANEL WIDGET
     CdsPanelWidgetComponent,
@@ -86,6 +89,7 @@ const routes: Routes = [
     //CDS PANEL ELEMENTS
     CdsPanelElementsComponent,
     CdsPanelActionsComponent,
+    CdsActionDragListComponent,
 
     //CDS PANEL BUTTON CONFIGURATION
     CdsPanelButtonConfigurationComponent,

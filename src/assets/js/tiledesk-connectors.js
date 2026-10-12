@@ -621,7 +621,7 @@ export class TiledeskConnectors {
 
   /** createConnectors */
   #createConnectors() {
-    console.log("[JS] createConnectors: ", this.connectors);
+    // console.log("[JS] createConnectors: ", this.connectors);
     for (const [value] of Object.entries(this.connectors)) {
       this.createConnector(
         value.fromId,

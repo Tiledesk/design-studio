@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, map, firstValueFrom } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -9,23 +9,31 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   providedIn: 'root'
 })
 export class AiService {
-
+  
+  // user: any;
   project_id: any;
-  public SERVER_BASE_URL: string;
 
+  // private persistence: string;
+  public SERVER_BASE_URL: string;
+  
+
+  // private
+  private URL_TILEDESK_OPENAI: string;
   private tiledeskToken: string;
+
   private logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
     public appStorageService: AppStorageService,
     private httpClient: HttpClient
-  ) {}
+  ) {     
+  }
 
   initialize(serverBaseUrl: string, project_id: string): void {
-    this.logger.log('[AI.SERVICE] - initialize serverBaseUrl', serverBaseUrl);
+    this.logger.log('[OPENAI.SERVICE] - initialize serverBaseUrl', serverBaseUrl);
     this.project_id = project_id;
     this.SERVER_BASE_URL = serverBaseUrl + this.project_id;
-    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken');
+    this.tiledeskToken = this.appStorageService.getItem('tiledeskToken')
   }
 
   getElevenLabsVoices(): Promise<any[]> {
@@ -34,9 +42,11 @@ export class AiService {
         'Content-Type': 'application/json',
         'Authorization': this.tiledeskToken,
       })
-    };
-    const url = this.SERVER_BASE_URL + '/voice/voices';
-    this.logger.debug('[AI.SERVICE] - getElevenLabsVoices URL: ', url);
+    }
+
+    const url = this.SERVER_BASE_URL + "/voice/voices";
+    this.logger.debug('[OPENAI.SERVICE] - preview prompt URL: ', url);
+
     return firstValueFrom(this.httpClient.get<any[]>(url, httpOptions));
   }
 
@@ -44,11 +54,15 @@ export class AiService {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': this.tiledeskToken,
+        'Authorization': this.tiledeskToken
       })
-    };
-    const url = this.SERVER_BASE_URL + '/voice/models';
-    this.logger.debug('[AI.SERVICE] - getElevenLabsModels URL: ', url);
+    } 
+
+    const url = this.SERVER_BASE_URL + "/voice/models";
+    this.logger.debug('[OPENAI.SERVICE] - preview prompt URL: ', url);
+
     return firstValueFrom(this.httpClient.get<any[]>(url, httpOptions));
   }
-}
+
+
+} 

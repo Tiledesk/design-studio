@@ -17,7 +17,8 @@ export const V3_FLOW_RULES: string[] = [
   'connected to a block with one `capture_user_reply`, which is then connected to the next step.',
   'V3-U5: `capture_user_reply` has no connector of its own: never set its `goToIntent`. The flow ' +
   'continues from the BLOCK connector, so `connect` the capture block to the next block.',
-  'V3-S2: connect `start` to the first block of the flow.',
+  'V3-S2: connect `start` to the first block of the flow. Exception: while Web start is disabled ' +
+  '(`start` has `attributes.web_start_disabled`), `start` stays unconnected and cannot be connected.',
   'V3-S3: `defaultFallback` stays empty: never add actions to it. `connect` it to the block that ' +
   'serves the message (V3-S8).',
   'V3-S4: `start` and `defaultFallback` are never deleted, renamed or used as a destination: nothing ' +
@@ -42,7 +43,10 @@ export const V3_FLOW_RULES: string[] = [
   'V3-T3: a flow ends with its last useful block (a message the user can read, or a handoff) and ' +
   'WITHOUT a `close` block. Add a `close` block only when the user explicitly asks to end the ' +
   'conversation with a button (e.g. "Do you want to close the conversation?" -> "Yes, close"): the ' +
-  'close block is the destination of that button only, and nothing comes after it.',
+  'close block is the destination of that button only, and nothing comes after it. Exception: in a ' +
+  'flow entered by a Webhook or Scheduled start box (`attributes.start_point`), nobody is on the other ' +
+  'side: there every path that ends with no person in it ends with a `close` block, reached from the ' +
+  'exit of the action or block before it.',
   'V3-U6: to route more than two ways on an exact value, use ONE `jsonconditionmulti` block ' +
   'instead of chaining a `jsoncondition2` per branch. Its `cases` are evaluated IN ORDER and the ' +
   'first one that matches wins, so put the most specific first; a case left without conditions ' +

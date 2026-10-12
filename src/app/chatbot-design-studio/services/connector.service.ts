@@ -1,7 +1,7 @@
 import { Injectable, Optional } from '@angular/core';
 import { Observable, merge } from 'rxjs';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { edgesOfIntent, indexFlow } from '../connectors/connector-catalog';
+import { edgesOfIntent, findButtons, indexFlow } from '../connectors/connector-catalog';
 import { ConnectorStore } from '../connectors/connector-store.service';
 import { ConnectorServiceLegacy } from './connector-legacy.service';
 import { ConnectorServiceV3 } from './connector-v3.service';
@@ -18,8 +18,9 @@ import { ConnectorServiceV3 } from './connector-v3.service';
  * Quale dei due risponde lo decide `DashboardService.isV3`, cioe' `attributes.dsVersion` del
  * bot aperto. I metodi che il legacy non ha e che la chat AI e il canvas usano anche sui V2
  * (`ensureConnectorsDrawn`, `refreshConnectorsAroundIntent`, `missingConnectorIds`,
- * `expectedConnectorIds`: esistevano gia' sulla linea di stage prima del refactor) qui sono
- * rifatti sopra il legacy, con lo stesso algoritmo di allora; gli id attesi vengono dal
+ * `expectedConnectorIds`: esistevano gia' sulla linea di stage prima del refactor) vanno al
+ * legacy quando li ha (il legacy della gemella STAGE e' quello di `master-pre`), altrimenti
+ * qui sono rifatti sopra il legacy, con lo stesso algoritmo di allora; gli id attesi vengono dal
  * catalogo, che la spec di parita' tiene uguale al disegno del legacy. `blockRendered` per un
  * V2 non fa nulla: il legacy aspetta i blocchi da solo.
  *
@@ -108,7 +109,9 @@ export class ConnectorService {
 
   /** Il flusso su cui si controllano le destinazioni. Il legacy lo riceve e basta. */
   syncIntents(intents: any[]): void {
-    if (this.isV3) { this.v3.syncIntents(intents); } else { this.legacy.listOfIntents = intents; }
+    if (this.isV3) { this.v3.syncIntents(intents); return; }
+    if (typeof (this.legacy as any).syncIntents === 'function') { (this.legacy as any).syncIntents(intents); return; }
+    this.legacy.listOfIntents = intents;
   }
 
   /** V3: i connettori in attesa di questo blocco si disegnano ora. V2: il legacy aspetta da solo (polling). */
@@ -143,6 +146,7 @@ export class ConnectorService {
   /** Gli id dei connettori che i dati del blocco chiedono, verso blocchi che esistono. */
   expectedConnectorIds(intent: any): string[] {
     if (this.isV3) { return this.v3.expectedConnectorIds(intent); }
+    if (typeof (this.legacy as any).expectedConnectorIds === 'function') { return (this.legacy as any).expectedConnectorIds(intent); }
     if (!intent?.intent_id) { return []; }
     return edgesOfIntent(intent, indexFlow(this.legacy.listOfIntents || [])).records.map(record => record.id);
   }
@@ -150,6 +154,7 @@ export class ConnectorService {
   /** I connettori che i dati chiedono e che non sono sullo stage. */
   missingConnectorIds(intents: any[]): string[] {
     if (this.isV3) { return this.v3.missingConnectorIds(intents); }
+    if (typeof (this.legacy as any).missingConnectorIds === 'function') { return (this.legacy as any).missingConnectorIds(intents); }
     this.syncIntents(intents);
     const missing: string[] = [];
     for (const intent of intents || []) {
@@ -168,6 +173,7 @@ export class ConnectorService {
    */
   async ensureConnectorsDrawn(intents: any[]): Promise<{ missing: string[]; redrawnBlocks: number; stillMissing: string[] }> {
     if (this.isV3) { return this.v3.ensureConnectorsDrawn(intents); }
+    if (typeof (this.legacy as any).ensureConnectorsDrawn === 'function') { return (this.legacy as any).ensureConnectorsDrawn(intents); }
     let redrawnBlocks = 0;
     const missing: string[] = [];
     for (let attempt = 0; attempt < LEGACY_DRAW_ATTEMPTS; attempt++) {
@@ -195,6 +201,7 @@ export class ConnectorService {
   /** Disegna o aggiorna i connettori da e verso un blocco: i suoi e quelli dei blocchi che lo puntano. */
   async refreshConnectorsAroundIntent(intentId: string, intents: any[]): Promise<void> {
     if (this.isV3) { return this.v3.refreshConnectorsAroundIntent(intentId, intents); }
+    if (typeof (this.legacy as any).refreshConnectorsAroundIntent === 'function') { return (this.legacy as any).refreshConnectorsAroundIntent(intentId, intents); }
     this.syncIntents(intents);
     const list = Array.isArray(intents) ? intents : [];
     const target = list.find(intent => intent?.intent_id === intentId);
@@ -227,6 +234,8 @@ export class ConnectorService {
   getConnectorsInByIntent(intentId: string): any[] { return this.impl.getConnectorsInByIntent(intentId); }
   getConnectorsInObservable(intentId: string): Observable<any[]> { return this.impl.getConnectorsInObservable(intentId); }
   searchConnectorsInByIntent(intent_id: string): Array<any> { return this.impl.searchConnectorsInByIntent(intent_id); }
+  /** Ogni `buttons[]` dentro una action, a qualunque profondita' (lo chiede il servizio degli intent). */
+  findButtons(obj: any): any[] { return typeof this.impl.findButtons === 'function' ? this.impl.findButtons(obj) : findButtons(obj); }
 
   /* ---- aspetto ---- */
 
