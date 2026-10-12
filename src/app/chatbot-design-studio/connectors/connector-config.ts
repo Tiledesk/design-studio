@@ -9,10 +9,10 @@ export const CONNECTORS_CONFIG = {
   /** Quanti blocchi per richiesta quando si salvano le riparazioni in blocco. */
   repairSaveChunk: 50,
   /**
-   * V3: il JSON dell'agente non porta piu' le destinazioni alla maniera V2. All'apertura i blocchi
-   * che le hanno ancora vengono salvati ripuliti (dopo la lista), e a ogni salvataggio i campi di
-   * destinazione delle action e del pallino (NON i bottoni) partono vuoti: la lista
-   * `attributes.connectors` del bot e' l'unica verita'. RICHIEDE IL MOTORE CHE LEGGE LA LISTA
+   * V3: il JSON dell'agente non porta traccia dei connettori alla maniera V2. All'apertura i blocchi
+   * che ne hanno ancora vengono salvati ripuliti (dopo la lista), e a ogni salvataggio partono senza
+   * le chiavi di destinazione delle action e del pallino (NON i bottoni) e senza gli attributi
+   * visivi per blocco: la lista `attributes.connectors` del bot e' l'unica verita'. RICHIEDE IL MOTORE CHE LEGGE LA LISTA
    * (tiledesk-chatbot con ConnectorsV3): con un motore vecchio i V3 ripuliti non seguono piu' i
    * collegamenti. Spento: i campi viaggiano pieni e uguali alla lista (dato duplicato).
    */

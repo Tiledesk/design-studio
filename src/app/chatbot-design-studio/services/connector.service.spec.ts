@@ -93,6 +93,40 @@ describe('ConnectorService — la facciata V2/V3', () => {
     expect(legacy.listOfIntents).toBeUndefined();
   });
 
+  it('V3: un connettore verso un blocco che entra nel DOM un attimo dopo aspetta e risponde true (il canvas salva il blocco nuovo solo allora)', async () => {
+    const { facade, v3 } = build(true);
+    const draw = jasmine.createSpy('draw');
+    (v3 as any).renderer = { draw, update() {} };
+    const from = document.createElement('div'); from.id = 'a/x'; document.body.appendChild(from);
+    const to = document.createElement('div'); to.id = 'b';
+    try {
+      const drawn = facade.createConnectorFromId('a/x', 'b', true, null);
+      setTimeout(() => document.body.appendChild(to), 50);
+      expect(await drawn).toBeTrue();
+      expect(draw).toHaveBeenCalledWith('a/x', 'b', from, to, null, true);
+    } finally {
+      from.remove(); to.remove();
+    }
+  });
+
+  it('V3: un connettore verso un blocco che non compare torna false e resta in attesa del blocco', async () => {
+    const { facade, v3 } = build(true);
+    const draw = jasmine.createSpy('draw');
+    (v3 as any).renderer = { draw, update() {} };
+    const from = document.createElement('div'); from.id = 'a/x'; document.body.appendChild(from);
+    const to = document.createElement('div'); to.id = 'b';
+    try {
+      expect(await facade.createConnectorFromId('a/x', 'b', false, null)).toBeFalse();
+      expect(draw).not.toHaveBeenCalled();
+      document.body.appendChild(to);
+      facade.blockRendered('b');
+      await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+      expect(draw).toHaveBeenCalledWith('a/x', 'b', from, to, null, false);
+    } finally {
+      from.remove(); to.remove();
+    }
+  });
+
   it('senza un DashboardService (le spec che istanziano a mano) risponde il V3', () => {
     const built = build(null);
     expect(built.facade.impl).toBe(built.v3);

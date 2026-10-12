@@ -26,7 +26,7 @@
 import { RESERVED_INTENT_NAMES } from '../utils';
 import { isReturnStackIntent } from '../utils-actions';
 import {
-  ConnectorProps, ConnectorRecord, DanglingRef, FlowIndex, edgesOfFlow, ensureTechnicalIds, indexFlow, recordIdOf,
+  ConnectorProps, ConnectorRecord, DanglingRef, FlowIndex, ResolvedSlot, edgesOfFlow, ensureTechnicalIds, indexFlow, recordIdOf,
   slotsOfIntent, writeSlot,
 } from './connector-catalog';
 import { CONNECTORS_COLLECTION_VERSION } from './connector-config';
@@ -47,8 +47,10 @@ export type RepairKind =
   | 'connector-attr-id-filled'
   /** V3 senza pulizia: un'uscita riscritta dalla lista del bot (la lista vince sui campi), da salvare. */
   | 'projected-from-collection'
-  /** V3 con pulizia: il JSON del blocco porta ancora una destinazione alla maniera V2; il blocco va salvato ripulito. */
-  | 'v2-destination-still-saved';
+  /** V3 con pulizia: il JSON del blocco porta ancora una chiave di destinazione alla maniera V2; il blocco va salvato ripulito. */
+  | 'v2-destination-still-saved'
+  /** V3 con pulizia: il JSON del blocco porta ancora gli attributi visivi per blocco (`attributes.connectors`); il blocco va salvato ripulito. */
+  | 'v2-connector-attrs-still-saved';
 
 export interface FlowRepair {
   intentId: string;
@@ -131,6 +133,10 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     }
   }
 
+  // Chi porta ancora gli attributi visivi per blocco (`attributes.connectors`, maniera V2): si
+  // guarda PRIMA dei default, che li creano vuoti in memoria per il canvas.
+  const hadV2Attrs = new Set<string>(list.filter(i => i?.attributes && Object.prototype.hasOwnProperty.call(i.attributes, 'connectors')).map(i => i.intent_id));
+
   // 2. Default che non contano come riparazioni: attributi e flag dei blocchi riservati.
   for (const intent of list) {
     if (!intent) { continue; }
@@ -186,14 +192,20 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
     }
   }
 
-  // 5a. V3 con pulizia: un blocco che sul server porta ancora una destinazione alla maniera V2
-  //     (campo col `#`, bottoni esclusi) va salvato ripulito: la verita' e' la lista.
+  // 5a. V3 con pulizia: il JSON di un V3 non porta traccia dei connettori alla maniera V2. Un
+  //     blocco che sul server ha ancora una chiave di destinazione (anche vuota, bottoni compresi:
+  //     il motore V3 riempie `button.action` dalla lista prima che la reply parta) o gli attributi
+  //     visivi per blocco va salvato ripulito: la verita' e' la lista. Un nome di blocco senza `#`
+  //     (flussi vecchi) non si tocca.
   if (opts.collectionWins && opts.cleanDestinations) {
     for (const intent of list) {
       if (!intent) { continue; }
       for (const slot of slotsOfIntent(intent)) {
-        if (slot.kind === 'button' || !slot.toId || !slot.hasHash) { continue; }
-        rec.add({ intentId: intent.intent_id, kind: 'v2-destination-still-saved', path: pathOf(intent, slot), before: slot.raw, after: '' });
+        if (!isV2Trace(slot)) { continue; }
+        rec.add({ intentId: intent.intent_id, kind: 'v2-destination-still-saved', path: pathOf(intent, slot), before: slot.raw, after: undefined });
+      }
+      if (hadV2Attrs.has(intent.intent_id)) {
+        rec.add({ intentId: intent.intent_id, kind: 'v2-connector-attrs-still-saved', path: 'attributes.connectors' });
       }
     }
   }
@@ -242,6 +254,29 @@ export function normalizeFlow(intents: any[], collection: ConnectorsCollection |
   const previous = isCollection(collection) ? collection : null;
   const built = buildCollection(list, previous, opts.now);
   const collectionChanged = built.changed;
+
+  // 7b. V3: l'aspetto dei connettori vive nei `props` della lista; il canvas pero' lo legge e lo
+  //     scrive ancora negli attributi del blocco, che sul server non ci sono piu'. Qui, in memoria,
+  //     si ricostruiscono dalla lista (quelli gia' presenti nel blocco vincono: sono la scrittura
+  //     piu' recente del menu). Solo per i record che hanno un aspetto (`display`, `label`,
+  //     `color`): la coda `params` di un bottone non lo e', e una voce senza `display` fa
+  //     comparire al pallino il riquadro col nome del blocco come se la linea fosse nascosta.
+  //     Il menu scrive sempre `display`: qui lo stesso, vero se il record non lo dice.
+  if (opts.collectionWins) {
+    const byId = new Map<string, any>(list.filter(i => !!i).map(i => [i.intent_id, i]));
+    for (const record of built.collection.items) {
+      const props = record.props;
+      if (!props || (props.display === undefined && props.label === undefined && props.color === undefined)) { continue; }
+      const intent = byId.get(record.from.intentId);
+      if (!intent) { continue; }
+      const fromId = record.id.substring(0, record.id.lastIndexOf('/'));
+      if (intent.attributes.connectors[fromId]) { continue; }
+      const entry: any = { id: record.id, display: props.display !== false };
+      if (props.label !== undefined) { entry.label = props.label; }
+      if (props.color !== undefined) { entry.color = props.color; }
+      intent.attributes.connectors[fromId] = entry;
+    }
+  }
 
   const changedIntentIds = [...rec.changed];
   const report: RepairReport = {
@@ -292,16 +327,23 @@ export function isCollection(value: any): value is ConnectorsCollection {
 function propsFor(record: ConnectorRecord, previous: ConnectorRecord | undefined, intents: any[]): ConnectorProps | null {
   const intent = intents.find(i => i?.intent_id === record.from.intentId);
   const fromId = record.id.substring(0, record.id.lastIndexOf('/'));
+  // Cio' che il record porta gia' dalla action (la coda `{...}` di un bottone) resta sempre.
+  const own: ConnectorProps = record.props ? { ...record.props } : {};
   const legacy = intent?.attributes?.connectors?.[fromId];
+  let looks: ConnectorProps = {};
   if (legacy && typeof legacy === 'object') {
-    const props: ConnectorProps = {};
-    if (typeof legacy.display === 'boolean') { props.display = legacy.display; }
-    if (typeof legacy.label === 'string' && legacy.label !== '') { props.label = legacy.label; }
-    if (typeof legacy.color === 'string' && legacy.color !== '') { props.color = legacy.color; }
-    if (Object.keys(props).length > 0) { return props; }
+    if (typeof legacy.display === 'boolean') { looks.display = legacy.display; }
+    if (typeof legacy.label === 'string' && legacy.label !== '') { looks.label = legacy.label; }
+    if (typeof legacy.color === 'string' && legacy.color !== '') { looks.color = legacy.color; }
   }
-  if (previous?.props && Object.keys(previous.props).length > 0) { return { ...previous.props }; }
-  return null;
+  if (previous?.props) {
+    const { params, ...rest } = previous.props;
+    if (Object.keys(looks).length === 0) { looks = rest; }
+    // Un bottone ripulito (senza `action`) non sa piu' la sua coda: la tiene il record precedente.
+    if (own.params === undefined && params !== undefined) { own.params = params; }
+  }
+  const props = { ...own, ...looks };
+  return Object.keys(props).length > 0 ? props : null;
 }
 
 /**
@@ -322,9 +364,16 @@ function projectCollection(list: any[], collection: ConnectorsCollection, index:
       const record = byFromId.get(slot.fromId);
       const wanted = record && index.ids.has(record.to.intentId) ? record.to.intentId : null;
       if (slot.toId && !slot.hasHash && !isIntentId(slot.toId)) { continue; }   // un nome di blocco: non si tocca
+      if (slot.kind === 'button' && !wanted && !slot.toId && slot.item?.type === 'action') {
+        // un bottone "action" senza record e senza destinazione (ripulito sul server): torna di testo
+        writeSlot(slot, null, null);
+        slot.item.type = 'text';
+        changed++;
+        continue;
+      }
       if ((slot.toId || null) === wanted) { continue; }
       const before = slot.raw;
-      writeSlot(slot, wanted);
+      writeSlot(slot, wanted, slot.kind === 'button' ? (record?.props?.params ?? slot.attrs) : undefined);
       if (slot.kind === 'button' && slot.item) { slot.item.type = wanted ? 'action' : 'text'; }
       if (rec) { rec.add({ intentId: intent.intent_id, kind: 'projected-from-collection', path: pathOf(intent, slot), before, after: slot.holder[slot.field] }); }
       changed++;
@@ -335,7 +384,7 @@ function projectCollection(list: any[], collection: ConnectorsCollection, index:
 
 function sameProps(a?: ConnectorProps, b?: ConnectorProps): boolean {
   const x = a || {}; const y = b || {};
-  return x.display === y.display && x.label === y.label && x.color === y.color;
+  return x.display === y.display && x.label === y.label && x.color === y.color && x.params === y.params;
 }
 
 function pathOf(intent: any, slot: { kind: string; actionId: string; key: string; field: string }): string {
@@ -371,19 +420,33 @@ export function recordIdOfSlot(fromId: string, toId: string | null): string | nu
   return toId ? recordIdOf(fromId, toId) : null;
 }
 
+/** Una chiave di destinazione scritta alla maniera V2: c'e', ed e' vuota o un `#id` (un nome di blocco nudo non lo e'). */
+function isV2Trace(slot: ResolvedSlot): boolean {
+  if (!slot.holder || !Object.prototype.hasOwnProperty.call(slot.holder, slot.field)) { return false; }
+  return !(slot.toId && !slot.hasHash);
+}
+
 /**
- * V3, al salvataggio: i campi di destinazione delle action e del pallino vanno sul server VUOTI,
- * perche' il motore V3 legge la lista del bot e non i campi. I bottoni no: `button.action` e' il
- * testo che il widget manda al bot, e il motore lo riceve cosi'. Un nome di blocco dei flussi
- * vecchi (senza `#`) non si tocca. Lavora su cio' che riceve: va chiamata sul payload, che e' un
- * clone, mai sul modello che il canvas disegna. Restituisce quanti campi ha svuotato.
+ * V3, al salvataggio: il JSON dell'agente non porta traccia dei connettori alla maniera V2. Via le
+ * chiavi di destinazione delle action e del pallino (`trueIntent`, `intentName`, `goToIntent`,
+ * `cases[].intent`, ...), via `button.action` dei bottoni (il motore V3 lo riempie dalla lista prima
+ * che la reply parta; la coda `{...}` sta nei `props` del record) e via gli attributi visivi per
+ * blocco (`attributes.connectors`: l'aspetto sta nei `props` della lista). Resta un nome di blocco
+ * senza `#` dei flussi vecchi. Lavora su cio' che riceve: va chiamata sul payload, che e' un clone,
+ * mai sul modello che il canvas disegna. Restituisce quante cose ha tolto.
  */
-export function stripDestinations(intents: any[]): number {
+export function stripV2Connectors(intents: any[]): number {
   let stripped = 0;
   for (const intent of intents || []) {
+    if (!intent) { continue; }
     for (const slot of slotsOfIntent(intent)) {
-      if (slot.kind === 'button' || !slot.toId || !slot.hasHash) { continue; }
-      if (writeSlot(slot, null)) { stripped++; }
+      if (!isV2Trace(slot)) { continue; }
+      delete slot.holder[slot.field];
+      stripped++;
+    }
+    if (intent.attributes && Object.prototype.hasOwnProperty.call(intent.attributes, 'connectors')) {
+      delete intent.attributes.connectors;
+      stripped++;
     }
   }
   return stripped;

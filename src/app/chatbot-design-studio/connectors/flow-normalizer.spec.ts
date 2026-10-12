@@ -1,4 +1,4 @@
-import { clearAllTargets, isCollection, normalizeFlow, preparedPastedIntent, stripDestinations } from './flow-normalizer';
+import { clearAllTargets, isCollection, normalizeFlow, preparedPastedIntent, stripV2Connectors } from './flow-normalizer';
 import { CONNECTORS_COLLECTION_VERSION } from './connector-config';
 
 /**
@@ -180,8 +180,8 @@ describe('flow-normalizer', () => {
       const prima = normalizeFlow(flusso(), null, opts(v3));
       expect(prima.report.collection.projected).toBe(0);
       expect(prima.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/x/false/c', 'b/n_b/c']);
-      // i quattro campi col # vanno ripuliti sul server: i loro blocchi si salvano
-      expect(prima.report.counts).toEqual({ 'v2-destination-still-saved': 4 });
+      // i quattro campi col # e la chiave `action` del bottone di testo vanno ripuliti sul server: i loro blocchi si salvano
+      expect(prima.report.counts).toEqual({ 'v2-destination-still-saved': 5 });
       expect(prima.changedIntentIds.sort()).toEqual(['a', 'b']);
 
       const salvata = clone(prima.collection);
@@ -191,12 +191,13 @@ describe('flow-normalizer', () => {
       salvata.items.splice(salvata.items.findIndex((i: any) => i.id === 'b/n_b/c'), 1);
       salvata.items.push({ id: 'b/n_b/c', from: { intentId: 'b', actionId: 'n_b', slot: 'next' }, to: { intentId: 'c' }, kind: 'block' });
 
-      // il JSON gia' ripulito di un V3: i campi sono vuoti, solo il bottone resta
+      // il JSON gia' ripulito di un V3: le chiavi non ci sono, solo il bottone resta
       const intents = flusso();
-      stripDestinations(intents);
+      stripV2Connectors(intents);
       intents[1].attributes.nextBlockAction.intentName = '#a';   // tranne uno, rimasto alla maniera V2 e diverso dalla lista
       const r = normalizeFlow(intents, salvata, opts(v3));
-      expect(intents[0].actions[0]).toEqual(jasmine.objectContaining({ trueIntent: '#b', falseIntent: '' }));
+      expect(intents[0].actions[0].trueIntent).toBe('#b');
+      expect(intents[0].actions[0].falseIntent).toBeUndefined();
       expect(intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'action', action: '#c' }));
       expect(intents[1].attributes.nextBlockAction.intentName).toBe('#c');
       expect(r.report.collection.projected).toBe(4);                       // in memoria, non da salvare
@@ -206,11 +207,11 @@ describe('flow-normalizer', () => {
       expect(r.collection.items.map(i => i.id)).toEqual(['a/n_a/b', 'a/x/true/b', 'a/r/k1/c', 'b/n_b/c']);
       expect(r.collectionChanged).toBeTrue();
       // l'apertura successiva, sul JSON ripulito, non ha niente da salvare
-      stripDestinations(r.intents);
+      stripV2Connectors(r.intents);
       const r2 = normalizeFlow(r.intents, r.collection, opts(v3));
       expect(r2.report.counts).toEqual({});
       expect(r2.changedIntentIds).toEqual([]);
-      expect(r2.report.collection.projected).toBe(3);                      // il bottone resta pieno: si riempiono le altre tre
+      expect(r2.report.collection.projected).toBe(4);                      // anche il bottone, ripulito, si riempie dalla lista
       expect(r2.collectionChanged).toBeFalse();
     });
 
@@ -251,17 +252,81 @@ describe('flow-normalizer', () => {
       expect(intents2[0].actions[0].falseIntent).toBe('#c');
     });
 
-    it('al salvataggio stripDestinations svuota pallino e uscite delle action, non i bottoni ne\' i nomi di blocco', () => {
+    it('in memoria ricostruisce gli attributi visivi del blocco solo dai record con un aspetto, sempre con display: la coda di un bottone non basta', () => {
+      const flusso = () => [
+        blocco('a', [{ _tdActionId: 'r', _tdActionType: 'reply', attributes: { attachment: { buttons: [
+          { uid: 'k1', type: 'action', action: '' }, { uid: 'k2', type: 'action', action: '' }, { uid: 'k3', type: 'action', action: '' },
+        ] } } }], ''),
+        blocco('c'),
+      ];
+      const lista = {
+        version: CONNECTORS_COLLECTION_VERSION, updatedAt: now(), items: [
+          { id: 'a/r/k1/c', from: { intentId: 'a', actionId: 'r', slot: 'button:k1' }, to: { intentId: 'c' }, kind: 'button', props: { params: '{"k":1}' } },
+          { id: 'a/r/k2/c', from: { intentId: 'a', actionId: 'r', slot: 'button:k2' }, to: { intentId: 'c' }, kind: 'button', props: { label: 'L' } },
+          { id: 'a/r/k3/c', from: { intentId: 'a', actionId: 'r', slot: 'button:k3' }, to: { intentId: 'c' }, kind: 'button', props: { display: false } },
+          { id: 'a/n_a/c', from: { intentId: 'a', actionId: 'n_a', slot: 'next' }, to: { intentId: 'c' }, kind: 'block' },
+        ],
+      };
+      const r = normalizeFlow(flusso(), lista as any, opts({ isV3: true, collectionWins: true, cleanDestinations: true }));
+      expect(r.intents[0].attributes.connectors).toEqual({
+        'a/r/k2': { id: 'a/r/k2/c', display: true, label: 'L' },
+        'a/r/k3': { id: 'a/r/k3/c', display: false },
+      });
+      expect(r.intents[0].actions[0].attributes.attachment.buttons[0].action).toBe('#c{"k":1}');
+    });
+
+    it('al salvataggio stripV2Connectors toglie le chiavi del pallino, delle uscite e dei bottoni e gli attributi visivi per blocco, non i nomi di blocco', () => {
       const intents = flusso();
-      intents[0].actions[1].attributes.attachment.buttons[0] = { uid: 'k1', type: 'action', value: 'Uno', action: '#c' };
-      intents.push(blocco('d', [{ _tdActionId: 'y', _tdActionType: 'intent', intentName: 'Nome' }]));
-      expect(stripDestinations(intents)).toBe(4);
-      expect(intents[0].attributes.nextBlockAction.intentName).toBe('');
-      expect(intents[0].actions[0]).toEqual(jasmine.objectContaining({ trueIntent: '', falseIntent: '' }));
-      expect(intents[0].actions[1].attributes.attachment.buttons[0].action).toBe('#c');
-      expect(intents[1].attributes.nextBlockAction.intentName).toBe('');
+      intents[0].actions[1].attributes.attachment.buttons[0] = { uid: 'k1', type: 'action', value: 'Uno', action: '#c{"k":1}' };
+      intents[0].attributes.connectors = { 'a/n_a': { id: 'a/n_a/b', label: 'L' } };
+      intents.push(blocco('d', [{ _tdActionId: 'y', _tdActionType: 'intent', intentName: 'Nome', falseIntent: '' }]));
+      expect(stripV2Connectors(intents)).toBe(6);   // 4 chiavi + il bottone + gli attributi del blocco a
+      expect('intentName' in intents[0].attributes.nextBlockAction).toBeFalse();
+      expect('trueIntent' in intents[0].actions[0]).toBeFalse();
+      expect('falseIntent' in intents[0].actions[0]).toBeFalse();
+      expect(intents[0].actions[1].attributes.attachment.buttons[0]).toEqual({ uid: 'k1', type: 'action', value: 'Uno' });
+      expect(intents[0].attributes.connectors).toBeUndefined();
+      expect('intentName' in intents[1].attributes.nextBlockAction).toBeFalse();
       expect(intents[3].actions[0].intentName).toBe('Nome');
-      expect(stripDestinations(intents)).toBe(0);
+      expect(intents[0].attributes.nextBlockAction._tdActionId).toBe('n_a');   // il descrittore del pallino resta: ancora il connettore
+      expect(stripV2Connectors(intents)).toBe(0);
+    });
+
+    it('un bottone ripulito si riempie dalla lista con la sua coda {attrs}, e senza record torna di testo', () => {
+      const v3 = { collectionWins: true, cleanDestinations: true };
+      const intents = flusso();
+      intents[0].actions[1].attributes.attachment.buttons[0] = { uid: 'k1', type: 'action', value: 'Uno', action: '#c{"k":1}' };
+      const prima = normalizeFlow(intents, null, opts(v3));
+      expect(prima.collection.items.find(i => i.id === 'a/r/k1/c')!.props).toEqual({ params: '{"k":1}' });
+      // sul server il bottone parte senza `action`; alla riapertura la lista lo riempie, coda compresa
+      stripV2Connectors(prima.intents);
+      const r2 = normalizeFlow(prima.intents, prima.collection, opts(v3));
+      expect(r2.intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'action', action: '#c{"k":1}' }));
+      expect(r2.report.counts).toEqual({});
+      expect(r2.collectionChanged).toBeFalse();
+      // la lista perde il record: il bottone torna di testo
+      const senza = clone(r2.collection); senza.items = senza.items.filter((i: any) => i.id !== 'a/r/k1/c');
+      stripV2Connectors(r2.intents);
+      const r3 = normalizeFlow(r2.intents, senza, opts(v3));
+      expect(r3.intents[0].actions[1].attributes.attachment.buttons[0]).toEqual(jasmine.objectContaining({ type: 'text', action: '' }));
+    });
+
+    it('gli attributi visivi per blocco migrano nei props della lista, il blocco si ripulisce, e alla riapertura tornano in memoria dalla lista', () => {
+      const v3 = { collectionWins: true, cleanDestinations: true };
+      const intents = flusso();
+      intents[0].attributes.connectors = { 'a/n_a': { id: 'a/n_a/b', label: 'etichetta', display: true } };
+      const prima = normalizeFlow(intents, null, opts(v3));
+      expect(prima.collection.items[0].props).toEqual({ display: true, label: 'etichetta' });
+      expect(prima.report.counts['v2-connector-attrs-still-saved']).toBe(1);
+      expect(prima.changedIntentIds).toContain('a');
+      // sul server il blocco parte senza attributi visivi
+      stripV2Connectors(prima.intents);
+      expect(prima.intents[0].attributes.connectors).toBeUndefined();
+      // alla riapertura la lista li rimette in memoria per il canvas, e non c'e' niente da salvare
+      const r2 = normalizeFlow(prima.intents, prima.collection, opts(v3));
+      expect(r2.intents[0].attributes.connectors['a/n_a']).toEqual({ id: 'a/n_a/b', display: true, label: 'etichetta' });
+      expect(r2.report.counts).toEqual({});
+      expect(r2.collectionChanged).toBeFalse();
     });
   });
 

@@ -139,10 +139,10 @@
     border-radius: 6px;
     margin: 0px;
     align-items: center;
-  }
-  
-  /* Menu laterale (hover) */
-  .connector-text-menu {
+    color: var(--blu);
+}
+
+.connector-text-menu {
     display: none;
     position: absolute;
     left: 100%;

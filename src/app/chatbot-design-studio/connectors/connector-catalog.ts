@@ -98,6 +98,8 @@ export interface ConnectorProps {
   display?: boolean;
   label?: string;
   color?: string;
+  /** Solo bottoni: la coda `{...}` di parametri che seguiva l'id in `button.action`. Nei V3 vive qui. */
+  params?: string;
 }
 
 /** Una destinazione che non porta a nessun blocco del flusso. */
@@ -410,8 +412,8 @@ export function setTarget(intent: any, actionId: string | null, slotKey: string,
   return writeSlot(slot, toId);
 }
 
-export function writeSlot(slot: ResolvedSlot, toId: string | null): boolean {
-  const value = slot.spec.path.kind === 'buttons' ? buildButtonAction(toId, slot.attrs) : destinationValue(toId);
+export function writeSlot(slot: ResolvedSlot, toId: string | null, params?: string | null): boolean {
+  const value = slot.spec.path.kind === 'buttons' ? buildButtonAction(toId, params !== undefined ? params : slot.attrs) : destinationValue(toId);
   if (slot.holder[slot.field] === value) { return false; }
   slot.holder[slot.field] = value;
   return true;
@@ -451,7 +453,9 @@ export function edgesOfIntent(intent: any, index: FlowIndex): IntentEdges {
     }
     const id = recordIdOf(slot.fromId, slot.toId);
     if (slots.has(id)) { continue; }
-    records.push({ id, from: { intentId: slot.intentId, actionId: slot.actionId, slot: slot.key }, to: { intentId: slot.toId }, kind: slot.kind });
+    const record: ConnectorRecord = { id, from: { intentId: slot.intentId, actionId: slot.actionId, slot: slot.key }, to: { intentId: slot.toId }, kind: slot.kind };
+    if (slot.kind === 'button' && slot.attrs) { record.props = { params: slot.attrs }; }
+    records.push(record);
     slots.set(id, slot);
   }
   return { records, dangling, slots };
