@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-v2-rules",
+    "types": ["jasmine", "node"]
+  },
+  "files": ["src/test-v2-rules.ts", "src/polyfills.ts"],
+  "include": [
+    "src/app/services/dashboard.service.spec.ts",
+    "src/app/chatbot-design-studio/utils-fallback.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

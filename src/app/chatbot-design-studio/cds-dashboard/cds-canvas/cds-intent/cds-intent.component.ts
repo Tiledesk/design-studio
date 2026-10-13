@@ -12,7 +12,7 @@ import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, DATE_NEW_CHATBOT, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -73,16 +73,19 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   isDefaultFallback = false;
 
   /** isDefaultFallbackLocked
-   * true SOLO se il blocco e' la defaultFallback e non contiene alcuna action
-   * (perche' nasce vuota nei chatbot nuovi, o perche' l'unica action e' stata
+   * true SOLO in un agente V3, se il blocco e' la defaultFallback e non contiene
+   * alcuna action (perche' nasce vuota, o perche' l'unica action e' stata
    * cancellata/spostata). In questo stato il blocco e' chiuso: niente drop,
    * niente pulsante "Add action", niente placeholder di blocco vuoto.
-   * Una defaultFallback legacy (con action al suo interno) NON e' bloccata.
+   * Negli agenti V2 la defaultFallback e' un blocco come gli altri, anche vuota:
+   * n action, drop e menu come sempre (regole V2 intere, decise all'apertura
+   * da DashboardService.isV3). Una defaultFallback con action al suo interno
+   * NON e' bloccata in nessuna versione.
    * E' un getter e non un campo: lo spostamento di una action verso un altro
    * blocco muta l'array in place senza emettere behaviorIntent, quindi un
    * valore memorizzato resterebbe stale. */
   public get isDefaultFallbackLocked(): boolean {
-    return this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
+    return this.isV3 && this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
   }
 
   startAction: any;
@@ -107,7 +110,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   serverBaseURL: any;
   chatbot_id: string;
   isUntitledBlock: boolean = false;
-  isNewChatbot: boolean = false;
+  /** Regole dell'editor per questo blocco: V3 (una action, niente drag) o V2 (n action, drag). Letto da DashboardService all'apertura. */
+  isV3: boolean = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -293,8 +297,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       this.updateIsUntitledBlock();
       // Aggiorna showIntentOptions dopo l'inizializzazione
       this.updateShowIntentOptions();
-      // Verifica se il chatbot è nuovo (creato dopo il 01/06/2025)
-      this.checkIfNewChatbot();
+      // Regole V2 o V3 per il blocco: decise una volta sola all'apertura del chatbot
+      this.setDsVersion();
       this.addEventListener();
       this.setIntentAttributes();
       
@@ -483,39 +487,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  /** checkIfNewChatbot
-   * Verifica se il chatbot è stato creato dopo il 01/06/2025
-   * Se la data di creazione è precedente al 01/06/2025, isNewChatbot = false
-   * Altrimenti isNewChatbot = true
+  /** setDsVersion
+   * Le regole del blocco seguono la versione dell'agente, risolta una volta sola
+   * da DashboardService all'apertura (attributes.dsVersion === 'v3'): V3 una sola
+   * action per blocco e niente drag delle action; V2 tutto come sempre.
    */
-  private checkIfNewChatbot(): void {
-    
-    //this.isNewChatbot = false;
-    //return;
-    const cutoffDate = DATE_NEW_CHATBOT;
-    const chatbot = this.dashboardService.selectedChatbot;
-    this.logger.log('[CDS-INTENT] checkIfNewChatbot: ', chatbot.createdAt);
-
-
-    if (!chatbot || !chatbot.createdAt) {
-      // Se non c'è data di creazione, considera come nuovo chatbot
-      this.isNewChatbot = true;
-      this.logger.log('[CDS-INTENT] checkIfNewChatbot: nessuna data di creazione, impostato a true');
-      return;
-    }
-
-    try {
-      // Se la data di creazione è precedente al ... (DATE_NEW_CHATBOT), isNewChatbot = false
-      // Altrimenti (successiva o uguale), isNewChatbot = true
-      this.isNewChatbot = chatbot.createdAt >= cutoffDate;
-      this.logger.log('[CDS-INTENT] checkIfNewChatbot:', {
-        isNewChatbot: this.isNewChatbot
-      });
-    } catch (error) {
-      this.logger.error('[CDS-INTENT] checkIfNewChatbot error:', error);
-      // In caso di errore, considera come nuovo chatbot
-      this.isNewChatbot = true;
-    }
+  private setDsVersion(): void {
+    this.isV3 = !!this.dashboardService?.isV3;
+    this.logger.log('[CDS-INTENT] setDsVersion:', { isV3: this.isV3 });
   }
 
   ngAfterViewInit() {
@@ -784,7 +763,17 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   //   }
   // }
 
-  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
+  /**
+   * Apre il dettaglio dell'action al click su di essa. Un click arriva anche alla fine di un
+   * trascinamento del blocco iniziato sull'intestazione dell'action (il browser lo emette al
+   * mouseup): se il puntatore si e' mosso dal mousedown piu' della soglia, era un trascinamento
+   * e il pannello non si apre. Senza evento (apertura dai controlli dell'action) si apre sempre.
+   */
+  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE, event?: MouseEvent) {
+    if (event && this.movedSinceMouseDown(event)) {
+      this.logger.log('[CDS-INTENT] onActionSelected: click dopo un trascinamento, pannello non aperto');
+      return;
+    }
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
@@ -959,12 +948,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if (this.isDefaultFallbackLocked) {
         return false;
       }
-      // Se il chatbot è nuovo, disabilita il drop se c'è già un'action nell'intent
-      // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-      if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
+      // V3: una sola action per blocco, quindi niente drop se ce n'e' gia' una
+      if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
         return false;
       }
-      // Per i chatbot esistenti, permette il drop normalmente
+      // V2: n action per blocco, il drop e' sempre permesso
       return true;
     }
   }
@@ -988,14 +976,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    // Se il chatbot è nuovo, impedisce il drop se c'è già un'action nell'intent
-    // Mantiene il limite di una action per blocco intent per i chatbot nuovi
-    if (this.isNewChatbot && this.intent.actions && this.intent.actions.length > 0) {
-      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot nuovo e c\'è già un\'action nell\'intent');
+    // V3: una sola action per blocco, quindi niente drop se ce n'e' gia' una
+    if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - agente V3 e c\'e\' gia\' una action nel blocco');
       return;
     }
-    
-    // Per i chatbot esistenti, esegue il drop normalmente
+
+    // V2: n action per blocco, il drop procede
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
     if (event.previousContainer === event.container) {
@@ -1113,6 +1100,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
 
   onIntentMouseDown(event: MouseEvent): void {
     this.hasMouseMoved = false;
+    this.mouseDownX = event.clientX;
+    this.mouseDownY = event.clientY;
+  }
+
+  /** True se, dal mousedown sul blocco, il puntatore si e' spostato oltre la soglia: un trascinamento, non un click. */
+  private movedSinceMouseDown(event: MouseEvent): boolean {
+    const dx = event.clientX - this.mouseDownX;
+    const dy = event.clientY - this.mouseDownY;
+    return Math.sqrt(dx * dx + dy * dy) > this.MOUSE_MOVE_THRESHOLD;
   }
 
   onIntentMouseMove(event: MouseEvent): void {

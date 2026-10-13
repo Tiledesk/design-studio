@@ -4,7 +4,7 @@
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
     [class.isStart]="isStart" 
-    [class.tds-slim-intent]="isNewChatbot"
+    [class.tds-slim-intent]="isV3"
     [class.cds-fallback-locked]="isDefaultFallbackLocked"
     [id]="'intent-content-'+ intent?.intent_id"
     [ngStyle]="{
@@ -75,7 +75,7 @@
         [class.cds-fallback-locked]="isDefaultFallbackLocked"
         cdkDropList
         [cdkDropListData]="listOfActions"
-        [cdkDropListDisabled]="isNewChatbot || isDefaultFallbackLocked"
+        [cdkDropListDisabled]="isV3 || isDefaultFallbackLocked"
         (cdkDropListDropped)="onDropAction($event)"
         [cdkDropListEnterPredicate]="canEnterDropList(intent)">
         <!-- [id]="'action_'+i" -->
@@ -84,7 +84,7 @@
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked" 
             cdkDrag
-            [cdkDragDisabled]="dragDisabled || isNewChatbot">
+            [cdkDragDisabled]="dragDisabled || isV3">
             <!-- add-action-placeholder  -->
             <!-- <div class="add--action-placeholder-add-icon">
                 <span class="material-icons"> add </span>
@@ -112,7 +112,7 @@
 
         <div *ngFor="let action of listOfActions; let i = index; let first = first; let last = last;" 
             cdkDrag
-            [cdkDragDisabled]="isNewChatbot"
+            [cdkDragDisabled]="isV3"
             (cdkDragStarted)="onDragStarted($event, intent.intent_id, i)" 
             (cdkDragReleased)="onDragEnded($event, i)"
             (cdkDragMoved)="onDragMove($event)"
@@ -127,11 +127,20 @@
                 'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
             }"
             (keydown)="onKeydown($event)" 
-            (click)="onSelectAction(action, i, action._tdActionId)">
+            (click)="onSelectAction(action, i, action._tdActionId, $event)">
             <!-- [class.isFirst]="first" -->
             <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
             <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
             <!-- <span *ngIf="!first" class="action-element"> -->
+
+            <!-- handle di riordino: SOLO questo (il drag_indicator) trascina/riordina l'azione, dentro
+                 il blocco, in un altro blocco o sullo stage; trascinando qualsiasi altro punto
+                 dell'intestazione si sposta il blocco intent (tds_draggable). Sta qui e non dentro
+                 cds-action-description perche' cdkDrag raccoglie gli handle solo fra i suoi content
+                 children. `tds_no_drag` tiene fuori questa presa dal trascinamento del blocco. -->
+            <div class="action-reorder-handle tds_no_drag" cdkDragHandle [title]="'CDSCanvas.Drag' | translate">
+                <img class="active-icon" src="assets/images/icons/drag_indicator.svg" alt="">
+            </div>
 
             <span class="action-element">
 
@@ -147,13 +156,12 @@
 
                 <cds-action-description 
                     class="header-action" 
-                    cdkDragHandle
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
                 <div cdkDragDisabled class="body-action" [ngSwitch]="action._tdActionType">
 
-                    <cds-action-controls *ngIf="!isNewChatbot"
+                    <cds-action-controls *ngIf="!isV3"
                         (onClickControl)="onClickControl($event, action, i)">
                     </cds-action-controls>
     
@@ -554,7 +562,7 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0 && !isNewChatbot" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
                 class="cds-add-action-btn">    
                 + {{ 'CDSCanvas.AddAction' | translate}}

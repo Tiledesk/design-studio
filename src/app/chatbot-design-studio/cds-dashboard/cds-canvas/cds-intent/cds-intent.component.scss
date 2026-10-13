@@ -407,6 +407,26 @@
 //   background-color: #e3e1f1;
 // }
 
+/* L'unica presa che trascina/riordina l'azione (vedi il template): sopra l'intestazione,
+   in alto a destra, dove prima stava il drag_indicator di cds-action-description. */
+.action-reorder-handle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: #394f5a;
+  z-index: 2;
+  img {
+    width: 16px;
+    height: auto;
+  }
+}
+
 .header-action {
   position: relative;
   min-height: 54px;

@@ -4,11 +4,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
-/**
- * Cutoff date used to determine whether a chatbot is considered "new".
- * ISO string format, compared lexicographically against `createdAt` (also ISO).
- */
-export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+/** Valore dell'etichetta `attributes.dsVersion` che identifica un agente da aprire
+ *  con il Design Studio V3. E' l'unica cosa che decide quale editor si apre: chi crea
+ *  l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
+ *  Confronto in minuscolo. */
+export const DS_VERSION_V3 = 'v3';
+
+/** TEMPORANEO -- DA TOGLIERE AL MERGE SU MASTER.
+ *  Data di taglio: un agente SENZA etichetta `dsVersion` creato da qui in poi apre con il
+ *  Design Studio V3 (richiesta di Dario del 13/10/2026). Serve finche' in giro ci sono agenti
+ *  nati V3 senza etichetta; quando ogni via di creazione la scrive, questa costante e il ramo
+ *  che la legge in DashboardService.resolveDsVersion spariscono e resta la sola etichetta. */
+export const DS_V3_CREATED_FROM = '2026-09-01T00:00:00.000Z';
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
@@ -635,10 +642,12 @@ export function checkInternalIntent(intent: Intent): boolean {
 
 /** isDefaultFallbackWithoutActions
  * True SOLO per un blocco defaultFallback che non contiene alcuna action.
- * I chatbot nuovi nascono con defaultFallback vuoto (actions: []) e collegano
+ * Gli agenti V3 nascono con defaultFallback vuoto (actions: []) e collegano
  * la reply a un blocco separato tramite attributes.nextBlockAction: in quello
  * stato il blocco e' chiuso e non deve accettare nuove action.
- * Un defaultFallback legacy (actions.length > 0) NON e' bloccato.
+ * Un defaultFallback con action al suo interno NON e' bloccato.
+ * La funzione non sa di versioni: se il blocco va chiuso lo decide chi la chiama
+ * (negli agenti V2 la defaultFallback e' un blocco come gli altri, anche vuota).
  */
 export function isDefaultFallbackWithoutActions(intent: any): boolean {
     if (!intent) { return false; }

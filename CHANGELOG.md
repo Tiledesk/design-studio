@@ -7,6 +7,14 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# V3/v2-flows-on-v3 13/10/2026
+- **changed** (TEMPORARY, to be removed when merged into master): an agent without the `dsVersion` label created on or after 1 September 2026 opens with the V3 editor; once every creation path stamps the label, the label alone decides again
+- **changed**: on open the Design Studio reads the agent's `attributes.dsVersion` once and keeps V2 rules for every agent without the `v3` label: any number of actions per block, actions dragged inside a block, into another block or onto the stage, action controls and "Add action" always available. V3 rules (one action per block, no action drag) apply only to labelled agents
+- **fixed**: in V2 agents the empty default fallback is no longer locked: it accepts actions from the menu and from drag & drop like any other block; the lock remains for V3 agents only
+- **changed**: an action is reordered or moved only from its drag indicator; dragging the rest of the action header moves the whole block
+- **fixed**: the action detail panel no longer opens at the end of a block drag started on the action header; it opens on a click only
+- **added**: `npm run test:v2-rules`, a dedicated suite for the editor-version check and the default fallback rule
+
 # 1.40.15
 - **added**: Adds OpenRouter to the AI action model picker
 
