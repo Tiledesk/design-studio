@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
+import { LeftPanelTab } from './left-panel-state.service';
 import { TiledeskStage } from 'src/assets/js/tiledesk-stage.js';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, CDS_SIDEBAR_WIDTH, STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
+import { DEFAULT_ALPHA_CONNECTORS, CDS_ADD_ACTION_MENU_WIDTH, STAGE_SETTINGS, scaleAndcenterStageOnCenterPosition } from '../utils';
 import { BehaviorSubject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { ConnectorService } from './connector.service';
@@ -19,6 +20,13 @@ export interface Settings {
   open_intent_list_state: boolean;
 }
 
+/**
+ * Come si apre la sinistra quando su questo agent non si e' mai scelto: la chat AI
+ * aperta, la lista dei blocchi chiusa. E' la configurazione con cui si comincia a
+ * lavorare a un flusso, non quella con cui lo si rilegge.
+ */
+export const DEFAULT_PANELS_STATE = { agentChat: true, blocks: false };
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,6 +39,9 @@ export class StageService {
   private alpha_connectors: number = DEFAULT_ALPHA_CONNECTORS;
   settings: Settings;
   loaded: boolean = false;
+
+  private readonly LEFT_PANEL_KEY_PREFIX = 'cds_left_panel_';
+  private readonly PANELS_KEY_PREFIX = 'cds_panels_';
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -318,23 +329,145 @@ export class StageService {
   /**
    * setPositionActionsMenu
    * calculates the position of the "FLOAT ADD ACTION MENU" to display it on the right or left of the connector
-   * @param point 
-   * @returns 
+   * physicPointCorrector() returns a point relative to #tds_container's own
+   * top-left; the menu itself (.menu--context--add) is positioned relative
+   * to .chatboat-dashboard instead (it's a sibling of cds-canvas, not a
+   * descendant of #tds_container), so this has to convert back by adding
+   * however far #tds_container's left edge currently sits from that
+   * ancestor. That used to be the 60px rail alone (CDS_SIDEBAR_WIDTH) --
+   * true only when #tds_container started right after the rail. It no
+   * longer always does: the chat panel and the blocks sidebar are real
+   * flex siblings before it now, each independently open/closed/resizable,
+   * so the offset has to be read live rather than assumed as a constant
+   * (.chatboat-dashboard itself starts flush at the viewport's left edge,
+   * which is what makes reading the container's own viewport-relative
+   * getBoundingClientRect().left directly correct here).
+   * @param point
+   * @returns
   */
   public setPositionActionsMenu(point){
     let positionFloatMenu = this.tiledeskStage.physicPointCorrector(point);
     let pos = positionFloatMenu.x+CDS_ADD_ACTION_MENU_WIDTH;
     let cont = this.tiledeskStage.container.offsetWidth;
+    const containerLeftOffset = this.tiledeskStage.container.getBoundingClientRect().left;
     // /this.logger.log("[CDS SERVICE] setPositionActionsMenu", pos, cont);
     if(cont<pos){
-      positionFloatMenu.x = positionFloatMenu.x+CDS_SIDEBAR_WIDTH-CDS_ADD_ACTION_MENU_WIDTH;
+      positionFloatMenu.x = positionFloatMenu.x+containerLeftOffset-CDS_ADD_ACTION_MENU_WIDTH;
     } else {
-      positionFloatMenu.x = positionFloatMenu.x+CDS_SIDEBAR_WIDTH;
+      positionFloatMenu.x = positionFloatMenu.x+containerLeftOffset;
     }
     return positionFloatMenu;
   }
 
 
+
+
+  /**
+   * Tab attiva del pannello sinistro (Blocks/Subagents).
+   *
+   * NB: a differenza delle altre impostazioni di stage NON e' salvata per singolo chatbot
+   * ma per "famiglia" (parent + i suoi subagent). Navigando fra parent e subagent cambia
+   * l'id_faq_kb: con una chiave per-bot ogni navigazione ripartirebbe da 'blocks', che e'
+   * esattamente il problema da risolvere.
+   */
+  public getActiveLeftPanel(familyId: string): LeftPanelTab | null {
+    if (!familyId) { return null; }
+    const value = this.appStorageService.getItem(this.LEFT_PANEL_KEY_PREFIX + familyId);
+    // 'chat' non e' piu' una di queste schede: ha una colonna sua, che si apre insieme a loro.
+    // Le preferenze scritte quando lo era esistono ancora, e vanno ignorate: lasciarle passare
+    // vorrebbe dire una colonna aperta su una scheda che nessuna linguetta puo' mostrare ne'
+    // richiudere.
+    if (value === 'subagents' || value === 'blocks' || value === 'actions') {
+      return value;
+    }
+    // Nessuna preferenza salvata: null, non 'blocks'. Il chiamante deve poter
+    // distinguere "l'utente ha scelto Blocks" da "l'utente non ha mai scelto",
+    // altrimenti non e' possibile avere una tab di default al primo accesso.
+    return null;
+  }
+
+  /**
+   * Quali pannelli di sinistra erano aperti l'ultima volta su QUESTO agent.
+   *
+   * Per agent e non globale: chi lavora a un flusso lungo tiene aperta la lista dei
+   * blocchi, chi ne sta scrivendo uno nuovo tiene aperta la chat, e sono spesso agent
+   * diversi nella stessa giornata.
+   *
+   * Una chiave sola per entrambi i pannelli perche' la domanda e' una: com'era la
+   * sinistra quando me ne sono andato. Due chiavi separate si sarebbero potute
+   * disallineare, e nessuna delle due avrebbe saputo dell'altra.
+   *
+   * Torna `null` quando non c'e' preferenza, e la differenza conta: il chiamante deve
+   * poter distinguere "l'utente aveva chiuso la chat" da "l'utente non ha mai scelto",
+   * che portano a due stati opposti.
+   */
+  public getPanelsState(id_faq_kb: string): { agentChat: boolean; blocks: boolean } | null {
+    if (!id_faq_kb) { return null; }
+    try {
+      const raw = this.appStorageService.getItem(this.PANELS_KEY_PREFIX + id_faq_kb);
+      if (!raw) { return null; }
+      const value = JSON.parse(raw);
+      if (typeof value?.agentChat !== 'boolean' || typeof value?.blocks !== 'boolean') { return null; }
+      return { agentChat: value.agentChat, blocks: value.blocks };
+    } catch (error) {
+      // Una preferenza illeggibile vale quanto una preferenza assente.
+      return null;
+    }
+  }
+
+  /** Aggiorna uno dei due pannelli lasciando l'altro com'era.
+   *
+   *  `agentChat` non viene piu' scritto da nessuno: la chat si apre a ogni ricaricamento
+   *  qualunque cosa sia salvata, quindi ricordarla sarebbe uno stato che nessuno interroga. La
+   *  chiave resta leggibile perche' le preferenze vecchie la contengono, e il formato salvato
+   *  vuole entrambi i campi. */
+  public savePanelState(id_faq_kb: string, panel: 'agentChat' | 'blocks', isOpen: boolean): void {
+    if (!id_faq_kb) { return; }
+    const current = this.getPanelsState(id_faq_kb) || DEFAULT_PANELS_STATE;
+    const next = { ...current, [panel]: isOpen };
+    try {
+      this.appStorageService.setItem(this.PANELS_KEY_PREFIX + id_faq_kb, JSON.stringify(next));
+    } catch (error) {
+      // Lo storage puo' rifiutare (finestra privata, quota): si perde la preferenza,
+      // non la sessione.
+    }
+  }
+
+
+  /**
+   * Com'e' la colonna delle tre schede aprendo un agente: aperta o no, e su quale scheda.
+   *
+   * La scheda si ricorda per **famiglia** (parent e suoi subagent) perche' navigando fra i due
+   * cambia l'id dell'agente, e ripartire ogni volta dalla scheda di default e' esattamente il
+   * fastidio da evitare. L'apertura invece si ricorda per **agente**: e' una scelta su quanto
+   * spazio dare al canvas di quel flusso.
+   *
+   * La chat non c'e' dentro, e non e' una dimenticanza: si apre a ogni ricaricamento qualunque
+   * cosa sia salvata, quindi di lei non c'e' niente da leggere.
+   *
+   * Senza preferenze la colonna e' **chiusa**: e' il default che la chiave aveva gia'
+   * (DEFAULT_PANELS_STATE.blocks), e il canvas nasce con tutto lo spazio tranne la chat.
+   */
+  public getLeftPanelSnapshot(familyId: string, agentId: string): { isOpen: boolean; activeTab: LeftPanelTab } {
+    const savedTab = this.getActiveLeftPanel(familyId);
+    let panels: { agentChat: boolean; blocks: boolean } | null = null;
+    try {
+      panels = this.getPanelsState(agentId);
+    } catch (error) {
+      // Una preferenza illeggibile vale quanto una che non c'e': si ricade sul default.
+      panels = null;
+    }
+
+    return {
+      isOpen: panels ? panels.blocks : DEFAULT_PANELS_STATE.blocks,
+      activeTab: savedTab ? savedTab : 'subagents'
+    };
+  }
+
+  public saveActiveLeftPanel(familyId: string, panel: LeftPanelTab){
+    if (!familyId) { return; }
+    this.appStorageService.setItem(this.LEFT_PANEL_KEY_PREFIX + familyId, panel);
+  }
 
 
   /** saveSettings 

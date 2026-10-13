@@ -1,8 +1,9 @@
 <div *ngIf="menuItemsList?.length>0" id="panel_actions_div" class="actions-drawer" #panel_actions_div (mouseleave)="closeInfo()">
 
-    <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect 
-        cdkDropList [cdkDropListData]="menuItemsList">
-        
+    <!-- L'elenco non e' piu' una lista del CDK: le azioni si trascinano col meccanismo del
+         browser, che la riga non la tocca -- resta dov'e', e il flusso riceve il rilascio. -->
+    <div  class="action-list" id="action_list_drop_connect" #action_list_drop_connect>
+
 
         <!-- <div [style.display]="isDragging?'block':'none'" class="menu-dragging">
             <div class="action-box" *ngFor="let item of menuItemsList; let i = index;">
@@ -20,19 +21,26 @@
 
 
         <div *ngIf="menuType === TYPE_OF_MENU.ACTION"
-            [style.display]="isDragging?'none':'block'" class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
-                (cdkDragEnded)="onDragEnd($event)"
-                [cdkDragDisabled]="item.value.disabled">
+            class="menu-dragging">
+            <!-- Trascinamento del browser: la riga resta nell'elenco per tutto il gesto e quello
+                 che segue il puntatore e' una sua istantanea. Le azioni che il piano non
+                 comprende non si prendono nemmeno. -->
+            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
+                [class.is-disabled]="item.value.disabled"
+                [draggable]="!item.value.disabled"
+                (dragstart)="onDragStart($event, item); nameTip.hide(0)">
 
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
-
+                <!-- Il nome per intero, ma solo dove la riga non riesce a mostrarlo: a deciderlo
+                     e' onRowEnter, misurando il testo. Un riquadro che ripete un nome gia'
+                     leggibile copre la riga accanto per non dire niente. -->
                 <div class="actions-btns-wpr" #divAction
-                    (mouseover)="openInfo(divAction, item.value)" 
-                    [attr.id]="'menu-trigger-' + i">
+                    [attr.id]="'menu-trigger-' + i"
+                    [matTooltip]="item.value.name | translate"
+                    #nameTip="matTooltip"
+                    matTooltipClass="cds-mat-tooltip"
+                    matTooltipPosition="right"
+                    [matTooltipShowDelay]="NAME_TOOLTIP_DELAY_MS"
+                    (mouseenter)="onRowEnter(divAction, nameTip)">
                     
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
                         <mat-icon class="svg-icon" [svgIcon]="item.value.src" aria-hidden="true"></mat-icon>
@@ -43,25 +51,25 @@
                     <!-- <span *ngIf="item.value.badge" class="trigger-beta-badge" [class.deprecation-badge]="item.value.badge==='DEP'" [class.beta-badge]="item.value.badge==='beta'" [class.new-badge]="item.value.badge==='new'">{{item.value.badge}}</span> -->
                     <span *ngIf="item.value.badge" [class]="'trigger-beta-badge badge-' + item.value.badge">{{item.value.badge}}</span>
 
-                    <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
-                        <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                            <mat-icon class="svg-icon" svgIcon="drag_indicator" aria-hidden="true"></mat-icon>
-                            <!-- <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate" alt=""> -->
-                        </button>
-                    </div>
+                    <!-- La descrizione si apre da qui e non passando sulla riga: la riga si
+                         trascina tutta, e un riquadro che compariva al solo passaggio finiva
+                         sopra a quello che si stava per prendere. -->
+                    <button type="button" class="action-info-btn"
+                        [attr.aria-label]="'CDSCanvas.ActionInfo' | translate"
+                        (mouseenter)="nameTip.hide(0); openInfo(divAction, item.value)"
+                        (mouseleave)="closeInfo()"
+                        (click)="$event.stopPropagation()">
+                        <mat-icon class="svg-icon" svgIcon="info" aria-hidden="true"></mat-icon>
+                    </button>
                 </div>
             </div>
         </div>
 
         <div *ngIf="menuType === TYPE_OF_MENU.EVENT" 
-            [style.display]="isDragging?'none':'block'" class="menu-dragging">
-            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;" 
-                cdkDrag 
-                (cdkDragStarted)="onDragStarted($event, i)" 
-                (cdkDragMoved)="onDragMoved($event)" 
-                (cdkDragEnded)="onDragEnd($event)">
-
-                <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
+            class="menu-dragging">
+            <div class="action-box" *ngFor="let item of menuItemsList; let i = index;"
+                [draggable]="true"
+                (dragstart)="onDragStart($event, item)">
 
                 <div class="actions-btns-wpr">
                     <div *ngIf="item.value.src && item.value.name" class="action-btn-icon">
@@ -83,9 +91,10 @@
     <!-- TOOLTIP FOR ACTION DOC -->
     <div #menuInfo id="menuInfo" 
         class="info-tooltip"
+        (mouseenter)="cancelCloseInfo()"
+        (mouseleave)="closeInfo()"
         [style.display]="isOpen?'block':'none'" 
-        [style.top.px]="positionMenu.y"
-        [style.left.px]="positionMenu.x">
+        [style.top.px]="positionMenu.y">
         <div class="tooltip-wrp">
             <div class="caret_tooltip"></div>
             <div class="info-tooltip-header">

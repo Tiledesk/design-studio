@@ -18,6 +18,8 @@ export class CdsActionIterationComponent implements OnInit {
   @Input() action: ActionIteration;
   @Input() previewMode: boolean = true;
   @Input() project_id: string;
+  /** V3: mostra la riga dell'uscita di fine lista (il pallino del blocco). */
+  @Input() isV3: boolean = false;
   @Output() updateAndSaveAction = new EventEmitter();
   @Output() onConnectorChange = new EventEmitter<{type: 'create' | 'delete',  fromId: string, toId: string}>()
 

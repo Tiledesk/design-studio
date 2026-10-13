@@ -9,9 +9,12 @@ import { IntentService } from '../../services/intent.service';
 import { StageService } from '../../services/stage.service';
 import { ConnectorService } from '../../services/connector.service';
 import { ControllerService } from '../../services/controller.service';
+import { LeftPanelStateService, LeftPanelTab } from '../../services/left-panel-state.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
+import { FlowOpsService } from '../../agent-chat/flow-ops.service';
+import { AgentChatHostService } from '../../agent-chat/agent-chat-host.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -20,14 +23,14 @@ import { Note } from 'src/app/models/note-model';
 import { NoteType } from 'src/app/models/note-types';
 
 // UTILS //
-import { INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME } from '../../utils';
+import { ACTION_DRAG_MIME, INTENT_COLORS, RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_OF_MENU, INTENT_TEMP_ID, OPTIONS, STAGE_SETTINGS, TYPE_INTENT_NAME , getIntentDefaultColor} from '../../utils';
 import { LOGOS_ITEMS } from './../../utils-resources';
 
 
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
@@ -74,27 +77,54 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   TYPE_INTENT_NAME = TYPE_INTENT_NAME;
 
   private subscriptionListOfIntents: Subscription;
+  private subscriptionLayoutApplied: Subscription;
   listOfIntents: Array<Intent> = [];
   listOfEvents: Array<Intent> = [];
   listOfNotes: Array<Note> = [];
   // intentSelected: Intent;
   intent_id: string;
   hasClickedAddAction: boolean = false;
-  hideActionPlaceholderOfActionPanel: boolean;
 
   /**  preload */
   totElementsOnTheStage: number = 0;
   countRenderedElements = 0;
   renderedAllIntents = false;
   renderedAllElements = false;
+
+  /** Blocks already rendered on this stage: anything rendered after the first build and
+   *  not in here is a block that has just been added (by hand, paste, undo or the AI chat). */
+  private renderedIntentIds = new Set<string>();
+  private newIntentIds: string[] = [];
+  private newIntentTimer: any = null;
+  private layoutConnectorsTimer: any = null;
   LOGOS_ITEMS = LOGOS_ITEMS;
   loadingProgress = 0;
   mapOfConnectors = [];
   mapOfIntents = [];
   labelInfoLoading:string = 'Loading';
 
-  /** panel list of intent */ 
-  IS_OPEN_INTENTS_LIST: boolean = true;
+  /** panel list of intent
+   *
+   *  Appoggiate a LeftPanelStateService, non piu' campi di questo componente: la stessa
+   *  risposta -- cosa e' aperto a sinistra -- serve anche al dashboard, che ospita il pannello
+   *  della chat fuori dal canvas. Restano proprieta' per non toccare i punti che le leggono e
+   *  le scrivono, che sono parecchi e nessuno dei quali cambia comportamento.
+   */
+  get IS_OPEN_INTENTS_LIST(): boolean { return this.leftPanelState.isOpen; }
+  set IS_OPEN_INTENTS_LIST(value: boolean) {
+    if (value) { this.leftPanelState.open(); } else { this.leftPanelState.close(); }
+  }
+
+  /**
+   * Quale delle tre schede occupa lo slot di sinistra: una per volta, scelta dalle linguette.
+   * Chi la sceglie e' il dashboard all'apertura dell'agente, leggendo la memoria; da li' in
+   * avanti la scelgono le linguette.
+   */
+  get activeLeftPanel(): LeftPanelTab { return this.leftPanelState.activeTab; }
+  set activeLeftPanel(value: LeftPanelTab) { this.leftPanelState.hydrate({ activeTab: value }); }
+
+  /** Scrive in memoria com'e' la colonna di sinistra; vedi rememberLeftPanel(). */
+  private subscriptionLeftPanel: Subscription;
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -126,7 +156,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   /** panel widget loaded */
   private subscriptionWidgetLoaded: Subscription;
-
 
   /** panel options */
   private subscriptionUndoRedo: Subscription;
@@ -177,12 +206,16 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
+  /** Publishes this canvas' own width as --canvas-width (see observeHostWidth). */
+  private hostResizeObserver: ResizeObserver | null = null;
+
 
   constructor(
     private readonly intentService: IntentService,
     private readonly stageService: StageService,
     private readonly connectorService: ConnectorService,
     private readonly controllerService: ControllerService,
+    public readonly leftPanelState: LeftPanelStateService,
     private readonly translate: TranslateService,
     public dashboardService: DashboardService,
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -191,7 +224,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    private readonly flowOpsService: FlowOpsService,
+    private readonly hostElement: ElementRef<HTMLElement>,
+    private readonly agentChatHostService: AgentChatHostService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -200,7 +236,12 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
+    // Cosa e' aperto a sinistra non lo decide il canvas: lo decide il dashboard, una volta sola
+    // all'apertura dell'agente, leggendo la memoria. Il canvas rinasce a ogni cambio di flusso e
+    // la sua parola sarebbe sempre l'ultima: aprendo un subagent dal suo pannello la scheda
+    // cambierebbe da sola sotto il clic che l'ha appena usata.
     this.initialize();
+    this.rememberLeftPanel();
   }
 
 
@@ -208,6 +249,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnDestroy() {
     // Pulisci la coda di retry dei connettori
     this.connectorService.clearRetryQueue();
+    clearTimeout(this.newIntentTimer);
+    clearTimeout(this.layoutConnectorsTimer);
+    this.hostResizeObserver?.disconnect();
 
     // Cancella il timer del debounce se è ancora attivo
     if (this.saveNoteDetailTimer) {
@@ -220,11 +264,17 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.executeSaveNoteDetail();
     }
 
+    if (this.subscriptionLeftPanel) {
+      this.subscriptionLeftPanel.unsubscribe();
+    }
     if (this.subscriptionChangedConnectorAttributes) {
       this.subscriptionChangedConnectorAttributes.unsubscribe();
     }
     if (this.subscriptionListOfIntents) {
       this.subscriptionListOfIntents.unsubscribe();
+    }
+    if (this.subscriptionLayoutApplied) {
+      this.subscriptionLayoutApplied.unsubscribe();
     }
     if (this.subscriptionOpenDetailPanel) {
       this.subscriptionOpenDetailPanel.unsubscribe();
@@ -269,14 +319,26 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   }
 
   /** */
+  /** The widget log is positioned against the dashboard, not against this canvas, yet
+   *  starts at the canvas' left edge: sized on the dashboard it ran under the widget
+   *  preview whenever the AI chat panel took space on the left. The canvas' real width,
+   *  kept up to date as the chat opens, closes or is resized, is what it sizes on. */
+  private observeHostWidth() {
+    if (typeof ResizeObserver === 'undefined') { return; }
+    const host = this.hostElement.nativeElement;
+    this.hostResizeObserver = new ResizeObserver(() => {
+      host.style.setProperty('--canvas-width', `${host.clientWidth}px`);
+    });
+    this.hostResizeObserver.observe(host);
+  }
+
   ngAfterViewInit() {
     this.logger.log("[CDS-CANVAS]  •••• ngAfterViewInit ••••");
     this.stageService.initializeStage(this.id_faq_kb);
-    if(this.stageService.settings?.open_intent_list_state != null){
-      this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
-    }
-    
-    
+    this.observeHostWidth();
+    // Qui non si legge piu' come era stata lasciata la sinistra: lo fa il dashboard, prima del
+    // primo disegno. Questa riga arrivava DOPO, e quindi aveva l'ultima parola su tutti:
+    // e' da li' che veniva lo stage ricostruito con le schede chiuse.
     // this.stageService.initStageSettings(this.id_faq_kb);
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
@@ -321,6 +383,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * @param intentID 
    */
   onIntentRendered(intentID) {
+    if (this.renderedAllIntents === true && intentID && !this.renderedIntentIds.has(intentID)) {
+      this.onNewIntentRendered(intentID);
+      return;
+    }
+    if (intentID) {
+      this.renderedIntentIds.add(intentID);
+    }
     if(this.stageService.loaded === false && this.renderedAllElements === false){
       this.labelInfoLoading = 'CDSCanvas.intentsProgress';
       if(this.mapOfIntents[intentID]) { //&& this.mapOfIntents[intentID].shown === false
@@ -332,6 +401,70 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       const allShownTrue = Object.values(this.mapOfIntents).every(intent => intent.shown === 'true');
       if(allShownTrue){ 
         this.onAllIntentsRendered();
+      }
+    }
+  }
+
+  /** A block added after the stage was built has just been rendered.
+   *
+   *  Collected for a moment, because the AI chat adds several blocks at once. Then every
+   *  connector from and to each new block is redrawn: they were first attempted before
+   *  the block's element existed. The stage is left where the user put it. */
+  private onNewIntentRendered(intentID: string) {
+    this.renderedIntentIds.add(intentID);
+    this.newIntentIds.push(intentID);
+    clearTimeout(this.newIntentTimer);
+    this.newIntentTimer = setTimeout(() => this.showNewIntents(), 80);
+  }
+
+  private showNewIntents() {
+    const ids = this.newIntentIds.filter(id => !!this.listOfIntents?.find(intent => intent.intent_id === id));
+    this.newIntentIds = [];
+    if (ids.length === 0) { return; }
+
+    requestAnimationFrame(async () => {
+      for (const id of ids) {
+        try {
+          await this.connectorService.refreshConnectorsAroundIntent(id, this.listOfIntents);
+        } catch (error) {
+          this.logger.error('[CDS-CANVAS] refresh connectors of new block failed', id, error);
+        }
+      }
+    });
+  }
+
+  /** The AI chat has finished editing and the flow has been laid out again: once the blocks
+   *  are at their new place, the connectors follow them and the view fits the whole flow.
+   *
+   *  Every block's connectors are updated, not only the moved ones: the update recomputes the
+   *  connectors LEAVING a block, so a connector entering a moved block from a block that stayed
+   *  put would keep pointing at the old place. A second pass once the fit animation is over
+   *  catches the connectors the connector check drew while the stage was still moving. */
+  private onFlowLaidOut(layout: { faqKbId: string, movedIds: string[], fitView?: boolean }) {
+    if (layout.faqKbId !== this.id_faq_kb) { return; }
+    clearTimeout(this.layoutConnectorsTimer);
+    requestAnimationFrame(async () => {
+      if (layout.faqKbId !== this.id_faq_kb) { return; }
+      if (layout.movedIds.length > 0) {
+        await this.updateAllConnectors();
+      }
+      // Blocks the AI chat moved leave the viewport alone: it is the user's, and
+      // nothing asked for it to change. Only a whole-flow layout fits the view.
+      if (layout.fitView !== false) {
+        await this.stageService.scaleAndCenter(this.id_faq_kb, this.listOfIntents);
+      }
+      this.layoutConnectorsTimer = setTimeout(() => {
+        if (layout.faqKbId === this.id_faq_kb) { this.updateAllConnectors(); }
+      }, 400);
+    });
+  }
+
+  private async updateAllConnectors() {
+    for (const intent of this.listOfIntents || []) {
+      try {
+        await this.connectorService.updateConnector(intent.intent_id);
+      } catch (error) {
+        this.logger.error('[CDS-CANVAS] update connectors of a laid out block failed', intent?.intent_id, error);
       }
     }
   }
@@ -440,6 +573,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   // --------------------------------------------------------- //
   
   private setSubscriptions(){
+    this.subscriptionLayoutApplied = this.flowOpsService.layoutApplied$.subscribe(layout => this.onFlowLaidOut(layout));
 
     this.subscriptionChangedConnectorAttributes = this.connectorService.observableChangedConnectorAttributes.subscribe((connector: any) => {
         this.logger.log('[CDS-CANVAS] --- AGGIORNATO connettore ', connector);
@@ -477,6 +611,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         this.logger.log("[CDS-CANVAS] --- AGGIORNATO ELENCO INTENTS", intents);
       if(intents.length>0){
           this.listOfIntents = intents;
+          // Il connector service controlla le destinazioni su questa lista: va tenuta
+          // allineata anche dopo una cancellazione, che sostituisce l'array.
+          this.connectorService.syncIntents(intents);
         // const chatbot_id = this.dashboardService.id_faq_kb;
         // const thereIsWebResponse = this.webhookService.checkIfThereIsWebResponse();
         // const updateWebhookObs = this.webhookService.updateWebhook(chatbot_id, thereIsWebResponse);
@@ -516,7 +653,10 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
         if (element.type) {
           this.closeAllPanels();
           this.IS_OPEN_PANEL_ACTION_DETAIL = true;
-          this.intentService.inactiveIntent();
+          // Il blocco resta selezionato mentre il pannello mostra una sua action: e' il blocco
+          // che il pannello sta modificando, e l'evidenziazione e' una sola (selectAction).
+          // Spegnerlo qui toglieva il contorno appena acceso e faceva riselezionare il blocco
+          // -- azzerando l'action scelta -- al primo clic dentro di esso.
           this.removeConnectorDraftAndCloseFloatMenu();
         // setTimeout(() => {
         //   this.IS_OPEN_PANEL_ACTION_DETAIL = true;
@@ -634,7 +774,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // ---------------------------------------
     // set subtype chatbot
     // ---------------------------------------
-    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
 
 
     // ---------------------------------------
@@ -717,7 +857,9 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   setConnectorColor(connector: any){
     const idIntentFrom = connector.id.split('/')[0];
     const intent = this.intentService.getIntentFromId(idIntentFrom);
-    const color = intent?.attributes?.color ?? INTENT_COLORS.COLOR1;
+    // Un blocco a cui nessuno ha scelto un colore porta quello della famiglia della sua azione:
+    // il connettore che ne esce deve uscire di quel colore, non del grigio di prima.
+    const color = intent?.attributes?.color ?? getIntentDefaultColor(intent);
     const opacity = this.stageService.getAlpha()/100;
     //this.logger.log('[CDS-CANVAS] setConnectorColor ', connector, opacity);
     this.connectorService.setConnectorColor(intent.intent_id, color, opacity);
@@ -835,11 +977,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
       this.logger.log("[CDS-CANVAS] ho rilasciato il connettore tratteggiato nello stage (nell'elemento con classe 'receiver_elements_dropped_on_stage') e quindi apro il float menu");
       const intentId = e.detail.fromId.split('/')[0];
       const intent = this.intentService.getIntentFromId(intentId);
-        if(intent.attributes?.color){
-        detail.color = intent.attributes.color;
-      } else {
-        detail.color = INTENT_COLORS.COLOR1;
-      }
+      detail.color = intent.attributes?.color ?? getIntentDefaultColor(intent);
       this.openFloatMenuOnConnectorDraftReleased(detail);
     } else {
       this.logger.log("[CDS-CANVAS] ho rilasciato in un punto qualsiasi del DS ma non sullo stage quindi non devo aprire il menu", detail);
@@ -972,7 +1110,13 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   @HostListener('document:click', ['$event'])
   documentClick(event: any): void {
     this.logger.log('[CDS CANVAS] DOCUMENT CLICK event: ', event.target, event);
-    if (event.target.id.startsWith("cdk-drop-list-") && !event.target.className.includes('button-replies')) {
+    // Il clic "fuori" e' quello che atterra sull'area vuota dello stage, riconosciuta dall'id
+    // della lista che riceve i rilasci. Quell'id era generato da Angular (`cdk-drop-list-N`)
+    // finche' nessuno gliene dava uno: da quando la tavolozza vive fuori dal canvas e si
+    // collega per nome, e' STAGE_DROP_LIST_ID. Il prefisso resta accettato per le altre liste.
+    const targetId: string = event.target?.id || '';
+    const isStage = targetId === this.STAGE_DROP_LIST_ID || targetId.startsWith('cdk-drop-list-');
+    if (isStage && !event.target.className.includes('button-replies')) {
       this.removeConnectorDraftAndCloseFloatMenu();
       this.controllerService.stopTestItOut();
       this.closeAllPanels();
@@ -1138,8 +1282,83 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList  ')
     this.IS_OPEN_INTENTS_LIST = !this.IS_OPEN_INTENTS_LIST;
     this.removeConnectorDraftAndCloseFloatMenu();
-    this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, this.IS_OPEN_INTENTS_LIST);
+    // La memoria la scrive rememberLeftPanel(), che ascolta lo stato: qui c'era una chiamata
+    // che valeva solo per questo gesto, e la freccia dentro il pannello -- che chiude lo stesso
+    // pannello -- non ne aveva nessuna. Chiudendo da li' e ricaricando, il pannello tornava
+    // aperto.
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
+  }
+
+  /**
+   * Id della "famiglia" a cui appartiene la tab del pannello sinistro: il parent quando siamo
+   * dentro un subagent, il chatbot corrente altrimenti. Cosi' la scelta Blocks/Subagents
+   * sopravvive alla navigazione parent <-> subagent, che cambia id_faq_kb.
+   */
+  private getLeftPanelFamilyId(): string {
+    const current: any = this.dashboardService.selectedChatbot;
+    return current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+  }
+
+  /**
+   * Ricorda com'e' la colonna delle tre schede: aperta o no, e su quale.
+   *
+   * Una sottoscrizione sola, e non una chiamata su ogni pulsante: questo e' il punto in cui lo
+   * stato cambia davvero, quindi un gesto nuovo -- un altro pulsante, una scorciatoia -- viene
+   * ricordato senza che nessuno se ne debba occupare. E' il motivo per cui la freccia dentro
+   * l'intestazione del pannello ora conta quanto la linguetta: prima salvava solo la linguetta.
+   *
+   * Gli id si leggono quando serve e non alla sottoscrizione: cambiano sotto, perche' il primo
+   * valore arriva all'istante e i servizi potrebbero non avere ancora in mano il nuovo flusso.
+   */
+  private rememberLeftPanel(): void {
+    this.subscriptionLeftPanel = this.leftPanelState.state$.subscribe(({ isOpen, activeTab }) => {
+      this.stageService.savePanelState(this.dashboardService.id_faq_kb, 'blocks', isOpen);
+      this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), activeTab);
+    });
+  }
+
+  /** L'identita' della lista che riceve le azioni rilasciate sullo stage.
+   *
+   *  Serve perche' la tavolozza ora sta fuori da #tds_container: il cdkDropListGroup collegava
+   *  le due liste finche' erano nello stesso sottoalbero, e fuori di li' il collegamento va
+   *  dichiarato per nome. Sta qui, in una costante sola, perche' le due parti devono
+   *  necessariamente concordare e una stringa ripetuta due volte prima o poi diverge. */
+  readonly STAGE_DROP_LIST_ID = 'cdsStageDropList';
+
+  /** Vero sugli agenti V3. Serve al template per una cosa sola: la larghezza del pannello di
+   *  sinistra, che qui segue quella della chat e sugli agenti precedenti resta quella di sempre. */
+  get isV3(): boolean { return !!this.dashboardService.isV3; }
+
+  /** Vero se quella linguetta e' quella che si sta guardando: pannello aperto E scheda attiva. */
+  /** La linguetta della chat AI c'e' solo dove la chat c'e': senza configurazione non si apre. */
+  get isAgentChatAvailable(): boolean {
+    return this.agentChatHostService.isConfigured();
+  }
+
+  isLeftTabVisible(tab: LeftPanelTab): boolean {
+    return this.leftPanelState.isTabVisible(tab);
+  }
+
+  /** La colonna delle tre schede. La chat non la riguarda: e' un'altra colonna, sua sorella
+   *  nella stessa riga, e le due si aprono e si chiudono per conto proprio. */
+  get IS_BOX_LEFT_OPEN(): boolean {
+    return this.leftPanelState.isOpen;
+  }
+
+  /** Apre la scheda; se era gia' quella aperta, chiude tutto e lascia la striscia.
+   *
+   *  E' lo stesso gesto della freccia di prima, spostato sulla linguetta: chi vuole tutto lo
+   *  spazio per il canvas ripreme quella che sta guardando. */
+  onSelectLeftPanel(panel: LeftPanelTab) {
+    if (this.leftPanelState.isTabVisible(panel)) {
+      this.onToogleSidebarIntentsList();
+      return;
+    }
+    this.leftPanelState.selectTab(panel);
+    // Niente da salvare qui: ci pensa rememberLeftPanel(). Prima la scheda delle azioni era
+    // esclusa dal salvataggio, e lasciandola aperta si tornava su un'altra.
   }
 
   /** onDroppedElementToStage **
@@ -1147,18 +1366,47 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
    * oppure 
    * chiamata quando aggiungo (droppandola) una action sullo stage spostandola da un altro intent  
    * */
+  /**
+   * Il puntatore attraversa il flusso con un'azione in mano.
+   *
+   * Fermare l'evento non e' una formalita': finche' nessuno lo fa, il browser considera l'area
+   * non adatta a ricevere e il rilascio non arriva mai. Si ferma solo per cio' che riconosciamo,
+   * cosi' un file trascinato dal desktop continua a non essere affare nostro.
+   */
+  onActionDragOverStage(event: DragEvent) {
+    if (!event.dataTransfer?.types?.includes(ACTION_DRAG_MIME)) { return; }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  /**
+   * Un'azione e' stata lasciata sul flusso: nasce il blocco che la contiene.
+   *
+   * Il punto del rilascio e' in coordinate dello schermo e va portato in quelle del flusso, che
+   * si sposta e si ingrandisce sotto di esso -- lo fa `logicPoint`, la stessa conversione che
+   * usa il rilascio di un'azione spostata da un blocco. Lo scostamento di 132px mette il blocco
+   * sotto il puntatore invece che col suo spigolo sinistro.
+   */
+  onActionDroppedOnStage(event: DragEvent) {
+    const actionType = event.dataTransfer?.getData(ACTION_DRAG_MIME);
+    if (!actionType) { return; }
+    event.preventDefault();
+    const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+    pos.x = pos.x - 132;
+    this.logger.log('[CDS-CANVAS] azione lasciata sullo stage dalla tavolozza: ', actionType, pos);
+    this.closeAllPanels();
+    this.closeActionDetailPanel();
+    this.createNewIntentFromPanelElement(pos, actionType);
+  }
+
   async onDroppedElementToStage(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
     let pos = this.connectorService.tiledeskConnectors.logicPoint(event.dropPoint);
     pos.x = pos.x - 132;
     let action: any = event.previousContainer.data[event.previousIndex];
-    if (action.value && action.value.type) {
-      this.logger.log('[CDS-CANVAS] ho draggato una action da panel element sullo stage');
-    this.closeAllPanels();
-    this.closeActionDetailPanel();
-      // this.removeConnectorDraftAndCloseFloatMenu();  
-      this.createNewIntentFromPanelElement(pos, action.value.type);
-    } else if (action) {
+    // Qui arrivano soltanto le azioni che vengono da un blocco: dalla tavolozza si trascina col
+    // meccanismo del browser, e quel rilascio lo raccoglie onActionDroppedOnStage.
+    if (action) {
       this.logger.log('[CDS-CANVAS] ho draggato una action da un intent sullo stage');
       let prevIntentOfaction = this.listOfIntents.find((intent) => intent.actions.some((act) => act._tdActionId === action._tdActionId));
       prevIntentOfaction.actions = prevIntentOfaction.actions.filter((act) => act._tdActionId !== action._tdActionId);
@@ -1301,11 +1549,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // }
   }
 
-  /** onHideActionPlaceholderOfActionPanel */
-  onHideActionPlaceholderOfActionPanel(event){
-    this.logger.log('[CDS-CANVAS] onHideActionPlaceholderOfActionPanel event : ', event);
-    // this.hideActionPlaceholderOfActionPanel = event
-  }
   // --------------------------------------------------------- // 
 
 

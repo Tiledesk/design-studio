@@ -1,3 +1,5 @@
+@use '../../left-panel' as lp;
+
 @import "./src/assets/sass/cds/_variables.scss";
 
 
@@ -5,7 +7,7 @@ $text-color: var(--blu);
 $icon-color: var(--gray-light-01);
 $text-hover-color: var(--blu);
 $icon-hover-color: var(--blu);
-$base-padding: 6px;
+$base-padding: 3px;
 
 :host{
     --tooltip-top-position: 0px;
@@ -14,7 +16,8 @@ $base-padding: 6px;
 #panel_actions_div{
     // position: absolute;
     padding: 0px;
-    box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    // Niente ombra: era quella del cassetto sospeso sopra al canvas. Qui e' un pannello dentro
+    // la colonna di sinistra, e l'ombra lo faceva sembrare staccato da cio' che lo contiene.
     .menu-dragging,
     .coming-soon {
         overflow: hidden;
@@ -36,41 +39,52 @@ $base-padding: 6px;
 
 
 .action-box {
-    padding: 0px $base-padding;
+    padding: 0px;
 }
 
+/* Riga dell'azione, allineata al V4. I valori arrivano dal pannello che la contiene
+   (cds-panel-elements), che li dichiara sul proprio host: qui bastano i ripieghi, perche'
+   questo componente non e' usato altrove. */
 .actions-btns-wpr {
-    // width: 136px; // dp
-    width: 100%; // nk
-    height: 30px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-    padding: 0px 2px;
-    &:hover{
-        cursor: -webkit-grab; 
-        cursor: grab;
-        box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
+    width: 100%;
+    @include lp.lp-row;
+    cursor: -webkit-grab;
+    cursor: grab;
+    // Senza, trascinando si finisce per selezionare il nome dell'azione invece di prenderla:
+    // il trascinamento e' quello del browser, e il browser di suo vorrebbe selezionare il testo.
+    user-select: none;
+    &:active { cursor: grabbing; }
+}
 
-        img{
-            filter: brightness(0) saturate(100%) invert(35%) sepia(48%) saturate(441%) hue-rotate(183deg) brightness(97%) contrast(88%);
-            cursor: -webkit-grab; 
-            cursor: grab;
-        }
 
-        .action-btn-text{
-            color: $text-hover-color
-        }
+/* L'icona in una cella squadrata con bordo, come nel V4: distingue l'azione dal testo senza
+   doverla colorare, e tiene le righe allineate anche con icone di forme diverse. */
+.action-btn-icon:first-of-type {
+    @include lp.lp-icon-cell;
+}
+
+/* Al passaggio l'icona si accende, come nell'elenco dei blocchi: e' il segno che quella riga e'
+   quella sotto il puntatore, oltre al fondo. Basta cambiare il colore della cella -- il tratto
+   dell'icona segue `currentColor` -- e per le icone che sono immagini serve il filtro, che le
+   vira sullo stesso blu. */
+.actions-btns-wpr:hover .action-btn-icon:first-of-type {
+    color: var(--blu);
+
+    img {
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
     }
+}
 
+
+.action-btn-text {
+    @include lp.lp-row-name;
 }
 
 
 .action-btn-icon {
     display: inline-flex;
-    color: $text-color;
+    // La tinta della cella la da' il mixin: azzurra, l'icona competeva col nome.
+    color: inherit;
     padding: 0;
     vertical-align: middle;
     // margin: 0 6px;
@@ -137,16 +151,31 @@ $base-padding: 6px;
     width: 16px;
     color: var(--gray-light-01);
     filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+    // Il passaggio accende l'icona invece di scambiarla di colpo. La stessa durata del fondo
+    // della riga, che cambia insieme a lei: due tempi diversi si leggerebbero come due cose.
+    transition: filter var(--transition-fast, .12s), color var(--transition-fast, .12s);
+}
+
+/* Al passaggio l'icona si colora, come nell'elenco dei blocchi.
+   Lo fa un filtro e non `color`: l'icona e' un disegno gia' tinto di grigio da un filtro, e un
+   colore dichiarato sopra non lo toglie -- il filtro e' l'ultimo a parlare. E' lo stesso filtro
+   che l'elenco dei blocchi usa sulle proprie icone, non un azzurro ricalcolato a occhio. */
+.actions-btns-wpr:hover .action-btn-icon:first-of-type {
+    color: var(--blu);
+
+    .svg-icon,
+    img {
+        filter: brightness(0) saturate(100%) invert(39%) sepia(19%) saturate(1139%) hue-rotate(184deg) brightness(91%) contrast(85%);
+    }
 }
 
 
-.action-btn-text{
-    // display: inline-flex;
-    color: $text-color;
+// Corpo, colore e peso del nome arrivano dal mixin condiviso, incluso piu' sopra. Qui
+// restavano l'azzurro e i 10px del cassetto sospeso, e vincevano perche' dichiarati dopo:
+// e' il motivo per cui i nomi delle azioni restavano diversi da quelli dei blocchi.
+.action-btn-text {
     padding: 0;
     vertical-align: middle;
-    font-size: 10px;
-    font-weight: 400;
 }
 
 
@@ -185,9 +214,7 @@ $base-padding: 6px;
     }
 
     .action-btn-text {
-        color: $text-hover-color;
-        font-size: 10px;
-        font-weight: 300;
+        // Al passaggio cambia il fondo della riga, non il testo: era una terza misura ancora.
     }
 }
   
@@ -214,13 +241,56 @@ $base-padding: 6px;
     border-radius: 8px;
 }
 
-.cdk-drag-disabled{
+/* La copia della riga che segue il puntatore durante il trascinamento (la crea onDragStart e
+   sta nel documento per un istante solo). Nasce dalla riga sotto il puntatore, quindi qui si
+   spengono tutti i segni del passaggio -- fondo grigio, icona accesa, pulsante della
+   descrizione -- e si dichiarano fondo bianco e gli angoli dei blocchi del flusso: nell'elenco
+   la riga ha gli spigoli vivi, arrotondata e' solo la copia, che viaggia da sola sul canvas.
+   Il token e' quello globale, non l'alias che il blocco si dichiara sul proprio host. */
+.actions-btns-wpr.action-drag-ghost {
+    &,
+    &:hover {
+        background: var(--ds-surface, #fff);
+        border-radius: var(--border-radius-base-preview, 8px);
+        overflow: hidden;
+        transition: none;
+    }
+
+    // L'icona come a riposo: grigia dal suo filtro, perche' a riposo e' quel filtro a tingerla
+    // e toglierlo del tutto la farebbe nera.
+    .action-btn-icon:first-of-type,
+    &:hover .action-btn-icon:first-of-type {
+        color: var(--ds-ink-2, #4a4a47);
+
+        .svg-icon,
+        img {
+            filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
+            transition: none;
+        }
+    }
+
+    .action-info-btn,
+    &:hover .action-info-btn {
+        opacity: 0;
+        transition: none;
+    }
+}
+
+/* Le azioni che il piano non comprende: prima lo stato lo segnava il CDK con una classe sua,
+   ora lo dichiara il template -- e' la stessa riga, con un nome che diciamo noi. */
+.action-box.is-disabled{
     background: var(--gray-02);
     .actions-btns-wpr,
     .actions-btns-wpr:hover{
         cursor: not-allowed;
         user-select: none;
         box-shadow: none;
+    }
+
+    // L'icona resta spenta anche al passaggio: accenderla direbbe "prendimi" proprio dove non
+    // si puo' prendere niente.
+    .actions-btns-wpr:hover .action-btn-icon:first-of-type .svg-icon {
+        filter: brightness(0) saturate(100%) invert(96%) sepia(0%) saturate(504%) hue-rotate(151deg) brightness(92%) contrast(88%);
     }
 }
 
@@ -245,13 +315,19 @@ $base-padding: 6px;
     margin: 0;
     position: absolute;
     top: 0px;
-    left: 85px;
+    // A filo con il bordo destro del pannello: lo scostamento di prima veniva dal cassetto
+    // sospeso, che era largo tutt'altro. Qui il pannello e' la colonna di sinistra, e un
+    // riquadro che parte piu' a destra scavalca la striscia delle linguette.
+    left: 100%;
     // border: 2px solid var(--gray-02);
 }
 
 
 // TOOLTIP ACTION INFO ICON : start
 .info-tooltip {
+    // Sopra alla striscia delle linguette (z-index 12): il riquadro esce dal pannello e le
+    // attraversa, e passarci sotto lo rendeva illeggibile proprio dove c'e' da leggere.
+    z-index: 30;
     background-color: var(--color-white-hex);
     color: white;
     font-size: 12px;
@@ -307,7 +383,8 @@ $base-padding: 6px;
             width: 12px;
             filter: brightness(0) saturate(100%) invert(99%) sepia(8%) saturate(403%) hue-rotate(225deg) brightness(117%) contrast(100%)
         }
-        .action-btn-text{
+        // Bianco solo qui: e' il segnaposto che segue il puntatore, su fondo pieno.
+        .action-btn-text {
             color: white;
         }
     }
@@ -354,3 +431,47 @@ $base-padding: 6px;
         }
     }
 }
+
+
+/* Info della action: all'estrema destra della riga, al posto della vecchia maniglia di
+   trascinamento -- che non serviva piu', perche' si trascina tutta la riga.
+   Compare passando sulla riga, come nel V4: sempre visibile sarebbe una colonna di icone che
+   ripete la stessa cosa per ogni voce. */
+.action-info-btn {
+    flex: 0 0 auto;
+    margin-left: auto;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    // Quadrato arrotondato come nel V4, non un cerchio: lo stesso raggio della cella
+    // dell'icona a sinistra, cosi' i due estremi della riga si rispondono.
+    border: 0;
+    border-radius: var(--radius-md, 6px);
+    background: none;
+    color: var(--ds-muted, #8a8884);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--transition-fast, .12s), background var(--transition-fast, .12s), color var(--transition-fast, .12s);
+
+    // Icona a tratto, come tutte quelle del V4: `fill: none` e il tratto che segue il colore
+    // del testo. Senza `fill: none` un'icona disegnata a contorni si riempirebbe di nero.
+    .svg-icon { width: 13px; height: 13px; }
+    ::ng-deep svg {
+        width: 13px;
+        height: 13px;
+        fill: none;
+        stroke: currentColor;
+    }
+
+    &:hover {
+        background: var(--ds-border, #ececea);
+        color: var(--ds-ink, #1a1a19);
+    }
+}
+
+.actions-btns-wpr:hover .action-info-btn { opacity: 1; }
+// Il puntatore puo' lasciare la riga per raggiungere il riquadro: finche' quello e' aperto la
+// "i" resta visibile, altrimenti sparirebbe sotto il puntatore a meta' strada.
+.action-info-btn:focus-visible { opacity: 1; }

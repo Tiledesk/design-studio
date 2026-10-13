@@ -2694,5 +2694,10 @@
         "LABEL_PRECHAT_STATIC_TERMS_PRIVACY": "قبل متابعة المحادثة ، يرجى الموافقة على سياسة الخصوصية الخاصة بشروط <a href='https://tiledesk.com/termsofservice/' target='_blank'></a> و <a href='https://tiledesk.com/privacy.html' target='_blank'></a>",
         "LABEL_PRECHAT_ACCEPT_TERMS_PRIVACY": "أنا موافق",
         "PRECHAT_REQUIRED_ERROR": "هذه الخانة مطلوبه"
+    },
+    "CDSAgentFromPrompt": {
+        "SendFailedTitle": "The request was not sent to the AI chat",
+        "SendFailedText": "The agent has been created, but the description could not be sent. Paste it in the AI chat to build the flow:",
+        "Building": "The AI is building your agent: blocks appear as it goes. This takes a moment."
     }
 }

@@ -1,0 +1,315 @@
+// Le forme condivise dai pannelli di sinistra: la fisarmonica delle sezioni, la riga di un
+// elenco, la cella dell'icona, il campo di ricerca.
+//
+// Sono mixin in un parziale e non regole in un foglio globale: i due pannelli hanno gli stili
+// incapsulati, quindi un foglio globale li raggiungerebbe solo a forza di `::ng-deep`. Il
+// parziale invece compila dentro ciascun componente, l'incapsulamento resta, e la definizione
+// esiste in un punto solo -- che e' il motivo per cui si fa.
+//
+// I valori vengono dai token dichiarati su `.box-left` (vedi cds-canvas.component.scss): qui
+// ci sono solo le forme. Ogni `var()` porta il suo ripiego, cosi' un pannello che finisse
+// fuori da quel contenitore resta leggibile invece di collassare.
+
+/// La riga di un elenco: azione o blocco, la stessa.
+@mixin lp-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5, 10px);
+  padding: var(--space-3, 6px) var(--space-6, 12px);
+  // Spigoli vivi: da quando la riga occupa tutta la larghezza del pannello, gli angoli
+  // arrotondati lascerebbero quattro tacche di fondo chiaro contro i bordi, e la barra della
+  // selezione non arriverebbe a filo dello spigolo.
+  border-radius: 0;
+  font-family: inherit;
+  font-size: var(--fs-md, 13px);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ds-ink, #1a1a19);
+  transition: background var(--transition-fast, .12s);
+
+  &:hover { background: var(--ds-canvas, #f7f6f3); }
+}
+
+/// La cella quadrata dell'icona: squadra icone di forme diverse e tiene i nomi incolonnati.
+@mixin lp-icon-cell {
+  width: var(--size-icon-cell, 22px);
+  min-width: var(--size-icon-cell, 22px);
+  height: var(--size-icon-cell, 22px);
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--ds-surface, #fff);
+  border: 1px solid var(--ds-border, #ececea);
+  color: var(--ds-ink-2, #4a4a47);
+  overflow: hidden;
+
+  // Tutto quello che puo' finire nella cella, riportato alla stessa misura. `mat-icon` e'
+  // nell'elenco perche' Material gli da' un box di 24x24: piu' grande della cella, quindi
+  // l'icona dentro resta decentrata e l'`overflow: hidden` qui sopra le taglia un lato.
+  mat-icon, .svg-icon, .icon, img, .material-icons, .material-icons-outlined {
+    width: 13px;
+    height: 13px;
+    min-width: 13px;
+    font-size: 13px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    object-fit: contain;
+  }
+
+  // `fill` sull'elemento `svg` e MAI sui `path`: molte icone sono disegnate a contorni, e
+  // riempirne i tracciati le trasforma in macchie piene tutte uguali.
+  ::ng-deep svg { width: 13px; height: 13px; fill: currentColor; }
+}
+
+/// Il nome di un'azione o di un blocco. Sono le regole del V4 (`.lib-name` / `.node-name`),
+/// riportate tali e quali: corpo, colore e troncamento. Un solo peso, nessuna variazione fra
+/// riposo, passaggio e selezione -- li' la differenza la fa il fondo della riga.
+@mixin lp-row-name {
+  // Il nome del blocco e' un `<p>`, che porta i margini verticali del browser: senza questo
+  // la riga cresce di un paio di pixel sopra e sotto, e l'elenco non si allinea a quello
+  // delle azioni, dove il nome e' un `<div>` e il margine non c'e'.
+  margin: 0;
+  font-size: var(--fs-md, 13px);
+  color: var(--ds-ink, #1a1a19);
+  font-weight: 400;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/// L'intestazione di una sezione a fisarmonica.
+@mixin lp-accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-5, 10px);
+  padding: var(--space-5, 10px) var(--space-6, 12px);
+  border: 0;
+  background: none;
+  border-radius: 0; //var(--radius-md, 6px);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition-fast, .12s);
+
+  &:hover { background: var(--ds-canvas, #f7f6f3); }
+}
+
+@mixin lp-accordion-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  font-size: var(--fs-md, 13px);
+  font-weight: var(--fw-medium, 500);
+  color: var(--ds-ink, #1a1a19);
+  letter-spacing: -0.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin lp-accordion-count {
+  flex: 0 0 auto;
+  font-family: var(--font-family-mono, ui-monospace, monospace);
+  font-size: var(--fs-tag, 10.5px);
+  color: var(--ds-muted, #8a8884);
+}
+
+/// La freccia: disegnata con due bordi e non un carattere, che cambia forma col font e si
+/// allinea male.
+@mixin lp-accordion-chevron {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  place-items: center;
+  font-size: 0;
+  color: var(--ds-muted, #8a8884);
+
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg) translate(-1px, -1px);
+    transition: transform .2s;
+  }
+  &.is-open::before { transform: rotate(45deg) translate(-1px, -1px); }
+}
+
+/// Il campo di ricerca a pillola: la forma distingue una ricerca da un campo di testo
+/// qualunque, prima ancora di leggere il segnaposto.
+@mixin lp-search-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 8px);
+  // Il carattere dichiarato e non ereditato: i due pannelli hanno host diversi, e `inherit`
+  // li faceva dipendere da cosa ciascuno aveva sopra -- che e' come erano finiti a divergere.
+  font-family: var(--font-family-poppins, 'Poppins', 'Roboto', Arial, sans-serif);
+  width: 100%;
+  height: 34px;
+  margin: 0;
+  padding: 0 var(--space-6, 12px);
+  border: 1px solid var(--ds-border, #ececea);
+  border-radius: 0px;
+  background: var(--ds-surface, #fff);
+  box-sizing: border-box;
+  transition: box-shadow var(--transition-fast, .12s);
+
+  &:focus-within { box-shadow: 0 0 0 3px rgba(80, 100, 147, .15); }
+
+  // L'icona: a tratto e della stessa misura in entrambi i campi. Il selettore e' `mat-icon`
+  // e non una classe, perche' i due template la avvolgono in modo diverso e una classe
+  // avrebbe richiesto di cambiarne uno solo per farli combaciare.
+  mat-icon {
+    flex: 0 0 auto;
+    width: var(--size-icon-base, 14px);
+    height: var(--size-icon-base, 14px);
+    font-size: var(--size-icon-base, 14px);
+    color: var(--ds-muted, #8a8884);
+
+    ::ng-deep svg {
+      width: var(--size-icon-base, 14px);
+      height: var(--size-icon-base, 14px);
+      fill: none;
+      stroke: currentColor;
+    }
+  }
+
+  // Il contenitore che il pannello dei blocchi mette attorno all'icona non deve aggiungere
+  // misure proprie: la pillola e' gia' un contenitore allineato.
+  .icon-container {
+    display: flex;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+  }
+
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: var(--fs-md, 13px);
+    color: var(--ds-ink, #1a1a19);
+    &::placeholder { color: var(--ds-muted, #8a8884); }
+  }
+}
+
+/// L'area che scorre: il corpo di un pannello, con la barra di scorrimento sottile che
+/// compare solo quando serve. `min-height: 0` non e' un ornamento -- senza, un figlio flex
+/// non si lascia stringere sotto il suo contenuto e a scorrere finisce il pannello intero,
+/// portandosi via l'intestazione.
+@mixin lp-scroll-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+  &:hover::-webkit-scrollbar-thumb { background: var(--ds-border, #ececea); }
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  &:hover { scrollbar-color: var(--ds-border, #ececea) transparent; }
+}
+
+/// La riga selezionata: fondo appena staccato e una barra sul bordo sinistro.
+///
+/// La barra e' un `::before`, quindi la riga che la include deve essere `position: relative`:
+/// altrimenti si ancora al primo antenato posizionato, che e' tutt'altro elemento, e compare
+/// lontano dalla riga che dovrebbe segnare. L'altezza la danno `top` e `bottom` insieme e non
+/// una `height`, che vincerebbe su `bottom` lasciando un moncone sempre uguale.
+@mixin lp-row-selected {
+  background: var(--ds-canvas, #f7f6f3);
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: var(--space-1, 2px);
+    bottom: var(--space-1, 2px);
+    width: 2px;
+    border-radius: 2px;
+    background: var(--ds-ink, #1a1a19);
+  }
+}
+
+/// La cornice di un pannello: il titolo con la freccia per chiudere, e la fascia della ricerca
+/// sotto. Emette le classi `lp-head-*` cosi' come stanno nei template, perche' i tre pannelli
+/// le scrivono identiche: finche' erano regole copiate in ciascun foglio, bastava ritoccarne
+/// una per farli divergere di nuovo -- ed e' esattamente come erano divergenti prima.
+@mixin lp-panel-head {
+  .lp-head-title {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 8px);
+    padding: var(--space-5, 10px) var(--space-5, 10px) var(--space-5, 10px) var(--space-8, 16px);
+    border-bottom: 1px solid var(--ds-border, #ececea);
+  }
+
+  .lp-head-title__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--fs-md, 13px);
+    font-weight: 600;
+    color: var(--ds-ink, #1a1a19);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lp-head-title__close {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius-md, 6px);
+    background: none;
+    color: var(--ds-muted, #8a8884);
+    cursor: pointer;
+    transition: background var(--transition-fast, .12s), color var(--transition-fast, .12s);
+
+    .icon { 
+      width: var(--size-icon-base, 14px); 
+      height: var(--size-icon-base, 14px); 
+      display: flex;
+      align-items: center;
+    }
+    // Riempita, non a contorno: la freccia e' un'icona piena (un solo tracciato chiuso), e
+    // `fill: none` la riduceva al filo del suo contorno -- a 14px, un pulsante vuoto. La regola
+    // a contorno vale per le icone disegnate cosi', come la lente qui accanto, e non per tutte.
+    ::ng-deep svg {
+      width: var(--size-icon-base, 14px);
+      height: var(--size-icon-base, 14px);
+      fill: currentColor;
+      stroke: none;
+    }
+
+    &:hover { background: var(--ds-border, #ececea); color: var(--ds-ink, #1a1a19); }
+  }
+
+  /* La ricerca vive in una fascia con il bordo sotto: la riga divisoria che c'era prima
+     faceva lo stesso lavoro ma non chiudeva nessuno spazio. */
+  .lp-search-head {
+    flex: 0 0 auto;
+    padding: var(--space-6, 12px);
+    border-bottom: 1px solid var(--ds-border, #ececea);
+
+    .search-box { @include lp-search-pill; }
+    .input-box-search-input-wpr { flex: 1 1 auto; min-width: 0; }
+  }
+}

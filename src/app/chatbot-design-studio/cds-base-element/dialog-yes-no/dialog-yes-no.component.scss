@@ -1,75 +1,83 @@
-::ng-deep .custom-dialog-container {
-    width: 40vw!important;
-    min-width: 500px;
-    max-width: 1000px!important;
-    mat-dialog-container {
-      padding: 0;
-    }
-}
+// Stessa grammatica visiva delle altre modali del DS (vedi attributes-dialog "Set Attributes"):
+// famiglia tpl-modal-*, divisore sottile sotto il titolo, bottone secondario grigio e primario blu.
+// NB: panelClass DEDICATA. Non riusare 'custom-dialog-container': e' condivisa da network-offline,
+// addkb-dialog, variable-list e dialog.component, e ridefinirla qui li ristilizzerebbe tutti.
+::ng-deep .custom-confirm-dialog-container {
+    width: 40vw !important;
+    min-width: 420px;
+    max-width: 560px !important;
 
-.tpl-modal-box {
-    border-radius: 6px;
-    flex-direction: column;
-    background: rgb(255, 255, 255);
-}
-.tpl-modal-header {
-    align-items: flex-start;
-    align-items: center;
-    border-bottom: 1px solid #dbe1e8;
-    display: flex;
-    flex-shrink: 0;
-    justify-content: center;
-    padding: 15px;
-    width: 100%;
-    i {
+    .tpl-modal-box {
+        border-radius: 6px;
+        flex-direction: column;
+        background: rgb(255, 255, 255);
+    }
+
+    .tpl-modal-header {
+        align-items: center;
+        display: flex;
         flex-shrink: 0;
-        font-size: 24px;
-        line-height: 23px;
-        margin-left: auto;
-        cursor: pointer;
+        justify-content: center;
+        width: 100%;
+
+        i {
+            flex-shrink: 0;
+            font-size: 24px;
+            line-height: 23px;
+            margin-left: auto;
+            cursor: pointer;
+        }
     }
-}
 
-.tpl-modal-header-text {
-    flex-grow: 1;
-    padding-right: 15px;
-    text-align: center;
-    width: 0;
-    span {
-        word-wrap: break-word;
-        display: -webkit-box;
-        line-height: 23px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 69px;
-        font-weight: 600;
-        font-size: 18px;
+    .tpl-modal-header-text {
+        flex-grow: 1;
+        text-align: center;
+        width: 0;
+
+        span {
+            word-wrap: break-word;
+            display: -webkit-box;
+            line-height: 23px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 69px;
+            font-weight: 600;
+            font-size: 18px;
+        }
     }
-}
 
-.tpl-modal-content {
-    flex-grow: 1;
-    padding: 30px 25px;
-    width: 100%;
-}
+    .confirm-dialog__hr {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
 
+    .tpl-modal-content {
+        flex-grow: 1;
+        padding: 30px 0px;
+        width: 100%;
+    }
 
-.tpl-modal-buttons {
-    display: flex;
-    flex-shrink: 0;
-    justify-content: flex-end;
-    padding: 0 25px 20px;
-    color: #333;
-    .cds-yellow-button{
-        margin-left: 10px; 
-        min-width: 80px;
-        background-color: var(--icon-color);
-        height: 100%;
+    .tpl-label-textarea {
+        margin-bottom: 5px;
+        color: #22272d;
+        font-size: 15px;
+        line-height: 19px;
+    }
+
+    .tpl-modal-buttons {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: flex-end;
         color: #333;
+        gap: 5px;
     }
-    .btn-cancel {
-        min-width: 80px;
-        border: 0;
-        height: 100%;
-    }
+}
+
+#cds-cancel-btn {
+    background: #e5e5e5;
+    color: #4b5052;
+}
+
+#cds-publish-btn:hover:enabled {
+    opacity: .8 !important;
 }

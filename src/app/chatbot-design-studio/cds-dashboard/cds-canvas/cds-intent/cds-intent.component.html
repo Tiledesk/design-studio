@@ -3,11 +3,14 @@
     (mousedown)="onIntentMouseDown($event)"
     (mousemove)="onIntentMouseMove($event)"
     (click)="$event.stopPropagation();onOpenIntentPanel(intent)"
-    [class.isStart]="isStart" 
-    [class.tds-slim-intent]="isV3"
+    [class.isStart]="isStart"
+    [class.isReturnStack]="isReturnStack"
+    [class.tds-v3-intent]="isV3"
     [class.cds-fallback-locked]="isDefaultFallbackLocked"
+    [class.cds-start-card]="isStartCard"
+    [class.cds-intent-selected]="intentService.intentSelectedID === intent.intent_id && intentService.intentActive"
     [id]="'intent-content-'+ intent?.intent_id"
-    [ngStyle]="{
+    [ngStyle]="isStartCard ? null : {
         'background-color': 'rgba('+intent.attributes.color+', 0.35)',
         'outline': intentService.intentSelectedID === intent.intent_id && intentService.intentActive ? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
       }">
@@ -27,11 +30,64 @@
         [display_name]="intent.intent_display_name"
         [deleteOptionEnabled]="listOfActions?.length > 0"
         [webhookEnabled]="intent.webhook_enabled"
+        [isReturnStack]="isReturnStack"
         (optionClicked)="onOptionClicked($event)">
     </cds-panel-intent-controls>
 
+    <!-- ======================================================================================= -->
+    <!-- V3 - BLOCCO DI PARTENZA: Web start, Webhook start e defaultFallback ancora vuota.          -->
+    <!-- Una scheda a due righe: sopra icona, titolo e connettore in uscita; sotto una riga di     -->
+    <!-- testo. E' una struttura sua, non il blocco generico con gli stili forzati: tutto quello    -->
+    <!-- che serve al blocco generico sta nel template legacyBlock piu' in basso e qui non entra.   -->
+    <!-- ======================================================================================= -->
+    <ng-container *ngIf="isStartCard; else legacyBlock">
+        <div class="start-card tds_draggable">
+
+            <div class="start-card__header tds_draggable">
+                <span class="start-card__icon tds_draggable" [ngClass]="startCardIcon.classes" aria-hidden="true">{{ startCardIcon.name }}</span>
+                <span class="start-card__title tds_draggable">{{ startCardTitleKey | translate }}</span>
+                <!-- Il connettore in uscita. Per Web start e Webhook start e' l'action "intent"
+                     dello start: da li' parte il flusso. Per la defaultFallback vuota e' il
+                     connettore del blocco (nextBlockAction), lo stesso che il blocco generico
+                     mostra in fondo a destra: e' quello che la porta al blocco col messaggio. -->
+                <cds-action-intent *ngIf="isStart"
+                    class="start-card__connector"
+                    [isStart]="true"
+                    [intentSelected]="intent"
+                    [action]="startAction"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-intent>
+                <cds-action-intent *ngIf="!isStart && actionIntent && !isActionIntent && !hideBlockConnector"
+                    class="start-card__connector start-card__connector--block"
+                    [intentSelected]="intent"
+                    [action]="actionIntent"
+                    [isLast]="true"
+                    (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                </cds-action-intent>
+            </div>
+
+            <div class="start-card__body tds_draggable">
+                <!-- Per il webhook, metodo e percorso dell'indirizzo appena arriva; l'indirizzo
+                     intero sta nel title. Per gli altri, una frase che dice da dove si parte. -->
+                <span *ngIf="isWebhookStart && webhookPath; else startCardText"
+                    class="start-card__text start-card__text--code tds_draggable" [title]="webhookUrl">
+                    <b class="tds_draggable">POST</b> {{ webhookPath }}
+                </span>
+                <ng-template #startCardText>
+                    <span class="start-card__text tds_draggable">{{ startCardTextKey | translate }}</span>
+                </ng-template>
+            </div>
+
+        </div>
+    </ng-container>
+
+    <!-- ======================================================================================= -->
+    <!-- BLOCCO GENERICO (e start, webhook e fallback dei legacy)                                   -->
+    <!-- ======================================================================================= -->
+    <ng-template #legacyBlock>
     <div [id]="'block-header-'+ intent?.intent_id"
-        class="pic-header" 
+        *ngIf="!isReturnStack"
+        class="pic-header"
         [ngClass]="{'cds-start': isStart}">
 
 
@@ -60,7 +116,20 @@
 
     </div>
     
-    <div *ngIf="isAgentsAvailable" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
+    <!-- ------------------------------------------------------------------------- -->
+    <!-- RETURN TO PARENT AGENT: nodo terminale a pastiglia                         -->
+    <!-- (speculare dello start: connettore in ingresso, nessuno in uscita)         -->
+    <!-- ------------------------------------------------------------------------- -->
+    <div *ngIf="isReturnStack" class="cds-return-stack-content tds_draggable">
+        <div class="cds-return-stack-icon">
+            <mat-icon svgIcon="assets/images/actions/web_response.svg" aria-hidden="true"></mat-icon>
+        </div>
+        <span class="cds-return-stack-label">
+            {{ 'CDSActionList.NAME.ReturnStack' | translate }}
+        </span>
+    </div>
+
+    <div *ngIf="isAgentsAvailable && !isReturnStack" class="agents-available" [class.isStart]="isStart"><span class="material-icons">boy</span></div>
 
     <div *ngIf="isStart" class="cds-start-content tds_draggable">
         <cds-action-intent class="panel-response" 
@@ -71,7 +140,7 @@
         </cds-action-intent>
     </div>
 
-    <div *ngIf="!isStart" class="actions-list-wpr"
+    <div *ngIf="!isStart && !isReturnStack" class="actions-list-wpr"
         [class.cds-fallback-locked]="isDefaultFallbackLocked"
         cdkDropList
         [cdkDropListData]="listOfActions"
@@ -81,8 +150,9 @@
         <!-- [id]="'action_'+i" -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
         <!-- Add block placeholder (mouseover)="mouseOverAddActionPlaceholder($event)" (mouseout)="mouseOutAddActionPlaceholder($event)"  -->
+        <!-- defaultFallback vuota: bloccata, niente segnaposto ne' pulsante "Add action"                                                -->
         <!-- ------------------------------------------------------------------------------------------------------------------------- -->
-        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked" 
+        <div class="add--action-placeholder" *ngIf="listOfActions?.length === 0 && !isDefaultFallbackLocked"
             cdkDrag
             [cdkDragDisabled]="dragDisabled || isV3">
             <!-- add-action-placeholder  -->
@@ -98,11 +168,11 @@
 
             <div class="csd-open-action-menu-btn-wpr">
                 <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="cds-add-action-btn">    
+                    class="cds-add-action-btn tds_no_drag">    
                     + {{ 'CDSCanvas.AddAction' | translate}}
                 </div>
                 <!-- <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="btn cds-add-action-btn csd-add-action-btn-wpr-element">
+                    class="btn cds-add-action-btn csd-add-action-btn-wpr-element tds_no_drag">
                     + Add action
                 </button> -->
             </div>
@@ -123,11 +193,8 @@
                 'cds-no-featured-action': action._tdActionType !== TYPE_ACTION.REPLY && (action._tdActionType !== TYPE_ACTION_VXML.DTMF_FORM || action._tdActionType !== TYPE_ACTION_VXML.BLIND_TRANSFER),
                 'cds-last-action': last
             }" 
-            [ngStyle]="{
-                'outline': intentService.actionSelectedID === action._tdActionId? '2px solid rgba('+intent.attributes.color+', 1)' : 'none'
-            }"
             (keydown)="onKeydown($event)" 
-            (click)="onSelectAction(action, i, action._tdActionId, $event)">
+            (click)="onSelectAction(action, i, action._tdActionId)">
             <!-- [class.isFirst]="first" -->
             <!-- [ngClass]="{'hide-drag-action-palceholder': hideActionDragPlaceholder}" -->
             <!-- [ngStyle]="{'opacity':hideActionDragPlaceholder === true ? '1' : '0' }" -->
@@ -154,8 +221,9 @@
             
                 <div class="action-drag-placeholder" *cdkDragPlaceholder></div>
 
-                <cds-action-description 
-                    class="header-action" 
+                <cds-action-description
+                    class="header-action"
+                    [class.tds_draggable_deep]="isV3"
                     [elementType]="action._tdActionType">
                 </cds-action-description>
     
@@ -265,6 +333,13 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-json-condition2>
+
+                    <cds-action-json-condition-multi *ngSwitchCase="TYPE_ACTION.JSON_CONDITION_MULTI"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-json-condition-multi>
     
                     <cds-action-replace-bot *ngSwitchCase="TYPE_ACTION.REPLACE_BOT" 
                         class="panel-response"
@@ -280,6 +355,16 @@
                         class="panel-response"
                         [action]="action">
                     </cds-action-replace-bot-v3>
+
+                    <cds-action-replace-bot-v4 *ngSwitchCase="TYPE_ACTION.REPLACE_BOTV4" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-replace-bot-v4>
+
+                    <cds-action-return-stack *ngSwitchCase="TYPE_ACTION.RETURN_STACK" 
+                        class="panel-response"
+                        [action]="action">
+                    </cds-action-return-stack>
 
                     <cds-action-assign-variable *ngSwitchCase="TYPE_ACTION.ASSIGN_VARIABLE" 
                         class="panel-response"
@@ -391,6 +476,7 @@
                         class="panel-response" 
                         [intentSelected]="intent"
                         [action]="action"
+                        [isV3]="isV3"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-iteration>
                     
@@ -530,6 +616,20 @@
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-flow-log>
 
+                    <cds-action-sub-agent *ngSwitchCase="TYPE_ACTION.INVOKE_SUB_AGENT"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-sub-agent>
+
+                    <cds-action-return *ngSwitchCase="TYPE_ACTION.RETURN"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-return>
+
                 </div>
             </span>
             
@@ -542,7 +642,7 @@
 
             <!-- <div *ngIf="last" class="csd-open-action-menu-btn-wpr">
                 <button #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                    class="btn cds-add-action-btn">
+                    class="btn cds-add-action-btn tds_no_drag">
                     <span class="material-icons">
                         add
                     </span>
@@ -553,7 +653,7 @@
         
     </div>
     
-    <cds-action-intent *ngIf="!isStart && intent && actionIntent && !isActionIntent"
+    <cds-action-intent *ngIf="!isStart && !isReturnStack && intent && actionIntent && !isActionIntent && !hideBlockConnector"
         class="panel-response last-action-intent" 
         [intentSelected]="intent"
         [action]="actionIntent"
@@ -562,13 +662,14 @@
     </cds-action-intent>
 
     <div class="footer-intent">
-        <div *ngIf="!isStart && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
+        <div *ngIf="!isStart && !isReturnStack && listOfActions?.length > 0 && !isV3" class="csd-open-action-menu-btn-wpr">
             <div #openActionMenuBtn (click)="$event.stopPropagation();openActionMenu(intent, 'add-action-btn')"
-                class="cds-add-action-btn">    
+                class="cds-add-action-btn tds_no_drag">    
                 + {{ 'CDSCanvas.AddAction' | translate}}
             </div>
         </div>
     </div>
+    </ng-template>
     
 
 

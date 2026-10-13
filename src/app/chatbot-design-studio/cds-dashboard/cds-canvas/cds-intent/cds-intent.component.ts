@@ -11,8 +11,8 @@ import { ControllerService } from '../../../services/controller.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
-import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
-import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions } from 'src/app/chatbot-design-studio/utils';
+import { TYPE_ACTION, TYPE_ACTION_VXML, ACTIONS_LIST, TYPE_CHATBOT, isReturnStackIntent, ACTIONS_WITH_OWN_OUTPUTS, actionEndsTheFlow } from 'src/app/chatbot-design-studio/utils-actions';
+import { INTENT_COLORS, TYPE_INTENT_NAME, replaceItemInArrayForKey, checkInternalIntent, generateShortUID, UNTITLED_BLOCK_PREFIX, isDefaultFallbackWithoutActions, getIntentDefaultColor } from 'src/app/chatbot-design-studio/utils';
 import { AppConfigService } from 'src/app/services/app-config';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { WebhookService } from 'src/app/chatbot-design-studio/services/webhook-service.service';
@@ -33,7 +33,6 @@ export enum HAS_SELECTED_TYPE {
 
 export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() intent: Intent;
-  @Input() hideActionPlaceholderOfActionPanel: boolean;
   @Input() chatbotSubtype: string;
   @Input() IS_OPEN_PANEL_INTENT_DETAIL: boolean;
   
@@ -71,6 +70,9 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   positionMenu: any;
   isStart = false;
   isDefaultFallback = false;
+  /** true quando il blocco contiene SOLO l'azione "Return to parent agent":
+   *  in quel caso è renderizzato come nodo terminale a pastiglia, senza connettore in uscita */
+  isReturnStack = false;
 
   /** isDefaultFallbackLocked
    * true SOLO in un agente V3, se il blocco e' la defaultFallback e non contiene
@@ -88,6 +90,49 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     return this.isV3 && this.isDefaultFallback && isDefaultFallbackWithoutActions(this.intent);
   }
 
+  /**
+   * V3: i blocchi di partenza -- Web start, Webhook start e la defaultFallback ancora vuota --
+   * hanno tutti la stessa scheda a due righe: sopra icona e titolo, sotto una riga di testo.
+   * Solo sugli agenti V3: sui legacy restano le pastiglie di sempre.
+   */
+  public get isStartCard(): boolean {
+    return this.isV3 && (this.isStart || this.isDefaultFallbackLocked);
+  }
+
+  public get isWebhookStart(): boolean {
+    return this.intent?.intent_display_name === TYPE_INTENT_NAME.WEBHOOK;
+  }
+
+  /** L'icona della scheda: la stessa che il blocco ha nel pannello dei blocchi, col suo colore. */
+  public get startCardIcon(): { name: string; classes: string } {
+    if (this.isWebhookStart) { return { name: 'webhook', classes: 'material-icons start-card__icon--webhook' }; }
+    if (this.isStart) { return { name: 'rocket_launch', classes: 'material-icons-outlined start-card__icon--web' }; }
+    return { name: 'undo', classes: 'material-icons start-card__icon--fallback' };
+  }
+
+  /** La chiave del titolo che la scheda mostra al posto del nome riservato del blocco. */
+  public get startCardTitleKey(): string {
+    if (this.isWebhookStart) { return 'CDSCanvas.StartCard.WebhookTitle'; }
+    if (this.isStart) { return 'CDSCanvas.StartCard.WebTitle'; }
+    return 'CDSCanvas.StartCard.FallbackTitle';
+  }
+
+  /** La chiave della riga di testo sotto il titolo; per il webhook vale solo finche' l'indirizzo non c'e'. */
+  public get startCardTextKey(): string {
+    if (this.isWebhookStart) { return 'CDSCanvas.StartCard.WebhookText'; }
+    if (this.isStart) { return 'CDSCanvas.StartCard.WebText'; }
+    return 'CDSCanvas.StartCard.FallbackText';
+  }
+
+  /**
+   * Il percorso dell'indirizzo del webhook, senza host: e' la parte che dice qualcosa, e in una
+   * riga sola l'indirizzo intero non ci starebbe. L'indirizzo intero resta nel title.
+   */
+  public get webhookPath(): string {
+    if (!this.webhookUrl) { return ''; }
+    try { return new URL(this.webhookUrl).pathname; } catch { return this.webhookUrl; }
+  }
+
   startAction: any;
   isDragging: boolean = false;
   actionDragPlaceholderWidth: number;
@@ -98,8 +143,14 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // Track mouse movement to distinguish click from drag
   private mouseDownX: number = 0;
   private mouseDownY: number = 0;
+  /** Vero quando la pressione in corso e' diventata un trascinamento: serve a distinguere un
+   *  click da un drag (apertura del pannello dell'intent e di quello dell'action). */
   private hasMouseMoved: boolean = false;
-  private readonly MOUSE_MOVE_THRESHOLD: number = 5; // pixels threshold to consider as drag
+  /** Quanto deve spostarsi la pressione perche' il gesto sia un trascinamento e non un clic.
+   *  E' la stessa soglia del motore di trascinamento (`dragThreshold`, `tiledesk-stage.js`), e
+   *  non puo' essere piu' alta: un gesto che muove il blocco senza arrivare qui aprirebbe anche
+   *  il pannello. */
+  private readonly MOUSE_MOVE_THRESHOLD: number = 4;
   webHookTooltipText: string;
   isInternalIntent: boolean = false;
   actionIntent: ActionIntentConnected;
@@ -110,8 +161,10 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   serverBaseURL: any;
   chatbot_id: string;
   isUntitledBlock: boolean = false;
-  /** Regole dell'editor per questo blocco: V3 (una action, niente drag) o V2 (n action, drag). Letto da DashboardService all'apertura. */
+  /** true quando il chatbot va editato con il Design Studio V3 (una action per blocco, niente drag). */
   isV3: boolean = false;
+  /** V3: nasconde il pallino di uscita del blocco quando l'action contenuta ha gia' connettori propri. */
+  hideBlockConnector: boolean = false;
 
   /** INTENT ATTRIBUTES */
   intentColor: any = INTENT_COLORS.COLOR1;
@@ -155,6 +208,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
           } else { // if(this.intent.actions.length !== intent.actions.length && intent.actions.length>0)
             this.logger.log("[CDS-INTENT] aggiorno le actions dell'intent");
             this.listOfActions = this.intent.actions;
+            this.updateIsReturnStack();
             this.setActionIntent();
             // cerca il primo connect to block e fissalo in fondo
             // this.listOfActions = this.intent.actions.filter(function(obj) {
@@ -295,6 +349,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }, 100); 
       this.isInternalIntent = checkInternalIntent(this.intent)
       this.updateIsUntitledBlock();
+      this.updateIsReturnStack();
       // Aggiorna showIntentOptions dopo l'inizializzazione
       this.updateShowIntentOptions();
       // Regole V2 o V3 per il blocco: decise una volta sola all'apertura del chatbot
@@ -426,29 +481,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Fixed bug where an empty intent's action placeholder remains visible if an action is dragged from the left action menu
-    this.logger.log('[CDS-INTENT] hideActionPlaceholderOfActionPanel (dragged from sx panel) ', this.hideActionPlaceholderOfActionPanel)
-    if (this.hideActionPlaceholderOfActionPanel === false) {
-      const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-      if (addActionPlaceholderEl instanceof HTMLElement) {
-        this.logger.log('[CDS-INTENT] HERE 1 !!!! addActionPlaceholderEl ', addActionPlaceholderEl);
-        if (addActionPlaceholderEl !== null) {
-          addActionPlaceholderEl.style.opacity = '0';
-        }
-      }
-    } else if (this.hideActionPlaceholderOfActionPanel === true) {
-      const addActionPlaceholderEl = document.querySelector('.add--action-placeholder');
-      if (addActionPlaceholderEl instanceof HTMLElement) {
-        this.logger.log('[CDS-INTENT] HERE 2 !!!! addActionPlaceholderEl ', addActionPlaceholderEl);
-        if (addActionPlaceholderEl !== null) {
-          addActionPlaceholderEl.style.opacity = '1';
-        }
-      }
-    }
     this.setAgentsAvailable();
     // Aggiorna isUntitledBlock se l'intent cambia
     if (changes['intent'] && !changes['intent'].firstChange) {
       this.updateIsUntitledBlock();
+      this.updateIsReturnStack();
     }
   }
 
@@ -467,6 +504,49 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
    */
   private updateIsUntitledBlock(){
     this.isUntitledBlock = this.intent?.intent_display_name?.startsWith(UNTITLED_BLOCK_PREFIX) ?? false;
+  }
+
+  /** updateIsReturnStack
+   * Ricalcola se il blocco va renderizzato come nodo terminale a pastiglia.
+   * Va chiamata OGNI volta che listOfActions può essere cambiata.
+   */
+  private updateIsReturnStack(){
+    const wasReturnStack = this.isReturnStack;
+    this.isReturnStack = !this.isStart && isReturnStackIntent(this.intent);
+    if(this.isReturnStack){
+      this.clearNextBlockConnector(wasReturnStack);
+    }
+  }
+
+  /** clearNextBlockConnector
+   * Il nodo "Return to parent agent" è terminale: non deve avere il connettore "next block".
+   * Non basta l'*ngIf nel template, perché ConnectorService.createConnectorsOfIntent
+   * lo ricrea al reload leggendo intent.attributes.nextBlockAction.intentName.
+   */
+  private clearNextBlockConnector(wasAlreadyReturnStack: boolean){
+    this.actionIntent = null;
+    const nextBlockAction = this.intent?.attributes?.nextBlockAction;
+    if(!nextBlockAction?.intentName){
+      return;
+    }
+    const fromId = this.intent.intent_id + '/' + nextBlockAction._tdActionId;
+    const toId = nextBlockAction.intentName.replace('#', '');
+    try {
+      // guardia obbligatoria: ConnectorService.deleteConnector fa intent.attributes?.connectors[idConnector],
+      // l'optional chaining protegge `attributes` ma NON `connectors`
+      if(!this.intent.attributes.connectors){
+        this.intent.attributes.connectors = {};
+      }
+      this.connectorService.deleteConnector(this.intent, fromId + '/' + toId, false, true);
+    } catch (error) {
+      this.logger.error('[CDS-INTENT] clearNextBlockConnector error: ', error);
+    }
+    // '' e non null: createConnectorsOfIntent testa `intentName && intentName !== ''`
+    nextBlockAction.intentName = '';
+    // salva solo alla transizione a runtime, per non generare una raffica di PUT al primo load
+    if(!wasAlreadyReturnStack && this.stageService.loaded === true){
+      this.intentService.updateIntent(this.intent);
+    }
   }
 
   /** updateShowIntentOptions
@@ -488,12 +568,12 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   /** setDsVersion
-   * Le regole del blocco seguono la versione dell'agente, risolta una volta sola
-   * da DashboardService all'apertura (attributes.dsVersion === 'v3'): V3 una sola
-   * action per blocco e niente drag delle action; V2 tutto come sempre.
+   * Legge la versione del Design Studio dal DashboardService, che la calcola
+   * una volta sola quando il chatbot viene caricato (resolveDsVersion).
+   * Qui non si ricalcola nulla: il blocco è solo un consumatore del flag.
    */
   private setDsVersion(): void {
-    this.isV3 = !!this.dashboardService?.isV3;
+    this.isV3 = this.dashboardService.isV3;
     this.logger.log('[CDS-INTENT] setDsVersion:', { isV3: this.isV3 });
   }
 
@@ -593,8 +673,51 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   /** CUSTOM FUNCTIONS  */
 
   /** setActionIntent */
+  /**
+   * V3 — decide se nascondere il pallino di uscita del blocco.
+   * Il pallino e' l'uscita di riserva del blocco: serve solo alle action che non
+   * hanno connettori propri. Si nasconde in due casi:
+   * - l'action espone gia' le sue uscite (Success/Else, bottoni, ecc.) e il pallino
+   *   sarebbe ridondante;
+   * - l'action chiude il flusso (Close, Agent handoff, Move to unassigned, Replace
+   *   AI Agent, Change Department che avvia il bot del dipartimento) e il pallino
+   *   non avrebbe destinazione.
+   *
+   * Due vincoli:
+   * - vale SOLO in V3: sui chatbot legacy il pallino resta sempre visibile;
+   * - non si nasconde mai un pallino GIA' COLLEGATO, altrimenti il collegamento
+   *   diventerebbe invisibile e non piu' rimovibile dall'utente.
+   */
+  private updateHideBlockConnector(fromId: string, toId: string): void {
+    if (!this.isV3) {
+      this.hideBlockConnector = false;
+      return;
+    }
+    const alreadyConnected = !!(fromId && toId);
+    this.hideBlockConnector = !alreadyConnected
+      && !!this.intent?.actions?.some(action => this.actionHasOwnOutputs(action) || actionEndsTheFlow(action));
+    this.logger.log('[CDS-INTENT] updateHideBlockConnector:', { alreadyConnected, hide: this.hideBlockConnector });
+  }
+
+  /**
+   * True se l'action espone connettori di uscita propri sul canvas.
+   * L'elenco e le esclusioni - fra cui la famiglia Reply, che conserva sempre il
+   * pallino del blocco - sono documentati in docs/V3/design-studio-v3-analysis.md
+   * (Parte 1-bis) e dichiarati in ACTIONS_WITH_OWN_OUTPUTS.
+   */
+  private actionHasOwnOutputs(action: any): boolean {
+    const type = action?._tdActionType;
+    return !!type && ACTIONS_WITH_OWN_OUTPUTS.includes(type);
+  }
+
   private setActionIntent(){
     try {
+      if(this.isReturnStack){
+        // nodo terminale "Return to parent agent": nessun connettore "next block".
+        // Senza questo early-return nextBlockAction verrebbe ricreato qui sotto.
+        this.actionIntent = null;
+        return;
+      }
       let connectorID = '';
       let fromId: string, toId: string;
       if(this.intent.attributes.nextBlockAction){
@@ -607,6 +730,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       }
       this.logger.log('[CDS-INTENT] actionIntent :: ', this.actionIntent);
       this.isActionIntent = this.intent.actions.some(obj => obj._tdActionType === TYPE_ACTION.INTENT);
+      this.updateHideBlockConnector(fromId, toId);
       if(this.isActionIntent){
         this.actionIntent = null;
         if(fromId && toId && fromId !== '' && toId !== ''){
@@ -661,10 +785,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       const nwColor = this.intent.attributes.color;
       this.intentColor = nwColor;
     } else {
-      this.intentColor = INTENT_COLORS.COLOR1;
-      this.intent.attributes.color = INTENT_COLORS.COLOR1;
+      this.intentColor = getIntentDefaultColor(this.intent);
+      this.intent.attributes.color = this.intentColor;
     }
   }
+
 
   private setIntentSelected() {
     this.listOfActions = null;
@@ -676,6 +801,7 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
         /** // this.patchAllActionsId(); */
         this.patchAttributesPosition();
         this.listOfActions = this.intent.actions;
+        this.updateIsReturnStack();
         if (this.intent.question) {
           const question_segment = this.intent.question.split(/\r?\n/).filter(element => element);
           this.questionCount = question_segment.length;
@@ -764,16 +890,15 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   // }
 
   /**
-   * Apre il dettaglio dell'action al click su di essa. Un click arriva anche alla fine di un
-   * trascinamento del blocco iniziato sull'intestazione dell'action (il browser lo emette al
-   * mouseup): se il puntatore si e' mosso dal mousedown piu' della soglia, era un trascinamento
-   * e il pannello non si apre. Senza evento (apertura dai controlli dell'action) si apre sempre.
+   * Clic su un'action del blocco: la sceglie e ne apre il pannello di dettaglio.
+   *
+   * Solo al clic, non alla fine di un trascinamento: il blocco ora si sposta anche afferrandolo
+   * da un'action, e il `click` che il browser manda dopo un trascinamento apriva il pannello di
+   * quell'action ogni volta che si spostava il blocco. Il blocco resta comunque selezionato --
+   * di quello se ne occupa la pressione.
    */
-  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE, event?: MouseEvent) {
-    if (event && this.movedSinceMouseDown(event)) {
-      this.logger.log('[CDS-INTENT] onActionSelected: click dopo un trascinamento, pannello non aperto');
-      return;
-    }
+  onSelectAction(action: any, index: number, idAction: HAS_SELECTED_TYPE) {
+    if (this.hasMouseMoved) { return; }
     this.logger.log('[CDS-INTENT] onActionSelected action: ', action);
     this.logger.log('[CDS-INTENT] onActionSelected index: ', index);
     this.logger.log('[CDS-INTENT] onActionSelected idAction: ', idAction);
@@ -948,11 +1073,11 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       if (this.isDefaultFallbackLocked) {
         return false;
       }
-      // V3: una sola action per blocco, quindi niente drop se ce n'e' gia' una
+      // In V3 il blocco accetta una sola action: se ne ha già una, nega il drop
       if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
         return false;
       }
-      // V2: n action per blocco, il drop e' sempre permesso
+      // Sui chatbot legacy il drop resta libero
       return true;
     }
   }
@@ -976,13 +1101,13 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    // V3: una sola action per blocco, quindi niente drop se ce n'e' gia' una
+    // In V3 il blocco accetta una sola action: se ne ha già una, il drop non passa
     if (this.isV3 && this.intent.actions && this.intent.actions.length > 0) {
-      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - agente V3 e c\'e\' gia\' una action nel blocco');
+      this.logger.log('[CDS-INTENT] onDropAction: impedito drop - chatbot V3 e c\'è già un\'action nell\'intent');
       return;
     }
 
-    // V2: n action per blocco, il drop procede
+    // Sui chatbot legacy il drop procede normalmente
     this.controllerService.closeAllPanels();
     this.intentService.setIntentSelected(this.intent.intent_id);
     if (event.previousContainer === event.container) {
@@ -1072,8 +1197,8 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
   openActionMenu(intent: any, calleBy: string) {
     this.logger.log('[CDS-INTENT] openActionMenu > intent ', intent)
     this.logger.log('[CDS-INTENT] openActionMenu > calleBy ', calleBy)
-    // nessun pulsante "Add action" renderizzato (es. defaultFallback vuota): niente da aprire
-    if (!this.openActionMenuBtnRef) {
+    // defaultFallback vuota, o nessun pulsante "Add action" renderizzato: niente da aprire
+    if (this.isDefaultFallbackLocked || !this.openActionMenuBtnRef) {
       return;
     }
     const openActionMenuElm = this.openActionMenuBtnRef.nativeElement.getBoundingClientRect()
@@ -1098,21 +1223,46 @@ export class CdsIntentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Pressione sul blocco: azzera la misura del gesto e seleziona il blocco.
+   *
+   * La selezione sta qui e non piu' solo sul trascinamento. Prima la faceva `start-dragging`,
+   * che il motore di trascinamento emette solo dove il gesto parte: premendo su un campo, su
+   * un pulsante o su un punto che non si trascina, il blocco non risultava selezionato. Questo
+   * gestore sta sulla radice del blocco e l'evento gli risale da qualunque discendente, quindi
+   * vale per ogni punto -- campi compresi, dove il trascinamento giustamente non parte.
+   *
+   * Solo se non e' gia' questo il blocco selezionato: rifarlo a ogni pressione sarebbe lavoro
+   * inutile, e soprattutto azzererebbe l'action scelta (lo fa setIntentSelected) a ogni clic
+   * dentro un blocco che la sta gia' mostrando nel pannello di dettaglio.
+   */
   onIntentMouseDown(event: MouseEvent): void {
     this.hasMouseMoved = false;
     this.mouseDownX = event.clientX;
     this.mouseDownY = event.clientY;
+    const alreadySelected = this.intentService.intentSelectedID === this.intent.intent_id
+      && this.intentService.intentActive;
+    if (!alreadySelected) {
+      this.intentService.setIntentSelected(this.intent.intent_id);
+    }
   }
 
-  /** True se, dal mousedown sul blocco, il puntatore si e' spostato oltre la soglia: un trascinamento, non un click. */
-  private movedSinceMouseDown(event: MouseEvent): boolean {
+  /**
+   * Dichiara il gesto un trascinamento, cosi' al rilascio non si aprono i pannelli: ne' quello
+   * dell'intent, ne' quello dell'action. Il browser manda un `click` anche alla fine di un
+   * trascinamento -- il blocco segue il puntatore, quindi pressione e rilascio cadono sullo
+   * stesso elemento -- ed e' da li' che il pannello si apriva mentre si spostava il blocco.
+   *
+   * Serve il tasto premuto e una distanza, non il semplice movimento: passare sopra un blocco
+   * non e' un gesto, e la mano che trema di un pixel su un clic non deve diventarlo.
+   */
+  onIntentMouseMove(event: MouseEvent): void {
+    if (event.buttons === 0) { return; }
     const dx = event.clientX - this.mouseDownX;
     const dy = event.clientY - this.mouseDownY;
-    return Math.sqrt(dx * dx + dy * dy) > this.MOUSE_MOVE_THRESHOLD;
-  }
-
-  onIntentMouseMove(event: MouseEvent): void {
-    this.hasMouseMoved = true;
+    if (Math.sqrt(dx * dx + dy * dy) >= this.MOUSE_MOVE_THRESHOLD) {
+      this.hasMouseMoved = true;
+    }
   }
   /** ******************************
    * intent controls options: START

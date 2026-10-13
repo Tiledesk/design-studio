@@ -120,3 +120,40 @@ cds-sidebar {
     border-top: solid 3px transparent;
   }
 }
+/* Mentre la chat AI costruisce l'agente appena descritto.
+   In alto e centrato sull'area del canvas, sopra i blocchi ma senza coprirli:
+   la cosa da guardare sono i blocchi che compaiono, non l'avviso. */
+.agent-building-banner {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100% - 32px);
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid #d1d9e0;
+    box-shadow: 0 2px 10px rgba(16, 24, 40, 0.12);
+    font-size: 13px;
+    color: rgb(52, 64, 84);
+    /* Non intercetta il puntatore: mentre l'agente si costruisce il canvas resta usabile. */
+    pointer-events: none;
+}
+
+.agent-building-banner__spinner {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    border: 2px solid #d1d9e0;
+    border-top-color: #2196f3;
+    border-radius: 50%;
+    animation: agent-building-spin 0.8s linear infinite;
+}
+
+@keyframes agent-building-spin {
+    to { transform: rotate(360deg); }
+}

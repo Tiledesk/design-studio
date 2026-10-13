@@ -2,6 +2,7 @@ import { SatPopover } from '@ncstate/sat-popover';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Component, Input, OnInit, SimpleChanges, EventEmitter, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { OPERATORS_LIST_V2, OperatorValidatorV2 } from '../../../../../../utils';
+import { supportsIgnoreCase } from '../../../../../../utils-condition';
 import { UNARY_OPERATORS, stripLiquidWrapper, normalizeLegacyOperator } from '../../../../../../utils-condition';
 import { Condition } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -33,6 +34,7 @@ export class BaseConditionRow2Component implements OnInit {
   conditionForm: FormGroup;
   readonlyTextarea: boolean = false;
   setAttributeBtnOperand2: boolean = false;
+  canShowIgnoreCase: boolean = false;
   canShowOperand2: boolean = true
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -67,7 +69,9 @@ export class BaseConditionRow2Component implements OnInit {
         type: ['const', Validators.required],
         value: ['', Validators.nullValidator],
         name: ['', Validators.nullValidator]
-      })
+      }),
+      // Spento di default: e' il confronto che il prodotto ha sempre fatto.
+      ignoreCase: [false]
     })
   }
 
@@ -85,7 +89,8 @@ export class BaseConditionRow2Component implements OnInit {
     this.conditionForm.patchValue({
       operand1 : stripLiquidWrapper(this.condition.operand1),
       operator: normalizedOperator,
-      operand2: operand2
+      operand2: operand2,
+      ignoreCase: (this.condition as any).ignoreCase === true
     });
     if(operand2){
       this.setAttributeBtnOperand2 = false;
@@ -99,7 +104,18 @@ export class BaseConditionRow2Component implements OnInit {
     // Unary operators have no Value: hide the field when reopening a saved condition.
     // Usa l'operatore NORMALIZZATO (un legacy *IgnoreCase non è unario).
     this.canShowOperand2 = !UNARY_OPERATORS.has(normalizedOperator);
+    this.canShowIgnoreCase = supportsIgnoreCase(normalizedOperator);
 }
+
+  /** La casella compare solo dove cambia qualcosa: sui confronti di testo. Su numeri,
+   *  date ed esistenza non c'e' caso da ignorare, e una casella che non fa niente
+   *  insegna che le caselle non contano. Fuori dai regex: vedi IGNORE_CASE_OPERATORS. */
+  onChangeOperatorIgnoreCase(operator: string): void {
+    this.canShowIgnoreCase = supportsIgnoreCase(operator);
+    if (!this.canShowIgnoreCase) {
+      this.conditionForm.patchValue({ ignoreCase: false });
+    }
+  }
 
 /** START EVENTS cds-textarea **/
   onChangeTextArea(text: string){
@@ -172,6 +188,7 @@ export class BaseConditionRow2Component implements OnInit {
 
   onClickOperator(operator: {}){
     this.conditionForm.patchValue({ operator: operator['type']})
+    this.onChangeOperatorIgnoreCase(operator['type']);
 
     // this.disableSubmit = true;
     this.readonlyTextarea = false;
@@ -197,6 +214,9 @@ export class BaseConditionRow2Component implements OnInit {
       let condition: Condition = new Condition()
       condition = Object.assign(condition, this.conditionForm.value);
       condition.operand2.type == 'var'? condition.operand2.name = condition.operand2.value: null;
+      // Si salva solo quando e' vero: una condizione sensibile resta identica a com'era
+      // prima che questo campo esistesse, e i flussi gia' salvati non cambiano forma.
+      if (!(condition as any).ignoreCase) { delete (condition as any).ignoreCase; }
       this.step = 0;
       this.conditionForm = this.createConditionGroup()
       this.close.emit(condition)

@@ -1,6 +1,7 @@
 import { AbstractControl } from "@angular/forms";
 import { Intent } from "src/app/models/intent-model";
 import { v4 as uuidv4 } from 'uuid';
+import { getActionCategoryColor } from "./utils-actions";
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
@@ -118,7 +119,8 @@ export enum SETTINGS_SECTION {
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
-    ADVANCED        = 'advanced'
+    ADVANCED        = 'advanced',
+    LLM_SETTINGS    = 'llm_settings',
 }
 
 export enum EXTERNAL_URL {
@@ -302,6 +304,21 @@ export enum TYPE_OF_MENU {
     FORM        = 'form',
     QUESTION    = 'question'
 }
+
+/**
+ * Il contenuto che viaggia quando si trascina un'azione dalla tavolozza al flusso: il tipo
+ * dell'azione, sotto un'etichetta tutta nostra.
+ *
+ * L'etichetta e' quello che distingue il nostro gesto da qualunque altra cosa si possa
+ * trascinare dentro una pagina -- un file dal desktop, un'immagine, del testo da un'altra
+ * finestra. Lo stage accetta il rilascio solo quando la riconosce, cosi' trascinare un file sul
+ * flusso non crea blocchi.
+ *
+ * Sta qui, e non in uno dei due componenti, perche' chi la scrive (la tavolozza) e chi la legge
+ * (il canvas) devono per forza dire la stessa stringa, e una stringa ripetuta in due punti prima
+ * o poi diverge.
+ */
+export const ACTION_DRAG_MIME = 'application/x-tiledesk-action-type';
 
 
 export enum TYPE_UPDATE_ACTION {
@@ -640,6 +657,30 @@ export function checkInternalIntent(intent: Intent): boolean {
 }
 
 
+/**
+ * Il colore con cui un blocco si presenta quando nessuno gliene ha scelto uno: quello della
+ * famiglia della sua azione -- verde per le piu' usate, blu per l'AI, e cosi' via -- cosi' il
+ * flusso si legge a colpo d'occhio prima ancora dei nomi.
+ *
+ * Decide guardando la prima azione che appartenga a una famiglia riconoscibile: un blocco ne
+ * contiene di solito una sola, e dove ce ne fossero piu' d'una comanda quella che lo apre.
+ *
+ * I blocchi riservati -- avvio, webhook, fallback -- restano del colore di sempre: il loro aspetto
+ * dice gia' che cosa sono, e una tinta presa dall'azione che contengono lo direbbe peggio.
+ *
+ * Sta qui, e non in chi disegna, perche' il colore appartiene al blocco: lo chiedono il blocco e
+ * il canvas, che con lo stesso colore disegna i connettori che ne escono.
+ */
+export function getIntentDefaultColor(intent: Intent | any): string {
+    if (!intent || checkInternalIntent(intent)) { return INTENT_COLORS.COLOR1; }
+    for (const action of intent.actions ?? []) {
+        const color = getActionCategoryColor(action?._tdActionType);
+        if (color) { return color; }
+    }
+    return INTENT_COLORS.COLOR1;
+}
+
+
 /** isDefaultFallbackWithoutActions
  * True SOLO per un blocco defaultFallback che non contiene alcuna action.
  * Gli agenti V3 nascono con defaultFallback vuoto (actions: []) e collegano
@@ -648,6 +689,7 @@ export function checkInternalIntent(intent: Intent): boolean {
  * Un defaultFallback con action al suo interno NON e' bloccato.
  * La funzione non sa di versioni: se il blocco va chiuso lo decide chi la chiama
  * (negli agenti V2 la defaultFallback e' un blocco come gli altri, anche vuota).
+ * Regola riportata dal branch features-2026/ds-generic-bug-fix-39 (278c658b).
  */
 export function isDefaultFallbackWithoutActions(intent: any): boolean {
     if (!intent) { return false; }

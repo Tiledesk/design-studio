@@ -44,6 +44,7 @@ export class DashboardService {
   /** Reactive counterpart of `isV3`, for components that render before the chatbot is loaded. */
   readonly isV3$ = new BehaviorSubject<boolean>(false);
 
+
   project: Project;
   /** Reactive stream for components that need to react to project changes. */
   readonly project$ = new BehaviorSubject<Project | null>(null);
@@ -51,6 +52,19 @@ export class DashboardService {
 
   departments: Department[]
   defaultDepartment: Department;
+
+  /** Set by CdsDashboardComponent; how anything moves the studio to another
+   *  flow of the same family without a page reload.
+   *
+   *  It lives here, and not on the chat host, so a side panel does not have
+   *  to ask the AI chat to navigate for it: this service is the one thing
+   *  everything that moves the studio already depends on. Null while no
+   *  dashboard is mounted -- callers fall back to their old navigation. */
+  public openFlow: ((faqKbId: string) => Promise<void>) | null = null;
+
+  /** Set by CdsDashboardComponent: reloads the open flow in place, without a
+   *  page reload. Null while no dashboard is mounted. */
+  public refreshFlow: (() => Promise<void>) | null = null;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   

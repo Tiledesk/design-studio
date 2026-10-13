@@ -12,6 +12,24 @@ export class TiledeskStage {
     drawer;
     classDraggable = "tds_draggable";
 
+    /** Come classDraggable, ma vale anche per i discendenti: il drag parte da un
+     *  punto qualsiasi del sottoalbero. Serve dove la maniglia e' un componente
+     *  con markup proprio (l'header dell'action in V3), i cui figli non possono
+     *  essere raggiunti dal CSS del componente padre. */
+    classDraggableDeep = "tds_draggable_deep";
+
+    /** Spostamento minimo (px) prima che un mousedown diventi un trascinamento:
+     *  sotto questa soglia il blocco non si muove, cosi' un click impreciso non
+     *  lo sposta di un paio di pixel. */
+    dragThreshold = 4;
+
+    /** Cosa non trascina mai, quando il punto premuto non dichiara nulla di suo e
+     *  la classe arriva da un antenato: ci si scrive, ci si preme sopra, non si
+     *  trascina. `.tds_no_drag` e' la via d'uscita per il markup che deve
+     *  chiamarsi fuori pur non essendo un campo -- una maniglia di riordino, per
+     *  dire, che ha gia' un trascinamento suo. */
+    notDraggableSelector = 'input, textarea, select, button, a, [contenteditable=""], [contenteditable="true"], [role="button"], .tds_no_drag';
+
 
     isDragging = false;
     position = {x: 0, y: 0};
@@ -164,13 +182,47 @@ export class TiledeskStage {
         let pos_mouse_x;
         let pos_mouse_y;
         element.onmousedown = (function(event) {
-            if (!event.target.classList.contains(this.classDraggable)) {
+            // Due regole, in quest'ordine.
+            //
+            // 1. Il confronto esatto sul target: l'elemento premuto porta lui la
+            //    classe. E' la regola storica, e resta senza eccezioni e senza
+            //    soglia -- da qui passa tutto cio' che oggi si trascina, compreso
+            //    il campo del nome del blocco, che si trascina e si modifica con
+            //    un doppio clic.
+            //
+            // 2. Altrimenti si risale ai genitori. Serve perche' la classe la
+            //    dichiara il contenitore, mentre il puntatore cade su cio' che
+            //    c'e' dentro -- un'icona, un testo, il markup di un componente
+            //    figlio -- che non puo' portarla e che senza risalita non
+            //    trascinava niente. Qui le esclusioni valgono: dentro un campo si
+            //    scrive, un pulsante si preme.
+            const target = event.target;
+            const canClosest = typeof target.closest === 'function';
+            const isExact = target.classList && target.classList.contains(this.classDraggable);
+            const isDeep = !isExact && canClosest
+                && !target.closest(this.notDraggableSelector)
+                && target.closest('.' + this.classDraggable + ', .' + this.classDraggableDeep);
+            if (!isExact && !isDeep) {
                 return false;
             }
+            // La soglia vale per la presa larga, quella che arriva dalla risalita:
+            // e' un'area facile da urtare, e senza soglia un clic impreciso
+            // sposterebbe il blocco di un paio di pixel. Le maniglie storiche e le
+            // note, che dichiarano la classe sul punto premuto, restano immediate.
+            const useThreshold = !!isDeep;
             event = event || window.event;
             event.preventDefault();
             pos_mouse_x = event.clientX;
             pos_mouse_y = event.clientY;
+            // Origine del gesto, usata solo per la soglia. pos_mouse_* resta fermo
+            // qui finche' la soglia non e' superata, cosi' il primo movimento
+            // applica lo spostamento per intero e il blocco non resta indietro.
+            const origin_mouse_x = event.clientX;
+            const origin_mouse_y = event.clientY;
+            let drag_started = false;
+            // start-dragging viene emesso subito, come prima: end-dragging deve
+            // restare accoppiato ad esso (cattura startDraggingPosition e gestisce
+            // l'apertura del pannello quando la posizione non e' cambiata).
             const custom_event = new CustomEvent("start-dragging", {
                 detail: {
                     element: element
@@ -180,6 +232,14 @@ export class TiledeskStage {
             document.onmousemove = (function(event) {
                 event = event || window.event;
                 event.preventDefault();
+                if (useThreshold && !drag_started) {
+                    const dist_x = event.clientX - origin_mouse_x;
+                    const dist_y = event.clientY - origin_mouse_y;
+                    if (Math.sqrt(dist_x * dist_x + dist_y * dist_y) < this.dragThreshold) {
+                        return;
+                    }
+                    drag_started = true;
+                }
                 const delta_x = event.clientX - pos_mouse_x;
                 const delta_y = event.clientY - pos_mouse_y;
                 pos_mouse_x = event.clientX;

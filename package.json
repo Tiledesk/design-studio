@@ -14,7 +14,9 @@
     "build": "ng build --output-path=dist --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:v2-rules": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-v2-rules.ts --ts-config=tsconfig.spec.v2-rules.json"
+    "test:v2-rules": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-v2-rules.ts --ts-config=tsconfig.spec.v2-rules.json",
+    "test:agent-chat": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-agent-chat.ts --ts-config=tsconfig.spec.agent-chat.json",
+    "test:condition": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-condition.ts --ts-config=tsconfig.spec.condition.json"
   },
   "private": false,
   "dependencies": {

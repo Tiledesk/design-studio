@@ -1,0 +1,241 @@
+@use '../left-panel' as lp;
+
+/* Pannello dei subagent, nella stessa grafica del pannello dei blocchi e di quello delle azioni.
+   Le forme -- la cornice, la riga, la cella dell'icona, il nome, la selezione, l'area che scorre
+   -- vengono dal parziale condiviso; i valori dai token dichiarati su `.box-left`.
+
+   Qui restano soltanto le due cose che sono di questo pannello e di nessun altro: il parent in
+   cima e il pulsante per creare un subagent. Prima questo foglio aveva una tavolozza sua -- un
+   altro blu, un altro grigio, 14px invece di 13, angoli arrotondati -- e il salto fra le tre
+   schede si vedeva tutto. */
+:host {
+    display: block;
+    height: 100%;
+    background: var(--ds-surface, #fff);
+    font-family: var(--font-family-poppins, 'Poppins', 'Roboto', Arial, sans-serif);
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: var(--ds-surface, #fff);
+}
+
+/* La cornice: titolo, freccia di chiusura e -- se un giorno la ricerca tornera' visibile -- la
+   sua fascia, gia' pronta nella forma degli altri due pannelli. */
+@include lp.lp-panel-head;
+
+.subagents-list {
+    @include lp.lp-scroll-area;
+    // Nessun padding: le righe arrivano a filo dei bordi come negli altri due elenchi, e lo
+    // spazio ai lati ce l'hanno loro, dal mixin condiviso.
+    padding: 0;
+}
+
+
+/* ── La riga ──────────────────────────────────────────────────────────── */
+
+.subagent-item {
+    @include lp.lp-row;
+    // Riferimento per la barra della selezione, che e' un `::before`.
+    position: relative;
+    text-decoration: none;
+    cursor: pointer;
+
+    .icon-container { @include lp.lp-icon-cell; }
+    .subagent-name { @include lp.lp-row-name; }
+
+    &.active { @include lp.lp-row-selected; }
+
+    /* I tre puntini: come la *i* delle azioni, nello stesso angolo e con le stesse misure.
+       Compaiono passando sulla riga e restano mentre il menu e' aperto o la riga e' quella
+       aperta, cosi' il bersaglio non scappa mentre ci si va sopra. */
+    .subagent-menu-btn {
+        flex: 0 0 auto;
+        margin-left: auto;
+        width: var(--size-icon-cell, 22px);
+        height: var(--size-icon-cell, 22px);
+        padding: 0;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: var(--radius-md, 6px);
+        background: none;
+        color: var(--ds-muted, #8a8884);
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity var(--transition-fast, .12s),
+                    background var(--transition-fast, .12s),
+                    color var(--transition-fast, .12s);
+
+        .material-icons {
+            font-size: var(--size-icon-base, 14px);
+            width: var(--size-icon-base, 14px);
+            height: var(--size-icon-base, 14px);
+            line-height: 1;
+        }
+
+        &:hover { background: var(--ds-border, #ececea); color: var(--ds-ink, #1a1a19); }
+        &[aria-expanded="true"] { opacity: 1; background: var(--ds-border, #ececea); }
+    }
+
+    &:hover .subagent-menu-btn,
+    &.active .subagent-menu-btn { opacity: 1; }
+}
+
+/* Il parent sta in cima e si stacca con una riga, come la fascia dei blocchi riservati nel loro
+   elenco: appartiene all'elenco ma non e' uno dei suoi elementi -- non si crea e non si elimina
+   da qui. L'icona non prende la cornice della cella, per lo stesso motivo per cui non la
+   prendono l'avvio e il fallback fra i blocchi. */
+.parent-item {
+    border-bottom: 1px solid var(--ds-border, #ececea);
+
+    .icon-container {
+        border: 0;
+        background: none;
+    }
+
+    .subagent-name { font-weight: var(--fw-medium, 500); }
+}
+
+
+/* ── Nessun subagent ─────────────────────────────────────────────────── */
+
+.subagents-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4, 8px);
+    padding: var(--space-8, 16px) var(--space-6, 12px);
+    text-align: center;
+    color: var(--ds-muted, #8a8884);
+
+    .empty-icon {
+        width: 24px;
+        height: 24px;
+        opacity: .6;
+
+        ::ng-deep svg { width: 24px; height: 24px; fill: currentColor; }
+    }
+
+    .empty-text {
+        margin: 0;
+        font-size: var(--fs-sm, 12px);
+        color: var(--ds-muted, #8a8884);
+    }
+}
+
+
+/* ── Nuovo subagent ─────────────────────────────────────────────────── */
+
+/* In coda alla lista, non ancorato in fondo al pannello: scorre con l'elenco, com'e' sempre
+   stato. Il bordo sopra lo separa dall'ultimo subagent senza bisogno di spazio vuoto. */
+.subagents-new {
+    padding: var(--space-6, 12px);
+    border-top: 1px solid var(--ds-border, #ececea);
+
+    .new-subagent-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-4, 8px);
+        width: 100%;
+        height: 34px;
+        padding: 0 var(--space-6, 12px);
+        // Stessa pillola del campo di ricerca: bordo, altezza e spigoli di quello, perche' e'
+        // l'altro elemento a tutta larghezza di questi pannelli.
+        border: 1px solid var(--ds-border, #ececea);
+        border-radius: 0;
+        background: var(--ds-surface, #fff);
+        font-family: inherit;
+        font-size: var(--fs-md, 13px);
+        font-weight: var(--fw-medium, 500);
+        color: var(--ds-ink, #1a1a19);
+        cursor: pointer;
+        transition: background var(--transition-fast, .12s), border-color var(--transition-fast, .12s);
+
+        .material-icons {
+            font-size: var(--size-icon-base, 14px);
+            width: var(--size-icon-base, 14px);
+            height: var(--size-icon-base, 14px);
+            line-height: 1;
+            color: var(--ds-ink-2, #4a4a47);
+        }
+
+        &:hover { background: var(--ds-canvas, #f7f6f3); }
+    }
+}
+
+
+/* ── Il menu dei tre puntini ─────────────────────────────────────────── */
+
+/* Material lo monta in fondo alla pagina, fuori da `.box-left`: i token dichiarati la' non
+   arrivano fin qui, quindi ogni `var()` porta il suo valore di ripiego ed e' quello che si
+   vede. Sono gli stessi numeri, scritti due volte perche' non c'e' modo di ereditarli. */
+::ng-deep .mat-menu-panel.subagent-menu-panel {
+    min-width: 0;
+    max-width: none;
+    // Material impone min-height:64px alle mat-menu-panel: senza azzerarlo il pannello
+    // resta molto piu' alto della voce che contiene.
+    min-height: 0;
+    width: 180px;
+    border-radius: var(--radius-md, 6px);
+    border: 1px solid var(--ds-border, #ececea);
+    // Niente ombra: e' la stessa scelta degli altri menu del prodotto (Options, menu del
+    // contesto), e qui l'avevo cambiata senza motivo mentre allineavo i colori.
+    box-shadow: none;
+    background: var(--ds-surface, #fff);
+    overflow: hidden;
+
+    .mat-menu-content:not(:empty) { padding: var(--space-2, 4px); }
+
+    .subagent-menu-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-5, 10px);
+        margin: 0;
+        padding: var(--space-3, 6px) var(--space-6, 12px);
+        border-radius: 0;
+        font-family: var(--font-family-poppins, 'Poppins', 'Roboto', Arial, sans-serif);
+        font-size: var(--fs-md, 13px);
+        line-height: 1.4;
+        color: var(--ds-ink, #1a1a19);
+        cursor: pointer;
+        transition: background var(--transition-fast, .12s);
+
+        // Il fondo, non il colore del testo: la voce si accende restando nel piano del menu.
+        &:hover { background: var(--ds-canvas, #f7f6f3); }
+    }
+
+    .subagent-menu-item-icon {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+
+        span {
+            font-size: var(--size-icon-base, 14px);
+            width: var(--size-icon-base, 14px);
+            height: var(--size-icon-base, 14px);
+            line-height: 1;
+            color: var(--ds-ink-2, #4a4a47);
+        }
+    }
+
+    .subagent-menu-item-text {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0;
+        font-size: var(--fs-md, 13px);
+        font-weight: 400;
+        color: inherit;
+    }
+
+    .truncate {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}

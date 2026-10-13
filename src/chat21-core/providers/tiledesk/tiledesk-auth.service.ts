@@ -5,7 +5,7 @@ import { UserModel } from 'src/chat21-core/models/user';
 import { avatarPlaceholder, getColorBck } from 'src/chat21-core/utils/utils-user';
 import { AppStorageService } from '../abstract/app-storage.service';
 import { LoggerInstance } from '../logger/loggerInstance';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 // import { BehaviorSubject } from 'rxjs';
 // import { EventsService } from 'src/app/services/events-service';
 
@@ -28,6 +28,15 @@ export class TiledeskAuthService {
   private logger: LoggerService = LoggerInstance.getInstance()
 
   private BS_IsONLINE: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+
+  private tiledeskTokenChangedSource: Subject<string> = new Subject<string>()
+  /** Emits whenever a newly issued token replaces the stored `tiledesk_token`.
+   *
+   *  Anything holding its own copy of the token -- the agent chat's iframe, for
+   *  one, which is handed the token once and then talks to the runtime by
+   *  itself -- has to be told, or a session that outlives its JWT starts
+   *  failing with no recovery short of a reload. */
+  public readonly tiledeskTokenChanged$ = this.tiledeskTokenChangedSource.asObservable()
 
   constructor(
     public http: HttpClient,
@@ -246,6 +255,13 @@ export class TiledeskAuthService {
       this.logger.log('[TILEDESK-AUTH] - checkAndSetInStorageTiledeskToken STORED-TOKEN EXIST AND IS = TO TOKEN ')
     }
     this.appStorage.setItem('tiledeskToken', tiledeskToken)
+    // Announced after the write, and only when the token actually changed:
+    // this is the single funnel through which every newly issued token reaches
+    // `tiledesk_token`, so it is the one place a holder of a stale copy can be
+    // told to refresh it.
+    if (storedTiledeskToken !== tiledeskToken) {
+      this.tiledeskTokenChangedSource.next(tiledeskToken)
+    }
   }
 
   isLoggedIn(): Promise<boolean>{

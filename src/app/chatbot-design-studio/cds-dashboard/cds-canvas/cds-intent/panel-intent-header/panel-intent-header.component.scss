@@ -2,6 +2,41 @@
   --width-title: 80%;
 }
 
+/* V3 - nella defaultFallback vuota il titolo e' tutto il contenuto del blocco,
+   che e' una pastiglia bassa: i 6px in cima lo spingono in basso e lo scentrano.
+   Scritta qui e con :host-context perche' la condizione sta sul blocco che ci
+   contiene, mentre questo div e' contenuto di questo componente -- una regola
+   scritta in cds-intent.component.scss non lo raggiunge, la view encapsulation
+   la limita agli elementi di quel template. */
+:host-context(.tds-v3-intent.cds-fallback-locked) .header {
+    padding-top: 0px;
+}
+
+/* V3 - il titolo della defaultFallback vuota: bianco e senza il filtro che lo
+   scurisce. Il !important batte il colore inline di [ngStyle] (il colore del blocco). */
+:host-context(.tds-v3-intent.cds-fallback-locked) .form-group input {
+    color: rgb(255 255 255) !important;
+    filter: none;
+}
+
+/* V3 - icona bianca sulla defaultFallback vuota: solo qui, gli altri blocchi e
+   gli agenti legacy tengono il rosso della regola .intent-icon. */
+:host-context(.tds-v3-intent.cds-fallback-locked) .intent-icon span.undo {
+    /* Azzurro: nei V3 il suo ramo e' quasi sempre un AI Prompt che risponde al messaggio
+       (V3-S8). Lo stesso nel pannello dei blocchi. */
+    color: rgb(50, 172, 255);
+}
+
+/* V3 - il razzo del Web start: il suo verde, lo stesso nel pannello dei blocchi. */
+:host-context(.tds-v3-intent) .intent-icon span.rocket {
+    color: rgb(52, 187, 126);
+}
+
+/* V3 - l'icona del Webhook start: viola invece del giallo, che resta sui chatbot legacy. */
+:host-context(.tds-v3-intent) .intent-icon span.webhook {
+    color: #ba86ff;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -82,7 +117,7 @@
             margin:0;
             font-size: 1.0em;
             position: relative;
-            filter: brightness(70%);
+            // filter: brightness(70%);
         }
         .btn-save {
             position: absolute;
@@ -370,7 +405,7 @@ $circle-size: 40px;
   }
   span.undo,
   span.call_end {
-    color: var(--color-red-hex)
+    color: var(--color-red-hex);
   }
   span.webhook {
     color: var(--color-yellow-hex)

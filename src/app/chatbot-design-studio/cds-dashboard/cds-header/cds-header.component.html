@@ -22,16 +22,28 @@
         </span>
     </div> -->
     <!-- <i class="material-icons cds-btn-back" (click)="goBack()">keyboard_arrow_left</i> -->
-    <div class="header-go-back">
-        <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#006cff">
-            <path d="M0 0h24v24H0z" fill="none"/><path d="M11.67 3.87L9.9 2.1 0 12l9.9 9.9 1.77-1.77L3.54 12z"/>
-        </svg> -->
-        <span class="cds-text"> {{BRAND_BASE_INFO['COMPANY_NAME']}}</span> 
-        <span class="cds-text title"> {{BRAND_BASE_INFO['META_TITLE']}}</span>    
-    </div>
+    <!-- Cella vuota di proposito: .header-right e' una griglia a tre colonne e .header-title
+         deve restare in quella di mezzo. La chat AI si apre e si chiude dalla sua linguetta,
+         in cima alla striscia di sinistra del canvas. -->
+    <div class="btn-group header-agent-chat-btn"></div>
     <div class="header-title ellips">
-        {{ selectedChatbot?.name }}
+        <!-- Selettore dell'agent (solo V3): cambia agent senza uscire dal Design Studio -->
+        <button type="button" class="agent-selector" *ngIf="isV3" [matMenuTriggerFor]="menuAgents"
+            [attr.aria-label]="'CDSHeader.SelectAgent' | translate">
+            <span class="agent-selector__name ellips">{{ selectedChatbot?.name }}</span>
+            <span class="material-icons agent-selector__caret">arrow_drop_down</span>
+        </button>
+        <!-- Agent legacy: solo il nome, come prima del selettore -->
+        <ng-container *ngIf="!isV3">{{ selectedChatbot?.name }}</ng-container>
         <span class="material-icons" *ngIf="(SHARE_MENU_ITEMS | filter:{key: 'status', value: 'active' }).length > 0" [matMenuTriggerFor]="menuShare">ios_share</span>
+        <span class="material-icons-outlined delete-agent-icon"
+            *ngIf="isV3 && selectedChatbot?._id"
+            [class.is-disabled]="isDeletingAgent"
+            matTooltip="{{ 'CDSHeader.DeleteAgent' | translate }}"
+            matTooltipClass="cds-mat-tooltip"
+            matTooltipPosition="below"
+            matTooltipHideDelay="100"
+            (click)="onDeleteAgent()">delete_outline</span>
     </div>
     <div class="right-opts">
 
@@ -164,6 +176,23 @@
             [items]="LOGO_MENU_ITEMS"
             (onMenuOption)="onMenuOptionFN($event)">
         </cds-menu>
+    </ng-template>
+</mat-menu>
+
+<!-- ELENCO DEGLI AGENT DEL PROGETTO -->
+<mat-menu #menuAgents="matMenu" class="agentsMenu" xPosition="after" yPosition="below">
+    <ng-template matMenuContent>
+        <button mat-menu-item class="agent-item"
+            *ngFor="let agent of agents"
+            [class.is-active]="agent._id === id_faq_kb"
+            (click)="onSelectAgent(agent)">
+            <span class="material-icons-outlined agent-item__icon">smart_toy</span>
+            <span class="agent-item__name">{{ agent.name }}</span>
+            <span class="material-icons agent-item__check" *ngIf="agent._id === id_faq_kb">check</span>
+        </button>
+        <div class="agents-menu__empty" *ngIf="agents.length === 0">
+            {{ 'CDSHeader.NoAgents' | translate }}
+        </div>
     </ng-template>
 </mat-menu>
 

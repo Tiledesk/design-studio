@@ -1,5 +1,5 @@
 import { FormControl, FormGroup } from '@angular/forms';
-import { Component, Input, OnInit, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild, OnChanges, SimpleChanges, ElementRef, NgZone, OnDestroy } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { RESERVED_INTENT_NAMES } from '../../utils';
 
@@ -8,7 +8,7 @@ import { RESERVED_INTENT_NAMES } from '../../utils';
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss']
 })
-export class SelectComponent implements OnInit {
+export class SelectComponent implements OnInit, OnDestroy {
   @ViewChild('ngSelect', { static: true }) ngSelect: NgSelectComponent;
 
   @Input() items: any[] = [];
@@ -41,7 +41,10 @@ export class SelectComponent implements OnInit {
   valueFormGroup: FormGroup 
   sortedItems: any[] = [];
   
-  constructor() { }
+  /** Rimuove il listener di scroll acceso all'apertura; null a pannello chiuso. */
+  private stopScrollWatch: (() => void) | null = null;
+
+  constructor(private host: ElementRef<HTMLElement>, private zone: NgZone) { }
 
   ngOnInit(): void {
     // empty
@@ -99,6 +102,7 @@ export class SelectComponent implements OnInit {
   }
 
   onOpen(){
+    this.watchOutsideScroll();
   }
 
   onFooterButtonClick(event) {
@@ -110,7 +114,62 @@ export class SelectComponent implements OnInit {
   }
 
   onClose(){
+    this.unwatchOutsideScroll();
     this.ngSelect.blur();
+  }
+
+  ngOnDestroy(): void {
+    // Un pannello aperto quando il componente viene distrutto (si cambia
+    // blocco, si chiude il pannello di dettaglio) lascerebbe il listener
+    // attaccato a document per sempre.
+    this.unwatchOutsideScroll();
+  }
+
+  /** Chiude il pannello quando scorre qualcosa che non e' questa select.
+   *
+   *  `appendTo="body"` stacca il pannello dal campo: e' figlio del body e le
+   *  sue coordinate sono calcolate all'apertura, quindi se il contenitore del
+   *  campo scorre la lista resta dov'era, sospesa sopra il resto della pagina.
+   *
+   *  Il listener e' in fase di CAPTURE su document perche' l'evento `scroll`
+   *  non risale: in capture si vede lo scroll di qualunque contenitore senza
+   *  doverne agganciare uno a ognuno, e senza sapere in anticipo dentro cosa
+   *  la select e' stata usata.
+   *
+   *  Lo scroll DENTRO la lista delle opzioni e' interazione con la select, non
+   *  con la pagina: quello non chiude niente, ed e' il motivo del controllo su
+   *  `.ng-dropdown-panel`.
+   *
+   *  Tutto fuori da Angular: uno scroll produce decine di eventi al secondo e
+   *  farli passare dalla change detection si sente sulla canvas. Si rientra
+   *  nella zona solo nel momento in cui si chiude davvero. */
+  private watchOutsideScroll(): void {
+    this.unwatchOutsideScroll();
+
+    const onScroll = (event: Event) => {
+      const target = event.target as Node | null;
+      const el = target && target.nodeType === Node.ELEMENT_NODE ? target as HTMLElement : null;
+      if (el && (el.closest('.ng-dropdown-panel') || this.host.nativeElement.contains(el))) {
+        return;
+      }
+      this.zone.run(() => this.ngSelect?.close());
+    };
+
+    this.zone.runOutsideAngular(() => {
+      // Al tick successivo, non subito: aprendo la select il browser puo'
+      // portare il campo in vista, e quello scroll chiuderebbe il pannello
+      // nello stesso istante in cui si e' aperto.
+      const armed = setTimeout(() => document.addEventListener('scroll', onScroll, true));
+      this.stopScrollWatch = () => {
+        clearTimeout(armed);
+        document.removeEventListener('scroll', onScroll, true);
+      };
+    });
+  }
+
+  private unwatchOutsideScroll(): void {
+    this.stopScrollWatch?.();
+    this.stopScrollWatch = null;
   }
 
 }
