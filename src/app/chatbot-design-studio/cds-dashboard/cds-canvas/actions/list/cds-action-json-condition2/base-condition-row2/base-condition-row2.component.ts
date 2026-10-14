@@ -15,6 +15,12 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 export class BaseConditionRow2Component implements OnInit {
   @ViewChild('operand1') inputOperand1: ElementRef;
   @Input() condition: Condition;
+  /**
+   * Catalogo operatori da mostrare nel picker. Default: tutti i V2 (azione JSON Condition V2).
+   * I FILTRI delle Reply passano OPERATORS_LIST_REPLY_FILTER, perché il server li valuta
+   * sull'AST `conditions` con semantica V1 e non conosce gli operatori solo-V2.
+   */
+  @Input() operators: { [key: string]: { name: string, type: any, src?: string, group?: string } } = OPERATORS_LIST_V2;
   @Output() close = new EventEmitter();
 
   textVariable: string = '';
@@ -43,7 +49,8 @@ export class BaseConditionRow2Component implements OnInit {
     this.logger.log('[BASE_CONDITION_ROW2] ******* ngOnChanges-->');
     this.conditionForm = this.createConditionGroup()
     this.step=0;
-    this.operatorsList = Object.keys(OPERATORS_LIST_V2).map(key => (OPERATORS_LIST_V2[key]))
+    const catalog = this.operators || OPERATORS_LIST_V2;
+    this.operatorsList = Object.keys(catalog).map(key => (catalog[key]))
     if(this.condition){
       this.logger.log('[BASE_CONDITION_ROW2] selectedConditionnnn-->', this.condition)
       this.setFormValue()

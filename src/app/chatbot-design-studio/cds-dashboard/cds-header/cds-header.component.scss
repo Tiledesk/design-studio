@@ -143,7 +143,16 @@
 
 #cds-publish-btn-wrp {
     position: relative;
-    
+
+    // evita che l'header sobbalzi nel passaggio "Publish" <-> spinner + "Saving...".
+    // inline-flex non crea un containing block: .publish-badge resta ancorato al wrapper.
+    #cds-publish-btn {
+        min-width: 110px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .publish-badge {
         position: absolute;
         top: -5px;

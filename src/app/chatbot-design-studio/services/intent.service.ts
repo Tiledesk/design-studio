@@ -1,7 +1,7 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
 import { Subject, BehaviorSubject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionSubAgent, ActionReturn, ActionJsonCondition2, ActionReplaceBotV4, ActionReturnStack } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionSubAgent, ActionReturn, ActionJsonCondition2, ActionReplaceBotV4, ActionReturnStack, ActionDataTable } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
 import { environment } from 'src/environments/environment';
@@ -19,6 +19,7 @@ import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { ReadOnlyService } from 'src/app/services/read-only.service';
+import { SavingStateService } from 'src/app/services/saving-state.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
@@ -87,8 +88,9 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService,
-    private readonly readOnlyService: ReadOnlyService
-  ) { 
+    private readonly readOnlyService: ReadOnlyService,
+    private savingStateService: SavingStateService
+  ) {
 
   }
 
@@ -993,6 +995,9 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.WEB_RESPONSE){
       action = new ActionWebRespose();
     }
+    if(typeAction === TYPE_ACTION.DATA_TABLE){
+      action = new ActionDataTable();
+    }
     if(typeAction === TYPE_ACTION.AGENT){
       action = new ActionAgent();
     }
@@ -1795,7 +1800,10 @@ export class IntentService {
       payload = applyConditionSaveModeToPayload(payload);
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
-        this.faqService.opsUpdate(payload).subscribe((resp: any) => {
+        // track(): incrementa alla subscribe, decrementa via finalize su next+complete /
+        // error / unsubscribe. Copre tutti e 5 i chiamanti (updateIntent, saveNewIntent,
+        // deleteIntentNew, restoreLastUNDO, restoreLastREDO), che NON fanno await qui.
+        this.savingStateService.track(this.faqService.opsUpdate(payload)).subscribe((resp: any) => {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
           // this.setDragAndListnerEventToElement(intent.intent_id);

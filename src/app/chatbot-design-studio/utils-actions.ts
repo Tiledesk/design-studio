@@ -56,7 +56,8 @@ export enum TYPE_ACTION {
     AI_CONDITION        = 'ai_condition',
     WEB_RESPONSE        = 'web_response',
     INVOKE_SUB_AGENT    = 'invoke_subagent',
-    RETURN              = 'return'
+    RETURN              = 'return',
+    DATA_TABLE          = 'data_table'
 }
 
 export enum TYPE_ACTION_REPLY {
@@ -188,6 +189,7 @@ export const ACTIONS_LIST: {
     RETURN_STACK:           { name: 'CDSActionList.NAME.ReturnStack',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],                                                category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.RETURN_STACK,         src: "assets/images/actions/web_response.svg",                  status: "active",   badge: 'NEW',         doc: "CDSActionList.DOC.ReturnStack",        subagent_visibility: 'only'},
     WAIT :                  { name: 'CDSActionList.NAME.Wait',                  chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.FLOW,                type: TYPE_ACTION.WAIT,                 src:"assets/images/actions/wait.svg",                   status: "active",                       doc: "CDSActionList.DOC.Wait"                                           },
     // WEB_REQUEST : { name: 'CDSActionList.NAME.WebRequest',category: TYPE_ACTION_CATEGORY.INTEGRATIONS, type: TYPE_ACTION.WEB_REQUEST, src:"assets/images/actions/web_request.svg", status: "active", description: ''},
+    DATA_TABLE :            { name: 'CDSActionList.NAME.DataTable',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.DATA_TABLE,           src:"assets/images/actions/data_table.svg",             status: "active", badge: 'BETA',        doc: "CDSActionList.DOC.DataTable"                                      },
     WEB_REQUESTV2 :         { name: 'CDSActionList.NAME.WebRequest',            chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_REQUESTV2,        src:"assets/images/actions/web_request.svg",            status: "active",                       doc: "CDSActionList.DOC.WebRequest"                                     },
     WEB_RESPONSE :          { name: 'CDSActionList.NAME.WebResponse',           chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT],                                                   category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.WEB_RESPONSE,         src:"assets/images/actions/web_response.svg",           status: "active",                       doc: ""                                                                 },
     EMAIL :                 { name: 'CDSActionList.NAME.SendEmail',             chatbot_types: [TYPE_CHATBOT.CHATBOT, TYPE_CHATBOT.WEBHOOK, TYPE_CHATBOT.COPILOT, TYPE_CHATBOT.VOICE, TYPE_CHATBOT.VOICE_TWILIO],    category: TYPE_ACTION_CATEGORY.INTEGRATIONS,        type: TYPE_ACTION.EMAIL,                src:"assets/images/actions/send_email.svg",             status: "active",                       doc: "CDSActionList.DOC.SendEmail"                                      },
@@ -260,3 +262,33 @@ export function isReturnStackIntent(intent: any): boolean {
         && actions.length === 1
         && actions[0]?._tdActionType === TYPE_ACTION.RETURN_STACK;
 }
+// ----- Data Table action constants -----
+export const DATA_TABLE_OPERATIONS: Array<{ name: string, value: string }> = [
+    { name: 'Get',    value: 'get' },
+    { name: 'Insert', value: 'insert' },
+    { name: 'Update', value: 'update' },
+    { name: 'Upsert', value: 'upsert' },
+    { name: 'Delete', value: 'delete' }
+];
+
+export const DATA_TABLE_OPERATORS: Array<{ name: string, value: string }> = [
+    { name: 'Equal',            value: 'equal' },
+    { name: 'Not equal',        value: 'not_equal' },
+    { name: 'Contains',         value: 'contains' },
+    { name: 'Starts with',      value: 'starts_with' },
+    { name: 'Ends with',        value: 'ends_with' },
+    { name: 'Greater than',     value: 'greater_than' },
+    { name: 'Greater or equal', value: 'greater_or_equal' },
+    { name: 'Less than',        value: 'less_than' },
+    { name: 'Less or equal',    value: 'less_or_equal' },
+    { name: 'Exists',           value: 'exists' },
+    { name: 'Not exists',       value: 'not_exists' }
+];
+
+// Operators that don't require a value
+export const DATA_TABLE_OPERATORS_NO_VALUE: string[] = ['exists', 'not_exists'];
+
+export const DATA_TABLE_MATCH: Array<{ name: string, value: string }> = [
+    { name: 'all (AND)', value: 'all' },
+    { name: 'any (OR)',  value: 'any' }
+];

@@ -10,7 +10,7 @@ import { ConnectorService } from '../../../../../../../services/connector.servic
 import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-tts',
@@ -98,9 +98,7 @@ export class CdsActionReplyTTSComponent implements OnInit {
     this.checkButtons();
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
-    if(this.response?._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-      this.filterConditionExist = true
-    }
+    this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
   }
 
   private checkButtons(){
@@ -202,7 +200,7 @@ export class CdsActionReplyTTSComponent implements OnInit {
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
     // // this.filterConditionExist = expression && expression?.conditions.length > 0?true:false;
-    this.filterConditionExist = !!(expression && expression?.conditions.length > 0);
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
 

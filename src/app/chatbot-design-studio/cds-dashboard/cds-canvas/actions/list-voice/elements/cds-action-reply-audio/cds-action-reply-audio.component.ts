@@ -5,7 +5,7 @@ import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { Expression, Message, Metadata, Wait } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
   selector: 'cds-action-reply-voice-audio',
@@ -53,9 +53,7 @@ export class CdsActionReplyAudioComponent implements OnInit {
 
   private initialize(){
     this.delayTime = (this.wait && this.wait.time  || this.wait.time === 0)? (this.wait.time/1000) : 500/1000;
-    if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-      this.filterConditionExist = true
-    }
+    this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
   }
 
 
@@ -78,7 +76,7 @@ export class CdsActionReplyAudioComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
 

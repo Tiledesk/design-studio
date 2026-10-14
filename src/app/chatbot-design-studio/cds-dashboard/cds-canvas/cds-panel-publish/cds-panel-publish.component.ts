@@ -1,5 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -12,6 +13,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { AppConfigService } from 'src/app/services/app-config';
 
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { SavingStateService } from 'src/app/services/saving-state.service';
 import { DepartmentService } from 'src/app/services/department.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { NotifyService } from 'src/app/services/notify.service';
@@ -97,7 +99,7 @@ export function resolveTargetsToPublish(targets: PublishTarget[]): PublishTarget
 
 })
 
-export class CdsPanelPublishComponent implements OnInit {
+export class CdsPanelPublishComponent implements OnInit, OnDestroy {
   @ViewChild('tooltip') tooltip: MatTooltip;
   @Output() closePanel = new EventEmitter();
   @Output() updateAndSaveAction = new EventEmitter;
@@ -129,6 +131,12 @@ export class CdsPanelPublishComponent implements OnInit {
   HAS_COMPLETED_PUBLISH_SUCCESS: boolean = false
   HAS_COMPLETED_PUBLISH_ERROR: boolean = false
   PUBLISH_PENDING: boolean = false
+  /** true appena parte un salvataggio del flusso o di una nota: disabilita il pulsante */
+  isSaving: boolean = false;
+  /** true solo se il salvataggio supera i 300ms: mostra spinner + "Saving..." */
+  isSavingVisible: boolean = false;
+  private subscriptionIsSaving: Subscription;
+  private subscriptionIsSavingVisible: Subscription;
 
   showRocket: boolean = true;
   showCheckMark: boolean = false;
@@ -161,6 +169,7 @@ export class CdsPanelPublishComponent implements OnInit {
     private readonly appStorageService: AppStorageService,
     private readonly webhookService: WebhookService,
     private readonly appConfigService: AppConfigService,
+    private readonly savingStateService: SavingStateService,
   ) {
 
   }
@@ -168,6 +177,14 @@ export class CdsPanelPublishComponent implements OnInit {
   ngOnInit(): void {
     // this.checkDepartmentsForProjectIdHasBot();
     this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+
+    /** SUBSCRIBE TO THE GLOBAL SAVING STATE */
+    this.subscriptionIsSaving = this.savingStateService.isSaving$.subscribe((saving) => {
+      this.isSaving = saving;
+    });
+    this.subscriptionIsSavingVisible = this.savingStateService.isSavingVisible$.subscribe((visible) => {
+      this.isSavingVisible = visible;
+    });
 
     const hasCheckedHideInstall = this.appStorageService.getItem(`hide-install-button-${this.projectID}`);
     this.logger.log('[PUBLISH-PANEL] hascheckedHideInstall', hasCheckedHideInstall)
@@ -268,6 +285,13 @@ export class CdsPanelPublishComponent implements OnInit {
   }
 
 
+
+  ngOnDestroy(): void {
+    // il componente sta dentro un *ngIf: viene distrutto e ricreato a ogni apertura
+    // del pannello, quindi senza unsubscribe le subscription si accumulerebbero
+    this.subscriptionIsSaving?.unsubscribe();
+    this.subscriptionIsSavingVisible?.unsubscribe();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.log('[PUBLISH-PANEL] intent', this.intent)
@@ -420,7 +444,9 @@ export class CdsPanelPublishComponent implements OnInit {
 
   onClickPublish() {
     if (!this.CAN_PUBLISH) { return; }
-
+    // Non pubblicare se c'e' un salvataggio in volo (stato non ancora persistito)
+    // ne' se una publish e' gia' partita: oggi un doppio click invia due publish.
+    if (this.isSaving || this.PUBLISH_PENDING) { return; }
     this.PUBLISH_PENDING = true
     this.status = 'pending';
 

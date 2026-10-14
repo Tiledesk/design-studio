@@ -13,7 +13,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
 import { TranslateService } from '@ngx-translate/core';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { TYPE_ACTION, TYPE_ACTION_VXML } from 'src/app/chatbot-design-studio/utils-actions';
-import { isLegacyFilter } from 'src/app/chatbot-design-studio/utils-condition';
+import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 const swal = require('sweetalert');
 
 @Component({
@@ -100,9 +100,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
     this.checkButtons();
     this.buttons = this.intentService.patchButtons(this.buttons, this.idAction);
     this.idIntent = this.idAction.split('/')[0];
-    if(this.response && this.response._tdJSONCondition && this.response._tdJSONCondition.conditions.length > 0){
-      this.filterConditionExist = true
-    }
+    this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
   }
 
   private checkButtons(){
@@ -197,7 +195,7 @@ export class CdsActionReplyVoiceTextComponent implements OnInit {
   /** onChangeExpression */
   onChangeExpression(expression: Expression){
     this.response._tdJSONCondition = expression;
-    this.filterConditionExist = expression && expression.conditions.length > 0? true : false;
+    this.filterConditionExist = hasFilter(expression);
     this.changeActionReply.emit();
   }
 

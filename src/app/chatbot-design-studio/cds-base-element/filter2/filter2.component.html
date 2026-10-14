@@ -1,6 +1,6 @@
 <div class="content element" [class.previewMode]="previewMode" style="width: 100%;">
     
-    <div class="filter-row" *ngIf="expression?.conditions.length === 0">
+    <div class="filter-row" *ngIf="!expression?.conditions?.length">
         <div class="add-filter-btn" 
             [satPopoverAnchor]="addConditionFilter" 
             (click)="addConditionFilter.toggle()">
@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="filter-row" *ngIf="expression?.conditions.length > 0">
+    <div class="filter-row" *ngIf="expression?.conditions?.length > 0">
         <div *ngFor="let group of expression?.conditions; let i = index; let last = last"
             class="text-editor-wrapper">
             <!-- CONDITION [i]-->
@@ -21,9 +21,13 @@
                     <span class="material-icons-outlined">delete</span>
                 </div>
                 <div class="filter-icon">
-                    <span class="material-icons">data_object</span>
+                    <!-- operatore non valutabile dal server: il blocco si fermerebbe su questo filtro -->
+                    <span *ngIf="!isReplyFilterOperatorSupported(group?.operator)"
+                        class="material-icons filter-unsupported-icon"
+                        [title]="'CDSCanvas.UnsupportedFilterOperator' | translate">warning</span>
+                    <span *ngIf="isReplyFilterOperatorSupported(group?.operator)" class="material-icons">data_object</span>
                 </div>
-                <div class="filter-text no-ellips">
+                <div class="filter-text no-ellips" [class.unsupported]="!isReplyFilterOperatorSupported(group?.operator)">
                     <b>{{group?.operand1}}</b>
                     {{ operatorLabel(group?.operator) | translate }}
                     <b>{{ operandRightDisplay(group) }}</b>
@@ -74,6 +78,7 @@
     interactiveClose="false">
     <base-condition-row2
         [condition]="selectedCondition"
+        [operators]="OPERATORS_LIST_PICKER"
         (close)="onDismiss($event)">
     </base-condition-row2>
 </sat-popover>

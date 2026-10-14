@@ -7,77 +7,45 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 24/09/2026
+# features-2026/subagents-2 24/09/2026
+- **added**: aggiunti i subagents (pannello laterale, creazione, azioni Invoke Sub Agent e Return), selezione degli agenti nella pubblicazione, release history con View, Republish e Restore
 
-- **added**: a **Restore** button brings the flow you are editing back to a published version. It is the opposite of Republish, and it is not reversible: confirming replaces what you have now, and the confirmation says so, names the date being restored, warns that subagents are not restored — this version is of this flow alone — and, when the flow has changes that were never published, says that those are what is about to be lost. Afterwards the flow is reloaded so what is on screen is what was restored
-- **changed**: the button that used to be called **Restore** in the release history is now called **Republish**, which is what it does: it puts an old version back online and leaves the flow you are editing alone. Two buttons named the same and doing opposite things is how work gets lost
-- **added**: every line of the release history has a **View** button that shows that published version full screen, without leaving the Design Studio: the blocks, the connections and the settings of each action exactly as they were when it was published. Nothing can be changed from there — a notice says so the whole time, and no edit ever reaches the server, whichever way it is attempted. The flow being worked on is untouched, and so is its view: zoom and framing used while looking at a release are not carried back
-- **fixed**: **centre the flow** now fits it into the part of the stage that can actually be seen, instead of the whole area — which includes what the blocks panel covers and what runs past the edge of the window. The flow used to end up off to one side, and on a wide flow part of it stayed out of view
-- **changed**: publishing an agent now covers its subagents as well. The publish panel lists the agent and every subagent, ticks the ones that have changes waiting to be published, and publishes them all in one go. If some go through and others do not, the panel says which is which, instead of a single "an error occurred"; the ones that succeeded are unticked, so trying again only retries what failed. An agent with no subagents sees the panel exactly as before
-- **fixed**: the dot marking unpublished changes no longer goes out just because the publish panel was opened. It goes out when the flow has really been published, and only for the flows that were
+# 1.40.15
+- **added**: Adds OpenRouter to the AI action model picker
 
-# this branch 09/09/2026
+# 1.40.14
+- **added**: the management of MCP servers and tools has been extracted from the AI Prompt action into a reusable section, so the other LLM actions can adopt it as it is
+- **added**: a Native Tools catalog listing the MCP servers provided by Tiledesk, each one showing its description and the tools currently active on it
+- **changed**: the MCP dialogs have been redesigned around a single consistent frame, with tooltips on every button and a Close button in the footer; a server is now attached to the prompt with an explicit button that becomes "Detach tools" once added, and it can be edited only once attached
+- **added**: a popup listing all the tools of a server with select and deselect all, reachable both from the servers list and from the server detail, where the selected ones are also summarised at a glance
+- **changed**: the tool selection is saved only on the action and never alters the shared MCP integration, and it is remembered per action and per server: detaching and re-attaching a server, closing the dialog or reloading the page no longer loses the chosen tools
+- **bug fix**: several fixes to the MCP interface — authentication is now honoured while discovering the tools of a server, the custom headers section is reachable again, some sizing glitches have been corrected and the missing italian translations have been added
+- **added**: new Gemini Agent Platform provider in the model selector of the Ask KB, AI Prompt and AI Condition actions; its models are read from the provider configured in the project integrations and are listed per server, so the action always runs on the server the model was chosen from
+- **changed**: the model selector is faster and more accurate — every provider is loaded in one go instead of one at a time, providers are grouped under their full name instead of their internal one, and a model offered by more than one provider no longer selects the wrong entry
+- **changed**: the default fallback block no longer accepts actions when it is empty — nothing can be dropped into it and both the "Add action" button and the empty-block message are hidden; chatbots that still keep a reply inside the default fallback are untouched and remain fully editable
+- **changed**: in the release history the "Restore" button is now "Re-publish", with a tooltip clarifying that it puts that version back online without changing the chatbot you are currently editing
+- **added**: a reference document describing the condition grammar the Design Studio emits, for the runtime and the LLM that have to evaluate it
+- **changed**: authentication persistence setting added to the design studio configuration, and the application startup no longer loads unused interface components
 
-- **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
+# 1.40.13
+- **added**: new AI models — Cohere Command A+ (05-2026), Gemini (3.6 Flash, 3.5 Flash/Flash-Lite, Omni Flash Preview, 3.1 Pro Preview, 3.1 Flash Live Preview, 3 Flash Preview, 2.5 Pro), Claude (Opus 5, Sonnet 5, Fable 5, Opus 4.8, Opus 4.7), Groq (Llama Prompt Guard 2 86M/22M, Qwen3.6-27B, OpenAI Safety GPT-OSS 20B), Deepseek v4 Flash/Pro, OpenAI Gpt-5.6 Sol/Terra/Luna
+- **changed**: updated AI model configs — corrected max_output_tokens (Gemini/Cohere/Claude/Groq), enabled reasoning where applicable (e.g. Command A+, Gemini-pro), fixed Groq model ids/names (Llama Prompt Guard, Llama/Gemma/Qwen labels), deactivated outdated models (Claude Opus/Sonnet 4.0, some Groq/OpenAI entries, Gemini image variants)
 
-# this branch 08/09/2026
+# 1.40.12
+- **added**: the **Publish** button is now disabled while the chatbot is being saved, showing a spinner + "Saving..." — a new root `SavingStateService` counts the in-flight saves (flow via `opsUpdate`, canvas notes via `NoteService`) and both the header button and the one inside the publish panel react to it, so a release can no longer be created from a state that is not persisted yet
+- **bug fix**: double-clicking Publish inside the panel no longer fires two publish requests (`PUBLISH_PENDING` is now part of the button's disabled state)
+- **changed**: the AI actions no longer re-fetch the same data per instance — the `integration`, `integration/name/ollama`, `integration/name/vllm` and `kb/namespace/all` GETs are now cached in `ProjectService`/`OpenaiService` through a new `HttpMemoCache` (in-flight dedup + short TTL, invalidated on `saveIntegration` and on project change). A canvas with N Ask KB / AI Prompt / AI Condition actions now issues 1 request per endpoint instead of N
+- **changed**: removed the duplicated `/integration` GET in the AI Prompt action and the dead `getIntegrationByName`/`getIntegrations` copies in AI Prompt and AI Condition, now using the shared util
+- **bug fix**: the MCP servers array is copied instead of referenced, so the MCP dialogs can no longer mutate the shared integration payload
+- **bug fix**: a reply filter could stop the flow on its block. The V2 filter editor offered all 38 operators, but reply filters are evaluated server-side on the `conditions` AST with V1 semantics — the 22 V2-only operators (`exists`, dates, arrays, lengths, …) are not interpretable there. The reply filter picker is now restricted to the 16 operators the server evaluates (`OPERATORS_LIST_REPLY_FILTER`, derived at runtime from `TYPE_OPERATOR` so it stays in sync), while the JSON Condition V2 **action** keeps all 38 — the `when` contract applies to the action only, not to message filters. Filters already saved with an unsupported operator are left untouched and flagged with a warning in the editor
 
-- **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
-- **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
-- **changed**: nel pannello Subagents la **casella di ricerca** "Search a subagent" e il **badge `parent`** sono nascosti: rimosso il markup, conservati stili e logica di filtro (`onSearch`/`applyFilter`), cosi' ripristinarli e' questione di poche righe
-- **changed**: il **parent** usa ora l'icona di gruppo e ogni **subagent** un **omino blu a mezzo busto** — nuova icona `person` registrata in `IconService`, ricavata dai tracciati gia' presenti in `actions/online_agents.svg` (testa e spalle, senza le onde del segnale) e ricentrata con una `translate`, per non alterare i numeri originali
-- **changed**: icone delle righe del pannello da 18 a 20px e grigio piu' carico (`#5a6672`): l'icona di gruppo e' fitta e alla dimensione precedente si leggeva male. L'omino dei **subagent** e' disegnato piu' piccolo (svg 12x12) ma il suo box resta 20px, cosi' i nomi restano allineati fra riga del parent e righe dei subagent
-- **fixed**: nel pannello Subagents la dimensione dell'icona era applicata solo alla riga **attiva**, quindi tutte le altre rendevano alla misura di default di `mat-icon` (24px) invece che a quella prevista
-- **fixed**: l'icona della tab **Blocks** non e' piu' bianca — `search.svg` porta `fill="#FFFFFF"` nell'asset e l'attributo sull'elemento vince sul colore ereditato; ora l'icona segue il colore della tab (grigio, blu quando attiva) come tutte le altre
-- **changed**: il pulsante **New subagent** e' visibile anche **dentro un subagent**. Il nuovo agent viene creato sotto il **parent della famiglia**, non sotto il subagent aperto: si ottiene un fratello, non un annidamento. L'id del parent lo decide il pannello e viaggia nei `data` della modale, che prima lo ricavava da se' con `id_faq_kb`; il pulsante non compare se quell'id non e' risolvibile
-- **changed**: la tab **Blocks** e' ora un pulsante quadrato con la sola icona a **lente**, che dice a colpo d'occhio che da li' si cerca un blocco; l'etichetta e' passata nel tooltip e la tab **Subagents** occupa tutta la larghezza rimanente
-- **changed**: rinominate tre action — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. Il nuovo nome e' allineato ovunque compaia: menu delle action, etichetta sul blocco nel canvas e titolo nella documentazione del pannello
-- **changed**: pannello **Subagents** — la tab passa al primo posto (Blocks seconda) ed e' quella aperta di default **quando l'agente non ha ancora una preferenza salvata**: se l'utente ne sceglie una, vince la sua (`getActiveLeftPanel` ora distingue "nessuna preferenza" da "Blocks", prima erano lo stesso valore). Entrambe le tab hanno un'icona; la risoluzione della tab si e' spostata in `ngOnInit`, cosi' il pannello Blocks non viene piu' montato e subito distrutto a ogni apertura. Il pulsante **New subagent** e' ora un footer ancorato in fondo al pannello invece che sopra l'elenco, quindi resta raggiungibile anche con la lista lunga. Icone dei subagent sostituite con SVG registrati in `IconService`, in linea con le altre del DS. L'elenco dei subagent e' ordinato **alfabeticamente** (case e accenti ignorati, numeri confrontati come numeri: "Agente 2" prima di "Agente 10"); il parent resta sempre primo
-- **added**: primi test unitari sul pannello Subagents — l'ordinamento alfabetico (estratto in `sortSubagentsByName`, funzione pura: maiuscole, accenti, numeri, lista vuota) e `getActiveLeftPanel` (preferenza assente, salvata, famiglie separate). ⚠️ **Non sono eseguibili**: l'harness Karma del repo non esegue alcun test (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — guasto preesistente, indipendente da queste modifiche
-# this branch gio 27 ago 2026
-- **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
-- **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
-- **changed**: the **Return** action is available again in the menu, with its original name "Return"
-- **added**: **Invoke Agent** preselects the start block when an agent is selected and clears the block when the agent is cleared, like **Invoke subagent**
-- **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
-- **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
+# 1.40.11
+- **added**: added new google models
 
-# this branch 
-- **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
-- **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
-- **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
-- **changed**: the Sub Agent action is hidden from the Special actions
-- **changed**: the subagent actions are available inside a subagent too (a subagent can invoke another subagent), superseding the `subagent_visibility: never` rule on **Invoke subagent**
-- **bug fix**: inside a subagent the invocable agents are now the siblings (parent's subagents), excluding itself, instead of an empty list
-- **added**: selecting a subagent preselects its start block
-- **bug fix**: clearing the selected subagent left the previously selected block
-- **changed**: the "Return" action is renamed "Return to agent"
-- **added**: the Blocks/Subagents tab is kept across reloads and parent/subagent navigation
-- **added**: delete a subagent from the Subagents panel (hover menu + confirmation modal)
-- **changed**: after creating a subagent the Design Studio reloads on the new subagent; after deleting one it reloads on the parent
-- **changed**: the Subagents panel is shown also inside a subagent, listing the parent chatbot (first, highlighted) and the sibling subagents, with the current agent highlighted
-- **changed**: subagents and the parent chatbot open in the same browser tab
-- **changed**: inside a subagent the "+ New subagent" button and the Sub Agent action are hidden
-- **bug fix**: fixed the subagent/parent navigation links (hash route ending with /blocks)
-- **changed**: the "+ New subagent" button moved right below the "Search a subagent" input in the Subagents panel
-- **changed**: subagents are handled like standard chatbots in the Design Studio (all chatbot actions/components enabled)
-- **bug fix**: opening a subagent showed an empty actions panel, preventing editing of its flow
-- **changed**: the Sub Agent action is not available inside a subagent
-- **added**: Subagents side panel with Blocks/Subagents tabs, listing the subagents connected to the chatbot (each opens its detail in a new tab)
-- **added**: create a new subagent from the Subagents panel (blocking modal, saved via faq_kb)
-- **changed**: Sub Agent action "Choose an Agent" now lists only the subagents connected to the chatbot
-- **changed**: Sub Agent detail panel now fills the panel height like the other actions
-- **bug fix**: Sub Agent action Success/Else (if/else) connectors were not rendered on the canvas
-- **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
-
-
-# this branch
-- **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
-- **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
-- **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control
-- **changed**: `returnstack` uses its own icon (`icons/stacks.svg`), no longer shared with **Connect block**
-- **bug fix**: moving an action between two blocks did not notify the source block (dead code after `return` in `moveActionBetweenDifferentIntents`), which did not re-render until reload
-- **bug fix**: `CDSActionList.DOC.ReturnStack.IMAGE` pointed to the Replace-bot screenshot
+# 1.40.10 
+- **added**: added documentation image and guide link to the Data Table action tooltip
+- **bug-fix**: show the divider only when the filter conditions section is visible in the Data Table action
+- **changed**: cds-config-*.json assets are now published under /environments/real_data
 
 # 1.40.9 
 - **changed**: hidden the legacy **Condition** (`condition`) and **Condition w/ else** (`jsoncondition`) actions from the action menu (`status: 'inactive'` in `ACTIONS_LIST`) — they can no longer be added to new flows, but existing agents built with them keep working (entries, types and rendering logic left intact). The new **Condition w/ else V2** (`jsoncondition2`) stays available
