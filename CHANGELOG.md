@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# master-pre 14/10/2026
+- **added** (master-pre): an agent managed by the new Design Studio (`dsVersion: v3`, or a connectors list in its attributes) is not opened here: an alert offers to open it in cds-v3 (`cdsV3BaseUrl` / `CDS_V3_URL`, same route) or to go back to the dashboard. Checked before the blocks load, also when switching agent from the header or the AI chat
+- **removed** (master-pre): the connectors refactor (lists in the agent attributes) leaves this line: it lives in the V3 Design Studio only. master-pre is back to 1.40.16-rc28
+
 # 1.40.16-rc28
 - **fixed** (master-pre): in the start box detail panel the title no longer overlaps its icon, and the icon always takes the title colour
 - **changed** (V3/design-vibe-coder): V3 start boxes (web, webhook, empty default fallback) share one fixed-size two-row card: blue header with icon, readable title and the out connector; white body with a one-line description (webhook: `POST` + path)

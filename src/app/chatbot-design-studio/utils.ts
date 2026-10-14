@@ -11,6 +11,17 @@ export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
  *  Confronto in minuscolo. */
 export const DS_VERSION_V3 = 'v3';
 
+/** True se l'agente e' gestito dal Design Studio V3 e NON va aperto con questa console:
+ *  porta l'etichetta `dsVersion = v3`, oppure ha gia' la lista dei connettori in
+ *  `attributes.connectors` (la gestione nuova, che qui non esiste: aprirlo e salvarlo da qui
+ *  perderebbe i collegamenti). Si apre con cds-v3. */
+export function isV3ManagedChatbot(chatbot: any): boolean {
+    const label = chatbot?.attributes?.dsVersion;
+    if (typeof label === 'string' && label.trim().toLowerCase() === DS_VERSION_V3) { return true; }
+    const list = chatbot?.attributes?.connectors;
+    return !!list && typeof list === 'object' && Array.isArray(list.items);
+}
+
 export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://guide.tiledesk.com/', target: '_blank'},

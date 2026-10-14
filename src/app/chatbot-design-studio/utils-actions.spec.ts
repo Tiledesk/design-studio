@@ -2,6 +2,21 @@ import {
   ACTIONS_LIST, ACTIONS_WITH_OWN_OUTPUTS, TYPE_ACTION, TYPE_CHATBOT,
   isActionAvailableInSubagentContext
 } from './utils-actions';
+import { isV3ManagedChatbot } from './utils';
+
+describe('isV3ManagedChatbot — gli agenti del V3 non si aprono con questa console', () => {
+  it('vero con l\'etichetta v3 o con la lista dei connettori negli attributi', () => {
+    expect(isV3ManagedChatbot({ attributes: { dsVersion: 'v3' } })).toBeTrue();
+    expect(isV3ManagedChatbot({ attributes: { dsVersion: ' V3 ' } })).toBeTrue();
+    expect(isV3ManagedChatbot({ attributes: { connectors: { version: 1, items: [] } } })).toBeTrue();
+  });
+  it('falso senza etichetta e senza lista, con un\'altra etichetta, o senza agente', () => {
+    expect(isV3ManagedChatbot({ attributes: {} })).toBeFalse();
+    expect(isV3ManagedChatbot({ attributes: { dsVersion: 'legacy', connectors: {} } })).toBeFalse();
+    expect(isV3ManagedChatbot({})).toBeFalse();
+    expect(isV3ManagedChatbot(null)).toBeFalse();
+  });
+});
 
 /**
  * Invarianti del catalogo delle azioni.

@@ -17,7 +17,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // UTILS //
-import { SETTINGS_SECTION, SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
+import { SETTINGS_SECTION, SIDEBAR_PAGES, isV3ManagedChatbot } from 'src/app/chatbot-design-studio/utils';
 import { Intent } from 'src/app/models/intent-model';
 
 //LOGGER
@@ -44,6 +44,8 @@ import { IntentService } from '../services/intent.service';
 import { LeftPanelStateService, LeftPanelTab } from '../services/left-panel-state.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AgentFromPromptService } from '../agent-chat/agent-chat-from-prompt.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogYesNoComponent } from '../cds-base-element/dialog-yes-no/dialog-yes-no.component';
 const swal = require('sweetalert');
 
 
@@ -134,9 +136,47 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // I due facoltativi restano in fondo, e non e' una preferenza: in TypeScript un parametro
     // obbligatorio non puo' seguirne uno facoltativo, quindi spostarli piu' su non compila.
     private readonly agentFromPromptService?: AgentFromPromptService,
-    private readonly translate?: TranslateService
+    private readonly translate?: TranslateService,
+    private readonly dialog?: MatDialog
   ) {
     this.manageRouteChanges();
+  }
+
+  /** L'agente aperto e' gestito dal V3 ed e' stato rifiutato: il canvas resta chiuso. */
+  private agentRefused = false;
+
+  /**
+   * Un agente gestito dal Design Studio V3 (etichetta `dsVersion = v3`, o lista dei connettori in
+   * `attributes.connectors`) non si apre qui: questa console non conosce quella gestione e
+   * salvandolo perderebbe i collegamenti. Avviso con il rinvio a cds-v3 (`cdsV3BaseUrl`, stessa
+   * rotta); senza quell'indirizzo in configurazione resta il ritorno all'elenco degli agenti nella
+   * dashboard. Torna true se l'agente e' stato rifiutato. Va chiamato PRIMA che il canvas carichi
+   * i blocchi.
+   */
+  private refuseV3ManagedAgent(): boolean {
+    const chatbot = this.dashboardService.selectedChatbot;
+    if (!isV3ManagedChatbot(chatbot)) { return false; }
+    this.logger.warn('[CDS DSHBRD] agente gestito dal V3, non apribile con questa console:', chatbot?._id);
+    const config = this.appConfigService.getConfig();
+    const route = '#/project/' + this.dashboardService.projectID + '/chatbot/' + chatbot._id + '/blocks';
+    const v3Base: string = typeof config.cdsV3BaseUrl === 'string' ? config.cdsV3BaseUrl.trim() : '';
+    const v3Url = v3Base && !v3Base.startsWith('${') && v3Base !== 'CHANGEIT' ? v3Base + route : null;
+    const dashboardUrl = config.dashboardBaseUrl + '#/project/' + this.dashboardService.projectID + '/bots/my-chatbots/all';
+    const go = (url: string) => window.open(url, '_self');
+    if (!this.dialog) { go(v3Url || dashboardUrl); return true; }
+    const t = (key: string, fallback: string, params?: any) => this.translate?.instant(key, params) ?? fallback;
+    const ref = this.dialog.open(DialogYesNoComponent, {
+      panelClass: 'custom-confirm-dialog-container',
+      disableClose: true,
+      data: {
+        title: t('CDSHeader.V3AgentTitle', 'Agent managed by the new Design Studio'),
+        text: t('CDSHeader.V3AgentText', 'This agent is managed by the new Design Studio (V3) and cannot be opened with this console.', { name: chatbot?.name ?? '' }),
+        yes: v3Url ? t('CDSHeader.V3AgentOpen', 'Open it in the new Design Studio') : t('CDSHeader.V3AgentDashboard', 'Go to the dashboard'),
+        no: v3Url ? t('CDSHeader.V3AgentDashboard', 'Go to the dashboard') : ''
+      }
+    });
+    ref.afterClosed().subscribe((confirmed: boolean) => go(confirmed === true && v3Url ? v3Url : dashboardUrl));
+    return true;
   }
 
   /** An agent just created from a description in the dashboard: start the build before the chat
@@ -429,6 +469,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
     try {
       await this.dashboardService.getBotById();
+      if (this.refuseV3ManagedAgent()) {
+        this.agentRefused = true;
+        throw new Error(`"${faqKbId}" is managed by the new Design Studio (V3) and cannot be opened in this console`);
+      }
       this.selectedChatbot = this.dashboardService.selectedChatbot;
       // The canvas loads the intents itself -- but fire-and-forget from its
       // own ngOnInit, and only after an HTTP round trip. Until that lands,
@@ -471,7 +515,8 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       // so it may only come back now that both name the new flow. Detected
       // here too, so this promise resolves with the canvas already rebuilt --
       // the agent's next act after open_flow is a get_flow.
-      this.flowVisible = true;
+      // Non se l'agente e' stato rifiutato: il canvas non deve nascere su un agente del V3.
+      this.flowVisible = !this.agentRefused;
       this.changeDetectorRef.detectChanges();
     }
     // Qui non si rimescola la sinistra: ricostruire il canvas non e' aprire un agente, e cosa
@@ -552,6 +597,8 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
+      // Un agente gestito dal V3 non si apre qui: avviso e rinvio, prima che il canvas carichi i blocchi.
+      if (this.refuseV3ManagedAgent()) { return; }
       // Between knowing which agent is open and opening the chat: the run has to exist before
       // the panel mounts, or the chat attaches to nothing and the description is lost.
       await this.sendPendingAgentPrompt();

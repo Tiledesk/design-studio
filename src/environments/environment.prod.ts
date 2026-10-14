@@ -11,6 +11,8 @@ export const environment = {
     apiUrl: 'CHANGEIT',
     widgetBaseUrl: 'CHANGEIT',
     dashboardBaseUrl: 'CHANGEIT',
+    // Il Design Studio V3 (cds-v3): dove si rimanda un agente gestito dal V3. Vuoto o CHANGEIT: si torna alla dashboard.
+    cdsV3BaseUrl: 'CHANGEIT',
     whatsappTemplatesBaseUrl: 'CHANGEIT',
     // The agent chat's mount point. It reverse proxies to the agent runtime,
     // so this is the only address design-studio needs. Unset or CHANGEIT
