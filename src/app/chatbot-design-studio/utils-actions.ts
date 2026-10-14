@@ -415,6 +415,11 @@ export const ACTIONS_WITH_OWN_OUTPUTS: Array<TYPE_ACTION> = [
     TYPE_ACTION.JSON_CONDITION,
     TYPE_ACTION.JSON_CONDITION2,
     TYPE_ACTION.JSON_CONDITION_MULTI,
+    // Il Sub Agent ha le uscite Success/Else come una condizione: mancava dall'elenco e il
+    // pallino V3 restava visibile per errore. Il catalogo dei connettori
+    // (connectors/connector-catalog.ts) ricava questo stesso elenco e una spec ne verifica
+    // l'uguaglianza.
+    TYPE_ACTION.INVOKE_SUB_AGENT,
     TYPE_ACTION.ASKGPT,
     TYPE_ACTION.ASKGPTV2,
     TYPE_ACTION.GPT_TASK,

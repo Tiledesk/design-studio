@@ -7,7 +7,6 @@ import { Message, Wait, Button, MessageAttributes, Expression } from 'src/app/mo
 import { TEXT_CHARS_LIMIT, TYPE_BUTTON, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
@@ -42,8 +41,6 @@ export class CdsActionReplyTTSComponent implements OnInit {
 
   // Connector //
   idIntent: string;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   // Textarea //
   // Delay //
   delayTime: number = 0;
@@ -67,18 +64,11 @@ export class CdsActionReplyTTSComponent implements OnInit {
 
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.connector = connector;
-      this.updateConnector();
-    });
     this.initialize();
   }
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   // PRIVATE FUNCTIONS //
@@ -133,38 +123,6 @@ export class CdsActionReplyTTSComponent implements OnInit {
   //   }); 
   // }
 
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idButton = array[array.length - 1];
-      const idConnector = this.idAction+'/'+idButton;
-      const buttonChanged = this.buttons.find(obj => obj.uid === idButton);
-      
-      if(idConnector === this.connector.fromId && buttonChanged){
-        this.logger.log('updateConnector [CdsActionReplyTextComponent]:: buttonChanged: ', this.connector, buttonChanged, this.buttons, idButton);
-        if(this.connector.deleted){
-          buttonChanged.__isConnected = false;
-          buttonChanged.__idConnector = this.connector.fromId;
-          buttonChanged.__idConnection = null;
-          buttonChanged.action = '';
-          buttonChanged.type = TYPE_BUTTON.TEXT;
-          if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-        } else {
-          // ADD / EDIT
-          buttonChanged.__idConnector = this.connector.fromId;
-          buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
-          buttonChanged.type = TYPE_BUTTON.ACTION;
-          if(!buttonChanged.__isConnected){
-            buttonChanged.__isConnected = true;
-            buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-          } 
-        }
-      }
-    } catch (error) {
-      this.logger.error('error: ', error);
-    }
-  }
 
 
 

@@ -37,9 +37,7 @@
             </div>
             <label class="title-preview-label">{{'CDSCanvas.Success' | translate }}</label> -->
             <cds-connector class="connector-true"
-                 [idConnector]   = "listOfConnectors[intent.label]?.idConnector"    
-                 [idConnection]  = "listOfConnectors[intent.label]?.idConnection"
-                 [isConnected]   = "listOfConnectors[intent.label]?.isConnected">
+                 [intent]="intentSelected" [action]="action" [slot]="'branch:' + intent.label">
             </cds-connector>
         </div>
         <hr class="preview-divider">
@@ -62,9 +60,7 @@
         <!-- {{'CDSCanvas.Fallback' | translate }} -->
        <label class="title-preview-label">Fallback</label>
         <cds-connector class="connector-false"
-            [idConnector]   = "idConnectorFallback"
-            [idConnection]  = "idConnectionFallback"
-            [isConnected]   = "isConnectedFallback">
+            [intent]="intentSelected" [action]="action" slot="fallback">
         </cds-connector>
     </div>
 
@@ -73,9 +69,7 @@
     <div class="previewContent">
        <label class="title-preview-label">{{'CDSCanvas.Error' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector]   = "idConnectorError"
-            [idConnection]  = "idConnectionError"
-            [isConnected]   = "isConnectedError">
+            [intent]="intentSelected" [action]="action" slot="error">
         </cds-connector>
     </div>
 

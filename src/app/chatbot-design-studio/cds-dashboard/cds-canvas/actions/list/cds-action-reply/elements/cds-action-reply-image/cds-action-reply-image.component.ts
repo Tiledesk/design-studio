@@ -6,7 +6,6 @@ import { ConnectorService } from '../../../../../../../services/connector.servic
 import { IntentService } from '../../../../../../../services/intent.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
 
 @Component({
@@ -37,8 +36,6 @@ export class CdsActionReplyImageComponent implements OnInit {
   
   idIntent: string;
   // Connector //
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   // Delay //
   delayTime: number;
@@ -64,11 +61,6 @@ export class CdsActionReplyImageComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.log('CdsActionReplyImageComponent isChangedConnector-->', connector);
-      this.connector = connector;
-      this.updateConnector();
-    });
     this.initialize();
     this.setInitialImageType();
   }
@@ -76,9 +68,6 @@ export class CdsActionReplyImageComponent implements OnInit {
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   // PRIVATE FUNCTIONS //
@@ -109,37 +98,6 @@ export class CdsActionReplyImageComponent implements OnInit {
   }
 
 
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idButton = array[array.length - 1];
-      const idConnector = this.idAction+'/'+idButton;
-      this.logger.log(' updateConnector :: connector.fromId - idConnector: ', this.connector.fromId, idConnector);
-      const buttonChanged = this.buttons.find(obj => obj.uid === idButton);
-      if(idConnector === this.connector.fromId && buttonChanged){
-        if(this.connector.deleted){
-          // DELETE 
-          buttonChanged.__isConnected = false;
-          buttonChanged.__idConnector = this.connector.fromId;
-          buttonChanged.__idConnection = null;
-          buttonChanged.action = '';
-          buttonChanged.type = TYPE_BUTTON.TEXT;
-          this.updateAndSaveAction.emit();
-        } else {
-          buttonChanged.__idConnector = this.connector.fromId;
-          buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
-          buttonChanged.type = TYPE_BUTTON.ACTION;
-          if(!buttonChanged.__isConnected){
-            buttonChanged.__isConnected = true;
-            buttonChanged.__idConnection = this.connector.fromId+"/"+this.connector.toId;
-            this.updateAndSaveAction.emit();
-          } 
-        }
-      }
-    } catch (error) {
-      this.logger.error('error: ', error);
-    }
-  }
   
 
 

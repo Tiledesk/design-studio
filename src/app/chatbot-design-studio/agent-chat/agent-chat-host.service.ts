@@ -219,10 +219,17 @@ export class AgentChatHostService {
       // anything already says that its fallback goes nowhere (V3-S8). Optional
       // call: a stand-in FlowOpsService without it reads as "nothing to say".
       const v3Warnings: string[] = isV3 ? (this.flowOps.fallbackWarnings?.() || []) : [];
+      // What the studio repaired when it opened the flow (missing `#`, dangling links, the
+      // connectors list): the agent reads it as data, not as something to redo.
+      const repair = this.intentService.lastRepairReport;
+      // The flow's connectors as one normalized list (from which block and outlet, to which
+      // block): the same links the action fields carry, ready to read without deriving them.
+      const connectors = this.intentService.connectorRecords?.() || [];
       const snapshot = {
         // Neither a server's credentials nor a key written into a web
         // request reach the model.
         ...withoutLiteralSecrets(withoutServerCredentials(this.flowOps.readFlow())),
+        ...(connectors.length ? { connectors } : {}),
         family,
         // The agent's own language (the bot's `language`), so a message the
         // flow shows -- or a warning meant for its users -- can be written
@@ -231,7 +238,11 @@ export class AgentChatHostService {
           ? { language: this.dashboardService.selectedChatbot.language } : {}),
         ds_version: isV3 ? 'v3' : 'legacy',
         ...(isV3 ? { v3_rules: V3_FLOW_RULES } : {}),
-        ...(v3Warnings.length ? { v3_warnings: v3Warnings } : {})
+        ...(v3Warnings.length ? { v3_warnings: v3Warnings } : {}),
+        ...(repair ? { repair_report: {
+          counts: repair.counts, changed_intent_ids: repair.changedIntentIds,
+          unresolved: repair.unresolved, connectors: repair.collection, saved: repair.saved ?? null,
+        } } : {})
       };
       // INVIATO: cosa esce davvero verso il vibe coder, voce per voce.
       this.logger.log('[AGENT-CHAT-HOST] ddp >>> INVIATO get_flow',

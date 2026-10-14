@@ -3,6 +3,7 @@ import { of, throwError, Subject } from 'rxjs';
 import { FlowOpsService } from './flow-ops.service';
 import { IntentService } from '../services/intent.service';
 import { ConnectorService } from '../services/connector.service';
+import { ConnectorServiceV3 } from '../services/connector-v3.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { AgentChatFamilyService } from './agent-chat-family.service';
 import { FaqService } from 'src/app/services/faq.service';
@@ -1340,7 +1341,7 @@ describe('FlowOpsService — what connect writes, read back by the studio itself
     const dot = await connectAndTakeTheDot();
     const from = intentService.getIntentFromId('i1');
 
-    const connectors = new ConnectorService();
+    const connectors = new ConnectorServiceV3();
     connectors.listOfIntents = intentService.listOfIntents;
     // Only the drawing is stubbed out -- it wants a rendered canvas and a
     // jsPlumb-style stage. Everything under test here (the '#' strip, the
@@ -1382,7 +1383,7 @@ describe('FlowOpsService — a routing destination is actually drawn, real DOM a
   let fromAnchor: HTMLElement;
   let toBlock: HTMLElement;
   let retargetBlock: HTMLElement;
-  let connectors: ConnectorService;
+  let connectors: ConnectorServiceV3;
   let service: FlowOpsService;
   let intentService: any;
 
@@ -1445,7 +1446,7 @@ describe('FlowOpsService — a routing destination is actually drawn, real DOM a
       restoreLastUNDO: jasmine.createSpy('restoreLastUNDO')
     };
 
-    connectors = new ConnectorService();
+    connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
     connectors.listOfIntents = intentService.listOfIntents;
 
@@ -1576,7 +1577,7 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
     toNew.classList.add('tds_input_block');
     document.body.appendChild(toNew);
 
-    const connectors = new ConnectorService();
+    const connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
 
     // Seed exactly two connectors sharing the prefix "start-id/act-1" -- the
@@ -1617,7 +1618,7 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
     startIntent.actions = [{ _tdActionId: 'act-1', _tdActionType: 'intent', intentName: '#welcome-id' } as any];
     const intents = [startIntent, anIntent('welcome-id', 'welcome'), anIntent('newblock-id', 'Chiedi Domanda')];
 
-    const connectors = new ConnectorService();
+    const connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
     connectors.listOfIntents = intents;
 
@@ -1666,7 +1667,7 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
     from.remove(); toOld.remove(); toNew.remove();
   });
 
-  it('finds the real cause -- the vendored library\'s delete leaves an orphaned _hitbox element behind, which redrawBlockConnectors now cleans up', () => {
+  it('the vendored library\'s delete now removes the _hitbox and the label group too (the defect redrawBlockConnectors used to clean up after)', () => {
     const from = document.createElement('div');
     from.id = 'start-id/act-1';
     document.body.appendChild(from);
@@ -1675,32 +1676,27 @@ describe('FlowOpsService — the residual stale edge: two named causes ruled out
     toOld.classList.add('tds_input_block');
     document.body.appendChild(toOld);
 
-    const connectors = new ConnectorService();
+    const connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
 
     (connectors as any).createConnectorFromId('start-id/act-1', 'welcome-id', false);
     const connectorId = 'start-id/act-1/welcome-id';
     expect(document.getElementById(connectorId)).not.toBeNull();
     expect(document.getElementById(`${connectorId}_hitbox`)).not.toBeNull();
+    expect(document.getElementById(`label_${connectorId}`)).not.toBeNull();
 
-    // The bare vendored call, exactly what deleteConnectorsOutOfBlock uses
-    // internally -- no workaround involved yet.
+    // The bare vendored call, exactly what deleteConnectorsOutOfBlock uses internally.
     (connectors as any).tiledeskConnectors.deleteConnector(connectorId, false, false);
 
-    // The registry entry and the main path are correctly gone...
+    // Registry entry, main path, hitbox and label are all gone: the library's own delete was
+    // fixed (src/assets/js/tiledesk-connectors.js), so an id-counting measurement that dedupes
+    // by stripping "_hitbox" no longer finds a ghost. FlowOpsService's cleanup step is now a
+    // safety net with nothing to do.
     expect((connectors as any).tiledeskConnectors.connectors[connectorId]).toBeUndefined();
     expect(document.getElementById(connectorId)).toBeNull();
-    // ...but the library never looked up or removed the hitbox sibling.
-    // This is the actual defect: an id-counting measurement that dedupes by
-    // stripping "_hitbox" (exactly what the coordinator's own live count
-    // did) still finds this id and reports the edge as present.
-    expect(document.getElementById(`${connectorId}_hitbox`)).not.toBeNull();
-
-    // Now go through the real fix: FlowOpsService's own cleanup step,
-    // called the way redrawBlockConnectors calls it (after
-    // deleteConnectorsOutOfBlock, on the same block prefix).
-    document.querySelectorAll('[id^="start-id/"][id$="_hitbox"]').forEach(el => el.remove());
     expect(document.getElementById(`${connectorId}_hitbox`)).toBeNull();
+    expect(document.getElementById(`label_${connectorId}`)).toBeNull();
+    expect(document.getElementById(`rect_${connectorId}`)).toBeNull();
 
     from.remove(); toOld.remove();
   });
@@ -1720,7 +1716,7 @@ describe('FlowOpsService — connect actually draws, and clears a retarget\'s st
   let drawer: HTMLElement;
   let toI2: HTMLElement;
   let toI3: HTMLElement;
-  let connectors: ConnectorService;
+  let connectors: ConnectorServiceV3;
   let service: FlowOpsService;
   let intentService: any;
 
@@ -1759,7 +1755,7 @@ describe('FlowOpsService — connect actually draws, and clears a retarget\'s st
     fromAnchor.id = fromAnchorId;
     document.body.appendChild(fromAnchor);
 
-    connectors = new ConnectorService();
+    connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
     connectors.listOfIntents = intentService.listOfIntents;
 
@@ -3771,7 +3767,7 @@ describe('ConnectorService.refreshConnectorsAroundIntent — every edge from and
   // pointing at it -- also when the service's intent list went stale after a
   // delete, which used to wipe the destination instead of drawing it.
   let elements: HTMLElement[];
-  let connectors: ConnectorService;
+  let connectors: ConnectorServiceV3;
   let intents: Intent[];
 
   function add(id: string, isBlock = false) {
@@ -3798,7 +3794,7 @@ describe('ConnectorService.refreshConnectorsAroundIntent — every edge from and
     add('N', true); add('N/nba-n');
     add('B', true);
     intents = [withNext('A', 'nba-a', '#N'), withNext('N', 'nba-n', '#B'), anIntent('B', 'B')];
-    connectors = new ConnectorService();
+    connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
   });
 
@@ -4243,7 +4239,7 @@ describe('FlowOpsService — V3 agents follow the rules of the V3 editor', () =>
 
 describe('ConnectorService.ensureConnectorsDrawn — no connector left undrawn, real DOM', () => {
   let elements: HTMLElement[];
-  let connectors: ConnectorService;
+  let connectors: ConnectorServiceV3;
   let intents: Intent[];
 
   function add(id: string, isBlock = false) {
@@ -4270,7 +4266,7 @@ describe('ConnectorService.ensureConnectorsDrawn — no connector left undrawn, 
     add('N', true); add('N/nba-n');
     add('B', true);
     intents = [withNext('A', 'nba-a', '#N'), withNext('N', 'nba-n', '#B'), anIntent('B', 'B')];
-    connectors = new ConnectorService();
+    connectors = new ConnectorServiceV3();
     connectors.initializeConnectors();
     connectors.syncIntents(intents);
   });

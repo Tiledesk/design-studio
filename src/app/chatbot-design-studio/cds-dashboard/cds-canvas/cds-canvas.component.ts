@@ -573,6 +573,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   }
 
   onIntentRendered(intentID) {
+    // The connectors waiting for this block can be drawn now (see ConnectorService.blockRendered).
+    if (intentID) { this.connectorService.blockRendered(intentID); }
     if (this.renderedAllIntents === true && intentID && !this.renderedIntentIds.has(intentID)) {
       this.onNewIntentRendered(intentID);
       return;
@@ -722,6 +724,14 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   }
 
   private showStageForLimitTime() {
+    // Should not fire any more: the expected connectors come from the same catalogue as the
+    // drawing. If it does, say which ones never appeared instead of a bare timeout.
+    try {
+      const missing = this.connectorService.missingConnectorIds(this.listOfIntents || []);
+      this.logger.warn('[CDS-CANVAS] stage shown after the time limit; connectors still missing:', missing);
+    } catch (error) {
+      this.logger.warn('[CDS-CANVAS] stage shown after the time limit', error);
+    }
     this.labelInfoLoading = 'CDSCanvas.loadingCompleteWithErrors';
     this.stageService.loaded = true;
     this.loadingProgress = 100;
@@ -854,7 +864,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
       this._movedAndScaledPendingDetail = null;
       if (detail == null) return;
       this.ngZone.run(() => {
-        this.connectorService.tiledeskConnectors.scale = detail.scale;
+        this.connectorService.setScale(detail.scale);
         if (this.IS_OPEN_ADD_ACTIONS_MENU || this.IS_OPEN_CONTEXT_MENU || this.IS_OPEN_COLOR_MENU || this.connectorService.connectorDraft != null) {
           this.removeConnectorDraftAndCloseFloatMenu();
         }
@@ -1362,7 +1372,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
     }
     if (!dropped?.type) { return; }
 
-    const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: event.clientX, y: event.clientY });
+    const pos = this.connectorService.logicPoint({ x: event.clientX, y: event.clientY });
     pos.x = pos.x - 132;
     this.logger.log('[CDS-CANVAS] voce lasciata sullo stage dalla tavolozza: ', dropped, pos);
     this.closeAllPanels();
@@ -1378,7 +1388,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
 
   async onDroppedElementToStage(event: CdkDragDrop<string[]>) {
     this.logger.log('[CDS-CANVAS] droppedElementOnStage:: ', event);
-    let pos = this.connectorService.tiledeskConnectors.logicPoint(event.dropPoint);
+    let pos = this.connectorService.logicPoint(event.dropPoint);
     pos.x = pos.x - 132;
     let action: any = event.previousContainer.data[event.previousIndex];
     // Qui arrivano soltanto le azioni che vengono da un blocco: dalla tavolozza si trascina col
@@ -1607,7 +1617,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit {
   // ============================================================
   onNoteDroppedOnStage(evt: { noteType: NoteType; clientX: number; clientY: number }): void {
     try {
-      const pos = this.connectorService.tiledeskConnectors.logicPoint({ x: evt.clientX, y: evt.clientY });
+      const pos = this.connectorService.logicPoint({ x: evt.clientX, y: evt.clientY });
       const newNote = new Note(this.id_faq_kb, pos);
       newNote.type = evt.noteType || 'text';
       if (newNote.type !== 'text') {

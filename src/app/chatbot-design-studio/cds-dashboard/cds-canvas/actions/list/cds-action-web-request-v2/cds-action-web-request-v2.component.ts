@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { TranslateService } from '@ngx-translate/core';
 
 //SERVICES
@@ -14,7 +13,6 @@ import { ActionWebRequestV2 } from 'src/app/models/action-model';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { HEADER_TYPE, TYPE_METHOD_REQUEST, WEB_REQUEST_BODY_MODES, WEB_REQUEST_RAW_TYPES, RAW_TYPE_CONTENT_TYPE } from 'src/app/chatbot-design-studio/utils-request';
 // import { CDSTextareaComponent } from '../../../base-elements/textarea/textarea.component';
 
@@ -38,12 +36,6 @@ export class CdsActionWebRequestV2Component implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   
   methods: Array<{label: string, value: string}>;
   optionSelected: 'header' | 'body' = 'header'
@@ -82,22 +74,11 @@ export class CdsActionWebRequestV2Component implements OnInit {
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.logger.debug("[ACTION-WEB-REQUEST-v2] action detail: ", this.action);
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-WEB-REQUEST-v2] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     this.initialize();
   }
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
     clearTimeout(this.validateTimer);
   }
 
@@ -118,32 +99,9 @@ export class CdsActionWebRequestV2Component implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
-  /** */
-  private updateConnector(){
-    this.logger.log('[ACTION WEB-REQUEST-v2] updateConnector:');
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION WEB-REQUEST-v2] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
 
   
   // CUSTOM FUNCTIONS //

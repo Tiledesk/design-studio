@@ -1,4 +1,4 @@
-import { ConnectorService } from './connector.service';
+import { ConnectorServiceV3 } from './connector-v3.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 
 /**
@@ -36,7 +36,7 @@ describe('ConnectorService — i connettori attesi dal canvas', () => {
     ];
   }
 
-  let service: ConnectorService;
+  let service: ConnectorServiceV3;
 
   beforeEach(() => {
     // Il servizio prende il logger al momento della costruzione: senza istanza
@@ -44,7 +44,7 @@ describe('ConnectorService — i connettori attesi dal canvas', () => {
     LoggerInstance.setInstance({
       log() {}, error() {}, warn() {}, info() {}, debug() {}, setLoggerConfig() {}
     } as any);
-    service = new ConnectorService();
+    service = new ConnectorServiceV3();
   });
 
   it('riconosce la destinazione di ogni caso e quella dell\'altrimenti', async () => {

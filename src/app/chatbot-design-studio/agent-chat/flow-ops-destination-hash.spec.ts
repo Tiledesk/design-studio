@@ -8,6 +8,7 @@ import { AgentChatFamilyService } from './agent-chat-family.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { Intent } from 'src/app/models/intent-model';
 import { withDestinationHash, fixActionDestinationHashes } from '../utils-connectors';
+import { normalizeFlow } from '../connectors/flow-normalizer';
 
 // The engine resolves a destination to a block id only when it starts with '#'
 // (MongodbBotsDataSource.getByIntentDisplayNameCache): a bare id is looked up as
@@ -56,23 +57,35 @@ describe('destination hash helpers', () => {
   });
 });
 
-describe('IntentService.patchActionId — repairs destinations saved without #', () => {
-  it('adds the # to a bare id of a block of the flow, and never to a block name', () => {
-    const faqs: any[] = [
-      { intent_id: 'p1', intent_display_name: 'Process Attachment', actions: [
-        { _tdActionId: 'a1', _tdActionType: 'ai_prompt', trueIntent: 'r1', falseIntent: 'f1' }
-      ] },
-      { intent_id: 'r1', intent_display_name: 'Add Result', actions: [] },
-      { intent_id: 'f1', intent_display_name: 'Add Failure', actions: [] },
-      { intent_id: 'c1', intent_display_name: 'Legacy Condition', actions: [
-        { _tdActionId: 'a2', _tdActionType: 'jsoncondition', trueIntent: 'Add Result', falseIntent: '#f1' }
-      ] }
-    ];
-    IntentService.prototype.patchActionId.call({}, faqs);
-    expect(faqs[0].actions[0].trueIntent).toBe('#r1');
-    expect(faqs[0].actions[0].falseIntent).toBe('#f1');
-    expect(faqs[3].actions[0].trueIntent).toBe('Add Result');
-    expect(faqs[3].actions[0].falseIntent).toBe('#f1');
+describe('Opening a flow — destinations saved without #', () => {
+  const faqs = (): any[] => [
+    { intent_id: 'p1', intent_display_name: 'Process Attachment', actions: [
+      { _tdActionId: 'a1', _tdActionType: 'ai_prompt', trueIntent: 'r1', falseIntent: 'f1' }
+    ] },
+    { intent_id: 'r1', intent_display_name: 'Add Result', actions: [] },
+    { intent_id: 'f1', intent_display_name: 'Add Failure', actions: [] },
+    { intent_id: 'c1', intent_display_name: 'Legacy Condition', actions: [
+      { _tdActionId: 'a2', _tdActionType: 'jsoncondition', trueIntent: 'Add Result', falseIntent: '#f1' }
+    ] }
+  ];
+
+  it('V3: the normalizer adds the # to a bare id of a block of the flow, and never to a block name', () => {
+    const flow = faqs();
+    normalizeFlow(flow, null, { uid: () => 'u', isV3: true, collectionWins: true });
+    expect(flow[0].actions[0].trueIntent).toBe('#r1');
+    expect(flow[0].actions[0].falseIntent).toBe('#f1');
+    expect(flow[3].actions[0].trueIntent).toBe('Add Result');
+    expect(flow[3].actions[0].falseIntent).toBe('#f1');
+  });
+
+  it('V2: patchActionId is the one of this line (master-pre on the STAGE twin) -- technical ids, and the # repair the pre already had', () => {
+    const flow = faqs();
+    flow[1].actions.push({ _tdActionType: 'reply' });
+    IntentService.prototype.patchActionId.call({}, flow);
+    expect(flow[0].actions[0].trueIntent).toBe('#r1');
+    expect(flow[0].actions[0].falseIntent).toBe('#f1');
+    expect(flow[3].actions[0].trueIntent).toBe('Add Result');
+    expect(flow[1].actions[0]._tdActionId).toBeTruthy();
   });
 });
 

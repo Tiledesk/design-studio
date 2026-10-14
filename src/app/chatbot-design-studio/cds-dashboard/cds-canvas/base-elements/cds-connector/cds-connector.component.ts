@@ -20,7 +20,19 @@ import { StageService } from 'src/app/chatbot-design-studio/services/stage.servi
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { DashboardService } from 'src/app/services/dashboard.service';
+import { outputsOf, blockOutputOf, recordIdOf, BLOCK_SLOT } from 'src/app/chatbot-design-studio/connectors/connector-catalog';
 
+/**
+ * Il pallino di un'uscita, e il riquadro col nome del blocco collegato quando la linea e'
+ * nascosta.
+ *
+ * Due modi di usarlo. Quello nuovo: `[intent]`, `[action]` e `slot` (`true`, `false`,
+ * `noInput`, `button:<uid>`, `case:<id>`, `next`...), e il componente ricava da solo, dal
+ * catalogo delle uscite, l'id della propria ancora e lo stato del collegamento, e li tiene
+ * aggiornati ascoltando i cambi dei connettori: le action non devono piu' sapere niente di
+ * connettori. Quello vecchio: `[idConnector]`, `[idConnection]`, `[isConnected]` calcolati dal
+ * componente padre; resta finche' l'ultima action non e' migrata.
+ */
 @Component({
   selector: 'cds-connector',
   templateUrl: './cds-connector.component.html',
@@ -59,9 +71,16 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
    *  Inputs / Outputs
    * ------------------------------------------------------------- */
 
+  // Modo vecchio: lo stato arriva dal padre.
   @Input() idConnector: string;
   @Input() idConnection: string;
   @Input() isConnected: boolean;
+  // Modo nuovo: lo stato si ricava dal modello.
+  @Input() intent: any;
+  /** In alternativa a `intent`, per le uscite delle action: basta l'id del blocco. */
+  @Input() intentId: string;
+  @Input() action: any;
+  @Input() slot: string;
 
   @Output() onShowConnector = new EventEmitter();
   @Output() onHideConnector = new EventEmitter();
@@ -92,6 +111,7 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit(): void {
     this.cachedAlpha = this.stageService.getAlpha() / 100;
+    if (this.slot) { this.resolveFromModel(); }
 
     // Deriva intent di destinazione
     this.intentId$.next(this.getIntentIdFromConnection());
@@ -104,6 +124,18 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+
+    if (this.slot) {
+      // Modo nuovo: lo stato si rilegge dal modello a ogni cambio degli input.
+      if (changes.intent || changes.intentId || changes.action || changes.slot) {
+        this.resolveFromModel();
+      }
+      this.intentId$.next(this.getIntentIdFromConnection());
+      this.updateConnectionIds();
+      this.clearConnectionElementCache();
+      this.setIdContractConnector();
+      return;
+    }
 
     // Caso: connector disconnesso → nascondi
     if (changes.isConnected?.currentValue === false) {
@@ -131,6 +163,24 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
   /* -------------------------------------------------------------
    *  Derivazione Intent / ID
    * ------------------------------------------------------------- */
+
+  /** Lo stato dell'uscita, letto dal modello attraverso il catalogo (modo nuovo). */
+  private resolveFromModel(): void {
+    const intentId = this.intent?.intent_id || this.intentId;
+    if (!intentId || !this.slot) { return; }
+    const resolved = this.slot === BLOCK_SLOT.key
+      ? (this.intent ? blockOutputOf(this.intent) : null)
+      : outputsOf(intentId, this.action).find(s => s.key === this.slot) || null;
+    if (!resolved) {
+      this.idConnector = null;
+      this.idConnection = null;
+      this.isConnected = false;
+      return;
+    }
+    this.idConnector = resolved.fromId;
+    this.isConnected = !!resolved.toId;
+    this.idConnection = resolved.toId ? recordIdOf(resolved.fromId, resolved.toId) : null;
+  }
 
   /** Estrae intent_id di destinazione dalla connection. */
   private getIntentIdFromConnection(): string | null {
@@ -198,6 +248,21 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
         this.intent_display_name = intent.intent_display_name;
         this.cdr.markForCheck();
       });
+
+    // Modo nuovo: un connettore di questa uscita e' nato o morto. Il campo e' gia' stato
+    // scritto dallo store (ConnectorService lo chiama in cattura, prima di questo
+    // ascoltatore); qui si rilegge e basta. Nel modo vecchio lo fa il componente padre.
+    this.intentService.isChangedConnector$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((connector: any) => {
+        if (!this.slot || !this.idConnector || connector?.fromId !== this.idConnector) { return; }
+        this.resolveFromModel();
+        this.intentId$.next(this.getIntentIdFromConnection());
+        this.updateConnectionIds();
+        this.clearConnectionElementCache();
+        this.setIdContractConnector();
+        this.cdr.markForCheck();
+      });
   }
 
   /* -------------------------------------------------------------
@@ -233,6 +298,9 @@ export class CdsConnectorComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.displayConnector = display ? 'none' : 'flex';
+    if (!this.isConnected) {
+      this.displayConnector = 'none';
+    }
   }
 
   private getIntentDisplayName(): void {
