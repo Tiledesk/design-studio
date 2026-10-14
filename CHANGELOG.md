@@ -7,7 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# this branch 24/09/2026
+# features-2026/subagents-2 14/10/2026
+- **changed**: opening a subagent, going back to the parent and deleting a subagent no longer reload the page: only the canvas is rebuilt on the new flow, the URL follows (read-only preview included), undo/redo are cleared and the header follows the agent. Ported from the stage line
+
+# features-2026/subagents-2 24/09/2026
 
 - **added**: a **Restore** button brings the flow you are editing back to a published version. It is the opposite of Republish, and it is not reversible: confirming replaces what you have now, and the confirmation says so, names the date being restored, warns that subagents are not restored — this version is of this flow alone — and, when the flow has changes that were never published, says that those are what is about to be lost. Afterwards the flow is reloaded so what is on screen is what was restored
 - **changed**: the button that used to be called **Restore** in the release history is now called **Republish**, which is what it does: it puts an old version back online and leaves the flow you are editing alone. Two buttons named the same and doing opposite things is how work gets lost
@@ -16,11 +19,11 @@
 - **changed**: publishing an agent now covers its subagents as well. The publish panel lists the agent and every subagent, ticks the ones that have changes waiting to be published, and publishes them all in one go. If some go through and others do not, the panel says which is which, instead of a single "an error occurred"; the ones that succeeded are unticked, so trying again only retries what failed. An agent with no subagents sees the panel exactly as before
 - **fixed**: the dot marking unpublished changes no longer goes out just because the publish panel was opened. It goes out when the flow has really been published, and only for the flows that were
 
-# this branch 09/09/2026
+# features-2026/ds-add-gemini-agent-platform 09/09/2026
 
 - **fixed**: provando a eliminare un subagent ancora usato da un altro agent, ora viene mostrato il messaggio di errore restituito dal servizio invece di lasciare l'operazione senza alcun esito visibile
 
-# this branch 08/09/2026
+# V3/master-V3-agent-chat 08/09/2026
 
 - **changed**: le tab del pannello sinistro tornano **entrambe con icona + etichetta** e occupano **meta' larghezza ciascuna** — sostituisce il pulsante quadrato con la sola lente introdotto poco sotto. Font a 12px e padding ridotti perche' "Subagents" si legga per intero nei ~103px che restano per tab; icone delle tab da 16 a 18px
 - **changed**: il pulsante **New subagent** torna **in coda alla lista**, subito sotto l'ultimo subagent, e scorre con essa — sostituisce il footer ancorato introdotto poco sotto
@@ -34,7 +37,7 @@
 - **changed**: rinominate tre action — **Invoke agent** -> *Move to another AI Agent*, **Invoke subagent** -> *Invoke Sub Agent*, **Transfer to a human** -> *Transfer to Human*. Il nuovo nome e' allineato ovunque compaia: menu delle action, etichetta sul blocco nel canvas e titolo nella documentazione del pannello
 - **changed**: pannello **Subagents** — la tab passa al primo posto (Blocks seconda) ed e' quella aperta di default **quando l'agente non ha ancora una preferenza salvata**: se l'utente ne sceglie una, vince la sua (`getActiveLeftPanel` ora distingue "nessuna preferenza" da "Blocks", prima erano lo stesso valore). Entrambe le tab hanno un'icona; la risoluzione della tab si e' spostata in `ngOnInit`, cosi' il pannello Blocks non viene piu' montato e subito distrutto a ogni apertura. Il pulsante **New subagent** e' ora un footer ancorato in fondo al pannello invece che sopra l'elenco, quindi resta raggiungibile anche con la lista lunga. Icone dei subagent sostituite con SVG registrati in `IconService`, in linea con le altre del DS. L'elenco dei subagent e' ordinato **alfabeticamente** (case e accenti ignorati, numeri confrontati come numeri: "Agente 2" prima di "Agente 10"); il parent resta sempre primo
 - **added**: primi test unitari sul pannello Subagents — l'ordinamento alfabetico (estratto in `sortSubagentsByName`, funzione pura: maiuscole, accenti, numeri, lista vuota) e `getActiveLeftPanel` (preferenza assente, salvata, famiglie separate). ⚠️ **Non sono eseguibili**: l'harness Karma del repo non esegue alcun test (`Executed 0 of 0`, `404 /_karma_webpack_/main.js`) — guasto preesistente, indipendente da queste modifiche
-# this branch gio 27 ago 2026
+# features-2026/subagents-2 27/08/2026
 - **changed**: `_tdActionType` of **Invoke subagent** is now `callsubagent` (was `replacebotv4`)
 - **changed**: **Return to parent agent** is renamed "Return to agent", uses the **Return** action icon, and is again hidden outside a subagent
 - **changed**: the **Return** action is available again in the menu, with its original name "Return"
@@ -42,7 +45,7 @@
 - **bug fix**: Release History threw on releases without `publishedBy` and rendered nothing; the avatar is now hidden and the author left blank
 - **changed**: the "Delete subagent" modal follows the standard DS modal style, on its own panel class so the shared `custom-dialog-container` is left untouched
 
-# this branch 
+# features-2026/subagents 25/08/2026
 - **changed**: the "Replace AI Agent" action is renamed "Invoke Agent"
 - **changed**: the "Invoke subagent" action (`replacebotv4`) now lists only the sibling subagents, excluding the current one, instead of every chatbot in the project
 - **added**: NEW badge on the Invoke Agent and Invoke Subagent actions
@@ -71,7 +74,7 @@
 - **changed**: minimalist scrollbars across action detail panels and the left Blocks/Subagents panels
 
 
-# this branch
+# features-2606/subagents 03/07/2026
 - **added**: context-aware action menu for subagents — **Invoke subagent** (`replacebotv4`) is offered only OUTSIDE a subagent, **Return to parent agent** (`returnstack`) only INSIDE one, via a new declarative `subagent_visibility: 'only' | 'never'` flag in `ACTIONS_LIST` applied to both the side panel and the in-block "+ Add action" menu; filters the menu only, existing flows keep rendering their actions
 - **bug fix**: inside a subagent the action menu was empty — no action declares `'subagent'` among its `chatbot_types`, so `checkIfActionIsInChatbotType` disabled all of them; the subtype is now normalized to `chatbot` via a new `resolveChatbotSubtype`
 - **changed**: **Return to parent agent** (`returnstack`) is now rendered as a terminal pill block — icon + fixed label, incoming connector only, no outgoing "next block" connector (cleared on the intent and skipped on reload); the pill hides the block header, the actions list and "+ Add action", and keeps only the delete control

@@ -1,6 +1,6 @@
 
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 // import { TranslateService } from '@ngx-translate/core';
 
 // SERVICES //
@@ -28,6 +28,7 @@ import { Subject } from 'rxjs';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { environment } from 'src/environments/environment';
 import { BRAND_BASE_INFO } from '../utils-resources';
+import { IntentService } from '../services/intent.service';
 import { StageService } from 'src/app/chatbot-design-studio/services/stage.service';
 import { ReadOnlyService, isReadOnlyRoute } from 'src/app/services/read-only.service';
 import { WebhookService } from '../services/webhook-service.service';
@@ -38,7 +39,7 @@ import { UploadService } from 'src/chat21-core/providers/abstract/upload.service
   templateUrl: './cds-dashboard.component.html',
   styleUrls: ['./cds-dashboard.component.scss']
 })
-export class CdsDashboardComponent implements OnInit {
+export class CdsDashboardComponent implements OnInit, OnDestroy {
   // @ViewChild('chatbot--dashboard') canvas!: ElementRef;
   
   SIDEBAR_PAGES = SIDEBAR_PAGES;
@@ -57,6 +58,8 @@ export class CdsDashboardComponent implements OnInit {
   showChangelog: boolean = false;
   /** Sola lettura: niente header, niente sidebar, banner sempre in vista. */
   IS_READ_ONLY: boolean = false;
+  /** Il canvas e' montato. Va a false e poi a true per ricostruirlo su un altro flusso (vedi rebuildFlow). */
+  flowVisible: boolean = true;
   BRAND_BASE_INFO = BRAND_BASE_INFO;
   
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -74,7 +77,10 @@ export class CdsDashboardComponent implements OnInit {
     private whatsappService: WhatsappService,
     private stageService: StageService,
     private readonly webhookService: WebhookService,
-    private readonly readOnlyService: ReadOnlyService
+    private readonly readOnlyService: ReadOnlyService,
+    private readonly router: Router,
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly intentService: IntentService
   ) {}
 
   /**
@@ -106,6 +112,82 @@ export class CdsDashboardComponent implements OnInit {
     this.showChangelog = this.checkForChangelogNotify();
     this.executeAsyncFunctionsInSequence();
     this.hideShowWidget('hide');
+    // Chi cambia flusso (il pannello dei subagent) passa da qui: il guscio resta montato e
+    // ricostruisce il solo canvas, senza ricaricare la pagina.
+    this.dashboardService.openFlow = (faqKbId: string) => this.openFlow(faqKbId);
+    this.dashboardService.refreshFlow = () => this.refreshFlow();
+  }
+
+  ngOnDestroy() {
+    this.dashboardService.openFlow = null;
+    this.dashboardService.refreshFlow = null;
+  }
+
+  /**
+   * Apre un altro flusso del progetto senza ricaricare la pagina.
+   *
+   * Il canvas viene distrutto e ricreato, non reinizializzato sul posto: possiede stage,
+   * connettori, undo, selezione e listener di trascinamento, e il suo `initialize()` li
+   * costruisce tutti da un `id_faq_kb`; un azzeramento a mano dovrebbe ricordarsene uno per uno
+   * e quello dimenticato non alza errori, disegna il flusso nuovo coi connettori del vecchio.
+   * L'URL fa parte dello stato: un refresh manuale o il tasto indietro devono atterrare dove
+   * l'utente e' davvero. La rotta di sola lettura (`preview`) resta tale.
+   */
+  public async openFlow(faqKbId: string): Promise<void> {
+    if (!faqKbId || faqKbId === this.dashboardService.id_faq_kb) { return; }
+    const section = this.readOnlyService.readOnly ? 'preview' : 'chatbot';
+    const navigated = await this.router.navigate(
+      ['project', this.dashboardService.projectID, section, faqKbId, 'blocks']);
+    if (!navigated) {
+      // Una guardia o un redirect annullano la navigazione: navigate() risolve false e lo
+      // studio e' ancora sul flusso di prima. Ricostruire il canvas direbbe di essersi mossi.
+      throw new Error(
+        `Could not open "${faqKbId}": the studio refused to navigate to it. `
+        + `The open flow is still "${this.dashboardService.id_faq_kb}".`);
+    }
+    await this.rebuildFlow(faqKbId);
+  }
+
+  /** Ricostruisce il canvas sul flusso che la rotta indica adesso, senza ricaricare la pagina. */
+  private async rebuildFlow(faqKbId: string): Promise<void> {
+    // Niente dello stack di undo appartiene al flusso che si apre: un Ctrl+Z riporterebbe
+    // dentro i blocchi del flusso precedente, con il loro id_faq_kb.
+    this.intentService.arrayUNDO = [];
+    this.intentService.arrayREDO = [];
+    this.intentService.behaviorUndoRedo.next({ undo: false, redo: false });
+    // `route.params` e' ancora sottoscritto da getUrlParams(): setParams() e' gia' passato
+    // per il nuovo id quando navigate() risolve.
+    this.flowVisible = false;
+    // false e true nello stesso giro di change detection collasserebbero in uno: l'*ngIf non
+    // vedrebbe mai il false e il canvas verrebbe riusato con lo stage del flusso vecchio.
+    this.changeDetectorRef.detectChanges();
+    try {
+      await this.dashboardService.getBotById();
+      this.selectedChatbot = this.dashboardService.selectedChatbot;
+      // Il canvas carica i blocchi da solo nel suo ngOnInit, ma dopo una chiamata HTTP: fino ad
+      // allora IntentService.listOfIntents terrebbe i blocchi del flusso precedente. Caricarli
+      // qui costa un GET in piu' e chiude quella finestra.
+      await this.intentService.getAllIntents(this.dashboardService.id_faq_kb);
+    } catch (error) {
+      this.intentService.listOfIntents = [];
+      this.intentService.prevListOfIntent = [];
+      throw new Error(
+        `Opened "${faqKbId}" but could not load it`
+        + `${error instanceof Error ? ': ' + error.message : ''}.`);
+    } finally {
+      // In `finally`: un canvas lasciato nascosto sarebbe uno studio senza canvas e senza errore.
+      this.flowVisible = true;
+      this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  /** Rilegge il flusso aperto in place (blocchi e attributi), come farebbe un reload, senza reload.
+   *  Per le modifiche fatte fuori dal canvas che il canvas deve vedere: un subagent cancellato
+   *  mentre il parent e' aperto. */
+  public async refreshFlow(): Promise<void> {
+    const faqKbId = this.dashboardService.id_faq_kb;
+    if (!faqKbId) { return; }
+    await this.rebuildFlow(faqKbId);
   }
 
   onSwipe(event: WheelEvent){
