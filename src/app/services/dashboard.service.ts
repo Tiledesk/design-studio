@@ -36,6 +36,12 @@ export class DashboardService {
   readonly selectedChatbot$ = new BehaviorSubject<Chatbot | null>(null);
   translateparamBotName: any;
 
+  /** Apre un altro flusso senza ricaricare la pagina. Lo pubblica il guscio del Design Studio
+   *  (CdsDashboardComponent.openFlow) finche' e' montato; null altrimenti. */
+  public openFlow: ((faqKbId: string) => Promise<void>) | null = null;
+  /** Rilegge il flusso aperto in place, come farebbe un reload, senza reload. Pubblicato dal guscio. */
+  public refreshFlow: (() => Promise<void>) | null = null;
+
   project: Project;
   /** Reactive stream for components that need to react to project changes. */
   readonly project$ = new BehaviorSubject<Project | null>(null);

@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# features-2026/subagents-2 14/10/2026
+- **changed**: opening a subagent, going back to the parent and deleting a subagent no longer reload the page: only the canvas is rebuilt on the new flow, the URL follows (read-only preview included), undo/redo are cleared and the header follows the agent. Ported from the stage line
+
 # features-2026/subagents-2 24/09/2026
 - **added**: aggiunti i subagents (pannello laterale, creazione, azioni Invoke Sub Agent e Return), selezione degli agenti nella pubblicazione, release history con View, Republish e Restore
 

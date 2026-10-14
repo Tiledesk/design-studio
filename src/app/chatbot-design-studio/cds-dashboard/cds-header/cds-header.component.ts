@@ -49,6 +49,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
    private subscriptionTestItOutPlayed: Subscription;
    private subscriptionIsSaving: Subscription;
    private subscriptionIsSavingVisible: Subscription;
+   private subscriptionSelectedChatbot: Subscription;
 
   id_faq_kb: string;
   projectID: string;
@@ -138,6 +139,14 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
       this.isWebhook = true;
       this.initializeWebhook();
     }
+    // Lo studio cambia agente senza ricaricare la pagina (CdsDashboardComponent.openFlow) e
+    // questo header non viene ricostruito: cio' che sopra e' stato letto una volta deve seguire l'agente.
+    this.subscriptionSelectedChatbot = this.dashboardService.selectedChatbot$
+      .subscribe((chatbot: Chatbot | null) => {
+        if (chatbot?._id && chatbot._id !== this.id_faq_kb) {
+          this.onAgentChanged(chatbot);
+        }
+      });
     this.getOSCODE();
     this.getTranslations()
     this.isBetaUrl = false;
@@ -152,6 +161,23 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     }
     this.subscriptionIsSaving?.unsubscribe();
     this.subscriptionIsSavingVisible?.unsubscribe();
+    if (this.subscriptionSelectedChatbot) {
+      this.subscriptionSelectedChatbot.unsubscribe();
+    }
+  }
+
+  /** L'agente aperto e' cambiato senza reload: l'header si aggiorna come se fosse appena nato. */
+  private onAgentChanged(chatbot: Chatbot): void {
+    // Prima di cambiare `isWebhook`: la chiusura del test usa lo stato dell'agente precedente.
+    if (this.isPlaying) {
+      this.onCloseTestItOut();
+    }
+    this.id_faq_kb = chatbot._id;
+    this.selectedChatbot = chatbot;
+    this.isWebhook = chatbot.subtype === 'webhook' || chatbot.subtype === 'copilot';
+    if (this.isWebhook) {
+      this.initializeWebhook();
+    }
   }
 
 

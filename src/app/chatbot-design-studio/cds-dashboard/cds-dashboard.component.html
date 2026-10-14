@@ -33,7 +33,7 @@
             [IS_OPEN_SIDEBAR]="IS_OPEN_SIDEBAR">
         </cds-sidebar>
 
-        <router-outlet></router-outlet>
+        <ng-container *ngIf="flowVisible"><router-outlet></router-outlet></ng-container>
 
     </div>
 
