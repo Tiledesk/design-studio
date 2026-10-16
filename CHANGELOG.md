@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc32
+- **changed** (master-pre): an agent of the new Design Studio is recognised by the `ds_version` field of the bot, where the server keeps the label since 2.30.0, and still by the label or the connectors list inside its attributes for the agents saved before; the field wins when the two disagree. Such an agent is not opened here and is sent to the new Design Studio, as before
+
 # 1.40.16-rc31
 - **added** (master-pre): an agent managed by the new Design Studio (`dsVersion: v3`, or a connectors list in its attributes) is not opened here: an alert offers to open it in cds-v3 (`cdsV3BaseUrl` / `CDS_V3_URL`, same route) or to go back to the dashboard. Checked before the blocks load, also when switching agent from the header or the AI chat
 - **removed** (master-pre): the connectors refactor (lists in the agent attributes) leaves this line: it lives in the V3 Design Studio only. master-pre is back to 1.40.16-rc28

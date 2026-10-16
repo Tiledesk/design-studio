@@ -5,21 +5,32 @@ import { getActionCategoryColor } from "./utils-actions";
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
-/** Valore dell'etichetta `attributes.dsVersion` che identifica un agente da aprire
- *  con il Design Studio V3. E' l'unica cosa che decide quale editor si apre: chi crea
- *  l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
+/** Valore dell'etichetta di versione che identifica un agente da aprire con il Design Studio
+ *  V3. Dal 16/10/2026 il server la tiene nel campo `ds_version` del bot; gli agenti salvati
+ *  prima la portano in `attributes.dsVersion`. E' l'unica cosa che decide quale editor si apre:
+ *  chi crea l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
  *  Confronto in minuscolo. */
 export const DS_VERSION_V3 = 'v3';
 
+/** L'etichetta di versione dell'agente: il campo `ds_version` del bot, oppure, per un agente
+ *  salvato prima che il campo esistesse, `attributes.dsVersion`. */
+export function dsVersionOf(chatbot: any): any {
+    const field = chatbot?.ds_version;
+    return field !== undefined && field !== null ? field : chatbot?.attributes?.dsVersion;
+}
+
 /** True se l'agente e' gestito dal Design Studio V3 e NON va aperto con questa console:
- *  porta l'etichetta `dsVersion = v3`, oppure ha gia' la lista dei connettori in
- *  `attributes.connectors` (la gestione nuova, che qui non esiste: aprirlo e salvarlo da qui
- *  perderebbe i collegamenti). Si apre con cds-v3. */
+ *  porta l'etichetta `v3` (nel campo `ds_version` o, alla vecchia maniera, in
+ *  `attributes.dsVersion`), oppure ha gia' la lista dei connettori (nel campo `connectors`
+ *  o, alla vecchia maniera, in `attributes.connectors`: la gestione nuova, che qui non esiste,
+ *  e aprirlo e salvarlo da qui perderebbe i collegamenti). Questa console e' un cancello verso
+ *  cds-v3: nel dubbio rifiuta, perche' un agente vecchio rifiutato per sbaglio viene solo
+ *  rimandato al V3, che lo ripara, mentre un V3 aperto qui verrebbe rovinato. */
 export function isV3ManagedChatbot(chatbot: any): boolean {
-    const label = chatbot?.attributes?.dsVersion;
+    const label = dsVersionOf(chatbot);
     if (typeof label === 'string' && label.trim().toLowerCase() === DS_VERSION_V3) { return true; }
-    const list = chatbot?.attributes?.connectors;
-    return !!list && typeof list === 'object' && Array.isArray(list.items);
+    return [chatbot?.connectors, chatbot?.attributes?.connectors]
+        .some(list => !!list && typeof list === 'object' && Array.isArray(list.items));
 }
 
 export const DOCS_LINK = {

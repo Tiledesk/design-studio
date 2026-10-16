@@ -13,7 +13,7 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 import { Department } from 'src/app/models/department-model';
 // UTILS //
-import { convertJsonToArray, DS_VERSION_V3 } from 'src/app/chatbot-design-studio/utils';
+import { convertJsonToArray, DS_VERSION_V3, dsVersionOf } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -132,7 +132,7 @@ export class DashboardService {
   private resolveDsVersion(chatbot: Chatbot): void {
     let isV3 = false;
     try {
-      const label = chatbot?.attributes?.dsVersion;
+      const label = dsVersionOf(chatbot);
       isV3 = typeof label === 'string' && label.trim().toLowerCase() === DS_VERSION_V3;
     } catch (error) {
       this.logger.error('[ DSHBRD-SERVICE ] resolveDsVersion ERROR: ', error);
@@ -140,7 +140,7 @@ export class DashboardService {
     }
     this.isV3 = isV3;
     this.isV3$.next(isV3);
-    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { label: chatbot?.attributes?.dsVersion, isV3 });
+    this.logger.log('[ DSHBRD-SERVICE ] resolveDsVersion: ', { label: dsVersionOf(chatbot), isV3 });
   }
 
   // ----------------------------------------------------------
