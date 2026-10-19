@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# features-2026/ds-return-to-agent 19-10-2026 17:17
+- **changed**: the "Return to agent" action is offered in every chatbot and voice agent, no longer only inside a sub agent, as in the Design Studio V3; existing flows are unchanged
+
 # 1.40.16
 - **changed**: opening a subagent, going back to the parent and deleting a subagent no longer reload the page: only the canvas is rebuilt on the new flow, the URL follows (read-only preview included), undo/redo are cleared and the header follows the agent. Ported from the stage line
 - **added**: added subagents (side panel, creation, Invoke Sub Agent and Return actions), selection of agents in the publication, release history with View, Republish and Restore
