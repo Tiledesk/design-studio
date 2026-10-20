@@ -12,6 +12,7 @@ import { ControllerService } from '../../services/controller.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { NoteService } from 'src/app/services/note.service';
 import { NoteResizeStateService } from './note-resize-state.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 
 // MODEL //
 import { Intent, Form } from 'src/app/models/intent-model';
@@ -27,7 +28,7 @@ import { LOGOS_ITEMS } from './../../utils-resources';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 
-import { TYPE_ACTION, TYPE_CHATBOT } from 'src/app/chatbot-design-studio/utils-actions';
+import { TYPE_ACTION, TYPE_CHATBOT, resolveChatbotSubtype } from 'src/app/chatbot-design-studio/utils-actions';
 import { AppStorageService } from 'src/chat21-core/providers/abstract/app-storage.service';
 import { storage } from 'firebase';
 import { LogService } from 'src/app/services/log.service';
@@ -93,8 +94,15 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   mapOfIntents = [];
   labelInfoLoading:string = 'Loading';
 
-  /** panel list of intent */ 
+  /** panel list of intent */
   IS_OPEN_INTENTS_LIST: boolean = true;
+
+  /**
+   * Pannello attivo nello slot sinistro (mutua esclusione Blocks/Subagents, gestito dai tab).
+   * Default 'subagents': e' la tab che si apre quando l'agente non ha ancora una preferenza
+   * salvata. Se l'utente ne ha scelta una, vince la sua (vedi resolveActiveLeftPanel).
+   */
+  activeLeftPanel: 'blocks' | 'subagents' = 'subagents';
 
   /** */
   private subscriptionChangedConnectorAttributes: Subscription;
@@ -191,7 +199,8 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     public logService: LogService,
     public webhookService: WebhookService,
     private readonly noteService: NoteService,
-    public noteResizeState: NoteResizeStateService
+    public noteResizeState: NoteResizeStateService,
+    public readonly readOnlyService: ReadOnlyService
   ) {
     this.setSubscriptions();
     this.setListnerEvents();
@@ -200,6 +209,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
   ngOnInit(): void {
     this.logger.log("[CDS-CANVAS]  •••• ngOnInit ••••");
     this.getParamsFromURL();
+    this.resolveActiveLeftPanel();
     this.initialize();
   }
 
@@ -275,8 +285,6 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if(this.stageService.settings?.open_intent_list_state != null){
       this.IS_OPEN_INTENTS_LIST = this.stageService.settings.open_intent_list_state;
     }
-    
-    
     // this.stageService.initStageSettings(this.id_faq_kb);
     this.stageService.setDrawer();
     this.connectorService.initializeConnectors();
@@ -634,7 +642,7 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     // ---------------------------------------
     // set subtype chatbot
     // ---------------------------------------
-    this.chatbotSubtype = this.dashboardService.selectedChatbot.subtype?this.dashboardService.selectedChatbot.subtype:TYPE_CHATBOT.CHATBOT;
+    this.chatbotSubtype = resolveChatbotSubtype(this.dashboardService.selectedChatbot.subtype);
 
 
     // ---------------------------------------
@@ -935,6 +943,11 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     if (focusedElement.tagName === 'TEXTAREA' || focusedElement.tagName === 'INPUT') {
       return;
     }
+    // Sola lettura: annulla e ripeti non hanno senso dove non si salva, e sono le due
+    // scorciatoie che l'utente batte per istinto.
+    if (this.readOnlyService.readOnly) {
+      return;
+    }
       // Prevent undo/redo if a detail panel is open (to allow native undo/redo in panel inputs)
     if (this.IS_OPEN_PANEL_ACTION_DETAIL || this.IS_OPEN_PANEL_INTENT_DETAIL) {
       this.logger.log('[CDS-CANVAS] Panel is open - skipping canvas undo/redo');
@@ -1140,6 +1153,40 @@ export class CdsCanvasComponent implements OnInit, AfterViewInit{
     this.removeConnectorDraftAndCloseFloatMenu();
     this.stageService.saveSettings(this.id_faq_kb, STAGE_SETTINGS.openIntentListState, this.IS_OPEN_INTENTS_LIST);
     this.logger.log('[CDS-CANVAS] onToogleSidebarIntentsList   this.IS_OPEN_INTENTS_LIST ',  this.IS_OPEN_INTENTS_LIST)
+  }
+
+  /**
+   * Id della "famiglia" a cui appartiene la tab del pannello sinistro: il parent quando siamo
+   * dentro un subagent, il chatbot corrente altrimenti. Cosi' la scelta Blocks/Subagents
+   * sopravvive alla navigazione parent <-> subagent, che cambia id_faq_kb.
+   */
+  private getLeftPanelFamilyId(): string {
+    const current: any = this.dashboardService.selectedChatbot;
+    return current?.subtype === 'subagent'
+      ? current?.parent_id
+      : this.dashboardService.id_faq_kb;
+  }
+
+  /**
+   * Decide la tab del pannello sinistro all'apertura dell'agente: vince la preferenza
+   * salvata per la famiglia, altrimenti si apre 'subagents'.
+   *
+   * Sta in ngOnInit e non in ngAfterViewInit: risolvendola dopo il primo render il
+   * pannello Blocks verrebbe montato e subito distrutto (i due pannelli sono in
+   * mutua esclusione via *ngIf), con lo sfarfallio che ne consegue.
+   */
+  private resolveActiveLeftPanel(): void {
+    const saved = this.stageService.getActiveLeftPanel(this.getLeftPanelFamilyId());
+    this.activeLeftPanel = saved ? saved : 'subagents';
+  }
+
+  /** Alterna il pannello sinistro (Blocks/Subagents) nello stesso slot; riapre il box se chiuso. */
+  onSelectLeftPanel(panel: 'blocks' | 'subagents') {
+    this.activeLeftPanel = panel;
+    this.stageService.saveActiveLeftPanel(this.getLeftPanelFamilyId(), panel);
+    if (!this.IS_OPEN_INTENTS_LIST) {
+      this.onToogleSidebarIntentsList();
+    }
   }
 
   /** onDroppedElementToStage **
