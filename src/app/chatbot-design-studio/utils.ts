@@ -19,20 +19,6 @@ export function dsVersionOf(chatbot: any): any {
     return field !== undefined && field !== null ? field : chatbot?.attributes?.dsVersion;
 }
 
-/** True se l'agente e' gestito dal Design Studio V3 e NON va aperto con questa console:
- *  porta l'etichetta `v3` (nel campo `ds_version` o, alla vecchia maniera, in
- *  `attributes.dsVersion`), oppure ha gia' la lista dei connettori (nel campo `connectors`
- *  o, alla vecchia maniera, in `attributes.connectors`: la gestione nuova, che qui non esiste,
- *  e aprirlo e salvarlo da qui perderebbe i collegamenti). Questa console e' un cancello verso
- *  cds-v3: nel dubbio rifiuta, perche' un agente vecchio rifiutato per sbaglio viene solo
- *  rimandato al V3, che lo ripara, mentre un V3 aperto qui verrebbe rovinato. */
-export function isV3ManagedChatbot(chatbot: any): boolean {
-    const label = dsVersionOf(chatbot);
-    if (typeof label === 'string' && label.trim().toLowerCase() === DS_VERSION_V3) { return true; }
-    return [chatbot?.connectors, chatbot?.attributes?.connectors]
-        .some(list => !!list && typeof list === 'object' && Array.isArray(list.items));
-}
-
 export const DOCS_LINK = {
     ASKGPTV2 : { 
         namespace_as_name: { link: 'https://guide.tiledesk.com/', target: '_blank'},

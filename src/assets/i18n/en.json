@@ -1785,10 +1785,6 @@
     },
     "Options": "Options",
     "CDSHeader": {
-        "V3AgentTitle": "Agent managed by the new Design Studio",
-        "V3AgentText": "\"{{name}}\" is managed by the new Design Studio (V3) and cannot be opened with this console.",
-        "V3AgentOpen": "Open it in the new Design Studio",
-        "V3AgentDashboard": "Go to the dashboard",
         "SelectAgent": "Select agent",
         "DeleteAgent": "Delete agent",
         "DeleteAgentTitle": "Delete agent",

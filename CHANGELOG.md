@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.40.16-rc33
+- **changed** (master-pre): every agent opens in this console again, those of the new Design Studio (V3) included: the alert "Agent managed by the new Design Studio" and the block on opening are gone, also when switching flow. Connections edited here on a V3 agent are saved the legacy way and do not update its connectors list
+
 # 1.40.16-rc32
 - **changed** (master-pre): an agent of the new Design Studio is recognised by the `ds_version` field of the bot, where the server keeps the label since 2.30.0, and still by the label or the connectors list inside its attributes for the agents saved before; the field wins when the two disagree. Such an agent is not opened here and is sent to the new Design Studio, as before
 

@@ -2,35 +2,18 @@ import {
   ACTIONS_LIST, ACTIONS_WITH_OWN_OUTPUTS, TYPE_ACTION, TYPE_CHATBOT,
   isActionAvailableInSubagentContext
 } from './utils-actions';
-import { dsVersionOf, isV3ManagedChatbot } from './utils';
+import { dsVersionOf } from './utils';
 
-describe('isV3ManagedChatbot — gli agenti del V3 non si aprono con questa console', () => {
-  it('vero con l\'etichetta v3 nel campo ds_version del bot', () => {
-    expect(isV3ManagedChatbot({ ds_version: 'v3' })).toBeTrue();
-    expect(isV3ManagedChatbot({ ds_version: ' V3 ', attributes: {} })).toBeTrue();
-  });
-  it('vero anche con l\'etichetta alla vecchia maniera, in attributes.dsVersion', () => {
-    expect(isV3ManagedChatbot({ attributes: { dsVersion: 'v3' } })).toBeTrue();
-    expect(isV3ManagedChatbot({ attributes: { dsVersion: ' V3 ' } })).toBeTrue();
-  });
-  it('vero con la lista dei connettori, nel campo del bot o negli attributi', () => {
-    expect(isV3ManagedChatbot({ connectors: { version: 1, items: [] } })).toBeTrue();
-    expect(isV3ManagedChatbot({ attributes: { connectors: { version: 1, items: [] } } })).toBeTrue();
-  });
-  it('il campo vince sull\'attributo quando dicono cose diverse', () => {
-    expect(isV3ManagedChatbot({ ds_version: 'v3', attributes: { dsVersion: 'legacy' } })).toBeTrue();
-    expect(isV3ManagedChatbot({ ds_version: 'legacy', attributes: { dsVersion: 'v3' } })).toBeFalse();
+describe('dsVersionOf — l\'etichetta di versione dell\'agente', () => {
+  it('legge il campo ds_version del bot, che vince sull\'attributo', () => {
     expect(dsVersionOf({ ds_version: 'v3', attributes: { dsVersion: 'legacy' } })).toBe('v3');
-    expect(dsVersionOf({ attributes: { dsVersion: 'v3' } })).toBe('v3');
-    expect(dsVersionOf({})).toBeUndefined();
   });
-  it('falso senza etichetta e senza lista, con un\'altra etichetta, o senza agente', () => {
-    expect(isV3ManagedChatbot({ attributes: {} })).toBeFalse();
-    expect(isV3ManagedChatbot({ ds_version: 'legacy' })).toBeFalse();
-    expect(isV3ManagedChatbot({ attributes: { dsVersion: 'legacy', connectors: {} } })).toBeFalse();
-    expect(isV3ManagedChatbot({ connectors: {} })).toBeFalse();
-    expect(isV3ManagedChatbot({})).toBeFalse();
-    expect(isV3ManagedChatbot(null)).toBeFalse();
+  it('senza campo legge attributes.dsVersion, alla vecchia maniera', () => {
+    expect(dsVersionOf({ attributes: { dsVersion: 'v3' } })).toBe('v3');
+  });
+  it('senza etichetta non inventa niente', () => {
+    expect(dsVersionOf({})).toBeUndefined();
+    expect(dsVersionOf(null)).toBeUndefined();
   });
 });
 
