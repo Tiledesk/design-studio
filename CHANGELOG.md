@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.41.0
+- **added**: voice_mode system-defined flow variable
+
 # 1.40.17
 - **changed**: the "Return to agent" action is offered in every chatbot and voice agent, no longer only inside a sub agent, as in the Design Studio V3; existing flows are unchanged
 
