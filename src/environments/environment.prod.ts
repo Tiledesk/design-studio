@@ -2,7 +2,7 @@ export const environment = {
     production: true,
     t2y12PruGU9wUtEGzBJfolMIgK: 'CHANGEIT',
     VERSION: require('../../package.json').version,
-    remoteConfig: true, 
+    remoteConfig: false, 
     remoteConfigUrl: './design-studio-config.json',
     apiUrl: 'CHANGEIT',
     widgetBaseUrl: 'CHANGEIT',
