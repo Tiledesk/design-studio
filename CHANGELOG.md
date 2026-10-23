@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.41.1
+- **changed**: remoteConfig: false
+
 # 1.41.0
 - **added**: voice_mode system-defined flow variable
 
