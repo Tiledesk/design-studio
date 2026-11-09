@@ -863,6 +863,32 @@ export class ConnectorService {
           }
         }
 
+        /** SET-RATING */
+        if(action._tdActionType === TYPE_ACTION.SET_RATING){
+          if(action.trueIntent && action.trueIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/true';
+            idConnectorTo =  action.trueIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.trueIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - SET-RATING ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - SET-RATING ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+          if(action.falseIntent && action.falseIntent !== ''){
+            idConnectorFrom = intent.intent_id+'/'+action._tdActionId + '/false';
+            idConnectorTo = action.falseIntent.replace("#", "");
+            if(!this.intentExists(idConnectorTo)){
+              action.falseIntent = '';
+              idConnectorTo = null;
+            }
+            this.logger.log('[CONNECTOR-SERV] - SET-RATING ACTION -> idConnectorFrom', idConnectorFrom);
+            this.logger.log('[CONNECTOR-SERV] - SET-RATING ACTION -> idConnectorTo', idConnectorTo);
+            this.createConnector(intent, idConnectorFrom, idConnectorTo);
+          }
+        }
+
         /** MAKE */
         if(action._tdActionType === TYPE_ACTION.MAKE){
           if(action.trueIntent && action.trueIntent !== ''){

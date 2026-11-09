@@ -135,6 +135,14 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/add_tag.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/set_rating.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/set_rating.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/get_rating.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/get_rating.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions/agent_handoff.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/agent_handoff.svg')
     );

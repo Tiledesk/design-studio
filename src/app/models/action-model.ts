@@ -956,6 +956,28 @@ export class ActionAddTags extends Action {
     }
 }
 
+export class ActionSetRating extends Action {
+    rating: string;
+    ratingMessage?: string;
+    forceUpdate: boolean;
+    assignErrorTo?: string;
+    trueIntent?: string;     // success branch connector
+    falseIntent?: string;    // error branch connector
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.SET_RATING;
+    }
+}
+
+export class ActionGetRating extends Action {
+    assignRatingTo: string;
+    assignRatingMessageTo: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.GET_RATING;
+    }
+}
+
 export class ActionVoice extends Action {
     text?: string;
     attributes: Attributes;

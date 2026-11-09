@@ -1,0 +1,53 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="previewContent get-rating">
+        <label class="title-preview-label">{{'CDSCanvas.RatingValue' | translate }}:
+            <span *ngIf="action?.assignRatingTo">{{ action?.assignRatingTo }}</span>
+            <span *ngIf="!action?.assignRatingTo" class="empty">-</span>
+        </label>
+        <label class="title-preview-label">{{'CDSCanvas.RatingMessage' | translate }}:
+            <span *ngIf="action?.assignRatingMessageTo">{{ action?.assignRatingMessageTo }}</span>
+            <span *ngIf="!action?.assignRatingMessageTo" class="empty">-</span>
+        </label>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.RatingValue' | translate }}:</label>
+        <cds-textarea
+            id="assignRatingTo"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            [text]="action.assignRatingTo"
+            [placeholder]="'rating_value'"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignRatingTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignRatingTo')">
+        </cds-textarea>
+        <label class="field-description"> {{ 'CDSCanvas.AssignRatingToDescription' | translate}} </label>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.RatingMessage' | translate }}:</label>
+        <cds-textarea
+            id="assignRatingMessageTo"
+            [textLimitBtn]="false"
+            [emojiPikerBtn]="false"
+            [setAttributeBtn]="true"
+            [minRow]="1" [maxRow]="1"
+            [readonly]="true"
+            [text]="action.assignRatingMessageTo"
+            [placeholder]="'rating_message'"
+            (selectedAttribute)="onSelectedAttribute($event, 'assignRatingMessageTo')"
+            (clearSelectedAttribute)="onSelectedAttribute($event, 'assignRatingMessageTo')">
+        </cds-textarea>
+        <label class="field-description"> {{ 'CDSCanvas.AssignRatingMessageToDescription' | translate}} </label>
+    </div>
+
+</div>
