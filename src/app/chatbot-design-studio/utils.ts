@@ -1,14 +1,23 @@
 import { AbstractControl } from "@angular/forms";
 import { Intent } from "src/app/models/intent-model";
 import { v4 as uuidv4 } from 'uuid';
+import { getActionCategoryColor } from "./utils-actions";
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
-/**
- * Cutoff date used to determine whether a chatbot is considered "new".
- * ISO string format, compared lexicographically against `createdAt` (also ISO).
- */
-export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+/** Valore dell'etichetta di versione che identifica un agente da aprire con il Design Studio
+ *  V3. Dal 16/10/2026 il server la tiene nel campo `ds_version` del bot; gli agenti salvati
+ *  prima la portano in `attributes.dsVersion`. E' l'unica cosa che decide quale editor si apre:
+ *  chi crea l'agente la dichiara, chi lo apre la rilegge. Senza etichetta l'agente e' legacy.
+ *  Confronto in minuscolo. */
+export const DS_VERSION_V3 = 'v3';
+
+/** L'etichetta di versione dell'agente: il campo `ds_version` del bot, oppure, per un agente
+ *  salvato prima che il campo esistesse, `attributes.dsVersion`. */
+export function dsVersionOf(chatbot: any): any {
+    const field = chatbot?.ds_version;
+    return field !== undefined && field !== null ? field : chatbot?.attributes?.dsVersion;
+}
 
 export const DOCS_LINK = {
     ASKGPTV2 : { 
@@ -34,18 +43,18 @@ export const DOCS_LINK = {
         more_json_uttons: { link: 'https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/reply-action#json-buttons', target: '_blank'},
     },
     VOICE_SETTINGS: {
-        twilio: {
+        'twilio': {
             voice_twilio: { link: 'https://console.twilio.com/us1/develop/voice/settings/text-to-speech?frameUrl=%2Fconsole%2Fvoice%2Ftwiml%2Ftext-to-speech%3Fx-target-region%3Dus1', target: '_blank'},
         },
-        openai: {
+        'openai': {
             tts_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createSpeech', target: '_blank'},
-            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},
+            stt_model: { link: 'https://platform.openai.com/docs/api-reference/audio/createTranscription', target: '_blank'},    
             voice_openai: { link: 'https://platform.openai.com/docs/api-reference/audio', target: '_blank'},
         },
-        elevenlabs: {
+        'elevenlabs': {
             tts_model: { link: 'https://elevenlabs.io/docs/api-reference/text-to-speech/convert', target: '_blank'},
-            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},
-            voice_elevenlabs: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
+            stt_model: { link: 'https://elevenlabs.io/docs/api-reference/models/list', target: '_blank'},    
+            voice_openai: { link: 'https://elevenlabs.io/docs/api-reference/voices/search', target: '_blank'},
         },
     },
     LIQUIDJS: {
@@ -111,7 +120,8 @@ export enum SETTINGS_SECTION {
     IMPORT_EXPORT   = 'export',
     COMMUNITY       = 'community',
     DEVELOPER       = 'developer',
-    ADVANCED        = 'advanced'
+    ADVANCED        = 'advanced',
+    LLM_SETTINGS    = 'llm_settings',
 }
 
 export enum EXTERNAL_URL {
@@ -207,24 +217,52 @@ export enum TYPE_EVENT_CATEGORY {
 }
 
 export enum TYPE_OPERATOR {
-    equalAsNumbers          = "equalAsNumbers",
+    // Existence / generic (unary, type-agnostic)
+    exists                  = "exists",
+    doesNotExist            = "doesNotExist",
+    isEmpty                 = "isEmpty",
+    isNotEmpty              = "isNotEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    // Text (string coercion)
     equalAsStrings          = "equalAsStrings",
-    notEqualAsNumbers       = "notEqualAsNumbers",
     notEqualAsStrings       = "notEqualAsStrings",
+    contains                = "contains",
+    notContains             = "notContains",
+    containsIgnoreCase      = "containsIgnoreCase",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    startsWithIgnoreCase    = "startsWithIgnoreCase",
+    endsWith                = "endsWith",
+    notEndsWith             = "notEndsWith",
+    matches                 = "matches",
+    notMatches              = "notMatches",
+    // Number (number coercion)
+    equalAsNumbers          = "equalAsNumbers",
+    notEqualAsNumbers       = "notEqualAsNumbers",
     greaterThan             = "greaterThan",
     greaterThanOrEqual      = "greaterThanOrEqual",
     lessThan                = "lessThan",
     lessThanOrEqual         = "lessThanOrEqual",
-    startsWith              = "startsWith",
-    notStartsWith           = 'notStartsWith',
-    startsWithIgnoreCase    = "startsWithIgnoreCase",
-    contains                = "contains",
-    containsIgnoreCase      = "containsIgnoreCase",
-    endsWith                = "endsWith",
-    isEmpty                 = "isEmpty",
-    isNull                  = "isNull",
-    isUndefined             = "isUndefined",
-    matches                 = "matches"
+    // Boolean (unary)
+    isTrue                  = "isTrue",
+    isFalse                 = "isFalse",
+    // Date & Time (date coercion)
+    equalAsDate             = "equalAsDate",
+    notEqualAsDate          = "notEqualAsDate",
+    isAfter                 = "isAfter",
+    isBefore                = "isBefore",
+    isAfterOrEqual          = "isAfterOrEqual",
+    isBeforeOrEqual         = "isBeforeOrEqual",
+    // Array (length -> number; contains -> string)
+    arrayContains           = "arrayContains",
+    arrayNotContains        = "arrayNotContains",
+    lengthEqualTo           = "lengthEqualTo",
+    lengthNotEqualTo        = "lengthNotEqualTo",
+    lengthGreaterThan       = "lengthGreaterThan",
+    lengthLessThan          = "lengthLessThan",
+    lengthGreaterThanOrEqual = "lengthGreaterThanOrEqual",
+    lengthLessThanOrEqual   = "lengthLessThanOrEqual"
 }
 
 /**
@@ -296,6 +334,21 @@ export enum TYPE_OF_MENU {
     QUESTION    = 'question'
 }
 
+/**
+ * Il contenuto che viaggia quando si trascina un'azione dalla tavolozza al flusso: il tipo
+ * dell'azione, sotto un'etichetta tutta nostra.
+ *
+ * L'etichetta e' quello che distingue il nostro gesto da qualunque altra cosa si possa
+ * trascinare dentro una pagina -- un file dal desktop, un'immagine, del testo da un'altra
+ * finestra. Lo stage accetta il rilascio solo quando la riconosce, cosi' trascinare un file sul
+ * flusso non crea blocchi.
+ *
+ * Sta qui, e non in uno dei due componenti, perche' chi la scrive (la tavolozza) e chi la legge
+ * (il canvas) devono per forza dire la stessa stringa, e una stringa ripetuta in due punti prima
+ * o poi diverge.
+ */
+export const ACTION_DRAG_MIME = 'application/x-tiledesk-action-type';
+
 
 export enum TYPE_UPDATE_ACTION {
     CONNECTOR   = 'connector',
@@ -313,21 +366,6 @@ export enum OPTIONS {
     MOUSE       = 'mouse',
     ALPHA       = 'alpha'
 }
-
-export const TYPE_GPT_MODEL: Array<{name: string, value: string, description: string, status: "active" | "inactive"}> = [
-    { name: "GPT-4.1",                          value: "gpt-4.1",               description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 mini",                     value: "gpt-4.1-mini",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4.1 nano",                     value: "gpt-4.1-nano",          description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-4o",                           value: "gpt-4o",                description: "TYPE_GPT_MODEL.gpt-4o.description",                   status: "active"    },
-    { name: "GPT-4o mini",                      value: "gpt-4o-mini",           description: "TYPE_GPT_MODEL.gpt-4o-mini.description",              status: "active"    },
-    { name: "GPT-4 (Legacy)",                   value: "gpt-4",                 description: "TYPE_GPT_MODEL.gpt-4.description",                    status: "active"    },
-    { name: "GPT-4 Turbo Preview",              value: "gpt-4-turbo-preview",   description: "TYPE_GPT_MODEL.gpt-4-turbo-preview.description",      status: "active"    },
-    { name: "GPT-3 (DaVinci)",                  value: "text-davinci-003",      description: "TYPE_GPT_MODEL.text-davinci-003.description",         status: "inactive"  },
-    { name: "GPT-3.5 Turbo",                    value: "gpt-3.5-turbo",         description: "TYPE_GPT_MODEL.gpt-3.5-turbo.description",            status: "active"    },
-    { name: "OpenAI o1-mini",                   value: "o1-mini",               description: "TYPE_GPT_MODEL.o1-mini.description",                  status: "inactive"    },
-    { name: "OpenAI o1-preview",                value: "o1-preview",            description: "TYPE_GPT_MODEL.o1-preview.description",               status: "inactive"    }
-]
-
 
 export const INTENT_TEMP_ID         = '';
 export const MESSAGE_METADTA_WIDTH  = '100%';
@@ -633,12 +671,37 @@ export function checkInternalIntent(intent: Intent): boolean {
 }
 
 
+/**
+ * Il colore con cui un blocco si presenta quando nessuno gliene ha scelto uno: quello della
+ * famiglia della sua azione -- verde per le piu' usate, blu per l'AI, e cosi' via -- cosi' il
+ * flusso si legge a colpo d'occhio prima ancora dei nomi.
+ *
+ * Decide guardando la prima azione che appartenga a una famiglia riconoscibile: un blocco ne
+ * contiene di solito una sola, e dove ce ne fossero piu' d'una comanda quella che lo apre.
+ *
+ * I blocchi riservati -- avvio, webhook, fallback -- restano del colore di sempre: il loro aspetto
+ * dice gia' che cosa sono, e una tinta presa dall'azione che contengono lo direbbe peggio.
+ *
+ * Sta qui, e non in chi disegna, perche' il colore appartiene al blocco: lo chiedono il blocco e
+ * il canvas, che con lo stesso colore disegna i connettori che ne escono.
+ */
+export function getIntentDefaultColor(intent: Intent | any): string {
+    if (!intent || checkInternalIntent(intent)) { return INTENT_COLORS.COLOR1; }
+    for (const action of intent.actions ?? []) {
+        const color = getActionCategoryColor(action?._tdActionType);
+        if (color) { return color; }
+    }
+    return INTENT_COLORS.COLOR1;
+}
+
+
 /** isDefaultFallbackWithoutActions
  * True SOLO per un blocco defaultFallback che non contiene alcuna action.
  * I chatbot nuovi nascono con defaultFallback vuoto (actions: []) e collegano
  * la reply a un blocco separato tramite attributes.nextBlockAction: in quello
- * stato il blocco e' chiuso e non deve accettare nuove action.
+ * stato il blocco e' chiuso e non deve accettare nuove action, in nessun modo.
  * Un defaultFallback legacy (actions.length > 0) NON e' bloccato.
+ * Regola riportata dal branch features-2026/ds-generic-bug-fix-39 (278c658b).
  */
 export function isDefaultFallbackWithoutActions(intent: any): boolean {
     if (!intent) { return false; }
@@ -981,4 +1044,158 @@ export class ColorUtils {
     // fallback sul colore di default (già con alpha desiderato)
     return defaultColor;
   }
+}
+// =============================
+// INTENT UTILITY FUNCTIONS
+// =============================
+
+/**
+ * Verifica se il colore fornito è valido.
+ * 
+ * @param color - Colore da validare
+ * @returns true se il colore è valido, false altrimenti
+ */
+export function isValidColor(color: any): boolean {
+  return color && color !== undefined && color !== null && color !== '';
+}
+
+/**
+ * Verifica se gli ID sono validi per la creazione di un connettore.
+ * 
+ * @param fromId - ID di origine
+ * @param toId - ID di destinazione
+ * @returns true se gli ID sono validi, false altrimenti
+ */
+export function areValidIds(fromId: string | null, toId: string | null): boolean {
+  return fromId !== null && toId !== null && fromId !== '' && toId !== '';
+}
+
+/**
+ * Trova la chiave dell'enum corrispondente al tipo di azione.
+ * 
+ * @param actionType - Il tipo di azione da cercare
+ * @param TYPE_ACTION - L'enum dei tipi di azione
+ * @returns La chiave dell'enum o null se non trovata
+ */
+export function findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+  const enumKeys = Object.keys(TYPE_ACTION);
+  
+  for (const key of enumKeys) {
+    if (TYPE_ACTION[key] === actionType) {
+      return key;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Aggiunge una classe CSS a un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da aggiungere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function addCssClassToElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log("[UTILS] Aggiunta classe CSS:", className, "a elemento:", componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element) {
+      element.classList.add(className);
+      if (logger) {
+        logger.log("[UTILS] Classe aggiunta con successo");
+      }
+    } else {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nell'aggiunta della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Rimuove una classe CSS da un elemento DOM.
+ * 
+ * @param elementRef - ElementRef del componente
+ * @param className - Nome della classe CSS da rimuovere
+ * @param componentID - Selettore CSS per identificare l'elemento target
+ * @param logger - Servizio logger per tracciare le operazioni
+ */
+export function removeCssClassFromElement(
+  elementRef: any, 
+  className: string, 
+  componentID: string, 
+  logger?: any
+): void {
+  try {
+    if (logger) {
+      logger.log('[UTILS] Rimozione classe CSS:', className, 'da elemento:', componentID);
+    }
+    
+    const element = elementRef.nativeElement.querySelector(componentID);
+    
+    if (element && element.classList.contains(className)) {
+      element.classList.remove(className);
+      if (logger) {
+        logger.log("[UTILS] Classe rimossa con successo");
+      }
+    } else if (!element) {
+      if (logger) {
+        logger.warn("[UTILS] Elemento non trovato:", componentID);
+      }
+    } else {
+      if (logger) {
+        logger.debug("[UTILS] Classe non presente sull'elemento:", className);
+      }
+    }
+  } catch (error) {
+    if (logger) {
+      logger.error("[UTILS] Errore nella rimozione della classe CSS:", error);
+    }
+  }
+}
+
+/**
+ * Calcola il numero di domande da una stringa di testo.
+ * 
+ * @param questionText - Testo contenente le domande
+ * @returns Numero di domande calcolato
+ */
+export function calculateQuestionCount(questionText: string): number {
+  if (!questionText) {
+    return 0;
+  }
+  
+  const questionSegments = questionText
+    .split(/\r?\n/)
+    .filter(segment => segment.trim() !== '');
+  
+  return questionSegments.length;
+}
+
+/**
+ * Calcola la dimensione di un form.
+ * 
+ * @param form - Oggetto form da analizzare
+ * @returns Dimensione del form (numero di campi)
+ */
+export function calculateFormSize(form: any): number {
+  if (form && form !== null) {
+    return Object.keys(form).length;
+  }
+  return 0;
 }

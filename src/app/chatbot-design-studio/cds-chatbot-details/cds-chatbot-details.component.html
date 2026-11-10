@@ -9,8 +9,8 @@
             <a href="javascript:;" role="button">{{ "BotDetails" | translate }}</a>
           </li>
 
-          <li *ngIf="selectedChatbot?.subtype === TYPE_CHATBOT.VOICE_TWILIO || selectedChatbot?.subtype === TYPE_CHATBOT.CHATBOT" (click)="toggleTab(SETTINGS_SECTION.VOICE_SETTINGS)" class="btn-with-border-effect" [ngClass]="
-                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.VOICE_SETTINGS,
+          <li *ngIf="(selectedChatbot?.subtype === TYPE_CHATBOT.VOICE_TWILIO || selectedChatbot?.subtype === TYPE_CHATBOT.CHATBOT)" (click)="toggleTab(SETTINGS_SECTION.VOICE_SETTINGS)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.VOICE_SETTINGS, 
                       'li-active' :           activeSection === SETTINGS_SECTION.VOICE_SETTINGS
                     }">
             <a href="javascript:;" role="button"> {{ "VoiceSettings" | translate }} </a>
@@ -41,6 +41,14 @@
                       'li-active' :           activeSection === SETTINGS_SECTION.ADVANCED
                     }">
             <a href="javascript:;" role="button"> {{ "Advanced" | translate }} </a>
+          </li>
+
+          <li *ngIf="llmSettingsAvailable"
+              (click)="toggleTab(SETTINGS_SECTION.LLM_SETTINGS)" class="btn-with-border-effect" [ngClass]="
+                    { 'border-from-center' :  activeSection !== SETTINGS_SECTION.LLM_SETTINGS,
+                      'li-active' :           activeSection === SETTINGS_SECTION.LLM_SETTINGS
+                    }">
+            <a href="javascript:;" role="button"> {{ "LlmSettingsTab" | translate }} </a>
           </li>
         </ul>
     </div>
@@ -80,6 +88,10 @@
       [project]="project"
       [translationsMap]="translationsMap">
     </cds-detail-advanced>
+
+    <cds-agent-chat-llm-settings *ngIf="llmSettingsAvailable && activeSection===SETTINGS_SECTION.LLM_SETTINGS"
+      (unavailable)="onLlmSettingsUnavailable()">
+    </cds-agent-chat-llm-settings>
   </div>
 </div>
 

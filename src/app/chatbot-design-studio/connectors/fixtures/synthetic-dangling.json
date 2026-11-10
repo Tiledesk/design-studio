@@ -1,0 +1,116 @@
+[
+ {
+  "intent_id": "start",
+  "intent_display_name": "start",
+  "actions": [
+   {
+    "_tdActionId": "a_start",
+    "_tdActionType": "intent",
+    "intentName": "#gone"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "defaultFallback",
+  "intent_display_name": "defaultFallback",
+  "actions": [],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_defaultFallback",
+    "_tdActionType": "intent",
+    "intentName": "#b"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "a",
+  "intent_display_name": "a",
+  "actions": [
+   {
+    "_tdActionId": "a_a",
+    "_tdActionType": "ai_prompt",
+    "trueIntent": "#b",
+    "falseIntent": "#gone"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {
+    "a/a_a/true": {
+     "id": "a/a_a/true/b",
+     "label": "ok"
+    },
+    "a/a_old/true": {
+     "label": "orfano"
+    },
+    "a/a_a/false": {
+     "display": false
+    }
+   },
+   "nextBlockAction": {
+    "_tdActionId": "n_a",
+    "_tdActionType": "intent",
+    "intentName": "#gone"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "b",
+  "intent_display_name": "b",
+  "actions": [
+   {
+    "_tdActionId": "a_b",
+    "_tdActionType": "reply",
+    "text": "b"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {
+    "b/n_b": {
+     "id": "b/n_b/a",
+     "display": false
+    }
+   },
+   "nextBlockAction": {
+    "_tdActionId": "n_b",
+    "_tdActionType": "intent",
+    "intentName": ""
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ }
+]

@@ -1,9 +1,6 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { ActionSetRating } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
@@ -15,7 +12,7 @@ import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance'
   templateUrl: './cds-action-set-rating.component.html',
   styleUrls: ['./cds-action-set-rating.component.scss']
 })
-export class CdsActionSetRatingComponent implements OnInit, OnDestroy {
+export class CdsActionSetRatingComponent implements OnInit {
 
   @Input() intentSelected: Intent;
   @Input() action: ActionSetRating;
@@ -26,41 +23,20 @@ export class CdsActionSetRatingComponent implements OnInit, OnDestroy {
   /** passed to cds-textarea so that a quick value can refresh the field */
   ratingControl = new FormControl<string>('');
 
-  // Connectors (success = true branch, else = false branch)
+  // Connectors (success = true branch, else = false branch): the connector store saves them
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   private logger: LoggerService = LoggerInstance.getInstance();
 
-  constructor(
-    private readonly intentService: IntentService
-  ) { }
+  constructor() { }
 
   ngOnInit(): void {
     this.logger.log("[ACTION-SET-RATING] action", this.action)
     this.initializeAttributes();
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      const connectorId = this.idIntentSelected + '/' + this.action._tdActionId;
-      if (connector?.fromId?.startsWith(connectorId)) {
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if (this.intentSelected) {
       this.initializeConnector();
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
     }
   }
 
@@ -78,24 +54,6 @@ export class CdsActionSetRatingComponent implements OnInit, OnDestroy {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected + '/' + this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected + '/' + this.action._tdActionId + '/false';
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue = resp.isConnectedTrue;
-    this.isConnectedFalse = resp.isConnectedFalse;
-    this.idConnectionTrue = resp.idConnectionTrue;
-    this.idConnectionFalse = resp.idConnectionFalse;
-  }
-
-  private updateConnector(): void {
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if (resp) {
-      this.isConnectedTrue = resp.isConnectedTrue;
-      this.isConnectedFalse = resp.isConnectedFalse;
-      this.idConnectionTrue = resp.idConnectionTrue;
-      this.idConnectionFalse = resp.idConnectionFalse;
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      }
-    }
   }
 
   // ---------- fields ----------

@@ -40,6 +40,7 @@ import { CdsActionJsonConditionComponent } from './cds-action-json-condition/cds
 import { BaseConditionRow2Component } from './cds-action-json-condition2/base-condition-row2/base-condition-row2.component';
 import { BaseFilter2Component } from './cds-action-json-condition2/base-filter2/base-filter2.component';
 import { CdsActionJsonCondition2Component } from './cds-action-json-condition2/cds-action-json-condition2.component';
+import { CdsActionJsonConditionMultiComponent } from './cds-action-json-condition-multi/cds-action-json-condition-multi.component';
 import { CdsActionMakeComponent } from './cds-action-make/cds-action-make.component';
 import { CdsActionOnlineAgentsComponent } from './cds-action-online-agents/cds-action-online-agents.component';
 import { CdsActionOpenHoursComponent } from './cds-action-open-hours/cds-action-open-hours.component';
@@ -76,8 +77,13 @@ import { CdsActionReplySettingsComponent } from './cds-action-reply/elements/cds
 import { CdsActionGptAssistantComponent } from './cds-action-gpt-assistant/cds-action-gpt-assistant.component';
 import { FormDataComponent } from './cds-action-web-request-v2/form-data/form-data.component';
 import { CdsActionWebRequestV2Component } from './cds-action-web-request-v2/cds-action-web-request-v2.component';
+import { CdsActionConnectorComponent } from './cds-action-connector/cds-action-connector.component';
+import { CdsConnectorAuthRowComponent } from './cds-connector-auth-row/cds-connector-auth-row.component';
 import { CdsActionReplyV2Component } from './cds-action-reply/cds-action-reply-v2/cds-action-reply.component';
 import { CdsActionOnlineAgentsV2Component } from './cds-action-online-agents-v2/cds-action-online-agents.component';
+import { CdsActionInviteHumanComponent } from './cds-action-invite-human/cds-action-invite-human.component';
+import { CdsActionRemoveHumanComponent } from './cds-action-remove-human/cds-action-remove-human.component';
+import { CdsActionRemoveCurrentBotComponent } from './cds-action-remove-current-bot/cds-action-remove-current-bot.component';
 import { CdsActionAddTagComponent } from './cds-action-add-tag/cds-action-add-tag.component';
 import { CdsActionSetRatingComponent } from './cds-action-set-rating/cds-action-set-rating.component';
 import { CdsActionGetRatingComponent } from './cds-action-get-rating/cds-action-get-rating.component';
@@ -124,6 +130,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
     CdsActionOnlineAgentsV2Component,
+    CdsActionInviteHumanComponent,
+    CdsActionRemoveHumanComponent,
+    CdsActionRemoveCurrentBotComponent,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
@@ -131,6 +140,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
     CdsActionJsonCondition2Component,
+    CdsActionJsonConditionMultiComponent,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
@@ -143,6 +153,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
       FormDataComponent,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,
@@ -252,6 +264,9 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionAgentHandoffComponent,
     CdsActionOnlineAgentsComponent,
     CdsActionOnlineAgentsV2Component,
+    CdsActionInviteHumanComponent,
+    CdsActionRemoveHumanComponent,
+    CdsActionRemoveCurrentBotComponent,
     CdsActionEmailComponent,
     CdsActionIntentComponent,
     CdsActionChangeDepartmentComponent,
@@ -259,6 +274,7 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionOpenHoursComponent,
     CdsActionJsonConditionComponent,
     CdsActionJsonCondition2Component,
+    CdsActionJsonConditionMultiComponent,
     CdsActionDeleteVariableComponent,
     CdsActionReplaceBotComponent,
     CdsActionReplaceBotV2Component,
@@ -270,6 +286,8 @@ import { FindPipe } from 'src/app/pipe/find.pipe';
     CdsActionHideMessageComponent,
     CdsActionWebRequestComponent,
     CdsActionWebRequestV2Component,
+    CdsActionConnectorComponent,
+    CdsConnectorAuthRowComponent,
     CdsActionMakeComponent,
     CdsActionHubspotComponent,
     CdsActionWhatsappAttributeComponent,

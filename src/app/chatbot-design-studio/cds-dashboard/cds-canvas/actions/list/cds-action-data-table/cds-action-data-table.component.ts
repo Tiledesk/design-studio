@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, OnDestroy, Output } from '@angular/core';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { Intent } from 'src/app/models/intent-model';
 import { ActionDataTable } from 'src/app/models/action-model';
 import { DataTableService } from 'src/app/services/data-table.service';
@@ -11,7 +10,6 @@ import {
   DATA_TABLE_OPERATORS_NO_VALUE,
   DATA_TABLE_MATCH
 } from 'src/app/chatbot-design-studio/utils-actions';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
@@ -44,12 +42,6 @@ export class CdsActionDataTableComponent implements OnInit, OnDestroy {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
@@ -64,13 +56,6 @@ export class CdsActionDataTableComponent implements OnInit, OnDestroy {
     if (this.action && !this.action.data) { this.action.data = {}; }
     this.initializeAttributes();
 
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      const connectorId = this.idIntentSelected + '/' + this.action._tdActionId;
-      if (connector?.fromId?.startsWith(connectorId)) {
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if (this.intentSelected) {
       this.initializeConnector();
     }
@@ -82,9 +67,6 @@ export class CdsActionDataTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   /** Register the data-table specific flow variable(s) into the userDefined attribute list. */
@@ -103,29 +85,9 @@ export class CdsActionDataTableComponent implements OnInit, OnDestroy {
     this.idIntentSelected = this.intentSelected.intent_id;
     this.idConnectorTrue = this.idIntentSelected + '/' + this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected + '/' + this.action._tdActionId + '/false';
-    this.checkConnectionStatus();
   }
 
-  private checkConnectionStatus(): void {
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue = resp.isConnectedTrue;
-    this.isConnectedFalse = resp.isConnectedFalse;
-    this.idConnectionTrue = resp.idConnectionTrue;
-    this.idConnectionFalse = resp.idConnectionFalse;
-  }
 
-  private updateConnector(): void {
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if (resp) {
-      this.isConnectedTrue = resp.isConnectedTrue;
-      this.isConnectedFalse = resp.isConnectedFalse;
-      this.idConnectionTrue = resp.idConnectionTrue;
-      this.idConnectionFalse = resp.idConnectionFalse;
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      }
-    }
-  }
 
   // ---------- loading ----------
   private loadTables(): void {
