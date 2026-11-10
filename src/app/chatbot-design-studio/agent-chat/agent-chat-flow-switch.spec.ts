@@ -22,6 +22,7 @@ import { CdsDashboardComponent } from '../cds-dashboard/cds-dashboard.component'
 import { LeftPanelStateService } from '../services/left-panel-state.service';
 import { StageService } from '../services/stage.service';
 import { CdsPanelSubagentsComponent } from '../cds-dashboard/cds-canvas/cds-panel-subagents/cds-panel-subagents.component';
+import { AGENT_CHAT_SWITCH } from './agent-chat.config';
 
 /** Standing in for CdsCanvasComponent: all this test needs from it is that it
  *  is created and destroyed by the router outlet, which is a property of the
@@ -64,6 +65,10 @@ class HostComponent {
 }
 
 describe('flow switch: the canvas is destroyed and rebuilt, the chat panel is not', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   beforeEach(() => {
     FakeCanvasComponent.events = [];
@@ -273,6 +278,10 @@ function makeDashboard(parts: any): any {
 }
 
 describe('CdsDashboardComponent.openFlow', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   function build(): { component: any, order: string[], dashboardService: any } {
     const order: string[] = [];
@@ -496,6 +505,10 @@ describe('CdsDashboardComponent.openFlow', () => {
  *  shared by the dashboard and by the REAL FlowOpsService that get_flow reads
  *  through, and a getAllIntents() that only swaps the array on a macrotask. */
 describe('open_flow resolves only once get_flow would see the new flow', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   const FLOWS: { [id: string]: any[] } = {
     kb1: [{ intent_id: 'parent-start', intent_display_name: 'start' }],
@@ -721,6 +734,10 @@ describe('open_flow resolves only once get_flow would see the new flow', () => {
 });
 
 describe("CdsDashboardComponent — com'e' la sinistra aprendo un agente", () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   // Si guarda lo stato condiviso e non le chiamate al controller: e' li' che vive la risposta
   // "cosa e' aperto a sinistra", e un test sulle chiamate direbbe solo che il codice fa i
@@ -832,6 +849,10 @@ describe("CdsDashboardComponent — com'e' la sinistra aprendo un agente", () =>
 // Il percorso vero, dal clic su "nuovo subagent" fino al canvas ricostruito: il pannello crea,
 // si sposta sul subagent appena fatto, e la scheda sotto gli occhi deve restare la sua.
 describe('Creare un subagent — la scheda dei subagent resta aperta', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   function build(isV3: boolean) {
     const leftPanelState = new LeftPanelStateService();
@@ -906,6 +927,10 @@ describe('Creare un subagent — la scheda dei subagent resta aperta', () => {
 });
 
 describe('LeftPanelStateService — una scheda per volta', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   it('scegliere una scheda apre il pannello e ne lascia una sola attiva', () => {
     const state = new LeftPanelStateService();
@@ -959,6 +984,10 @@ describe('LeftPanelStateService — una scheda per volta', () => {
 });
 
 describe('StageService — com\'e\' la colonna delle tre schede, letta dalla memoria', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
 
   function stage(stored: Record<string, string>) {
     const storage: any = { getItem: (k: string) => stored[k] ?? null, setItem: () => {} };

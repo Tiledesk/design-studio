@@ -12,7 +12,16 @@ export interface AgentChatConfig {
   chatOrigin: string;
 }
 
+/** The agent chat (the Vibe Coder) is switched off in this Design Studio, whatever the
+ *  chatbot type and even with `agentChatUrl` configured: every surface -- the left rail tab,
+ *  the panel, the LLM settings tab, the build from a prompt -- asks `readAgentChatConfig`,
+ *  so a null here hides them all. An object rather than a const so that specs can turn it on. */
+export const AGENT_CHAT_SWITCH = { enabled: false };
+
 export function readAgentChatConfig(appConfig: any): AgentChatConfig | null {
+  if (!AGENT_CHAT_SWITCH.enabled) {
+    return null;
+  }
   const raw = appConfig?.agentChatUrl;
   if (!raw || typeof raw !== 'string' || raw === 'CHANGEIT') {
     return null;

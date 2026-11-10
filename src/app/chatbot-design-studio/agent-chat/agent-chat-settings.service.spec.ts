@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AppConfigService } from 'src/app/services/app-config';
 import { AgentChatSettingsService } from './agent-chat-settings.service';
+import { AGENT_CHAT_SWITCH } from './agent-chat.config';
 
 class FakeAppConfig {
   constructor(private cfg: any) {}
@@ -9,6 +10,10 @@ class FakeAppConfig {
 }
 
 describe('AgentChatSettingsService', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
   let http: HttpTestingController;
 
   function setup(cfg: any = { agentChatUrl: 'https://chat.test/' }) {

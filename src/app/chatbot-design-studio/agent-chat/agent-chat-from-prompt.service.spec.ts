@@ -6,8 +6,13 @@ import {
   AGENT_FROM_PROMPT_PENDING_KEY
 } from './agent-chat-from-prompt.service';
 import { AGENT_CHAT_CLIENT_TOOLS } from './agent-chat-host.service';
+import { AGENT_CHAT_SWITCH } from './agent-chat.config';
 
 describe('AgentFromPromptService', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
   let http: HttpTestingController;
   let service: AgentFromPromptService;
 

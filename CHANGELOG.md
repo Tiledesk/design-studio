@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# features-2026/ds-rating-actions-STAGE 10/11/2026
+- **changed**: the **Vibe Coder** (the AI agent chat) is hidden in this Design Studio, for every chatbot type and even when `agentChatUrl` is configured: no left rail tab, no chat panel, no Vibe Coder tab in the settings, and no flow built from a prompt. It is switched off in code by `AGENT_CHAT_SWITCH` in `agent-chat.config.ts`
+
 # features-2026/ds-rating-actions 09/11/2026
 - **added**: new action **Set rating** (category Special), for chatbots, voice, webhook and copilot agents. It sets the rating of the conversation, from 1 to 5: the value is a text field that also takes a variable `{}`, with the values 1-5 to pick below it. An optional **Rating message** (text with `{}`) is saved as the comment of the rating. **Force update**, unchecked by default: when unchecked the rating is set only if the conversation has none yet; when checked it is always overwritten. Like Web request it has two exits: **Success** (rating saved, or kept because already given) and **else** (invalid value or request failed), with **Assign error to** (`rating_error` by default) holding the reason. The engine runs it as `set_rating` (`rating`, `ratingMessage`, `forceUpdate`, `assignErrorTo`, `trueIntent`, `falseIntent`). Design Studio v3 has the action without message, exits and error variable for now
 - **added**: new action **Get rating** (category Special), for chatbots, voice, webhook and copilot agents. It reads the rating of the conversation and its comment and saves them in two variables, `rating_value` and `rating_message` by default, both renamable. The engine runs it as `get_rating` (`assignRatingTo`, `assignRatingMessageTo`). Same action as Design Studio v3

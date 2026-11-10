@@ -12,8 +12,13 @@ import { AgentChatCapabilitiesService } from './agent-chat-capabilities.service'
 import { V3_FLOW_RULES } from './v3-flow-rules';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { AGENT_CHAT_SWITCH } from './agent-chat.config';
 
 describe('AgentChatHostService', () => {
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
   let service: AgentChatHostService;
   let flowOps: any;
   let familyService: any;

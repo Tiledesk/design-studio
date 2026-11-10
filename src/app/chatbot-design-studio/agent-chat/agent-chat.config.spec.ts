@@ -1,6 +1,15 @@
-import { readAgentChatConfig } from './agent-chat.config';
+import { AGENT_CHAT_SWITCH, readAgentChatConfig } from './agent-chat.config';
 
 describe('readAgentChatConfig', () => {
+
+  // The Vibe Coder is off in this Design Studio (AGENT_CHAT_SWITCH): these specs test it on.
+  beforeEach(() => { AGENT_CHAT_SWITCH.enabled = true; });
+  afterEach(() => { AGENT_CHAT_SWITCH.enabled = false; });
+
+  it('returns null while the switch is off, even with a valid url', () => {
+    AGENT_CHAT_SWITCH.enabled = false;
+    expect(readAgentChatConfig({ agentChatUrl: 'https://chat.example.com' })).toBeNull();
+  });
 
   it('returns null when the key is missing', () => {
     expect(readAgentChatConfig({})).toBeNull();
