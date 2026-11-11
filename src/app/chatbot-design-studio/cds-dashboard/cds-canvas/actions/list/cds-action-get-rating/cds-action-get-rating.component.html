@@ -1,6 +1,9 @@
 <div *ngIf="previewMode" class="cds-action-preview">
 
     <div class="previewContent get-rating">
+        <label *ngIf="action?.requestId" class="title-preview-label">{{'CDSCanvas.RatingRequestId' | translate }}:
+            <span [ngClass]="action?.requestId | variableCssClass">{{ action?.requestId | getVariableName }}</span>
+        </label>
         <label class="title-preview-label">{{'CDSCanvas.RatingValue' | translate }}:
             <span *ngIf="action?.assignRatingTo">{{ action?.assignRatingTo }}</span>
             <span *ngIf="!action?.assignRatingTo" class="empty">-</span>
@@ -15,6 +18,23 @@
 
 
 <div *ngIf="!previewMode" class="content-panel-intent-detail no-footer">
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.RatingRequestId' | translate }}</label>
+        <cds-textarea
+            class="text-editable-div request-id"
+            [text]="action.requestId"
+            [minRow]="1" [maxRow]="1"
+            popoverVerticalAlign="above"
+            [emojiPikerBtn]="false"
+            [textLimitBtn]="false"
+            [setAttributeBtn]="true"
+            [placeholder]="'CDSCanvas.RatingRequestIdPlaceholder' | translate "
+            (blur)="onBlur()"
+            (changeTextarea)="onChangeTextarea($event, 'requestId')">
+        </cds-textarea>
+        <label class="field-description"> {{ 'CDSCanvas.GetRatingRequestIdDescription' | translate}} </label>
+    </div>
 
     <div class="field-box">
         <label class="title-label">{{'CDSCanvas.RatingValue' | translate }}:</label>

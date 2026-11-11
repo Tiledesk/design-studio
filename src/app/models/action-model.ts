@@ -1049,6 +1049,7 @@ export class ActionAddTags extends Action {
 }
 
 export class ActionSetRating extends Action {
+    requestId?: string;      // conversation to rate; empty = current conversation (required in webhook flows)
     rating: string;
     ratingMessage?: string;
     forceUpdate: boolean;
@@ -1062,6 +1063,7 @@ export class ActionSetRating extends Action {
 }
 
 export class ActionGetRating extends Action {
+    requestId?: string;      // conversation to read; empty = current conversation (required in webhook flows)
     assignRatingTo: string;
     assignRatingMessageTo: string;
     constructor() {

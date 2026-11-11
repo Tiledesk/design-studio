@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { CdsActionGetRatingComponent } from './cds-action-get-rating.component';
@@ -7,6 +7,12 @@ import { ActionGetRating } from 'src/app/models/action-model';
 import { ACTIONS_LIST, TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
+
+@Pipe({ name: 'variableCssClass' })
+class VariableCssClassStubPipe implements PipeTransform { transform(value: any) { return ''; } }
+
+@Pipe({ name: 'getVariableName' })
+class GetVariableNameStubPipe implements PipeTransform { transform(value: any) { return value; } }
 
 describe('CdsActionGetRatingComponent', () => {
   let component: CdsActionGetRatingComponent;
@@ -18,7 +24,7 @@ describe('CdsActionGetRatingComponent', () => {
     LoggerInstance.setInstance({ log: silent, debug: silent, info: silent, warn: silent, error: silent } as any);
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
-      declarations: [CdsActionGetRatingComponent],
+      declarations: [CdsActionGetRatingComponent, VariableCssClassStubPipe, GetVariableNameStubPipe],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
@@ -58,14 +64,15 @@ describe('CdsActionGetRatingComponent', () => {
     expect(names.filter(n => n === 'rating_message').length).toBe(1);
   });
 
-  it('renders the block preview and two variable fields in the panel', () => {
+  it('renders the block preview, the Request ID and the two variable fields in the panel', () => {
     component.previewMode = true;
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('rating_value');
 
     component.previewMode = false;
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('cds-textarea').length).toBe(2);
+    expect(fixture.nativeElement.querySelectorAll('cds-textarea').length).toBe(3);
+    expect(fixture.nativeElement.querySelector('cds-textarea.request-id')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('cds-connector')).toBeNull();
   });
 
@@ -75,5 +82,18 @@ describe('CdsActionGetRatingComponent', () => {
     component.onSelectedAttribute({ value: 'voto' }, 'assignRatingTo');
     expect(component.action.assignRatingTo).toBe('voto');
     expect(emitted.length).toBe(1);
+  });
+
+  it('the Request ID is saved in requestId on blur and shown in the preview', () => {
+    const emitted: any[] = [];
+    component.updateAndSaveAction.subscribe(e => emitted.push(e));
+    component.onChangeTextarea('{{closed_id}}', 'requestId');
+    component.onBlur();
+    expect(component.action.requestId).toBe('{{closed_id}}');
+    expect(emitted.length).toBe(1);
+
+    component.previewMode = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('{{closed_id}}');
   });
 });
