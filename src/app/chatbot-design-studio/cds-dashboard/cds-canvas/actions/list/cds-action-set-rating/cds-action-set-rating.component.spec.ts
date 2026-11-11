@@ -128,4 +128,16 @@ describe('CdsActionSetRatingComponent', () => {
     expect(component.action.forceUpdate).toBeFalse();
     expect(emitted.length).toBe(2);
   });
+
+  it('the panel has the Request ID field, saved in requestId and shown in the preview', () => {
+    component.previewMode = false;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('cds-textarea.request-id')).toBeTruthy();
+    component.onChangeTextarea('{{payload.payload.request_id}}', 'requestId');
+    expect(component.action.requestId).toBe('{{payload.payload.request_id}}');
+
+    component.previewMode = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('{{payload.payload.request_id}}');
+  });
 });
