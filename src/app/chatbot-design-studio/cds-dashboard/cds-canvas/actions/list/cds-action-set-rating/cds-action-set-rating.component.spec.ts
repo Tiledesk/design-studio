@@ -128,4 +128,33 @@ describe('CdsActionSetRatingComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('{{payload.payload.request_id}}');
   });
+
+  it('Force update is hidden in the panel and in the preview, but still in the code', () => {
+    expect(component.showForceUpdate).toBeFalse();
+    component.action.forceUpdate = true;
+    component.previewMode = false;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-checkbox')).toBeNull();
+
+    component.previewMode = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).not.toContain('CDSCanvas.RatingForceUpdate');
+  });
+
+  it('saves to the conversation rating by default and to the AI evaluation when chosen', () => {
+    expect(component.action.saveTo).toBeUndefined();
+    component.previewMode = false;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-radio-group.rating-target')).toBeTruthy();
+
+    const emitted: any[] = [];
+    component.updateAndSaveAction.subscribe(e => emitted.push(e));
+    component.onChangeTarget('attributes', 'saveTo');
+    expect(component.action.saveTo).toBe('attributes');
+    expect(emitted.length).toBe(1);
+
+    component.previewMode = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('CDSCanvas.RatingTargetAttributes');
+  });
 });

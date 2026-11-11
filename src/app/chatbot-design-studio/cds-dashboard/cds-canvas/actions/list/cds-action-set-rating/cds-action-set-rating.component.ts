@@ -19,6 +19,10 @@ export class CdsActionSetRatingComponent implements OnInit {
   @Input() previewMode: boolean = true;
   @Output() updateAndSaveAction = new EventEmitter();
 
+  /** Force update is hidden, not removed: the close webhook runs before the user rates, so it is not needed now.
+   *  A value already saved on the action still works in the engine. Set to true to show it again. */
+  showForceUpdate: boolean = false;
+
   ratingValues: Array<string> = ['1', '2', '3', '4', '5'];
   /** passed to cds-textarea so that a quick value can refresh the field */
   ratingControl = new FormControl<string>('');
@@ -65,6 +69,12 @@ export class CdsActionSetRatingComponent implements OnInit {
   onSelectRatingValue(value: string) {
     this.action.rating = value;
     this.ratingControl.patchValue(value);
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
+  /** 'rating' (default) or 'attributes': where the engine saves the value */
+  onChangeTarget(value: 'rating' | 'attributes', property: string) {
+    this.action[property] = value;
     this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
   }
 

@@ -40,6 +40,12 @@ export class CdsActionGetRatingComponent implements OnInit {
     userDefined.elements = [...userDefined.elements, ...new_attributes];
   }
 
+  /** 'rating' (default) or 'attributes': where the engine reads the value */
+  onChangeTarget(value: 'rating' | 'attributes', property: string) {
+    this.action[property] = value;
+    this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
+  }
+
   onChangeTextarea(event: string, property: string) {
     this.logger.log("[ACTION-GET-RATING] onChangeTextarea", property, event)
     this.action[property] = event
