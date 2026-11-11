@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# features-2026/ds-rating-actions 11/11/2026
+# 1.41.2-rc2
 - **added**: **Set rating** and **Get rating** have a new optional field, **Request ID**, the conversation to rate or read. It takes a variable `{}`; empty means the current conversation. A webhook flow has no conversation of its own, so there it must be set: for a webhook called when a conversation is closed, use `payload.payload.request_id` (not `request_id`, which in a webhook is the id of the run). It is shown in the block preview when set. The engine runs it as `requestId`
 
 
