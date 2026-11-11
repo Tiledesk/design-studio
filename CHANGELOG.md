@@ -8,7 +8,7 @@
 *Tiledesk SRL*
 
 
-# features-2026/ds-rating-actions 11/11/2026
+# 1.41.2-rc3
 - **added**: **Set rating** has a new choice, **Save to**: **Conversation rating** (the default, as before) or **AI evaluation**, which saves the value and the message in the conversation attributes `ai_rating` and `ai_sentiment`. The webhook called when a conversation is closed runs before the user rates in the chat: with AI evaluation the user rating and the AI evaluation never overwrite each other. **Get rating** has the matching choice, **Read from**. The block preview shows it when AI evaluation is chosen. The engine runs them as `saveTo` and `readFrom` (`rating` or `attributes`); actions without them keep working as before
 - **changed**: **Force update** of **Set rating** is hidden in the panel and in the block preview, not removed: it is not needed while the close webhook runs before the user rates. A value already saved on an action still works
 
