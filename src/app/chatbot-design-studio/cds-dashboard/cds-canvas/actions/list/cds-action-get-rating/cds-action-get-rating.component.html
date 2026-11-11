@@ -1,6 +1,9 @@
 <div *ngIf="previewMode" class="cds-action-preview">
 
     <div class="previewContent get-rating">
+        <label *ngIf="action?.readFrom === 'attributes'" class="title-preview-label">{{'CDSCanvas.RatingReadFrom' | translate }}:
+            <span>{{ 'CDSCanvas.RatingTargetAttributes' | translate }}</span>
+        </label>
         <label *ngIf="action?.requestId" class="title-preview-label">{{'CDSCanvas.RatingRequestId' | translate }}:
             <span [ngClass]="action?.requestId | variableCssClass">{{ action?.requestId | getVariableName }}</span>
         </label>
@@ -34,6 +37,15 @@
             (changeTextarea)="onChangeTextarea($event, 'requestId')">
         </cds-textarea>
         <label class="field-description"> {{ 'CDSCanvas.GetRatingRequestIdDescription' | translate}} </label>
+    </div>
+
+    <div class="field-box">
+        <label class="title-label">{{'CDSCanvas.RatingReadFrom' | translate }}</label>
+        <mat-radio-group class="rating-target" [value]="action?.readFrom || 'rating'" (change)="onChangeTarget($event.value, 'readFrom')">
+            <mat-radio-button value="rating">{{ 'CDSCanvas.RatingTargetRating' | translate }}</mat-radio-button>
+            <mat-radio-button value="attributes">{{ 'CDSCanvas.RatingTargetAttributes' | translate }}</mat-radio-button>
+        </mat-radio-group>
+        <label class="field-description"> {{ 'CDSCanvas.RatingReadFromDescription' | translate}} </label>
     </div>
 
     <div class="field-box">

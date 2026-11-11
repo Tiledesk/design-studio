@@ -1,5 +1,12 @@
 <div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
 
+    <div *ngIf="action?.saveTo === 'attributes'" class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.RatingSaveTo' | translate }}:
+        </div>
+        <div class="action-row-right">{{ 'CDSCanvas.RatingTargetAttributes' | translate }}</div>
+    </div>
+
     <div *ngIf="action?.requestId" class="action-row">
         <div class="set-attribute-label action-row-left">
             {{'CDSCanvas.RatingRequestId' | translate }}:
@@ -28,7 +35,8 @@
         </div>
     </div>
 
-    <div *ngIf="action?.forceUpdate" class="action-row">
+    <!-- Force update hidden (showForceUpdate), not removed: the close webhook runs before the user rates -->
+    <div *ngIf="showForceUpdate && action?.forceUpdate" class="action-row">
         <div class="set-attribute-label action-row-left">
             {{'CDSCanvas.RatingForceUpdate' | translate }}
         </div>
@@ -88,6 +96,15 @@
         </div>
 
         <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.RatingSaveTo' | translate }}</label>
+            <mat-radio-group class="rating-target" [value]="action?.saveTo || 'rating'" (change)="onChangeTarget($event.value, 'saveTo')">
+                <mat-radio-button value="rating">{{ 'CDSCanvas.RatingTargetRating' | translate }}</mat-radio-button>
+                <mat-radio-button value="attributes">{{ 'CDSCanvas.RatingTargetAttributes' | translate }}</mat-radio-button>
+            </mat-radio-group>
+            <label class="field-description"> {{ 'CDSCanvas.RatingSaveToDescription' | translate}} </label>
+        </div>
+
+        <div class="field-box">
             <label class="title-label">{{'CDSCanvas.Rating' | translate }}</label>
             <cds-textarea
                 class="text-editable-div"
@@ -131,7 +148,8 @@
             <label class="field-description"> {{ 'CDSCanvas.RatingMessageDescription' | translate}} </label>
         </div>
 
-        <div class="field-box">
+        <!-- Force update hidden (showForceUpdate), not removed: the close webhook runs before the user rates -->
+        <div *ngIf="showForceUpdate" class="field-box">
             <section class="disable-input-message-section">
                 <mat-checkbox
                     [checked]="action?.forceUpdate"

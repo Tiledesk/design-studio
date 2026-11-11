@@ -96,4 +96,21 @@ describe('CdsActionGetRatingComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('{{closed_id}}');
   });
+
+  it('reads the conversation rating by default and the AI evaluation when chosen', () => {
+    expect(component.action.readFrom).toBeUndefined();
+    component.previewMode = false;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('mat-radio-group.rating-target')).toBeTruthy();
+
+    const emitted: any[] = [];
+    component.updateAndSaveAction.subscribe(e => emitted.push(e));
+    component.onChangeTarget('attributes', 'readFrom');
+    expect(component.action.readFrom).toBe('attributes');
+    expect(emitted.length).toBe(1);
+
+    component.previewMode = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.cds-action-preview').textContent).toContain('CDSCanvas.RatingTargetAttributes');
+  });
 });

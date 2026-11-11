@@ -14,3 +14,9 @@
     font-weight: 400;
     color: var(--brown);
 }
+
+.rating-target {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
