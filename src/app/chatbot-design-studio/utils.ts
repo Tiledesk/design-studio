@@ -5,6 +5,65 @@ import { getActionCategoryColor } from "./utils-actions";
 
 export const UNTITLED_BLOCK_PREFIX: string = 'untitled_block_';
 
+/** La versione degli agenti di questa console: quelli senza etichetta, cioe' tutti quelli creati prima
+ *  che `ds_version` esistesse. Gli altri (`v3`, `v4`...) si aprono con la console della loro versione. */
+export const DS_VERSION_V2 = 'v2';
+const DS_VERSION_LABEL = /^v\d+$/;
+/** La console di ogni versione sta accanto alle altre, sullo stesso host, e cambia solo il segmento
+ *  di percorso: `cds` per la V2, `cds-v3`, `cds-v4`... per le successive. */
+const CDS_PATH_SEGMENT = /^cds(-v\d+)?$/;
+
+/**
+ * La versione con cui l'agente e' stato creato: l'etichetta `ds_version` del bot, o quella che un agente
+ * salvato prima del 16/10/2026 porta ancora in `attributes.dsVersion`, in minuscolo; `v2` se non c'e'.
+ * Null se c'e' ma non e' una versione (`v` e un numero): non si sa dove aprirlo, e qui resta come sempre.
+ */
+export function agentDsVersion(chatbot: any): string | null {
+    const label = chatbot?.ds_version ?? chatbot?.attributes?.dsVersion;
+    if (label === undefined || label === null || (typeof label === 'string' && label.trim() === '')) {
+        return DS_VERSION_V2;
+    }
+    if (typeof label !== 'string') { return null; }
+    const version = label.trim().toLowerCase();
+    return DS_VERSION_LABEL.test(version) ? version : null;
+}
+
+/** Il segmento di percorso della console di quella versione: `cds` per la V2, `cds-vN` per le altre. */
+export function cdsPathSegmentFor(version: string): string | null {
+    if (!version || !DS_VERSION_LABEL.test(version)) { return null; }
+    return version === DS_VERSION_V2 ? 'cds' : 'cds-' + version;
+}
+
+/**
+ * L'indirizzo con cui la console di quella versione apre lo stesso agente: quello attuale con il segmento
+ * della console (`cds`, `cds-v3`...) cambiato in quello della versione. Si tiene la rotta attuale (blocchi,
+ * impostazioni...) se e' quella dell'agente, altrimenti si apre sui blocchi. Null se l'indirizzo non ha un
+ * segmento di console (in locale, per esempio), se la versione non e' valida, o se la console e' gia' quella.
+ */
+export function cdsUrlForVersion(
+    location: { origin: string, pathname: string, hash: string },
+    version: string,
+    projectId: string,
+    chatbotId: string
+): string | null {
+    const target = cdsPathSegmentFor(version);
+    if (!location || !target || !projectId || !chatbotId) { return null; }
+    const segments = (location.pathname || '').split('/');
+    let index = -1;
+    segments.forEach((segment, i) => { if (CDS_PATH_SEGMENT.test(segment)) { index = i; } });
+    if (index === -1 || segments[index] === target) { return null; }
+    segments[index] = target;
+    const agentRoute = `#/project/${projectId}/chatbot/${chatbotId}/`;
+    const hash = (location.hash || '').startsWith(agentRoute) ? location.hash : agentRoute + 'blocks';
+    return location.origin + segments.join('/') + hash;
+}
+
+/**
+ * Cutoff date used to determine whether a chatbot is considered "new".
+ * ISO string format, compared lexicographically against `createdAt` (also ISO).
+ */
+export const DATE_NEW_CHATBOT = '3000-01-01T00:00:00.000Z';
+
 /** Valore dell'etichetta di versione che identifica un agente da aprire con il Design Studio
  *  V3. Dal 16/10/2026 il server la tiene nel campo `ds_version` del bot; gli agenti salvati
  *  prima la portano in `attributes.dsVersion`. E' l'unica cosa che decide quale editor si apre:

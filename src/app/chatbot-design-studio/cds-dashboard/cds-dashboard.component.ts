@@ -17,7 +17,9 @@ import { Project } from 'src/app/models/project-model';
 import { Chatbot } from 'src/app/models/faq_kb-model';
 
 // UTILS //
-import { SETTINGS_SECTION, SIDEBAR_PAGES } from 'src/app/chatbot-design-studio/utils';
+import { SETTINGS_SECTION, SIDEBAR_PAGES, agentDsVersion, cdsUrlForVersion, DS_VERSION_V2 } from 'src/app/chatbot-design-studio/utils';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogYesNoComponent } from '../cds-base-element/dialog-yes-no/dialog-yes-no.component';
 import { Intent } from 'src/app/models/intent-model';
 
 //LOGGER
@@ -134,7 +136,8 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     // I due facoltativi restano in fondo, e non e' una preferenza: in TypeScript un parametro
     // obbligatorio non puo' seguirne uno facoltativo, quindi spostarli piu' su non compila.
     private readonly agentFromPromptService?: AgentFromPromptService,
-    private readonly translate?: TranslateService
+    private readonly translate?: TranslateService,
+    private readonly dialog?: MatDialog
   ) {
     this.manageRouteChanges();
   }
@@ -429,6 +432,10 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
     try {
       await this.dashboardService.getBotById();
+      if (this.refuseOtherVersionAgent()) {
+        this.agentRefused = true;
+        throw new Error(`"${faqKbId}" belongs to another Design Studio version and cannot be opened in this console`);
+      }
       this.selectedChatbot = this.dashboardService.selectedChatbot;
       // The canvas loads the intents itself -- but fire-and-forget from its
       // own ngOnInit, and only after an HTTP round trip. Until that lands,
@@ -471,7 +478,9 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       // so it may only come back now that both name the new flow. Detected
       // here too, so this promise resolves with the canvas already rebuilt --
       // the agent's next act after open_flow is a get_flow.
-      this.flowVisible = true;
+      //
+      // Except for an agent of another version: the canvas must not be born on it.
+      this.flowVisible = !this.agentRefused;
       this.changeDetectorRef.detectChanges();
     }
     // Qui non si rimescola la sinistra: ricostruire il canvas non e' aprire un agente, e cosa
@@ -534,6 +543,56 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**************** CUSTOM FUNCTIONS ****************/
+  /** L'agente aperto e' di un'altra versione ed e' stato rifiutato: il canvas resta chiuso. */
+  private agentRefused = false;
+
+  /** Dove si e' adesso e come si va altrove: campi e non chiamate dirette, cosi' i test possono
+   *  dire da che indirizzo si parte e vedere dove si andrebbe senza ricaricare la pagina. */
+  private currentLocation: () => { origin: string, pathname: string, hash: string } = () => window.location;
+  private replaceLocation: (url: string) => void = (url) => window.location.replace(url);
+
+  /**
+   * Questa console apre gli agenti V2: quelli senza etichetta `ds_version` (o con `v2`). Un agente di
+   * un'altra versione (`v3`, `v4`...) qui perderebbe i suoi collegamenti, che quella versione tiene in un
+   * formato che questa console non conosce: un avviso, poi alla chiusura la pagina si ricarica nella
+   * console della sua versione, allo stesso indirizzo con il segmento cambiato (`cds-v3`, `cds-v4`...).
+   * `replace`, perche' tornando indietro non si ricada qui. Dove quella console non si ricava dall'indirizzo
+   * (in locale) l'avviso rinvia all'elenco degli agenti nella dashboard. Un'etichetta che non e' una
+   * versione resta qui, come sempre. Torna true se l'agente e' stato rifiutato. Va chiamato PRIMA che il
+   * canvas carichi i blocchi.
+   */
+  private refuseOtherVersionAgent(): boolean {
+    const chatbot: any = this.dashboardService.selectedChatbot;
+    const version = agentDsVersion(chatbot);
+    if (version === null || version === DS_VERSION_V2) { return false; }
+    this.logger.warn('[CDS DSHBRD] agente di un\'altra versione, non apribile con questa console:', chatbot?._id, version);
+    const versionUrl = cdsUrlForVersion(this.currentLocation(), version, this.dashboardService.projectID, chatbot?._id);
+    const dashboardUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.dashboardService.projectID + '/bots/my-chatbots/all';
+    const go = () => versionUrl ? this.replaceLocation(versionUrl) : window.open(dashboardUrl, '_self');
+    if (!this.dialog) { go(); return true; }
+    const params = { name: chatbot?.name ?? '', version: version.toUpperCase() };
+    const t = (key: string, fallback: string) => {
+      const value = this.translate?.instant(key, params);
+      return value && value !== key ? value : fallback;
+    };
+    const ref = this.dialog.open(DialogYesNoComponent, {
+      panelClass: 'custom-confirm-dialog-container',
+      disableClose: true,
+      data: {
+        title: t('CDSHeader.OtherVersionTitle', 'Agent created with another version'),
+        text: versionUrl
+          ? t('CDSHeader.OtherVersionText', `"${params.name}" was created with Design Studio ${params.version}, and will be opened there.`)
+          : t('CDSHeader.OtherVersionDashboardText', `"${params.name}" was created with Design Studio ${params.version} and cannot be opened with this console. Open it from the dashboard.`),
+        yes: versionUrl
+          ? t('CDSHeader.OtherVersionButton', `Open in Design Studio ${params.version}`)
+          : t('CDSHeader.OtherVersionDashboardButton', 'Go to the dashboard'),
+        no: ''
+      }
+    });
+    ref.afterClosed().subscribe(() => go());
+    return true;
+  }
+
   /** 
    * execute Async Functions In Sequence
    * Le funzioni async sono gestite in maniera sincrona ed eseguite in coda
@@ -552,11 +611,14 @@ export class CdsDashboardComponent implements OnInit, OnDestroy {
       this.project = this.dashboardService.project;
       this.initialize();
       const getBotById = await this.dashboardService.getBotById();
+      this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
+      // Un agente di un'altra versione non si apre qui: avviso e rinvio, prima che il canvas carichi i blocchi
+      // e prima che la chat AI parta su di lui.
+      if (this.refuseOtherVersionAgent()) { this.agentRefused = true; return; }
       // Between knowing which agent is open and opening the chat: the run has to exist before
       // the panel mounts, or the chat attaches to nothing and the description is lost.
       await this.sendPendingAgentPrompt();
       this.restoreLeftPanels();
-      this.logger.log('[CDS DSHBRD] Risultato 4:', getBotById, this.selectedChatbot);
       const getDefaultDepartmentId = await this.dashboardService.getDeptsByProjectId();
       this.logger.log('[CDS DSHBRD] Risultato 5:', getDefaultDepartmentId);
       if (getTranslations && getUrlParams && getBotById && getCurrentProject && getDefaultDepartmentId) {

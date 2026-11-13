@@ -20,7 +20,8 @@
     "test:condition": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-condition.ts --ts-config=tsconfig.spec.condition.json",
     "test:start-points": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-start-points.ts --ts-config=tsconfig.spec.start-points.json",
     "test:connectors": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-connectors.ts --ts-config=tsconfig.spec.connectors.json",
-    "test:models": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-models.ts --ts-config=tsconfig.spec.models.json"
+    "test:models": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-models.ts --ts-config=tsconfig.spec.models.json",
+    "test:version": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-version.ts --ts-config=tsconfig.spec.version.json"
   },
   "private": false,
   "dependencies": {

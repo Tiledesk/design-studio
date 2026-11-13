@@ -12,6 +12,10 @@
 - **changed** (features-2611/ai-models): new AI actions start with gpt-5.4-mini instead of gpt-4o (also AI Prompt and AI Condition without a model, and the AI actions the AI chat adds without one); the temperature is fixed at 1 for gpt-6.x too, as for gpt-5.x, in the panels and in the AI chat
 - **added** (features-2611/ai-models): specs for the catalogue and the fixed temperature, in `npm run test:models`
 
+# features-2611/v3-agents-redirect 12/11/2026
+- **added** (features-2611/v3-agents-redirect): an agent of another Design Studio version (`ds_version` `v3`, `v4`..., or the older `attributes.dsVersion`) is not opened in this console, where its connections would be lost: a dialog, then the page reloads in the console of its version on the same agent and route, the same address with `cds-v3` (`cds-vN`) in place of `cds`, also when switching flow. Where that console cannot be derived (local) the dialog sends to the agents list of the dashboard. Agents without a label stay here, as before. Brings back on this line the block removed in 1.40.16-rc33, now for every version and with the same rule the V3 uses to send V2 agents here
+- **added** (features-2611/v3-agents-redirect): specs in `npm run test:version`
+
 # 1.41.2-rc3
 - **added**: **Set rating** has a new choice, **Save to**: **Conversation rating** (the default, as before) or **AI evaluation**, which saves the value and the message in the conversation attributes `ai_rating` and `ai_sentiment`. The webhook called when a conversation is closed runs before the user rates in the chat: with AI evaluation the user rating and the AI evaluation never overwrite each other. **Get rating** has the matching choice, **Read from**. The block preview shows it when AI evaluation is chosen. The engine runs them as `saveTo` and `readFrom` (`rating` or `attributes`); actions without them keep working as before
 - **changed**: **Force update** of **Set rating** is hidden in the panel and in the block preview, not removed: it is not needed while the close webhook runs before the user rates. A value already saved on an action still works
