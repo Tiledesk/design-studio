@@ -1,7 +1,7 @@
 {
   "name": "@tiledesk/cds",
   "author": "Tiledesk SRL",
-  "version": "1.41.1",
+  "version": "1.41.2",
   "license": "MIT",
   "homepage": "https://www.tiledesk.com",
   "repository": {
@@ -16,6 +16,7 @@
     "test": "ng test",
     "test:publish": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-publish.ts --ts-config=tsconfig.spec.publish.json",
     "test:preview": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-preview.ts --ts-config=tsconfig.spec.preview.json",
+    "test:models": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-models.ts --ts-config=tsconfig.spec.models.json",
     "test:version": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-version.ts --ts-config=tsconfig.spec.version.json"
   },
   "private": false,
