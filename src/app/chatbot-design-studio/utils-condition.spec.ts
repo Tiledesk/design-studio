@@ -11,6 +11,7 @@ import {
   parseCondition,
   hasFilter,
   ensureConditionsFromWhen,
+  ensureCaseConditionsFromWhen,
 } from './utils-condition';
 
 /** Helpers di costruzione AST */
@@ -223,7 +224,8 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     'matches(text, "^a.*")', '!matches(text, "^a.*")',
     'isEmpty(a)', '!isEmpty(a)',
     'isNull(a)',
-    'isUndefined(a)', '!isUndefined(a)',
+    'isUndefined(a)',
+    'exists(a)', '!exists(a)',
     'dateEqual(d, "2024-01-01")', '!dateEqual(d, "2024-01-01")',
     'isAfter(d, "2024-01-01")', 'isBefore(d, "2024-01-01")',
     'isAfterOrEqual(d, "2024-01-01")', 'isBeforeOrEqual(d, "2024-01-01")',
@@ -288,6 +290,30 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     expect(parseCondition('!isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
     expect(parseCondition('a == true')?.operator as any).toBe(TYPE_OPERATOR_V2.isTrue);
     expect(parseCondition('a == false')?.operator as any).toBe(TYPE_OPERATOR_V2.isFalse);
+  });
+
+  it('esiste / non esiste: un termine solo, che torna indietro intero', () => {
+    // Scritto come `!isUndefined(a)`, "esiste" era vero anche su una variabile messa a null.
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.exists))).toBe('exists(a)');
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.doesNotExist))).toBe('!exists(a)');
+    // Riaperta, la condizione deve tornare l'operatore da cui e' nata. `doesNotExist` non ce la
+    // faceva: veniva salvato come `isUndefined(a)` e si rileggeva come `isUndefined`, cambiando
+    // operatore sotto le mani di chi l'aveva scritto.
+    expect(parseCondition('exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(parseCondition('!exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.doesNotExist);
+    // I filtri salvati prima restano leggibili.
+    expect(parseCondition('isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.isUndefined);
+  });
+
+  it('un filtro salvato con la vecchia forma viene riscritto al primo salvataggio', () => {
+    // `!isUndefined(a)` si rilegge come "esiste" e si riscrive `exists(a)`: non e' un ritorno
+    // identico, ed e' voluto. La vecchia forma diceva che una variabile messa a null esiste, e
+    // riscriverla e' il modo in cui la correzione raggiunge i filtri gia' salvati. Finche'
+    // nessuno li riapre continuano a comportarsi come prima, perche' il motore legge la loro
+    // formula cosi' com'e'.
+    const riletta = parseCondition('!isUndefined(a)');
+    expect(riletta?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(conditionToWhen(riletta!)).toBe('exists(a)');
   });
 
 });
@@ -359,21 +385,23 @@ describe('utils-condition · filtri reply V2', () => {
     expect(td.when).toBeUndefined();
   });
 
-  it('il picker dei filtri reply espone SOLO gli operatori che il server valuta', () => {
-    // i 22 solo-V2 non sono rappresentabili nell'AST V1 -> non devono essere selezionabili
-    const soloV2 = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'isTrue', 'isFalse',
-                    'isAfter', 'arrayContains', 'lengthGreaterThan'];
-    soloV2.forEach(o => {
-      expect(isReplyFilterOperatorSupported(o)).toBe(false);
-      expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeUndefined();
-    });
-    const comuni = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
-                    'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
-    comuni.forEach(o => {
+  it('il picker dei filtri reply espone tutti gli operatori del catalogo', () => {
+    // Il picker e' DERIVATO: tiene le chiavi di OPERATORS_LIST_V2 presenti nell'enum legacy.
+    // Restringerlo non e' piu' il modo di proteggere l'utente da un operatore che il motore
+    // non sa valutare: quella protezione vive nel motore, che ora li implementa tutti.
+    const prima = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
+                   'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
+    const rimessi = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'notEndsWith',
+                     'notMatches', 'isTrue', 'isFalse', 'equalAsDate', 'notEqualAsDate', 'isAfter',
+                     'isBefore', 'isAfterOrEqual', 'isBeforeOrEqual', 'arrayContains',
+                     'arrayNotContains', 'lengthEqualTo', 'lengthNotEqualTo', 'lengthGreaterThan',
+                     'lengthLessThan', 'lengthGreaterThanOrEqual', 'lengthLessThanOrEqual'];
+    [...prima, ...rimessi].forEach(o => {
       expect(isReplyFilterOperatorSupported(o)).toBe(true);
       expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeDefined();
     });
-    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(16);
+    expect(rimessi.length).toBe(22);
+    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(38);
   });
 
   it('hasFilter: riconosce entrambe le forme ed è null-safe', () => {
@@ -411,6 +439,255 @@ describe('utils-condition · filtri reply V2', () => {
     expect(bad.conditions).toEqual([]);
     applyConditionSaveModeToPayload(payloadWith(bad));
     expect(bad.when).toBe('weirdFunc(a)');
+  });
+
+});
+
+/** Confronti di testo che ignorano maiuscole e minuscole.
+ *
+ *  La forma scelta abbassa di caso ENTRAMBI i lati con `lowerCase`, una funzione che il
+ *  motore gia' conosce: nessun operatore nuovo, nessuna versione del motore da attendere.
+ *  Il rischio vero non e' generare male, e' rileggere male -- il `when` e' l'unica cosa
+ *  salvata, quindi se la rilettura non riconosce la forma la casella si ripresenta spenta
+ *  e il salvataggio successivo cancella l'impostazione in silenzio. Per questo qui si
+ *  prova soprattutto l'andata e ritorno. */
+describe('utils-condition · ignora maiuscole e minuscole', () => {
+
+  function ignoring(operand1: string, operator: TYPE_OPERATOR_V2, value: string): Condition {
+    const c = cond(operand1, operator, { type: 'const', value });
+    (c as any).ignoreCase = true;
+    return c;
+  }
+
+  it('abbassa di caso entrambi i lati, non solo la variabile', () => {
+    expect(conditionToWhen(ignoring('nome', TYPE_OPERATOR_V2.contains, 'Mario')))
+      .toBe('contains(lowerCase(nome), lowerCase("Mario"))');
+  });
+
+  it('vale per ogni confronto di testo, negazioni comprese', () => {
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.equalAsStrings, 'x'))).toBe('lowerCase(a) == lowerCase("x")');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notEqualAsStrings, 'x'))).toBe('lowerCase(a) != lowerCase("x")');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notContains, 'x'))).toBe('!contains(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.startsWith, 'x'))).toBe('startsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notStartsWith, 'x'))).toBe('!startsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.endsWith, 'x'))).toBe('endsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notEndsWith, 'x'))).toBe('!endsWith(lowerCase(a), lowerCase("x"))');
+  });
+
+  it('non tocca una condizione sensibile: il when e\' quello di sempre', () => {
+    expect(conditionToWhen(cond('nome', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'Mario' })))
+      .toBe('contains(nome, "Mario")');
+  });
+
+  it('ignora il flag dove non ha senso: numeri e regex', () => {
+    // Su un numero non c'e' caso da ignorare.
+    expect(conditionToWhen(ignoring('eta', TYPE_OPERATOR_V2.greaterThan, '18'))).toBe('eta > 18');
+    // Abbassare di caso una regex la cambia: `\D` diventerebbe `\d`, il suo opposto.
+    // `escapeString` protegge la barra rovesciata: nel when arriva raddoppiata, ed e'
+    // giusto cosi'. Quel che conta qui e' che NON sia stata abbassata di caso.
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.matches, '\\D+'))).toBe('matches(a, "\\\\D+")');
+  });
+
+  it('riapre la condizione come l\'utente l\'aveva lasciata', () => {
+    const parsed: any = parseCondition('contains(lowerCase(nome), lowerCase("Mario"))');
+    expect(parsed.operator).toBe(TYPE_OPERATOR_V2.contains);
+    expect(parsed.operand1).toBe('nome');
+    expect(parsed.operand2.value).toBe('Mario');
+    expect(parsed.ignoreCase).toBeTrue();
+  });
+
+  it('riapre anche la forma con ==', () => {
+    const parsed: any = parseCondition('lowerCase(citta) == lowerCase("Roma")');
+    expect(parsed.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+    expect(parsed.operand1).toBe('citta');
+    expect(parsed.operand2.value).toBe('Roma');
+    expect(parsed.ignoreCase).toBeTrue();
+  });
+
+  it('andata e ritorno: rigenerare dopo aver riletto da lo stesso when', () => {
+    for (const when of [
+      'contains(lowerCase(nome), lowerCase("Mario"))',
+      '!contains(lowerCase(nome), lowerCase("Mario"))',
+      'lowerCase(citta) == lowerCase("Roma")',
+      'lowerCase(citta) != lowerCase("Roma")',
+      'startsWith(lowerCase(a), lowerCase("x"))',
+      'endsWith(lowerCase(a), lowerCase("x"))'
+    ]) {
+      expect(conditionToWhen(parseCondition(when) as Condition)).toBe(when);
+    }
+  });
+
+  it('una condizione sensibile non diventa insensibile riaprendola', () => {
+    const parsed: any = parseCondition('contains(nome, "Mario")');
+    expect(parsed.ignoreCase).toBeUndefined();
+  });
+
+  it('lascia stare un lowerCase scritto a mano su un lato solo', () => {
+    // Non e' la forma che generiamo: e' roba scritta da qualcuno, e va conservata
+    // com'e' invece di essere reinterpretata.
+    const parsed: any = parseCondition('contains(lowerCase(nome), "Mario")');
+    expect(parsed.ignoreCase).toBeUndefined();
+    expect(parsed.operand1).toBe('lowerCase(nome)');
+  });
+});
+
+/* ============================================================================
+ * Condition a piu' uscite (`jsonconditionmulti`)
+ * ==========================================================================*/
+
+describe('jsonconditionmulti — casi indipendenti', () => {
+
+  const branch = (id: string, conditions: any[], intent: string) =>
+    ({ type: 'expression', _tdCaseId: id, conditions, intent } as any);
+
+  const save = (action: any) => {
+    const payload = { operations: [{ type: 'put', intent: { actions: [action] } }] };
+    applyConditionSaveModeToPayload(payload);
+    return action;
+  };
+
+  it('ogni caso esce con il PROPRIO `when` e le conditions svuotate', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [
+        branch('c1', [cond('x', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '1' })], '#B1'),
+        branch('c2', [cond('y', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '2' })], '#B2'),
+      ],
+      elseIntent: '#ELSE',
+    };
+    save(action);
+    expect(action.cases[0].when).toBe('x == "1"');
+    expect(action.cases[1].when).toBe('y == "2"');
+    if (SAVE_ONLY_WHEN) {
+      expect(action.cases[0].conditions).toEqual([]);
+      expect(action.cases[1].conditions).toEqual([]);
+    }
+    // id, destinazione e ramo else non vengono toccati dal salvataggio
+    expect(action.cases[0]._tdCaseId).toBe('c1');
+    expect(action.cases[0].intent).toBe('#B1');
+    expect(action.elseIntent).toBe('#ELSE');
+  });
+
+  it('dentro un caso AND/OR continuano a funzionare', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [branch('c1', [
+        cond('lastUserText', TYPE_OPERATOR_V2.isNotEmpty),
+        { type: 'operator', operator: 'AND' },
+        cond('user_city', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'new' }),
+      ], '#B1')],
+    };
+    save(action);
+    expect(action.cases[0].when).toBe('!isEmpty(lastUserText) && contains(user_city, "new")');
+  });
+
+  it('un caso NON aperto in questa sessione conserva il suo `when`', () => {
+    // Arriva dal server in forma solo-`when`: rigenerare da un AST vuoto lo cancellerebbe.
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [{ type: 'expression', _tdCaseId: 'c1', conditions: [], when: 'x == "1"', intent: '#B1' }],
+    };
+    save(action);
+    expect(action.cases[0].when).toBe('x == "1"');
+  });
+
+  it('R1 — un payload misto lascia intatte V1 e V2', () => {
+    const v1: any = {
+      _tdActionType: 'jsoncondition',
+      groups: [expr(cond('a', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '1' }))],
+    };
+    const v2: any = {
+      _tdActionType: 'jsoncondition2',
+      groups: [expr(cond('b', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '2' }))],
+      when: '',
+    };
+    const multi: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [branch('c1', [cond('c', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '3' })], '#B1')],
+    };
+    const payload = { operations: [{ type: 'put', intent: { actions: [v1, v2, multi] } }] };
+    applyConditionSaveModeToPayload(payload);
+
+    // V1: nessun `when`, AST intatto — come prima che la action nuova esistesse
+    expect(v1.when).toBeUndefined();
+    expect(v1.groups.length).toBe(1);
+    // V2: una sola stringa, dai suoi `groups`
+    expect(v2.when).toBe('b == "2"');
+    expect((v2 as any).cases).toBeUndefined();
+    // Multi: il suo caso
+    expect(multi.cases[0].when).toBe('c == "3"');
+    expect((multi as any).groups).toBeUndefined();
+  });
+
+  it('riapertura: i casi si ricostruiscono da `when`, nell ordine', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [
+        { type: 'expression', _tdCaseId: 'c1', conditions: [], when: 'x == "1"', intent: '#B1' },
+        { type: 'expression', _tdCaseId: 'c2', conditions: [], when: 'contains(user_city, "new")', intent: '#B2' },
+      ],
+    };
+    ensureCaseConditionsFromWhen(action);
+    expect(action.cases[0].conditions.length).toBe(1);
+    expect(action.cases[0].conditions[0].operand1).toBe('x');
+    expect(action.cases[1].conditions[0].operand1).toBe('user_city');
+    expect(action.cases[1].conditions[0].operator).toBe(TYPE_OPERATOR_V2.contains);
+  });
+
+  it('giro completo: salva, riapri, risalva -> stesso `when`', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [branch('c1', [
+        cond('x', TYPE_OPERATOR_V2.equalAsStrings, { type: 'const', value: '1' }),
+        { type: 'operator', operator: 'OR' },
+        cond('y', TYPE_OPERATOR_V2.greaterThan, { type: 'const', value: '10' }),
+      ], '#B1')],
+    };
+    save(action);
+    const primo = action.cases[0].when;
+    ensureCaseConditionsFromWhen(action);
+    save(action);
+    expect(action.cases[0].when).toBe(primo);
+  });
+
+  it('un caso vuoto resta vuoto: nessun `when` inventato', () => {
+    const action: any = {
+      _tdActionType: 'jsonconditionmulti',
+      cases: [{ type: 'expression', _tdCaseId: 'c1', conditions: [], intent: '' }],
+    };
+    save(action);
+    expect(action.cases[0].when).toBeUndefined();
+    ensureCaseConditionsFromWhen(action);
+    expect(action.cases[0].conditions).toEqual([]);
+  });
+
+  it('azione senza `cases` non fa esplodere il salvataggio', () => {
+    const action: any = { _tdActionType: 'jsonconditionmulti', elseIntent: '#ELSE' };
+    expect(() => save(action)).not.toThrow();
+    expect(() => ensureCaseConditionsFromWhen(action)).not.toThrow();
+  });
+
+});
+
+describe('round-trip dei letterali numerici (V2 e multi)', () => {
+
+  it('`x == "1"` resta un confronto di TESTO dopo riapertura e risalvataggio', () => {
+    const groups = parseWhenToGroups('x == "1"');
+    expect(serializeConditionToWhen(groups)).toBe('x == "1"');
+    const c: any = (groups[0] as any).conditions[0];
+    expect(c.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+  });
+
+  it('`x == 1` resta un confronto di NUMERI', () => {
+    const groups = parseWhenToGroups('x == 1');
+    expect(serializeConditionToWhen(groups)).toBe('x == 1');
+    const c: any = (groups[0] as any).conditions[0];
+    expect(c.operator).toBe(TYPE_OPERATOR_V2.equalAsNumbers);
+  });
+
+  it('vale anche per il diverso', () => {
+    expect(serializeConditionToWhen(parseWhenToGroups('x != "2"'))).toBe('x != "2"');
+    expect(serializeConditionToWhen(parseWhenToGroups('x != 2'))).toBe('x != 2');
   });
 
 });

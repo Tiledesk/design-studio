@@ -21,6 +21,7 @@ import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk
 import { environment } from 'src/environments/environment';
 import { CdsModalActivateBotComponent } from 'src/app/modals/cds-modal-activate-bot/cds-modal-activate-bot.component';
 import { LOGO_MENU_ITEMS, PLAY_MENU_ITEMS, SHARE_MENU_ITEMS } from '../../utils-menu';
+import { scheduledTestError } from 'src/app/chatbot-design-studio/utils-scheduled-panel';
 import { NotifyService } from 'src/app/services/notify.service';
 import { TranslateService } from '@ngx-translate/core';
 import { BRAND_BASE_INFO, LOGOS_ITEMS } from './../../utils-resources';
@@ -29,6 +30,12 @@ import { WebhookService } from '../../services/webhook-service.service';
 import { LogService } from 'src/app/services/log.service';
 import { ControllerService } from '../../services/controller.service';
 import { TYPE_CHATBOT } from '../../utils-actions';
+import { ConnectorTriggerService } from '../../connector/connector-trigger.service';
+import { ConnectorCatalogService } from '../../connector/connector-catalog.service';
+import { ProjectService } from 'src/app/services/projects.service';
+import { AgentChatHostService } from 'src/app/chatbot-design-studio/agent-chat/agent-chat-host.service';
+import { LeftPanelStateService } from '../../services/left-panel-state.service';
+import { isWebhookStartPointActive, shouldDeleteWebhookPreload } from '../../utils-start-points';
 
 const swal = require('sweetalert');
 
@@ -57,6 +64,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   //selectedChatbot: Chatbot;
 
 
+  /** Gli agent del progetto, per il selettore in header. */
+  agents: Chatbot[] = [];
+  /** True mentre l'eliminazione dell'agent e' in volo. */
+  isDeletingAgent: boolean = false;
+
   isBetaUrl: boolean = false;
   popup_visibility: string = 'none';
   TRY_ON_WA: boolean;
@@ -69,6 +81,9 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
   PLAY_MENU_ITEMS = PLAY_MENU_ITEMS;
   translationsMap: Map<string, string> = new Map();
   isPlaying:boolean = false;
+  isWebhookStartTest: boolean = false;
+  private subscriptionWebhookStartTest: Subscription;
+  private webhookStartTestStarting: boolean = false;
   /** true appena parte un salvataggio: disabilita il pulsante Publish */
   isSaving: boolean = false;
   /** true solo se il salvataggio supera i 300ms: mostra spinner + "Saving..." */
@@ -102,6 +117,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     private readonly logService: LogService,
     private readonly controllerService: ControllerService,
     private readonly savingStateService: SavingStateService,
+    private readonly triggerService: ConnectorTriggerService,
+    private readonly connectorCatalogService: ConnectorCatalogService,
+    private readonly projectService: ProjectService,
+    private agentChatHostService: AgentChatHostService,
+    private readonly leftPanelState: LeftPanelStateService,
   ) {
     this.manageRouteChanges();
     this.setSubscriptions();
@@ -135,12 +155,14 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     this.selectedChatbot = this.dashboardService.selectedChatbot;
     // this.IS_CHATBOT_MODIFIED = this.selectedChatbot?.modified || false;
     this.logger.log('[CdsHeaderComponent] selectedChatbot::: ', this.selectedChatbot);
+    this.loadAgents();
     if(this.dashboardService.selectedChatbot.subtype === 'webhook' || this.dashboardService.selectedChatbot.subtype === 'copilot'){
       this.isWebhook = true;
       this.initializeWebhook();
     }
-    // Lo studio cambia agente senza ricaricare la pagina (CdsDashboardComponent.openFlow) e
-    // questo header non viene ricostruito: cio' che sopra e' stato letto una volta deve seguire l'agente.
+    // The studio can now move to another agent without a page reload
+    // (CdsDashboardComponent.openFlow), and this header is not rebuilt when it
+    // does: everything above that was read once must follow the agent.
     this.subscriptionSelectedChatbot = this.dashboardService.selectedChatbot$
       .subscribe((chatbot: Chatbot | null) => {
         if (chatbot?._id && chatbot._id !== this.id_faq_kb) {
@@ -155,20 +177,63 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.subscriptionTestItOutPlayed) {
-      this.subscriptionTestItOutPlayed.unsubscribe();
+  // -------------------------------------------------------
+  // @ Selettore degli agent
+  // -------------------------------------------------------
+
+  /** Carica gli agent del progetto per il menu a tendina in header. */
+  private loadAgents(): void {
+    this.faqKbService.getFaqKbByProjectId().subscribe({
+      next: (agents: Chatbot[]) => {
+        this.agents = agents ? agents : [];
+        this.logger.log('[CdsHeaderComponent] loadAgents: ', this.agents.length);
+      },
+      error: (error) => {
+        // Il selettore resta vuoto ma l'header continua a funzionare.
+        this.logger.error('[CdsHeaderComponent] loadAgents ERROR: ', error);
+        this.agents = [];
+      }
+    });
+  }
+
+  /** Selettore dell'agent ed "Elimina agent" sono funzioni del V3: gli agent legacy mostrano solo il nome. */
+  get isV3(): boolean {
+    return this.dashboardService.isV3;
+  }
+
+  /**
+   * Passa a un altro agent. La rotta e' `/project/:projectid/chatbot/:faqkbid/blocks`
+   * e il canvas si ricostruisce sul nuovo agent, senza ricaricare la pagina.
+   */
+  onSelectAgent(agent: Chatbot): void {
+    if (!agent || !agent._id || agent._id === this.id_faq_kb) return;
+    this.logger.log('[CdsHeaderComponent] onSelectAgent: ', agent._id);
+    this.openAgent(agent._id);
+  }
+
+  /**
+   * Apre un agent senza ricaricare la pagina: `dashboardService.openFlow` naviga, azzera
+   * undo/redo, ricarica bot e blocchi e ricostruisce il canvas. L'header si riallinea da
+   * solo tramite `selectedChatbot$` (vedi `onAgentChanged`). I servizi inizializzati nel
+   * boot sono legati al progetto, non all'agent, quindi restano validi.
+   */
+  private async openAgent(botId: string): Promise<void> {
+    if (!this.dashboardService.openFlow) {
+      // Nessun dashboard montato: si cambia solo la rotta, mai un reload.
+      this.router.navigate(['/project', this.projectID, 'chatbot', botId, 'blocks']);
+      return;
     }
-    this.subscriptionIsSaving?.unsubscribe();
-    this.subscriptionIsSavingVisible?.unsubscribe();
-    if (this.subscriptionSelectedChatbot) {
-      this.subscriptionSelectedChatbot.unsubscribe();
+    try {
+      await this.dashboardService.openFlow(botId);
+    } catch (error) {
+      this.logger.error('[CdsHeaderComponent] openAgent ERROR: ', error);
+      this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.OpenAgentError'), 4, 'report_problem');
     }
   }
 
-  /** L'agente aperto e' cambiato senza reload: l'header si aggiorna come se fosse appena nato. */
+  /** Riallinea l'header all'agent aperto, quando cambia senza ricaricare la pagina. */
   private onAgentChanged(chatbot: Chatbot): void {
-    // Prima di cambiare `isWebhook`: la chiusura del test usa lo stato dell'agente precedente.
+    // Prima di cambiare `isWebhook`: la chiusura del test usa lo stato dell'agent precedente.
     if (this.isPlaying) {
       this.onCloseTestItOut();
     }
@@ -178,6 +243,63 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     if (this.isWebhook) {
       this.initializeWebhook();
     }
+    this.loadAgents();
+  }
+
+  /**
+   * Elimina l'intero agent, previa conferma. L'operazione e' irreversibile:
+   * il server rimuove il chatbot e i suoi blocchi. A eliminazione avvenuta si
+   * passa al primo agent rimasto, o si torna alla dashboard se non ne restano.
+   */
+  onDeleteAgent(): void {
+    if (this.isDeletingAgent || !this.selectedChatbot?._id) return;
+    const name = this.selectedChatbot.name;
+    swal({
+      title: this.translate.instant('CDSHeader.DeleteAgentTitle'),
+      text: this.translate.instant('CDSHeader.DeleteAgentText', { name: name }),
+      icon: 'warning',
+      buttons: [this.translate.instant('Cancel'), this.translate.instant('Delete')],
+      dangerMode: true
+    }).then((willDelete: boolean) => {
+      if (!willDelete) return;
+      this.isDeletingAgent = true;
+      const botId = this.selectedChatbot._id;
+      this.faqKbService.deleteBot(botId).subscribe({
+        next: () => {
+          this.isDeletingAgent = false;
+          const remaining = this.agents.filter(a => a._id !== botId);
+          this.agents = remaining;
+          if (remaining.length > 0) {
+            this.openAgent(remaining[0]._id);
+          } else {
+            this.goToDashboardChatbots();
+          }
+        },
+        error: (error) => {
+          this.logger.error('[CdsHeaderComponent] onDeleteAgent ERROR: ', error);
+          this.isDeletingAgent = false;
+          this.notify.showWidgetStyleUpdateNotification(this.translate.instant('CDSHeader.DeleteAgentError'), 4, 'report_problem');
+        }
+      });
+    });
+  }
+
+  /** Torna all'elenco degli agent nella dashboard esterna. */
+  private goToDashboardChatbots(): void {
+    const dashbordBaseUrl = this.appConfigService.getConfig().dashboardBaseUrl + '#/project/' + this.projectID + '/bots/my-chatbots/all';
+    window.open(dashbordBaseUrl, '_self');
+  }
+
+  ngOnDestroy() {
+    if (this.subscriptionTestItOutPlayed) {
+      this.subscriptionTestItOutPlayed.unsubscribe();
+    }
+    this.subscriptionSelectedChatbot?.unsubscribe();
+    this.subscriptionIsSaving?.unsubscribe();
+    this.subscriptionIsSavingVisible?.unsubscribe();
+    this.subscriptionWebhookStartTest?.unsubscribe();
+    this.intentService.webhookStartTest = false;
+    this.intentService.startTestKind = null;
   }
 
 
@@ -189,6 +311,11 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
         if(!state){
           this.onCloseTestItOut()
         }
+      });
+
+      /** SUBSCRIBE TO WEBHOOK START TEST REQUESTS (start block panel) */
+      this.subscriptionWebhookStartTest = this.controllerService.webhookStartTestRequested$.subscribe((kind) => {
+        this.onOpenWebhookStartTest(kind);
       });
 
       /** SUBSCRIBE TO THE GLOBAL SAVING STATE */
@@ -418,12 +545,36 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
 
+  /** Arm/disarm connector dev-mirroring for the current chatbot webhook across every
+   *  configured/installed connector, so Test-It-Out also delivers trigger events to the
+   *  draft (/dev) bot. Best-effort — never blocks the test session. */
+  private async setConnectorsDebug(arm: boolean): Promise<void> {
+    if (!this.webhookId) { return; }
+    const conns: Array<{ baseUrl: string; apiKey?: string }> = [];
+    ((environment as any).connectorBaseUrls || []).forEach((b: string) => { if (b) { conns.push({ baseUrl: b }); } });
+    try {
+      const integrations: any = await firstValueFrom((this.projectService as any).getIntegrations(this.projectID));
+      this.connectorCatalogService.getInstalledConnectorEntries(integrations).forEach(({ baseUrl, apiKey }) => {
+        if (!conns.find(c => c.baseUrl === baseUrl)) {
+          conns.push({ baseUrl, apiKey });
+        }
+      });
+    } catch { /* ignore — dev path still arms via connectorBaseUrls */ }
+    conns.forEach(c => {
+      const call$ = arm
+        ? this.triggerService.armDebug(c.baseUrl, c.apiKey || '', this.webhookId, 3600)
+        : this.triggerService.disarmDebug(c.baseUrl, c.apiKey || '', this.webhookId);
+      call$.subscribe({ error: (e: any) => this.logger.error('[triggers] ' + (arm ? 'armDebug' : 'disarmDebug') + ' failed', e) });
+    });
+  }
+
   async onOpenTestItOut(){
     let request_id: string | Promise<void>;
-    this.logService.initialize(null); 
+    this.logService.initialize(null);
     if(this.isWebhook){
       this.logger.log("[cds-header] onOpenTestItOut: isWebhook");
       request_id = await this.webhookStarterLog();
+      this.setConnectorsDebug(true);
     } else {
       request_id = this.logService.request_id;
     }
@@ -435,6 +586,7 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
     const mqtt_token = tokenResp.token || null;
     request_id = tokenResp.request_id || null;
     this.logService.starterLog(mqtt_token, request_id);
+
     this.openTestSiteInPopupWindow();
     this.isPlaying = true;
   }
@@ -442,13 +594,81 @@ export class CdsHeaderComponent implements OnInit, OnDestroy {
 
 
   onCloseTestItOut(){
-    if(this.isWebhook){
+    // a scheduled start test has no webhook preload to delete
+    if(shouldDeleteWebhookPreload(this.isWebhook, this.isWebhookStartTest, this.intentService.startTestKind)){
       this.stopWebhook();
+      this.setConnectorsDebug(false);
     }
     this.intentService.closeTestItOut();
     this.isPlaying = false;
     this.intentService.resetLiveActiveIntent();
+    this.isWebhookStartTest = false;
+    this.intentService.webhookStartTest = false;
+    this.intentService.startTestKind = null;
     this.logService.closeLog();
+  }
+
+  private notifyScheduledTestError(error: any){
+    const { message, key } = scheduledTestError(error);
+    this.notify.showWidgetStyleUpdateNotification(message || this.translate.instant(key), 4, 'report_problem');
+  }
+
+  async onOpenWebhookStartTest(kind: 'webhook' | 'scheduled' = 'webhook'){
+    if (this.webhookStartTestStarting) {
+      return;
+    }
+    if (this.isPlaying) {
+      this.onCloseTestItOut();
+    }
+    this.serverBaseURL = this.appConfigService.getConfig().apiUrl;
+    const chatbot_id = this.dashboardService.id_faq_kb;
+    this.webhookStartTestStarting = true;
+    try {
+      let requestId: string;
+      if (kind === 'scheduled') {
+        // the draft schedule, now: no URL, only the conversation and its logs
+        const test = await lastValueFrom(this.webhookService.testScheduledStart(chatbot_id));
+        if (!test?.request_id) {
+          this.logger.warn("[CDS-header] scheduled test request_id not found");
+          this.notifyScheduledTestError(null);
+          return;
+        }
+        this.webhookUrl = '';
+        requestId = test.request_id;
+      } else {
+        const webhook = await lastValueFrom(this.webhookService.getWebhook(chatbot_id));
+        if (!isWebhookStartPointActive(webhook)) {
+          this.logger.warn("[CDS-header] start webhook not active for chatbot_id:", chatbot_id);
+          return;
+        }
+        this.webhookId = webhook.webhook_id;
+        this.webhookUrl = `${this.serverBaseURL}webhook/${webhook.webhook_id}`;
+        const preload = await lastValueFrom(this.webhookService.preloadWebhook(this.webhookId));
+        if (!preload?.request_id) {
+          this.logger.warn("[CDS-header] preload request_id not found");
+          return;
+        }
+        requestId = preload.request_id;
+      }
+      this.logService.initialize(null);
+      const tokenResp = await this.getToken(requestId);
+      if (!tokenResp) {
+        return;
+      }
+      this.isWebhookStartTest = true;
+      this.intentService.webhookStartTest = true;
+      this.intentService.startTestKind = kind;
+      this.logService.starterLog(tokenResp.token || null, tokenResp.request_id || requestId);
+      this.openTestSiteInPopupWindow();
+      this.isPlaying = true;
+    } catch (error) {
+      this.logger.error("[CDS-header] onOpenWebhookStartTest error:", error);
+      if (kind === 'scheduled') {
+        this.notifyScheduledTestError(error);
+      }
+    } finally {
+      this.webhookStartTestStarting = false;
+    }
   }
 
 

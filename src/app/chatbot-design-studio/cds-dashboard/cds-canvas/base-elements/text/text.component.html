@@ -21,7 +21,18 @@
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" 
                 (opened)="onOpenClose('open')" (closed)="onOpenClose('close')" (optionSelected)="onOptionSelectedFN($event)">
                 <mat-option *ngFor="let option of filteredOptions | async" [value]="option.value" [title]="option.label">
-                  {{option.label}}
+                  <!-- {{option.label}} -->
+                    <div class="option-item-wrp" [attr.additionalText]="option?.additionalText ? true: false" [disabled]="option?.disabled"> 
+                        <div style="width: 100%; display: flex; flex-direction: column;">
+                            <div class="option-item-wrp">
+                                <span class="label-option">{{ option?.label | translate }}</span>
+                                <span *ngIf="option?.additionalText" class="label-option-text">{{option?.additionalText | translate }}</span>
+                            </div>
+                            <!-- <div class="option-item-wrp">
+                                <span *ngIf="optionalBindDescription" class="label-option-text description" [class.description-margin]="item['icon']">{{item[optionalBindDescription] | translate }}</span>
+                            </div> -->
+                        </div>
+                    </div>
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>

@@ -13,6 +13,26 @@ export class IconService {
 
   registerIcons(): void {
 
+    // Non c'erano, e un `svgIcon` che non esiste non solleva: disegna il nulla. La linguetta
+    // della chat e la "i" delle azioni restavano due cerchi vuoti, senza niente nel log.
+    this.matIconRegistry.addSvgIcon(
+      'info',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/info.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'stack_node',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/stack_node.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'agent_chat',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/agent_chat.svg')
+    );
+    // La linguetta della chat AI (il vibe coder): codice dentro un fumetto, con le scintille.
+    this.matIconRegistry.addSvgIcon(
+      'vibe_coder',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/icons/vibe_coder.svg')
+    );
+
     // ai prompt //
     this.matIconRegistry.addSvgIcon(
       'anthropic',
@@ -83,6 +103,14 @@ export class IconService {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/new.svg')
     );
     this.matIconRegistry.addSvgIcon(
+      'assets/images/actions_category/start_points.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/start_points.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions_category/start_point_scheduled.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/start_point_scheduled.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
       'assets/images/actions_category/special.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions_category/special.svg')
     );
@@ -133,6 +161,14 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/add_tag.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/add_tag.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/set_rating.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/set_rating.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/get_rating.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/get_rating.svg')
     );
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/agent_handoff.svg',
@@ -229,6 +265,18 @@ export class IconService {
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/online_agents.svg',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/online_agents.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/invite_human.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/invite_human.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/remove_human.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/remove_human.svg')
+    );
+    this.matIconRegistry.addSvgIcon(
+      'assets/images/actions/remove_current_bot.svg',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/images/actions/remove_current_bot.svg')
     );
     this.matIconRegistry.addSvgIcon(
       'assets/images/actions/open_hours.svg',

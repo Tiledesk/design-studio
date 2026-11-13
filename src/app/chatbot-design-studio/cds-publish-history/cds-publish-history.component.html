@@ -105,18 +105,24 @@
                     <div class="restore-release" style="padding-left: 12px; padding-right: 6px;">
                         <div class="restore-btn-wpr">
                             <button type="button" class="restore-btn" (click)="viewRelease(release)"
-                                matTooltip="{{'CDSPreview.ViewTooltip' | translate}}"
-                                matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
+                                [matTooltip]="'CDSPreview.ViewTooltip' | translate"
+                                matTooltipClass="cds-mat-tooltip cds-mat-tooltip-multiline"
+                                matTooltipPosition="above"
+                                matTooltipHideDelay="100">
                                 {{'View' | translate}}
                             </button>
                             <button type="button" class="restore-btn" (click)="republishRelease(release)"
-                                matTooltip="{{'CDSPublishHistory.RepublishTooltip' | translate}}"
-                                matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
+                                [matTooltip]="'RepublishReleaseTooltip' | translate"
+                                matTooltipClass="cds-mat-tooltip cds-mat-tooltip-multiline"
+                                matTooltipPosition="above"
+                                matTooltipHideDelay="100">
                                 {{'Republish' | translate}}
                             </button>
                             <button type="button" class="restore-btn" (click)="restoreRelease(release)"
-                                matTooltip="{{'CDSPublishHistory.RestoreTooltip' | translate}}"
-                                matTooltipClass="cds-mat-tooltip" matTooltipPosition="above">
+                                [matTooltip]="'CDSPublishHistory.RestoreTooltip' | translate"
+                                matTooltipClass="cds-mat-tooltip cds-mat-tooltip-multiline"
+                                matTooltipPosition="above"
+                                matTooltipHideDelay="100">
                                 {{'Restore' | translate}}
                             </button>
                         </div>

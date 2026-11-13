@@ -7,3 +7,11 @@
 }
 
 
+
+/* V3: la riga che da' il nome all'uscita di fine lista. Il connettore e' il
+   pallino del blocco (in basso a destra, .tds-v3-intent .connector-isLast):
+   l'etichetta sta a destra, come "else" nell'AI Prompt, per stargli accanto. */
+.previewContent.iteration-done {
+    justify-content: flex-end;
+    text-align: right;
+}

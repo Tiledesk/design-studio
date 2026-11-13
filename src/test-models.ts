@@ -17,5 +17,5 @@ getTestBed().initTestEnvironment(
 );
 
 const context = (require as any).context(
-  './app/', true, /(utils-ai_models\.unit\.spec|utils-llm-models\.spec)\.ts$/);
+  './app/', true, /(utils-ai_models\.unit\.spec|utils-llm-models\.unit\.spec)\.ts$/);
 context.keys().forEach(context);
