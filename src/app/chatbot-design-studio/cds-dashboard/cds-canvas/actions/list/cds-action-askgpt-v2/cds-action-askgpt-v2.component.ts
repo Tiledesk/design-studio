@@ -24,7 +24,7 @@ import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel, hasFixedTemperature } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 import { environment } from 'src/environments/environment';
 
@@ -279,8 +279,8 @@ export class CdsActionAskgptV2Component implements OnInit, OnChanges {
         this.action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
       }
 
-      const isGpt5 = modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5');
-      if (isGpt5) {
+      const fixedTemperature = hasFixedTemperature(modelName);
+      if (fixedTemperature) {
         this.ai_setting['temperature'].disabled = true;
         const currentTemp = typeof this.action?.temperature === 'number' ? this.action.temperature : Number(this.action?.temperature);
         if (resetTemperature || !Number.isFinite(currentTemp)) {

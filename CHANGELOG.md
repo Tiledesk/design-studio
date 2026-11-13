@@ -7,6 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# features-2611/ai-models 13/11/2026
+- **changed** (features-2611/ai-models): models catalogue aligned to the Design Studio V3 (corrected list of 12/11/2026, the same as the dashboard): new Claude Opus/Sonnet/Haiku 5.5 and Fable 5.1/5.2, OpenAI GPT-6 Astra/Luna/Sol and GPT-6.1 Sol/Terra, Gemini 4 Carbon/Argon and 3.8 Flash, Command A Translate, gpt-oss, MiniMax M2.7 and Muse Spark Open on Groq; Gemini image models and duplicate entries removed. New ids `claude-opus-4-5-20251101`, `deepseek-flash`, `gemini-omni-1.1-flash`: their multipliers in `AI_MODELS` must use them. Actions that use a model no longer listed are unchanged
+- **changed** (features-2611/ai-models): new AI actions start with gpt-5.4-mini instead of gpt-4o (also AI Prompt and AI Condition without a model); the temperature is fixed at 1 for gpt-6.x too, as for gpt-5.x
+- **added** (features-2611/ai-models): specs for the catalogue and the fixed temperature, in `npm run test:models`
+
 # 1.41.1
 - **changed**: remoteConfig: false
 

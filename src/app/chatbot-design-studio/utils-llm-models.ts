@@ -261,6 +261,14 @@ export async function getIntegrationModels(
 }
 
 /**
+ * I modelli OpenAI gpt-5.x e gpt-6.x accettano solo la temperatura di default (1): nel pannello il
+ * campo si spegne. Vale per il nome del modello come arriva dall'action, "gpt-5.4" o "Gpt-5.4".
+ */
+export function hasFixedTemperature(modelName: string): boolean {
+  return /^gpt-[56]/i.test(modelName ?? '');
+}
+
+/**
  * Sets the selected model and updates related properties
  * @param modelName The label of the model to set
  * @param llmModels Array of available LLM models

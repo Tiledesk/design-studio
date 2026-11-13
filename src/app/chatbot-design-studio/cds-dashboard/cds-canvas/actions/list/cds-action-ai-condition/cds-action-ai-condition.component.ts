@@ -27,7 +27,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { checkConnectionStatusOfAction, checkConnectionStatusByConnector, updateConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
-import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
+import { sortAutocompleteOptions, getModelsByName, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel, hasFixedTemperature } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
 
 @Component({
@@ -221,8 +221,8 @@ export class CdsActionAiConditionComponent implements OnInit {
         this.action.max_tokens = Math.min(Math.max(currentMaxTokens, min), max);
       }
 
-      const isGpt5 = modelName.startsWith('gpt-5') || modelName.startsWith('Gpt-5');
-      if (isGpt5) {
+      const fixedTemperature = hasFixedTemperature(modelName);
+      if (fixedTemperature) {
         this.ai_setting['temperature'].disabled = true;
         const currentTemp =
           typeof this.action?.temperature === 'number' ? this.action.temperature : Number(this.action?.temperature);
@@ -360,7 +360,7 @@ export class CdsActionAiConditionComponent implements OnInit {
     }
     if(property === 'model'){
       this.action['labelModel'] = event;
-      if(event.startsWith('gpt-5') || event.startsWith('Gpt-5')){
+      if(hasFixedTemperature(event)){
         this.action.temperature = 1
         this.ai_setting['temperature'].disabled= true
       } else {
