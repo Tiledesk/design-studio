@@ -1,0 +1,182 @@
+<div *ngIf="previewMode" class="cds-action-preview" style="position: relative;">
+
+    <div *ngIf="action?.saveTo === 'attributes'" class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.RatingSaveTo' | translate }}:
+        </div>
+        <div class="action-row-right">{{ 'CDSCanvas.RatingTargetAttributes' | translate }}</div>
+    </div>
+
+    <div *ngIf="action?.requestId" class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.RatingRequestId' | translate }}:
+        </div>
+        <div class="action-row-right ellips" [ngClass]="action?.requestId | variableCssClass">
+            {{ action?.requestId | getVariableName }}
+        </div>
+    </div>
+
+    <div class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.Rating' | translate }}:
+        </div>
+        <div *ngIf="action?.rating" class="action-row-right" [ngClass]="action?.rating | variableCssClass">
+            {{ action?.rating | getVariableName }}
+        </div>
+        <div *ngIf="!action?.rating" class="action-row-right empty">1-5</div>
+    </div>
+
+    <div *ngIf="action?.ratingMessage" class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.RatingMessage' | translate }}:
+        </div>
+        <div class="action-row-right ellips" [ngClass]="action?.ratingMessage | variableCssClass">
+            {{ action?.ratingMessage | getVariableName }}
+        </div>
+    </div>
+
+    <!-- Force update hidden (showForceUpdate), not removed: the close webhook runs before the user rates -->
+    <div *ngIf="showForceUpdate && action?.forceUpdate" class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{'CDSCanvas.RatingForceUpdate' | translate }}
+        </div>
+    </div>
+
+    <div *ngIf="action?.assignErrorTo" class="action-row">
+        <div class="set-attribute-label action-row-left">
+            {{ 'CDSCanvas.AssignErrorTo' | translate }}:
+        </div>
+        <span class="tag output-val ellips">{{ action.assignErrorTo }}</span>
+    </div>
+
+    <div class="previewContent">
+        <div class="icon-action">
+            <img class="active-icon" src="assets/images/icons/if_condition.svg">
+        </div>
+        <label class="title-preview-label">{{ 'CDSCanvas.Success' | translate }}</label>
+        <cds-connector class="connector-true"
+            [idConnector]="idConnectorTrue"
+            [idConnection]="idConnectionTrue"
+            [isConnected]="isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{ 'CDSCanvas.Else' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector]="idConnectorFalse"
+            [idConnection]="idConnectionFalse"
+            [isConnected]="isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail">
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.RatingRequestId' | translate }}</label>
+            <cds-textarea
+                class="text-editable-div request-id"
+                [text]="action.requestId"
+                [minRow]="1" [maxRow]="1"
+                popoverVerticalAlign="above"
+                [emojiPikerBtn]="false"
+                [textLimitBtn]="false"
+                [setAttributeBtn]="true"
+                [placeholder]="'CDSCanvas.RatingRequestIdPlaceholder' | translate "
+                (blur)="onBlur()"
+                (changeTextarea)="onChangeTextarea($event, 'requestId')">
+            </cds-textarea>
+            <label class="field-description"> {{ 'CDSCanvas.RatingRequestIdDescription' | translate}} </label>
+        </div>
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.RatingSaveTo' | translate }}</label>
+            <mat-radio-group class="rating-target" [value]="action?.saveTo || 'rating'" (change)="onChangeTarget($event.value, 'saveTo')">
+                <mat-radio-button value="rating">{{ 'CDSCanvas.RatingTargetRating' | translate }}</mat-radio-button>
+                <mat-radio-button value="attributes">{{ 'CDSCanvas.RatingTargetAttributes' | translate }}</mat-radio-button>
+            </mat-radio-group>
+            <label class="field-description"> {{ 'CDSCanvas.RatingSaveToDescription' | translate}} </label>
+        </div>
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.Rating' | translate }}</label>
+            <cds-textarea
+                class="text-editable-div"
+                [text]="action.rating"
+                [control]="ratingControl"
+                [minRow]="1" [maxRow]="1"
+                popoverVerticalAlign="above"
+                [emojiPikerBtn]="false"
+                [textLimitBtn]="false"
+                [setAttributeBtn]="true"
+                [placeholder]="'CDSCanvas.RatingPlaceholder' | translate "
+                (blur)="onBlur()"
+                (changeTextarea)="onChangeTextarea($event, 'rating')">
+            </cds-textarea>
+
+            <div class="rating-values">
+                <button *ngFor="let value of ratingValues" type="button"
+                    class="rating-value"
+                    [class.selected]="action?.rating === value"
+                    (click)="onSelectRatingValue(value)">
+                    {{ value }}
+                </button>
+            </div>
+            <label class="field-description"> {{ 'CDSCanvas.RatingDescription' | translate}} </label>
+        </div>
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.RatingMessage' | translate }}</label>
+            <cds-textarea
+                class="text-editable-div rating-message"
+                [text]="action.ratingMessage"
+                [minRow]="2" [maxRow]="4"
+                popoverVerticalAlign="above"
+                [emojiPikerBtn]="false"
+                [textLimitBtn]="false"
+                [setAttributeBtn]="true"
+                [placeholder]="'CDSCanvas.RatingMessagePlaceholder' | translate "
+                (blur)="onBlur()"
+                (changeTextarea)="onChangeTextarea($event, 'ratingMessage')">
+            </cds-textarea>
+            <label class="field-description"> {{ 'CDSCanvas.RatingMessageDescription' | translate}} </label>
+        </div>
+
+        <!-- Force update hidden (showForceUpdate), not removed: the close webhook runs before the user rates -->
+        <div *ngIf="showForceUpdate" class="field-box">
+            <section class="disable-input-message-section">
+                <mat-checkbox
+                    [checked]="action?.forceUpdate"
+                    (change)="onChangeCheckbox($event,'forceUpdate')">
+                    {{"CDSCanvas.RatingForceUpdate" | translate}}
+                </mat-checkbox>
+                <label class="field-description">{{ "CDSCanvas.RatingForceUpdateDescription" | translate }}</label>
+            </section>
+        </div>
+
+        <div class="field-box">
+            <label class="title-label">{{'CDSCanvas.AssignErrorTo' | translate }}</label>
+            <cds-textarea
+                id="assignErrorTo"
+                class="assign-error-to"
+                [textLimitBtn]="false"
+                [emojiPikerBtn]="false"
+                [setAttributeBtn]="true"
+                [minRow]="1" [maxRow]="1"
+                [readonly]="true"
+                [text]="action.assignErrorTo"
+                [placeholder]="'rating_error'"
+                (selectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')"
+                (clearSelectedAttribute)="onSelectedAttribute($event, 'assignErrorTo')">
+            </cds-textarea>
+            <label class="field-description"> {{ 'CDSCanvas.AssignRatingErrorToDescription' | translate}} </label>
+        </div>
+
+    </div>
+</div>

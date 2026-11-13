@@ -475,6 +475,20 @@
                         [action]="action"
                         (updateAndSaveAction)="onUpdateAndSaveAction($event)">
                     </cds-action-add-tag>
+
+                    <cds-action-set-rating *ngSwitchCase="TYPE_ACTION.SET_RATING"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-set-rating>
+
+                    <cds-action-get-rating *ngSwitchCase="TYPE_ACTION.GET_RATING"
+                        class="panel-response"
+                        [intentSelected]="intent"
+                        [action]="action"
+                        (updateAndSaveAction)="onUpdateAndSaveAction($event)">
+                    </cds-action-get-rating>
                     
                     <cds-action-lead-update *ngSwitchCase="TYPE_ACTION.LEAD_UPDATE" 
                         class="panel-response"

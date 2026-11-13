@@ -956,6 +956,32 @@ export class ActionAddTags extends Action {
     }
 }
 
+export class ActionSetRating extends Action {
+    requestId?: string;      // conversation to rate; empty = current conversation (required in webhook flows)
+    saveTo?: 'rating' | 'attributes';   // rating (default, also when missing) or the AI evaluation attributes ai_rating / ai_sentiment
+    rating: string;
+    ratingMessage?: string;
+    forceUpdate: boolean;
+    assignErrorTo?: string;
+    trueIntent?: string;     // success branch connector
+    falseIntent?: string;    // error branch connector
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.SET_RATING;
+    }
+}
+
+export class ActionGetRating extends Action {
+    requestId?: string;      // conversation to read; empty = current conversation (required in webhook flows)
+    readFrom?: 'rating' | 'attributes'; // rating (default, also when missing) or the AI evaluation attributes ai_rating / ai_sentiment
+    assignRatingTo: string;
+    assignRatingMessageTo: string;
+    constructor() {
+        super();
+        this._tdActionType = TYPE_ACTION.GET_RATING;
+    }
+}
+
 export class ActionVoice extends Action {
     text?: string;
     attributes: Attributes;
