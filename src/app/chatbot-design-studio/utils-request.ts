@@ -67,6 +67,31 @@ export const HEADER_TYPE: Array<{ label: string, value: string }> = [
     { label: "x-mock-response-delay", value: "x-mock-response-delay" },
 ]
 
+/** First body selector (Postman-like): none / form-data / raw. */
+export const WEB_REQUEST_BODY_MODES: Array<{ name: string, value: string }> = [
+    { name: "none",      value: "none" },
+    { name: "form-data", value: "form-data" },
+    { name: "raw",       value: "raw" },
+]
+
+/** Second selector, shown only when body mode === 'raw'. */
+export const WEB_REQUEST_RAW_TYPES: Array<{ name: string, value: string }> = [
+    { name: "Text",       value: "text" },
+    { name: "JavaScript", value: "javascript" },
+    { name: "JSON",       value: "json" },
+    { name: "HTML",       value: "html" },
+    { name: "XML",        value: "xml" },
+]
+
+/** Content-Type header set for each raw sub-type. */
+export const RAW_TYPE_CONTENT_TYPE: { [key: string]: string } = {
+    text:       'text/plain',
+    javascript: 'application/javascript',
+    json:       'application/json',
+    html:       'text/html',
+    xml:        'application/xml',
+}
+
 export const RESPONSE_STATUS_TYPE: Array<{ label: string, value: string }> = [
     { label: "100 Continue",                                    value:"100"},
     { label: "101 Switching Protocols",                         value:"101"},

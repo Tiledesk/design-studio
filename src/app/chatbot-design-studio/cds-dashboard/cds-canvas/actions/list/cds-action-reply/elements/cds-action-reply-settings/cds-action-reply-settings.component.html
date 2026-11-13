@@ -19,9 +19,7 @@
         </label>
         
         <cds-connector class="button-connector"
-            [idConnector] = "idConnectorNoInput"
-            [idConnection] = "idConnectionNoInput"
-            [isConnected] = "isConnectedNoInput">
+            [intentId]="idIntentSelected" [action]="action" slot="noInput">
         </cds-connector>
     </div>
 
@@ -34,9 +32,7 @@
         <label class="title-preview-label">{{'CDSCanvas.NoMatch' | translate}}</label>
         
         <cds-connector class="button-connector"
-            [idConnector] = "idConnectorNoMatch"
-            [idConnection] = "idConnectionNoMatch"
-            [isConnected] = "isConnectedNoMatch">
+            [intentId]="idIntentSelected" [action]="action" slot="noMatch">
         </cds-connector>
     </div>
     

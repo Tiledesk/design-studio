@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Subscription } from 'rxjs';
 
 //SERVICES
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
@@ -16,7 +15,6 @@ import { Project } from 'src/app/models/project-model';
 //UTILS
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-qapla',
@@ -38,12 +36,6 @@ export class CdsActionQaplaComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   
   project: Project;
 
@@ -57,14 +49,6 @@ export class CdsActionQaplaComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.log("[ACTION QAPLA] action:", this.action);
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -74,9 +58,6 @@ export class CdsActionQaplaComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   initializeConnector() {
@@ -84,34 +65,11 @@ export class CdsActionQaplaComponent implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
 
-  /** */
-  private updateConnector(){
-    this.logger.log('[ACTION-ASKGPT] updateConnector:');
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION-ASKGPT] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
   
   
   private initializeAttributes() {

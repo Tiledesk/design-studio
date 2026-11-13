@@ -1,15 +1,22 @@
 import { Injectable, setTestabilityGetter } from '@angular/core';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, firstValueFrom } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
-import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionSubAgent, ActionReturn, ActionJsonCondition2, ActionReplaceBotV4, ActionReturnStack, ActionDataTable } from 'src/app/models/action-model';
+import { ActionReply, ActionAgent, ActionAssignFunction, ActionAssignVariable, ActionChangeDepartment, ActionClose, ActionDeleteVariable, ActionEmail, ActionHideMessage, ActionIntentConnected, ActionJsonCondition, ActionJsonCondition2, ActionOnlineAgent, ActionOpenHours, ActionRandomReply, ActionReplaceBot, ActionWait, ActionWebRequest, Command, Wait, Message, Expression, Action, ActionAskGPT, ActionWhatsappAttribute, ActionWhatsappStatic, ActionWebRequestV2, ActionGPTTask, ActionCaptureUserReply, ActionIteration, ActionQapla, ActionCondition, ActionMake, ActionAssignVariableV2, ActionHubspot, ActionCode, ActionReplaceBotV2, ActionAskGPTV2, ActionCustomerio, ActionVoice, ActionBrevo, Attributes, ActionN8n, ActionGPTAssistant, ActionReplyV2, ActionOnlineAgentV2, ActionInviteHuman, ActionRemoveHuman, ActionRemoveCurrentBot, ActionLeadUpdate, ActionClearTranscript, ActionMoveToUnassigned, ActionConnectBlock, ActionAddTags, ActionSendWhatsapp, WhatsappBroadcast, ActionReplaceBotV3, ActionReplaceBotV4, ActionReturnStack, ActionAiPrompt, ActionWebRespose, ActionKBContent, ActionFlowLog, ActionAiCondition, ActionDataTable, ActionSubAgent, ActionReturn, ActionJsonConditionMulti, ConditionCase, ActionSetRating, ActionGetRating } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
-import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, TYPE_GPT_MODEL } from '../utils';
+import { RESERVED_INTENT_NAMES, TYPE_INTENT_ELEMENT, TYPE_INTENT_NAME, TYPE_COMMAND, removeNodesStartingWith, generateShortUID, UNTITLED_BLOCK_PREFIX, isElementOnTheStage, insertItemInArray, replaceItemInArrayForKey, deleteItemInArrayForKey, isDefaultFallbackWithoutActions, getIntentDefaultColor } from '../utils';
 import { environment } from 'src/environments/environment';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ExpressionType } from '@angular/compiler';
 import { STARTING_NAMES, TYPE_ACTION, TYPE_ACTION_VXML, TYPE_CHATBOT, resolveChatbotSubtype } from '../utils-actions';
-import { LLM_MODEL } from '../utils-ai_models';
+import { LLM_MODEL, OPENAI_MODEL } from '../utils-ai_models';
+import { buildConnectorAction } from '../connector/connector-action.factory';
+import { ConnectorActionEntry } from '../connector/connector-manifest.model';
+import { patchActionIds } from './patch-action-id.util';
 import { applyConditionSaveModeToPayload } from '../utils-condition';
+import { ConnectorStore } from '../connectors/connector-store.service';
+import { CONNECTORS_CONFIG } from '../connectors/connector-config';
+import { NormalizeResult, RepairReport, normalizeFlow, preparedPastedIntent, stripV2Connectors } from '../connectors/flow-normalizer';
 
 // SERVICES //
 import { StageService } from '../services/stage.service';
@@ -18,11 +25,13 @@ import { ControllerService } from '../services/controller.service';
 import { FaqService } from 'src/app/services/faq.service';
 import { FaqKbService } from 'src/app/services/faq-kb.service';
 import { DashboardService } from 'src/app/services/dashboard.service';
-import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { SavingStateService } from 'src/app/services/saving-state.service';
+import { ReadOnlyService } from 'src/app/services/read-only.service';
 import { TiledeskAuthService } from 'src/chat21-core/providers/tiledesk/tiledesk-auth.service';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FirebaseUploadService } from 'src/chat21-core/providers/firebase/firebase-upload.service';
+import { isStartBox, StartTestKind, defaultEntryIntent, isWebStartDisabled } from '../utils-start-points';
 
 /** CLASSE DI SERVICES PER TUTTE LE AZIONI RIFERITE AD OGNI SINGOLO INTENT **/
 
@@ -36,8 +45,13 @@ export class IntentService {
   liveActiveIntent = new BehaviorSubject<{ intent: Intent; logAnimationType: boolean; scale: number|null }>(null);
   testIntent = new BehaviorSubject<Intent>(null);
   BSTestItOut = new BehaviorSubject<Intent>(null);
+  webhookStartTest: boolean = false;
+  /** kind of the running start test (with webhookStartTest): only that kind's box is highlighted, only a webhook test has a preload */
+  startTestKind: StartTestKind = null;
   behaviorUndoRedo = new BehaviorSubject<{ undo: boolean, redo: boolean }>({undo:false, redo: false});
   behaviorIntentColor = new BehaviorSubject<{ intentId: string, color: string }>({intentId:null, color: null});
+  /** Emette quando cambiano intentSelectedID o intentActive; usato da cds-intent per aggiornare stili senza ngDoCheck. */
+  behaviorIntentSelection = new BehaviorSubject<{ intentSelectedID: string | null; intentActive: boolean }>({ intentSelectedID: null, intentActive: false });
 
   listOfIntents: Array<Intent> = [];
   prevListOfIntent: Array<Intent> = [];
@@ -74,6 +88,11 @@ export class IntentService {
 
   public arrayUNDO: Array<any> = [];
   public arrayREDO: Array<any> = [];
+  /**
+   * Entries were removed from the middle of arrayUNDO (a start box saved or deleted without history). Whoever
+   * counted entries on the stack (the agent chat's Undo of its last batch) must count again or forget them.
+   */
+  public readonly undoHistoryPruned$ = new Subject<void>();
   public lastActionUndoRedo: boolean;
 
   public arrayCOPYPAST: Array<any> = [];
@@ -88,13 +107,84 @@ export class IntentService {
     private stageService: StageService,
     private dashboardService: DashboardService,
     private tiledeskAuthService: TiledeskAuthService,
+    private http: HttpClient,
+    private savingStateService: SavingStateService,
     private readonly readOnlyService: ReadOnlyService,
-    private savingStateService: SavingStateService
+    private connectorStore?: ConnectorStore
   ) {
+    // La lista dei connettori si salva da sola quando cambia: lo store sa cosa, qui si sa come.
+    this.connectorStore?.bindPersistence({
+      saveCollection: collection => {
+        const id = this.dashboardService?.id_faq_kb;
+        return id ? this.saveConnectorsCollection(collection, id) : Promise.resolve();
+      },
+      updateIntent: intent => this.updateIntent(intent),
+    });
+  }
 
+  private emitIntentSelection(): void {
+    this.behaviorIntentSelection.next({ intentSelectedID: this.intentSelectedID, intentActive: this.intentActive });
+  }
+
+  /** Il rapporto delle riparazioni fatte all'ultima apertura del flusso (vedi flow-normalizer). */
+  public lastRepairReport: RepairReport | null = null;
+
+  /** La lista dei connettori del flusso aperto, nel formato normalizzato (una copia). Solo per un V3: un V2 non ha lista. */
+  public connectorRecords(): any[] {
+    if (!this.dashboardService?.isV3) { return []; }
+    return JSON.parse(JSON.stringify(this.connectorStore?.records || []));
   }
 
 
+  public chatbotPatch(listOfIntents) {
+    let corruptedButtons = [];
+    corruptedButtons = this.findAndFixAllBrokenButtons(listOfIntents);
+    this.logger.log('[INTENT SERVICE] ::: chatbotPatch corruptedButtons:: ', corruptedButtons);
+    if (corruptedButtons.length > 0) {
+      //this.sendCorruptedButtonsEmail(corruptedButtons);
+    }
+    return corruptedButtons;
+  }
+
+
+
+
+  public findAndFixAllBrokenButtons(listOfIntents){
+    const corruptedButtons = [];
+    if (!Array.isArray(listOfIntents)) return corruptedButtons;
+    listOfIntents.forEach(intent => {
+      let intentModified = false;
+      if (intent.actions && Array.isArray(intent.actions)) {
+        intent.actions.forEach(action => {
+          const buttons = this.connectorService.findButtons(action);
+          buttons.forEach(button => {
+            if (button && button.action) {
+              if (button.type !== 'action') {
+                // const actionId = button.action.startsWith('#') ? button.action.substring(1) : button.action;
+                // const foundIntent = listOfIntents.find(i => i.intent_id === actionId);
+                // if (foundIntent) {
+                //   button.type = 'action';
+                // } else {
+                //   button.action = '';
+                // }
+                corruptedButtons.push({
+                  intentId: intent.intent_id,
+                  intentName: intent.intent_display_name,
+                  actionId: action._tdActionId,
+                  button: { ...button }
+                });
+                intentModified = true;
+              }
+            }
+          });
+        });
+      }
+      // if (intentModified) {
+      //   this.updateIntent(intent);
+      // }
+    });
+    return corruptedButtons;
+  }
 
    public setIntentColor(color){
     const intentId = this.intentSelected.intent_id;
@@ -133,10 +223,10 @@ export class IntentService {
     this.intentSelectedID = null;
     this.intentActive = false;
     if(this.listOfIntents && this.listOfIntents.length > 0){
-      let startIntent = this.listOfIntents.filter(obj => ( obj.intent_display_name.trim() === TYPE_INTENT_NAME.START));
-      // this.logger.log('setDefaultIntentSelected: ', startIntent, startIntent[0]);
-      if(startIntent && startIntent.length>0){
-        this.intentSelected = startIntent[0];
+      // the start block; with Web start disabled (hidden) the first visible start box, else the first block
+      const entry = defaultEntryIntent(this.listOfIntents, TYPE_INTENT_NAME.START);
+      if(entry){
+        this.intentSelected = entry;
       }
     }
     // this.logger.log('[INTENT SERVICE] ::: setDefaultIntentSelected ::: ', this.intentSelected);
@@ -160,6 +250,7 @@ export class IntentService {
       this.intentActive = false;
       this.resetZindex();
     }
+    this.emitIntentSelection();
   }
 
 
@@ -178,8 +269,9 @@ export class IntentService {
 
   public setIntentSelectedByIntent(intent){
     this.intentSelected = intent;
-    this.intentSelectedID = this.intentSelected.intent_id;
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
     this.intentActive = true;
+    this.emitIntentSelection();
   }
 
   public setIntentSelectedPosition(x, y){
@@ -202,6 +294,14 @@ export class IntentService {
 
 
   public setMapOfIntents(){
+    // Built from scratch, not added to. This map is the canvas's checklist of
+    // the blocks it is waiting to render, so it describes ONE flow. Adding to
+    // it was harmless only while changing flow meant reloading the page, which
+    // threw this singleton away with everything else; now that the canvas is
+    // rebuilt in place, a block left over from the previous flow never
+    // renders, the checklist never completes, and the connectors -- drawn only
+    // once every block has reported in -- are never drawn at all.
+    this.mapOfIntents = {};
     this.listOfIntents.forEach( intent => {
       const intentID = intent.intent_id;
       this.mapOfIntents[intentID] = {'shown': false };
@@ -217,7 +317,12 @@ export class IntentService {
   }
 
   public addActionToIntentSelected(action){
-    if(this.intentSelected){
+    if(action && this.intentSelected){
+      // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta, da nessuna via
+      if (isDefaultFallbackWithoutActions(this.intentSelected)) {
+        this.logger.log('[INTENT SERVICE] addActionToIntentSelected: impedito - defaultFallback vuota (bloccata)');
+        return;
+      }
       this.intentSelected.actions.push(action);
       this.updateIntent(this.intentSelected);
     }
@@ -264,6 +369,16 @@ export class IntentService {
     return intent;
   }
 
+  /**
+   * Observable che emette solo quando l'intent con il given id è aggiornato (behaviorIntent).
+   * Usato da cds-connector per sottoscriversi solo al proprio intent e ridurre il costo N×subscription.
+   */
+  intentUpdatesById$(intentId: string) {
+    return this.behaviorIntent.pipe(
+      filter((intent) => intent?.intent_id === intentId)
+    );
+  }
+
 
 
   // START DASHBOARD FUNCTIONS //
@@ -306,17 +421,29 @@ export class IntentService {
   public async getAllIntents(id_faq_kb): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.faqService.getAllFaqByFaqKbId(id_faq_kb).subscribe((faqs: Intent[]) => {
-        if (faqs) {
+        let normalized: NormalizeResult | null = null;
+        if (faqs && this.dashboardService?.isV3) {
+          // V3: il flusso viene riparato e le uscite riscritte dalla lista del bot PRIMA di
+          // entrare nello stato: il canvas disegna gia' dati puliti. Il salvataggio parte dopo,
+          // senza far aspettare chi ha chiesto il flusso.
+          normalized = this.normalizeLoadedFlow(faqs, id_faq_kb);
+          this.listOfIntents = JSON.parse(JSON.stringify(normalized.intents));
+          this.prevListOfIntent = JSON.parse(JSON.stringify(normalized.intents));
+        } else if (faqs) {
+          // V2: esattamente come master. Nessuna lista, nessuna riparazione salvata.
           this.patchActionId(faqs);
           this.listOfIntents = JSON.parse(JSON.stringify(faqs));
           this.prevListOfIntent = JSON.parse(JSON.stringify(faqs));
           this.intentAnalyzer();
+          this.resetConnectorStore();
         } else {
           this.listOfIntents = [];
           this.prevListOfIntent = [];
+          this.resetConnectorStore();
         }
         this.refreshIntents();
         resolve(true);
+        if (normalized) { void this.persistRepairs(normalized, id_faq_kb); }
       }, (error) => {
         this.logger.error('ERROR: ', error);
         reject(false);
@@ -332,6 +459,14 @@ export class IntentService {
   }
 
   
+  /** Un V2 (o nessun flusso): lo store dei connettori non ha niente da dire. */
+  private resetConnectorStore(): void {
+    this.lastRepairReport = null;
+    this.connectorStore?.reset();
+    if (this.connectorStore) { this.connectorStore.mode = 'actions'; }
+  }
+
+  /** V2, pari pari da master: toglie le action nulle e marca i blocchi riservati. */
   private intentAnalyzer() {
     this.listOfIntents.forEach(intent => {
       if (intent.actions) {
@@ -344,19 +479,105 @@ export class IntentService {
   }
 
   /**
-   * patchActionId
-   * @param faqs 
+   * SOLO V3. Ripara il flusso appena caricato e lo allinea alla lista dei connettori del bot.
+   *
+   * E' il normalizzatore (connectors/flow-normalizer.ts) a fare il lavoro: `#` mancanti, id
+   * tecnici, riferimenti a blocchi che non esistono, pallino dei blocchi Return, attributi
+   * visivi orfani; poi LA LISTA VINCE: ogni uscita viene riscritta dalla lista salvata in
+   * `attributes.connectors` del bot (se il bot non ce l'ha ancora, nasce dalle action e viene
+   * salvata). Il rapporto resta a disposizione di chi lo chiede (la chat AI lo riceve con
+   * get_flow) e finisce in console in una riga.
+   */
+  private normalizeLoadedFlow(faqs: any[], id_faq_kb: string): NormalizeResult {
+    const stored = this.dashboardService?.selectedChatbot?.attributes?.connectors;
+    const result = normalizeFlow(faqs, stored, { uid: generateShortUID, isV3: true, faqKbId: id_faq_kb, collectionWins: true, cleanDestinations: CONNECTORS_CONFIG.v3CleanDestinations });
+    this.lastRepairReport = result.report;
+    if (this.connectorStore) {
+      this.connectorStore.lastRepairReport = result.report;
+      this.connectorStore.load(result.collection);
+      this.connectorStore.mode = 'collection';
+    }
+    const r = result.report;
+    this.logger.info('[CONNECTORS] agente V3', id_faq_kb + ': connettori dalla lista del bot',
+      r.collection.existed
+        ? '(lista trovata; uscite riempite dalla lista: ' + r.collection.projected + ')'
+        : '(lista assente: costruita dalle action, viene salvata)',
+      'blocchi da ripulire dalle tracce V2:', ((r.counts['v2-destination-still-saved'] || r.counts['v2-connector-attrs-still-saved']) ? r.changedIntentIds.length : 0));
+    this.logger.info('[FLOW-REPAIR]', id_faq_kb, 'riparazioni:', r.counts, 'blocchi da salvare:', r.changedIntentIds.length,
+      'irrisolti:', r.unresolved.length, 'lista:', r.collection.existed ? (r.collection.changed ? 'ricostruita' : 'invariata') : 'costruita', r.collection.records);
+    this.logger.log('[FLOW-REPAIR] dettaglio', r);
+    return result;
+  }
+
+  /**
+   * Salva sul server quello che il normalizzatore ha cambiato: i soli blocchi toccati, in
+   * blocco (`faq/ops_update`, senza passare da undo/redo: l'utente non ha fatto nulla da
+   * annullare) e la lista dei connettori negli attributi del bot. Salvaguardie, in ordine:
+   * niente da salvare, interruttore spento, un salvataggio dell'utente in corso (si aspetta),
+   * il flusso aperto e' cambiato nel frattempo (si lascia perdere), errore HTTP (riferito,
+   * nessun ritentativo: il primo salvataggio manuale del blocco lo porta su comunque).
+   */
+  private async persistRepairs(result: NormalizeResult, id_faq_kb: string): Promise<void> {
+    const report = result.report;
+    const needIntents = result.changedIntentIds.length > 0;
+    const needCollection = result.collectionChanged;
+    if (!needIntents && !needCollection) { return; }
+    if (!CONNECTORS_CONFIG.repairSaveAtOpen) {
+      this.logger.info('[FLOW-REPAIR] salvataggio all\'apertura spento: riparazioni solo in memoria');
+      return;
+    }
+    report.saved = { intents: false, collection: false };
+    try {
+      if (this.savingStateService?.isSaving) {
+        await firstValueFrom(this.savingStateService.isSaving$.pipe(filter(saving => !saving)));
+      }
+      if (this.dashboardService?.id_faq_kb !== id_faq_kb) { return; }
+      // Prima la lista, poi i blocchi: i blocchi partono con le destinazioni V2 ripulite, e senza
+      // la lista salvata quei collegamenti non esisterebbero piu' da nessuna parte.
+      if (needCollection) {
+        await this.saveConnectorsCollection(result.collection, id_faq_kb);
+        report.saved.collection = true;
+      }
+      if (needIntents) {
+        await this.saveRepairedIntents(result.changedIntentIds, id_faq_kb);
+        report.saved.intents = true;
+      }
+      this.logger.info('[FLOW-REPAIR] salvato:', report.saved);
+    } catch (error: any) {
+      report.saveError = String(error?.message || error);
+      this.logger.error('[FLOW-REPAIR] salvataggio fallito:', error);
+    }
+  }
+
+  private async saveRepairedIntents(intentIds: string[], id_faq_kb: string): Promise<void> {
+    const size = Math.max(1, CONNECTORS_CONFIG.repairSaveChunk);
+    for (let i = 0; i < intentIds.length; i += size) {
+      const operations = intentIds.slice(i, i + size)
+        .map(id => this.listOfIntents.find(intent => intent.intent_id === id))
+        .filter(intent => !!intent)
+        .map(intent => ({ type: 'put', intent: JSON.parse(JSON.stringify(intent)) }));
+      if (operations.length === 0) { continue; }
+      await this.opsUpdate({ id_faq_kb, operations }, false);
+    }
+  }
+
+  private async saveConnectorsCollection(collection: any, id_faq_kb: string): Promise<void> {
+    await firstValueFrom(this.faqKbService.patchAttributes(id_faq_kb, { connectors: collection }));
+    const chatbot = this.dashboardService?.selectedChatbot;
+    if (chatbot) {
+      chatbot.attributes = { ...(chatbot.attributes || {}), connectors: collection };
+    }
+  }
+
+  /**
+   * patchActionId (V2, pari pari da master)
+   * @param faqs
    * quando creo un nuovo bot gli elementi welcome e defaultfallback non hanno un _tdActionId
    * perchè generati dal server. In questo caso è necessario assegnarne uno.
+   * Per un V3 fa lo stesso lavoro il normalizzatore (normalizeLoadedFlow).
    */
   public patchActionId(faqs){
-    faqs.forEach(element => {
-      element.actions.forEach(action => {
-        if(!action._tdActionId || action._tdActionId === "UUIDV4"){
-          action._tdActionId = action._tdActionId?action._tdActionId:generateShortUID();
-        }
-      });
-    });
+    patchActionIds(faqs);
   }
  
 
@@ -367,10 +588,14 @@ export class IntentService {
     intent.id_faq_kb = chatbot_id;
     intent.attributes.position = pos;
     intent.intent_display_name = this.setDisplayName();
-    if(color){
-      intent.attributes.color = color;
+    if (action) {
+      intent.actions.push(action);
     }
-    intent.actions.push(action);
+    // Il colore: quello chiesto da chi crea il blocco -- un connettore porta il suo, per restare
+    // dello stesso colore del blocco da cui esce -- altrimenti quello della famiglia dell'azione
+    // appena messa dentro. Va deciso DOPO il push: senza l'azione, la famiglia non si sa, e un
+    // blocco che nasce vuoto resta del grigio con cui lo costruisce IntentAttributes.
+    intent.attributes.color = color ?? getIntentDefaultColor(intent);
     this.logger.log("[INTENT SERVICE] ho creato un nuovo intent contenente l'azione ", intent, " action:", action, " in posizione ", pos);
     return intent;
   }
@@ -688,10 +913,22 @@ export class IntentService {
   // moving new action in intent from panel elements
   public moveNewActionIntoIntent(currentActionIndex, action, currentIntentId): any {
     // this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent');
-    let newAction = this.createNewAction(action.value.type);
+    if (action?.value?.start_point) {
+      // a start point palette item is not an action (createNewAction would return undefined)
+      return null;
+    }
+    let newAction = this.createNewAction(action.value.type, { connectorEntry: action.value.connectorEntry });
+    if (!newAction) {
+      return;
+    }
     let currentIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === currentIntentId;
     });
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere aggiunta, da nessuna via
+    if (isDefaultFallbackWithoutActions(currentIntent)) {
+      this.logger.log('[INTENT-SERVICE] moveNewActionIntoIntent: impedito - defaultFallback vuota (bloccata)');
+      return null;
+    }
     currentIntent.actions.splice(currentActionIndex, 0, newAction);
     this.behaviorIntent.next(currentIntent);
     // this.connectorService.updateConnector(currentIntent.intent_id);
@@ -720,6 +957,11 @@ export class IntentService {
     let previousIntent = this.listOfIntents.find(function(obj) {
       return obj.intent_id === that.previousIntentId;
     });
+    // defaultFallback vuota: blocco chiuso, nessuna action puo' essere spostata al suo interno
+    if (isDefaultFallbackWithoutActions(currentIntent)) {
+      this.logger.log('[INTENT-SERVICE] moveActionBetweenDifferentIntents: impedito - defaultFallback vuota (bloccata)');
+      return;
+    }
     // this.logger.log('moveActionBetweenDifferentIntents: ', event, this.listOfIntents, currentIntentId, currentIntent, previousIntent);
     currentIntent.actions.splice(event.currentIndex, 0, action);
     previousIntent.actions.splice(event.previousIndex, 1);
@@ -836,38 +1078,43 @@ export class IntentService {
     return this.intentSelected;
   }
 
-  /** selectAction */
+  /** selectAction
+   *
+   *  Scegliere un'action non toglie piu' la selezione al blocco: l'evidenziazione e' una
+   *  sola, ed e' quella del blocco. Prima le due si escludevano -- premere su un'action
+   *  spegneva il contorno del blocco e ne accendeva uno attorno all'action -- e cosi' lo
+   *  stesso gesto diceva due cose diverse a seconda di dove cadeva il puntatore.
+   *
+   *  `actionSelectedID` resta, perche' non e' uno stato visivo: dice a chi apre il pannello
+   *  di dettaglio, e a chi cancella, di quale action si parla.
+   */
   public selectAction(intentID, actionId){
-    this.intentSelectedID = null;
-    this.intentActive = false;
     this.actionSelectedID = actionId;
     this.intentSelected = this.listOfIntents.find(intent => intent.intent_id === intentID);
-    this.listActions = this.intentSelected.actions;
-    this.selectedAction = this.listActions.find(action => action._tdActionId === actionId);
-    // this.logger.log('[INTENT SERVICE] --> selectAction: ', intentID, actionId);
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
+    this.intentActive = !!this.intentSelected;
+    this.listActions = this.intentSelected?.actions;
+    this.selectedAction = this.listActions?.find(action => action._tdActionId === actionId);
     this.behaviorIntent.next(this.intentSelected);
+    this.emitIntentSelection();
   }
 
   /** setIntentSelected */
   public setIntentSelected(intentID){
     this.logger.log('[INTENT SERVICE] ::: setIntentSelected:: ', intentID);
     this.intentSelected = this.selectIntent(intentID);
-    this.intentSelectedID = this.intentSelected.intent_id;
-    this.intentActive = true;
+    this.intentSelectedID = this.intentSelected?.intent_id ?? null;
+    this.intentActive = !!this.intentSelected;
     this.actionSelectedID = null;
     this.listActions = null;
     this.selectedAction = null;
     if(this.intentSelected?.actions){
       this.listActions = this.intentSelected.actions;
     }
-    // //this.listActions = this.intentSelected.actions?this.intentSelected.actions:null;
-    // //this.logger.log('[INTENT SERVICE] ::: setIntentSelected ::: ', this.intentSelected);
     if(this.intentSelected){
       this.behaviorIntent.next(this.intentSelected);
     }
-    // if(!this.intentSelected)return;
-    // chiudo tutti i pannelli
-    // this.controllerService.closeAllPanels();
+    this.emitIntentSelection();
   }
 
   
@@ -882,19 +1129,26 @@ export class IntentService {
     this.logger.log('[CDS-INTENT] intentSelected: ', this.intentSelected);
     if(this.intentSelected){
       this.setDefaultIntentSelected();
-      //** center stage on 'start' intent */
+      //** center stage on the selected entry: 'start', or a visible start box when Web start is disabled (hidden) */
+      if (isWebStartDisabled(this.intentSelected)) {
+        // nothing visible to centre on (a flow made of the hidden start only)
+        return;
+      }
       let startElement = await isElementOnTheStage(this.intentSelected.intent_id); // sync
       if(startElement){
         /// let id_faq_kb = this.dashboardService.id_faq_kb;
         /// this.logger.log('[CDS-INTENT] setStartIntent: ', startElement);
         /// this.stageService.centerStageOnHorizontalPosition(startElement);
-        let left = 0;
-        const element = document.getElementById('cdsPanelIntentList');
-        if (element) {
-          left = element.offsetWidth+100;
-        }
+        // This used to nudge the centred position right by roughly
+        // #cdsPanelIntentList's (.box-left's) own width, to clear the
+        // sidebar back when #tds_container spanned underneath it and
+        // .box-left merely floated on top via z-index. #tds_container is a
+        // real flex sibling starting after .box-left (and the chat panel)
+        // now, so centring within the container's own coordinate space
+        // already lands past both -- re-adding their width here would push
+        // the 'start' block needlessly far right instead of centring it.
         let id_faq_kb = this.dashboardService.id_faq_kb;
-        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement, left);
+        this.stageService.centerStageOnHorizontalPosition(id_faq_kb, startElement);
       }
     }
   }
@@ -909,6 +1163,7 @@ export class IntentService {
   /** unselectIntent */
   public inactiveIntent(){
     this.intentActive = false;
+    this.emitIntentSelection();
   }
 
 
@@ -923,6 +1178,10 @@ export class IntentService {
   */
   public deleteSelectedAction(){
     // this.logger.log('[INTENT SERVICE] ::: deleteSelectedAction', this.intentSelected.intent_id, this.actionSelectedID);
+    if (isStartBox(this.intentSelected)) {
+      // the connect action of a start box is its only content
+      return;
+    }
     if(this.intentSelected.intent_id && this.actionSelectedID){
       this.connectorService.deleteConnectorsFromActionByActionId(this.actionSelectedID);
       let intentToUpdate = this.listOfIntents.find((intent) => intent.intent_id === this.intentSelected.intent_id);
@@ -954,9 +1213,19 @@ export class IntentService {
    * @param typeAction 
    * @returns 
    */
-  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML) {
+  public createNewAction(typeAction: TYPE_ACTION | TYPE_ACTION_VXML, options?: { connectorEntry?: ConnectorActionEntry }) {
     this.logger.log('[INTENT-SERV] createNewAction typeAction ', typeAction)
     let action: any;
+
+    if (typeAction === TYPE_ACTION.CONNECTOR) {
+      if (options?.connectorEntry) {
+        return buildConnectorAction(options.connectorEntry, this.dashboardService.projectID);
+      }
+      // No connector descriptor reached us: never return undefined (it would be
+      // inserted as a null action and crash the canvas). Skip instead.
+      this.logger.error('[INTENT-SERV] connector action requested without a connectorEntry; skipping');
+      return null;
+    }
 
     if(typeAction === TYPE_ACTION.REPLY){
       action = new ActionReply();
@@ -1031,6 +1300,15 @@ export class IntentService {
     if(typeAction === TYPE_ACTION.ONLINE_AGENTSV2){
       action = new ActionOnlineAgentV2();
     }
+    if(typeAction === TYPE_ACTION.INVITE_HUMAN){
+      action = new ActionInviteHuman();
+    }
+    if(typeAction === TYPE_ACTION.REMOVE_HUMAN){
+      action = new ActionRemoveHuman();
+    }
+    if(typeAction === TYPE_ACTION.REMOVE_CURRENT_BOT){
+      action = new ActionRemoveCurrentBot();
+    }
     if(typeAction === TYPE_ACTION.OPEN_HOURS){
       action = new ActionOpenHours();
     }
@@ -1067,6 +1345,11 @@ export class IntentService {
       action = new ActionJsonCondition2();
       action.groups.push( new Expression());
     }
+    if(typeAction === TYPE_ACTION.JSON_CONDITION_MULTI){
+      // Nasce con un caso: un'azione a zero casi non direbbe nulla di cosa sa fare.
+      action = new ActionJsonConditionMulti();
+      action.cases.push( new ConditionCase());
+    }
     if(typeAction === TYPE_ACTION.CONDITION) {
       action = new ActionCondition();
       action.groups.push( new Expression());
@@ -1099,7 +1382,7 @@ export class IntentService {
       action.temperature = 0.7;
       action.top_k = 5;
       action.alpha = 0.5;
-      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
+      action.model = OPENAI_MODEL.find(el => el.value === 'gpt-4o').value
       action.preview = [];
       action.history = false;
       action.citations = false;
@@ -1110,7 +1393,7 @@ export class IntentService {
       action = new ActionGPTTask();
       action.max_tokens = 256;
       action.temperature = 0.7;
-      action.model = TYPE_GPT_MODEL.find(el => el.value === 'gpt-4o').value
+      action.model = OPENAI_MODEL.find(el => el.value === 'gpt-4o').value
       action.assignReplyTo = 'gpt_reply';
       action.preview = [];
       action.formatType = 'none'
@@ -1199,6 +1482,18 @@ export class IntentService {
       action.tags = '';
       action.pushToList = false;
     }
+    if(typeAction === TYPE_ACTION.SET_RATING){
+      action = new ActionSetRating();
+      action.rating = '';
+      action.ratingMessage = '';
+      action.forceUpdate = false;
+      action.assignErrorTo = 'rating_error';
+    }
+    if(typeAction === TYPE_ACTION.GET_RATING){
+      action = new ActionGetRating();
+      action.assignRatingTo = 'rating_value';
+      action.assignRatingMessageTo = 'rating_message';
+    }
     if(typeAction === TYPE_ACTION.LEAD_UPDATE){
       action = new ActionLeadUpdate();
     }
@@ -1240,7 +1535,7 @@ export class IntentService {
       commandWait2.time = 0
       action.attributes.commands.push(commandWait2);
       let command_form = new Command(TYPE_COMMAND.SETTINGS);
-      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', noInputIntent: null, noInputTimeout: 5000, bargein: true}
+      command_form.settings = { minDigits: null, maxDigits: null, terminators: '#', noInputIntent: null, noMatchIntent: null, noInputTimeout: 5000, bargein: true}
       command_form.subType = TYPE_ACTION_VXML.DTMF_FORM
       action.attributes.commands.push(command_form);
     }
@@ -1453,7 +1748,12 @@ export class IntentService {
       this.setBehaviorUndoRedo();
       this.opsUpdate(this.payload);
     }
-    const action = this.intentSelected.actions.find((obj) => obj._tdActionId === this.actionSelectedID);
+    // Optional all the way down: this is a log line, and `intentSelected` is
+    // null on a freshly rebuilt canvas (a flow switch destroys and recreates
+    // it, and nothing re-selects a block). Dereferencing it there threw --
+    // out of a public method the canvas's own Ctrl+Z and the chat panel's
+    // Undo both call -- for the sake of a message nobody reads.
+    const action = this.intentSelected?.actions?.find((obj) => obj._tdActionId === this.actionSelectedID);
     this.logger.log('[INTENT SERVICE] -> è action:: ', action, this.intentSelected, this.actionSelectedID);
   }
 
@@ -1624,6 +1924,31 @@ export class IntentService {
     this.opsUpdate(this.payload); 
   }
 
+  /** Moves several blocks at once, as ONE step of undo and ONE save.
+   *  Used by the automatic layout of the flow: updateIntent() per block would push one
+   *  undo entry and one save per block. The undo copy is the block as it is now, just
+   *  before the move. Returns the ids actually moved. */
+  public updateIntentPositions(moves: Array<{ intent_id: string, position: { x: number, y: number } }>): string[] {
+    const undo = [];
+    const redo = [];
+    let idFaqKb = null;
+    for (const move of moves || []) {
+      const intent = this.listOfIntents.find((obj) => obj.intent_id === move.intent_id);
+      if (!intent) { continue; }
+      undo.push({ type: "put", intent: JSON.parse(JSON.stringify(intent)) });
+      intent.attributes = intent.attributes || {};
+      intent.attributes.position = { x: move.position.x, y: move.position.y };
+      redo.push({ type: "put", intent: JSON.parse(JSON.stringify(intent)) });
+      idFaqKb = intent.id_faq_kb;
+    }
+    if (redo.length === 0) { return []; }
+    this.arrayUNDO.push({ undo: undo, redo: redo });
+    this.arrayREDO = [];
+    this.setBehaviorUndoRedo();
+    this.opsUpdate({ id_faq_kb: idFaqKb, operations: redo }).catch(() => {});
+    return redo.map(op => op.intent.intent_id);
+  }
+
   /** */
   public async saveNewIntent(intent: Intent, nowIntent: Intent, prevIntent:Intent){
     this.logger.log('[INTENT SERVICE] -> addIntentNew, ', intent, nowIntent, prevIntent);
@@ -1664,6 +1989,38 @@ export class IntentService {
     this.logger.log('[INTENT SERVICE] -> payload, ', this.payload,  this.operationsRedo,  this.operationsUndo);
     this.refreshIntents();
     this.opsUpdate(this.payload);
+  }
+
+  /**
+   * Start boxes: saves a new block with a direct POST /faq and resolves only with the saved faq.
+   * Not ops_update: that answers before its loopback calls have saved anything. No undo entry.
+   */
+  public async createIntentWithoutHistory(intent: Intent): Promise<any> {
+    // Sola lettura: e' un POST diretto, non passa dal guard di opsUpdate; rifiuta invece di fingere un salvataggio
+    if (this.readOnlyService.readOnly) {
+      throw new Error('read-only: start box not created');
+    }
+    const body = removeNodesStartingWith(JSON.parse(JSON.stringify(intent)), '__');
+    const saved = await firstValueFrom(this.savingStateService.track(this.faqService.addIntent(body)));
+    if (this.dashboardService.selectedChatbot) {
+      this.dashboardService.selectedChatbot.modified = true;
+    }
+    return saved;
+  }
+
+  /** Start boxes: rollback of createIntentWithoutHistory, a direct DELETE /faq/intentId… resolved by the server. No undo entry. */
+  public async deleteSavedIntentWithoutHistory(intent: Intent): Promise<any> {
+    // Sola lettura: DELETE diretto, non passa dal guard di opsUpdate
+    if (this.readOnlyService.readOnly) {
+      return null;
+    }
+    return firstValueFrom(this.savingStateService.track(this.faqService.deleteFaq(intent.id, intent.intent_id, intent.id_faq_kb)));
+  }
+
+  /** Start boxes: a block saved by createIntentWithoutHistory joins the canvas; it is the new baseline for the next undo entry */
+  public addSavedIntentToListOfIntents(intent: Intent) {
+    this.addNewIntentToListOfIntents(intent);
+    this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
   }
 
 
@@ -1711,12 +2068,51 @@ export class IntentService {
     }
     
 
+    /**
+     * Saves one block with a direct put and no undo entry (Web start disable/enable): undoing would bring back a
+     * connection the start no longer offers. The block must already be changed in listOfIntents; opsUpdate then
+     * takes the new baseline of the next undo entry. Rejects when the save fails.
+     */
+    public async saveIntentWithoutHistory(intent: Intent): Promise<boolean> {
+      const saved = await this.opsUpdate({
+        id_faq_kb: intent.id_faq_kb,
+        operations: [{ type: 'put', intent: JSON.parse(JSON.stringify(intent)) }]
+      });
+      // older undo/redo entries hold full snapshots of this block: restoring one would bring back the old state
+      // (and show a hidden start again without the canvas knowing)
+      const touches = (op: any) => (op?.undo || []).concat(op?.redo || []).some((o: any) => o?.intent?.intent_id === intent.intent_id);
+      const undoDepth = this.arrayUNDO.length;
+      this.arrayUNDO = this.arrayUNDO.filter(op => !touches(op));
+      this.arrayREDO = this.arrayREDO.filter(op => !touches(op));
+      this.setBehaviorUndoRedo();
+      if (this.arrayUNDO.length !== undoDepth) {
+        this.undoHistoryPruned$?.next();
+      }
+      this.refreshIntent(intent);
+      return saved;
+    }
+
+    /** Deletes a start box without leaving history: undoing would bring back a box whose start point no longer exists */
+    public async deleteIntentWithoutHistory(intent: Intent){
+      try {
+        await this.deleteIntentNew(intent);
+      } finally {
+        const undoDepth = this.arrayUNDO.length;
+        this.arrayUNDO = this.arrayUNDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
+        this.arrayREDO = this.arrayREDO.filter(op => !(op?.redo || []).some(o => o?.intent?.intent_id === intent.intent_id));
+        this.setBehaviorUndoRedo();
+        if (this.arrayUNDO.length !== undoDepth) {
+          this.undoHistoryPruned$?.next();
+        }
+      }
+    }
+
     public deleteIntentAttributesConnectorByIntent(intentId, intent) {
       this.logger.log('[INTENT SERVICE] -> deleteIntentAttributesConnectorByIntent, ', intentId,  intent);
       const connectorsList = intent.attributes?.connectors;
       if(!connectorsList) return;
       const filteredData = Object.keys(connectorsList)
-      .filter(key => !connectorsList[key].id.endsWith(intentId))
+      .filter(key => !connectorsList[key]?.id?.endsWith(intentId))
       .reduce((acc, key) => {
         acc[key] = connectorsList[key];
         return acc;
@@ -1798,6 +2194,12 @@ export class IntentService {
       // Salvataggio condizioni: scrive `when` (sempre) e, in modalità TEST, salva SOLO `when`
       // svuotando l'AST nel payload. Agisce solo sul payload (clone) -> UI/modello invariati.
       payload = applyConditionSaveModeToPayload(payload);
+      if (this.dashboardService?.isV3 && CONNECTORS_CONFIG.v3CleanDestinations) {
+        // V3: sul server nessuna traccia dei connettori alla maniera V2 (chiavi di destinazione e
+        // attributi visivi per blocco; i bottoni restano): la verita' e' la lista del bot. Solo sul
+        // payload: il modello che il canvas disegna resta pieno.
+        stripV2Connectors((payload?.operations || []).map((op: any) => op?.intent).filter((intent: any) => !!intent));
+      }
       //this.setDragAndListnerEventToElement(intent.intent_id);
       return new Promise((resolve, reject) => {
         // track(): incrementa alla subscribe, decrementa via finalize su next+complete /
@@ -1806,6 +2208,8 @@ export class IntentService {
         this.savingStateService.track(this.faqService.opsUpdate(payload)).subscribe((resp: any) => {
           // this.logger.log('[INTENT SERVICE] -> opsUpdate, ', resp);
           this.prevListOfIntent = JSON.parse(JSON.stringify(this.listOfIntents));
+          // V3: il flusso e' salvato, la lista dei connettori si riallinea alle action (e si salva se cambia).
+          if (this.dashboardService?.isV3) { this.connectorStore?.syncFromIntents(this.listOfIntents); }
           // this.setDragAndListnerEventToElement(intent.intent_id);
           this.dashboardService.selectedChatbot.modified = true;
           resolve(true);
@@ -1924,6 +2328,10 @@ export class IntentService {
   /************************************************/
   public copyElement(element): {key: string, data: any} {
     this.logger.log('[INTENT SERVICE] -> copyElement, ', element);
+    if (element?.type === 'INTENT' && isStartBox(element.element)) {
+      // start boxes are one per type: never copied
+      return null;
+    }
     let value= {}
     if(element && element.type === 'INTENT'){
       this.arrayCOPYPAST[0] = element;
@@ -1949,6 +2357,12 @@ export class IntentService {
 
   public async pasteElementToStage(positions){
     let element = this.arrayCOPYPAST[0];
+    if (element?.type === 'INTENT' && isStartBox(element.element)) {
+      // e.g. copied before start boxes were refused, still in storage
+      localStorage.removeItem('copied_items');
+      this.arrayCOPYPAST = [];
+      return;
+    }
     let point = this.connectorService.logicPoint(positions);
     this.logger.log('[INTENT SERVICE] -> pasteElementToStage, ', element, point);
     if(element && element.type === 'INTENT'){
@@ -1981,9 +2395,18 @@ export class IntentService {
 
 
   private pasteIntentOntoStage(newIntent, prevIntent_id, newIntent_id){
-    let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
-    let intent = JSON.parse(elementJson);
-    intent = this.resetConnectors(intent);
+    let intent: any;
+    if (this.dashboardService?.isV3) {
+      // V3: nuovo id, nessun collegamento e nessun attributo visivo ereditato, sulle sole
+      // destinazioni (il V2 azzera OGNI stringa che comincia per `#`, e scrive il nuovo id con
+      // un `.replace` sul JSON che tocca solo la prima occorrenza).
+      intent = preparedPastedIntent(JSON.parse(JSON.stringify(newIntent)), newIntent_id);
+    } else {
+      // V2: esattamente come master.
+      let elementJson = JSON.stringify(newIntent).replace(prevIntent_id, newIntent_id);
+      intent = JSON.parse(elementJson);
+      intent = this.resetConnectors(intent);
+    }
     // this.connectorService.createConnectorsOfIntent(intent);
     // this.connectorService.updateConnectorsOfBlock(intent.intent_id);
     this.addNewIntentToListOfIntents(intent);
@@ -1994,6 +2417,7 @@ export class IntentService {
   }
 
 
+  /** V2, pari pari da master: azzera ogni stringa che comincia per `#` nel blocco incollato. */
   private resetConnectors(json) {
     let results = [];
     function exploreObject(obj) {
@@ -2009,9 +2433,7 @@ export class IntentService {
     }
     exploreObject(json);
     return json;
-    //return results;
   }
-
 
   private replaceId(obj: any, keyToReplace: string) {
     for (const key in obj) {
@@ -2042,6 +2464,244 @@ export class IntentService {
     }
   }
 
+  // =============================
+  // INTENT ATTRIBUTES MANAGEMENT
+  // =============================
+
+  /**
+   * Configura gli attributi dell'intent, in particolare il colore.
+   * Inizializza gli attributi se non esistono e imposta il colore di default se non specificato.
+   * 
+   * @param intent - L'intent da configurare
+   * @returns Il colore dell'intent configurato
+   */
+  public setIntentAttributes(intent: Intent): string {
+    try {
+      // Inizializza gli attributi se non esistono
+      this.initializeIntentAttributes(intent);
+      // Configura il colore dell'intent
+      return this.configureIntentColor(intent);
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nella configurazione degli attributi intent:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Inizializza l'oggetto attributes dell'intent se non esiste.
+   * 
+   * @param intent - L'intent da inizializzare
+   */
+  private initializeIntentAttributes(intent: Intent): void {
+    if (!intent?.attributes) {
+      intent['attributes'] = {};
+      this.logger.debug("[INTENT SERVICE] Attributi intent inizializzati");
+    }
+  }
+
+  /**
+   * Configura il colore dell'intent.
+   * Usa il colore esistente se presente, altrimenti imposta il colore di default.
+   * 
+   * @param intent - L'intent da configurare
+   * @returns Il colore dell'intent configurato
+   */
+  private configureIntentColor(intent: Intent): string {
+    const existingColor = intent.attributes.color;
+    if (this.isValidColor(existingColor)) {
+      this.logger.debug("[INTENT SERVICE] Colore intent configurato:", existingColor);
+      return existingColor;
+    } else {
+      return this.setDefaultIntentColor(intent);
+    }
+  }
+
+  /**
+   * Verifica se il colore fornito è valido.
+   * 
+   * @param color - Colore da validare
+   * @returns true se il colore è valido, false altrimenti
+   */
+  private isValidColor(color: any): boolean {
+    return color && color !== undefined && color !== null && color !== '';
+  }
+
+  /**
+   * Imposta il colore di default per l'intent.
+   * 
+   * @param intent - L'intent per cui impostare il colore di default
+   * @returns Il colore di default impostato
+   */
+  private setDefaultIntentColor(intent: Intent): string {
+    const defaultColor = '156,163,205'; // INTENT_COLORS.COLOR1
+    intent.attributes.color = defaultColor;
+    this.logger.debug("[INTENT SERVICE] Colore di default impostato:", defaultColor);
+    return defaultColor;
+  }
+
+  /**
+   * Assicura che l'intent abbia gli attributi di posizione configurati.
+   * Crea gli attributi se non esistono e imposta la posizione di default.
+   * 
+   * @param intent - L'intent da configurare
+   */
+  public patchAttributesPosition(intent: Intent): void {
+    try {
+      // Inizializza gli attributi se non esistono
+      this.initializeIntentAttributes(intent);
+      
+      // Assicura che la posizione sia configurata
+      this.ensurePositionAttribute(intent);
+      
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nella configurazione della posizione:", error);
+    }
+  }
+
+  /**
+   * Assicura che l'attributo position sia presente e configurato.
+   * 
+   * @param intent - L'intent da configurare
+   */
+  private ensurePositionAttribute(intent: Intent): void {
+    if (!intent.attributes.position) {
+      intent.attributes['position'] = { 'x': 0, 'y': 0 };
+      this.logger.debug("[INTENT SERVICE] Posizione di default impostata");
+    }
+  }
+
+  // =============================
+  // INTENT METRICS CALCULATION
+  // =============================
+
+  /**
+   * Configura lo stato dell'intent quando viene selezionato.
+   * Inizializza le proprietà dell'intent e calcola le metriche (azioni, domande, form).
+   * 
+   * @param intent - L'intent da configurare
+   * @returns Oggetto con le metriche calcolate
+   */
+  public setIntentSelectedWithMetrics(intent: Intent): {
+    questionCount: number;
+    formSize: number;
+    actionsCount: number;
+  } {
+    try {
+      const metrics = {
+        questionCount: 0,
+        formSize: 0,
+        actionsCount: 0
+      };
+
+      if (intent) {
+        // Configura la posizione degli attributi
+        this.patchAttributesPosition(intent);
+        
+        // Calcola le metriche
+        metrics.questionCount = this.calculateQuestionCount(intent.question);
+        metrics.formSize = this.calculateFormSize(intent.form);
+        metrics.actionsCount = intent.actions?.length || 0;
+      }
+      
+      this.logger.debug("[INTENT SERVICE] Intent selezionato configurato:", intent?.intent_id, metrics);
+      return metrics;
+      
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nella configurazione dell'intent selezionato:", error);
+      return { questionCount: 0, formSize: 0, actionsCount: 0 };
+    }
+  }
+
+  /**
+   * Calcola il numero di domande nell'intent.
+   * 
+   * @param questionText - Testo delle domande
+   * @returns Numero di domande calcolato
+   */
+  private calculateQuestionCount(questionText: string): number {
+    if (!questionText) {
+      return 0;
+    }
+    
+    const questionSegments = questionText
+      .split(/\r?\n/)
+      .filter(segment => segment.trim() !== '');
+    
+    const count = questionSegments.length;
+    this.logger.debug("[INTENT SERVICE] Numero domande calcolato:", count);
+    return count;
+  }
+
+  /**
+   * Calcola la dimensione del form dell'intent.
+   * 
+   * @param form - Oggetto form da analizzare
+   * @returns Dimensione del form (numero di campi)
+   */
+  private calculateFormSize(form: any): number {
+    if (form && form !== null) {
+      const size = Object.keys(form).length;
+      this.logger.debug("[INTENT SERVICE] Dimensione form calcolata:", size);
+      return size;
+    }
+    return 0;
+  }
+
+  // =============================
+  // ACTION PARAMETERS MANAGEMENT
+  // =============================
+
+  /**
+   * Ottiene i parametri di configurazione per un'azione specifica.
+   * Cerca l'azione nell'enum TYPE_ACTION e restituisce la configurazione corrispondente.
+   * 
+   * @param action - L'azione per cui ottenere i parametri
+   * @param TYPE_ACTION - L'enum dei tipi di azione
+   * @param ACTIONS_LIST - La lista delle configurazioni delle azioni
+   * @returns La configurazione dell'azione o undefined se non trovata
+   */
+  public getActionParams(action: any, TYPE_ACTION: any, ACTIONS_LIST: any): any {
+    try {
+      if (!action || !action._tdActionType) {
+        this.logger.warn("[INTENT SERVICE] Azione non valida per getActionParams:", action);
+        return undefined;
+      }
+
+      const actionKey = this.findActionKey(action._tdActionType, TYPE_ACTION);
+      
+      if (actionKey) {
+        const actionConfig = ACTIONS_LIST[actionKey];
+        this.logger.debug("[INTENT SERVICE] Parametri azione trovati:", actionKey);
+        return actionConfig;
+      } else {
+        this.logger.warn("[INTENT SERVICE] Tipo azione non trovato:", action._tdActionType);
+        return undefined;
+      }
+      
+    } catch (error) {
+      this.logger.error("[INTENT SERVICE] Errore nell'ottenimento dei parametri azione:", error);
+      return undefined;
+    }
+  }
+
+  /**
+   * Trova la chiave dell'enum corrispondente al tipo di azione.
+   * 
+   * @param actionType - Il tipo di azione da cercare
+   * @param TYPE_ACTION - L'enum dei tipi di azione
+   * @returns La chiave dell'enum o null se non trovata
+   */
+  private findActionKey(actionType: string, TYPE_ACTION: any): string | null {
+    const enumKeys = Object.keys(TYPE_ACTION);
+    
+    for (const key of enumKeys) {
+      if (TYPE_ACTION[key] === actionType) {
+        return key;
+      }
+    }
+    
+    return null;
+  }
 
   /**
    * getDefaultFallbackIntent

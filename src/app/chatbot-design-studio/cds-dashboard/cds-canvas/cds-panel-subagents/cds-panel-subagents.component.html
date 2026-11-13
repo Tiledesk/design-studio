@@ -1,26 +1,44 @@
 <div class="content">
 
+    <!-- Intestazione nella cornice condivisa con i pannelli dei blocchi e delle azioni: le tre
+         schede si alternano nello stesso slot, e partire da altezze o pesi diversi si legge come
+         un salto. La freccia fa la stessa cosa della linguetta attiva nella striscia: chi ha il
+         pannello sotto gli occhi non deve cercare la linguetta per toglierlo di mezzo. -->
+    <div class="lp-head-title">
+        <span class="lp-head-title__text">{{ 'CDSCanvas.Subagents' | translate }}</span>
+        <button type="button" class="lp-head-title__close"
+            [attr.aria-label]="'Close' | translate"
+            (click)="onClosePanel()">
+            <mat-icon class="icon" svgIcon="chevron_left" aria-hidden="true"></mat-icon>
+        </button>
+    </div>
+
     <!-- Casella di ricerca nascosta su richiesta. La logica di filtro resta in
-         onSearch()/applyFilter(): senza termine, filteredSubagents = tutti. -->
+         onSearch()/applyFilter(): senza termine, filteredSubagents = tutti. Volendola, la fascia
+         e' quella dei due pannelli accanto: `lp-search-head` piu' `search-box`. -->
 
     <!-- Lista: parent (sempre primo) + subagent -->
     <div class="subagents-list" *ngIf="IS_OPEN">
 
-        <!-- Parent chatbot -->
+        <!-- Il parent apre la famiglia e sta in cima, staccato da una riga: lo stesso posto e lo
+             stesso trattamento che nell'elenco dei blocchi hanno l'avvio e il fallback. -->
         <div *ngIf="parentItem" class="subagent-item parent-item"
             [class.active]="parentItem._id === currentId"
-            (click)="openAgent(parentItem._id)"
-            [attr.title]="parentItem.name">
-            <mat-icon class="subagent-icon" svgIcon="groups" aria-hidden="true"></mat-icon>
+            (click)="openAgent(parentItem._id)">
+            <div class="icon-container">
+                <mat-icon class="icon" svgIcon="groups" aria-hidden="true"></mat-icon>
+            </div>
             <span class="subagent-name">{{ parentItem.name }}</span>
         </div>
 
-        <!-- Subagent -->
+        <!-- Subagent. Nessun `title`: il riquadro che il browser ne ricava compariva sopra la
+             riga accanto e sopra le linguette, e ripeteva un nome che e' gia' li' scritto. -->
         <div *ngFor="let sa of filteredSubagents" class="subagent-item"
             [class.active]="sa._id === currentId"
-            (click)="openAgent(sa._id)"
-            [attr.title]="sa.name">
-            <mat-icon class="subagent-icon" svgIcon="person" aria-hidden="true"></mat-icon>
+            (click)="openAgent(sa._id)">
+            <div class="icon-container">
+                <mat-icon class="icon" svgIcon="person" aria-hidden="true"></mat-icon>
+            </div>
             <span class="subagent-name">{{ sa.name }}</span>
 
             <!-- Azioni del subagent. Si apre in hover e si chiude 1s dopo l'uscita del mouse

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-condition",
+    "types": ["jasmine", "node"]
+  },
+  "files": ["src/test-condition.ts", "src/polyfills.ts"],
+  "include": [
+    "src/app/chatbot-design-studio/utils-condition.spec.ts",
+    "src/app/chatbot-design-studio/utils-actions.spec.ts",
+    "src/app/chatbot-design-studio/services/connector-map.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

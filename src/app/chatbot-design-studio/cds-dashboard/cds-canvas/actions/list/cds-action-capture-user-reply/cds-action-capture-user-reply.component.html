@@ -28,9 +28,7 @@
         </label>
 
         <cds-connector *ngIf="action?.goToIntent" class="connector"
-            [idConnector] = "idConnector"
-            [idConnection] = "idConnection"
-            [isConnected] = "isConnected">
+            [intent]="intentSelected" [action]="action" slot="default">
         </cds-connector>
     </div>
 

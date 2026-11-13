@@ -74,6 +74,15 @@
                 </cds-textarea>
             </div>
         </section>
+
+        <!-- Qualifica il confronto fra attributo e valore, quindi sta sotto al valore e
+             non nell'elenco degli operatori: raddoppiare le voci avrebbe significato
+             scegliere due volte la stessa cosa. Solo sui confronti di testo. -->
+        <section class="ignore-case" *ngIf="canShowIgnoreCase">
+            <mat-checkbox formControlName="ignoreCase">
+                {{'CDSCanvas.IgnoreCase' | translate }}
+            </mat-checkbox>
+        </section>
         <section class="submit">
             <button class="btn btn-primary pull-right cds-blue-button" [disabled]="disableSubmit || !conditionForm.value.operator" type="submit">{{'CDSCanvas.ApplyCondition' | translate }}</button>
         </section>

@@ -1,0 +1,22 @@
+.previewContent.get-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.title-preview-label > span {
+    font-weight: 600;
+}
+
+.title-preview-label > span.empty {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brown);
+}
+
+.rating-target {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}

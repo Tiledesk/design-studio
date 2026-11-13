@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Subscription, firstValueFrom } from 'rxjs';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { TYPE_METHOD_ATTRIBUTE, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { ActionSubAgent } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
@@ -36,15 +35,9 @@ export class CdsActionSubAgentComponent implements OnInit, OnDestroy {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
 
   jsonParameters: string;
   typeMethodAttribute = TYPE_METHOD_ATTRIBUTE;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   private readonly logger: LoggerService = LoggerInstance.getInstance();
 
   constructor(
@@ -55,17 +48,10 @@ export class CdsActionSubAgentComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.connector = connector;
-      this.updateConnector();
-    });
     this.initialize();
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   private async initialize(): Promise<void> {
@@ -104,36 +90,9 @@ export class CdsActionSubAgentComponent implements OnInit, OnDestroy {
     this.idConnectorTrue = this.idIntentSelected + '/' + this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected + '/' + this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
-  private checkConnectionStatus(): void {
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue = resp.isConnectedTrue;
-    this.isConnectedFalse = resp.isConnectedFalse;
-    this.idConnectionTrue = resp.idConnectionTrue;
-    this.idConnectionFalse = resp.idConnectionFalse;
-  }
 
-  private updateConnector(): void {
-    const resp = updateConnector(
-      this.connector,
-      this.action,
-      this.isConnectedTrue,
-      this.isConnectedFalse,
-      this.idConnectionTrue,
-      this.idConnectionFalse
-    );
-    if (resp) {
-      this.isConnectedTrue = resp.isConnectedTrue;
-      this.isConnectedFalse = resp.isConnectedFalse;
-      this.idConnectionTrue = resp.idConnectionTrue;
-      this.idConnectionFalse = resp.idConnectionFalse;
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      }
-    }
-  }
 
   get showBranching(): boolean {
     return this.action?.mode === 'wait_result' || this.action?.awaitWebhookPublish === true;
