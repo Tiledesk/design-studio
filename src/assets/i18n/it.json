@@ -326,5 +326,12 @@
         "field_label": "Scrivi un'etichetta chiara che aiuti gli utenti a inserire i dati corretti (es: come ti chiami?)",
         "field_error": "Scrivi un messaggio di errore se i dati inseriti dall'utente non sono corretti"
       }
+    },
+    "CDSHeader": {
+        "OtherVersionTitle": "Agente creato con un'altra versione",
+        "OtherVersionText": "\"{{name}}\" e' stato creato con il Design Studio {{version}}, e verra' aperto li'.",
+        "OtherVersionButton": "Apri nel Design Studio {{version}}",
+        "OtherVersionDashboardText": "\"{{name}}\" e' stato creato con il Design Studio {{version}} e non puo' essere aperto con questa console. Aprilo dalla dashboard.",
+        "OtherVersionDashboardButton": "Vai alla dashboard"
     }
   }

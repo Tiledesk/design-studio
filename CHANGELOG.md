@@ -7,6 +7,10 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# features-2611/v3-agents-redirect 12/11/2026
+- **added**: an agent of another Design Studio version (`ds_version` `v3`, `v4`..., or the older `attributes.dsVersion`) is not opened in this console, where its connections would be lost: a dialog, then the page reloads in the console of its version on the same agent and route, the same address with `cds-v3` (`cds-vN`) in place of `cds`, also when switching flow. Where that console cannot be derived (local) the dialog sends to the agents list of the dashboard. Agents without a label stay here, as before
+- **added**: specs in `npm run test:version`
+
 # 1.41.1
 - **changed**: remoteConfig: false
 

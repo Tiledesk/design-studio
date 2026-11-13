@@ -1571,6 +1571,11 @@
     },
     "Options": "Options",
     "CDSHeader": {
+        "OtherVersionTitle": "Agent created with another version",
+        "OtherVersionText": "\"{{name}}\" was created with Design Studio {{version}}, and will be opened there.",
+        "OtherVersionButton": "Open in Design Studio {{version}}",
+        "OtherVersionDashboardText": "\"{{name}}\" was created with Design Studio {{version}} and cannot be opened with this console. Open it from the dashboard.",
+        "OtherVersionDashboardButton": "Go to the dashboard",
         "LinkCopiedToClipboard": "Link copied to clipboard",
         "ThereAreUnpublishedChanges": "There are unpublished changes"
     },

@@ -15,7 +15,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:publish": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-publish.ts --ts-config=tsconfig.spec.publish.json",
-    "test:preview": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-preview.ts --ts-config=tsconfig.spec.preview.json"
+    "test:preview": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-preview.ts --ts-config=tsconfig.spec.preview.json",
+    "test:version": "ng test --watch=false --browsers=ChromeHeadless --main=src/test-version.ts --ts-config=tsconfig.spec.version.json"
   },
   "private": false,
   "dependencies": {
