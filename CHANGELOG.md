@@ -7,12 +7,15 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# 1.41.2
+# 1.41.3
 - **added**: new actions **Set rating** and **Get rating** (category Special), for chatbots, voice, webhook and copilot agents. Set rating saves the rating of the conversation (1 to 5, also from a variable `{}`) with an optional **Rating message**, and has two exits, **Success** and **else**, with **Assign error to** (`rating_error`). Get rating reads the rating and its message into two variables (`rating_value`, `rating_message`). Both have an optional **Request ID**, the conversation to rate or read (empty: the current one; in a webhook flow it must be set, e.g. `payload.payload.request_id`), and **Save to** / **Read from**: **Conversation rating** (default) or **AI evaluation**, in the attributes `ai_rating` and `ai_sentiment`. **Force update** is hidden: a value already saved still works. The engine runs them as `set_rating` and `get_rating`
 - **changed**: AI models aligned to the Design Studio V3 (list of 12/11/2026, the same as the dashboard): new Claude 5.5 and Fable, GPT-6 and GPT-6.1, Gemini 4 and 3.8 Flash, Command A Translate, gpt-oss, MiniMax M2.7 and Muse Spark Open; Gemini image models and duplicates removed. New ids `claude-opus-4-5-20251101`, `deepseek-flash`, `gemini-omni-1.1-flash`: their multipliers in `AI_MODELS` must use them. Actions on a model no longer listed are unchanged
 - **changed**: new AI actions start with gpt-5.4-mini instead of gpt-4o; the temperature is fixed at 1 for gpt-6.x too, as for gpt-5.x
 - **added**: an agent of another Design Studio version (`ds_version` `v3`, `v4`..., or the older `attributes.dsVersion`) is not opened here, where its connections would be lost: a dialog, then it reloads in its console (`cds-v3`, `cds-vN`) on the same agent and route, also when switching flow; locally the dialog sends to the dashboard. Agents without a label open as before
 - **added**: specs in `npm run test:models` and `npm run test:version`
+
+# 1.41.2
+- **changed**: remoteConfig: true
 
 # 1.41.1
 - **changed**: remoteConfig: false
