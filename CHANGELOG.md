@@ -7,14 +7,11 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# features-2611/ai-models 13/11/2026
-- **changed** (features-2611/ai-models): models catalogue aligned to the Design Studio V3 (corrected list of 12/11/2026, the same as the dashboard): new Claude Opus/Sonnet/Haiku 5.5 and Fable 5.1/5.2, OpenAI GPT-6 Astra/Luna/Sol and GPT-6.1 Sol/Terra, Gemini 4 Carbon/Argon and 3.8 Flash, Command A Translate, gpt-oss, MiniMax M2.7 and Muse Spark Open on Groq; Gemini image models and duplicate entries removed. New ids `claude-opus-4-5-20251101`, `deepseek-flash`, `gemini-omni-1.1-flash`: their multipliers in `AI_MODELS` must use them. Actions that use a model no longer listed are unchanged
-- **changed** (features-2611/ai-models): new AI actions start with gpt-5.4-mini instead of gpt-4o (also AI Prompt and AI Condition without a model, and the AI actions the AI chat adds without one); the temperature is fixed at 1 for gpt-6.x too, as for gpt-5.x, in the panels and in the AI chat
-- **added** (features-2611/ai-models): specs for the catalogue and the fixed temperature, in `npm run test:models`
-
-# features-2611/v3-agents-redirect 12/11/2026
-- **added** (features-2611/v3-agents-redirect): an agent of another Design Studio version (`ds_version` `v3`, `v4`..., or the older `attributes.dsVersion`) is not opened in this console, where its connections would be lost: a dialog, then the page reloads in the console of its version on the same agent and route, the same address with `cds-v3` (`cds-vN`) in place of `cds`, also when switching flow. Where that console cannot be derived (local) the dialog sends to the agents list of the dashboard. Agents without a label stay here, as before. Brings back on this line the block removed in 1.40.16-rc33, now for every version and with the same rule the V3 uses to send V2 agents here
-- **added** (features-2611/v3-agents-redirect): specs in `npm run test:version`
+# 1.41.2-rc4
+- **changed**: AI models aligned to the Design Studio V3 (list of 12/11/2026, the same as the dashboard): new Claude 5.5 and Fable, GPT-6 and GPT-6.1, Gemini 4 and 3.8 Flash, Command A Translate, gpt-oss, MiniMax M2.7 and Muse Spark Open; Gemini image models and duplicates removed. New ids `claude-opus-4-5-20251101`, `deepseek-flash`, `gemini-omni-1.1-flash`: their multipliers in `AI_MODELS` must use them. Actions on a model no longer listed are unchanged
+- **changed**: new AI actions, also those added by the AI chat, start with gpt-5.4-mini instead of gpt-4o; the temperature is fixed at 1 for gpt-6.x too, as for gpt-5.x
+- **added**: an agent of another Design Studio version (`ds_version` `v3`, `v4`..., or the older `attributes.dsVersion`) is not opened here: a dialog, then it reloads in its console (`cds-v3`, `cds-vN`) on the same agent and route, also when switching flow; locally the dialog sends to the dashboard. Agents without a label open as before. Brings back the block removed in 1.40.16-rc33
+- **added**: specs in `npm run test:models` and `npm run test:version`
 
 # 1.41.2-rc3
 - **added**: **Set rating** has a new choice, **Save to**: **Conversation rating** (the default, as before) or **AI evaluation**, which saves the value and the message in the conversation attributes `ai_rating` and `ai_sentiment`. The webhook called when a conversation is closed runs before the user rates in the chat: with AI evaluation the user rating and the AI evaluation never overwrite each other. **Get rating** has the matching choice, **Read from**. The block preview shows it when AI evaluation is chosen. The engine runs them as `saveTo` and `readFrom` (`rating` or `attributes`); actions without them keep working as before
