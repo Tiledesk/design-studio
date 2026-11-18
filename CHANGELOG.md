@@ -7,7 +7,7 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# features-2611/conditions-when 18/11/2026
+# 1.41.3-rc1
 - **added** (features-2611/conditions-when): reply filters offer all 38 comparisons of the Condition, as in the Design Studio V3: besides the 16 they had, *exists*, *does not exist*, *is not empty*, *does not contain*, *does not end with*, *does not match regex*, *is true*, *is false*, the 6 date comparisons and the 8 list comparisons (contains, does not contain, length). They are read by the engine from the `when` formula, so they need tiledesk-chatbot 3.1.3-rc1 or later (stage) and, in production, the release of features-2611/reply-filters-when
 - **added** (features-2611/conditions-when): **Ignore uppercase and lowercase**, a checkbox under the value of text comparisons (is equal to, contains, starts with, ends with and their negations), in the Condition and in reply filters. Off by default. It gives back the case-insensitive filters that new reply filters lost in July (*starts with ignore case*, *contains ignore case*), and makes *ends with* case-insensitive again for whoever needs it
 - **changed** (features-2611/conditions-when): *exists* is written `exists(x)` and *does not exist* `!exists(x)`: a variable set to null does not exist. Conditions saved as `!isUndefined(x)` keep their meaning until they are saved again; reopened, *does not exist* is no longer shown as *is undefined*
