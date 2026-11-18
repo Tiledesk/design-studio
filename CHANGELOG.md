@@ -7,14 +7,12 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
-# features-2611/conditions-when 18/11/2026
-- **added** (features-2611/conditions-when): reply filters offer all 38 comparisons of the Condition, as in the Design Studio V3: besides the 16 they had, *exists*, *does not exist*, *is not empty*, *does not contain*, *does not end with*, *does not match regex*, *is true*, *is false*, the 6 date comparisons and the 8 list comparisons (contains, does not contain, length). They are read by the engine from the `when` formula, so they need tiledesk-chatbot 3.1.3-rc1 or later (stage) and, in production, the release of features-2611/reply-filters-when
-- **added** (features-2611/conditions-when): **Ignore uppercase and lowercase**, a checkbox under the value of text comparisons (is equal to, contains, starts with, ends with and their negations), in the Condition and in reply filters. Off by default. It gives back the case-insensitive filters that new reply filters lost in July (*starts with ignore case*, *contains ignore case*), and makes *ends with* case-insensitive again for whoever needs it
-- **changed** (features-2611/conditions-when): *exists* is written `exists(x)` and *does not exist* `!exists(x)`: a variable set to null does not exist. Conditions saved as `!isUndefined(x)` keep their meaning until they are saved again; reopened, *does not exist* is no longer shown as *is undefined*
-- **fixed** (features-2611/conditions-when): a text comparison with a number, `x == "1"`, reopened and saved again lost its quotes and became a comparison of numbers
-- **fixed** (features-2611/conditions-when): the panel of the old Condition no longer breaks on an operator it does not know
-- **changed** (features-2611/conditions-when): operator labels as in the V3 ("is equal to (number)" instead of "equal As Numbers"); the `when` grammar (`json-condition-when-grammar.md`) updated
-- **added** (features-2611/conditions-when): `npm run test:condition`, the specs of conditions and filters (`utils-condition.spec.ts`)
+# 1.41.4
+- **added** (features-2611/conditions-when): reply filters offer all 38 comparisons of the Condition, as in the V3: 22 more than before (exists, does not exist, is not empty, does not contain, does not end with, does not match regex, is true, is false, dates, lists and their length). They need tiledesk-chatbot with features-2611/reply-filters-when (3.1.3-rc1 or later)
+- **added** (features-2611/conditions-when): **Ignore uppercase and lowercase**, a checkbox on text comparisons in the Condition and in reply filters, off by default
+- **changed** (features-2611/conditions-when): *exists* is false on a variable set to null; *does not exist* reopens as itself, no longer as *is undefined*
+- **fixed** (features-2611/conditions-when): `x == "1"` no longer becomes a comparison of numbers when saved again; the panel of the old Condition no longer breaks on an unknown operator
+- **changed** (features-2611/conditions-when): operator labels as in the V3; specs in `npm run test:condition`
 
 # 1.41.3
 - **added**: new actions **Set rating** and **Get rating** (category Special), for chatbots, voice, webhook and copilot agents. Set rating saves the rating of the conversation (1 to 5, also from a variable `{}`) with an optional **Rating message**, and has two exits, **Success** and **else**, with **Assign error to** (`rating_error`). Get rating reads the rating and its message into two variables (`rating_value`, `rating_message`). Both have an optional **Request ID**, the conversation to rate or read (empty: the current one; in a webhook flow it must be set, e.g. `payload.payload.request_id`), and **Save to** / **Read from**: **Conversation rating** (default) or **AI evaluation**, in the attributes `ai_rating` and `ai_sentiment`. **Force update** is hidden: a value already saved still works. The engine runs them as `set_rating` and `get_rating`
