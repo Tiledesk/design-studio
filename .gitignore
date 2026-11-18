@@ -61,3 +61,4 @@ docs
 .claude
 json-condition-when-grammar.md
 proxy.conf.json
+___deploy_amazon_beta.sh

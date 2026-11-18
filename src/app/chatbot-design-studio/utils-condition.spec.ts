@@ -223,7 +223,8 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     'matches(text, "^a.*")', '!matches(text, "^a.*")',
     'isEmpty(a)', '!isEmpty(a)',
     'isNull(a)',
-    'isUndefined(a)', '!isUndefined(a)',
+    'isUndefined(a)',
+    'exists(a)', '!exists(a)',
     'dateEqual(d, "2024-01-01")', '!dateEqual(d, "2024-01-01")',
     'isAfter(d, "2024-01-01")', 'isBefore(d, "2024-01-01")',
     'isAfterOrEqual(d, "2024-01-01")', 'isBeforeOrEqual(d, "2024-01-01")',
@@ -288,6 +289,30 @@ describe('utils-condition · parseWhenToGroups (round-trip when-preserving)', ()
     expect(parseCondition('!isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
     expect(parseCondition('a == true')?.operator as any).toBe(TYPE_OPERATOR_V2.isTrue);
     expect(parseCondition('a == false')?.operator as any).toBe(TYPE_OPERATOR_V2.isFalse);
+  });
+
+  it('esiste / non esiste: un termine solo, che torna indietro intero', () => {
+    // Scritto come `!isUndefined(a)`, "esiste" era vero anche su una variabile messa a null.
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.exists))).toBe('exists(a)');
+    expect(conditionToWhen(cond('a', TYPE_OPERATOR_V2.doesNotExist))).toBe('!exists(a)');
+    // Riaperta, la condizione deve tornare l'operatore da cui e' nata. `doesNotExist` non ce la
+    // faceva: veniva salvato come `isUndefined(a)` e si rileggeva come `isUndefined`, cambiando
+    // operatore sotto le mani di chi l'aveva scritto.
+    expect(parseCondition('exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(parseCondition('!exists(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.doesNotExist);
+    // I filtri salvati prima restano leggibili.
+    expect(parseCondition('isUndefined(a)')?.operator as any).toBe(TYPE_OPERATOR_V2.isUndefined);
+  });
+
+  it('un filtro salvato con la vecchia forma viene riscritto al primo salvataggio', () => {
+    // `!isUndefined(a)` si rilegge come "esiste" e si riscrive `exists(a)`: non e' un ritorno
+    // identico, ed e' voluto. La vecchia forma diceva che una variabile messa a null esiste, e
+    // riscriverla e' il modo in cui la correzione raggiunge i filtri gia' salvati. Finche'
+    // nessuno li riapre continuano a comportarsi come prima, perche' il motore legge la loro
+    // formula cosi' com'e'.
+    const riletta = parseCondition('!isUndefined(a)');
+    expect(riletta?.operator as any).toBe(TYPE_OPERATOR_V2.exists);
+    expect(conditionToWhen(riletta!)).toBe('exists(a)');
   });
 
 });
@@ -359,21 +384,53 @@ describe('utils-condition · filtri reply V2', () => {
     expect(td.when).toBeUndefined();
   });
 
-  it('il picker dei filtri reply espone SOLO gli operatori che il server valuta', () => {
-    // i 22 solo-V2 non sono rappresentabili nell'AST V1 -> non devono essere selezionabili
-    const soloV2 = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'isTrue', 'isFalse',
-                    'isAfter', 'arrayContains', 'lengthGreaterThan'];
-    soloV2.forEach(o => {
-      expect(isReplyFilterOperatorSupported(o)).toBe(false);
-      expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeUndefined();
-    });
-    const comuni = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
-                    'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
-    comuni.forEach(o => {
+  it('il picker dei filtri reply espone tutti gli operatori del catalogo', () => {
+    // Il picker e' DERIVATO: tiene le chiavi di OPERATORS_LIST_V2 presenti nell'enum legacy.
+    // Restringerlo non e' piu' il modo di proteggere l'utente da un operatore che il motore
+    // non sa valutare: quella protezione vive nel motore, che ora li implementa tutti.
+    const prima = ['equalAsStrings', 'notEqualAsStrings', 'contains', 'startsWith', 'endsWith',
+                   'matches', 'isEmpty', 'isNull', 'isUndefined', 'greaterThan', 'lessThanOrEqual'];
+    const rimessi = ['exists', 'doesNotExist', 'isNotEmpty', 'notContains', 'notEndsWith',
+                     'notMatches', 'isTrue', 'isFalse', 'equalAsDate', 'notEqualAsDate', 'isAfter',
+                     'isBefore', 'isAfterOrEqual', 'isBeforeOrEqual', 'arrayContains',
+                     'arrayNotContains', 'lengthEqualTo', 'lengthNotEqualTo', 'lengthGreaterThan',
+                     'lengthLessThan', 'lengthGreaterThanOrEqual', 'lengthLessThanOrEqual'];
+    [...prima, ...rimessi].forEach(o => {
       expect(isReplyFilterOperatorSupported(o)).toBe(true);
       expect(OPERATORS_LIST_REPLY_FILTER[o]).toBeDefined();
     });
-    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(16);
+    expect(rimessi.length).toBe(22);
+    expect(Object.keys(OPERATORS_LIST_REPLY_FILTER).length).toBe(38);
+  });
+
+  it('ogni operatore del picker salva un `when`, che si riapre con lo stesso operatore', () => {
+    // Il motore valuta il `when` del filtro quando c'e'. Senza, ripiega sull'albero
+    // `conditions`, dove 22 di questi operatori non li conosce: un operatore offerto qui che
+    // non producesse un `when` darebbe un filtro che il motore non sa valutare.
+    const rhs = (key: string, group: string): string | undefined => {
+      if (group === 'Existence' || group === 'Boolean') return undefined;
+      if (group === 'Number' || key.startsWith('length')) return '2';
+      if (group === 'Date & Time') return '2026-01-01';
+      return 'a';
+    };
+    Object.keys(OPERATORS_LIST_REPLY_FILTER).forEach(key => {
+      const value = rhs(key, OPERATORS_LIST_REPLY_FILTER[key].group);
+      const td: any = expr(cond('x', key as TYPE_OPERATOR_V2, value === undefined ? undefined : { type: 'const', value }));
+      td.version = 2;
+      applyConditionSaveModeToPayload(payloadWith(td));
+      expect(td.when).withContext(key).toBeTruthy();
+      expect(td.conditions.length).withContext(key).toBe(1);
+      expect(parseCondition(td.when)?.operator as any).withContext(key).toBe(key);
+    });
+  });
+
+  it('"ignora maiuscole" in un filtro: il `when` abbassa entrambi i lati', () => {
+    const c: any = cond('user_name', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'Mario' });
+    c.ignoreCase = true;
+    const td: any = expr(c);
+    td.version = 2;
+    applyConditionSaveModeToPayload(payloadWith(td));
+    expect(td.when).toBe('contains(lowerCase(user_name), lowerCase("Mario"))');
   });
 
   it('hasFilter: riconosce entrambe le forme ed è null-safe', () => {
@@ -411,6 +468,117 @@ describe('utils-condition · filtri reply V2', () => {
     expect(bad.conditions).toEqual([]);
     applyConditionSaveModeToPayload(payloadWith(bad));
     expect(bad.when).toBe('weirdFunc(a)');
+  });
+
+});
+
+/** Confronti di testo che ignorano maiuscole e minuscole.
+ *
+ *  La forma scelta abbassa di caso ENTRAMBI i lati con `lowerCase`, una funzione che il
+ *  motore gia' conosce: nessun operatore nuovo, nessuna versione del motore da attendere.
+ *  Il rischio vero non e' generare male, e' rileggere male -- il `when` e' l'unica cosa
+ *  salvata, quindi se la rilettura non riconosce la forma la casella si ripresenta spenta
+ *  e il salvataggio successivo cancella l'impostazione in silenzio. Per questo qui si
+ *  prova soprattutto l'andata e ritorno. */
+describe('utils-condition · ignora maiuscole e minuscole', () => {
+
+  function ignoring(operand1: string, operator: TYPE_OPERATOR_V2, value: string): Condition {
+    const c = cond(operand1, operator, { type: 'const', value });
+    (c as any).ignoreCase = true;
+    return c;
+  }
+
+  it('abbassa di caso entrambi i lati, non solo la variabile', () => {
+    expect(conditionToWhen(ignoring('nome', TYPE_OPERATOR_V2.contains, 'Mario')))
+      .toBe('contains(lowerCase(nome), lowerCase("Mario"))');
+  });
+
+  it('vale per ogni confronto di testo, negazioni comprese', () => {
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.equalAsStrings, 'x'))).toBe('lowerCase(a) == lowerCase("x")');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notEqualAsStrings, 'x'))).toBe('lowerCase(a) != lowerCase("x")');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notContains, 'x'))).toBe('!contains(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.startsWith, 'x'))).toBe('startsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notStartsWith, 'x'))).toBe('!startsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.endsWith, 'x'))).toBe('endsWith(lowerCase(a), lowerCase("x"))');
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.notEndsWith, 'x'))).toBe('!endsWith(lowerCase(a), lowerCase("x"))');
+  });
+
+  it('non tocca una condizione sensibile: il when e\' quello di sempre', () => {
+    expect(conditionToWhen(cond('nome', TYPE_OPERATOR_V2.contains, { type: 'const', value: 'Mario' })))
+      .toBe('contains(nome, "Mario")');
+  });
+
+  it('ignora il flag dove non ha senso: numeri e regex', () => {
+    // Su un numero non c'e' caso da ignorare.
+    expect(conditionToWhen(ignoring('eta', TYPE_OPERATOR_V2.greaterThan, '18'))).toBe('eta > 18');
+    // Abbassare di caso una regex la cambia: `\D` diventerebbe `\d`, il suo opposto.
+    // `escapeString` protegge la barra rovesciata: nel when arriva raddoppiata, ed e'
+    // giusto cosi'. Quel che conta qui e' che NON sia stata abbassata di caso.
+    expect(conditionToWhen(ignoring('a', TYPE_OPERATOR_V2.matches, '\\D+'))).toBe('matches(a, "\\\\D+")');
+  });
+
+  it('riapre la condizione come l\'utente l\'aveva lasciata', () => {
+    const parsed: any = parseCondition('contains(lowerCase(nome), lowerCase("Mario"))');
+    expect(parsed.operator).toBe(TYPE_OPERATOR_V2.contains);
+    expect(parsed.operand1).toBe('nome');
+    expect(parsed.operand2.value).toBe('Mario');
+    expect(parsed.ignoreCase).toBeTrue();
+  });
+
+  it('riapre anche la forma con ==', () => {
+    const parsed: any = parseCondition('lowerCase(citta) == lowerCase("Roma")');
+    expect(parsed.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+    expect(parsed.operand1).toBe('citta');
+    expect(parsed.operand2.value).toBe('Roma');
+    expect(parsed.ignoreCase).toBeTrue();
+  });
+
+  it('andata e ritorno: rigenerare dopo aver riletto da lo stesso when', () => {
+    for (const when of [
+      'contains(lowerCase(nome), lowerCase("Mario"))',
+      '!contains(lowerCase(nome), lowerCase("Mario"))',
+      'lowerCase(citta) == lowerCase("Roma")',
+      'lowerCase(citta) != lowerCase("Roma")',
+      'startsWith(lowerCase(a), lowerCase("x"))',
+      'endsWith(lowerCase(a), lowerCase("x"))'
+    ]) {
+      expect(conditionToWhen(parseCondition(when) as Condition)).toBe(when);
+    }
+  });
+
+  it('una condizione sensibile non diventa insensibile riaprendola', () => {
+    const parsed: any = parseCondition('contains(nome, "Mario")');
+    expect(parsed.ignoreCase).toBeUndefined();
+  });
+
+  it('lascia stare un lowerCase scritto a mano su un lato solo', () => {
+    // Non e' la forma che generiamo: e' roba scritta da qualcuno, e va conservata
+    // com'e' invece di essere reinterpretata.
+    const parsed: any = parseCondition('contains(lowerCase(nome), "Mario")');
+    expect(parsed.ignoreCase).toBeUndefined();
+    expect(parsed.operand1).toBe('lowerCase(nome)');
+  });
+});
+
+describe('round-trip dei letterali numerici (Condition e filtri)', () => {
+
+  it('`x == "1"` resta un confronto di TESTO dopo riapertura e risalvataggio', () => {
+    const groups = parseWhenToGroups('x == "1"');
+    expect(serializeConditionToWhen(groups)).toBe('x == "1"');
+    const c: any = (groups[0] as any).conditions[0];
+    expect(c.operator).toBe(TYPE_OPERATOR_V2.equalAsStrings);
+  });
+
+  it('`x == 1` resta un confronto di NUMERI', () => {
+    const groups = parseWhenToGroups('x == 1');
+    expect(serializeConditionToWhen(groups)).toBe('x == 1');
+    const c: any = (groups[0] as any).conditions[0];
+    expect(c.operator).toBe(TYPE_OPERATOR_V2.equalAsNumbers);
+  });
+
+  it('vale anche per il diverso', () => {
+    expect(serializeConditionToWhen(parseWhenToGroups('x != "2"'))).toBe('x != "2"');
+    expect(serializeConditionToWhen(parseWhenToGroups('x != 2'))).toBe('x != 2');
   });
 
 });

@@ -260,24 +260,52 @@ export enum TYPE_EVENT_CATEGORY {
 }
 
 export enum TYPE_OPERATOR {
-    equalAsNumbers          = "equalAsNumbers",
+    // Existence / generic (unary, type-agnostic)
+    exists                  = "exists",
+    doesNotExist            = "doesNotExist",
+    isEmpty                 = "isEmpty",
+    isNotEmpty              = "isNotEmpty",
+    isNull                  = "isNull",
+    isUndefined             = "isUndefined",
+    // Text (string coercion)
     equalAsStrings          = "equalAsStrings",
-    notEqualAsNumbers       = "notEqualAsNumbers",
     notEqualAsStrings       = "notEqualAsStrings",
+    contains                = "contains",
+    notContains             = "notContains",
+    containsIgnoreCase      = "containsIgnoreCase",
+    startsWith              = "startsWith",
+    notStartsWith           = 'notStartsWith',
+    startsWithIgnoreCase    = "startsWithIgnoreCase",
+    endsWith                = "endsWith",
+    notEndsWith             = "notEndsWith",
+    matches                 = "matches",
+    notMatches              = "notMatches",
+    // Number (number coercion)
+    equalAsNumbers          = "equalAsNumbers",
+    notEqualAsNumbers       = "notEqualAsNumbers",
     greaterThan             = "greaterThan",
     greaterThanOrEqual      = "greaterThanOrEqual",
     lessThan                = "lessThan",
     lessThanOrEqual         = "lessThanOrEqual",
-    startsWith              = "startsWith",
-    notStartsWith           = 'notStartsWith',
-    startsWithIgnoreCase    = "startsWithIgnoreCase",
-    contains                = "contains",
-    containsIgnoreCase      = "containsIgnoreCase",
-    endsWith                = "endsWith",
-    isEmpty                 = "isEmpty",
-    isNull                  = "isNull",
-    isUndefined             = "isUndefined",
-    matches                 = "matches"
+    // Boolean (unary)
+    isTrue                  = "isTrue",
+    isFalse                 = "isFalse",
+    // Date & Time (date coercion)
+    equalAsDate             = "equalAsDate",
+    notEqualAsDate          = "notEqualAsDate",
+    isAfter                 = "isAfter",
+    isBefore                = "isBefore",
+    isAfterOrEqual          = "isAfterOrEqual",
+    isBeforeOrEqual         = "isBeforeOrEqual",
+    // Array (length -> number; contains -> string)
+    arrayContains           = "arrayContains",
+    arrayNotContains        = "arrayNotContains",
+    lengthEqualTo           = "lengthEqualTo",
+    lengthNotEqualTo        = "lengthNotEqualTo",
+    lengthGreaterThan       = "lengthGreaterThan",
+    lengthLessThan          = "lengthLessThan",
+    lengthGreaterThanOrEqual = "lengthGreaterThanOrEqual",
+    lengthLessThanOrEqual   = "lengthLessThanOrEqual"
 }
 
 /**
@@ -491,16 +519,15 @@ export const OPERATORS_LIST_V2: { [key: string]: { name: string, type: TYPE_OPER
 /**
  * Operatori disponibili nei FILTRI delle Reply (`_tdJSONCondition`).
  *
- * I filtri reply sono valutati dal server sull'AST `conditions` con semantica V1: il
- * contratto `when` vale solo per l'AZIONE JSON Condition V2, non per i filtri dei messaggi.
- * Offrire nel picker un operatore che il server non conosce produce un filtro non
- * interpretabile e il flusso si blocca sul blocco che lo contiene.
+ * Sono tutti i 38 operatori della Condition: l'intersezione con TYPE_OPERATOR, che ora
+ * li elenca tutti. I filtri modificati nell'editor nuovo salvano anche la formula `when`, e il
+ * motore (tiledesk-chatbot, evaluateMessageFilter) valuta quella quando c'e': date, liste,
+ * lunghezze, negazioni, `exists(x)` e "ignora maiuscole" funzionano solo cosi'.
  *
- * L'insieme è quindi l'intersezione con il catalogo V1, DERIVATA a runtime da
- * TYPE_OPERATOR: aggiungendo un operatore a V1 compare qui da solo, senza doppia manutenzione.
- * I 22 operatori solo-V2 (exists, doesNotExist, date, array, lunghezze, ...) non sono
- * rappresentabili nell'AST V1 — `exists` sarebbe `!isUndefined(x)` e l'AST non ha
- * un nodo di negazione — quindi non sono traducibili, solo esclusi.
+ * Serve un motore che legga il `when` dei filtri e conosca `exists`: in produzione dalla 3.1.2
+ * per il `when`, e per `exists` dal rientro in main di features-2611/reply-filters-when; sullo
+ * stage dalla 3.1.3-rc1. Un motore piu' vecchio valuta l'albero `conditions`, dove conosce solo
+ * i 16 operatori di sempre: con gli altri il filtro non si valuta.
  */
 export const OPERATORS_LIST_REPLY_FILTER: { [key: string]: { name: string, type: TYPE_OPERATOR_V2, src?: string, group?: string } } =
     Object.keys(OPERATORS_LIST_V2)

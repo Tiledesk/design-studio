@@ -58,8 +58,8 @@ Le negazioni sono emesse come `!fn(...)`.
 ### Esistenza / generici (unari — nessun operando destro)
 | Operatore | Forma `when` | Significato |
 |---|---|---|
-| exists | `!isUndefined(x)` | l'attributo è definito (presente), anche se null/vuoto |
-| does not exist | `isUndefined(x)` | l'attributo è undefined / non presente |
+| exists | `exists(x)` | l'attributo ha un valore: non è undefined e non è null (`""`, `0`, `false` esistono) |
+| does not exist | `!exists(x)` | l'attributo manca o vale null |
 | is empty | `isEmpty(x)` | stringa vuota, array vuoto, oggetto vuoto, o null/undefined |
 | is not empty | `!isEmpty(x)` | non vuoto |
 | is null | `isNull(x)` | il valore è esattamente `null` |
@@ -78,6 +78,8 @@ Le negazioni sono emesse come `!fn(...)`.
 | does not end with | `!endsWith(x, "y")` | `!endsWith(file, ".pdf")` |
 | matches regex | `matches(x, "y")` | `matches(email, "^.+@.+$")` |
 | does not match regex | `!matches(x, "y")` | `!matches(email, "^.+@.+$")` |
+
+**Ignora maiuscole e minuscole** (casella sotto il valore, solo su uguale/diverso testo, contiene, inizia, finisce e le loro negazioni; non su `matches`): i due lati sono abbassati con `lowerCase(...)`, l'operatore resta lo stesso. Esempio: `contains(lowerCase(user.name), lowerCase("mario"))`, `lowerCase(city) == lowerCase("Roma")`. Un `lowerCase` su un solo lato è scritto a mano e si rilegge così com'è.
 
 ### Numero (coercion a numero — operando destro nudo)
 | Operatore | Forma `when` | Esempio |
@@ -135,9 +137,11 @@ poi valuta.** Non sollevare mai errori; in caso di fallimento di coercion restit
   come date (ISO-8601). Confronto cronologico (`dateEqual` = stesso istante). Data non valida → `false`.
 - **Array** (`arrayContains`, `length`): riconduci il sinistro ad array (se è una stringa JSON, fai il
   parse). `arrayContains` = test di appartenenza (confronto elementi come stringa). `length(x)` = numero
-  di elementi dell'array; se `x` è una stringa, la sua lunghezza in caratteri; altrimenti `0`.
+  di elementi dell'array; se `x` è una stringa che contiene un array JSON (`'["a","b"]'`, come arriva una
+  lista da una web request, una tabella o una knowledge base), il numero dei suoi elementi; se è un'altra
+  stringa, la sua lunghezza in caratteri; altrimenti `0`.
 - **Esistenza/Vuoto**: `isUndefined` = valore `undefined`; `isNull` = valore `null`;
-  `exists` = NON undefined; `isEmpty` = `null`/`undefined`/`""`/`[]`/`{}`; `isNotEmpty` = la negazione.
+  `exists` = né undefined né null; `isEmpty` = `null`/`undefined`/`""`/`[]`/`{}`; `isNotEmpty` = la negazione.
 - **Negazione** `!fn(...)`: NOT logico del risultato booleano della funzione.
 
 ### La differenza di tipo non è mai un errore
@@ -159,7 +163,15 @@ Confrontare valori di tipo diverso NON deve fallire. Riconduci secondo l'operato
 ---
 
 ## 5. Note
-- Tutti i confronti sono **case-sensitive** (gli operatori legacy `*IgnoreCase` sono stati rimossi;
-  se compaiono in dati vecchi, vanno trattati come l'equivalente case-sensitive).
+- Tutti i confronti sono **case-sensitive**, salvo la forma con `lowerCase(...)` su entrambi i lati (vedi Testo).
+  Gli operatori legacy `*IgnoreCase` sono stati rimossi: se compaiono in dati vecchi, vanno trattati come
+  l'equivalente case-sensitive.
+- Le condizioni salvate prima di questa versione scrivono "exists" come `!isUndefined(x)` e "does not exist" come
+  `isUndefined(x)`, dove una variabile a null è definita: valgono così finché non vengono risalvate. Riaperta
+  nell'editor, `!isUndefined(x)` torna "exists" e al salvataggio diventa `exists(x)`; `isUndefined(x)` torna
+  "is undefined" e resta com'è.
+- Dove si usa il `when`: l'azione **Condition** (`jsoncondition2`, salva solo `when`) e i **filtri delle risposte** modificati nell'editor nuovo
+  (`_tdJSONCondition` con `version: 2`, che porta sia `when` sia l'albero `conditions`). Il motore legge il
+  `when` quando c'è; i filtri vecchi, senza `when`, sono valutati sull'albero `conditions`.
 - L'operando sinistro è sempre un path di attributo nudo; non è mai racchiuso in `{{ }}`.
 - L'operando destro può essere a sua volta un attributo (identificatore nudo) → risolvilo e confronta i valori.
