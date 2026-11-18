@@ -56,7 +56,7 @@
 
   <div class="publish-btn-wpr">
     <button id="cds-publish-btn" type="button" class="btn btn-primary cds-blue-button"
-      [disabled]="!CAN_PUBLISH || isSaving || PUBLISH_PENDING"
+      [disabled]="isSaving || PUBLISH_PENDING || !CAN_PUBLISH"
       (click)="onClickPublish()">
       <ng-container *ngIf="!isSavingVisible">
         <span>

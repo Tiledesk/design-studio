@@ -1,0 +1,111 @@
+<!-- `notConfigured` suppresses the whole section, title included: a deployment
+     with no `model_catalog` is behaving exactly as designed, and a panel that
+     says so is a panel reporting a fault that does not exist. -->
+<div class="chatbot-details-wpr llm-settings-wpr" *ngIf="!notConfigured">
+  <div class="row">
+    <div class="col-sm-10 col-md-10">
+      <h3 class="card_title__underlined">
+        <span class="card_title__underline">
+          {{ 'LlmSettingsTitle' | translate }}
+        </span>
+      </h3>
+    </div>
+    <div class="col-sm-10 col-md-10">
+      <!-- Blank on purpose. `.section-subtitle` is not a subtitle: it is the
+           section's horizontal rule (`height: 20px; border-top: 1px solid #ddd`
+           in assets/sass/cds/styles.scss), and every sibling leaves it empty.
+           The note that used to live here rendered *on top of* the line. -->
+      <div class="section-subtitle">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- What the user most needs to know before touching anything: the panel is
+       reached from one flow, the setting is not. Styled as the helper text in
+       detail.component.html rather than as a banner, so it reads like the rest
+       of this settings area. -->
+  <div class="row" style="margin-bottom: 16px;">
+    <div class="col-sm-10 col-md-10">
+      <span class="llm-settings-scope">{{ 'LlmSettingsProjectScope' | translate }}</span>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="loading">
+    <div class="col-sm-10 col-md-10">{{ 'Loading' | translate }}</div>
+  </div>
+
+  <div class="row" *ngIf="error">
+    <div class="col-sm-10 col-md-10 error">{{ error | translate }}</div>
+  </div>
+
+  <!-- One `.row` per label+control pair, exactly as every sibling section does
+       it (advanced.component.html). A single `.row` around the whole form put
+       all seven children into one grid row, so nothing lined up with the label
+       that named it. -->
+  <form *ngIf="!loading && !readOnly" (ngSubmit)="save()">
+    <div class="row" style="margin-bottom: 16px;">
+      <label for="llm-model" class="col-sm-2 cds--custom-label">
+        {{ 'LlmSettingsModel' | translate }}
+      </label>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+        <!-- The sentinel option ('') is the deployment's own model; the
+             options list already carries it once, marked. -->
+        <ng-select id="llm-model-select" labelForId="llm-model" class="csd-chatbot-dtls-input" [items]="options" bindLabel="label"
+                   bindValue="id" groupBy="group" [searchFn]="searchOption" [clearable]="false"
+                   [ngModel]="selectedModelId" name="model" (ngModelChange)="onModelChange($event)"
+                   [placeholder]="'LlmSettingsSearch' | translate">
+          <!-- Two lines, both allowed to wrap: ng-select truncates a single
+               nowrap line, which cut the price and the unavailable text. -->
+          <ng-template ng-label-tmp let-item="item">
+            <div class="llm-opt" [title]="item.label">
+              <div class="llm-opt-name">{{ item.name }}</div>
+              <div class="llm-opt-meta">{{ item.meta }}</div>
+            </div>
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item">
+            <div class="llm-opt" [title]="item.label">
+              <div class="llm-opt-name">{{ item.name }}</div>
+              <div class="llm-opt-meta">{{ item.meta }}</div>
+            </div>
+          </ng-template>
+        </ng-select>
+      </div>
+    </div>
+
+    <div class="row" style="margin-bottom: 16px;">
+      <label for="llm-temperature" class="col-sm-2 cds--custom-label">
+        {{ 'LlmSettingsTemperature' | translate }}
+      </label>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+        <!-- Blank is not "unset": agent.yaml's own params stay in force and
+             merge at resolve time, so the placeholder says so rather than
+             inventing a number into a field that would then be saved. -->
+        <input id="llm-temperature" class="input csd-chatbot-dtls-input" type="number" step="0.1" min="0" max="2"
+               [placeholder]="'LlmSettingsInherited' | translate"
+               [ngModel]="temperature" name="temperature" (ngModelChange)="onTemperatureChange($event)"
+               [disabled]="selectedModelId === ''">
+      </div>
+    </div>
+
+    <div class="row" style="margin-bottom: 16px;">
+      <label for="llm-max-tokens" class="col-sm-2 cds--custom-label">
+        {{ 'LlmSettingsMaxTokens' | translate }}
+      </label>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+        <input id="llm-max-tokens" class="input csd-chatbot-dtls-input" type="number" min="1"
+               [placeholder]="'LlmSettingsInherited' | translate"
+               [ngModel]="maxTokens" name="maxTokens" (ngModelChange)="onMaxTokensChange($event)"
+               [disabled]="selectedModelId === ''">
+      </div>
+    </div>
+
+    <div class="row" style="margin-bottom: 16px;">
+      <label class="col-sm-2 cds--custom-label"></label>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 llm-settings-actions">
+        <button type="submit" class="btn btn-primary cds-blue-button" [disabled]="saving || selectedUnavailable">
+          {{ 'LlmSettingsSave' | translate }}
+        </button>
+        <span class="saved" *ngIf="saved">{{ 'LlmSettingsSaved' | translate }}</span>
+      </div>
+    </div>
+  </form>
+</div>

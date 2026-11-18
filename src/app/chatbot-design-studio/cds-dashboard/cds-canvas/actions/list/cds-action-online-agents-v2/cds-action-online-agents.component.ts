@@ -5,11 +5,9 @@ import { Intent } from 'src/app/models/intent-model';
 import { ActionOnlineAgentV2 } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { Department } from 'src/app/models/department-model';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 
 @Component({
@@ -39,12 +37,6 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
   departments: Department[]
@@ -57,21 +49,11 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     this.initialize();
   }
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   // ngOnChanges() {
@@ -118,33 +100,10 @@ export class CdsActionOnlineAgentsV2Component implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
-  /** */
-  private updateConnector(){
-    this.logger.log('[ACTION-ONLINE-AGENT] updateConnector:');
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION-ONLINE-AGENT] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
   
   onChangeCheckbox(target){
     try {

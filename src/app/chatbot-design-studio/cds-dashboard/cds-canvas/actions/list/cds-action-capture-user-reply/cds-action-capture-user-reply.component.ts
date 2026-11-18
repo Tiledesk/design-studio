@@ -4,9 +4,7 @@ import { Intent } from 'src/app/models/intent-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { ActionCaptureUserReply } from 'src/app/models/action-model';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_UPDATE_ACTION } from '../../../../../utils';
-import { checkConnectionStatusByConnector, updateSingleConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-capture-user-reply',
@@ -29,8 +27,6 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
   idConnector: string;
   idConnection: string;
   isConnected: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -40,22 +36,11 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
   ngOnInit(): void {
     this.logger.debug("[ACTION-CAPTURE-USER-REPLY] action detail: ", this.action);
 
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-CAPTURE-USER-REPLY] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateSingleConnector();
-      }
-    });
     this.initializeConnector();
   }
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   initializeConnector() {
@@ -64,7 +49,6 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
     this.idConnector = this.idIntentSelected+'/'+this.action._tdActionId;
     this.listOfIntents = this.intentService.getListOfIntents();
     this.listOfIntents.sort((a, b) => a.name.localeCompare(b.name));
-    this.checkConnectionStatus();
   }
 
   // private checkConnectionStatus(){
@@ -81,26 +65,8 @@ export class CdsActionCaptureUserReplyComponent implements OnInit {
   //   }
   // }
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusByConnector(this.action.goToIntent, this.idConnector);
-    this.isConnected  = resp.isConnected;
-    this.idConnection = resp.idConnection;
-  }
 
 
-    /** */
-    private updateSingleConnector(){
-      this.logger.log('[ACTION-CAPTURE-USER-REPLY] updateSingleConnector:');
-      const resp = updateSingleConnector(this.connector, this.action, this.isConnected, this.idConnection);
-      if(resp){
-        this.isConnected  = resp.isConnected;
-        this.idConnection = resp.idConnection;
-        this.logger.log('[ACTION-CAPTURE-USER-REPLY] updateSingleConnector:', resp);
-        if (resp.emit) {
-          this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-        } 
-      }
-    }
 
 
   // private updateConnector2(){

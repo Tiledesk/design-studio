@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, Input, NO_ERRORS_SCHEMA, Pipe, PipeTransform } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { By } from '@angular/platform-browser';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { CdsActionSetRatingComponent } from './cds-action-set-rating.component';
 import { ActionSetRating } from 'src/app/models/action-model';
 import { ACTIONS_LIST, TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
-import { Subject } from 'rxjs';
 
 @Pipe({ name: 'variableCssClass' })
 class VariableCssClassStubPipe implements PipeTransform { transform(value: any) { return ''; } }
@@ -14,12 +14,11 @@ class VariableCssClassStubPipe implements PipeTransform { transform(value: any) 
 @Pipe({ name: 'getVariableName' })
 class GetVariableNameStubPipe implements PipeTransform { transform(value: any) { return value; } }
 
-/** Without it the unknown element would get the native, read-only `isConnected` DOM property. */
 @Component({ selector: 'cds-connector', template: '' })
 class CdsConnectorStubComponent {
-  @Input() idConnector: string;
-  @Input() idConnection: string;
-  @Input() isConnected: boolean;
+  @Input() intent: any;
+  @Input() action: any;
+  @Input() slot: string;
 }
 
 describe('CdsActionSetRatingComponent', () => {
@@ -33,7 +32,6 @@ describe('CdsActionSetRatingComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       declarations: [CdsActionSetRatingComponent, VariableCssClassStubPipe, GetVariableNameStubPipe, CdsConnectorStubComponent],
-      providers: [{ provide: IntentService, useValue: { isChangedConnector$: new Subject<any>() } }],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
@@ -72,7 +70,9 @@ describe('CdsActionSetRatingComponent', () => {
     component.previewMode = true;
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.cds-action-preview')).toBeTruthy();
-    expect(fixture.nativeElement.querySelectorAll('cds-connector').length).toBe(2);
+    const connectors = fixture.debugElement.queryAll(By.directive(CdsConnectorStubComponent)).map(d => d.componentInstance);
+    expect(connectors.map(c => c.slot)).toEqual(['true', 'false']);
+    expect(connectors.every(c => c.action === component.action && c.intent === component.intentSelected)).toBeTrue();
     expect(component.idConnectorTrue).toBe('block-1/' + component.action._tdActionId + '/true');
     expect(component.idConnectorFalse).toBe('block-1/' + component.action._tdActionId + '/false');
   });
@@ -84,18 +84,6 @@ describe('CdsActionSetRatingComponent', () => {
     expect(fixture.nativeElement.querySelector('cds-textarea.rating-message')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('cds-textarea.assign-error-to')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('cds-connector')).toBeNull();
-  });
-
-  it('a connector drawn on the else exit is saved in falseIntent', () => {
-    component.intentSelected = { intent_id: 'block-1' } as any;
-    fixture.detectChanges();
-    const emitted: any[] = [];
-    component.updateAndSaveAction.subscribe(e => emitted.push(e));
-    const subject = TestBed.inject(IntentService).isChangedConnector$ as unknown as Subject<any>;
-    subject.next({ fromId: 'block-1/' + component.action._tdActionId + '/false', toId: 'block-2', id: 'c1', save: true });
-    expect(component.action.falseIntent).toBe('#block-2');
-    expect(component.isConnectedFalse).toBeTrue();
-    expect(emitted.length).toBe(1);
   });
 
   it('a picked error variable is saved', () => {

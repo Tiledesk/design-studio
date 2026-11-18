@@ -2595,5 +2595,10 @@
         "CHANGE_TO_AVAILABLE_UNAVAILABLE": "alterar para disponível/indisponível",
         "CHANGE_TO_YOUR_STATUS_TO_AVAILABLE": "altere seu status para disponível",
         "CHANGE_TO_YOUR_STATUS_TO_UNAVAILABLE": "altere seu status para indisponível"
+    },
+    "CDSAgentFromPrompt": {
+        "SendFailedTitle": "The request was not sent to the AI chat",
+        "SendFailedText": "The agent has been created, but the description could not be sent. Paste it in the AI chat to build the flow:",
+        "Building": "The AI is building your agent: blocks appear as it goes. This takes a moment."
     }
 }

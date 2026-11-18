@@ -179,3 +179,52 @@ export function updateConnector(connector, action, isConnectedTrue, isConnectedF
         }
         return resp;
     }
+
+/**
+ * Campi di una action che indicano il blocco dove andare. Il motore li legge come
+ * comando `/<valore>` e cerca il blocco per id SOLO se il valore comincia con '#'
+ * (MongodbBotsDataSource.getByIntentDisplayNameCache): senza '#' lo cerca per nome,
+ * non lo trova e il flusso si ferma, mentre il canvas lo disegna collegato lo stesso.
+ */
+export const ACTION_DESTINATION_FIELDS: string[] = [
+    'trueIntent', 'falseIntent', 'goToIntent', 'fallbackIntent',
+    'elseIntent', 'errorIntent', 'noInputIntent', 'noMatchIntent'
+];
+
+/**
+ * Rimette il '#' davanti all'id di un blocco quando manca. `isIntentId` dice se il
+ * valore e' davvero l'id di un blocco: un valore che non lo e' (un nome di blocco
+ * dei flussi piu' vecchi, un vuoto) resta com'e'.
+ */
+export function withDestinationHash(value: any, isIntentId: (id: string) => boolean): any {
+    if (typeof value !== 'string') { return value; }
+    const trimmed = value.trim();
+    if (trimmed === '' || trimmed.startsWith('#')) { return value; }
+    return isIntentId(trimmed) ? '#' + trimmed : value;
+}
+
+/**
+ * Applica withDestinationHash a ogni destinazione della action: i campi di
+ * ACTION_DESTINATION_FIELDS, i rami dell'AI Condition (`intents[].conditionIntentId`)
+ * e i casi della condizione a piu' uscite (`cases[].intent`). Restituisce true se ha
+ * cambiato qualcosa.
+ */
+export function fixActionDestinationHashes(action: any, isIntentId: (id: string) => boolean): boolean {
+    if (!action || typeof action !== 'object') { return false; }
+    let changed = false;
+    const fix = (holder: any, key: string) => {
+        const fixed = withDestinationHash(holder[key], isIntentId);
+        if (fixed !== holder[key]) {
+            holder[key] = fixed;
+            changed = true;
+        }
+    };
+    ACTION_DESTINATION_FIELDS.forEach(field => fix(action, field));
+    if (Array.isArray(action.intents)) {
+        action.intents.forEach((entry: any) => { if (entry && typeof entry === 'object') { fix(entry, 'conditionIntentId'); } });
+    }
+    if (Array.isArray(action.cases)) {
+        action.cases.forEach((branch: any) => { if (branch && typeof branch === 'object') { fix(branch, 'intent'); } });
+    }
+    return changed;
+}

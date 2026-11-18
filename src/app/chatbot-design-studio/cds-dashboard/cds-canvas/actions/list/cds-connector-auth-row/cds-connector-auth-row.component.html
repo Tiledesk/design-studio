@@ -1,0 +1,10 @@
+<div class="te-auth" *ngIf="requiresAuth">
+  <img class="te-icon" *ngIf="icon" [src]="icon" alt="">
+  <div class="te-auth-info">
+    <span class="te-auth-name ellips">{{ name }}</span>
+    <span class="te-auth-email ellips" *ngIf="connected && email">{{ email }}</span>
+  </div>
+  <span class="te-auth-ok" *ngIf="connected">{{ 'CDSCanvas.Connected' | translate }}</span>
+  <button class="te-auth-btn ghost" *ngIf="connected" (click)="onConnect(true)">{{ 'CDSCanvas.ChangeAccount' | translate }}</button>
+  <button class="te-auth-btn" *ngIf="!connected" (click)="onConnect()">{{ 'CDSCanvas.Connect' | translate }}</button>
+</div>

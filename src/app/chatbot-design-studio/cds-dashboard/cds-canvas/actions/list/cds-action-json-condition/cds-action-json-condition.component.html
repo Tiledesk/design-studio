@@ -10,9 +10,7 @@
         <ng-container *ngIf="action?.groups?.length > 0 && action?.groups[0]?.conditions && action?.groups[0]?.conditions.length > 0" [ngTemplateOutlet]="conditions"></ng-container>
         
         <cds-connector class="connector-true"
-            [idConnector] = "idConnectorTrue"
-            [idConnection] = "idConnectionTrue"
-            [isConnected] = "isConnectedTrue">
+            [intent]="intentSelected" [action]="action" slot="true">
         </cds-connector>   
         
     </div>
@@ -23,9 +21,7 @@
     <div *ngIf="!action?.noelse" class="previewContent">   
         <label class="title-preview-label">{{'CDSCanvas.Else' | translate }}</label>
         <cds-connector class="connector-false"
-            [idConnector] = "idConnectorFalse"
-            [idConnection] = "idConnectionFalse"
-            [isConnected] = "isConnectedFalse">
+            [intent]="intentSelected" [action]="action" slot="false">
         </cds-connector>
     </div>
 

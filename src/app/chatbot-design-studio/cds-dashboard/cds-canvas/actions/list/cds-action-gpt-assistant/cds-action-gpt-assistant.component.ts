@@ -1,13 +1,11 @@
 import { Intent } from 'src/app/models/intent-model';
 import { ActionGPTAssistant } from './../../../../../../models/action-model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { IntentService } from 'src/app/chatbot-design-studio/services/intent.service';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-gpt-assistant',
@@ -29,12 +27,6 @@ export class CdsActionGptAssistantComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   
   private logger: LoggerService = LoggerInstance.getInstance();
   constructor(
@@ -43,14 +35,6 @@ export class CdsActionGptAssistantComponent implements OnInit {
 
   ngOnInit(): void {
     this.logger.debug("[ACTION GPT-ASSISTANT] ngOnInit action: ", this.action);
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION GPT-ASSISTANT] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -58,9 +42,6 @@ export class CdsActionGptAssistantComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   initializeConnector() {
@@ -68,32 +49,9 @@ export class CdsActionGptAssistantComponent implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
-  /** */
-  private updateConnector(){
-    this.logger.log('[ACTION-GPT-ASSISTANT] updateConnector:');
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION-GPT-ASSISTANT] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
 
 
   private initializeAttributes() {

@@ -1,0 +1,513 @@
+[
+ {
+  "intent_id": "start",
+  "intent_display_name": "start",
+  "actions": [
+   {
+    "_tdActionId": "a_start",
+    "_tdActionType": "intent",
+    "intentName": "#aic"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "defaultFallback",
+  "intent_display_name": "defaultFallback",
+  "actions": [],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_defaultFallback",
+    "_tdActionType": "intent",
+    "intentName": "#prompt"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "aic",
+  "intent_display_name": "ai condition",
+  "actions": [
+   {
+    "_tdActionId": "a_aic",
+    "_tdActionType": "ai_condition",
+    "intents": [
+     {
+      "label": "vendite",
+      "prompt": "p1",
+      "conditionIntentId": "#multi"
+     },
+     {
+      "label": "supporto",
+      "prompt": "p2",
+      "conditionIntentId": "#iter"
+     },
+     {
+      "label": "vuoto",
+      "prompt": "p3",
+      "conditionIntentId": ""
+     }
+    ],
+    "fallbackIntent": "#prompt",
+    "errorIntent": "#cap"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_aic",
+    "_tdActionType": "intent",
+    "intentName": ""
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "multi",
+  "intent_display_name": "condizione multipla",
+  "actions": [
+   {
+    "_tdActionId": "a_multi",
+    "_tdActionType": "jsonconditionmulti",
+    "cases": [
+     {
+      "_tdCaseId": "c1",
+      "when": "x == 1",
+      "intent": "#iter"
+     },
+     {
+      "when": "x == 2",
+      "intent": "#cap"
+     },
+     {
+      "_tdCaseId": "c3",
+      "when": "x == 3",
+      "intent": ""
+     }
+    ],
+    "elseIntent": "#prompt"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "iter",
+  "intent_display_name": "iterazione",
+  "actions": [
+   {
+    "_tdActionId": "a_iter",
+    "_tdActionType": "iteration",
+    "goToIntent": "#prompt",
+    "fallbackIntent": "#cap"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_iter",
+    "_tdActionType": "intent",
+    "intentName": "#cap"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "cap",
+  "intent_display_name": "capture",
+  "actions": [
+   {
+    "_tdActionId": "a_cap",
+    "_tdActionType": "capture_user_reply",
+    "goToIntent": "#prompt"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_cap",
+    "_tdActionType": "intent",
+    "intentName": ""
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "cap2",
+  "intent_display_name": "capture senza goto",
+  "actions": [
+   {
+    "_tdActionId": "a_cap2",
+    "_tdActionType": "capture_user_reply",
+    "goToIntent": ""
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_cap2",
+    "_tdActionType": "intent",
+    "intentName": "#prompt"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "prompt",
+  "intent_display_name": "ai prompt",
+  "actions": [
+   {
+    "_tdActionId": "a_prompt",
+    "_tdActionType": "ai_prompt",
+    "trueIntent": "#sub",
+    "falseIntent": "#web"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_prompt",
+    "_tdActionType": "intent",
+    "intentName": ""
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "sub",
+  "intent_display_name": "sub agent",
+  "actions": [
+   {
+    "_tdActionId": "a_sub",
+    "_tdActionType": "invoke_subagent",
+    "trueIntent": "#web",
+    "falseIntent": "#web"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "web",
+  "intent_display_name": "web request",
+  "actions": [
+   {
+    "_tdActionId": "a_web",
+    "_tdActionType": "webrequestv2",
+    "trueIntent": "#fam1",
+    "falseIntent": "#fam2"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "fam1",
+  "intent_display_name": "famiglia 1",
+  "actions": [
+   {
+    "_tdActionId": "a_1",
+    "_tdActionType": "jsoncondition2",
+    "trueIntent": "#fam2",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_2",
+    "_tdActionType": "askgptv2",
+    "trueIntent": "#fam2",
+    "falseIntent": "#fam2"
+   },
+   {
+    "_tdActionId": "a_3",
+    "_tdActionType": "gpt_task",
+    "trueIntent": "",
+    "falseIntent": "#fam2"
+   },
+   {
+    "_tdActionId": "a_4",
+    "_tdActionType": "gpt_assistant",
+    "trueIntent": "#fam2",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_5",
+    "_tdActionType": "askgpt",
+    "trueIntent": "#fam2",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_6",
+    "_tdActionType": "jsoncondition",
+    "trueIntent": "#fam2",
+    "falseIntent": "#fam2"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "fam2",
+  "intent_display_name": "famiglia 2",
+  "actions": [
+   {
+    "_tdActionId": "a_7",
+    "_tdActionType": "ifonlineagents",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_8",
+    "_tdActionType": "ifonlineagentsv2",
+    "trueIntent": "",
+    "falseIntent": "#fam1"
+   },
+   {
+    "_tdActionId": "a_9",
+    "_tdActionType": "data_table",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_10",
+    "_tdActionType": "make",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_11",
+    "_tdActionType": "hubspot",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_12",
+    "_tdActionType": "customerio",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_13",
+    "_tdActionType": "brevo",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_14",
+    "_tdActionType": "n8n",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_15",
+    "_tdActionType": "qapla",
+    "trueIntent": "#fam1",
+    "falseIntent": ""
+   },
+   {
+    "_tdActionId": "a_16",
+    "_tdActionType": "send_whatsapp",
+    "trueIntent": "#fam1",
+    "falseIntent": "#ret"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_fam2",
+    "_tdActionType": "intent",
+    "intentName": "#ret"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "ret",
+  "intent_display_name": "return",
+  "actions": [
+   {
+    "_tdActionId": "a_ret",
+    "_tdActionType": "returnstack"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_ret",
+    "_tdActionType": "intent",
+    "intentName": "#prompt"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "v2",
+  "intent_display_name": "reply v2",
+  "actions": [
+   {
+    "_tdActionId": "a_v2",
+    "_tdActionType": "replyv2",
+    "noInputIntent": "#prompt",
+    "noMatchIntent": "#cap",
+    "attributes": {
+     "attachment": {
+      "buttons": [
+       {
+        "uid": "bv1",
+        "type": "action",
+        "value": "A",
+        "action": "#iter"
+       },
+       {
+        "uid": "bv2",
+        "type": "action",
+        "value": "B",
+        "action": "#multi"
+       }
+      ]
+     }
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "plain",
+  "intent_display_name": "solo reply",
+  "actions": [
+   {
+    "_tdActionId": "a_plain",
+    "_tdActionType": "reply",
+    "text": "fine"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_plain",
+    "_tdActionType": "intent",
+    "intentName": "#v2"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ }
+]

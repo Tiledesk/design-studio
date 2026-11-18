@@ -1,0 +1,85 @@
+<div *ngIf="previewMode" class="cds-action-preview">
+
+    <div class="action-row">
+        <div class="action-row-left">
+            <span class="material-icons">person_remove</span>
+        </div>
+        <div class="action-row-right">
+            <span><b>{{ selectedScopeName }}</b></span>
+        </div>
+    </div>
+
+    <div class="previewContent">
+        <label class="title-preview-label"><b>{{ 'CDSCanvas.RemoveHumanRemoved' | translate }}</b></label>
+        <cds-connector class="connector-true"
+            [idConnector]="idConnectorTrue"
+            [idConnection]="idConnectionTrue"
+            [isConnected]="isConnectedTrue">
+        </cds-connector>
+    </div>
+
+    <hr class="preview-divider">
+
+    <div class="previewContent">
+        <label class="title-preview-label">{{ 'CDSCanvas.RemoveHumanError' | translate }}</label>
+        <cds-connector class="connector-false"
+            [idConnector]="idConnectorFalse"
+            [idConnection]="idConnectionFalse"
+            [isConnected]="isConnectedFalse">
+        </cds-connector>
+    </div>
+
+</div>
+
+<div *ngIf="!previewMode">
+    <div class="content-panel-intent-detail">
+
+        <div class="field-box">
+            <label class="title-label">{{ 'CDSCanvas.RemoveHumanScope' | translate }}</label>
+            <cds-select id="remove-human-scope"
+                [items]="scopeOptions"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.scope"
+                [sortAlphabetically]="false"
+                [clearable]="false"
+                (onSelected)="onChangeScope($event)">
+            </cds-select>
+        </div>
+
+        <hr class="custom-divider">
+
+        <div class="field-box">
+            <div class="condition-container">
+                <span class="condition-text">{{ 'CDSCanvas.RemoveHumanRemoved' | translate }}</span>
+            </div>
+            <cds-select id="remove-human-true"
+                [items]="listOfIntents"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.trueIntent"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                [clearable]="true"
+                (onSelected)="onChangeSelect($event, 'trueIntent')"
+                (onReset)="onResetBlockSelect($event, 'trueIntent')">
+            </cds-select>
+        </div>
+
+        <div class="field-box">
+            <div class="condition-container">
+                <span class="condition-text">{{ 'CDSCanvas.RemoveHumanError' | translate }}</span>
+            </div>
+            <cds-select id="remove-human-false"
+                [items]="listOfIntents"
+                [bindLabelSelect]="'name'"
+                [bindValueSelect]="'value'"
+                [itemSelected]="action?.falseIntent"
+                [placeholder]="'CDSCanvas.SelectABlock' | translate"
+                [clearable]="true"
+                (onSelected)="onChangeSelect($event, 'falseIntent')"
+                (onReset)="onResetBlockSelect($event, 'falseIntent')">
+            </cds-select>
+        </div>
+
+    </div>
+</div>

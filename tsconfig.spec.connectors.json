@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec-connectors",
+    "types": [
+      "jasmine",
+      "node"
+    ],
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "files": [
+    "src/test-connectors.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/app/chatbot-design-studio/connectors/**/*.ts",
+    "src/app/chatbot-design-studio/services/connector-map.spec.ts",
+    "src/app/chatbot-design-studio/services/connector.service.spec.ts",
+    "src/**/*.d.ts"
+  ]
+}

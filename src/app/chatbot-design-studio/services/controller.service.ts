@@ -30,8 +30,20 @@ export class ControllerService {
   private testItOutPlaying = new Subject<any>();
   public isTestItOutPlaying$ = this.testItOutPlaying.asObservable();
 
+  private webhookStartTestSource = new Subject<'webhook' | 'scheduled'>();
+  public webhookStartTestRequested$ = this.webhookStartTestSource.asObservable();
+
+  /** "Test webhook start" / "Test scheduled start" of a start box panel: the header opens the conversation and the logs */
+  public requestWebhookStartTest(kind: 'webhook' | 'scheduled' = 'webhook'){
+    this.webhookStartTestSource.next(kind);
+  }
+
   private publishPanelStatusSubject = new Subject<any>();
   public isOpenPublishPanel$ = this.publishPanelStatusSubject.asObservable();
+
+  private agentChatPanelSource = new Subject<boolean>();
+  public isOpenAgentChatPanel$ = this.agentChatPanelSource.asObservable();
+  private agentChatPanelOpen = false;
 
   constructor() {
   }
@@ -85,6 +97,27 @@ export class ControllerService {
     this.addActionMenu.next(null);
     this.buttonSource.next(null);
     this.actionSource.next({type: null, element: null});
+  }
+
+  /** The agent chat panel is a toggle rather than an open/close pair: it is
+   *  driven by one header button, which reflects its own state. */
+  public toggleAgentChatPanel(){
+    this.agentChatPanelOpen = !this.agentChatPanelOpen;
+    this.agentChatPanelSource.next(this.agentChatPanelOpen);
+  }
+
+  public get isAgentChatPanelOpen(): boolean {
+    return this.agentChatPanelOpen;
+  }
+
+  public openAgentChatPanel(){
+    this.agentChatPanelOpen = true;
+    this.agentChatPanelSource.next(true);
+  }
+
+  public closeAgentChatPanel(){
+    this.agentChatPanelOpen = false;
+    this.agentChatPanelSource.next(false);
   }
 
 }

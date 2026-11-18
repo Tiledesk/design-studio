@@ -37,6 +37,9 @@ export class IntentAttributes {
     connectors?: any;
     color?: any;
     readonly?: boolean;
+    start_point?: string;
+    /** the `start` block's Web start box is turned off: hidden and unconnected, the block is kept */
+    web_start_disabled?: boolean;
     constructor() {
         this.position = {x:0, y:0};
         this.nextBlockAction = {

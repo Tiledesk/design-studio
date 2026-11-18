@@ -7,7 +7,6 @@ import { Message, Wait, Button, MessageAttributes, Expression, Setting, ActionRe
 import { TYPE_BUTTON, TYPE_COMMAND, TYPE_UPDATE_ACTION, replaceItemInArrayForKey } from '../../../../../../../utils';
 import { IntentService } from '../../../../../../../services/intent.service';
 import { ConnectorService } from '../../../../../../../services/connector.service';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
 import { secondsToDhms } from 'src/app/utils/util';
@@ -43,8 +42,6 @@ export class CdsActionReplySettingsComponent implements OnInit {
   isConnectedNoInput: boolean = false;
   isConnectorInputDisabled: boolean = false;
   isConnectorMatchDisabled: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
 
   private logger: LoggerService = LoggerInstance.getInstance();
@@ -56,14 +53,6 @@ export class CdsActionReplySettingsComponent implements OnInit {
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.logger.debug("[ACTION REPLY SETTINGS] action detail: ", this.action);
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION REPLY SETTINGS] isChangedConnector -->', connector);
-      let connectorId = this.idAction;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     this.initializeConnector();
 
     this.handleActionChanges.subscribe(()=> this.checkButtonsInCommands())
@@ -71,9 +60,6 @@ export class CdsActionReplySettingsComponent implements OnInit {
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
   
   // ngOnChanges(changes: SimpleChanges): void {
@@ -85,75 +71,10 @@ export class CdsActionReplySettingsComponent implements OnInit {
     this.idConnectorNoInput = this.idAction + '/noInput';
     this.idConnectorNoMatch = this.idAction + '/noMatch';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
     this.checkButtonsInCommands();
   }
 
-  private updateConnector(){
-    try {
-      const array = this.connector.fromId.split("/");
-      const idButton = array[0] + '/' + array[array.length - 2];
-      if(idButton === this.idAction){
-        if(this.connector.deleted){
-          if(array[array.length -1] === 'noInput'){
-            this.action.noInputIntent = null;
-            this.isConnectedNoInput = false;
-            this.idConnectionNoInput = null;
-          }        
-          if(array[array.length -1] === 'noMatch'){
-            this.action.noMatchIntent = null;
-            this.isConnectedNoMatch = false;
-            this.idConnectionNoMatch = null;
-          }
-          if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-        } else { 
-          // TODO: verificare quale dei due connettori è stato aggiunto (controllare il valore della action corrispondente al true/false intent)
-          this.logger.debug('[ACTION REPLY SETTINGS] updateConnector', this.connector.toId, this.connector.fromId ,this.action, array[array.length-1]);
-          if(array[array.length -1] === 'noInput'){
-            // this.action.trueIntent = '#'+this.connector.toId;
-            this.isConnectedNoInput = true;
-            this.idConnectionNoInput = this.connector.fromId+"/"+this.connector.toId;
-            this.action.noInputIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }        
-          if(array[array.length -1] === 'noMatch'){
-            // this.action.falseIntent = '#'+this.connector.toId;
-            this.isConnectedNoMatch = true;
-            this.idConnectionNoMatch = this.connector.fromId+"/"+this.connector.toId;
-            this.action.noMatchIntent = '#'+this.connector.toId;
-            if(this.connector.save)this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector});
-          }
-        }
-      }
-    } catch (error) {
-      this.logger.error('[ACTION REPLY SETTINGS] updateConnector error: ', error);
-    }
-  }
 
-  private checkConnectionStatus(){
-    if(this.action.noInputIntent){
-      this.isConnectedNoInput = true;
-      const posId = this.action.noInputIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.noInputIntent.slice(posId+1);
-        this.idConnectionNoInput = this.idConnectorNoInput+"/"+toId;
-      }
-    } else {
-      this.isConnectedNoInput = false;
-      this.idConnectionNoInput = null;
-    }
-    if(this.action.noMatchIntent){
-      this.isConnectedNoMatch = true;
-      const posId = this.action.noMatchIntent.indexOf("#");
-      if (posId !== -1) {
-        const toId = this.action.noMatchIntent.slice(posId+1);
-        this.idConnectionNoMatch = this.idConnectorNoMatch+"/"+toId;
-      }
-     } else {
-      this.isConnectedNoMatch = false;
-      this.idConnectionNoMatch = null;
-     }
-  }
 
 
   formatLabel(value: number): string {

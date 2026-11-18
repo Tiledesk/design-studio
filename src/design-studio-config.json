@@ -5,7 +5,9 @@
   "globalRemoteJSSrc": "${REMOTE_JS_SRC}",
   "widgetBaseUrl": "${WIDGET_LOCATION}",
   "dashboardBaseUrl": "${DASHBOARD_URL}",
+  "cdsV3BaseUrl": "${CDS_V3_URL}",
   "whatsappTemplatesBaseUrl":"${WHATSAPP_TEMPLATES_BASE_URL}",
+  "agentChatUrl": "CHANGEIT",
   "wsUrl": "${WS_URL}",
   "wsUrlRel": "${WS_URL_RELATIVE}",
   "uploadEngine": "${UPLOAD_ENGINE}",
@@ -15,6 +17,7 @@
   "aiModels":"${AI_MODELS}",
   "storage_prefix": "cds_sv5",
   "pineconeReranking": "${PINECONE_RERANKING}",
+  "CHATBOT_VERSION": "${CHATBOT_VERSION}",
   "phoneNumber":"${PHONE_NUMBER}",
   "authPersistence": "${AUTH_PERSISTENCE}",
   "firebase": {

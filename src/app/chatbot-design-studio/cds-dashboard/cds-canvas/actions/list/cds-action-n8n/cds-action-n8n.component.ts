@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Subscription } from 'rxjs/internal/Subscription';
 
 //MODELS
 import { Intent } from 'src/app/models/intent-model';
@@ -14,7 +13,6 @@ import { AppConfigService } from 'src/app/services/app-config';
 //UTILS
 import { TYPE_UPDATE_ACTION, TYPE_METHOD_ATTRIBUTE, TEXT_CHARS_LIMIT } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 
 @Component({
   selector: 'cds-action-n8n',
@@ -36,13 +34,7 @@ export class CdsActionN8nComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
 
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   
   helpUrl = "https://guide.tiledesk.com/ai-chatbots-and-automation/actions-explained/n8n.io";
   pattern = "^[a-zA-Z_]*[a-zA-Z_]+[a-zA-Z0-9_]*$";
@@ -62,20 +54,12 @@ export class CdsActionN8nComponent implements OnInit {
   // SYSTEM FUNCTIONS //
   ngOnInit(): void {
     this.logger.log("[ACTION-N8N] action detail: ", this.action);
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.log('[ACTION-N8N] isChangedConnector -->', connector);
-      this.connector = connector;
-      this.updateConnector();
-    });
     this.initialize();
   }
 
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   /** */
@@ -84,33 +68,9 @@ export class CdsActionN8nComponent implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
-  /** */
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
-  /** */
-  private updateConnector(){
-    this.logger.log('[ACTION-N8N] updateConnector:');
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION-N8N] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
   
   // CUSTOM FUNCTIONS //
   private initialize(){

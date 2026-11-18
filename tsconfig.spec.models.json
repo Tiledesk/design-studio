@@ -7,7 +7,7 @@
   "files": ["src/test-models.ts", "src/polyfills.ts"],
   "include": [
     "src/app/chatbot-design-studio/utils-ai_models.unit.spec.ts",
-    "src/app/chatbot-design-studio/utils-llm-models.spec.ts",
+    "src/app/chatbot-design-studio/utils-llm-models.unit.spec.ts",
     "src/**/*.d.ts"
   ]
 }

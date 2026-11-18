@@ -1,0 +1,197 @@
+[
+ {
+  "intent_id": "start",
+  "intent_display_name": "start",
+  "actions": [
+   {
+    "_tdActionId": "a_start",
+    "_tdActionType": "intent",
+    "intentName": "#menu"
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "defaultFallback",
+  "intent_display_name": "defaultFallback",
+  "actions": [],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {},
+   "nextBlockAction": {
+    "_tdActionId": "n_defaultFallback",
+    "_tdActionType": "intent",
+    "intentName": "#menu"
+   }
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "menu",
+  "intent_display_name": "menu",
+  "actions": [
+   {
+    "_tdActionId": "a_menu",
+    "_tdActionType": "dtmf_menu",
+    "attributes": {
+     "commands": [
+      {
+       "type": "message",
+       "message": {
+        "text": "Premi",
+        "attributes": {
+         "attachment": {
+          "buttons": [
+           {
+            "uid": "k1",
+            "type": "action",
+            "value": "1",
+            "action": "#form"
+           },
+           {
+            "uid": "k2",
+            "type": "action",
+            "value": "2",
+            "action": "#xfer"
+           }
+          ]
+         }
+        }
+       }
+      },
+      {
+       "type": "wait",
+       "settings": {
+        "noInputIntent": "#form",
+        "noMatchIntent": "#xfer"
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "form",
+  "intent_display_name": "form",
+  "actions": [
+   {
+    "_tdActionId": "a_form",
+    "_tdActionType": "dtmf_form",
+    "attributes": {
+     "commands": [
+      {
+       "type": "wait",
+       "settings": {
+        "noInputIntent": "#menu",
+        "noMatchIntent": ""
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "xfer",
+  "intent_display_name": "transfer",
+  "actions": [
+   {
+    "_tdActionId": "a_xfer",
+    "_tdActionType": "blind_transfer",
+    "attributes": {
+     "commands": [
+      {
+       "type": "wait",
+       "settings": {
+        "trueIntent": "#speech",
+        "falseIntent": "#menu"
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ },
+ {
+  "intent_id": "speech",
+  "intent_display_name": "speech",
+  "actions": [
+   {
+    "_tdActionId": "a_speech",
+    "_tdActionType": "speech_form",
+    "attributes": {
+     "commands": [
+      {
+       "type": "wait",
+       "settings": {
+        "noInputIntent": "#menu",
+        "noMatchIntent": "#form"
+       }
+      }
+     ]
+    }
+   }
+  ],
+  "attributes": {
+   "position": {
+    "x": 0,
+    "y": 0
+   },
+   "color": "0, 0, 0",
+   "connectors": {}
+  },
+  "language": "it",
+  "question": "",
+  "answer": ""
+ }
+]

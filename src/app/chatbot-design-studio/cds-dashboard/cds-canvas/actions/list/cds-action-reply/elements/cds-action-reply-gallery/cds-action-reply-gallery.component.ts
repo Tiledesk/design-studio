@@ -7,7 +7,6 @@ import { TEXT_CHARS_LIMIT, TYPE_BUTTON, TYPE_URL, generateShortUID } from '../..
 import { Button, Expression, GalleryElement, Message, Wait, Metadata, MessageAttributes } from 'src/app/models/action-model';
 import { LoggerService } from 'src/chat21-core/providers/abstract/logger.service';
 import { LoggerInstance } from 'src/chat21-core/providers/logger/loggerInstance';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { TYPE_ACTION } from 'src/app/chatbot-design-studio/utils-actions';
 import { LIST_JSON_MODEL_GALLERY } from 'src/app/chatbot-design-studio/utils-json-gallery';
 import { isLegacyFilter, hasFilter } from 'src/app/chatbot-design-studio/utils-condition';
@@ -39,8 +38,6 @@ export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, On
   
   // Connector //
   idIntent: string;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
   // Delay //
   delayTime: number;
   // Filter // 
@@ -87,9 +84,6 @@ export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, On
 
   /** */
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
 
@@ -114,10 +108,6 @@ export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, On
         this.checkArrowsVisibility();
       }, 200);
       
-      this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-        this.connector = connector;
-        this.updateConnector();
-      });
       this.idIntent = this.idAction.split('/')[0];
 
       this.filterConditionExist = hasFilter(this.response?._tdJSONCondition);
@@ -180,46 +170,6 @@ export class CdsActionReplyGalleryComponent implements OnInit, AfterViewInit, On
   //   });
   // }
   
-  private updateConnector(){
-    try {
-      this.gallery.forEach((el, index)=> {
-        const array = this.connector.fromId.split("/");
-        const idButton = array[array.length - 1];
-        const idConnector = this.idAction+'/'+idButton;
-        this.logger.log('[REPLY-GALLERY] updateConnector :: connector.fromId - idConnector: ', this.connector.fromId, idConnector);
-        const buttonChanged = el.buttons.find(obj => obj.uid === idButton);
-        if(idConnector === this.connector.fromId && buttonChanged){
-          if(this.connector.deleted){
-            // DELETE 
-            buttonChanged.__isConnected = false;
-            buttonChanged.__idConnector = this.connector.fromId;
-            buttonChanged.action = '';
-            buttonChanged.type = TYPE_BUTTON.TEXT;
-            // if(this.connector.notify)
-            // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-            // this.changeActionReply.emit();
-            this.updateAndSaveAction.emit();
-          } else {
-            // ADD / EDIT
-            // buttonChanged.__isConnected = true;
-            buttonChanged.__idConnector = this.connector.fromId;
-            buttonChanged.action = buttonChanged.action? buttonChanged.action : '#' + this.connector.toId;
-            buttonChanged.type = TYPE_BUTTON.ACTION;
-            if(!buttonChanged.__isConnected){
-              buttonChanged.__isConnected = true;
-              // if(this.connector.notify)
-              // if(this.connector.save)this.updateAndSaveAction.emit(this.connector);
-              this.updateAndSaveAction.emit();
-              // this.changeActionReply.emit();
-            } 
-          }
-          // this.changeActionReply.emit();
-        }
-      });
-    } catch (error) {
-      this.logger.error('error: ', error);
-    }
-  }
 
 
 

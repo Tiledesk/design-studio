@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Outpu
 import { Observable, Subscription } from 'rxjs';
 
 //MODELS
-import { ActionAiPrompt } from 'src/app/models/action-model';
+import { ActionAiPrompt, ReasoningLevel } from 'src/app/models/action-model';
 import { Intent } from 'src/app/models/intent-model';
 
 //SERVICES
@@ -25,7 +25,6 @@ import { loadTokenMultiplier } from 'src/app/utils/util';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ANTHROPIC_MODEL, COHERE_MODEL, DEEPSEEK_MODEL, DEFAULT_MODEL, GOOGLE_MODEL, GROQ_MODEL, LLM_MODEL, OLLAMA_MODEL, OPENAI_MODEL, generateLlmModelsFlat } from 'src/app/chatbot-design-studio/utils-ai_models';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { ProjectService } from 'src/app/services/projects.service';
 import { sortAutocompleteOptions, getModelsByName, getIntegrations, setModel, initLLMModels, applySelectedServerToAction, appendSelectedServerToPayload, LlmModel, hasFixedTemperature } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { FormatNumberPipe } from 'src/app/pipe/format-number.pipe';
@@ -89,12 +88,6 @@ export class CdsActionAiPromptComponent implements OnInit {
   idIntentSelected: string = '';
   idConnectorTrue: string = '';
   idConnectorFalse: string = '';
-  idConnectionTrue: string = '';
-  idConnectionFalse: string = '';
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   projectPlan: PLAN_NAME;
   PLAN_NAME = PLAN_NAME;
@@ -126,14 +119,6 @@ export class CdsActionAiPromptComponent implements OnInit {
     // i modelli dei provider dinamici (ollama, vllm, agentplatform, openrouter) vengono caricati da initLLMModels()
     this.llm_models = this.llm_model.filter(el => el.status === 'active');
     this.projectPlan = this.dashboardService.project.profile.name
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION AI_PROMPT] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -153,9 +138,6 @@ export class CdsActionAiPromptComponent implements OnInit {
 
 
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
 
@@ -193,36 +175,13 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.logger.log('[ACTION AI_PROMPT] idIntentSelected:', this.idIntentSelected);
     this.logger.log('[ACTION AI_PROMPT] idConnectorTrue:', this.idConnectorTrue);
     this.logger.log('[ACTION AI_PROMPT] idConnectorFalse:', this.idConnectorFalse);
-    this.checkConnectionStatus();
     
     // this.logger.log('[ACTION AI_PROMPT] isConnectedFalse:', this.isConnectedFalse);
     // this.logger.log('[ACTION AI_PROMPT] idConnectionTrue:', this.idConnectionTrue);
     // this.logger.log('[ACTION AI_PROMPT] idConnectionFalse:', this.idConnectionFalse);
   }
   
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.logger.log('[ACTION AI_PROMPT] checkConnectionStatusOfAction:',this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-    this.logger.log('[ACTION AI_PROMPT] resp:',resp);
-  }
 
-  private updateConnector(){
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION AI_PROMPT] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
 
 
   private initializeAttributes() {
@@ -295,6 +254,11 @@ export class CdsActionAiPromptComponent implements OnInit {
       this.ai_setting['temperature'].disabled = false;
     }
   }
+  // Se il modello non supporta reasoning, disattiva reasoning sull'action
+  if (this.llm_model_selected?.reasoning !== true) {
+    this.action.reasoning = false;
+  }
+  // console.log("[ACTION AI_PROMPT] llm_models_flat: ", this.llm_models_flat);
 }
 
 
@@ -336,9 +300,44 @@ export class CdsActionAiPromptComponent implements OnInit {
     this.updateAndSaveAction.emit();
   }
 
+  /** Chiamato al change dello slider reasoning: salva l'enum e emette il save */
+  onReasoningLevelChange(value: number): void {
+    this.action.reasoningLevel = this.numberToReasoningLevel(value);
+    this.updateAndSaveAction.emit();
+  }
+
+  /** Converte 0,1,2 in enum ReasoningLevel (per slider → action) */
+  numberToReasoningLevel(n: number): ReasoningLevel {
+    const clamped = Math.min(2, Math.max(0, n));
+    return clamped === 0 ? 'low' : clamped === 1 ? 'medium' : 'high';
+  }
+
+  /** True se la checkbox Reasoning deve essere disabilitata (modello senza supporto reasoning) */
+  get isReasoningCheckboxDisabled(): boolean {
+    return this.llm_model_selected?.reasoning !== true;
+  }
+
+  /** Valore numerico per lo slider (0, 1, 2) da action.reasoningLevel */
+  get reasoningLevelSlider(): number {
+    const v = this.action.reasoningLevel;
+    if (v === 'low') return 0;
+    if (v === 'medium') return 1;
+    if (v === 'high') return 2;
+    // retrocompatibilità: se era salvato come number
+    if (typeof v === 'number') return Math.min(2, Math.max(0, v));
+    return 1; // default medium
+  }
+  set reasoningLevelSlider(value: number) {
+    this.action.reasoningLevel = this.numberToReasoningLevel(value);
+  }
+
   onChangeCheckbox(event: MatCheckboxChange, target){
     try {
       this.action[target] = event.checked;
+      if (target === 'reasoning' && event.checked && (this.action.reasoningLevel === undefined || this.action.reasoningLevel === null)) {
+        this.action.reasoningLevel = 'medium';
+      }
+      // this.action.assignReasoningContentTo = "reasoning_content";
       this.updateAndSaveAction.emit({type: TYPE_UPDATE_ACTION.ACTION, element: this.action});
     } catch (error) {
       this.logger.log("[ACTION AI_PROMPT] Error: ", error);
@@ -651,5 +650,11 @@ export class CdsActionAiPromptComponent implements OnInit {
     return this.formatNumberPipe.transform(value);
   }
 
+  /** Label per reasoning: accetta number (0,1,2) per lo slider thumb o enum ('low'|'medium'|'high') per l'input */
+  formatReasoningLabel = (value: number | ReasoningLevel): string => {
+    const n = typeof value === 'number' ? value : (value === 'low' ? 0 : value === 'medium' ? 1 : 2);
+    const key = n === 0 ? 'CDSCanvas.ReasoningLevelLow' : n === 1 ? 'CDSCanvas.ReasoningLevelMedium' : 'CDSCanvas.ReasoningLevelHigh';
+    return this.translate.instant(key);
+  }
 
 }

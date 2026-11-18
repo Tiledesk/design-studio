@@ -35,9 +35,9 @@
 
 
     <div class="section">
-        <div class="action-title">
-            <div class="icon-action">
-                <img class="active-icon" [src]="element?.src" [title]="element?.name | translate ">
+        <div class="action-title tds_draggable">
+            <div class="icon-action tds_draggable">
+                <img class="active-icon tds_draggable" [src]="element?.src" [title]="element?.name | translate ">
                 <!-- <span *ngIf="previewMode && element.badge" [class.deprecation-badge]="element.badge==='DEP'" class="trigger-beta-badge">{{element.badge}}</span> -->
                 <span *ngIf="previewMode && element?.badge" [class]="'trigger-beta-badge badge-' + element?.badge">{{element?.badge}}</span>
             </div>
@@ -47,11 +47,8 @@
             <span *ngIf="!previewMode && element?.badge" [class]="'trigger-beta-badge badge-' + element?.badge">{{element?.badge}}</span>
             <span *ngIf="!previewMode && element?.status ==='beta'" class="trigger-beta-badge">Beta</span>
 
-            <div *ngIf="previewMode" class="action-btn-icon">
-                <button class="btn btn-tdblu-no-boxshadow drag-btn">
-                    <img class="active-icon" src="assets/images/icons/drag_indicator.svg" [title]="'CDSCanvas.Drag' | translate">
-                </button>
-            </div>
+            <!-- drag_indicator rimosso da qui: il handle di riordino è renderizzato dal parent (cds-intent)
+                 come unico cdkDragHandle, così SOLO quel pulsante riordina l'azione. -->
 
         </div>
         

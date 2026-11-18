@@ -131,7 +131,6 @@ export class NativeUploadService extends UploadService {
                         : encodeURIComponent(filename || '');
                     const src = this.URL_TILEDESK_UPLOAD + 'files?path=' + pathParam;
                     const downloadURL = this.URL_TILEDESK_UPLOAD + 'files/download?path=' + pathParam;
-
                     resolve({downloadURL : downloadURL, src: src})
                 },
                 error: (error) => {

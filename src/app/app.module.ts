@@ -48,6 +48,7 @@ import { ImageRepoService } from 'src/chat21-core/providers/abstract/image-repo.
 import { NetworkOfflineComponent } from './modals/network-offline/network-offline.component';
 import { AppInterruptionComponent } from './modals/app-interruption/app-interruption.component';
 import { BrandResources } from './chatbot-design-studio/BrandResources';
+import { AiService } from './services/ai.service';
 
 import localeIt from '@angular/common/locales/it';
 registerLocaleData(localeIt, 'it');
@@ -188,7 +189,9 @@ export function uploadFactory(http: HttpClient, appConfig: AppConfigService, app
     DepartmentService,
     UsersService,
     KnowledgeBaseService,
+    AiService,
     OpenaiService,
+    AiService,
     WhatsappService,
     BrandService,
     MultichannelService,

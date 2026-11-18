@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
 
 //MODELS
 import { ActionGPTTask } from 'src/app/models/action-model';
@@ -15,15 +14,15 @@ import { IntentService } from 'src/app/chatbot-design-studio/services/intent.ser
 
 //UTILS
 import { AttributesDialogComponent } from './attributes-dialog/attributes-dialog.component';
-import { DOCS_LINK, TYPE_GPT_MODEL, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
+import { DOCS_LINK, TYPE_UPDATE_ACTION } from 'src/app/chatbot-design-studio/utils';
 import { variableList } from 'src/app/chatbot-design-studio/utils-variables';
 import { DashboardService } from 'src/app/services/dashboard.service';
 import { PLAN_NAME } from 'src/chat21-core/utils/constants';
 import { TranslateService } from '@ngx-translate/core';
 import { loadTokenMultiplier } from 'src/app/utils/util';
+import { filterModelsByAiModelsConfig, manageGpt5ModelSettings } from 'src/app/chatbot-design-studio/utils-llm-models';
 import { BRAND_BASE_INFO } from 'src/app/chatbot-design-studio/utils-resources';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { checkConnectionStatusOfAction, updateConnector } from 'src/app/chatbot-design-studio/utils-connectors';
 import { OPENAI_MODEL } from 'src/app/chatbot-design-studio/utils-ai_models';
 import { LlmModel } from 'src/app/chatbot-design-studio/utils-llm-models';
 
@@ -46,10 +45,15 @@ export class CdsActionGPTTaskComponent implements OnInit {
   listOfIntents: Array<{name: string, value: string, icon?:string}>;
 
   panelOpenState = false;
-  model_list: Array<{ name: string, value: string }>;
-  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
-    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1},
-    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  // model_list: Array<{ name: string, value: string }>;
+  // ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number}} = {
+  //   "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1},
+  //   "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05}
+  
+  model_list: Array<{ name: string, value: string, additionalText?: string }>;
+  ai_setting: { [key: string] : {name: string,  min: number, max: number, step: number, disabled: boolean}} = {
+    "max_tokens": { name: "max_tokens",  min: 10, max: 100000, step: 1, disabled: false},
+    "temperature" : { name: "temperature", min: 0, max: 1, step: 0.05, disabled: false}
   }
   ai_response: string = "";
   ai_error: string = "Oops! Something went wrong. Check your GPT Key or retry in a few moment."
@@ -67,13 +71,7 @@ export class CdsActionGPTTaskComponent implements OnInit {
   idIntentSelected: string;
   idConnectorTrue: string;
   idConnectorFalse: string;
-  idConnectionTrue: string;
-  idConnectionFalse: string;
-  isConnectedTrue: boolean = false;
-  isConnectedFalse: boolean = false;
   
-  connector: any;
-  private subscriptionChangedConnector: Subscription;
 
   projectPlan: PLAN_NAME
   PLAN_NAME = PLAN_NAME
@@ -121,14 +119,6 @@ export class CdsActionGPTTaskComponent implements OnInit {
     //     return { ...el, multiplier: null }
     // })
     this.projectPlan = this.dashboardService.project.profile.name
-    this.subscriptionChangedConnector = this.intentService.isChangedConnector$.subscribe((connector: any) => {
-      this.logger.debug('[ACTION-ASKGPT] isChangedConnector -->', connector);
-      let connectorId = this.idIntentSelected+"/"+this.action._tdActionId;
-      if(connector.fromId.startsWith(connectorId)){
-        this.connector = connector;
-        this.updateConnector();
-      }
-    });
     if(this.intentSelected){
       this.initializeConnector();
     }
@@ -143,9 +133,6 @@ export class CdsActionGPTTaskComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    if (this.subscriptionChangedConnector) {
-      this.subscriptionChangedConnector.unsubscribe();
-    }
   }
 
   initializeConnector() {
@@ -153,32 +140,9 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.idConnectorTrue = this.idIntentSelected+'/'+this.action._tdActionId + '/true';
     this.idConnectorFalse = this.idIntentSelected+'/'+this.action._tdActionId + '/false';
     this.listOfIntents = this.intentService.getListOfIntents();
-    this.checkConnectionStatus();
   }
 
-  private checkConnectionStatus(){
-    const resp = checkConnectionStatusOfAction(this.action, this.idConnectorTrue, this.idConnectorFalse);
-    this.isConnectedTrue    = resp.isConnectedTrue;
-    this.isConnectedFalse   = resp.isConnectedFalse;
-    this.idConnectionTrue   = resp.idConnectionTrue;
-    this.idConnectionFalse  = resp.idConnectionFalse;
-  }
 
-  /** */
-  private updateConnector(){
-    this.logger.log('[ACTION-ASKGPT] updateConnector:');
-    const resp = updateConnector(this.connector, this.action, this.isConnectedTrue, this.isConnectedFalse, this.idConnectionTrue, this.idConnectionFalse);
-    if(resp){
-      this.isConnectedTrue    = resp.isConnectedTrue;
-      this.isConnectedFalse   = resp.isConnectedFalse;
-      this.idConnectionTrue   = resp.idConnectionTrue;
-      this.idConnectionFalse  = resp.idConnectionFalse;
-      this.logger.log('[ACTION-ASKGPT] updateConnector:', resp);
-      if (resp.emit) {
-        this.updateAndSaveAction.emit({ type: TYPE_UPDATE_ACTION.CONNECTOR, element: this.connector });
-      } 
-    }
-  }
 
   // private updateConnector(){
   //   try {
@@ -254,6 +218,10 @@ export class CdsActionGPTTaskComponent implements OnInit {
     this.logger.debug("[ACTION GPT-TASK] onChangeSelect event: ", event.value)
     this.logger.debug("[ACTION GPT-TASK] onChangeSelect target: ", target)
     this.action[target] = event.value;
+
+    /** MANAGE GPT-5 MODELS */
+    manageGpt5ModelSettings(this.action, this.ai_setting);
+
     this.updateAndSaveAction.emit();
   }
 

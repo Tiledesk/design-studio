@@ -1,93 +1,97 @@
-@import "./src/assets/sass/cds/_variables.scss";
+@use '../left-panel' as lp;
 
-.cds-panel-elements {
-    position: absolute;
-    top: 12px;
-    left: 100%;
-    transform: translateX(12px);
-    padding: 4px;
-    border-radius: 10px;
-    z-index: 10;
+/* Pannello delle azioni, allineato a quello del Design Studio V4.
+   I nomi dei valori sono quelli di la' (`--ds-*`, `--space-*`, `--fs-*`, `--cat-*`) per rendere
+   immediato il confronto fra i due progetti. I colori delle categorie sono gli stessi espressi
+   in esadecimale: il V4 li scrive in oklch, che qui non aggiunge niente e toglie supporto.
+   Dichiarati sull'host, quindi non escono da questo pannello. */
+:host {
+    // Dichiarato qui come fa `panel-shell` nel V4, invece di ereditarlo: le righe e la ricerca
+    // usano `font-family: inherit`, quindi basta questo punto solo per tenerle tutte in passo.
+    font-family: var(--font-family-poppins, 'Poppins', 'Roboto', Arial, sans-serif);
+    display: block;
+    height: 100%;
+    min-height: 0;
+    background: var(--ds-surface);
+}
 
+.cds-actions-panel {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-svg {
-    overflow: hidden;
-    vertical-align: middle;
+    height: 100%;
+    min-height: 0;
 }
 
-.cds-elements {
-    padding: 4px;
-    border-radius: 8px;
-    background-color: white;
-    box-shadow: rgba(19, 33, 68, 0.01) 0px 1px 3px 1px, rgba(19, 33, 68, 0.12) 0px 5px 8px -8px, rgba(19, 33, 68, 0.12) 0px 2px 4px -3px, rgba(19, 33, 68, 0.03) 0px 0px 0px 1px;
-    overflow: hidden;
-    transition: height 0.15s ease 0s;
-    border: 2px solid var(--gray-02)
-}
-
-.cds-button-element {
-    animation: 0.1s ease-in-out 0s 1 normal both running;
-}
-
-.cds-box-button {
-    transition: background-color 0.15s ease 0s;
-    width: 64px;
-    height: 64px;
-    flex-direction: column;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 6px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cds-box-button:hover, 
-.cds-box-button:focus {
-    background-color: var(--gray-02);
-}
+/* ── Ricerca ── */
 
 
-.box-img {
-    transition: opacity 0.15s ease 0s, background-color 0.15s ease 0s, color 0.15s ease 0s, transform 0.15s ease 0s;
-    box-sizing: content-box;
-    width: 24px;
-    height: 24px;
+
+
+.cds-actions-panel__clear {
+    flex: 0 0 auto;
+    border: 0;
     background: transparent;
+    color: var(--ds-muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    &:hover { color: var(--ds-ink); }
 }
 
-.box-title {
-    font-size: 9px;
-    font-weight: 400; 
-}
-
-#menuElement {
-    min-width: 100px;
-    max-width: 400px;
-    width: 210px;
-    color: var(--blu);
-    font-size: 15px;
-    line-height: 18px;
-    list-style: none;
-    // overflow: hidden;
+/* ── Corpo ── */
+.cds-actions-panel__body {
+    @include lp.lp-scroll-area;
     padding: 0;
-    // box-shadow: #1321440a 0 12px 24px, #1321440a 0 8px 12px, #13214405 0 4px 4px, #13214403 0 2px 2px, #13214403 0 1px 1px, #11316008 0 0, #1131600f 0 0 0 1px;
-    border-radius: 8px;
-    background: rgb(255,255,255);
-    will-change: transform;
-    animation: .15s ease 0s 1 normal none running fadein, .15s ease 0s 1 normal none running movein, .1s ease 0s 1 normal none running scaleY;
-    margin: 0;
-    position: absolute;
-    top: 0px;
-    left: 85px;
-    border: 2px solid var(--gray-02);
 }
+
+/* ── Categorie ── */
+.cds-actions-cat {
+    border-bottom: 1px solid var(--ds-border);
+    &:last-child { border-bottom: none; }
+
+}
+
+.cds-actions-cat__header {
+    @include lp.lp-accordion-header;
+}
+
+
+/* Tinta e alone arrivano dal template, che li legge dalla famiglia: qui restano forma e misura.
+   L'alone tiene il pallino leggibile anche sul fondo chiaro, senza ingrandirlo. */
+.cds-actions-cat__dot {
+    width: var(--space-4);
+    height: var(--space-4);
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--ds-muted);
+}
+
+.cds-actions-cat__name {
+    @include lp.lp-accordion-name;
+}
+
+
+.cds-actions-cat__count {
+    @include lp.lp-accordion-count;
+}
+
+
+.cds-actions-cat__chevron {
+    @include lp.lp-accordion-chevron;
+}
+
+
+.cds-actions-cat__body { padding: var(--space-1) 0 var(--space-4); }
+
+.cds-actions-panel__empty {
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+    font-size: var(--fs-sm);
+    color: var(--ds-muted);
+}
+
+
+/* La cornice del pannello -- titolo, freccia di chiusura, fascia della ricerca -- viene dal
+   parziale condiviso: le stesse regole servono ai blocchi e ai subagent, e finche' erano
+   copiate in ciascun foglio bastava ritoccarne una per farli divergere. */
+@include lp.lp-panel-head;
