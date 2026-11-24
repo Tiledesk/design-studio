@@ -59,13 +59,20 @@
     width: 100%;
     height: 36px;
     padding: 0 8px;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 300;
     box-sizing: border-box;
     border-radius: var(--input-border-radius-base);
     border: solid 1px var(--blu-light-02);
     background-color: var(--dm-surface, var(--color-white-hex));
-    color: var(--dm-text, inherit);
+    // same text and placeholder colors as the cds-select values above
+    color: var(--dm-text, #333);
     outline: none;
+
+    &::placeholder {
+        color: #999;
+        opacity: 1;
+    }
 
     &:focus {
         border-color: var(--blu);
