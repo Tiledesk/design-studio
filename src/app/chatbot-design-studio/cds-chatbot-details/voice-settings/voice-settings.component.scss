@@ -52,3 +52,23 @@
         pointer-events: none;
     }
 }
+
+.barge-in-timings {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px 30px;
+    width: 80%;
+    margin-bottom: 16px;
+
+    .barge-in-timing {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .barge-in-timing-hint {
+        color: #9aa0a6;
+        font-size: 12px;
+        font-weight: 400;
+    }
+}

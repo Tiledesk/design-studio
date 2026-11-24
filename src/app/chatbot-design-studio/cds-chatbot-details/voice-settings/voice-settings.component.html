@@ -128,6 +128,24 @@
                 {{ 'CDSSetting.BargeInDescription' | translate }}
             </span>
         </div>
+        <!-- Barge-in timings: empty = default -->
+        <div *ngIf="showBargeIn && bargeIn" id="bargeInTimings" class="barge-in-timings">
+            <div *ngFor="let timing of bargeInTimings" class="barge-in-timing">
+                <label class="cds-custom-label" [for]="'bargeInTiming-' + timing.key">
+                    {{ timing.label | translate }}
+                </label>
+                <input type="number" class="form-control"
+                    [id]="'bargeInTiming-' + timing.key"
+                    [min]="timing.min" [max]="timing.max" step="1"
+                    [placeholder]="timing.defaultValue"
+                    [value]="bargeInTimingValues[timing.key]"
+                    (change)="onChangeBargeInTiming(timing.key, $any($event.target).value)">
+                <span class="barge-in-timing-hint">
+                    {{ timing.hint | translate: { default: timing.defaultValue } }}
+                </span>
+            </div>
+        </div>
+
 
     </div>
 
