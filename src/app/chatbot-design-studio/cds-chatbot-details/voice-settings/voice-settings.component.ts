@@ -26,6 +26,18 @@ function mapVoiceForSelect(voice: any) {
   };
 }
 
+/**
+ * Barge-in tuning saved as chatbot globals. Empty = default: the widget's for the
+ * volume drop, the speech proxy's (server setting) for guard time and minimum words.
+ */
+export const BARGE_IN_TIMINGS: Array<{ key: string, label: string, hint: string, defaultValue: number, min: number, max?: number }> = [
+  { key: 'BARGE_IN_DUCK_VOLUME',     label: 'CDSSetting.BargeInDuckVolume',    hint: 'CDSSetting.BargeInDuckVolumeDescription',    defaultValue: 15,   min: 0, max: 100 },
+  { key: 'BARGE_IN_DUCK_RELEASE_MS', label: 'CDSSetting.BargeInDuckRelease',   hint: 'CDSSetting.BargeInDuckReleaseDescription',   defaultValue: 1200, min: 0 },
+  { key: 'BARGE_IN_DUCK_MAX_MS',     label: 'CDSSetting.BargeInDuckMax',       hint: 'CDSSetting.BargeInDuckMaxDescription',       defaultValue: 6000, min: 0 },
+  { key: 'BARGE_IN_GUARD_MS',        label: 'CDSSetting.BargeInGuard',         hint: 'CDSSetting.BargeInGuardDescription',         defaultValue: 1000, min: 0 },
+  { key: 'BARGE_IN_MIN_WORDS',       label: 'CDSSetting.BargeInMinWords',      hint: 'CDSSetting.BargeInMinWordsDescription',      defaultValue: 2,    min: 1 },
+];
+
 @Component({
   selector: 'cds-voice-settings',
   templateUrl: './voice-settings.component.html',
@@ -56,6 +68,9 @@ export class CDSVoiceSettingsComponent implements OnInit {
   voice_name: string;
   voice_language: string;
   bargeIn: boolean;
+  readonly bargeInTimings = BARGE_IN_TIMINGS;
+  /** Field text per timing key ('' = not set, default applies). */
+  bargeInTimingValues: { [key: string]: string } = {};
 
 
   //PLAYER audio (elevenlabs)
@@ -93,6 +108,11 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.stt_model = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'STT_MODEL')?.value
     this.voice_name = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'TTS_VOICE_NAME')?.value
     this.bargeIn = this.selectedChatbot.attributes?.globals?.find(el => el.key === 'BARGE_IN')?.value === 'true'
+    this.bargeInTimingValues = {};
+    BARGE_IN_TIMINGS.forEach(t => {
+      const value = this.selectedChatbot.attributes?.globals?.find(el => el.key === t.key)?.value;
+      this.bargeInTimingValues[t.key] = value === null || value === undefined ? '' : String(value);
+    });
     this.voice_language_list = Array.from( new Map( voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(v => [v.language_code, { language_code: v.language_code, language: v.language }])).values() );
     this.voice_name_list = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.map(mapVoiceForSelect)
     this.voice_language = voiceProviderList.find(el => el.key === this.voiceProvider)?.tts_voice.find(el => el.voiceId === this.voice_name)?.language_code
@@ -225,6 +245,28 @@ export class CDSVoiceSettingsComponent implements OnInit {
     this.logger.log('[CDS-CHATBOT-VOICE-SETTINGS] onChangeBargeIn ', checked)
     this.bargeIn = checked;
     this.findAndUpdateProperty('BARGE_IN', checked ? 'true' : 'false');
+    this.saveAttributes();
+  }
+
+  /** Saves a barge-in timing; '' clears it (default applies), an invalid value is ignored. */
+  onChangeBargeInTiming(key: string, raw: string) {
+    const timing = BARGE_IN_TIMINGS.find(t => t.key === key);
+    if (!timing) return;
+    const text = (raw ?? '').toString().trim();
+    if (text !== '') {
+      const n = Number(text);
+      const max = timing.max ?? Number.MAX_SAFE_INTEGER;
+      if (!/^\d+$/.test(text) || n < timing.min || n > max) {
+        this.logger.warn('[CDS-CHATBOT-VOICE-SETTINGS] invalid barge-in value ignored ', key, raw);
+        // Re-assign so the field shows the saved value again.
+        this.bargeInTimingValues = { ...this.bargeInTimingValues };
+        return;
+      }
+    }
+    const value = text === '' ? null : String(Number(text));
+    if ((this.bargeInTimingValues[key] || null) === value) return;
+    this.bargeInTimingValues[key] = value ?? '';
+    this.findAndUpdateProperty(key, value);
     this.saveAttributes();
   }
 

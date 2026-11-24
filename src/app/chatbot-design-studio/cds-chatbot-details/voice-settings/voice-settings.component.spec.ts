@@ -105,4 +105,67 @@ describe('VoiceSettingsComponent', () => {
 
     expect(fixture.debugElement.query(By.css('#bargeIn'))).toBeNull();
   }));
+
+  // ── Barge-in timings (BARGE_IN_DUCK_* / BARGE_IN_GUARD_MS / BARGE_IN_MIN_WORDS) ──
+
+  function setTiming(key: string, value: string): void {
+    component.onChangeBargeInTiming(key, value);
+  }
+
+  it('reads the barge-in timing globals', fakeAsync(() => {
+    load(makeChatbot(TYPE_CHATBOT.CHATBOT, [
+      { key: 'BARGE_IN', value: 'true' },
+      { key: 'BARGE_IN_DUCK_VOLUME', value: '30' },
+      { key: 'BARGE_IN_DUCK_MAX_MS', value: '4000' },
+    ]));
+
+    expect(component.bargeInTimingValues['BARGE_IN_DUCK_VOLUME']).toBe('30');
+    expect(component.bargeInTimingValues['BARGE_IN_DUCK_MAX_MS']).toBe('4000');
+    expect(component.bargeInTimingValues['BARGE_IN_DUCK_RELEASE_MS']).toBe('');
+  }));
+
+  it('saves a timing as a whole number string', fakeAsync(() => {
+    load(makeChatbot(TYPE_CHATBOT.CHATBOT, [{ key: 'BARGE_IN', value: 'true' }]));
+
+    setTiming('BARGE_IN_DUCK_RELEASE_MS', ' 800 ');
+
+    expect(savedGlobals()).toContain({ key: 'BARGE_IN_DUCK_RELEASE_MS', value: '800' });
+    expect(savedGlobals()).toContain({ key: 'BARGE_IN', value: 'true' });
+  }));
+
+  it('clearing a timing saves null, so the default applies', fakeAsync(() => {
+    load(makeChatbot(TYPE_CHATBOT.CHATBOT, [
+      { key: 'BARGE_IN', value: 'true' },
+      { key: 'BARGE_IN_GUARD_MS', value: '1500' },
+    ]));
+
+    setTiming('BARGE_IN_GUARD_MS', '');
+
+    expect(savedGlobals()).toContain({ key: 'BARGE_IN_GUARD_MS', value: null });
+  }));
+
+  it('does not save an out-of-range timing and keeps the previous value', fakeAsync(() => {
+    load(makeChatbot(TYPE_CHATBOT.CHATBOT, [
+      { key: 'BARGE_IN', value: 'true' },
+      { key: 'BARGE_IN_DUCK_VOLUME', value: '30' },
+    ]));
+    faqKbService.addNodeToChatbotAttributes.calls.reset();
+
+    setTiming('BARGE_IN_DUCK_VOLUME', '150');
+    setTiming('BARGE_IN_MIN_WORDS', '0');
+    setTiming('BARGE_IN_DUCK_MAX_MS', '-5');
+
+    expect(faqKbService.addNodeToChatbotAttributes).not.toHaveBeenCalled();
+    expect(component.bargeInTimingValues['BARGE_IN_DUCK_VOLUME']).toBe('30');
+  }));
+
+  it('shows the timing fields only while barge-in is on', fakeAsync(() => {
+    load(makeChatbot(TYPE_CHATBOT.CHATBOT));
+    expect(fixture.debugElement.query(By.css('#bargeInTimings'))).toBeNull();
+
+    component.onChangeBargeIn(true);
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.queryAll(By.css('#bargeInTimings input')).length).toBe(5);
+  }));
 });
