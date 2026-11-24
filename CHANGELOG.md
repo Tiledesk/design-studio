@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.42.0-rc3
+- **fixed** (feature/barge-in): the barge-in timing fields use the same text and placeholder colors and font as the selects of Voice settings
+
 # 1.42.0-rc2
 - **fixed** (feature/barge-in): the barge-in timing fields of Voice settings have the same layout as the other voice settings: one per row, label above, a box as wide and bordered as the selects, grey hint below
 
