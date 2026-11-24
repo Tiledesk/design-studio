@@ -114,6 +114,41 @@
             </div>
         </div>
 
+        <!--Barge-in (web-widget chatbots, via speech proxy) -->
+        <div *ngIf="showBargeIn" style="margin-bottom: 16px;">
+            <label class="cds-custom-label">
+                {{ 'CDSSetting.BargeIn' | translate }}
+            </label>
+            <cds-toogle id="bargeIn"
+                [checked]="bargeIn"
+                [disabled]="false"
+                (onChangeToggle)="onChangeBargeIn($event)">
+            </cds-toogle>
+            <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                {{ 'CDSSetting.BargeInDescription' | translate }}
+            </span>
+        </div>
+        <!-- Barge-in timings: empty = default. Same layout as the selects above: label, 40% box, grey hint -->
+        <div *ngIf="showBargeIn && bargeIn" id="bargeInTimings">
+            <div *ngFor="let timing of bargeInTimings" style="margin-bottom: 16px;">
+                <label class="cds-custom-label" [for]="'bargeInTiming-' + timing.key">
+                    {{ timing.label | translate }}
+                </label>
+                <div style="width: 40%;">
+                    <input type="number" class="barge-in-timing-input"
+                        [id]="'bargeInTiming-' + timing.key"
+                        [min]="timing.min" [max]="timing.max" step="1"
+                        [placeholder]="timing.defaultValue"
+                        [value]="bargeInTimingValues[timing.key]"
+                        (change)="onChangeBargeInTiming(timing.key, $any($event.target).value)">
+                    <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                        {{ timing.hint | translate: { default: timing.defaultValue } }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
 </div>
