@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.42.0-rc1
+- **added** (feature/barge-in): under the **Barge-in** switch of Voice settings, five optional fields: **Bot volume while the user talks (%)**, **Restore volume after (ms)**, **Max lowered time (ms)**, **Guard time (ms)** and **Minimum words to interrupt**. They are saved as the `BARGE_IN_DUCK_VOLUME`, `BARGE_IN_DUCK_RELEASE_MS`, `BARGE_IN_DUCK_MAX_MS`, `BARGE_IN_GUARD_MS` and `BARGE_IN_MIN_WORDS` globals; empty means the default, out-of-range values are not saved. Same fields as design-studio-v3 3.4.0-rc2
+
 # 1.41.3-rc1
 - **added** (features-2611/conditions-when): reply filters offer all 38 comparisons of the Condition, as in the Design Studio V3: besides the 16 they had, *exists*, *does not exist*, *is not empty*, *does not contain*, *does not end with*, *does not match regex*, *is true*, *is false*, the 6 date comparisons and the 8 list comparisons (contains, does not contain, length). They are read by the engine from the `when` formula, so they need tiledesk-chatbot 3.1.3-rc1 or later (stage) and, in production, the release of features-2611/reply-filters-when
 - **added** (features-2611/conditions-when): **Ignore uppercase and lowercase**, a checkbox under the value of text comparisons (is equal to, contains, starts with, ends with and their negations), in the Condition and in reply filters. Off by default. It gives back the case-insensitive filters that new reply filters lost in July (*starts with ignore case*, *contains ignore case*), and makes *ends with* case-insensitive again for whoever needs it
