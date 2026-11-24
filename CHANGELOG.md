@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.42.0-rc2
+- **fixed** (feature/barge-in): the barge-in timing fields of Voice settings have the same layout as the other voice settings: one per row, label above, a box as wide and bordered as the selects, grey hint below
+
 # 1.42.0-rc1
 - **added** (feature/barge-in): under the **Barge-in** switch of Voice settings, five optional fields: **Bot volume while the user talks (%)**, **Restore volume after (ms)**, **Max lowered time (ms)**, **Guard time (ms)** and **Minimum words to interrupt**. They are saved as the `BARGE_IN_DUCK_VOLUME`, `BARGE_IN_DUCK_RELEASE_MS`, `BARGE_IN_DUCK_MAX_MS`, `BARGE_IN_GUARD_MS` and `BARGE_IN_MIN_WORDS` globals; empty means the default, out-of-range values are not saved. Same fields as design-studio-v3 3.4.0-rc2
 
