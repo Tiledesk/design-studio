@@ -7,6 +7,9 @@
 ### **Copyrigth**: 
 *Tiledesk SRL*
 
+# 1.42.0
+- **added** (feature/barge-in): **Barge-in** switch in Voice settings of web-widget agents (`BARGE_IN` global): the user can interrupt the bot while it is speaking. Under it, five optional fields in the same layout as the other voice settings: **Bot volume while the user talks (%)**, **Restore volume after (ms)**, **Max lowered time (ms)**, **Guard time (ms)** and **Minimum words to interrupt** (`BARGE_IN_DUCK_VOLUME`, `BARGE_IN_DUCK_RELEASE_MS`, `BARGE_IN_DUCK_MAX_MS`, `BARGE_IN_GUARD_MS`, `BARGE_IN_MIN_WORDS`); empty means the default. They need speech proxy 1.1.0 and widget 5.3.3
+
 # 1.41.4
 - **added** (features-2611/conditions-when): reply filters offer all 38 comparisons of the Condition, as in the V3: 22 more than before (exists, does not exist, is not empty, does not contain, does not end with, does not match regex, is true, is false, dates, lists and their length). They need tiledesk-chatbot with features-2611/reply-filters-when (3.1.3-rc1 or later)
 - **added** (features-2611/conditions-when): **Ignore uppercase and lowercase**, a checkbox on text comparisons in the Condition and in reply filters, off by default
