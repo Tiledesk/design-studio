@@ -53,22 +53,21 @@
     }
 }
 
-.barge-in-timings {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px 30px;
-    width: 80%;
-    margin-bottom: 16px;
+// Barge-in timing fields: same box as the other settings inputs (assets/sass/cds/settings-section.scss)
+.barge-in-timing-input {
+    display: block;
+    width: 100%;
+    height: 36px;
+    padding: 0 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border-radius: var(--input-border-radius-base);
+    border: solid 1px var(--blu-light-02);
+    background-color: var(--dm-surface, var(--color-white-hex));
+    color: var(--dm-text, inherit);
+    outline: none;
 
-    .barge-in-timing {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .barge-in-timing-hint {
-        color: #9aa0a6;
-        font-size: 12px;
-        font-weight: 400;
+    &:focus {
+        border-color: var(--blu);
     }
 }

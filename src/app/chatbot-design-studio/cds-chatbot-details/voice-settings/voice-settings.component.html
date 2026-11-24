@@ -128,21 +128,23 @@
                 {{ 'CDSSetting.BargeInDescription' | translate }}
             </span>
         </div>
-        <!-- Barge-in timings: empty = default -->
-        <div *ngIf="showBargeIn && bargeIn" id="bargeInTimings" class="barge-in-timings">
-            <div *ngFor="let timing of bargeInTimings" class="barge-in-timing">
+        <!-- Barge-in timings: empty = default. Same layout as the selects above: label, 40% box, grey hint -->
+        <div *ngIf="showBargeIn && bargeIn" id="bargeInTimings">
+            <div *ngFor="let timing of bargeInTimings" style="margin-bottom: 16px;">
                 <label class="cds-custom-label" [for]="'bargeInTiming-' + timing.key">
                     {{ timing.label | translate }}
                 </label>
-                <input type="number" class="form-control"
-                    [id]="'bargeInTiming-' + timing.key"
-                    [min]="timing.min" [max]="timing.max" step="1"
-                    [placeholder]="timing.defaultValue"
-                    [value]="bargeInTimingValues[timing.key]"
-                    (change)="onChangeBargeInTiming(timing.key, $any($event.target).value)">
-                <span class="barge-in-timing-hint">
-                    {{ timing.hint | translate: { default: timing.defaultValue } }}
-                </span>
+                <div style="width: 40%;">
+                    <input type="number" class="barge-in-timing-input"
+                        [id]="'bargeInTiming-' + timing.key"
+                        [min]="timing.min" [max]="timing.max" step="1"
+                        [placeholder]="timing.defaultValue"
+                        [value]="bargeInTimingValues[timing.key]"
+                        (change)="onChangeBargeInTiming(timing.key, $any($event.target).value)">
+                    <span style="color: #9aa0a6;font-size: 12px;font-weight: 400;">
+                        {{ timing.hint | translate: { default: timing.defaultValue } }}
+                    </span>
+                </div>
             </div>
         </div>
 
